@@ -22,7 +22,7 @@ from common.djangoapps.student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseBlock
 from xmodule.error_module import ErrorBlock
 from xmodule.x_module import XModule
-from openedx.features.genplus_features.genplus_learning.models import ProgramAccessRole
+from genplus.lms.djangoapps.genplus_learning.models import ProgramAccessRole
 
 
 from .access import has_access

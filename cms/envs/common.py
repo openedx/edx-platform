@@ -1616,7 +1616,7 @@ GENPLUS_INSTALLED_APPS = [
     'openedx.features.genplus_features.genplus_learning',
 
     # genplus badges app
-    'openedx.features.genplus_features.genplus_badges',
+    # 'openedx.features.genplus_features.genplus_badges',
 
     # genplus assessments app
     'openedx.features.genplus_features.genplus_assessments',

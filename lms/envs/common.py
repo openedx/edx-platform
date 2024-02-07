@@ -3134,16 +3134,16 @@ GENPLUS_INSTALLED_APPS = [
     # 'openedx.features.genplus_features.genplus',
 
     # genplus learning app
-    'openedx.features.genplus_features.genplus_learning',
+    # 'openedx.features.genplus_features.genplus_learning',
 
     # genplus teach app
     # 'openedx.features.genplus_features.genplus_teach',
 
     # genplus badges app
-    'openedx.features.genplus_features.genplus_badges',
+    # 'openedx.features.genplus_features.genplus_badges',
 
     # genplus assessments app
-    'openedx.features.genplus_features.genplus_assessments',
+    # 'openedx.features.genplus_features.genplus_assessments',
 
     # installed third party apps
     'tinymce',
