@@ -1613,13 +1613,13 @@ INSTALLED_APPS = [
 GENPLUS_INSTALLED_APPS = [
 
     # genplus learning app
-    'openedx.features.genplus_features.genplus_learning',
+    # 'openedx.features.genplus_features.genplus_learning',
 
     # genplus badges app
     # 'openedx.features.genplus_features.genplus_badges',
 
     # genplus assessments app
-    'openedx.features.genplus_features.genplus_assessments',
+    # 'openedx.features.genplus_features.genplus_assessments',
 ]
 
 INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
