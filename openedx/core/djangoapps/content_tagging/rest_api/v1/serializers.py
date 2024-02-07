@@ -13,6 +13,8 @@ from openedx_tagging.core.tagging.rest_api.v1.serializers import (
 
 from organizations.models import Organization
 
+from ...models import TaxonomyOrg
+
 
 class TaxonomyOrgListQueryParamsSerializer(TaxonomyListQueryParamsSerializer):
     """
@@ -73,8 +75,11 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
     def get_orgs(self, obj) -> list[str]:
         """
         Return the list of orgs for the taxonomy.
-         """
-        return [taxonomy_org.org.short_name for taxonomy_org in obj.taxonomyorg_set.all() if taxonomy_org.org]
+        """
+        return [
+            taxonomy_org.org.short_name for taxonomy_org in obj.taxonomyorg_set.all()
+            if taxonomy_org.org and taxonomy_org.rel_type == TaxonomyOrg.RelType.OWNER
+        ]
 
     def get_all_orgs(self, obj) -> bool:
         """
@@ -82,7 +87,7 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
         """
         is_all_orgs = False
         for taxonomy_org in obj.taxonomyorg_set.all():
-            if taxonomy_org.org_id is None:
+            if taxonomy_org.org_id is None and taxonomy_org.rel_type == TaxonomyOrg.RelType.OWNER:
                 return True
         return False
 
