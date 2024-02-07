@@ -3343,13 +3343,12 @@ INSTALLED_APPS = [
     # Notifications
     'openedx.core.djangoapps.notifications',
 
-
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
-    "openedx_learning.core.components.apps.ComponentsConfig",
-    "openedx_learning.core.contents.apps.ContentsConfig",
-    "openedx_learning.core.publishing.apps.PublishingConfig",
+    "openedx_learning.core.components",
+    "openedx_learning.core.contents",
+    "openedx_learning.core.publishing",
 ]
 
 OPENEDX_LEARNING = {
