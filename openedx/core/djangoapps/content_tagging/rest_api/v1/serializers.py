@@ -15,38 +15,26 @@ from openedx_tagging.core.tagging.rest_api.v1.serializers import (
 from organizations.models import Organization
 
 
-class OptionalSlugRelatedField(serializers.SlugRelatedField):
-    """
-    Modifies the DRF serializer SlugRelatedField.
-
-    Non-existent slug values are represented internally as an empty queryset, instead of throwing a validation error.
-    """
-
-    def to_internal_value(self, data):
-        """
-        Returns the object related to the given slug value, or an empty queryset if not found.
-        """
-
-        queryset = self.get_queryset()
-        try:
-            return queryset.get(**{self.slug_field: data})
-        except ObjectDoesNotExist:
-            return queryset.none()
-        except (TypeError, ValueError):
-            self.fail('invalid')
-
-
 class TaxonomyOrgListQueryParamsSerializer(TaxonomyListQueryParamsSerializer):
     """
     Serializer for the query params for the GET view
     """
 
-    org: fields.Field = OptionalSlugRelatedField(
-        slug_field="short_name",
-        queryset=Organization.objects.all(),
+    org: fields.Field = serializers.CharField(
         required=False,
     )
     unassigned: fields.Field = serializers.BooleanField(required=False)
+
+    def validate(self, attrs: dict) -> dict:
+        """
+        Validate the serializer data
+       """
+        if "org" in attrs and "unassigned" in attrs:
+            raise serializers.ValidationError(
+                "'org' and 'unassigned' params cannot be both defined"
+            )
+
+        return attrs
 
 
 class TaxonomyUpdateOrgBodySerializer(serializers.Serializer):

@@ -145,11 +145,11 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
     )
     @ddt.unpack
     def test_get_taxonomies_for_org(self, org_attr, enabled, expected):
-        org_owner = getattr(self, org_attr) if org_attr else None
+        org_owner = getattr(self, org_attr).short_name if org_attr else None
         taxonomies = list(
             taxonomy.cast()
             for taxonomy in api.get_taxonomies_for_org(
-                org_owner=org_owner, enabled=enabled
+                org_short_name=org_owner, enabled=enabled
             )
         )
         assert taxonomies == [

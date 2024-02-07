@@ -56,12 +56,7 @@ class TaxonomyOrgView(TaxonomyView):
         query_params = TaxonomyOrgListQueryParamsSerializer(data=self.request.query_params.dict())
         query_params.is_valid(raise_exception=True)
         enabled = query_params.validated_data.get("enabled", None)
-        unassigned = query_params.validated_data.get("unassigned", None)
         org = query_params.validated_data.get("org", None)
-
-        # Raise an error if both "org" and "unassigned" query params were provided
-        if "org" in query_params.validated_data and "unassigned" in query_params.validated_data:
-            raise ValidationError("'org' and 'unassigned' params cannot be both defined")
 
         # If org filtering was requested, then use it, even if the org is invalid/None
         if "org" in query_params.validated_data:
