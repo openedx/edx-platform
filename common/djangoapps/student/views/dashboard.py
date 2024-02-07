@@ -30,7 +30,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_st
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.learner_home.waffle import should_redirect_to_learner_home_mfe
+from lms.djangoapps.learner_home.waffle import learner_home_mfe_enabled
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
@@ -521,7 +521,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     if not UserProfile.objects.filter(user=user).exists():
         return redirect(reverse('account_settings'))
 
-    if should_redirect_to_learner_home_mfe(user):
+    if learner_home_mfe_enabled():
         return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
