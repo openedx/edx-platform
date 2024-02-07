@@ -5,8 +5,6 @@ Tests for toggles, where there is logic beyond enable/disable.
 from unittest.mock import patch
 import ddt
 
-from django.test import override_settings
-
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.learner_home.waffle import learner_home_mfe_enabled
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
