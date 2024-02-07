@@ -1146,6 +1146,7 @@ class ReplaceUsernamesView(APIView):
 
     """
 
+    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)
 
     def post(self, request):
