@@ -221,7 +221,10 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     if not object_id:
         return True
 
-    context_key = get_context_key_from_key_string(object_id)
+    try:
+        context_key = get_context_key_from_key_string(object_id)
+    except ValueError:
+        return False
 
     return has_studio_write_access(user, context_key)
 
@@ -247,7 +250,10 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     if not object_id:
         raise ValueError("object_id must be provided")
 
-    context_key = get_context_key_from_key_string(object_id)
+    try:
+        context_key = get_context_key_from_key_string(object_id)
+    except ValueError:
+        return False
 
     return has_studio_read_access(user, context_key)
 

@@ -1697,6 +1697,17 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    def test_tag_invalid_object(self):
+        """
+        Test that we cannot tag an object that is not a CouseKey, LibraryLocatorV2 or UsageKey
+        """
+        url = OBJECT_TAG_UPDATE_URL.format(object_id='invalid_key', taxonomy_id=self.tA1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     def test_get_tags(self):
         """
         Test that we can get tags for an object
