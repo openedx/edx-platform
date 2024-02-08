@@ -1768,8 +1768,8 @@ DATABASES = {
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-# This will be overridden through LMS config
-DEFAULT_HASHING_ALGORITHM = 'sha1'
+DEFAULT_HASHING_ALGORITHM = 'sha256'
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
@@ -5063,8 +5063,6 @@ ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 # .. toggle_target_removal_date: 2024-04-01
 # .. toggle_tickets: https://2u-internal.atlassian.net/browse/VAN-1797
 ENFORCE_SESSION_EMAIL_MATCH = False
-
-LEARNER_HOME_MFE_REDIRECT_PERCENTAGE = 0
 
 ############### Settings for the ace_common plugin #################
 # Note that all settings are actually defined by the plugin
