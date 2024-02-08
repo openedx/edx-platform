@@ -305,7 +305,7 @@ def get_metadata(queryset, text_search=None):
             title=lib.learning_package.title if lib.learning_package else "",
             type=lib.type,
             description="",
-            version=None,
+            version=0,
             allow_public_learning=lib.allow_public_learning,
             allow_public_read=lib.allow_public_read,
             num_blocks=0,
@@ -348,9 +348,28 @@ def get_library(library_key):
     has_unpublished_changes = publishing_api.get_entities_with_unpublished_changes(
                                   learning_package.id
                               ).exists()
+
+    # I'm doing this one to match what was already existing, but I'm not clear
+    # on the use case for it.
     has_unpublished_deletes = publishing_api.get_entities_with_unpublished_deletes(
                                   learning_package.id
                               ).exists()
+
+    # Learning Core doesn't really have a notion of a global version number,but
+    # we can sort of approximate it by using the primary key of the last publish
+    # log entry, in the sense that it will be a monotonically increasing
+    # integer, though there will be large gaps. We use 0 to denote that nothing
+    # has been done, since that will never be a valid value for a PublishLog pk.
+    #
+    # That being said, we should figure out if we really even want to keep a top
+    # level version indicator for the Library as a whole. In the v1 libs
+    # implemention, this served as a way to know whether or not there was an
+    # updated version of content that a course could pull in. But more recently,
+    # we've decided to do those version references at the level of the
+    # individual blocks being used, since a Learning Core backed library is
+    # intended to be used for many LibraryContentBlocks and not 1:1 like v1
+    # libraries
+    version = 0 if last_publish_log is None else last_publish_log.pk
 
     return ContentLibraryMetadata(
         key=library_key,
@@ -358,7 +377,7 @@ def get_library(library_key):
         type=ref.type,
         description=ref.learning_package.description,
         num_blocks=num_blocks,
-        version=None if last_publish_log is None else last_publish_log.pk,
+        version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
         allow_lti=ref.allow_lti,
         allow_public_learning=ref.allow_public_learning,
@@ -571,11 +590,13 @@ def delete_library(library_key):
     Delete a content library
     """
     content_lib = ContentLibrary.objects.get_by_key(library_key)
+    learning_package = content_lib.learning_package
 
-    # TODO: Move the delete() operation to an API call
-    # TODO: Should we detach the LearningPackage and delete it asynchronously?
-    content_lib.learning_package.delete()
     content_lib.delete()
+
+    # TODO: Move the LearningPackage delete() operation to an API call
+    # TODO: Should we detach the LearningPackage and delete it asynchronously?
+    learning_package.delete()
 
     CONTENT_LIBRARY_DELETED.send_event(
         content_library=ContentLibraryData(
@@ -673,8 +694,12 @@ def set_library_block_olx(usage_key, new_olx_str):
     # XBlock that's broken or missing.
     component = get_component_from_usage_key(usage_key)
 
-    # Get the title from the new OLX
-    new_title = node.attrib.get("display_name", "")
+    # Get the title from the new OLX (or default to the default specified on the
+    # XBlock's display_name field.
+    new_title = node.attrib.get(
+        "display_name",
+        xblock_type_display_name(usage_key.block_type),
+    )
 
     now = datetime.now(tz=timezone.utc)
 

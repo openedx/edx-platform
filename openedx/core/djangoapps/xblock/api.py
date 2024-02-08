@@ -23,6 +23,7 @@ from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocator
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchViewError
+from xblock.plugin import PluginMissingError
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
@@ -189,14 +190,20 @@ def xblock_type_display_name(block_type):
     """
     Get the display name for the specified XBlock class.
     """
-    block_class = XBlock.load_class(block_type)
+    try:
+        # We want to be able to give *some* value, even if the XBlock is later
+        # uninstalled.
+        block_class = XBlock.load_class(block_type)
+    except PluginMissingError:
+        return block_type
+
     if hasattr(block_class, 'display_name') and block_class.display_name.default:
         return _(block_class.display_name.default)  # pylint: disable=translation-of-non-string
     else:
         return block_type  # Just use the block type as the name
 
 
-def _get_component_from_usage_key(self, usage_key):
+def _get_component_from_usage_key(usage_key):
     learning_package = publishing_api.get_learning_package_by_key(str(usage_key.lib_key))
     return components_api.get_component_by_key(
         learning_package.id,
@@ -212,9 +219,12 @@ def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
     # Inefficient but simple approach first
     component = _get_component_from_usage_key(usage_key)
     component_version = component.versioning.draft
-    text_content = component_version.contents.get(key="block.xml").text_content
 
-    return text_content.text
+    # TODO: we should probably make a method on ComponentVersion that returns
+    # a content based on the name.
+    content = component_version.contents.get(componentversioncontent__key="block.xml")
+
+    return content.text
 
 
 def get_block_display_name(block_or_key):

@@ -77,10 +77,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
         }
-        self.assertDictContainsEntries(lib, expected_data)
-        # Check that bundle_uuid looks like a valid UUID
-        UUID(lib["bundle_uuid"])  # will raise an exception if not valid
 
+        self.assertDictContainsEntries(lib, expected_data)
         # Read:
         lib2 = self._get_library(lib["id"])
         self.assertDictContainsEntries(lib2, expected_data)
@@ -219,7 +217,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         assert lib['has_unpublished_changes'] is False
 
         # A library starts out empty:
-        assert self._get_library_blocks(lib_id) == []
+        assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'problem' XBlock to the library:
         block_data = self._add_block_to_library(lib_id, "problem", "problem1")
@@ -235,7 +233,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         assert 'def_key' in block_data
 
         # now the library should contain one block and have unpublished changes:
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
@@ -244,7 +242,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
         # Now update the block's OLX:
         orig_olx = self._get_library_block_olx(block_id)
@@ -307,7 +305,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         assert lib['has_unpublished_changes'] is False
 
         # A library starts out empty:
-        assert self._get_library_blocks(lib_id) == []
+        assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'html' XBlock to the library:
         block_data = self._add_block_to_library(lib_id, "html", "html1")
@@ -318,12 +316,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
             "has_unpublished_changes": True,
         })
         block_id = block_data["id"]
-        # Confirm that the result contains a definition key, but don't check its value,
-        # which for the purposes of these tests is an implementation detail.
-        assert 'def_key' in block_data
 
         # now the library should contain one block and have unpublished changes:
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
@@ -332,7 +327,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
         # Now update the block's OLX:
         orig_olx = self._get_library_block_olx(block_id)
@@ -361,25 +356,20 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
         block2 = self._add_block_to_library(lib["id"], "unit", "unit1")
 
-        self._add_block_to_library(lib["id"], "problem", "problem2", parent_block=block2["id"])
-
-        result = self._get_library_blocks(lib["id"])
-        assert len(result) == 2
+        response = self._get_library_blocks(lib["id"])
+        result = response['results']
+        assert len(response['results']) == 2
         assert block1 in result
-
-        result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
-        assert len(result['results']) == 2
-        assert result['next'] is None
+        assert response['next'] is None
 
         self._add_block_to_library(lib["id"], "problem", "problem3")
+
         # Test pagination
         result = self._get_library_blocks(lib["id"])
-        assert len(result) == 3
-        result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
         assert len(result['results']) == 2
+
         assert 'page=2' in result['next']
-        assert 'pagination=true' in result['next']
-        result = self._get_library_blocks(lib["id"], {'pagination': 'true', 'page': '2'})
+        result = self._get_library_blocks(lib["id"], {'page': '2'})
         assert len(result['results']) == 1
         assert result['next'] is None
 
