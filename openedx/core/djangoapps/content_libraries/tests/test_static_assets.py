@@ -1,6 +1,7 @@
 """
 Tests for static asset files in Blockstore-based Content Libraries
 """
+from unittest import skip
 
 from openedx.core.djangoapps.content_libraries.tests.base import (
     ContentLibrariesRestApiTest,
@@ -22,7 +23,8 @@ I'm Anant Agarwal, I'm the president of edX,
 """
 
 
-class ContentLibrariesStaticAssetsTestMixin:
+@skip("Assets are being reimplemented in Learning Core. Disable until that's ready.")
+class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
     """
     Tests for static asset files in Blockstore-based Content Libraries
 
@@ -106,12 +108,3 @@ class ContentLibrariesStaticAssetsTestMixin:
         self._commit_library_changes(library["id"])
         check_sjson()
         check_download()
-
-
-class ContentLibrariesStaticAssetsTest(
-    ContentLibrariesStaticAssetsTestMixin,
-    ContentLibrariesRestApiTest,
-):
-    """
-    Tests for static asset files in Blockstore-based Content Libraries, using the installed Blockstore app.
-    """

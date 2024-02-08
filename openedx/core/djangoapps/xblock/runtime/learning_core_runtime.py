@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 from weakref import WeakKeyDictionary
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db.transaction import atomic
 
@@ -20,7 +21,7 @@ from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 
 from xblock.core import XBlock
-from xblock.exceptions import InvalidScopeError, NoSuchDefinition
+from xblock.exceptions import InvalidScopeError, NoSuchDefinition, NoSuchUsage
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope, Sentinel
 from xblock.field_data import FieldData
 
@@ -203,12 +204,17 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         where the definitive place should be and have everything else call that.
         """
         learning_package = publishing_api.get_learning_package_by_key(str(usage_key.lib_key))
-        return components_api.get_component_by_key(
-            learning_package.id,
-            namespace='xblock.v1',
-            type_name=usage_key.block_type,
-            local_key=usage_key.block_id,
-        )
+        try:
+            component = components_api.get_component_by_key(
+                learning_package.id,
+                namespace='xblock.v1',
+                type_name=usage_key.block_type,
+                local_key=usage_key.block_id,
+            )
+        except ObjectDoesNotExist:
+            raise NoSuchUsage(usage_key)
+
+        return component
 
     def _lookup_asset_url(self, block: XBlock, asset_path: str):  # pylint: disable=unused-argument
         """
@@ -242,6 +248,9 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # just get it the easy way.
         component = self._get_component_from_usage_key(usage_key)
         component_version = component.versioning.draft
+        if component_version is None:
+            raise NoSuchUsage(usage_key)
+
         content = component_version.contents.get(
             componentversioncontent__key="block.xml"
         )

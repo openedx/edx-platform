@@ -428,6 +428,10 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
 
         This is a single giant test case, because that optimizes for the fastest
         test run time, even though it can make debugging failures harder.
+
+        TODO: The asset permissions part of this test have been commented out
+        for now. These should be re-enabled after we re-implement them over
+        Learning Core data models.
         """
         # Create a few users to use for all of these tests:
         admin = UserFactory.create(username="Admin", email="admin@example.com")
@@ -552,17 +556,17 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         # But if we grant allow_public_read, then they can:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
-            self._set_library_block_asset(block3_key, "whatever.png", b"data")
+            # self._set_library_block_asset(block3_key, "whatever.png", b"data")
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key)
-            self._get_library_block_assets(block3_key)
-            self._get_library_block_asset(block3_key, file_name="whatever.png")
+            # self._get_library_block_assets(block3_key)
+            # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
         # Users without authoring permission cannot edit nor delete XBlocks (this library has allow_public_read False):
         for user in [reader, random_user]:
             with self.as_user(user):
                 self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
-                self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
+                # self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
                 self._delete_library_block(block3_key, expect_response=403)
                 self._commit_library_changes(lib_id, expect_response=403)
                 self._revert_library_changes(lib_id, expect_response=403)
@@ -571,9 +575,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         with self.as_user(author_group_member):
             olx = self._get_library_block_olx(block3_key)
             self._set_library_block_olx(block3_key, olx)
-            self._get_library_block_assets(block3_key)
-            self._set_library_block_asset(block3_key, "test.txt", b"data")
-            self._get_library_block_asset(block3_key, file_name="test.txt")
+            # self._get_library_block_assets(block3_key)
+            # self._set_library_block_asset(block3_key, "test.txt", b"data")
+            # self._get_library_block_asset(block3_key, file_name="test.txt")
             self._delete_library_block(block3_key)
             self._commit_library_changes(lib_id)
             self._revert_library_changes(lib_id)  # This is a no-op after the commit, but should still have 200 response

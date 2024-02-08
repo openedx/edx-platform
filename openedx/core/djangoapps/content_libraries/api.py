@@ -659,8 +659,21 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
 
 def get_library_block(usage_key) -> LibraryXBlockMetadata:
     """Get metadata (LibraryXBlockMetadata) about one specific XBlock in a library"""
-    component = get_component_from_usage_key(usage_key)
+    try:
+        component = get_component_from_usage_key(usage_key)
+    except ObjectDoesNotExist:
+        raise ContentLibraryBlockNotFound(usage_key)
+
+    # The component might have existed at one point, but no longer does because
+    # the draft was soft-deleted. This is actually a weird edge case and I'm not
+    # clear on what the proper behavior should be, since (a) the published
+    # version still exists; and (b) we might want to make some queries on the
+    # block even after it's been removed, since there might be versioned
+    # references to it.
     draft_version = component.versioning.draft
+    if not draft_version:
+        raise ContentLibraryBlockNotFound(usage_key)
+
     published_version = component.versioning.published
 
     return LibraryXBlockMetadata(

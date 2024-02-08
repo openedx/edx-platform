@@ -14,14 +14,11 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth import authenticate
-from django.contrib.auth import get_user_model
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
 from django.db.transaction import atomic
-from django.http import Http404
-from django.http import HttpResponseBadRequest
-from django.http import JsonResponse
+from django.db.models import Q
+from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -49,6 +46,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from xblock.exceptions import NoSuchUsage
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
@@ -169,13 +167,13 @@ class LibraryRootView(APIView):
         paginator = LibraryApiPagination()
         queryset = api.get_libraries_for_user(request.user, org=org, library_type=library_type)
 
-        #if text_search:
-        #    result = api.get_metadata_from_index(queryset, text_search=text_search)
-        #    result = paginator.paginate_queryset(result, request)
-        #else:
-        #    # We can paginate queryset early and prevent fetching unneeded metadata
-        #    paginated_qs = paginator.paginate_queryset(queryset, request)
-        #    result = api.get_metadata_from_index(paginated_qs)
+        if text_search:
+            queryset = queryset.filter(
+                Q(slug__icontains=text_search) |
+                Q(org__short_name__icontains=text_search) |
+                Q(learning_package__title__icontains=text_search) |
+                Q(learning_package__description__icontains=text_search)
+            )
 
         paginated_qs = paginator.paginate_queryset(queryset, request)
         result = api.get_metadata(paginated_qs)
@@ -483,6 +481,7 @@ class LibraryBlocksView(APIView):
             )
         ],
     )
+
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -530,7 +529,6 @@ class LibraryBlockView(APIView):
     """
     Views to work with an existing XBlock in a content library.
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -538,7 +536,11 @@ class LibraryBlockView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_library_block(key)
+        try:
+            result = api.get_library_block(key)
+        except NoSuchUsage:
+            raise ContentLibraryBlockNotFound(key)
+
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
     @atomic
