@@ -110,6 +110,7 @@ class TestTaxonomyObjectsMixin:
             title="Library Org A",
             description="This is a library from Org A",
         )
+        self.libraryA = str(self.content_libraryA.key)
 
     def _setUp_users(self):
         """
@@ -127,9 +128,15 @@ class TestTaxonomyObjectsMixin:
 
         self.staffA = User.objects.create(
             username="staffA",
-            email="userA@example.com",
+            email="staffA@example.com",
         )
         update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
+
+        self.staffB = User.objects.create(
+            username="staffB",
+            email="staffB@example.com",
+        )
+        update_org_role(self.staff, OrgStaffRole, self.staffB, [self.orgB.short_name])
 
         self.content_creatorA = User.objects.create(
             username="content_creatorA",
@@ -1380,7 +1387,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     """
 
     @ddt.data(
-        # userA and userS are staff in courseA and can tag using enabled taxonomies
+        # staffA and staff are staff in courseA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
@@ -1465,7 +1472,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        # userA and userS are staff in courseA (owner of xblockA) and can tag using any taxonomies
+        # staffA and staff are staff in courseA (owner of xblockA) and can tag using any taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
@@ -1549,6 +1556,129 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
+        # staffA and staff are staff in libraryA and can tag using enabled taxonomies
+        ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", [], status.HTTP_200_OK),
+        ("staff", "tA1", [], status.HTTP_200_OK),
+        ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_tag_library(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        """
+        Tests that only staff and org level users can tag libraries
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": tag_values}, format="json")
+
+        assert response.status_code == expected_status
+        if status.is_success(expected_status):
+            tags_by_taxonomy = response.data[str(self.libraryA)]["taxonomies"]
+            if tag_values:
+                response_taxonomy = tags_by_taxonomy[0]
+                assert response_taxonomy["name"] == taxonomy.name
+                response_tags = response_taxonomy["tags"]
+                assert [t["value"] for t in response_tags] == tag_values
+            else:
+                assert tags_by_taxonomy == []  # No tags are set from any taxonomy
+
+            # Check that re-fetching the tags returns what we set
+            new_response = self.client.get(url, format="json")
+            assert status.is_success(new_response.status_code)
+            assert new_response.data == response.data
+
+    @ddt.data(
+        "staffA",
+        "staff",
+    )
+    def test_tag_library_disabled_taxonomy(self, user_attr):
+        """
+        Nobody can use disabled taxonomies to tag objects
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        disabled_taxonomy = self.tA2
+        assert disabled_taxonomy.enabled is False
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=disabled_taxonomy.pk)
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(
+        ("staffA", "tA1"),
+        ("staff", "tA1"),
+        ("staffA", "multiple_taxonomy"),
+        ("staff", "multiple_taxonomy"),
+    )
+    @ddt.unpack
+    def test_tag_library_invalid(self, user_attr, taxonomy_attr):
+        """
+        Tests that nobody can add invalid tags to a library using a closed taxonomy
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": ["invalid"]}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @ddt.data(
+        ("staff", status.HTTP_200_OK),
+        ("staffA", status.HTTP_403_FORBIDDEN),
+        ("staffB", status.HTTP_403_FORBIDDEN),
+    )
+    @ddt.unpack
+    def test_tag_cross_org(self, user_attr, expected_status):
+        """
+        Tests that only global admins can add a taxonomy from orgA to an object from orgB
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseB, taxonomy_id=self.tA1.pk)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == expected_status
+
+    @ddt.data(
+        ("staff", status.HTTP_200_OK),
+        ("staffA", status.HTTP_403_FORBIDDEN),
+        ("staffB", status.HTTP_403_FORBIDDEN),
+    )
+    @ddt.unpack
+    def test_tag_no_org(self, user_attr, expected_status):
+        """
+        Tests that only global admins can add a no-org taxonomy to an object
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=self.ot1.pk)
+
+        response = self.client.put(url, {"tags": []}, format="json")
+
+        assert response.status_code == expected_status
+
+    @ddt.data(
         "courseB",
         "xblockB",
     )
@@ -1581,7 +1711,21 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    def test_tag_invalid_object(self):
+        """
+        Test that we cannot tag an object that is not a CouseKey, LibraryLocatorV2 or UsageKey
+        """
+        url = OBJECT_TAG_UPDATE_URL.format(object_id='invalid_key', taxonomy_id=self.tA1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     def test_get_tags(self):
+        """
+        Test that we can get tags for an object
+        """
         self.client.force_authenticate(user=self.staffA)
         taxonomy = self.multiple_taxonomy
         tag_values = ["Tag 1", "Tag 2"]
@@ -1621,7 +1765,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         object_key = self.courseA
         object_id = str(object_key)
-        tagging_api.tag_content_object(object_key=object_key, taxonomy=self.t1, tags=["anvil", "android"])
+        tagging_api.tag_object(object_id=object_id, taxonomy=self.t1, tags=["anvil", "android"])
         expected_tags = [
             {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": True},
             {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": True},
