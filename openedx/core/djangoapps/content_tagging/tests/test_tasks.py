@@ -73,7 +73,7 @@ class TestAutoTagging(  # type: ignore[misc]
 
         If value is None, check if the ObjectTag does not exists
         """
-        object_tags = list(api.get_content_tags(object_key, taxonomy_id=taxonomy_id))
+        object_tags = list(api.get_object_tags(str(object_key), taxonomy_id=taxonomy_id))
         object_tag = object_tags[0] if len(object_tags) == 1 else None
         if len(object_tags) > 1:
             raise ValueError("Found too many object tags")
@@ -166,7 +166,11 @@ class TestAutoTagging(  # type: ignore[misc]
 
         # Simulates user manually changing a tag
         lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
-        api.tag_content_object(course.id, lang_taxonomy, ["Español (España)"])
+        api.tag_object(
+            object_id=str(course.id),
+            taxonomy=lang_taxonomy,
+            tags=["Español (España)"]
+        )
 
         # Update course language
         course.language = "en"

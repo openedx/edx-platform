@@ -4,6 +4,8 @@ Serializers for Enhanced Staff Grader (ESG)
 # pylint: disable=abstract-method
 # pylint: disable=missing-function-docstring
 
+from urllib.parse import urljoin
+from django.conf import settings
 from rest_framework import serializers
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -191,10 +193,16 @@ class InitializeSerializer(serializers.Serializer):
 class UploadedFileSerializer(serializers.Serializer):
     """Serializer for a file uploaded as a part of a response"""
 
-    downloadUrl = serializers.URLField(source="download_url")
+    downloadUrl = serializers.SerializerMethodField(method_name="get_download_url")
     description = serializers.CharField()
     name = serializers.CharField()
     size = serializers.IntegerField()
+
+    def get_download_url(self, obj):
+        """
+        Get the representation for SerializerMethodField `downloadUrl`
+        """
+        return urljoin(settings.LMS_ROOT_URL, obj.get("download_url"))
 
 
 class ResponseSerializer(serializers.Serializer):

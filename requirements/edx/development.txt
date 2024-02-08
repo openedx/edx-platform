@@ -145,14 +145,14 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.34.30
+boto3==1.34.35
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.30
+botocore==1.34.35
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -181,7 +181,7 @@ celery==5.3.6
     #   edx-enterprise
     #   event-tracking
     #   openedx-learning
-certifi==2023.11.17
+certifi==2024.2.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -255,7 +255,7 @@ click-repl==0.3.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   celery
-code-annotations==1.5.0
+code-annotations==1.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -463,7 +463,7 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-debug-toolbar==4.2.0
+django-debug-toolbar==4.3.0
     # via -r requirements/edx/development.in
 django-environ==0.11.2
     # via
@@ -482,7 +482,7 @@ django-filter==23.5
     #   edx-enterprise
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==6.0.3
+django-ipware==6.0.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -744,7 +744,7 @@ edx-django-utils==5.10.1
     #   openedx-blockstore
     #   ora2
     #   super-csv
-edx-drf-extensions==10.1.0
+edx-drf-extensions==10.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -757,7 +757,7 @@ edx-drf-extensions==10.1.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.11.6
+edx-enterprise==4.11.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -840,7 +840,7 @@ edx-tincan-py35==1.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-toggles==5.1.0
+edx-toggles==5.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -898,11 +898,11 @@ execnet==2.0.2
     #   pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.txt
-faker==22.6.0
+faker==22.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.109.0
+fastapi==0.109.2
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1155,7 +1155,7 @@ mailsnake==1.6.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-mako==1.3.0
+mako==1.3.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1176,7 +1176,7 @@ markey==0.8
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   enmerkar-underscore
-markupsafe==2.1.4
+markupsafe==2.1.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1217,7 +1217,7 @@ mpmath==1.3.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   sympy
-multidict==6.0.4
+multidict==6.0.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1230,7 +1230,7 @@ mypy==1.8.0
     #   djangorestframework-stubs
 mypy-extensions==1.0.0
     # via mypy
-mysqlclient==2.2.1
+mysqlclient==2.2.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1302,7 +1302,7 @@ openedx-django-wiki==2.0.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==9.3.0
+openedx-events==9.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1313,7 +1313,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning==0.4.4
+openedx-learning==0.5.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1353,7 +1353,7 @@ pansi==2020.7.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   py2neo
-path==16.9.0
+path==16.10.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1465,11 +1465,11 @@ pycryptodomex==3.20.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.6.0
+pydantic==2.6.1
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
-pydantic-core==2.16.1
+pydantic-core==2.16.2
     # via
     #   -r requirements/edx/testing.txt
     #   pydantic
@@ -1609,7 +1609,7 @@ pytest-attrib==0.1.3
     # via -r requirements/edx/testing.txt
 pytest-cov==4.1.0
     # via -r requirements/edx/testing.txt
-pytest-django==4.7.0
+pytest-django==4.8.0
     # via -r requirements/edx/testing.txt
 pytest-json-report==1.5.0
     # via -r requirements/edx/testing.txt
@@ -1648,7 +1648,7 @@ python-memcached==1.62
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-python-slugify==8.0.2
+python-slugify==8.0.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1667,7 +1667,7 @@ python3-saml==1.16.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-pytz==2023.4
+pytz==2024.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1971,7 +1971,7 @@ staff-graded-xblock==2.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-starlette==0.35.1
+starlette==0.36.3
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
@@ -2039,7 +2039,7 @@ tqdm==4.66.1
     #   -r requirements/edx/testing.txt
     #   nltk
     #   openai
-types-pytz==2023.4.0.20240130
+types-pytz==2024.1.0.20240203
     # via django-stubs
 types-pyyaml==6.0.12.12
     # via
@@ -2126,7 +2126,7 @@ virtualenv==20.25.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-voluptuous==0.14.1
+voluptuous==0.14.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
