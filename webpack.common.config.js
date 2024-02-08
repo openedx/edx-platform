@@ -116,7 +116,7 @@ module.exports = Merge.smart({
             WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
 
             // GenPlus Features
-            SkillAssessmentAdmin: './openedx/features/genplus_features/genplus_assessments/static/genplus_assessments/js/index.jsx',
+            SkillAssessmentAdmin: process.env.JS_ENV_EXTRA_CONFIG.GENPLUS_ASSESSMENT_PATH +'/static/genplus_assessments/js/index.jsx',
 
             AnnouncementsView: './openedx/features/announcements/static/announcements/jsx/Announcements.jsx',
             CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
