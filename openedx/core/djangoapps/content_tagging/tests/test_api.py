@@ -1,11 +1,11 @@
 """Tests for the Tagging models"""
 import ddt
 from django.test.testcases import TestCase
-from openedx_tagging.core.tagging.models import Tag
+from opaque_keys.edx.keys import CourseKey
+from openedx_tagging.core.tagging.models import ObjectTag, Tag
 from organizations.models import Organization
 
 from .. import api
-from ..models import ContentObjectTag
 
 
 class TestTaxonomyMixin:
@@ -233,34 +233,6 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         assert result[0]["parent_value"] is None
         assert result[0]["depth"] == 0
 
-    def test_cannot_tag_across_orgs(self):
-        """
-        Ensure that I cannot apply tags from a taxonomy that's linked to another
-        org.
-        """
-        # This taxonomy is only linked to the "OpenedX org", so it can't be used for "Axim" content.
-        taxonomy = self.taxonomy_one_org
-        tags = [self.tag_one_org.value]
-        with self.assertRaises(ValueError) as exc:
-            api.tag_content_object(
-                object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
-                taxonomy=taxonomy,
-                tags=tags,
-            )
-        assert "The specified Taxonomy is not enabled for the content object's org (Ax)" in str(exc.exception)
-        # But this will work fine:
-        api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:OeX+DemoX+Demo_Course"),
-            taxonomy=taxonomy,
-            tags=tags,
-        )
-        # As will this:
-        api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:Ax+DemoX+Demo_Course"),
-            taxonomy=self.taxonomy_both_orgs,
-            tags=[self.tag_both_orgs.value],
-        )
-
 
 class TestGetAllObjectTagsMixin:
     """
@@ -294,41 +266,47 @@ class TestGetAllObjectTagsMixin:
             value="Tag 2.2",
         )
 
-        self.course_tags = api.tag_content_object(
-            object_key=CourseKey.from_string("course-v1:orgA+test_course+test_run"),
+        api.tag_object(
+            object_id="course-v1:orgA+test_course+test_run",
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1'],
         )
+        self.course_tags = api.get_object_tags("course-v1:orgA+test_course+test_run")
 
         # Tag blocks
-        self.sequential_tags1 = api.tag_content_object(
-            object_key=UsageKey.from_string(
-                "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential"
-            ),
+        api.tag_object(
+            object_id="block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1', 'Tag 1.2'],
         )
-        self.sequential_tags2 = api.tag_content_object(
-            object_key=UsageKey.from_string(
-                "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential"
-            ),
+        self.sequential_tags1 = api.get_object_tags(
+            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+            taxonomy_id=self.taxonomy_1.id,
+
+        )
+        api.tag_object(
+            object_id="block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
-        self.vertical1_tags = api.tag_content_object(
-            object_key=UsageKey.from_string(
-                "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"
-            ),
+        self.sequential_tags2 = api.get_object_tags(
+            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+            taxonomy_id=self.taxonomy_2.id,
+        )
+        api.tag_object(
+            object_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.2'],
         )
-        self.html_tags = api.tag_content_object(
-            object_key=UsageKey.from_string(
-                "block-v1:orgA+test_course+test_run+type@html+block@test_html"
-            ),
+        self.vertical1_tags = api.get_object_tags(
+            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"
+        )
+        api.tag_object(
+            object_id="block-v1:orgA+test_course+test_run+type@html+block@test_html",
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
+        self.html_tags = api.get_object_tags("block-v1:orgA+test_course+test_run+type@html+block@test_html")
 
         # Create "deleted" object tags, which will be omitted from the results.
         for object_id in (
@@ -337,7 +315,7 @@ class TestGetAllObjectTagsMixin:
             "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
             "block-v1:orgA+test_course+test_run+type@html+block@test_html",
         ):
-            ContentObjectTag.objects.create(
+            ObjectTag.objects.create(
                 object_id=str(object_id),
                 taxonomy=None,
                 tag=None,
