@@ -1773,7 +1773,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         url = OBJECT_TAGS_URL.format(object_id=object_id)
         self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(7):  # TODO Why so many queries?
+        with self.assertNumQueries(7):
             response = self.client.get(url)
 
         assert response.status_code == 200
@@ -2299,7 +2299,7 @@ class TestTaxonomyTagsViewSet(TestTaxonomyObjectsMixin, APITestCase):
         url = f"{TAXONOMY_TAGS_URL}?search_term=an&parent_tag=ALPHABET".format(pk=self.t1.id)
 
         self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(13):  # TODO Why so many queries?
+        with self.assertNumQueries(11):
             response = self.client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
