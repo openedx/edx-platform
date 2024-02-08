@@ -1373,7 +1373,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     """
 
     @ddt.data(
-        # userA and userS are staff in courseA and can tag using enabled taxonomies
+        # staffA and staff are staff in courseA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
@@ -1458,7 +1458,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        # userA and userS are staff in courseA (owner of xblockA) and can tag using any taxonomies
+        # staffA and staff are staff in courseA (owner of xblockA) and can tag using any taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
@@ -1542,7 +1542,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        # userA and userS are staff in libraryA and can tag using enabled taxonomies
+        # staffA and staff are staff in libraryA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
