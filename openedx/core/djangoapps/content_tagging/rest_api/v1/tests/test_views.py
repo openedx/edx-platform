@@ -1592,7 +1592,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     )
     def test_tag_library_disabled_taxonomy(self, user_attr):
         """
-        Nobody can use disable taxonomies to tag objects
+        Nobody can use disabled taxonomies to tag objects
         """
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
