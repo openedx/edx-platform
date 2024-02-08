@@ -497,18 +497,28 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             if user_attr == "staffA":
                 assert response.data["orgs"] == [self.orgA.short_name]
 
-    def test_list_taxonomy_query_count(self):
+    @ddt.data(
+        ('staff', 11),
+        ("content_creatorA", 25),  # FIXME too many queries.
+        ("library_staffA", 25),
+        ("library_userA", 25),
+        ("instructorA", 25),
+        ("course_instructorA", 25),
+        ("course_staffA", 25),
+    )
+    @ddt.unpack
+    def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
         """
         Test how many queries are used when retrieving taxonomies and permissions
         """
         url = TAXONOMY_ORG_LIST_URL + f'?org={self.orgA.short_name}&enabled=true'
-
-        self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(11):
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        with self.assertNumQueries(expected_queries):
             response = self.client.get(url)
 
         assert response.status_code == 200
-        assert response.data["can_add_taxonomy"]
+        assert response.data["can_add_taxonomy"] == user.is_staff
         assert len(response.data["results"]) == 4
         for taxonomy in response.data["results"]:
             if taxonomy["system_defined"]:
@@ -516,8 +526,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
                 assert not taxonomy["can_delete_taxonomy"]
                 assert taxonomy["can_tag_object"]
             else:
-                assert taxonomy["can_change_taxonomy"]
-                assert taxonomy["can_delete_taxonomy"]
+                assert taxonomy["can_change_taxonomy"] == user.is_staff
+                assert taxonomy["can_delete_taxonomy"] == user.is_staff
                 assert taxonomy["can_tag_object"]
 
 
@@ -1759,7 +1769,17 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert status.is_success(response3.status_code)
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
-    def test_object_tags_query_count(self):
+    @ddt.data(
+        ('staff', 7),
+        #("content_creatorA", 8),  # FIXME 403?
+        #("library_staffA", 8),
+        #("library_userA", 8),
+        ("instructorA", 19),  # FIXME too many queries.
+        ("course_instructorA", 19),
+        ("course_staffA", 19),
+    )
+    @ddt.unpack
+    def test_object_tags_query_count(self, user_attr: str, expected_queries: int):
         """
         Test how many queries are used when retrieving object tags and permissions
         """
@@ -1770,10 +1790,10 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
             {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": True},
             {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": True},
         ]
-
         url = OBJECT_TAGS_URL.format(object_id=object_id)
-        self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(7):
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        with self.assertNumQueries(expected_queries):
             response = self.client.get(url)
 
         assert response.status_code == 200
@@ -2292,19 +2312,30 @@ class TestTaxonomyTagsViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     Test cases for TaxonomyTagsViewSet retrive action.
     """
-    def test_taxonomy_tags_query_count(self):
+    @ddt.data(
+        ('staff', 11),
+        ("content_creatorA", 13),  # FIXME too many queries?
+        ("library_staffA", 13),
+        ("library_userA", 13),
+        ("instructorA", 13),
+        ("course_instructorA", 13),
+        ("course_staffA", 13),
+    )
+    @ddt.unpack
+    def test_taxonomy_tags_query_count(self, user_attr: str, expected_queries: int):
         """
         Test how many queries are used when retrieving small taxonomies+tags and permissions
         """
         url = f"{TAXONOMY_TAGS_URL}?search_term=an&parent_tag=ALPHABET".format(pk=self.t1.id)
 
-        self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(11):
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        with self.assertNumQueries(expected_queries):
             response = self.client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["can_add_tag"]
+        assert response.data["can_add_tag"] == user.is_staff
         assert len(response.data["results"]) == 2
         for taxonomy in response.data["results"]:
-            assert taxonomy["can_change_tag"]
-            assert taxonomy["can_delete_tag"]
+            assert taxonomy["can_change_tag"] == user.is_staff
+            assert taxonomy["can_delete_tag"] == user.is_staff
