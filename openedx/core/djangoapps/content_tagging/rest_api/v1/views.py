@@ -1,6 +1,7 @@
 """
 Tagging Org API Views
 """
+from django.db.models import Count
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
@@ -18,8 +19,8 @@ from ...api import (
     set_taxonomy_orgs,
 )
 from ...rules import get_admin_orgs
-from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
+from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -66,8 +67,13 @@ class TaxonomyOrgView(TaxonomyView):
         else:
             queryset = get_taxonomies(enabled)
 
-        # Prefetch tag_set so we can serialize the tag counts
-        return queryset.prefetch_related("taxonomyorg_set__org", "tag_set")
+        # Prefetch taxonomyorgs so we can check permissions
+        queryset = queryset.prefetch_related("taxonomyorg_set__org")
+
+        # Annotate with tags_count to avoid selecting all the tags
+        queryset = queryset.annotate(tags_count=Count("tag", distinct=True))
+
+        return queryset
 
     def perform_create(self, serializer):
         """
