@@ -40,7 +40,7 @@ common/djangoapps/enrollment/
 lms/djangoapps/commerce/
 lms/djangoapps/experiments/
 lms/djangoapps/learner_dashboard/                                    @openedx/2U-aperture
-lms/djangoapps/learner_home/
+lms/djangoapps/learner_home/                                         @openedx/2U-aperture
 openedx/features/content_type_gating/
 openedx/features/course_duration_limits/
 openedx/features/discounts/
