@@ -21,11 +21,11 @@ from rest_framework.views import APIView
 from ...api import (
     create_taxonomy,
     get_all_object_tags,
-    get_taxonomy,
     get_taxonomies,
     get_taxonomies_for_org,
+    get_taxonomy,
     get_unassigned_taxonomies,
-    set_taxonomy_orgs,
+    set_taxonomy_orgs
 )
 from ...rules import get_admin_orgs
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
