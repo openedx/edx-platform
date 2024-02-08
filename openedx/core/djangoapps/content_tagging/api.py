@@ -19,6 +19,7 @@ def create_taxonomy(
     allow_multiple=True,
     allow_free_text=False,
     orgs: list[Organization] | None = None,
+    export_id: str | None = None,
 ) -> Taxonomy:
     """
     Creates, saves, and returns a new Taxonomy with the given attributes.
@@ -29,6 +30,7 @@ def create_taxonomy(
         enabled=enabled,
         allow_multiple=allow_multiple,
         allow_free_text=allow_free_text,
+        export_id=export_id,
     )
 
     if orgs is not None:
