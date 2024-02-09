@@ -17,7 +17,7 @@ boltons==21.0.0
     #   semgrep
 bracex==2.4
     # via wcmatch
-certifi==2023.11.17
+certifi==2024.2.2
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -54,7 +54,7 @@ mdurl==0.1.2
     # via markdown-it-py
 packaging==23.2
     # via semgrep
-peewee==3.17.0
+peewee==3.17.1
     # via semgrep
 pkgutil-resolve-name==1.3.10
     # via jsonschema

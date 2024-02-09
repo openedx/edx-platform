@@ -3,13 +3,10 @@ Content Tagging models
 """
 from __future__ import annotations
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import LearningContextKey, UsageKey
-from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
+from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
 
@@ -80,33 +77,3 @@ class TaxonomyOrg(models.Model):
         if rels.filter(org=None).exists():
             return list(Organization.objects.all())
         return [rel.org for rel in rels]
-
-
-class ContentObjectTag(ObjectTag):
-    """
-    ObjectTag that requires an LearningContextKey or BlockUsageLocator as the object ID.
-    """
-
-    class Meta:
-        proxy = True
-
-    @property
-    def object_key(self) -> UsageKey | LearningContextKey:
-        """
-        Returns the object ID parsed as a UsageKey or LearningContextKey.
-        Raises InvalidKeyError object_id cannot be parse into one of those key types.
-
-        Returns None if there's no object_id.
-        """
-        try:
-            return LearningContextKey.from_string(self.object_id)
-        except InvalidKeyError:
-            return UsageKey.from_string(self.object_id)
-
-    def clean(self):
-        super().clean()
-        # Make sure that object_id is a valid key
-        try:
-            self.object_key
-        except InvalidKeyError as err:
-            raise ValidationError("object_id is not a valid opaque key string.") from err

@@ -235,12 +235,12 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
-    @patch('common.djangoapps.student.views.dashboard.should_redirect_to_learner_home_mfe')
-    def test_redirect_to_learner_home(self, mock_should_redirect_to_learner_home_mfe):
+    @patch('common.djangoapps.student.views.dashboard.learner_home_mfe_enabled')
+    def test_redirect_to_learner_home(self, mock_learner_home_mfe_enabled):
         """
         if learner home mfe is enabled, redirect to learner home mfe
         """
-        mock_should_redirect_to_learner_home_mfe.return_value = True
+        mock_learner_home_mfe_enabled.return_value = True
         response = self.client.get(self.path)
         self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
 
