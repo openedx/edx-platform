@@ -518,6 +518,15 @@ certificate_revoked_event_config['learning-certificate-lifecycle']['enabled'] = 
 certificate_created_event_config = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.created.v1']
 certificate_created_event_config['learning-certificate-lifecycle']['enabled'] = True
 
+course_access_role_added_event_setting = EVENT_BUS_PRODUCER_CONFIG[
+    'org.openedx.learning.user.course_access_role.added.v1'
+]
+course_access_role_added_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
+course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
+    'org.openedx.learning.user.course_access_role.removed.v1'
+]
+course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
+
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
