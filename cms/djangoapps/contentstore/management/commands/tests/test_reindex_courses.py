@@ -10,6 +10,7 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime, timedelta
 
 
 @ddt.ddt
@@ -26,11 +27,18 @@ class TestReindexCourse(ModuleStoreTestCase):
             org="test", library="lib2", display_name="run2", default_store=ModuleStoreEnum.Type.split
         )
 
+        yesterday = datetime.min.today() - timedelta(days=1)
+
         self.first_course = CourseFactory.create(
-            org="test", course="course1", display_name="run1"
+            org="test", course="course1", display_name="run1", start=yesterday, end=None
         )
+
         self.second_course = CourseFactory.create(
-            org="test", course="course2", display_name="run1"
+            org="test", course="course2", display_name="run1", start=yesterday, end=yesterday
+        )
+
+        self.third_course = CourseFactory.create(
+            org="test", course="course3", display_name="run1", start=None, end=None
         )
 
     REINDEX_PATH_LOCATION = (
@@ -103,7 +111,7 @@ class TestReindexCourse(ModuleStoreTestCase):
                 call_command('reindex_course', all=True)
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
-                expected_calls = self._build_calls(self.first_course, self.second_course)
+                expected_calls = self._build_calls(self.first_course, self.second_course, self.third_course)
                 self.assertCountEqual(patched_index.mock_calls, expected_calls)
 
     def test_given_all_key_prompts_and_reindexes_all_courses_cancelled(self):
@@ -116,3 +124,15 @@ class TestReindexCourse(ModuleStoreTestCase):
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
                 patched_index.assert_not_called()
+
+    def test_given_active_key_prompt(self):
+        """
+            Test that reindexes all active courses when --active key is given
+            Active courses have a start date but no end date, or the end date is in the future.
+        """
+        with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index, \
+                mock.patch(self.MODULESTORE_PATCH_LOCATION, mock.Mock(return_value=self.store)):
+            call_command('reindex_course', active=True)
+
+            expected_calls = self._build_calls(self.first_course)
+            self.assertCountEqual(patched_index.mock_calls, expected_calls)

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from urllib.parse import parse_qs, urlparse
 import json
+from unittest.mock import MagicMock
 
 import abc
 import ddt
@@ -33,6 +34,7 @@ from openedx.core.djangoapps.content_libraries.api import (
     create_library,
     set_library_user_permissions,
 )
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
@@ -60,6 +62,7 @@ def check_taxonomy(
     allow_free_text=False,
     system_defined=False,
     visible_to_authors=True,
+    export_id=None,
     **_
 ):
     """
@@ -73,6 +76,7 @@ def check_taxonomy(
     assert data["allow_free_text"] == allow_free_text
     assert data["system_defined"] == system_defined
     assert data["visible_to_authors"] == visible_to_authors
+    assert data["export_id"] == export_id
 
 
 class TestTaxonomyObjectsMixin:
@@ -106,6 +110,7 @@ class TestTaxonomyObjectsMixin:
             title="Library Org A",
             description="This is a library from Org A",
         )
+        self.libraryA = str(self.content_libraryA.key)
 
     def _setUp_users(self):
         """
@@ -123,9 +128,15 @@ class TestTaxonomyObjectsMixin:
 
         self.staffA = User.objects.create(
             username="staffA",
-            email="userA@example.com",
+            email="staffA@example.com",
         )
         update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
+
+        self.staffB = User.objects.create(
+            username="staffB",
+            email="staffB@example.com",
+        )
+        update_org_role(self.staff, OrgStaffRole, self.staffB, [self.orgB.short_name])
 
         self.content_creatorA = User.objects.create(
             username="content_creatorA",
@@ -172,11 +183,11 @@ class TestTaxonomyObjectsMixin:
         Create taxonomies for testing
         """
         # Orphaned taxonomy
-        self.ot1 = Taxonomy.objects.create(name="ot1", enabled=True)
-        self.ot2 = Taxonomy.objects.create(name="ot2", enabled=False)
+        self.ot1 = tagging_api.create_taxonomy(name="ot1", enabled=True)
+        self.ot2 = tagging_api.create_taxonomy(name="ot2", enabled=False)
 
         # System defined taxonomy
-        self.st1 = Taxonomy.objects.create(name="st1", enabled=True)
+        self.st1 = tagging_api.create_taxonomy(name="st1", enabled=True)
         self.st1.taxonomy_class = SystemDefinedTaxonomy
         self.st1.save()
         TaxonomyOrg.objects.create(
@@ -184,7 +195,7 @@ class TestTaxonomyObjectsMixin:
             rel_type=TaxonomyOrg.RelType.OWNER,
             org=None,
         )
-        self.st2 = Taxonomy.objects.create(name="st2", enabled=False)
+        self.st2 = tagging_api.create_taxonomy(name="st2", enabled=False)
         self.st2.taxonomy_class = SystemDefinedTaxonomy
         self.st2.save()
         TaxonomyOrg.objects.create(
@@ -192,24 +203,30 @@ class TestTaxonomyObjectsMixin:
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
 
-        # Global taxonomy
-        self.t1 = Taxonomy.objects.create(name="t1", enabled=True)
+        # Global taxonomy, which contains tags
+        self.t1 = tagging_api.create_taxonomy(name="t1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.t1,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.t2 = Taxonomy.objects.create(name="t2", enabled=False)
+        self.t2 = tagging_api.create_taxonomy(name="t2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.t2,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
+        root1 = Tag.objects.create(taxonomy=self.t1, value="ALPHABET")
+        Tag.objects.create(taxonomy=self.t1, value="android", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="abacus", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="azure", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="aardvark", parent=root1)
+        Tag.objects.create(taxonomy=self.t1, value="anvil", parent=root1)
 
         # OrgA taxonomy
-        self.tA1 = Taxonomy.objects.create(name="tA1", enabled=True)
+        self.tA1 = tagging_api.create_taxonomy(name="tA1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA1,
             org=self.orgA, rel_type=TaxonomyOrg.RelType.OWNER,)
-        self.tA2 = Taxonomy.objects.create(name="tA2", enabled=False)
+        self.tA2 = tagging_api.create_taxonomy(name="tA2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.tA2,
             org=self.orgA,
@@ -217,13 +234,13 @@ class TestTaxonomyObjectsMixin:
         )
 
         # OrgB taxonomy
-        self.tB1 = Taxonomy.objects.create(name="tB1", enabled=True)
+        self.tB1 = tagging_api.create_taxonomy(name="tB1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tB1,
             org=self.orgB,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.tB2 = Taxonomy.objects.create(name="tB2", enabled=False)
+        self.tB2 = tagging_api.create_taxonomy(name="tB2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.tB2,
             org=self.orgB,
@@ -231,7 +248,7 @@ class TestTaxonomyObjectsMixin:
         )
 
         # OrgA and OrgB taxonomy
-        self.tBA1 = Taxonomy.objects.create(name="tBA1", enabled=True)
+        self.tBA1 = tagging_api.create_taxonomy(name="tBA1", enabled=True)
         TaxonomyOrg.objects.create(
             taxonomy=self.tBA1,
             org=self.orgA,
@@ -242,7 +259,7 @@ class TestTaxonomyObjectsMixin:
             org=self.orgB,
             rel_type=TaxonomyOrg.RelType.OWNER,
         )
-        self.tBA2 = Taxonomy.objects.create(name="tBA2", enabled=False)
+        self.tBA2 = tagging_api.create_taxonomy(name="tBA2", enabled=False)
         TaxonomyOrg.objects.create(
             taxonomy=self.tBA2,
             org=self.orgA,
@@ -278,7 +295,8 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             expected_taxonomies: list[str],
             enabled_parameter: bool | None = None,
             org_parameter: str | None = None,
-            unassigned_parameter: bool | None = None
+            unassigned_parameter: bool | None = None,
+            page_size: int | None = None,
     ) -> None:
         """
         Helper function to call the list endpoint and check the response
@@ -293,6 +311,7 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             "enabled": enabled_parameter,
             "org": org_parameter,
             "unassigned": unassigned_parameter,
+            "page_size": page_size,
         }.items() if v is not None}
 
         response = self.client.get(url, query_params, format="json")
@@ -304,11 +323,12 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
         """
         Tests that staff users see all taxonomies
         """
-        # Default page_size=10, and so "tBA1" and "tBA2" appear on the second page
+        # page_size=10, and so "tBA1" and "tBA2" appear on the second page
         expected_taxonomies = ["ot1", "ot2", "st1", "st2", "t1", "t2", "tA1", "tA2", "tB1", "tB2"]
         self._test_list_taxonomy(
             user_attr="staff",
             expected_taxonomies=expected_taxonomies,
+            page_size=10,
         )
 
     @ddt.data(
@@ -455,6 +475,7 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             "description": "This is a description",
             "enabled": True,
             "allow_multiple": True,
+            "export_id": "taxonomy_data",
         }
 
         if user_attr:
@@ -475,6 +496,29 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             # Also checks if the taxonomy was associated with the org
             if user_attr == "staffA":
                 assert response.data["orgs"] == [self.orgA.short_name]
+
+    def test_list_taxonomy_query_count(self):
+        """
+        Test how many queries are used when retrieving taxonomies and permissions
+        """
+        url = TAXONOMY_ORG_LIST_URL + f'?org=${self.orgA.short_name}&enabled=true'
+
+        self.client.force_authenticate(user=self.staff)
+        with self.assertNumQueries(16):  # TODO Why so many queries?
+            response = self.client.get(url)
+
+        assert response.status_code == 200
+        assert response.data["can_add_taxonomy"]
+        assert len(response.data["results"]) == 2
+        for taxonomy in response.data["results"]:
+            if taxonomy["system_defined"]:
+                assert not taxonomy["can_change_taxonomy"]
+                assert not taxonomy["can_delete_taxonomy"]
+                assert taxonomy["can_tag_object"]
+            else:
+                assert taxonomy["can_change_taxonomy"]
+                assert taxonomy["can_delete_taxonomy"]
+                assert taxonomy["can_tag_object"]
 
 
 @ddt.ddt
@@ -787,7 +831,14 @@ class TestTaxonomyDetailViewSet(TestTaxonomyDetailExportMixin, APITestCase):
         assert response.status_code == expected_status, reason
 
         if status.is_success(expected_status):
-            check_taxonomy(response.data, taxonomy.pk, **(TaxonomySerializer(taxonomy.cast()).data))
+            request = MagicMock()
+            request.user = user
+            context = {"request": request}
+            check_taxonomy(
+                response.data,
+                taxonomy.pk,
+                **(TaxonomySerializer(taxonomy.cast(), context=context)).data,
+            )
 
 
 @skip_unless_cms
@@ -988,6 +1039,7 @@ class TestTaxonomyUpdateViewSet(TestTaxonomyChangeMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
+                    "export_id": taxonomy.export_id,
                 },
             )
 
@@ -1028,6 +1080,7 @@ class TestTaxonomyPatchViewSet(TestTaxonomyChangeMixin, APITestCase):
                     "name": "new name",
                     "description": taxonomy.description,
                     "enabled": taxonomy.enabled,
+                    "export_id": taxonomy.export_id,
                 },
             )
 
@@ -1286,8 +1339,14 @@ class TestObjectTagMixin(TestTaxonomyObjectsMixin):
             block_id='block_id'
         )
 
-        self.multiple_taxonomy = Taxonomy.objects.create(name="Multiple Taxonomy", allow_multiple=True)
-        self.single_value_taxonomy = Taxonomy.objects.create(name="Required Taxonomy", allow_multiple=False)
+        self.multiple_taxonomy = tagging_api.create_taxonomy(
+            name="Multiple Taxonomy",
+            allow_multiple=True,
+        )
+        self.single_value_taxonomy = tagging_api.create_taxonomy(
+            name="Required Taxonomy",
+            allow_multiple=False,
+        )
         for i in range(20):
             # Valid ObjectTags
             Tag.objects.create(taxonomy=self.tA1, value=f"Tag {i}")
@@ -1295,7 +1354,10 @@ class TestObjectTagMixin(TestTaxonomyObjectsMixin):
             Tag.objects.create(taxonomy=self.multiple_taxonomy, value=f"Tag {i}")
             Tag.objects.create(taxonomy=self.single_value_taxonomy, value=f"Tag {i}")
 
-        self.open_taxonomy = Taxonomy.objects.create(name="Enabled Free-Text Taxonomy", allow_free_text=True)
+        self.open_taxonomy = tagging_api.create_taxonomy(
+            name="Enabled Free-Text Taxonomy",
+            allow_free_text=True,
+        )
 
         # Add org permissions to taxonomy
         TaxonomyOrg.objects.create(
@@ -1325,7 +1387,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     """
 
     @ddt.data(
-        # userA and userS are staff in courseA and can tag using enabled taxonomies
+        # staffA and staff are staff in courseA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
@@ -1410,7 +1472,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        # userA and userS are staff in courseA (owner of xblockA) and can tag using any taxonomies
+        # staffA and staff are staff in courseA (owner of xblockA) and can tag using any taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
         ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
         ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
@@ -1494,6 +1556,129 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
+        # staffA and staff are staff in libraryA and can tag using enabled taxonomies
+        ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", [], status.HTTP_200_OK),
+        ("staff", "tA1", [], status.HTTP_200_OK),
+        ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_tag_library(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        """
+        Tests that only staff and org level users can tag libraries
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": tag_values}, format="json")
+
+        assert response.status_code == expected_status
+        if status.is_success(expected_status):
+            tags_by_taxonomy = response.data[str(self.libraryA)]["taxonomies"]
+            if tag_values:
+                response_taxonomy = tags_by_taxonomy[0]
+                assert response_taxonomy["name"] == taxonomy.name
+                response_tags = response_taxonomy["tags"]
+                assert [t["value"] for t in response_tags] == tag_values
+            else:
+                assert tags_by_taxonomy == []  # No tags are set from any taxonomy
+
+            # Check that re-fetching the tags returns what we set
+            new_response = self.client.get(url, format="json")
+            assert status.is_success(new_response.status_code)
+            assert new_response.data == response.data
+
+    @ddt.data(
+        "staffA",
+        "staff",
+    )
+    def test_tag_library_disabled_taxonomy(self, user_attr):
+        """
+        Nobody can use disabled taxonomies to tag objects
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        disabled_taxonomy = self.tA2
+        assert disabled_taxonomy.enabled is False
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=disabled_taxonomy.pk)
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(
+        ("staffA", "tA1"),
+        ("staff", "tA1"),
+        ("staffA", "multiple_taxonomy"),
+        ("staff", "multiple_taxonomy"),
+    )
+    @ddt.unpack
+    def test_tag_library_invalid(self, user_attr, taxonomy_attr):
+        """
+        Tests that nobody can add invalid tags to a library using a closed taxonomy
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=taxonomy.pk)
+
+        response = self.client.put(url, {"tags": ["invalid"]}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @ddt.data(
+        ("staff", status.HTTP_200_OK),
+        ("staffA", status.HTTP_403_FORBIDDEN),
+        ("staffB", status.HTTP_403_FORBIDDEN),
+    )
+    @ddt.unpack
+    def test_tag_cross_org(self, user_attr, expected_status):
+        """
+        Tests that only global admins can add a taxonomy from orgA to an object from orgB
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseB, taxonomy_id=self.tA1.pk)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == expected_status
+
+    @ddt.data(
+        ("staff", status.HTTP_200_OK),
+        ("staffA", status.HTTP_403_FORBIDDEN),
+        ("staffB", status.HTTP_403_FORBIDDEN),
+    )
+    @ddt.unpack
+    def test_tag_no_org(self, user_attr, expected_status):
+        """
+        Tests that only global admins can add a no-org taxonomy to an object
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=self.ot1.pk)
+
+        response = self.client.put(url, {"tags": []}, format="json")
+
+        assert response.status_code == expected_status
+
+    @ddt.data(
         "courseB",
         "xblockB",
     )
@@ -1526,7 +1711,21 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    def test_tag_invalid_object(self):
+        """
+        Test that we cannot tag an object that is not a CouseKey, LibraryLocatorV2 or UsageKey
+        """
+        url = OBJECT_TAG_UPDATE_URL.format(object_id='invalid_key', taxonomy_id=self.tA1.pk)
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     def test_get_tags(self):
+        """
+        Test that we can get tags for an object
+        """
         self.client.force_authenticate(user=self.staffA)
         taxonomy = self.multiple_taxonomy
         tag_values = ["Tag 1", "Tag 2"]
@@ -1538,12 +1737,12 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         # Fetch this object's tags for a single taxonomy
         expected_tags = [{
-            'editable': True,
             'name': 'Multiple Taxonomy',
             'taxonomy_id': taxonomy.pk,
+            'can_tag_object': True,
             'tags': [
-                {'value': 'Tag 1', 'lineage': ['Tag 1']},
-                {'value': 'Tag 2', 'lineage': ['Tag 2']},
+                {'value': 'Tag 1', 'lineage': ['Tag 1'], 'can_delete_objecttag': True},
+                {'value': 'Tag 2', 'lineage': ['Tag 2'], 'can_delete_objecttag': True},
             ],
         }]
 
@@ -1559,6 +1758,28 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         response3 = self.client.get(get_all_url, format="json")
         assert status.is_success(response3.status_code)
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
+
+    def test_object_tags_query_count(self):
+        """
+        Test how many queries are used when retrieving object tags and permissions
+        """
+        object_key = self.courseA
+        object_id = str(object_key)
+        tagging_api.tag_object(object_id=object_id, taxonomy=self.t1, tags=["anvil", "android"])
+        expected_tags = [
+            {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": True},
+            {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": True},
+        ]
+
+        url = OBJECT_TAGS_URL.format(object_id=object_id)
+        self.client.force_authenticate(user=self.staff)
+        with self.assertNumQueries(7):  # TODO Why so many queries?
+            response = self.client.get(url)
+
+        assert response.status_code == 200
+        assert len(response.data[object_id]["taxonomies"]) == 1
+        assert response.data[object_id]["taxonomies"][0]["can_tag_object"]
+        assert response.data[object_id]["taxonomies"][0]["tags"] == expected_tags
 
 
 @skip_unless_cms
@@ -1638,6 +1859,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy",
                 "file": file,
             },
             format="multipart"
@@ -1648,6 +1870,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
         taxonomy = response.data
         assert taxonomy["name"] == "Imported Taxonomy name"
         assert taxonomy["description"] == "Imported Taxonomy description"
+        assert taxonomy["export_id"] == "imported_taxonomy"
 
         # Check if the tags were created
         url = TAXONOMY_TAGS_URL.format(pk=taxonomy["id"])
@@ -1683,6 +1906,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy",
                 "file": file,
             },
             format="multipart"
@@ -1693,6 +1917,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
         taxonomy = response.data
         assert taxonomy["name"] == "Imported Taxonomy name"
         assert taxonomy["description"] == "Imported Taxonomy description"
+        assert taxonomy["export_id"] == "imported_taxonomy"
 
         # Check if the tags were created
         url = TAXONOMY_TAGS_URL.format(pk=taxonomy["id"])
@@ -1717,6 +1942,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy",
             },
             format="multipart"
         )
@@ -1741,12 +1967,36 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
             url,
             {
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy",
                 "file": file,
             },
             format="multipart"
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["taxonomy_name"][0] == "This field is required."
+
+        # Check if the taxonomy was not created
+        assert not Taxonomy.objects.filter(name="Imported Taxonomy name").exists()
+
+    @ddt.data(
+        "csv",
+        "json",
+    )
+    def test_import_no_export_id(self, file_format) -> None:
+        url = TAXONOMY_CREATE_IMPORT_URL
+        file = SimpleUploadedFile(f"taxonomy.{file_format}", b"invalid file content")
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.post(
+            url,
+            {
+                "taxonomt_name": "Imported Taxonomy name",
+                "taxonomy_description": "Imported Taxonomy description",
+                "file": file,
+            },
+            format="multipart"
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["taxonomy_export_id"][0] == "This field is required."
 
         # Check if the taxonomy was not created
         assert not Taxonomy.objects.filter(name="Imported Taxonomy name").exists()
@@ -1763,6 +2013,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy_id",
                 "file": file,
             },
             format="multipart"
@@ -1789,6 +2040,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy",
                 "file": file,
             },
             format="multipart"
@@ -1818,6 +2070,7 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy",
                 "file": file,
             },
             format="multipart"
@@ -1837,7 +2090,7 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
     def setUp(self):
         ImportTaxonomyMixin.setUp(self)
 
-        self.taxonomy = Taxonomy.objects.create(
+        self.taxonomy = tagging_api.create_taxonomy(
             name="Test import taxonomy",
         )
         tag_1 = Tag.objects.create(
@@ -1946,6 +2199,7 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomy_export_id": "imported_taxonomy",
                 "file": file,
             },
             format="multipart"
@@ -2015,6 +2269,7 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
             {
                 "taxonomy_name": "Imported Taxonomy name",
                 "taxonomy_description": "Imported Taxonomy description",
+                "taxonomt_export_id": "imported_taxonomy",
                 "file": file,
             },
             format="multipart"
@@ -2029,3 +2284,27 @@ class TestImportTagsView(ImportTaxonomyMixin, APITestCase):
         assert len(tags) == len(self.old_tags)
         for i, tag in enumerate(tags):
             assert tag["value"] == self.old_tags[i].value
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestTaxonomyTagsViewSet(TestTaxonomyObjectsMixin, APITestCase):
+    """
+    Test cases for TaxonomyTagsViewSet retrive action.
+    """
+    def test_taxonomy_tags_query_count(self):
+        """
+        Test how many queries are used when retrieving small taxonomies+tags and permissions
+        """
+        url = f"{TAXONOMY_TAGS_URL}?search_term=an&parent_tag=ALPHABET".format(pk=self.t1.id)
+
+        self.client.force_authenticate(user=self.staff)
+        with self.assertNumQueries(13):  # TODO Why so many queries?
+            response = self.client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["can_add_tag"]
+        assert len(response.data["results"]) == 2
+        for taxonomy in response.data["results"]:
+            assert taxonomy["can_change_tag"]
+            assert taxonomy["can_delete_tag"]

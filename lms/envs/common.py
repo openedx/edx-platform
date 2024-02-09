@@ -68,6 +68,10 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+try:
+    from skill_tagging.skill_tagging_mixin import SkillTaggingMixin
+except ImportError:
+    SkillTaggingMixin = None
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
@@ -1633,6 +1637,8 @@ from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+if SkillTaggingMixin:
+    XBLOCK_MIXINS += (SkillTaggingMixin,)
 XBLOCK_EXTRA_MIXINS = ()
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
@@ -1762,8 +1768,8 @@ DATABASES = {
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-# This will be overridden through LMS config
-DEFAULT_HASHING_ALGORITHM = 'sha1'
+DEFAULT_HASHING_ALGORITHM = 'sha256'
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
@@ -2237,6 +2243,9 @@ MIDDLEWARE = [
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+
+    # Middleware to flush user's session in other browsers when their email is changed.
+    'openedx.core.djangoapps.safe_sessions.middleware.EmailChangeMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
@@ -5041,7 +5050,19 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
-LEARNER_HOME_MFE_REDIRECT_PERCENTAGE = 0
+############## Settings for EmailChangeMiddleware ###############
+
+# .. toggle_name: ENFORCE_SESSION_EMAIL_MATCH
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this setting invalidates sessions in other browsers
+#       upon email change, while preserving the session validity in the browser where the
+#       email change occurs. This toggle is just being used for rollout.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-12-07
+# .. toggle_target_removal_date: 2024-04-01
+# .. toggle_tickets: https://2u-internal.atlassian.net/browse/VAN-1797
+ENFORCE_SESSION_EMAIL_MATCH = False
 
 ############### Settings for the ace_common plugin #################
 # Note that all settings are actually defined by the plugin
@@ -5455,3 +5476,31 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
 BEAMER_PRODUCT_ID = ""
+
+#### Survey Report ####
+# .. toggle_name: SURVEY_REPORT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set to True to enable the feature to generate and send survey reports.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-01-30
+SURVEY_REPORT_ENABLE = True
+# .. setting_name: SURVEY_REPORT_ENDPOINT
+# .. setting_default: Open edX organization endpoint
+# .. setting_description: Endpoint where the report will be sent.
+SURVEY_REPORT_ENDPOINT = 'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/'
+# .. toggle_name: ANONYMOUS_SURVEY_REPORT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If enable, the survey report will be send a UUID as ID instead of use lms site name.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-02-21
+ANONYMOUS_SURVEY_REPORT = False
+# .. setting_name: SURVEY_REPORT_CHECK_THRESHOLD
+# .. setting_default: every 6 months
+# .. setting_description: Survey report banner will appear if a survey report is not sent in the months defined.
+SURVEY_REPORT_CHECK_THRESHOLD = 6
+# .. setting_name: SURVEY_REPORT_EXTRA_DATA
+# .. setting_default: empty dictionary
+# .. setting_description: Dictionary with additional information that you want to share in the report.
+SURVEY_REPORT_EXTRA_DATA = {}

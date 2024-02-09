@@ -6,10 +6,9 @@ from typing import Union
 
 import django.contrib.auth.models
 import openedx_tagging.core.tagging.rules as oel_tagging
-from organizations.models import Organization
 import rules
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from django.db.models import Q
+from organizations.models import Organization
 
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from common.djangoapps.student.models import CourseAccessRole
@@ -24,6 +23,7 @@ from common.djangoapps.student.roles import (
 from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
 
 from .models import TaxonomyOrg
+from .utils import get_context_key_from_key_string
 
 UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
 
@@ -219,16 +219,14 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     Everyone that has permission to edit the object should be able to tag it.
     """
     if not object_id:
-        raise ValueError("object_id must be provided")
-    try:
-        usage_key = UsageKey.from_string(object_id)
-        if not usage_key.course_key.is_course:
-            raise ValueError("object_id must be from a block or a course")
-        course_key = usage_key.course_key
-    except InvalidKeyError:
-        course_key = CourseKey.from_string(object_id)
+        return True
 
-    return has_studio_write_access(user, course_key)
+    try:
+        context_key = get_context_key_from_key_string(object_id)
+    except ValueError:
+        return False
+
+    return has_studio_write_access(user, context_key)
 
 
 @rules.predicate
@@ -251,15 +249,46 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
     if not object_id:
         raise ValueError("object_id must be provided")
-    try:
-        usage_key = UsageKey.from_string(object_id)
-        if not usage_key.course_key.is_course:
-            raise ValueError("object_id must be from a block or a course")
-        course_key = usage_key.course_key
-    except InvalidKeyError:
-        course_key = CourseKey.from_string(object_id)
 
-    return has_studio_read_access(user, course_key)
+    try:
+        context_key = get_context_key_from_key_string(object_id)
+    except ValueError:
+        return False
+
+    return has_studio_read_access(user, context_key)
+
+
+@rules.predicate
+def can_change_object_tag(
+    user: UserType, perm_obj: oel_tagging.ObjectTagPermissionItem | None = None
+) -> bool:
+    """
+    Checks if the user has permissions to create or modify tags on the given taxonomy and object_id.
+    """
+    if not oel_tagging.can_change_object_tag(user, perm_obj):
+        return False
+
+    # The following code allows METHOD permission (PUT) in the viewset for everyone
+    if perm_obj is None:
+        return True
+
+    # TaxonomySerializer use this rule passing object_id = "" to check if the user
+    # can use the taxonomy
+    if perm_obj.object_id == "":
+        return True
+
+    # Also skip taxonomy check if the taxonomy is not set
+    if not perm_obj.taxonomy:
+        return True
+
+    # Taxonomy admins can tag any object using any taxonomy
+    if oel_tagging.is_taxonomy_admin(user):
+        return True
+
+    context_key = get_context_key_from_key_string(perm_obj.object_id)
+
+    org_short_name = context_key.org
+    return perm_obj.taxonomy.taxonomyorg_set.filter(Q(org__short_name=org_short_name) | Q(org=None)).exists()
 
 
 @rules.predicate
@@ -274,7 +303,7 @@ def can_change_taxonomy_tag(user: UserType, tag: oel_tagging.Tag | None = None) 
     return oel_tagging.is_taxonomy_admin(user) and (
         not tag
         or not taxonomy
-        or (taxonomy and not taxonomy.allow_free_text and not taxonomy.system_defined)
+        or (bool(taxonomy) and not taxonomy.allow_free_text and not taxonomy.system_defined)
     )
 
 
@@ -292,10 +321,11 @@ rules.set_perm("oel_tagging.delete_tag", can_change_taxonomy_tag)
 rules.set_perm("oel_tagging.view_tag", rules.always_allow)
 
 # ObjectTag
-rules.set_perm("oel_tagging.add_object_tag", oel_tagging.can_change_object_tag)
-rules.set_perm("oel_tagging.change_objecttag", oel_tagging.can_change_object_tag)
-rules.set_perm("oel_tagging.delete_objecttag", oel_tagging.can_change_object_tag)
+rules.set_perm("oel_tagging.add_objecttag", can_change_object_tag)
+rules.set_perm("oel_tagging.change_objecttag", can_change_object_tag)
+rules.set_perm("oel_tagging.delete_objecttag", can_change_object_tag)
 rules.set_perm("oel_tagging.view_objecttag", oel_tagging.can_view_object_tag)
+rules.set_perm("oel_tagging.can_tag_object", can_change_object_tag)
 
 # This perms are used in the tagging rest api from openedx_tagging that is exposed in the CMS. They are overridden here
 # to include Organization and objects permissions.
