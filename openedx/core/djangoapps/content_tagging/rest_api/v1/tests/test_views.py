@@ -1818,7 +1818,7 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         assert response.headers['Content-Type'] == 'text/csv'
 
         expected_csv = (
-            '"Name","Type","ID","Taxonomy 1","Taxonomy 2"\r\n'
+            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
             '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
             '"  test sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@test_'
             'sequential","Tag 1.1, Tag 1.2","Tag 2.1"\r\n'
