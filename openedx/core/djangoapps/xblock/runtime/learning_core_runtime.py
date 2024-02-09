@@ -1,5 +1,5 @@
 """
-
+Learning Core XBlock Runtime code
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from xblock.exceptions import InvalidScopeError, NoSuchDefinition, NoSuchUsage
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope, Sentinel
 from xblock.field_data import FieldData
 
-from opaque_keys.edx.keys import AssetKey, CourseKey, DefinitionKey, LearningContextKey, UsageKey, UsageKeyV2
+from opaque_keys.edx.keys import AssetKey, CourseKey, LearningContextKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import CheckFieldMixin
 
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
@@ -38,8 +38,6 @@ log = logging.getLogger(__name__)
 
 DELETED = Sentinel('DELETED')  # Special value indicating a field was reset to its default value
 CHILDREN_INCLUDES = Sentinel('CHILDREN_INCLUDES')  # Key for a pseudo-field that stores the XBlock's children info
-
-MAX_DEFINITIONS_LOADED = 100  # How many of the most recently used XBlocks' field data to keep in memory at max.
 
 ActiveBlock = namedtuple('ActiveBlock', ['olx_hash', 'changed_fields'])
 
@@ -313,7 +311,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             )
             content = contents_api.get_or_create_text_content(
                 component.learning_package_id,
-                media_type_id=block_media_type.id,
+                block_media_type.id,
                 text=serialized.olx_str,
                 created=now,
             )

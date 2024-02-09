@@ -718,7 +718,7 @@ def set_library_block_olx(usage_key, new_olx_str):
 
     new_content = contents_api.get_or_create_text_content(
         component.learning_package_id,
-        media_type_id=get_or_create_olx_media_type(usage_key.block_type).id,
+        get_or_create_olx_media_type(usage_key.block_type).id,
         text=new_olx_str,
         created=now,
     )
@@ -842,13 +842,13 @@ def create_component_for_block(content_lib, usage_key):
     )
     content = contents_api.get_or_create_text_content(
         learning_package.id,
-        media_type_id=get_or_create_olx_media_type(usage_key.block_type).id,
+        get_or_create_olx_media_type(usage_key.block_type).id,
         text=xml_text,
         created=now,
     )
-    components_api.add_content_to_component_version(
+    components_api.create_component_version_content(
         component_version.pk,
-        content_id=content.id,
+        content.id,
         key="block.xml",
         learner_downloadable=False
     )
