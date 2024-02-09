@@ -13,9 +13,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_f
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
-from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 from openedx.core.djangoapps.content_libraries import api as library_api
-from blockstore.apps import api as blockstore_api
 
 CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
 XBLOCK_ENDPOINT = "/xblock/"
@@ -214,7 +212,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
 
 
-class ClipboardLibraryContentPasteTestCase(BlockstoreAppTestMixin, LiveServerTestCase, ModuleStoreTestCase):
+class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
     """
     Test Clipboard Paste functionality with library content
     """
@@ -229,7 +227,6 @@ class ClipboardLibraryContentPasteTestCase(BlockstoreAppTestMixin, LiveServerTes
         self.store = modulestore()
         # Create a content library:
         library = library_api.create_library(
-            collection_uuid=blockstore_api.create_collection("Collection").uuid,
             library_type=library_api.COMPLEX,
             org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
             slug="lib",
