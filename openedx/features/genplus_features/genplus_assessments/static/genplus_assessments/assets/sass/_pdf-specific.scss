@@ -1,0 +1,25 @@
+header {
+
+  &.alt {
+    display: none;
+  }
+}
+
+@page title_template {
+  header {
+
+    &.alt {
+      display: none;
+    }
+  }
+}
+
+@page regular_template {
+  header {
+    display: none;
+
+    &.alt {
+      display: block;
+    }
+  }
+}

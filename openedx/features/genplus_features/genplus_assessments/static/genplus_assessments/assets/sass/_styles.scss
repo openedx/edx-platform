@@ -1,0 +1,626 @@
+* {
+  box-sizing: border-box;
+}
+
+*:after,
+*:before {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: "Readex Pro", serifsystem-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: $text-color;
+  font-size: 14px;
+  line-height: 1.3;
+  margin: .75in;
+  padding-top: .5rem;
+}
+
+.cover-wrapper {
+  padding: 0;
+}
+
+.cover-content {
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: $heading-font;
+  font-weight: normal;
+}
+
+hr {
+  margin: 1rem 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+canvas {
+  display: block;
+  width: 800px;
+  margin: 0 auto 2rem;
+}
+
+blockquote {
+  margin: 0 1rem 2rem;
+  padding: .3rem 2rem;
+
+  h3 {
+    margin: 0;
+  }
+
+  q {
+    display: block;
+  }
+
+  cite {
+    font-style: normal;
+  }
+}
+
+.heading-default {
+  color: $pink;
+}
+
+.container {
+  margin: 0 auto;
+
+  @include clearfix;
+}
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 3rem;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1rem;
+  text-align: center;
+
+  &.small {
+    text-align: right;
+    margin-top: 0;
+
+    img {
+      width: 300px;
+      height: auto;
+     }
+  }
+
+  .student-name {
+    font-size: 2rem;
+  }
+
+  .container {
+
+    .text-block {
+      overflow: hidden;
+    }
+
+    .text-frame {
+      overflow: hidden;
+      padding-top: 4rem;
+    }
+  }
+
+  .name {
+    margin: 0;
+    color: $pink;
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    color: $pink;
+  }
+
+  .title {
+    margin: 0;
+    background: $text-color;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 3.65rem;
+    line-height: 1;
+    text-align: right;
+    padding-right: 2rem;
+
+    .text {
+      display: inline-block;
+      position: relative;
+      vertical-align: bottom;
+      margin-bottom: -.5rem;
+    }
+  }
+
+  .logo {
+    float: right;
+    width: 9rem;
+    margin-left: -2rem;
+  }
+
+  .profile {
+
+    &-image {
+      text-align: center;
+      float: left;
+      width: 8rem;
+      height: 8rem;
+      margin-right: 1rem;
+      margin-top: 3.3rem;
+      background: $pink;
+      border-radius: 50%;
+
+      img {
+        vertical-align: top;
+        width: 100%;
+      }
+    }
+
+    &-frame {
+      width: 7rem;
+      height: 7rem;
+      margin: 0 auto;
+      background: $purple;
+      position: relative;
+      overflow: hidden;
+      border-radius: 50%;
+    }
+
+    &-box {
+      width: 5.8rem;
+      height: 5.8rem;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 50%;
+      background: $text-color;
+    }
+  }
+
+  &.alt {
+
+    .text-block {
+      max-width: 50%;
+      margin-left: auto;
+    }
+
+    .logo {
+      width: 6rem;
+    }
+
+    .title {
+      font-size: 2.25rem;
+      padding-top: 1rem;
+
+      .text {
+        margin-bottom: -.26rem;
+      }
+    }
+
+    .profile-image {
+      float: left;
+      width: 6rem;
+      height: 6rem;
+      margin-bottom: -1rem;
+      position: relative;
+      z-index: 1;
+
+      .profile-frame {
+        width: 5.2rem;
+        height: 5.2rem;
+
+        img {
+          width: 4.2rem;
+        }
+      }
+    }
+  }
+}
+
+.section-wrapper {
+  page-break-inside: avoid;
+  padding: 2.7rem 0 3rem;
+}
+
+.section {
+  border: .5rem solid $pink-lighter;
+  border-radius: $default-radius;
+  position: relative;
+  padding: 0 1rem;
+  margin: 0;
+  page-break-inside: avoid;
+  z-index: 1;
+
+  .heading {
+    position: relative;
+    page-break-inside: avoid;
+    margin: -2.7rem 0 1rem;
+
+    .text-block {
+      position: relative;
+      background: #fff;
+      border: .25rem solid $pink;
+      margin-left: -2rem;
+      padding: 5px .5rem 5px 35px;
+      display: inline-block;
+      vertical-align: middle;
+      border-radius: 0 $default-radius $default-radius 0;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      text-transform: capitalize;
+    }
+
+    .subtitle {
+      color: $pink;
+    }
+
+    .image-frame {
+      height: 5rem;
+      width: 5rem;
+      border-radius: 50%;
+      border: .5rem solid $pink;
+      display: inline-block;
+      vertical-align: middle;
+      background: #fff;
+      padding: .5rem;
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  .content {
+
+    p {
+      margin: 0 0 1.2rem;
+    }
+  }
+}
+
+.assessment-intro {
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 1rem 2rem;
+  border: .5rem solid $pink;
+  margin-bottom: 2rem;
+
+  h2 {
+    float: left;
+    width: 40%;
+    margin: 0;
+    padding-right: 20px;
+  }
+
+  .year-info {
+    position: relative;
+    float: left;
+    width: 30%;
+    padding: 10px 10px 10px 40px;
+
+    img {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      margin-top: -1.16rem;
+    }
+  }
+}
+
+.rating-assessment {
+  border: .25rem solid $text-color;
+  border-radius: $default-radius;
+  white-space: nowrap;
+  padding: .5rem 1rem;
+  margin-bottom: 1rem;
+  page-break-inside: avoid;
+  @include clearfix;
+
+  .question-text {
+    display: inline-block;
+    vertical-align: middle;
+    white-space: normal;
+    width: 360px;
+  }
+
+  .year-info {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    width: 240px;
+    padding: 10px;
+
+    .text {
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1.2;
+    }
+
+    img {
+      float: left;
+    }
+
+    .star-rating {
+      float: left;
+      padding: 4px 0 0 1rem;
+    }
+  }
+
+  p {
+    margin: 0;
+    overflow: hidden;
+  }
+}
+
+.text-assessment {
+  page-break-inside: avoid;
+
+  .question-text {
+    padding: 0 2rem;
+  }
+
+  .answers {
+    overflow: hidden;
+    padding-left: 1rem;
+  }
+
+  .answer-list {
+    position: relative;
+    float: left;
+    width: 45%;
+    border-radius: 20px;
+    border: 0.25rem solid $pink-lighter;
+
+    &.end-year {
+      float: right;
+      border-color: $blue-lighter;
+    }
+
+    img {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      margin: -1.16rem 0 0 -1.16rem;
+    }
+  }
+
+  p {
+    margin: 0 0 .5rem;
+  }
+}
+
+.alphabets-list {
+  counter-reset: alphabets;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+
+  li {
+    counter-increment: alphabets;
+    width: 20%;
+    float: left;
+    position: relative;
+    padding: 0 13px 0 15px;
+
+    &:last-of-type {
+      padding-right: 0;
+    }
+
+    &:before {
+      content: counter(alphabets, upper-alpha);
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      text-align: center;
+      margin-top: -1.16rem;
+      z-index: 1;
+      line-height: 2.32rem;
+    }
+
+    img {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      margin-top: -1.16rem;
+    }
+
+    .text {
+      display: block;
+      border: .25rem solid $pink-lighter;
+      border-radius: $default-radius;
+      padding: 6px .5rem 6px 18px;
+    }
+  }
+}
+
+.star-rating {
+  margin: 0 0 0 auto;
+  padding: 0 0 0 1rem;
+  list-style: none;
+  float: right;
+
+  li {
+    float: left;
+    position: relative;
+    margin-left: .25rem;
+  }
+}
+
+.unit-completion {
+  @include clearfix;
+
+  h2 {
+    color: $pink;
+    margin-right: 1rem;
+  }
+}
+
+.completion-badges {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: .9rem;
+  text-align: center;
+  text-transform: uppercase;
+  @include clearfix;
+
+  .image-frame {
+    height: 5rem;
+    width: 5rem;
+    margin: 0 auto .8rem;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+
+    .completed {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 20px;
+      max-width: 3rem;
+    }
+  }
+
+  li {
+    display: inline-block;
+    vertical-align: top;
+    margin: .25rem;
+  }
+
+  .text {
+    display: block;
+  }
+}
+
+.fill-in-blanks {
+  margin: .5rem 0 2rem;
+  padding: 0;
+  list-style: none;
+
+  &.alt {
+
+    li {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  li {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: .5rem;
+
+    p {
+      .section & {
+        margin: 0;
+      }
+    }
+  }
+
+  .text {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      border-bottom: 2px dotted #000;
+      width: 600rem;
+      left: 100%;
+      bottom: .27rem;
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+.teacher-comments {
+  color: $pink;
+}
+
+.booster-badges {
+  @include clearfix;
+
+  h2,
+  h3 {
+    color: $pink;
+  }
+
+  .group-image {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .badges {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: .8rem;
+    text-align: center;
+
+    .date {
+      display: block;
+    }
+
+    li {
+      text-align: center;
+      margin: 0 1rem 2rem;
+      display: inline-block;
+      vertical-align: top;
+
+      img {
+        max-width: 6rem;
+      }
+    }
+  }
+}
+
+.icon-info {
+  color: $pink;
+  border: 1px solid $pink;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 15px;
+  line-height: 16px;
+  margin-bottom: 2px;
+}
+
+.list-unstyled {
+  list-style: none;
+}
+
+.skills-reflection {
+
+  .heading {
+    color: $pink;
+  }
+}
+
+.teacher-feedbacks {
+  page-break-before: always;
+}
