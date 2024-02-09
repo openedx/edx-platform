@@ -333,6 +333,11 @@ xblock_deleted_event_setting['course-authoring-xblock-lifecycle']['enabled'] = T
 xblock_duplicated_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.duplicated.v1']
 xblock_duplicated_event_setting['course-authoring-xblock-lifecycle']['enabled'] = True
 
+course_access_role_added_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.user.course_access_role.added.v1']
+course_access_role_added_event_setting['course-access-role-lifecycle']['enabled'] = True
+course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.user.course_access_role.removed.v1']
+course_access_role_removed_event_setting['course-access-role-lifecycle']['enabled'] = True
+
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
