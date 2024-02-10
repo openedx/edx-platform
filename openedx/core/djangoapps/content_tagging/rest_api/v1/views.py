@@ -173,8 +173,7 @@ class ObjectTagExportView(APIView):
 
             # Prepare the header for the taxonomies
             for taxonomy_id, taxonomy in taxonomies.items():
-                # ToDo: change to taxonomy.external_id after the external_id is implemented
-                header[f"taxonomy_{taxonomy_id}"] = taxonomy.name
+                header[f"taxonomy_{taxonomy_id}"] = taxonomy.export_id
 
             csv_writer = csv.DictWriter(pseudo_buffer, fieldnames=header.keys(), quoting=csv.QUOTE_NONNUMERIC)
             yield csv_writer.writerow(header)
