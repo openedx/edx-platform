@@ -1,0 +1,5 @@
+<h3 class="modal-section-title">
+    <input type="checkbox" id="optional_content" name="optional_content"
+          class="input input-checkbox" />
+    <%- gettext('Mark as optional') %>
+</h3>

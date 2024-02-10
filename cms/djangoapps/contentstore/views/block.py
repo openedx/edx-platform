@@ -1279,6 +1279,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             'group_access': xblock.group_access,
             'user_partitions': user_partitions,
             'show_correctness': xblock.show_correctness,
+            'optional_content': xblock.optional_content,
         })
 
         if xblock.category == 'sequential':

@@ -43,7 +43,7 @@ class BlockCompletionTransformer(BlockStructureTransformer):
 
     @classmethod
     def collect(cls, block_structure):
-        block_structure.request_xblock_fields('completion_mode')
+        block_structure.request_xblock_fields('completion_mode', 'optional_content')
 
     @staticmethod
     def _is_block_excluded(block_structure, block_key):
