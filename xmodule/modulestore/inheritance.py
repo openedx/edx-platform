@@ -238,6 +238,17 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings
     )
 
+    optional_content = Boolean(
+        display_name=_('Optional'),
+        help=_(
+            'Set this to true to mark this block as optional.'
+            'Progress in this block won\'t count towards course completion progress'
+            'and will count as optional progress instead.'
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
     @property
     def close_date(self):
         """

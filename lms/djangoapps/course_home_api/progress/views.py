@@ -246,6 +246,7 @@ class ProgressTabView(RetrieveAPIView):
             'access_expiration': access_expiration,
             'certificate_data': get_cert_data(student, course, enrollment_mode, course_grade),
             'completion_summary': get_course_blocks_completion_summary(course_key, student),
+            'optional_completion_summary': get_course_blocks_completion_summary(course_key, student, optional=True),
             'course_grade': course_grade,
             'credit_course_requirements': credit_course_requirements(course_key, student),
             'end': course.end,

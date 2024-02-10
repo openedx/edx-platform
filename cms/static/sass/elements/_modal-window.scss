@@ -747,6 +747,7 @@
 
     .edit-discussion,
     .edit-staff-lock,
+    .edit-optional-content,
     .edit-content-visibility,
     .edit-unit-access {
       margin-bottom: $baseline;
@@ -760,19 +761,20 @@
     // UI: staff lock and discussion
     .edit-discussion,
     .edit-staff-lock,
+    .edit-optional-content,
     .edit-settings-timed-examination,
     .edit-unit-access {
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
 
         // CASE: unchecked
-        ~ .tip-warning {
+        ~.tip-warning {
           display: block;
         }
 
         // CASE: checked
         &:checked {
-          ~ .tip-warning {
+          ~.tip-warning {
             display: none;
           }
         }
@@ -832,6 +834,7 @@
 
   .edit-discussion,
   .edit-unit-access,
+  .edit-optional-content,
   .edit-staff-lock {
     .modal-section-content {
       @include font-size(16);
@@ -874,6 +877,7 @@
 
   .edit-discussion,
   .edit-unit-access,
+  .edit-optional-content,
   .edit-staff-lock {
     .modal-section-content {
       @include font-size(16);

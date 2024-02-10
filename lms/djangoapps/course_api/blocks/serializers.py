@@ -56,6 +56,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('has_score'),
     SupportedFieldType('has_scheduled_content'),
     SupportedFieldType('weight'),
+    SupportedFieldType('optional_content'),
     SupportedFieldType('show_correctness'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
