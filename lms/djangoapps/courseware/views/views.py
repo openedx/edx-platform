@@ -2015,7 +2015,7 @@ def financial_assistance_request(request):
             return HttpResponseForbidden()
         # Require email verification
         if request.user.is_active is not True:
-            logging.warning('FA_v1: User %s tried to submit app without activating their account.' % username)
+            logging.warning('FA_v1: User %s tried to submit app without activating their account.', username)
             return HttpResponseForbidden('Please confirm your email before applying for financial assistance.')
 
         course_id = data['course']
@@ -2091,7 +2091,7 @@ def financial_assistance_request_v2(request):
             return HttpResponseForbidden()
         # Require email verification
         if request.user.is_active is not True:
-            logging.warning('FA_v2: User %s tried to submit app without activating their account.' % username)
+            logging.warning('FA_v2: User %s tried to submit app without activating their account.', username)
             return HttpResponseForbidden('Please confirm your email before applying for financial assistance.')
 
         course_id = data['course']
