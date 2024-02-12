@@ -499,12 +499,12 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         ('staff', 11),
-        ("content_creatorA", 22),  # FIXME too many queries.
-        ("library_staffA", 22),
-        ("library_userA", 22),
-        ("instructorA", 22),
-        ("course_instructorA", 22),
-        ("course_staffA", 22),
+        ("content_creatorA", 19),  # FIXME too many queries.
+        ("library_staffA", 19),
+        ("library_userA", 19),
+        ("instructorA", 19),
+        ("course_instructorA", 19),
+        ("course_staffA", 19),
     )
     @ddt.unpack
     def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
@@ -1241,11 +1241,12 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         self.client.force_authenticate(user=user)
 
         response = self.client.put(url, {"orgs": []}, format="json")
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND]
 
         # Check that the orgs didn't change
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
         response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
         assert response.data["orgs"] == [self.orgA.short_name]
 
     def test_update_org_check_permissions_orgA(self) -> None:
@@ -1770,25 +1771,32 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
     @ddt.data(
-        ('staff', 7),
-        #("content_creatorA", 8),  # FIXME 403?
-        #("library_staffA", 8),
-        #("library_userA", 8),
-        ("instructorA", 17),  # FIXME too many queries.
-        ("course_instructorA", 17),
-        ("course_staffA", 17),
+        ('staff', 'courseA', 7),
+        ('staff', 'libraryA', 7),
+        ("content_creatorA", 'courseA', 20, False),  # FIXME too many queries.
+        ("content_creatorA", 'libraryA', 20, False),
+        ("library_staffA", 'libraryA', 20, False),  # Library users can only view objecttags, not change them.
+        ("library_userA", 'libraryA', 20, False),
+        ("instructorA", 'courseA', 13),
+        ("course_instructorA", 'courseA', 13),
+        ("course_staffA", 'courseA', 13),
     )
     @ddt.unpack
-    def test_object_tags_query_count(self, user_attr: str, expected_queries: int):
+    def test_object_tags_query_count(
+            self,
+            user_attr: str,
+            object_attr: str,
+            expected_queries: int,
+            expected_perm: bool = True):
         """
         Test how many queries are used when retrieving object tags and permissions
         """
-        object_key = self.courseA
+        object_key = getattr(self, object_attr)
         object_id = str(object_key)
         tagging_api.tag_object(object_id=object_id, taxonomy=self.t1, tags=["anvil", "android"])
         expected_tags = [
-            {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": True},
-            {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": True},
+            {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": expected_perm},
+            {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": expected_perm},
         ]
         url = OBJECT_TAGS_URL.format(object_id=object_id)
         user = getattr(self, user_attr)
@@ -1798,7 +1806,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         assert response.status_code == 200
         assert len(response.data[object_id]["taxonomies"]) == 1
-        assert response.data[object_id]["taxonomies"][0]["can_tag_object"]
+        assert response.data[object_id]["taxonomies"][0]["can_tag_object"] == expected_perm
         assert response.data[object_id]["taxonomies"][0]["tags"] == expected_tags
 
 

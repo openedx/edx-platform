@@ -7,11 +7,9 @@ from typing import Union
 import django.contrib.auth.models
 import openedx_tagging.core.tagging.rules as oel_tagging
 import rules
-from django.db.models import Q
 from organizations.models import Organization
 
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
-from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -45,7 +43,7 @@ def is_org_user(user: UserType, orgs: list[Organization]) -> bool:
 
 def get_admin_orgs(user: UserType, orgs: list[Organization] | None = None) -> list[Organization]:
     """
-    Returns a list of orgs that the given user is an admin, from the given list of orgs.
+    Returns a list of orgs that the given user is an org-level staff, from the given list of orgs.
 
     If no orgs are provided, check all orgs
     """
@@ -55,9 +53,9 @@ def get_admin_orgs(user: UserType, orgs: list[Organization] | None = None) -> li
     ]
 
 
-def get_content_creator_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
+def _get_content_creator_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
     """
-    Returns a list of orgs that the given user is a content creator, the given list of orgs.
+    Returns a list of orgs that the given user is an org-level library user or instructor, from the given list of orgs.
     """
     return [
         org for org in orgs if (
@@ -68,20 +66,42 @@ def get_content_creator_orgs(user: UserType, orgs: list[Organization]) -> list[O
     ]
 
 
-def get_instructor_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
+def _get_course_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
     """
-    Returns a list of orgs that the given user is an instructor, from the given list of orgs.
+    Returns a list of orgs for courses where the given user is staff or instructor, from the given list of orgs.
+
+    Note: The user does not have org-level access to these orgs, only course-level access. So when checking ObjectTag
+    permissions, ensure that the user has staff/instructor access to the course/library with that object_id.
     """
-    instructor_roles = CourseAccessRole.objects.filter(
-        org__in=(org.short_name for org in orgs),
-        user=user,
-        role__in=(CourseStaffRole.ROLE, CourseInstructorRole.ROLE),
-    )
-    instructor_orgs = [role.org for role in instructor_roles]
-    return [org for org in orgs if org.short_name in instructor_orgs]
+    if not orgs:
+        return []
+
+    def user_has_role_ignore_course_id(user, role_name, org_name) -> bool:
+        """
+        Returns True if the given user has the given role for the given org, OR for any courses in this org.
+        """
+        # We use the user's RolesCache here to avoid re-querying.
+        # This cache gets populated the first time the user's permissions are checked (i.e when
+        # _get_content_creator_orgs is called).
+
+        # pylint: disable=protected-access
+        roles_cache = user._roles
+        assert roles_cache
+        return any(
+            access_role.role in roles_cache.get_roles(role_name) and
+            access_role.org == org_name
+            for access_role in roles_cache._roles
+        )
+
+    return [
+        org for org in orgs if (
+            user_has_role_ignore_course_id(user, CourseStaffRole.ROLE, org.short_name) or
+            user_has_role_ignore_course_id(user, CourseInstructorRole.ROLE, org.short_name)
+        )
+    ]
 
 
-def get_library_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
+def _get_library_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
     """
     Returns a list of orgs (from the given list of orgs) that are associated with libraries that the given user has
     explicitly been granted read access for.
@@ -100,14 +120,15 @@ def get_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization
     Return a list of orgs that the given user is a member of (instructor or content creator),
     from the given list of orgs.
     """
-    content_creator_orgs = get_content_creator_orgs(user, orgs)
-    instructor_orgs = get_instructor_orgs(user, orgs)
-    library_user_orgs = get_library_user_orgs(user, orgs)
-    user_orgs = list(set(content_creator_orgs) | set(instructor_orgs) | set(library_user_orgs))
+    content_creator_orgs = _get_content_creator_orgs(user, orgs)
+    course_user_orgs = _get_course_user_orgs(user, orgs)
+    library_user_orgs = _get_library_user_orgs(user, orgs)
+    user_orgs = list(set(content_creator_orgs) | set(course_user_orgs) | set(library_user_orgs))
 
     return user_orgs
 
 
+@rules.predicate
 def can_create_taxonomy(user: UserType) -> bool:
     """
     Returns True if the given user can create a taxonomy.
@@ -146,7 +167,7 @@ def can_view_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy) -> bool:
 
     is_all_org, taxonomy_orgs = TaxonomyOrg.get_organizations(taxonomy)
 
-    # Enabled all-org taxonomies can be viewed by any registred user
+    # Enabled all-org taxonomies can be viewed by any registered user
     if is_all_org:
         return taxonomy.enabled
 
@@ -211,7 +232,11 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     except ValueError:
         return False
 
-    return has_studio_write_access(user, context_key)
+    if has_studio_write_access(user, context_key):
+        return True
+
+    object_org = Organization.objects.filter(short_name=context_key.org).first()
+    return object_org and is_org_admin(user, [object_org])
 
 
 @rules.predicate
@@ -230,7 +255,7 @@ def can_view_object_tag_taxonomy(user: UserType, taxonomy: oel_tagging.Taxonomy)
 @rules.predicate
 def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     """
-    Everyone that has permission to view the object should be able to tag it.
+    Everyone that has permission to view the object should be able to view its tags.
     """
     if not object_id:
         raise ValueError("object_id must be provided")
@@ -240,40 +265,11 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     except ValueError:
         return False
 
-    return has_studio_read_access(user, context_key)
-
-
-@rules.predicate
-def can_change_object_tag(
-    user: UserType, perm_obj: oel_tagging.ObjectTagPermissionItem | None = None
-) -> bool:
-    """
-    Checks if the user has permissions to create or modify tags on the given taxonomy and object_id.
-    """
-    if not oel_tagging.can_change_object_tag(user, perm_obj):
-        return False
-
-    # The following code allows METHOD permission (PUT) in the viewset for everyone
-    if perm_obj is None:
+    if has_studio_read_access(user, context_key):
         return True
 
-    # TaxonomySerializer use this rule passing object_id = "" to check if the user
-    # can use the taxonomy
-    if perm_obj.object_id == "":
-        return True
-
-    # Also skip taxonomy check if the taxonomy is not set
-    if not perm_obj.taxonomy:
-        return True
-
-    # Taxonomy admins can tag any object using any taxonomy
-    if oel_tagging.is_taxonomy_admin(user):
-        return True
-
-    context_key = get_context_key_from_key_string(perm_obj.object_id)
-
-    org_short_name = context_key.org
-    return perm_obj.taxonomy.taxonomyorg_set.filter(Q(org__short_name=org_short_name) | Q(org=None)).exists()
+    object_org = Organization.objects.filter(short_name=context_key.org).first()
+    return object_org and (is_org_admin(user, [object_org]) or is_org_user(user, [object_org]))
 
 
 @rules.predicate
@@ -306,11 +302,7 @@ rules.set_perm("oel_tagging.delete_tag", can_change_taxonomy_tag)
 rules.set_perm("oel_tagging.view_tag", rules.always_allow)
 
 # ObjectTag
-rules.set_perm("oel_tagging.add_objecttag", can_change_object_tag)
-rules.set_perm("oel_tagging.change_objecttag", can_change_object_tag)
-rules.set_perm("oel_tagging.delete_objecttag", can_change_object_tag)
-rules.set_perm("oel_tagging.view_objecttag", oel_tagging.can_view_object_tag)
-rules.set_perm("oel_tagging.can_tag_object", can_change_object_tag)
+rules.set_perm("oel_tagging.can_tag_object", oel_tagging.can_change_object_tag)
 
 # This perms are used in the tagging rest api from openedx_tagging that is exposed in the CMS. They are overridden here
 # to include Organization and objects permissions.
