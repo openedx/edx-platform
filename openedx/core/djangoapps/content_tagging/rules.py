@@ -18,7 +18,6 @@ from common.djangoapps.student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole
 )
-from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
 
 from .models import TaxonomyOrg
 from .utils import get_context_key_from_key_string, TaggingRulesCache
@@ -105,14 +104,13 @@ def _get_course_user_orgs(user: UserType, orgs: list[Organization]) -> list[Orga
 def _get_library_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
     """
     Returns a list of orgs (from the given list of orgs) that are associated with libraries that the given user has
-    explicitly been granted read access for.
+    explicitly been granted access to.
 
     Note: If no libraries exist for the given orgs, then no orgs will be returned, even though the user may be permitted
     to access future libraries created in these orgs.
     Nor does this mean the user may access all libraries in this org: library permissions are granted per library.
     """
-    libraries = get_libraries_for_user(user, org=[org.short_name for org in orgs]).select_related('org').only('org')
-    library_orgs = [library.org for library in libraries]
+    library_orgs = rules_cache.get_library_orgs(user, [org.short_name for org in orgs])
     return list(set(library_orgs).intersection(orgs))
 
 

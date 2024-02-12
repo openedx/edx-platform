@@ -9,6 +9,8 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from organizations.models import Organization
 
+from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
+
 from .types import ContentKey
 
 
@@ -78,3 +80,23 @@ class TaggingRulesCache:
             ]
 
         return all_orgs.values()
+
+    def get_library_orgs(self, user, org_names: list[str]) -> list[Organization]:
+        """
+        Returns the Organizations that are associated with libraries that the given user has explicitly been granted
+        access to.
+
+        These library orgs are cached for the duration of the request.
+        """
+        cache_key = f'library_orgs:{user.id}'
+        library_orgs = self.request_cache.data.get(cache_key)
+        if library_orgs is None:
+            library_orgs = {
+                library.org.short_name: library.org
+                for library in get_libraries_for_user(user).select_related('org').only('org')
+            }
+            self.request_cache.set(cache_key, library_orgs)
+
+        return [
+            library_orgs[org_name] for org_name in org_names if org_name in library_orgs
+        ]

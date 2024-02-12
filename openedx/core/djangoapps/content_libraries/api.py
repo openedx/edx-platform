@@ -291,10 +291,7 @@ def get_libraries_for_user(user, org=None, library_type=None):
     """
     filter_kwargs = {}
     if org:
-        if isinstance(org, list):
-            filter_kwargs['org__short_name__in'] = org
-        else:
-            filter_kwargs['org__short_name'] = org
+        filter_kwargs['org__short_name'] = org
     if library_type:
         filter_kwargs['type'] = library_type
     qs = ContentLibrary.objects.filter(**filter_kwargs)
