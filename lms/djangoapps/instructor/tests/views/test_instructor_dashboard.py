@@ -25,6 +25,7 @@ from common.djangoapps.student.tests.factories import AdminFactory, CourseAccess
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import XssTestMixin
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization
 from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
@@ -599,6 +600,30 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
+    def test_dashboard_analytics_access_based_on_permissions(self):
+        """
+        Test analytics dashboard message is shown based on user permissions
+        """
+        user = UserFactory.create()
+        role = Role.objects.create(name='test_role_1')
+        role.permissions.create(name=CourseRolesPermission.MANAGE_STUDENTS.value.name)
+        role.permissions.create(
+            name=CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value.name
+        )
+        UserRole.objects.get_or_create(
+            user=user,
+            role=role,
+            course=self.course_overview,
+        )
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(self.url)
+        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics"' \
+                            ' data-section="instructor_analytics">Analytics</button></li>'
+        self.assertContains(response, analytics_section)
+
+    @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
+    @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
     def test_dashboard_analytics_points_at_insights(self):
         """
         Test analytics dashboard message is shown
@@ -685,8 +710,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertContains(response, ora_section)
 
+    @ddt.data(
+        (CourseRolesPermission.MANAGE_GRADES.value.name),
+        (CourseRolesPermission.MANAGE_STUDENTS.value.name)
+    )
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
-    def test_open_response_assessment_page_access_based_on_permissions(self):
+    def test_open_response_assessment_page_access_based_on_permissions(self, permission):
         """
         Test that Open Responses is available only if course contains at least one ORA block
         and user has correct permissions
@@ -700,7 +729,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
         user = UserFactory.create()
         role = Role.objects.create(name='test_role_1')
-        role.permissions.create(name=CourseRolesPermission.MANAGE_GRADES.value.name)
+        role.permissions.create(name=permission)
         role.permissions.create(
             name=CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value.name
         )
@@ -753,6 +782,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @ddt.data(
         (CourseRolesPermission.MANAGE_ALL_USERS.value.name, True),
         (CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.value.name, False),
+        (CourseRolesPermission.MANAGE_STUDENTS.value.name, False)
     )
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
     @ddt.unpack
@@ -781,8 +811,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertContains(response, membership_section)
         self.assertEqual(access, admin_role in str(response.content))
 
+    @ddt.data(
+        (CourseRolesPermission.MANAGE_COHORTS.value.name),
+        (CourseRolesPermission.MANAGE_STUDENTS.value.name)
+    )
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
-    def test_cohort_page_access_based_on_permissions(self):
+    def test_cohort_page_access_based_on_permissions(self, permission):
         """
         Test that Cohorts tab is available only if user has correct permissions
         """
@@ -792,7 +826,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
         user = UserFactory.create()
         role = Role.objects.create(name='test_role_1')
-        role.permissions.create(name=CourseRolesPermission.MANAGE_COHORTS.value.name)
+        role.permissions.create(name=permission)
         role.permissions.create(
             name=CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value.name
         )
@@ -808,6 +842,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @ddt.data(
         (CourseRolesPermission.MANAGE_ALL_USERS.value.name),
         (CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF.value.name),
+        (CourseRolesPermission.MANAGE_STUDENTS.value.name)
     )
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
     def test_student_admin_page_access_based_on_permissions(self, permission_name):
@@ -833,9 +868,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url).content.decode('utf-8')
         self.assertEqual(True, admin_section in response)
 
+    @ddt.data(
+        (CourseRolesPermission.MANAGE_ALL_USERS.value.name),
+        (CourseRolesPermission.MANAGE_STUDENTS.value.name)
+    )
     @patch('lms.djangoapps.instructor.views.instructor_dashboard.is_enabled_for_course')
     @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
-    def test_extensions_page_access_based_on_permissions(self, mock):
+    def test_extensions_page_access_based_on_permissions(self, permission, mock):
         """
         Test that Extensions is available only if user has correct permissions
         """
@@ -846,7 +885,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
         user = UserFactory.create()
         role = Role.objects.create(name='test_role_1')
-        role.permissions.create(name=CourseRolesPermission.MANAGE_ALL_USERS.value.name)
+        role.permissions.create(name=permission)
         role.permissions.create(
             name=CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value.name
         )
@@ -858,6 +897,68 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url).content.decode('utf-8')
         self.assertEqual(True, extension_section in response)
+
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
+    def test_send_email_page_access_based_on_permissions(self):
+        """
+        Test that Email tab is available only if user has correct permissions
+        """
+        send_email_section = (
+            '<li class="nav-item"><button type="button" class="btn-link send_email" '
+            'data-section="send_email">Email</button></li>'
+        )
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
+        cauth = CourseAuthorization(course_id=self.course.id, email_enabled=True)
+        cauth.save()
+        user = UserFactory.create()
+        role = Role.objects.create(name='test_role_1')
+        role.permissions.create(name=CourseRolesPermission.MANAGE_STUDENTS.value.name)
+        role.permissions.create(
+            name=CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value.name
+        )
+        UserRole.objects.get_or_create(
+            user=user,
+            role=role,
+            course=self.course_overview,
+        )
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertContains(response, send_email_section)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
+    @override_waffle_flag(USE_PERMISSION_CHECKS_FLAG, active=True)
+    def test_special_exams_proctored_page_access_based_on_permissions(self):
+        """
+        Test that Email tab is available only if user has correct permissions
+        """
+        special_exams_section = (
+            '<li class="nav-item"><button type="button" class="btn-link special_exams" '
+            'data-section="special_exams">Special Exams</button></li>'
+        )
+        course = CourseFactory.create(
+            enable_proctored_exams=True,
+            enable_timed_exams=True,
+            grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
+            display_name='<script>alert("XSS")</script>',
+            default_store=ModuleStoreEnum.Type.split
+        )
+        course_overview = CourseOverview.get_from_id(course.id)
+        course_overview.save()
+        user = UserFactory.create()
+        role = Role.objects.create(name='test_role_1')
+        role.permissions.create(name=CourseRolesPermission.MANAGE_STUDENTS.value.name)
+        role.permissions.create(
+            name=CourseRolesPermission.ACCESS_INSTRUCTOR_DASHBOARD.value.name
+        )
+        UserRole.objects.get_or_create(
+            user=user,
+            role=role,
+            course=course_overview,
+        )
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(course.id)})
+        response = self.client.get(url)
+        self.assertContains(response, special_exams_section)
 
 
 @ddt.ddt

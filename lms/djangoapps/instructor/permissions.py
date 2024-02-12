@@ -40,6 +40,7 @@ MANAGE_STUDENTS = 'instructor.manage_students'
 MANAGE_MEMBERSHIP_LIMITED = 'instructor.manage_membership_limited'
 MANAGE_MEMBERSHIP_FULL = 'instructor.manage_membership_full'
 MANAGE_COHORTS = 'instructor.manage_cohorts'
+MANAGE_COURSE_INFO = 'instructor.manage_course_info'
 
 perms[ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM] = HasAccessRule('staff')
 perms[ASSIGN_TO_COHORTS] = HasAccessRule('staff')
@@ -132,5 +133,13 @@ perms[MANAGE_MEMBERSHIP_FULL] = (
 perms[MANAGE_COHORTS] = (
     HasAccessRule('instructor') |
     HasAccessRule('staff') |
-    HasPermissionRule(CourseRolesPermission.MANAGE_COHORTS)
+    HasPermissionRule(CourseRolesPermission.MANAGE_COHORTS) |
+    HasPermissionRule(CourseRolesPermission.MANAGE_STUDENTS)
+)
+# TODO: remove role checks once course_roles is fully implemented
+perms[MANAGE_COURSE_INFO] = (
+    HasAccessRule('instructor') |
+    HasAccessRule('staff') |
+    HasPermissionRule(CourseRolesPermission.MANAGE_ALL_USERS) |
+    HasPermissionRule(CourseRolesPermission.MANAGE_USERS_EXCEPT_ADMIN_AND_STAFF)
 )
