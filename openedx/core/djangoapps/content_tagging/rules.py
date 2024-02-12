@@ -21,8 +21,10 @@ from common.djangoapps.student.roles import (
 from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
 
 from .models import TaxonomyOrg
-from .utils import get_context_key_from_key_string
+from .utils import get_context_key_from_key_string, TaggingRulesCache
 
+
+rules_cache = TaggingRulesCache()
 UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
 
 
@@ -30,7 +32,6 @@ def is_org_admin(user: UserType, orgs: list[Organization] | None = None) -> bool
     """
     Return True if the given user is an admin for any of the given orgs.
     """
-
     return len(get_admin_orgs(user, orgs)) > 0
 
 
@@ -47,7 +48,7 @@ def get_admin_orgs(user: UserType, orgs: list[Organization] | None = None) -> li
 
     If no orgs are provided, check all orgs
     """
-    org_list = Organization.objects.all() if orgs is None else orgs
+    org_list = rules_cache.get_orgs() if orgs is None else orgs
     return [
         org for org in org_list if OrgStaffRole(org=org.short_name).has_user(user)
     ]
@@ -115,14 +116,15 @@ def _get_library_user_orgs(user: UserType, orgs: list[Organization]) -> list[Org
     return list(set(library_orgs).intersection(orgs))
 
 
-def get_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
+def get_user_orgs(user: UserType, orgs: list[Organization] | None = None) -> list[Organization]:
     """
     Return a list of orgs that the given user is a member of (instructor or content creator),
     from the given list of orgs.
     """
-    content_creator_orgs = _get_content_creator_orgs(user, orgs)
-    course_user_orgs = _get_course_user_orgs(user, orgs)
-    library_user_orgs = _get_library_user_orgs(user, orgs)
+    org_list = rules_cache.get_orgs() if orgs is None else orgs
+    content_creator_orgs = _get_content_creator_orgs(user, org_list)
+    course_user_orgs = _get_course_user_orgs(user, org_list)
+    library_user_orgs = _get_library_user_orgs(user, org_list)
     user_orgs = list(set(content_creator_orgs) | set(course_user_orgs) | set(library_user_orgs))
 
     return user_orgs
@@ -235,8 +237,9 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
     if has_studio_write_access(user, context_key):
         return True
 
-    object_org = Organization.objects.filter(short_name=context_key.org).first()
-    return object_org and is_org_admin(user, [object_org])
+    assert context_key.org
+    object_org = rules_cache.get_orgs([context_key.org])
+    return bool(object_org) and is_org_admin(user, object_org)
 
 
 @rules.predicate
@@ -268,8 +271,9 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     if has_studio_read_access(user, context_key):
         return True
 
-    object_org = Organization.objects.filter(short_name=context_key.org).first()
-    return object_org and (is_org_admin(user, [object_org]) or is_org_user(user, [object_org]))
+    assert context_key.org
+    object_org = rules_cache.get_orgs([context_key.org])
+    return bool(object_org) and (is_org_admin(user, object_org) or is_org_user(user, object_org))
 
 
 @rules.predicate

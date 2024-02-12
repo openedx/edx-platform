@@ -499,12 +499,12 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         ('staff', 11),
-        ("content_creatorA", 19),  # FIXME too many queries.
-        ("library_staffA", 19),
-        ("library_userA", 19),
-        ("instructorA", 19),
-        ("course_instructorA", 19),
-        ("course_staffA", 19),
+        ("content_creatorA", 18),  # FIXME too many queries.
+        ("library_staffA", 18),
+        ("library_userA", 18),
+        ("instructorA", 18),
+        ("course_instructorA", 18),
+        ("course_staffA", 18),
     )
     @ddt.unpack
     def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
@@ -1773,10 +1773,10 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     @ddt.data(
         ('staff', 'courseA', 7),
         ('staff', 'libraryA', 7),
-        ("content_creatorA", 'courseA', 20, False),  # FIXME too many queries.
-        ("content_creatorA", 'libraryA', 20, False),
-        ("library_staffA", 'libraryA', 20, False),  # Library users can only view objecttags, not change them.
-        ("library_userA", 'libraryA', 20, False),
+        ("content_creatorA", 'courseA', 15, False),  # FIXME too many queries.
+        ("content_creatorA", 'libraryA', 15, False),
+        ("library_staffA", 'libraryA', 15, False),  # Library users can only view objecttags, not change them.
+        ("library_userA", 'libraryA', 15, False),
         ("instructorA", 'courseA', 13),
         ("course_instructorA", 'courseA', 13),
         ("course_staffA", 'courseA', 13),
