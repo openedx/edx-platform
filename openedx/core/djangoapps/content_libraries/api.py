@@ -225,7 +225,6 @@ class LibraryXBlockMetadata:
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
-    def_key = attr.ib(type=BundleDefinitionLocator)
     display_name = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     tags_count = attr.ib(0)
@@ -238,7 +237,6 @@ class LibraryXBlockMetadata:
                 component.component_type.name,
                 component.local_key,
             ),
-            def_key=None,
             display_name=component.versioning.draft.title,
             has_unpublished_changes=component.versioning.has_unpublished_changes
         )
@@ -418,27 +416,24 @@ def create_library(
     Returns a ContentLibraryMetadata instance.
     """
     assert isinstance(org, Organization)
-    assert not transaction.get_autocommit(), (
-        "Call within a django.db.transaction.atomic block so that all created objects are rolled back on error."
-    )
-
     validate_unicode_slug(slug)
     try:
-        ref = ContentLibrary.objects.create(
-            org=org,
-            slug=slug,
-            type=library_type,
-            allow_public_learning=allow_public_learning,
-            allow_public_read=allow_public_read,
-            license=library_license,
-        )
-        learning_package = publishing_api.create_learning_package(
-            key=str(ref.library_key),
-            title=title,
-            description=description,
-        )
-        ref.learning_package = learning_package
-        ref.save()
+        with transaction.atomic():
+            ref = ContentLibrary.objects.create(
+                org=org,
+                slug=slug,
+                type=library_type,
+                allow_public_learning=allow_public_learning,
+                allow_public_read=allow_public_read,
+                license=library_license,
+            )
+            learning_package = publishing_api.create_learning_package(
+                key=str(ref.library_key),
+                title=title,
+                description=description,
+            )
+            ref.learning_package = learning_package
+            ref.save()
 
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
@@ -500,14 +495,16 @@ def set_library_user_permissions(library_key, user, access_level):
     if current_grant and current_grant.access_level == AccessLevel.ADMIN_LEVEL:
         if not ref.permission_grants.filter(access_level=AccessLevel.ADMIN_LEVEL).exclude(user_id=user.id).exists():
             raise LibraryPermissionIntegrityError(_('Cannot change or remove the access level for the only admin.'))
-    if access_level is None:
-        ref.permission_grants.filter(user=user).delete()
-    else:
-        ContentLibraryPermission.objects.update_or_create(
-            library=ref,
-            user=user,
-            defaults={"access_level": access_level},
-        )
+
+    with transaction.atomic():
+        if access_level is None:
+            ref.permission_grants.filter(user=user).delete()
+        else:
+            ContentLibraryPermission.objects.update_or_create(
+                library=ref,
+                user=user,
+                defaults={"access_level": access_level},
+            )
 
 
 def set_library_group_permissions(library_key, group, access_level):
@@ -517,14 +514,15 @@ def set_library_group_permissions(library_key, group, access_level):
     access_level should be one of the AccessLevel values defined above.
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
-    if access_level is None:
-        ref.permission_grants.filter(group=group).delete()
-    else:
-        ContentLibraryPermission.objects.update_or_create(
-            library=ref,
-            group=group,
-            defaults={"access_level": access_level},
-        )
+    with transaction.atomic():
+        if access_level is None:
+            ref.permission_grants.filter(group=group).delete()
+        else:
+            ContentLibraryPermission.objects.update_or_create(
+                library=ref,
+                group=group,
+                defaults={"access_level": access_level},
+            )
 
 
 def update_library(
@@ -589,14 +587,16 @@ def delete_library(library_key):
     """
     Delete a content library
     """
-    content_lib = ContentLibrary.objects.get_by_key(library_key)
-    learning_package = content_lib.learning_package
+    with transaction.atomic():
+        content_lib = ContentLibrary.objects.get_by_key(library_key)
+        learning_package = content_lib.learning_package
+        content_lib.delete()
 
-    content_lib.delete()
-
-    # TODO: Move the LearningPackage delete() operation to an API call
-    # TODO: Should we detach the LearningPackage and delete it asynchronously?
-    learning_package.delete()
+        # TODO: Move the LearningPackage delete() operation to an API call
+        # TODO: We should eventually detach the LearningPackage and delete it
+        #       asynchronously, especially if we need to delete a bunch of stuff
+        #       on the filesystem for it.
+        learning_package.delete()
 
     CONTENT_LIBRARY_DELETED.send_event(
         content_library=ContentLibraryData(
@@ -621,7 +621,6 @@ def lib_xblock_metadata_from_component(library_key, component):
             component.component_type.name,
             component.local_key,
         ),
-        def_key=None,
         display_name=component.versioning.draft.title,
         has_unpublished_changes=component.versioning.has_unpublished_changes
     )
@@ -678,7 +677,6 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
 
     return LibraryXBlockMetadata(
         usage_key=usage_key,
-        def_key=None,
         display_name=draft_version.title,
         has_unpublished_changes=(draft_version != published_version),
     )
@@ -716,20 +714,21 @@ def set_library_block_olx(usage_key, new_olx_str):
 
     now = datetime.now(tz=timezone.utc)
 
-    new_content = contents_api.get_or_create_text_content(
-        component.learning_package_id,
-        get_or_create_olx_media_type(usage_key.block_type).id,
-        text=new_olx_str,
-        created=now,
-    )
-    components_api.create_next_version(
-        component.pk,
-        title=new_title,
-        content_to_replace={
-            'block.xml': new_content.pk,
-        },
-        created=now,
-    )
+    with transaction.atomic():
+        new_content = contents_api.get_or_create_text_content(
+            component.learning_package_id,
+            get_or_create_olx_media_type(usage_key.block_type).id,
+            text=new_olx_str,
+            created=now,
+        )
+        components_api.create_next_version(
+            component.pk,
+            title=new_title,
+            content_to_replace={
+                'block.xml': new_content.pk,
+            },
+            created=now,
+        )
 
     LIBRARY_BLOCK_UPDATED.send_event(
         library_block=LibraryBlockData(
@@ -743,6 +742,11 @@ def create_library_block(library_key, block_type, definition_id):
     """
     Create a new XBlock in this library of the specified type (e.g. "html").
     """
+    # It's in the serializer as ``definition_id``, but for our purposes, it's
+    # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
+    # more details. TODO: Change the param name once we change the serializer.
+    block_id = definition_id
+
     assert isinstance(library_key, LibraryLocatorV2)
     ref = ContentLibrary.objects.get_by_key(library_key)
     if ref.type != COMPLEX:
@@ -763,16 +767,14 @@ def create_library_block(library_key, block_type, definition_id):
         )
 
     # Make sure the proposed ID will be valid:
-    validate_unicode_slug(definition_id)
+    validate_unicode_slug(block_id)
     # Ensure the XBlock type is valid and installed:
     XBlock.load_class(block_type)  # Will raise an exception if invalid
     # Make sure the new ID is not taken already:
-    new_usage_id = definition_id  # Since this is a top level XBlock, usage_id == definition_id
-
     usage_key = LibraryUsageLocatorV2(
         lib_key=library_key,
         block_type=block_type,
-        usage_id=new_usage_id,
+        usage_id=block_id,
     )
     library_context = get_learning_context_impl(usage_key)
 

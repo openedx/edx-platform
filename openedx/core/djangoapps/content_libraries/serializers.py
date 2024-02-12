@@ -110,10 +110,17 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     Serializer for LibraryXBlockMetadata
     """
     id = serializers.CharField(source="usage_key", read_only=True)
-    def_key = serializers.CharField(read_only=True)
+
+    # TODO: Remove this serializer field once the frontend no longer relies on
+    # it. Learning Core doesn't use definition IDs, but we're passing this dummy
+    # value back to preserve the REST API contract (just to reduce the number of
+    # things we're changing at one time).
+    def_key = serializers.ReadOnlyField(default=None)
+
     block_type = serializers.CharField(source="usage_key.block_type")
     display_name = serializers.CharField(read_only=True)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
+
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
@@ -133,9 +140,19 @@ class LibraryXBlockCreationSerializer(serializers.Serializer):
     Serializer for adding a new XBlock to a content library
     """
     # Parent block: optional usage key of an existing block to add this child
-    # block to.
+    # block to. TODO: Remove this, because we don't support it.
     parent_block = serializers.CharField(required=False)
+
     block_type = serializers.CharField()
+
+    # TODO: Rename to ``block_id`` or ``slug``. The Learning Core XBlock runtime
+    # doesn't use definition_ids, but this field is really just about requesting
+    # a specific block_id, e.g. the "best_tropical_vacation_spots" portion of a
+    # problem with UsageKey:
+    #   lb:Axim:VacationsLib:problem:best_tropical_vacation_spots
+    #
+    # It doesn't look like the frontend actually uses this to put meaningful
+    # slugs at the moment, but hopefully we can change this soon.
     definition_id = serializers.SlugField()
 
 

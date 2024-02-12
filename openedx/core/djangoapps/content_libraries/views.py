@@ -1,12 +1,45 @@
 """
-=======================
-Content Libraries Views
-=======================
+This module contains the REST APIs for Learning Core-based content libraries,
+and LTI 1.3 views (though I'm not sure how functional the LTI piece of this is
+right now).
 
-This module contains the REST APIs for blockstore-based content libraries, and
-LTI 1.3 views.
+.. warning::
+    **NOTICE: DO NOT USE @atomic FOR THESE VIEWS!!!**
+
+    We have to use manual transactions for content libraries related views, or
+    we'll run into mysterious race condition bugs. We should NOT use the @atomic
+    decorator over any of these views.
+
+    The problem is this: Code outside of this app will want to listen for
+    content lifecycle events like ``LIBRARY_BLOCK_CREATED`` and take certain
+    actions based on them. We see this pattern used extensively with courses.
+    Another common pattern is to use celery to queue up an asynchronous task to
+    do that work.
+
+    If there is an implicit database transaction around the entire view
+    execution, the celery task may start up just before the view finishes
+    executing. When that happens, the celery task doesn't see the new content
+    change, because the view transaction hasn't finished committing it to the
+    database yet.
+
+    The worst part of this is that dev environments and tests often won't catch
+    this because celery is typically configured to run in-process in those
+    situations. When it's run in-process, celery is already inside the view's
+    transaction so it will "see" the new changes and everything will appear to
+    be fine–only to fail intermittently when deployed to production.
+
+    We can and should continue to use atomic() as a context manager when we want
+    to make changes to multiple models. But this should happen at the api module
+    layer, not in the view. Other apps are permitted to call functions in the
+    public api.py module, and we want to make sure those api calls manage their
+    own transactions and don't assume that they're being called in an atomic
+    block.
+
+    Historical note: These views used to be wrapped with @atomic because we
+    wanted to make all views that operated on Blockstore data atomic:
+        https://github.com/openedx/edx-platform/pull/30456
+
 """
-
 
 from functools import wraps
 import itertools
@@ -16,7 +49,6 @@ import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
-from django.db.transaction import atomic
 from django.db.models import Q
 from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -185,7 +217,6 @@ class LibraryRootView(APIView):
             return paginator.get_paginated_response(serializer.data)
         return Response(serializer.data)
 
-    @atomic
     def post(self, request):
         """
         Create a new content library.
@@ -241,7 +272,6 @@ class LibraryDetailsView(APIView):
         result = api.get_library(key)
         return Response(ContentLibraryMetadataSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def patch(self, request, lib_key_str):
         """
@@ -264,7 +294,6 @@ class LibraryDetailsView(APIView):
         result = api.get_library(key)
         return Response(ContentLibraryMetadataSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str):  # pylint: disable=unused-argument
         """
@@ -285,7 +314,6 @@ class LibraryTeamView(APIView):
     Note also the 'allow_public_' settings which can be edited by PATCHing the
     library itself (LibraryDetailsView.patch).
     """
-    @atomic
     @convert_exceptions
     def post(self, request, lib_key_str):
         """
@@ -331,7 +359,6 @@ class LibraryTeamUserView(APIView):
     View to add/remove/edit an individual user's permissions for a content
     library.
     """
-    @atomic
     @convert_exceptions
     def put(self, request, lib_key_str, username):
         """
@@ -363,7 +390,6 @@ class LibraryTeamUserView(APIView):
             raise NotFound
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str, username):
         """
@@ -385,7 +411,6 @@ class LibraryTeamGroupView(APIView):
     """
     View to add/remove/edit a group's permissions for a content library.
     """
-    @atomic
     @convert_exceptions
     def put(self, request, lib_key_str, group_name):
         """
@@ -400,7 +425,6 @@ class LibraryTeamGroupView(APIView):
         api.set_library_group_permissions(key, group, access_level=serializer.validated_data["access_level"])
         return Response({})
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str, username):
         """
@@ -435,7 +459,6 @@ class LibraryCommitView(APIView):
     """
     Commit/publish or revert all of the draft changes made to the library.
     """
-    @atomic
     @convert_exceptions
     def post(self, request, lib_key_str):
         """
@@ -447,7 +470,6 @@ class LibraryCommitView(APIView):
         api.publish_changes(key)
         return Response({})
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str):  # pylint: disable=unused-argument
         """
@@ -502,7 +524,6 @@ class LibraryBlocksView(APIView):
         serializer = LibraryXBlockMetadataSerializer(paginated_xblock_metadata, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-    @atomic
     @convert_exceptions
     def post(self, request, lib_key_str):
         """
@@ -543,7 +564,6 @@ class LibraryBlockView(APIView):
 
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, usage_key_str):  # pylint: disable=unused-argument
         """
@@ -570,7 +590,6 @@ class LibraryBlockLtiUrlView(APIView):
 
     Returns 404 in case the block not found by the given key.
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -600,7 +619,6 @@ class LibraryBlockOlxView(APIView):
         xml_str = xblock_api.get_library_block_olx(key)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
-    @atomic
     @convert_exceptions
     def post(self, request, usage_key_str):
         """
@@ -626,7 +644,6 @@ class LibraryBlockAssetListView(APIView):
     """
     Views to list an existing XBlock's static asset files
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -645,7 +662,6 @@ class LibraryBlockAssetView(APIView):
     """
     parser_classes = (MultiPartParser, )
 
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str, file_path):
         """
@@ -659,7 +675,6 @@ class LibraryBlockAssetView(APIView):
                 return Response(LibraryXBlockStaticFileSerializer(f).data)
         raise NotFound
 
-    @atomic
     @convert_exceptions
     def put(self, request, usage_key_str, file_path):
         """
@@ -682,7 +697,6 @@ class LibraryBlockAssetView(APIView):
             raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(LibraryXBlockStaticFileSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, usage_key_str, file_path):
         """
@@ -705,7 +719,6 @@ class LibraryImportTaskViewSet(ViewSet):
     Import blocks from Courseware through modulestore.
     """
 
-    @atomic
     @convert_exceptions
     def list(self, request, lib_key_str):
         """
@@ -724,7 +737,6 @@ class LibraryImportTaskViewSet(ViewSet):
             paginator.paginate_queryset(result, request)
         )
 
-    @atomic
     @convert_exceptions
     def create(self, request, lib_key_str):
         """
@@ -745,7 +757,6 @@ class LibraryImportTaskViewSet(ViewSet):
         import_task = api.import_blocks_create_task(library_key, course_key)
         return Response(ContentLibraryBlockImportTaskSerializer(import_task).data)
 
-    @atomic
     @convert_exceptions
     def retrieve(self, request, lib_key_str, pk=None):
         """
