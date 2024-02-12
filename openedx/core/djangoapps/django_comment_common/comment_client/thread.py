@@ -145,6 +145,7 @@ class Thread(models.Model):
             'resp_skip': kwargs.get('response_skip'),
             'resp_limit': kwargs.get('response_limit'),
             'reverse_order': kwargs.get('reverse_order', False),
+            'merge_question_type_responses': kwargs.get('merge_question_type_responses', False)
         }
         request_params = utils.strip_none(request_params)
 

@@ -130,6 +130,7 @@ class CommentListGetForm(_PaginationForm):
     flagged = BooleanField(required=False)
     endorsed = ExtendedNullBooleanField(required=False)
     requested_fields = MultiValueField(required=False)
+    merge_question_type_responses = BooleanField(required=False)
 
 
 class UserCommentListGetForm(_PaginationForm):
