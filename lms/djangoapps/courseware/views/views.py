@@ -2087,7 +2087,7 @@ def financial_assistance_request_v2(request):
             return HttpResponseForbidden()
         # Require email verification
         if request.user.is_active is not True:
-            return HttpResponseForbidden()
+            return HttpResponseForbidden('Please confirm your email before applying for financial assistance.')
 
         course_id = data['course']
         if course_id and course_id not in request.META.get('HTTP_REFERER'):
