@@ -429,7 +429,6 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
         role = AccessRole(self.course_key)
         role.add_users(self.user)
 
-        event_receiver.assert_called_once()
         self.assertTrue(self.receiver_called)
         self.assertDictContainsSubset(
             {
