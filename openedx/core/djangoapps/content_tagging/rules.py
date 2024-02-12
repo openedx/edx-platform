@@ -90,9 +90,9 @@ def get_library_user_orgs(user: UserType, orgs: list[Organization]) -> list[Orga
     to access future libraries created in these orgs.
     Nor does this mean the user may access all libraries in this org: library permissions are granted per library.
     """
-    return [
-        org for org in orgs if get_libraries_for_user(user, org=org.short_name).exists()
-    ]
+    libraries = get_libraries_for_user(user, org=[org.short_name for org in orgs]).select_related('org').only('org')
+    library_orgs = [library.org for library in libraries]
+    return list(set(library_orgs).intersection(orgs))
 
 
 def get_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:

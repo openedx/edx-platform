@@ -499,12 +499,12 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         ('staff', 11),
-        ("content_creatorA", 25),  # FIXME too many queries.
-        ("library_staffA", 25),
-        ("library_userA", 25),
-        ("instructorA", 25),
-        ("course_instructorA", 25),
-        ("course_staffA", 25),
+        ("content_creatorA", 22),  # FIXME too many queries.
+        ("library_staffA", 22),
+        ("library_userA", 22),
+        ("instructorA", 22),
+        ("course_instructorA", 22),
+        ("course_staffA", 22),
     )
     @ddt.unpack
     def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
@@ -762,7 +762,7 @@ class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
             user_attr=user_attr,
             taxonomy_attr="ot1",
             expected_status=status.HTTP_404_NOT_FOUND,
-            reason="Only staff should see taxonomies with no org",
+            reason="Only taxonomy admins should see taxonomies with no org",
         )
 
     @ddt.data(
@@ -1774,9 +1774,9 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         #("content_creatorA", 8),  # FIXME 403?
         #("library_staffA", 8),
         #("library_userA", 8),
-        ("instructorA", 19),  # FIXME too many queries.
-        ("course_instructorA", 19),
-        ("course_staffA", 19),
+        ("instructorA", 17),  # FIXME too many queries.
+        ("course_instructorA", 17),
+        ("course_staffA", 17),
     )
     @ddt.unpack
     def test_object_tags_query_count(self, user_attr: str, expected_queries: int):
