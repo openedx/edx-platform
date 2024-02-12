@@ -83,12 +83,15 @@ def get_instructor_orgs(user: UserType, orgs: list[Organization]) -> list[Organi
 
 def get_library_user_orgs(user: UserType, orgs: list[Organization]) -> list[Organization]:
     """
-    Returns a list of orgs that the given user has explicity permission, from the given list of orgs.
+    Returns a list of orgs (from the given list of orgs) that are associated with libraries that the given user has
+    explicitly been granted read access for.
+
+    Note: If no libraries exist for the given orgs, then no orgs will be returned, even though the user may be permitted
+    to access future libraries created in these orgs.
+    Nor does this mean the user may access all libraries in this org: library permissions are granted per library.
     """
     return [
-        org for org in orgs if (
-            len(get_libraries_for_user(user, org=org.short_name)) > 0
-        )
+        org for org in orgs if get_libraries_for_user(user, org=org.short_name).exists()
     ]
 
 
