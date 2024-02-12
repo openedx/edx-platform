@@ -238,6 +238,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and (
 ):
     AUTHENTICATION_BACKENDS = ['common.djangoapps.third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
 
+########################## Authn MFE Context API #######################
+ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
+
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
