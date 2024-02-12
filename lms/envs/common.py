@@ -349,7 +349,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to perform acceptance and load test. Auto auth view is responsible for load
-    #    testing and is controlled by this feature flag. Session verification (of CacheBackedAuthenticationMiddleware) 
+    #    testing and is controlled by this feature flag. Session verification (of CacheBackedAuthenticationMiddleware)
     #    is a security feature, but it can be turned off by enabling this feature flag.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-07-25
