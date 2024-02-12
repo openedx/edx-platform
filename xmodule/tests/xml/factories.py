@@ -58,7 +58,7 @@ class XmlImportData:
 
 # Extract all argument names used to construct XmlImportData objects,
 # so that the factory doesn't treat them as XML attributes
-XML_IMPORT_ARGS = inspect.getargspec(XmlImportData.__init__).args  # lint-amnesty, pylint: disable=deprecated-method
+XML_IMPORT_ARGS = inspect.getfullargspec(XmlImportData.__init__).args  # lint-amnesty, pylint: disable=deprecated-method
 
 
 class XmlImportFactory(Factory):
