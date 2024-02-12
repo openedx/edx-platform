@@ -3,6 +3,17 @@ This module contains the REST APIs for Learning Core-based content libraries,
 and LTI 1.3 views (though I'm not sure how functional the LTI piece of this is
 right now).
 
+Most of the real work is intended to happen in the api.py module. The views are
+intended to be thin ones that do:
+
+1. Permissions checking
+2. Input/output data translation via serializers
+3. Pagination
+
+Everything else should be delegated to api.py for the actual business logic. If
+you see business logic happening in these views, consider refactoring them into
+the api module instead.
+
 .. warning::
     **NOTICE: DO NOT USE @atomic FOR THESE VIEWS!!!**
 
@@ -50,6 +61,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
 from django.db.models import Q
+from django.db.transaction import atomic
 from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -197,16 +209,12 @@ class LibraryRootView(APIView):
         text_search = serializer.validated_data['text_search']
 
         paginator = LibraryApiPagination()
-        queryset = api.get_libraries_for_user(request.user, org=org, library_type=library_type)
-
-        if text_search:
-            queryset = queryset.filter(
-                Q(slug__icontains=text_search) |
-                Q(org__short_name__icontains=text_search) |
-                Q(learning_package__title__icontains=text_search) |
-                Q(learning_package__description__icontains=text_search)
-            )
-
+        queryset = api.get_libraries_for_user(
+            request.user,
+            org=org,
+            library_type=library_type,
+            text_search=text_search,
+        )
         paginated_qs = paginator.paginate_queryset(queryset, request)
         result = api.get_metadata(paginated_qs)
 
@@ -245,15 +253,19 @@ class LibraryRootView(APIView):
 
         # Backwards compatibility: ignore the no-longer used "collection_uuid"
         # parameter. This was necessary with Blockstore, but not used for
-        # Learning Core.
+        # Learning Core. TODO: This can be removed once the frontend stops
+        # sending it to us. This whole bit of deserialization is kind of weird
+        # though, with the renames and such. Look into this later for clennup.
         data.pop("collection_uuid", None)
 
         try:
-            result = api.create_library(org=org, **data)
+            with atomic():
+                result = api.create_library(org=org, **data)
+                # Grant the current user admin permissions on the library:
+                api.set_library_user_permissions(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
         except api.LibraryAlreadyExists:
             raise ValidationError(detail={"slug": "A library with that ID already exists."})  # lint-amnesty, pylint: disable=raise-missing-from
-        # Grant the current user admin permissions on the library:
-        api.set_library_user_permissions(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
+
         return Response(ContentLibraryMetadataSerializer(result).data)
 
 
@@ -557,10 +569,7 @@ class LibraryBlockView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        try:
-            result = api.get_library_block(key)
-        except NoSuchUsage:
-            raise ContentLibraryBlockNotFound(key)
+        result = api.get_library_block(key)
 
         return Response(LibraryXBlockMetadataSerializer(result).data)
 

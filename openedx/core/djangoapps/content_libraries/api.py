@@ -270,7 +270,7 @@ class LibraryXBlockType:
 # ============
 
 
-def get_libraries_for_user(user, org=None, library_type=None):
+def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
     """
     Return content libraries that the user has permission to view.
     """
@@ -282,6 +282,15 @@ def get_libraries_for_user(user, org=None, library_type=None):
     qs = ContentLibrary.objects.filter(**filter_kwargs) \
                                .select_related('learning_package', 'org') \
                                .order_by('org__short_name', 'slug')
+
+    if text_search:
+        qs = qs.filter(
+            Q(slug__icontains=text_search) |
+            Q(org__short_name__icontains=text_search) |
+            Q(learning_package__title__icontains=text_search) |
+            Q(learning_package__description__icontains=text_search)
+        )
+
     return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
 
 
