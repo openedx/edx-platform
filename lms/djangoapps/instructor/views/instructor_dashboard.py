@@ -37,6 +37,7 @@ from common.djangoapps.student.roles import (
     CourseSalesAdminRole,
     CourseStaffRole,
     eSHEInstructorRole,
+    TeachingAssistantRole,
     strict_role_checking,
 )
 from common.djangoapps.util.json_request import JsonResponse
@@ -132,6 +133,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'admin': request.user.is_staff,
         'instructor': bool(has_access(request.user, 'instructor', course)),
         'eshe_instructor': eSHEInstructorRole(course_key).has_user(request.user),
+        'teaching_assistant': TeachingAssistantRole(course_key).has_user(request.user),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': bool(has_access(request.user, 'staff', course)),
@@ -506,7 +508,11 @@ def _section_membership(course, access):
         # section if the user doesn't have the Course Staff role set explicitly
         # or have the Discussion Admin role.
         'is_hidden': (
-            not access['forum_admin'] and (access['eshe_instructor'] and not access['explicit_staff'])
+            not access['forum_admin']
+            and (
+                (access['eshe_instructor'] or access['teaching_assistant'])
+                and not access['explicit_staff']
+            )
         ),
     }
     return section_data

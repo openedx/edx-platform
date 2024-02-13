@@ -300,9 +300,20 @@ class CourseLimitedStaffRole(CourseStaffRole):
 
 @register_access_role
 class eSHEInstructorRole(CourseStaffRole):
-    """A Staff member of a course without access to Studio."""
+    """A Staff member of a course without access to the membership tab and enrollment-related operations."""
 
     ROLE = 'eshe_instructor'
+    BASE_ROLE = CourseStaffRole.ROLE
+
+
+@register_access_role
+class TeachingAssistantRole(CourseStaffRole):
+    """
+    A Staff member of a course without access to the membership tab, enrollment-related operations and
+    grade-related operations.
+    """
+
+    ROLE = 'teaching_assistant'
     BASE_ROLE = CourseStaffRole.ROLE
 
 

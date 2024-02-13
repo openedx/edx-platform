@@ -316,9 +316,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         else:
             self.assertNotContains(response, reason_field)
 
-    def test_membership_tab_for_eshe_instructor(self):
+    @ddt.data('eshe_instructor', 'teaching_assistant')
+    def test_membership_tab_content(self, role):
         """
-        Verify that eSHE instructors don't have access to membership tab and
+        Verify that eSHE Instructors and Teaching Assistants don't have access to membership tab and
         work correctly with other roles.
         """
 
@@ -336,11 +337,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         user = UserFactory.create()
         self.client.login(username=user.username, password="test")
 
-        # eSHE instructors shouldn't have access to membership tab
+        # eSHE Instructors / Teaching Assistants shouldn't have access to membership tab
         CourseAccessRoleFactory(
             course_id=self.course.id,
             user=user,
-            role='eshe_instructor',
+            role=role,
             org=self.course.id.org
         )
         response = self.client.get(self.url)
@@ -365,6 +366,52 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertContains(response, membership_section)
         self.assertContains(response, batch_enrollment)
+
+    def test_student_admin_tab_content(self):
+        """
+        Verify that Teaching Assistants don't have access to the gradebook-related sections
+        of the student admin tab.
+        """
+
+        # Should be visible to Teaching Assistants
+        view_enrollment_status = '<div class="student-enrollment-status-container action-type-container">'
+        view_progress = '<div class="student-progress-container action-type-container">'
+
+        # Should not be visible to Teaching Assistants
+        view_gradebook = '<div class="action-type-container ">'
+        adjust_learner_grade = '<div class="student-grade-container action-type-container ">'
+        adjust_all_learners_grades = '<div class="course-specific-container action-type-container ">'
+
+        user = UserFactory.create()
+        self.client.login(username=user.username, password="test")
+
+        # Teaching Assistants shouldn't have access to the gradebook-related sections
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role='teaching_assistant',
+            org=self.course.id.org
+        )
+        response = self.client.get(self.url)
+        self.assertContains(response, view_enrollment_status)
+        self.assertContains(response, view_progress)
+        self.assertNotContains(response, view_gradebook)
+        self.assertNotContains(response, adjust_learner_grade)
+        self.assertNotContains(response, adjust_all_learners_grades)
+
+        # However if combined with instructor, they should have access to all sections
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role='instructor',
+            org=self.course.id.org
+        )
+        response = self.client.get(self.url)
+        self.assertContains(response, view_enrollment_status)
+        self.assertContains(response, view_progress)
+        self.assertContains(response, view_gradebook)
+        self.assertContains(response, adjust_learner_grade)
+        self.assertContains(response, adjust_all_learners_grades)
 
     def test_student_admin_staff_instructor(self):
         """

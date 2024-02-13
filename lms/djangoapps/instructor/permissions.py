@@ -32,6 +32,21 @@ VIEW_DASHBOARD = 'instructor.dashboard'
 VIEW_ENROLLMENTS = 'instructor.view_enrollments'
 VIEW_FORUM_MEMBERS = 'instructor.view_forum_members'
 
+# Due to how the roles iheritance is implemented currently, eshe_instructor and teaching_assistant have implicit
+# staff access, but unlike staff, they shouldn't be able to enroll and do grade-related operations as per client's
+# requirements. At the same time, all other staff-derived roles, like Limited Staff, should be able to enroll students.
+# This solution is far from perfect, but it's probably the best we can do untill the roles system is reworked.
+_is_teaching_assistant = HasRolesRule('teaching_assistant')
+_is_eshe_instructor = HasRolesRule('eshe_instructor')
+_is_eshe_instructor_or_teaching_assistant = _is_teaching_assistant | _is_eshe_instructor
+is_staff_but_not_teaching_assistant = (
+    (_is_teaching_assistant & HasAccessRule('staff', strict=True)) |
+    (~_is_teaching_assistant & HasAccessRule('staff'))
+)
+is_staff_but_not_eshe_instructor_or_teaching_assistant = (
+    (_is_eshe_instructor_or_teaching_assistant & HasAccessRule('staff', strict=True)) |
+    (~_is_eshe_instructor_or_teaching_assistant & HasAccessRule('staff'))
+)
 
 perms[ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM] = HasAccessRule('staff')
 perms[ASSIGN_TO_COHORTS] = HasAccessRule('staff')
@@ -41,23 +56,17 @@ perms[EDIT_INVOICE_VALIDATION] = HasAccessRule('staff')
 perms[ENABLE_CERTIFICATE_GENERATION] = is_staff
 perms[GENERATE_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GENERATE_BULK_CERTIFICATE_EXCEPTIONS] = is_staff
-perms[GIVE_STUDENT_EXTENSION] = HasAccessRule('staff')
+perms[GIVE_STUDENT_EXTENSION] = is_staff_but_not_teaching_assistant
 perms[VIEW_ISSUED_CERTIFICATES] = HasAccessRule('staff') | HasRolesRule('data_researcher')
 # only global staff or those with the data_researcher role can access the data download tab
 # HasAccessRule('staff') also includes course staff
 perms[CAN_RESEARCH] = is_staff | HasRolesRule('data_researcher')
-# eshe_instructor implicitly gets staff access, but shouldn't be able to enroll
-perms[CAN_ENROLL] = (
-    # can enroll if a user is an eshe_instructor and has an explicit staff role
-    (HasRolesRule('eshe_instructor') & HasAccessRule('staff', strict=True)) |
-    # can enroll if a user is just staff
-    (~HasRolesRule('eshe_instructor') & HasAccessRule('staff'))
-)
+perms[CAN_ENROLL] = is_staff_but_not_eshe_instructor_or_teaching_assistant
 perms[CAN_BETATEST] = HasAccessRule('instructor')
 perms[ENROLLMENT_REPORT] = HasAccessRule('staff') | HasRolesRule('data_researcher')
 perms[VIEW_COUPONS] = HasAccessRule('staff') | HasRolesRule('data_researcher')
 perms[EXAM_RESULTS] = HasAccessRule('staff')
-perms[OVERRIDE_GRADES] = HasAccessRule('staff')
+perms[OVERRIDE_GRADES] = is_staff_but_not_teaching_assistant
 perms[SHOW_TASKS] = HasAccessRule('staff') | HasRolesRule('data_researcher')
 perms[EMAIL] = HasAccessRule('staff')
 perms[RESCORE_EXAMS] = HasAccessRule('instructor')

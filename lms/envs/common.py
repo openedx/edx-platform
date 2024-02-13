@@ -1069,6 +1069,16 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/561/files'
     'ENABLE_ESHE_INSTRUCTOR_ROLE': False,
+
+    # .. toggle_name: FEATURES['ENABLE_TEACHING_ASSISTANT_ROLE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to enable the Teaching Assistant role
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-02-12
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/632/files'
+    'ENABLE_TEACHING_ASSISTANT_ROLE': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API

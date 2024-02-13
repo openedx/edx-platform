@@ -1,7 +1,13 @@
 <%page args="section_data" expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
+
+<%
+  teaching_assistant_access = section_data['access']['teaching_assistant']
+  gradebook_related_sections_hidden = teaching_assistant_access and not section_data['access']['explicit_staff']
+%>
+
 %if section_data['access']['staff'] or section_data['access']['instructor']:
-<div class="action-type-container">
+<div class="action-type-container ${'hidden' if gradebook_related_sections_hidden else ''}">
     %if section_data.get('writable_gradebook_url') or section_data.get('is_small_course'):
         <br><br>
         <h4 class="hd hd-4">${_("View gradebook for enrolled learners")}</h4>
@@ -59,7 +65,7 @@
   <hr>
 </div>
 
-<div class="student-grade-container action-type-container">
+<div class="student-grade-container action-type-container ${'hidden' if gradebook_related_sections_hidden else ''}">
     <h4 class="hd hd-4">${_("Adjust a learner's grade for a specific problem")}</h4>
     <div class="request-response-error"></div>
     <label for="student-select-grade">
@@ -132,7 +138,7 @@
 </div>
 
 % if course.entrance_exam_enabled:
-<div class="entrance-exam-grade-container action-type-container">
+<div class="entrance-exam-grade-container action-type-container ${'hidden' if gradebook_related_sections_hidden else ''}">
     <h4 class="hd hd-4">${_("Adjust a learner's entrance exam results")}</h4>
     <div class="request-response-error"></div>
 
@@ -194,7 +200,7 @@
 
 %if section_data['access']['instructor']:
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-<div class="course-specific-container action-type-container">
+<div class="course-specific-container action-type-container ${'hidden' if gradebook_related_sections_hidden else ''}">
     <h4 class="hd hd-4">${_("Adjust all enrolled learners' grades for a specific problem")}</h4>
     <div class="request-response-error"></div>
 
@@ -232,7 +238,7 @@
 %endif
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-<div class="running-tasks-container action-type-container">
+<div class="running-tasks-container action-type-container ${'hidden' if gradebook_related_sections_hidden else ''}">
     <h4 class="hd hd-4">${_("Pending Tasks")}</h4>
     <div class="running-tasks-section">
         <label>${_("The status for any active tasks appears in a table below.")}</label>
