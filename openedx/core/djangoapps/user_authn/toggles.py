@@ -33,3 +33,15 @@ def should_redirect_to_authn_microfrontend():
     return configuration_helpers.get_value(
         'ENABLE_AUTHN_MICROFRONTEND', settings.FEATURES.get('ENABLE_AUTHN_MICROFRONTEND')
     )
+
+
+def should_enable_auto_generated_username():
+    """
+    Checks if auto-generated username should be enabled.
+    """
+    request = get_current_request()
+    if request and request.GET.get('skip_authn_mfe'):
+        return False
+    return bool(configuration_helpers.get_value(
+        'ENABLE_AUTO_GENERATED_USERNAME', settings.FEATURES.get('ENABLE_AUTO_GENERATED_USERNAME')
+    ))

@@ -12,6 +12,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from rest_framework import serializers
+from openedx.core.djangoapps.user_authn.toggles import should_enable_auto_generated_username
 
 
 from common.djangoapps.student.models import (
@@ -168,6 +169,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "phone_number": None,
             "pending_name_change": None,
             "verified_name": None,
+            "hide_username": should_enable_auto_generated_username(),
         }
 
         if user_profile:
@@ -226,7 +228,10 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             fields = _visible_fields(user_profile, user, self.configuration)
         else:
             fields = self.configuration.get('public_fields')
-
+        if isinstance(fields, list) and fields is not None:
+            fields.append('hide_username')
+        elif isinstance(fields, set) and fields is not None:
+            fields.add('hide_username')
         return self._filter_fields(
             fields,
             data
