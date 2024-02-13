@@ -97,8 +97,6 @@ def load_block(usage_key, user):
     # Get the Learning Context Implementation based on the usage key
     context_impl = get_learning_context_impl(usage_key)
 
-    log.error(f"load_block using {context_impl} for {usage_key}")
-
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
     if user is not None and not context_impl.can_view_block(user, usage_key):
