@@ -675,7 +675,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         # Test unauthenticated
         response = self.client.post(self.url, data)
-        assert response.status_code == 401
+        assert response.status_code == 403
 
         # Test non-service worker
         random_user = UserFactory()
