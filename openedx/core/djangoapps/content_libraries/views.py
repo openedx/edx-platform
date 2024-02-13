@@ -80,14 +80,9 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.base import TemplateResponseMixin
-from django.views.generic.base import View
-from pylti1p3.contrib.django import DjangoCacheDataStorage
-from pylti1p3.contrib.django import DjangoDbToolConf
-from pylti1p3.contrib.django import DjangoMessageLaunch
-from pylti1p3.contrib.django import DjangoOIDCLogin
-from pylti1p3.exception import LtiException
-from pylti1p3.exception import OIDCException
+from django.views.generic.base import TemplateResponseMixin, View
+from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
+from pylti1p3.exception import LtiException, OIDCException
 
 import edx_api_doc_tools as apidocs
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
@@ -101,7 +96,6 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from xblock.exceptions import NoSuchUsage
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
@@ -125,9 +119,7 @@ from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
 
-from .models import ContentLibrary
-from .models import LtiGradedResource
-from .models import LtiProfile
+from .models import ContentLibrary, LtiGradedResource, LtiProfile
 
 
 User = get_user_model()
