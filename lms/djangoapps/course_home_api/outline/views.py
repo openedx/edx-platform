@@ -376,7 +376,6 @@ class OutlineTabView(RetrieveAPIView):
 
 
 @api_view(['POST'])
-@authentication_classes((JwtAuthentication,))
 @permission_classes((IsAuthenticated,))
 def dismiss_welcome_message(request):  # pylint: disable=missing-function-docstring
     course_id = request.data.get('course_id', None)
