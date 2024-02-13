@@ -258,3 +258,36 @@ def handle_retirement_cancellation(retirement, email_address=None):
     retirement.user.save()
 
     retirement.delete()
+
+
+def get_first_and_last_name(first_name, last_name, full_name):
+    """
+    Determine the first name and last name initial based on the provided parameters.
+
+    Args:
+    - first_name (str): The first name of the user.
+    - last_name (str): The last name of the user.
+    - full_name (str): The full name of the user.
+
+    Returns:
+    - tuple: A tuple containing the first name and last name initial determined based on the provided parameters.
+    """
+
+    if first_name or last_name:
+        if first_name and last_name:
+            return first_name, last_name[0] if last_name else ''
+        else:
+            if full_name:
+                names = full_name.split()
+                if len(names) == 1:
+                    return names[0], ''
+                elif len(names) > 1:
+                    return names[0], names[-1][0] if names[-1] else ''
+            return '', ''
+    elif full_name:
+        names = full_name.split()
+        if len(names) == 1:
+            return names[0], ''
+        elif len(names) > 1:
+            return names[0], names[-1][0] if names[-1] else ''
+    return '', ''

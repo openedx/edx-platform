@@ -24,7 +24,7 @@ from common.djangoapps.student.models import (
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled, get_first_and_last_name
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from openedx.core.djangoapps.user_authn.views.registration_form import contains_html, contains_url
@@ -143,6 +143,8 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             ),
             "email": user.email,
             "id": user.id,
+            "first_name": first_name,
+            "last_name": last_name,
             # For backwards compatibility: Tables created after the upgrade to Django 1.8 will save microseconds.
             # However, mobile apps are not expecting microsecond in the serialized value. If we set it to zero the
             # DRF JSONEncoder will not include it in the serialized value.
@@ -169,6 +171,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "phone_number": None,
             "pending_name_change": None,
             "verified_name": None,
+            "hide_username": should_enable_auto_generated_username(),
         }
 
         if user_profile:

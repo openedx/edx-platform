@@ -400,6 +400,9 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert 'm' == data['level_of_education']
         assert data['social_links'] is not None
         assert data['time_zone'] is None
+        assert self.user.first_name == data['first_name']
+        assert self.user.last_name[0] == data['last_name']
+        assert data['hide_username'] == should_enable_auto_generated_username()
 
     def _verify_private_account_response(self, response, requires_parental_consent=False):
         """
@@ -735,6 +738,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         # verify response
         if requesting_username == "different_user":
             data = response.data
+
             assert 7 == len(data)
 
             # public fields
@@ -1196,6 +1200,9 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             assert self.FULL_RESPONSE_FIELD_COUNT == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
+            assert self.user.first_name == data['first_name']
+            assert self.user.last_name[0] == data['last_name']
+            assert self.user.username == data['username']
             assert self.user.email == data['email']
             assert self.user.id == data['id']
             assert year_of_birth == data['year_of_birth']
