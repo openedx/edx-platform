@@ -11,6 +11,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from lms.djangoapps.teams.serializers import BulkTeamCountTopicSerializer, MembershipSerializer, TopicSerializer
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.lib.teams_config import TeamsConfig
+from openedx.core.djangoapps.user_authn.toggles import auto_generated_username_enabled
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -60,7 +61,8 @@ class MembershipSerializerTestCase(SerializerTestCase):
                                                   'image_url_large': 'http://testserver/static/default_120.png',
                                                   'image_url_medium': 'http://testserver/static/default_50.png',
                                                   'image_url_small': 'http://testserver/static/default_30.png',
-                                                  'has_image': False}, 'account_privacy': 'private'}
+                                                  'has_image': False}, 'account_privacy': 'private',
+                                'hide_username': auto_generated_username_enabled()}
         assert 'membership' not in data['team']
 
 

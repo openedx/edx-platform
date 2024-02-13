@@ -31,6 +31,7 @@ from common.djangoapps.student.views.management import activate_secondary_email
 
 from lms.djangoapps.certificates.data import CertificateStatuses
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
+from openedx.core.djangoapps.user_authn.toggles import auto_generated_username_enabled
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
 from openedx.core.djangoapps.user_api.accounts.api import (
     get_account_settings,
@@ -640,6 +641,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'course_certificates': None,
             'phone_number': None,
             'pending_name_change': None,
+            'hide_username': auto_generated_username_enabled(),
         }
 
     def test_normalize_password(self):

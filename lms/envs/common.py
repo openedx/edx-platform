@@ -4167,6 +4167,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'account_privacy',
         'profile_image',
         'username',
+        'hide_username',
+        'name',
     ],
 }
 
