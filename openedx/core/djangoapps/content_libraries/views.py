@@ -1,4 +1,8 @@
 """
+=======================
+Content Libraries Views
+=======================
+
 This module contains the REST APIs for Learning Core-based content libraries,
 and LTI 1.3 views (though I'm not sure how functional the LTI piece of this is
 right now).
@@ -7,7 +11,7 @@ Most of the real work is intended to happen in the api.py module. The views are
 intended to be thin ones that do:
 
 1. Permissions checking
-2. Input/output data translation via serializers
+2. Input/output data conversion via serializers
 3. Pagination
 
 Everything else should be delegated to api.py for the actual business logic. If
@@ -15,9 +19,16 @@ you see business logic happening in these views, consider refactoring them into
 the api module instead.
 
 .. warning::
-    **NOTICE: DO NOT USE @atomic FOR THESE VIEWS!!!**
+    **NOTICE: DO NOT USE THE @atomic DECORATOR FOR THESE VIEWS!!!**
 
-    We have to use manual transactions for content libraries related views, or
+    Views in ths module are decorated with:
+      @method_decorator(non_atomic_requests, name="dispatch")
+
+    This forces the views to execute without an implicit view-level transaction,
+    even if the project is configured to use view-level transactions by default.
+    (So no matter what you set the ATOMIC_REQUESTS setting to.)
+
+    We *must* use manual transactions for content libraries related views, or
     we'll run into mysterious race condition bugs. We should NOT use the @atomic
     decorator over any of these views.
 
@@ -61,7 +72,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from django.db.transaction import atomic
+from django.db.transaction import atomic, non_atomic_requests
 from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -177,6 +188,7 @@ class LibraryApiPagination(PageNumberPagination):
     ]
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryRootView(APIView):
     """
@@ -269,6 +281,7 @@ class LibraryRootView(APIView):
         return Response(ContentLibraryMetadataSerializer(result).data)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryDetailsView(APIView):
     """
@@ -317,6 +330,7 @@ class LibraryDetailsView(APIView):
         return Response({})
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryTeamView(APIView):
     """
@@ -365,6 +379,7 @@ class LibraryTeamView(APIView):
         return Response(ContentLibraryPermissionSerializer(team, many=True).data)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryTeamUserView(APIView):
     """
@@ -418,6 +433,7 @@ class LibraryTeamUserView(APIView):
         return Response({})
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryTeamGroupView(APIView):
     """
@@ -450,6 +466,7 @@ class LibraryTeamGroupView(APIView):
         return Response({})
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockTypesView(APIView):
     """
@@ -466,6 +483,7 @@ class LibraryBlockTypesView(APIView):
         return Response(LibraryXBlockTypeSerializer(result, many=True).data)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryCommitView(APIView):
     """
@@ -494,6 +512,7 @@ class LibraryCommitView(APIView):
         return Response({})
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlocksView(APIView):
     """
@@ -557,6 +576,7 @@ class LibraryBlocksView(APIView):
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockView(APIView):
     """
@@ -592,6 +612,7 @@ class LibraryBlockView(APIView):
         return Response({})
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockLtiUrlView(APIView):
     """
@@ -613,6 +634,7 @@ class LibraryBlockLtiUrlView(APIView):
         return Response({"lti_url": lti_login_url})
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockOlxView(APIView):
     """
@@ -648,6 +670,7 @@ class LibraryBlockOlxView(APIView):
         return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str}).data)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockAssetListView(APIView):
     """
@@ -664,6 +687,7 @@ class LibraryBlockAssetListView(APIView):
         return Response(LibraryXBlockStaticFilesSerializer({"files": files}).data)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockAssetView(APIView):
     """
@@ -722,6 +746,7 @@ class LibraryBlockAssetView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryImportTaskViewSet(ViewSet):
     """
@@ -801,6 +826,7 @@ def requires_lti_enabled(view_func):
     return wrapped_view
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @method_decorator(requires_lti_enabled, name='dispatch')
 class LtiToolView(View):
     """
@@ -817,6 +843,7 @@ class LtiToolView(View):
         self.lti_tool_storage = DjangoCacheDataStorage(cache_name='default')
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @method_decorator(csrf_exempt, name='dispatch')
 class LtiToolLoginView(LtiToolView):
     """
@@ -850,6 +877,7 @@ class LtiToolLoginView(LtiToolView):
             return HttpResponseBadRequest('Invalid LTI login request.')
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 @method_decorator(csrf_exempt, name='dispatch')
 @method_decorator(xframe_options_exempt, name='dispatch')
 class LtiToolLaunchView(TemplateResponseMixin, LtiToolView):
@@ -1037,6 +1065,7 @@ class LtiToolLaunchView(TemplateResponseMixin, LtiToolView):
                  resource)
 
 
+@method_decorator(non_atomic_requests, name="dispatch")
 class LtiToolJwksView(LtiToolView):
     """
     JSON Web Key Sets view.
