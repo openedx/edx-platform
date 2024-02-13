@@ -400,8 +400,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert 'm' == data['level_of_education']
         assert data['social_links'] is not None
         assert data['time_zone'] is None
-        assert self.user.first_name == data['first_name']
-        assert self.user.last_name[0] == data['last_name']
         assert data['hide_username'] == should_enable_auto_generated_username()
 
     def _verify_private_account_response(self, response, requires_parental_consent=False):

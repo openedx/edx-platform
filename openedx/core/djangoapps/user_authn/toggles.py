@@ -48,6 +48,7 @@ def is_auto_generated_username_enabled():
     """
     Checks if auto-generated username should be enabled.
     """
+    
     return configuration_helpers.get_value(
         'ENABLE_AUTO_GENERATED_USERNAME', settings.FEATURES.get('ENABLE_AUTO_GENERATED_USERNAME')
     )
