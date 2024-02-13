@@ -33,7 +33,6 @@ from openedx.core.djangoapps.user_api.accounts.tests.factories import (
     RetirementStateFactory,
     UserRetirementStatusFactory
 )
-from openedx.core.djangoapps.user_authn.toggles import auto_generated_username_enabled
 from openedx.core.djangoapps.user_api.models import UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -360,7 +359,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
 
     ENABLED_CACHES = ['default']
     TOTAL_QUERY_COUNT = 27
-    FULL_RESPONSE_FIELD_COUNT = 30
+    FULL_RESPONSE_FIELD_COUNT = 29
 
     def setUp(self):
         super().setUp()
@@ -385,7 +384,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         Verify that the shareable fields from the account are returned
         """
         data = response.data
-        assert 13 == len(data)
+        assert 11 == len(data)
 
         # public fields (3)
         assert account_privacy == data['account_privacy']
@@ -400,18 +399,16 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert 'm' == data['level_of_education']
         assert data['social_links'] is not None
         assert data['time_zone'] is None
-        assert data['hide_username'] == should_enable_auto_generated_username()
 
     def _verify_private_account_response(self, response, requires_parental_consent=False):
         """
         Verify that only the public fields are returned if a user does not want to share account fields
         """
         data = response.data
-        assert 5 == len(data)
+        assert 3 == len(data)
         assert PRIVATE_VISIBILITY == data['account_privacy']
         self._verify_profile_image_data(data, not requires_parental_consent)
         assert self.user.username == data['username']
-        assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
 
     def _verify_full_account_response(self, response, requires_parental_consent=False, year_of_birth=2000):
         """
@@ -453,7 +450,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert data['secondary_email'] is None
         assert data['secondary_email_enabled'] is None
         assert year_of_birth == data['year_of_birth']
-        assert data['hide_username'] == auto_generated_username_enabled()
         if self.name_affirmation_service:
             assert self.VERIFIED_NAME == data['verified_name']
         else:
@@ -736,8 +732,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         # verify response
         if requesting_username == "different_user":
             data = response.data
-
-            assert 7 == len(data)
+            assert 6 == len(data)
 
             # public fields
             assert self.user.username == data['username']
@@ -814,7 +809,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             assert [] == data['language_proficiencies']
             assert PRIVATE_VISIBILITY == data['account_privacy']
             assert data['time_zone'] is None
-            assert data['hide_username'] == auto_generated_username_enabled()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         verify_get_own_information(self._get_num_queries(25))
@@ -1198,9 +1192,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             assert self.FULL_RESPONSE_FIELD_COUNT == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
-            assert self.user.first_name == data['first_name']
-            assert self.user.last_name[0] == data['last_name']
-            assert self.user.username == data['username']
             assert self.user.email == data['email']
             assert self.user.id == data['id']
             assert year_of_birth == data['year_of_birth']
@@ -1214,7 +1205,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             self._verify_profile_image_data(data, False)
             assert data['requires_parental_consent']
             assert PRIVATE_VISIBILITY == data['account_privacy']
-            assert data['hide_username'] == auto_generated_username_enabled()
         else:
             self._verify_private_account_response(response, requires_parental_consent=True)
 

@@ -4167,8 +4167,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'account_privacy',
         'profile_image',
         'username',
-        'hide_username',
-        'name',
     ],
 }
 
@@ -4213,8 +4211,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "phone_number",
         "activation_key",
         "pending_name_change",
-        "first_name",
-        "last_name",
     ]
 )
 
