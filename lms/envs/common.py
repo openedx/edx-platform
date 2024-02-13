@@ -5353,13 +5353,6 @@ OUTCOME_SURVEYS_EVENTS_ENABLED = True
 ######################## Settings for cancel retirement in Support Tools ########################
 COOL_OFF_DAYS = 14
 
-URLS_2U_LOBS = {
-    'executive_education': 'https://www.edx.org/executive-education',
-    'masters_degree': 'https://www.edx.org/masters',
-    'bachelors_degree': 'https://www.edx.org/bachelors',
-    'boot_camps': 'https://www.edx.org/boot-camps',
-}
-
 ############ Settings for externally hosted executive education courses ############
 EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
