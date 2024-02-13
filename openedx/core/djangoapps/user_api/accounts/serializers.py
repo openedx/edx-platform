@@ -236,7 +236,10 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             fields = self.configuration.get('public_fields')
 
         if additional_white_listed_fields:
-            fields.extend(additional_white_listed_fields)
+            if isinstance(fields, list) and fields is not None:
+                fields.extend(additional_white_listed_fields)
+            elif isinstance(fields, set) and fields is not None:
+                fields.update(additional_white_listed_fields)
 
         return self._filter_fields(
             fields,
