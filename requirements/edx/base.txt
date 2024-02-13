@@ -74,13 +74,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.34.35
+boto3==1.34.40
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.35
+botocore==1.34.40
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -172,9 +172,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-deprecated==1.2.14
-    # via jwcrypto
-django==4.2.9
+django==4.2.10
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -294,7 +292,7 @@ django-js-asset==2.2.0
     # via django-mptt
 django-method-override==1.0.4
     # via -r requirements/edx/kernel.in
-django-model-utils==4.3.1
+django-model-utils==4.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   django-user-tasks
@@ -463,6 +461,7 @@ edx-django-utils==5.10.1
     #   edx-when
     #   event-tracking
     #   openedx-blockstore
+    #   openedx-events
     #   ora2
     #   super-csv
 edx-drf-extensions==10.2.0
@@ -650,7 +649,7 @@ jsonschema==4.21.1
     #   optimizely-sdk
 jsonschema-specifications==2023.12.1
     # via jsonschema
-jwcrypto==1.5.1
+jwcrypto==1.5.3
     # via
     #   django-oauth-toolkit
     #   pylti1p3
@@ -728,7 +727,7 @@ multidict==6.0.5
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.2.3
+mysqlclient==2.2.4
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
@@ -765,7 +764,7 @@ openedx-blockstore==1.4.0
     # via -r requirements/edx/kernel.in
 openedx-calc==3.0.1
     # via -r requirements/edx/kernel.in
-openedx-django-pyfs==3.4.1
+openedx-django-pyfs==3.5.0
     # via
     #   lti-consumer-xblock
     #   xblock
@@ -773,7 +772,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.0.3
     # via -r requirements/edx/kernel.in
-openedx-events==9.4.0
+openedx-events==9.5.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-event-bus-kafka
@@ -792,7 +791,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
-ora2==6.0.31
+ora2==6.0.32
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
@@ -928,7 +927,7 @@ python-ipware==2.0.1
     # via django-ipware
 python-memcached==1.62
     # via -r requirements/edx/paver.txt
-python-slugify==8.0.3
+python-slugify==8.0.4
     # via code-annotations
 python-swiftclient==4.4.0
     # via ora2
@@ -1015,7 +1014,7 @@ rpds-py==0.17.1
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.5
+ruamel-yaml==0.18.6
     # via drf-yasg
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
@@ -1131,7 +1130,7 @@ tinycss2==1.2.1
     # via bleach
 tomlkit==0.12.3
     # via snowflake-connector-python
-tqdm==4.66.1
+tqdm==4.66.2
     # via
     #   nltk
     #   openai
@@ -1142,10 +1141,11 @@ typing-extensions==4.9.0
     #   django-countries
     #   drf-spectacular
     #   edx-opaque-keys
+    #   jwcrypto
     #   kombu
     #   pylti1p3
     #   snowflake-connector-python
-tzdata==2023.4
+tzdata==2024.1
     # via
     #   backports-zoneinfo
     #   celery
@@ -1178,7 +1178,7 @@ voluptuous==0.14.2
     # via ora2
 walrus==0.9.3
     # via edx-event-bus-redis
-watchdog==3.0.0
+watchdog==4.0.0
     # via -r requirements/edx/paver.txt
 wcwidth==0.2.13
     # via prompt-toolkit
@@ -1200,9 +1200,7 @@ webob==1.8.7
     #   -r requirements/edx/kernel.in
     #   xblock
 wrapt==1.16.0
-    # via
-    #   -r requirements/edx/paver.txt
-    #   deprecated
+    # via -r requirements/edx/paver.txt
 xblock[django]==1.10.0
     # via
     #   -r requirements/edx/kernel.in
