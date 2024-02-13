@@ -39,6 +39,11 @@
         <span> <%- gettext('Hide in Course Outline, accessible via Link') %> </span>
     </label>
     <p class='field-message' id='hide-from-toc-description'> <%- gettext('It is intentionally hidden from standard navigation, ensuring that only individuals with the link can view its contents.') %> </p>
+    <% if (hideFromTOC) { %>
+      <p class="tip tip-warning">
+        <%- gettext('If you make this section visible in the table of content, learners will be able to see its content.') %>
+      </p>
+    <% } %>
   <% } %>
   </div>
 </div>

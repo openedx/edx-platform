@@ -315,6 +315,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var isPracticeExam = xblockInfo.get('is_practice_exam');
             var isOnboardingExam = xblockInfo.get('is_onboarding_exam');
             var enableHideFromTOCUI = xblockInfo.get('enable_hide_from_toc_ui');
+            var hideFromTOC = xblockInfo.get('hide_from_toc');
             var html = this.template($.extend({}, {
                 xblockInfo: xblockInfo,
                 xblockType: this.options.xblockType,
@@ -325,6 +326,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 isPracticeExam: isPracticeExam,
                 isOnboardingExam: isOnboardingExam,
                 enableHideFromTOCUI: enableHideFromTOCUI,
+                hideFromTOC: hideFromTOC,
                 isTimedExam: isTimeLimited && !(
                     isProctoredExam || isPracticeExam || isOnboardingExam
                 ),
@@ -855,8 +857,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return {
                     publish: 'republish',
                     metadata: {
-                        visible_to_staff_only: this.isLocked() ? true : null,
-                        hide_from_toc: this.isHiddenFromTOC() ? true : null
+                        visible_to_staff_only: this.isLocked() || null,
+                        hide_from_toc: this.isHiddenFromTOC() || null
                     }
                 };
             } else {
