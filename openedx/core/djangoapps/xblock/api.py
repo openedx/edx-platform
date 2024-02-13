@@ -38,6 +38,8 @@ from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
+from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
+
 # Made available as part of this package's public API:
 from openedx.core.djangoapps.xblock.learning_context import LearningContext
 
@@ -48,49 +50,34 @@ log = logging.getLogger(__name__)
 
 def get_runtime_system():
     """
-    Get the XBlockRuntimeSystem, which is a single long-lived factory that can
-    create user-specific runtimes.
+    Return a new XBlockRuntimeSystem.
 
-    The Runtime System isn't always needed (e.g. for management commands), so to
-    keep application startup faster, it's only initialized when first accessed
-    via this method.
+    TODO: Refactor to get rid of the XBlockRuntimeSystem entirely and just
+    create the LearningCoreXBlockRuntime and return it. We used to want to keep
+    around a long lived runtime system (a factory that returns runtimes) for
+    caching purposes, and have it dynamically construct a runtime on request.
+    Now we're just re-constructing both the system and the runtime in this call
+    and returning it every time, because:
+
+    1. We no longer have slow, Blockstore-style definitions to cache, so the
+       performance of this is perfectly acceptable.
+    2. Having a singleton increases complexity and the chance of bugs.
+    3. Creating the XBlockRuntimeSystem every time only takes about 10-30 µs.
+
+    Given that, the extra XBlockRuntimeSystem class just adds confusion. But
+    despite that, it's tested, working code, and so I'm putting off refactoring
+    for now.
     """
-    # TODO: Is any of the following necessary now that we're no longer using
-    # Blockstore or its caching mechanisms? And why were we doing a dict with
-    # attributes manually set by thread ID instead of a ContextVar?
-    #
-    # The runtime system should not be shared among threads, as there is currently a race condition when parsing XML
-    # that can lead to duplicate children.
-    # (In BlockstoreXBlockRuntime.get_block(), has_cached_definition(def_id) returns false so parse_xml is called, but
-    # meanwhile another thread parses the XML and caches the definition; then when parse_xml gets to XML nodes for
-    # child blocks, it appends them to the children already cached by the other thread and saves the doubled list of
-    # children; this happens only occasionally but is very difficult to avoid in a clean way due to the API of parse_xml
-    # and XBlock field data in general [does not distinguish between setting initial values during parsing and changing
-    # values at runtime due to user interaction], and how it interacts with BlockstoreFieldData. Keeping the caches
-    # local to each thread completely avoids this problem.)
-    cache_name = f'_system_{threading.get_ident()}'
-    if not hasattr(get_runtime_system, cache_name):
-        params = dict(
-            handler_url=get_handler_url,
-            runtime_class=LearningCoreXBlockRuntime,
-        )
-        params.update(get_xblock_app_config().get_runtime_system_params())
-        setattr(get_runtime_system, cache_name, _XBlockRuntimeSystem(**params))
-    return getattr(get_runtime_system, cache_name)
-
-def get_runtime_system():
     params = get_xblock_app_config().get_runtime_system_params()
     params.update(
         runtime_class=LearningCoreXBlockRuntime,
         handler_url=get_handler_url,
         authored_data_store=LearningCoreFieldData(),
     )
-    start = datetime.now()
     runtime = _XBlockRuntimeSystem(**params)
-    end = datetime.now()
-    log.info(f"Runtime initiated in {end - start}")
 
     return runtime
+
 
 def load_block(usage_key, user):
     """
@@ -123,7 +110,6 @@ def load_block(usage_key, user):
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
     # set to 3.
     # field_overrides = context_impl.get_field_overrides(usage_key)
-
     runtime = get_runtime_system().get_runtime(user=user)
 
     return runtime.get_block(usage_key)
@@ -169,21 +155,6 @@ def get_block_metadata(block, includes=()):
                 data["editable_children"].append(block.children[idx])
 
     return data
-
-
-def resolve_definition(block_or_key):
-    """
-    Given an XBlock, definition key, or usage key, return the definition key.
-    """
-    if isinstance(block_or_key, BundleDefinitionLocator):
-        return block_or_key
-    elif isinstance(block_or_key, UsageKeyV2):
-        context_impl = get_learning_context_impl(block_or_key)
-        return context_impl.definition_for_usage(block_or_key)
-    elif isinstance(block_or_key, XBlock):
-        return block_or_key.scope_ids.def_id
-    else:
-        raise TypeError(block_or_key)
 
 
 def xblock_type_display_name(block_type):
