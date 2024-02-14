@@ -69,7 +69,7 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from edx_rest_api_client.client import OAuthAPIClient
 from lxml import etree
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import (
     LibraryLocatorV2,
     LibraryUsageLocatorV2,
@@ -87,6 +87,7 @@ from openedx_events.content_authoring.signals import (
 )
 from openedx_learning.core.publishing import api as publishing_api
 from openedx_learning.core.contents import api as contents_api
+from openedx_learning.core.contents.models import MediaType
 from openedx_learning.core.components import api as components_api
 from openedx_learning.core.components.models import Component
 from openedx_tagging.core.tagging import api as tagging_api
@@ -604,18 +605,6 @@ def _get_library_component_tags_count(library_key) -> dict:
     return tagging_api.get_object_tag_counts(library_key_pattern, count_implicit=True)
 
 
-def lib_xblock_metadata_from_component(library_key, component):
-    return LibraryXBlockMetadata(
-        usage_key=LibraryUsageLocatorV2(
-            library_key,
-            component.component_type.name,
-            component.local_key,
-        ),
-        display_name=component.versioning.draft.title,
-        has_unpublished_changes=component.versioning.has_unpublished_changes
-    )
-
-
 def get_library_blocks(library_key, text_search=None, block_types=None) -> list[LibraryXBlockMetadata]:
     """
     Get the library blocks and filter.
@@ -788,7 +777,14 @@ def create_library_block(library_key, block_type, definition_id):
 
     return get_library_block(usage_key)
 
-def component_already_exists(usage_key):
+
+def component_already_exists(usage_key: UsageKeyV2) -> bool:
+    """
+    Does a Component exist for this usage key?
+
+    This is a lower-level function that will return True if a Component object
+    exists, even if it was soft-deleted, and there is no active draft version.
+    """
     try:
         get_component_from_usage_key(usage_key)
     except ObjectDoesNotExist:
@@ -796,7 +792,17 @@ def component_already_exists(usage_key):
     return True
 
 
-def get_component_from_usage_key(usage_key):
+def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
+    """
+    Fetch the Component object for a given usage key.
+
+    Raises a ObjectDoesNotExist error if no such Component exists.
+
+    This is a lower-level function that will return a Component even if there is
+    no current draft version of that Component (because it's been soft-deleted).
+    The get_library_block function is the one that will check to see if a draft
+    version exists or not before returning.
+    """
     content_lib = ContentLibrary.objects.get_by_key(usage_key.context_key)
     learning_package = content_lib.learning_package
     return components_api.get_component_by_key(
@@ -807,7 +813,13 @@ def get_component_from_usage_key(usage_key):
     )
 
 
-def get_or_create_olx_media_type(block_type):
+def get_or_create_olx_media_type(block_type: str) -> MediaType:
+    """
+    Get or create a MediaType for the block type.
+
+    Learning Core stores all Content with a Media Type (a.k.a. MIME type). For
+    OLX, we use the "application/vnd.*" convention, per RFC 6838.
+    """
     return contents_api.get_or_create_media_type(
         f"application/vnd.openedx.xblock.v1.{block_type}+xml"
     )
@@ -815,6 +827,13 @@ def get_or_create_olx_media_type(block_type):
 
 def create_component_for_block(content_lib, usage_key):
     """
+    Create a Component for an XBlock type, and initialize it.
+
+    This will create a Component, along with its first ComponentVersion. The tag
+    in the OLX will have no attributes, e.g. `<problem />`. This first version
+    will be set as the current draft. This function does not publish the
+    Component.
+
     TODO: We should probably shift this to openedx.core.djangoapps.xblock.api
     (along with its caller) since it gives runtime storage specifics. The
     Library-specific logic stays in this module, so "create a block for my lib"
