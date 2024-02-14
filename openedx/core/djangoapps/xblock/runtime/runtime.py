@@ -21,7 +21,6 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import FieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
-from xblock.field_data import FieldData
 from xblock.runtime import IdReader, KvsFieldData, MemoryIdManager, Runtime
 
 from xmodule.errortracker import make_error_tracker

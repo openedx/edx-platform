@@ -7,7 +7,6 @@ our newer Open edX-specific opaque key formats.
 from opaque_keys.edx.keys import UsageKeyV2
 from xblock.runtime import IdReader
 
-from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 
 
 class OpaqueKeyReader(IdReader):

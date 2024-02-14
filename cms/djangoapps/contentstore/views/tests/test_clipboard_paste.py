@@ -4,7 +4,6 @@ allow users to paste XBlocks that were copied using the staged_content/clipboard
 APIs.
 """
 import ddt
-from django.test import LiveServerTestCase
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
 from organizations.models import Organization

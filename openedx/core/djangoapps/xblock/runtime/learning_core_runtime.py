@@ -18,7 +18,7 @@ from lxml import etree
 
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage
-from xblock.fields import Field, Scope, ScopeIds, Sentinel
+from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import FieldData
 
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
@@ -276,8 +276,8 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 type_name=usage_key.block_type,
                 local_key=usage_key.block_id,
             )
-        except ObjectDoesNotExist:
-            raise NoSuchUsage(usage_key)
+        except ObjectDoesNotExist as exc:
+            raise NoSuchUsage(usage_key) from exc
 
         return component
 

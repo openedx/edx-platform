@@ -76,8 +76,8 @@ def render_block_view(request, usage_key_str, view_name):
 
     try:
         block = load_block(usage_key, request.user)
-    except NoSuchUsage:
-        raise NotFound(f"{usage_key} not found")
+    except NoSuchUsage as exc:
+        raise NotFound(f"{usage_key} not found") from exc
 
     fragment = _render_block_view(block, view_name, request.user)
     response_data = get_block_metadata(block)

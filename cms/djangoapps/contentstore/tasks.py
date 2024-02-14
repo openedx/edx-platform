@@ -922,7 +922,6 @@ def _create_metadata(v1_library_key, collection_uuid):
     library_license = ''  # '' = ALL_RIGHTS_RESERVED
     with atomic():
         return v2contentlib_api.create_library(
-            collection,
             library_type,
             org,
             slug,
