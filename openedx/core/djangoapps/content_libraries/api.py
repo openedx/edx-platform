@@ -618,6 +618,7 @@ def get_library_blocks(library_key, text_search=None, block_types=None) -> list[
         for component in get_library_components(library_key, text_search, block_types)
     ]
 
+
 def get_library_components(library_key, text_search=None, block_types=None) -> QuerySet[Component]:
     """
     Get the library components and filter.
