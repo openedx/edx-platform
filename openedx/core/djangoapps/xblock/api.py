@@ -180,8 +180,6 @@ def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
 
     This is a lower-level function that will return a Component even if there is
     no current draft version of that Component (because it's been soft-deleted).
-    The get_library_block function is the one that will check to see if a draft
-    version exists or not before returning.
     """
     learning_package = publishing_api.get_learning_package_by_key(
         str(usage_key.context_key)
@@ -198,12 +196,13 @@ def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
     """
     Get the OLX source of the given XBlock.
     """
-    # Inefficient but simple approach first
+    # Inefficient but simple approach. Optimize later if needed.
     component = get_component_from_usage_key(usage_key)
     component_version = component.versioning.draft
 
     # TODO: we should probably make a method on ComponentVersion that returns
-    # a content based on the name.
+    # a content based on the name. Accessing by componentversioncontent__key is
+    # awkward.
     content = component_version.contents.get(componentversioncontent__key="block.xml")
 
     return content.text
