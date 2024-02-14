@@ -356,8 +356,10 @@ def get_library(library_key):
                                   learning_package.id
                               ).exists()
 
-    # I'm doing this one to match what was already existing, but I'm not clear
-    # on the use case for it.
+    # TODO: I'm doing this one to match already-existing behavior, but this is
+    # something that we should remove. It exists to accomodate some complexities
+    # with how Blockstore staged changes, but Learning Core works differently,
+    # and has_unpublished_changes should be sufficient.
     has_unpublished_deletes = publishing_api.get_entities_with_unpublished_deletes(
                                   learning_package.id
                               ).exists()
@@ -570,7 +572,8 @@ def update_library(
             if allow_public_read is not None:
                 content_lib.allow_public_read = allow_public_read
             if library_type is not None:
-                # TODO: Can we get rid of this field entirely?
+                # TODO: Get rid of this field entirely, and remove library_type
+                # from any functions that take it as an argument.
                 content_lib.library_type = library_type
             if library_license is not None:
                 content_lib.library_license = library_license
@@ -692,8 +695,6 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
 
 def set_library_block_olx(usage_key, new_olx_str):
     """
-    TODO: When is it even being called now?
-
     Replace the OLX source of the given XBlock.
 
     This is only meant for use by developers or API client applications, as
