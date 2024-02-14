@@ -203,6 +203,9 @@ class LibraryXBlockMetadata:
 
     @classmethod
     def from_component(cls, library_key, component):
+        """
+        Construct a LibraryXBlockMetadata from a Component object.
+        """
         return cls(
             usage_key=LibraryUsageLocatorV2(
                 library_key,
@@ -352,7 +355,8 @@ def get_library(library_key):
     # we've decided to do those version references at the level of the
     # individual blocks being used, since a Learning Core backed library is
     # intended to be used for many LibraryContentBlocks and not 1:1 like v1
-    # libraries
+    # libraries. The top level version stays for now because LibraryContentBlock
+    # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
 
     return ContentLibraryMetadata(
@@ -482,15 +486,14 @@ def set_library_user_permissions(library_key, user, access_level):
         if not ref.permission_grants.filter(access_level=AccessLevel.ADMIN_LEVEL).exclude(user_id=user.id).exists():
             raise LibraryPermissionIntegrityError(_('Cannot change or remove the access level for the only admin.'))
 
-    with transaction.atomic():
-        if access_level is None:
-            ref.permission_grants.filter(user=user).delete()
-        else:
-            ContentLibraryPermission.objects.update_or_create(
-                library=ref,
-                user=user,
-                defaults={"access_level": access_level},
-            )
+    if access_level is None:
+        ref.permission_grants.filter(user=user).delete()
+    else:
+        ContentLibraryPermission.objects.update_or_create(
+            library=ref,
+            user=user,
+            defaults={"access_level": access_level},
+        )
 
 
 def set_library_group_permissions(library_key, group, access_level):
@@ -500,15 +503,15 @@ def set_library_group_permissions(library_key, group, access_level):
     access_level should be one of the AccessLevel values defined above.
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
-    with transaction.atomic():
-        if access_level is None:
-            ref.permission_grants.filter(group=group).delete()
-        else:
-            ContentLibraryPermission.objects.update_or_create(
-                library=ref,
-                group=group,
-                defaults={"access_level": access_level},
-            )
+
+    if access_level is None:
+        ref.permission_grants.filter(group=group).delete()
+    else:
+        ContentLibraryPermission.objects.update_or_create(
+            library=ref,
+            group=group,
+            defaults={"access_level": access_level},
+        )
 
 
 def update_library(
@@ -646,7 +649,13 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
 
 
 def get_library_block(usage_key) -> LibraryXBlockMetadata:
-    """Get metadata (LibraryXBlockMetadata) about one specific XBlock in a library"""
+    """
+    Get metadata (LibraryXBlockMetadata) about one specific XBlock in a library
+
+    This will raise ContentLibraryBlockNotFound if there is no draft version of
+    this block (i.e. it's been soft-deleted from Studio), even if there is a
+    live published version of it in the LMS.
+    """
     try:
         component = get_component_from_usage_key(usage_key)
     except ObjectDoesNotExist:
