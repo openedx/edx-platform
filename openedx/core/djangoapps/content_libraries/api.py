@@ -52,8 +52,7 @@ from __future__ import annotations
 
 import abc
 import collections
-from datetime import datetime
-from uuid import UUID
+from datetime import datetime, timezone
 import base64
 import hashlib
 import logging
@@ -63,15 +62,15 @@ import requests
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
+from edx_rest_api_client.client import OAuthAPIClient
 from lxml import etree
-from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
-    BundleDefinitionLocator,
     LibraryLocatorV2,
     LibraryUsageLocatorV2,
     LibraryLocator as LibraryLocatorV1
@@ -86,52 +85,25 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
 )
-from organizations.models import Organization
-from openedx_learning.core.components.models import Component
 from openedx_learning.core.publishing import api as publishing_api
+from openedx_learning.core.contents import api as contents_api
+from openedx_learning.core.components import api as components_api
+from openedx_learning.core.components.models import Component
+from openedx_tagging.core.tagging import api as tagging_api
+from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
-from edx_rest_api_client.client import OAuthAPIClient
 
-from openedx.core.djangoapps.content_libraries import permissions
-# pylint: disable=unused-import
-from openedx.core.djangoapps.content_libraries.constants import (
-    ALL_RIGHTS_RESERVED,
-    CC_4_BY,
-    COMPLEX,
-    DRAFT_NAME,
-    PROBLEM,
-    VIDEO,
-)
-from openedx.core.djangoapps.content_libraries.models import (
-    ContentLibrary,
-    ContentLibraryPermission,
-    ContentLibraryBlockImportTask,
-)
-from openedx.core.djangoapps.xblock.api import (
-    get_block_display_name,
-    get_learning_context_impl,
-    xblock_type_display_name,
-)
+from openedx.core.djangoapps.xblock.api import xblock_type_display_name
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from openedx_tagging.core.tagging import api as tagging_api
 
-from openedx_learning.core.publishing.models import Draft
-
-from datetime import timezone
-from openedx_learning.core.publishing import api as publishing_api
-from openedx_learning.core.contents import api as contents_api
-from openedx_learning.core.components import api as components_api
-from django.core.exceptions import ObjectDoesNotExist
-
-
-
-from . import tasks
-
+from . import permissions, tasks
+from .constants import ALL_RIGHTS_RESERVED, COMPLEX
+from .models import ContentLibrary, ContentLibraryPermission, ContentLibraryBlockImportTask
 
 log = logging.getLogger(__name__)
 
@@ -299,7 +271,7 @@ def get_metadata(queryset, text_search=None):
     Take a list of ContentLibrary objects and return metadata from Learning Core.
     """
     if text_search:
-        queryset_org_search = queryset.filter(org__short_name__icontains=text_search)
+        queryset = queryset.filter(org__short_name__icontains=text_search)
 
     libraries = [
         # TODO: Do we really need these fields for the library listing view?
@@ -315,6 +287,9 @@ def get_metadata(queryset, text_search=None):
             version=0,
             allow_public_learning=lib.allow_public_learning,
             allow_public_read=lib.allow_public_read,
+
+            # These are currently dummy values to maintain the REST API contract
+            # while we shift to Learning Core models.
             num_blocks=0,
             last_published=None,
             has_unpublished_changes=False,
@@ -642,7 +617,9 @@ def get_library_blocks(library_key, text_search=None, block_types=None) -> list[
     """
     Get the library blocks and filter.
 
-    Can we just remove this entirely?
+    TODO: This is primarily used in tests, but it's getting an unbounded list,
+    instead of a pagable queryset. We should get rid of this function
+    altogether.
     """
     return [
         LibraryXBlockMetadata.from_component(library_key, component)
@@ -703,9 +680,9 @@ def set_library_block_olx(usage_key, new_olx_str):
     """
     # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
     assert isinstance(usage_key, LibraryUsageLocatorV2)
+
     # Make sure the block exists:
-    metadata = get_library_block(usage_key)
-    block_type = usage_key.block_type
+    _block_metadata = get_library_block(usage_key)
 
     # Verify that the OLX parses, at least as generic XML:
     node = etree.fromstring(new_olx_str)
@@ -786,10 +763,9 @@ def create_library_block(library_key, block_type, definition_id):
         block_type=block_type,
         usage_id=block_id,
     )
-    library_context = get_learning_context_impl(usage_key)
 
     if component_already_exists(usage_key):
-        raise LibraryBlockAlreadyExists(f"An XBlock with ID '{new_usage_id}' already exists")
+        raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
 
     create_component_for_block(ref, usage_key)
 
@@ -800,6 +776,7 @@ def create_library_block(library_key, block_type, definition_id):
             usage_key=usage_key
         )
     )
+
     return get_library_block(usage_key)
 
 def component_already_exists(usage_key):
@@ -881,25 +858,19 @@ def delete_library_block(usage_key, remove_from_parent=True):
     )
 
 
-def get_library_block_static_asset_files(usage_key):
+def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticFile]:
     """
     Given an XBlock in a content library, list all the static asset files
     associated with that XBlock.
 
-    Returns a list of LibraryXBlockStaticFile objects.
+    Returns a list of LibraryXBlockStaticFile objects, sorted by path.
+
+    TODO: This is not yet implemented for Learning Core backed libraries.
     """
     return []
 
-    def_key, lib_bundle = _lookup_usage_key(usage_key)
-    result = [
-        LibraryXBlockStaticFile(path=f.path, url=f.url, size=f.size)
-        for f in lib_bundle.get_static_files_for_definition(def_key)
-    ]
-    result.sort(key=lambda f: f.path)
-    return result
 
-
-def add_library_block_static_asset_file(usage_key, file_name, file_content):
+def add_library_block_static_asset_file(usage_key, file_name, file_content) -> LibraryXBlockStaticFile:
     """
     Upload a static asset file into the library, to be associated with the
     specified XBlock. Will silently overwrite an existing file of the same name.
@@ -910,52 +881,26 @@ def add_library_block_static_asset_file(usage_key, file_name, file_content):
 
     Returns a LibraryXBlockStaticFile object.
 
+    Sends a LIBRARY_BLOCK_UPDATED event.
+
     Example:
         video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
         add_library_block_static_asset_file(video_block, "subtitles-en.srt", subtitles.encode('utf-8'))
     """
-    assert isinstance(file_content, bytes)
-    def_key, lib_bundle = _lookup_usage_key(usage_key)
-    if file_name != file_name.strip().strip('/'):
-        raise InvalidNameError("file name cannot start/end with / or whitespace.")
-    if '//' in file_name or '..' in file_name:
-        raise InvalidNameError("Invalid sequence (// or ..) in filename.")
-    file_path = lib_bundle.get_static_prefix_for_definition(def_key) + file_name
-    # Write the new static file into the library bundle's draft
-    draft = get_or_create_bundle_draft(def_key.bundle_uuid, DRAFT_NAME)
-    write_draft_file(draft.uuid, file_path, file_content)
-
-    LIBRARY_BLOCK_UPDATED.send_event(
-        library_block=LibraryBlockData(
-            library_key=lib_bundle.library_key,
-            usage_key=usage_key
-        )
-    )
-    return LibraryXBlockStaticFile(path=file_metadata.path, url=file_metadata.url, size=file_metadata.size)
+    raise NotImplementedError("Static assets not yet implemented for Learning Core")
 
 
 def delete_library_block_static_asset_file(usage_key, file_name):
     """
     Delete a static asset file from the library.
 
+    Sends a LIBRARY_BLOCK_UPDATED event.
+
     Example:
         video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
         delete_library_block_static_asset_file(video_block, "subtitles-en.srt")
     """
-    def_key, lib_bundle = _lookup_usage_key(usage_key)
-    if '..' in file_name:
-        raise InvalidNameError("Invalid .. in file name.")
-    file_path = lib_bundle.get_static_prefix_for_definition(def_key) + file_name
-    # Delete the file from the library bundle's draft
-    draft = get_or_create_bundle_draft(def_key.bundle_uuid, DRAFT_NAME)
-    write_draft_file(draft.uuid, file_path, contents=None)
-
-    LIBRARY_BLOCK_UPDATED.send_event(
-        library_block=LibraryBlockData(
-            library_key=lib_bundle.library_key,
-            usage_key=usage_key
-        )
-    )
+    raise NotImplementedError("Static assets not yet implemented for Learning Core")
 
 
 def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
@@ -1290,6 +1235,9 @@ class EdxModulestoreImportClient(BaseEdxImportClient):
 class EdxApiImportClient(BaseEdxImportClient):
     """
     An import client based on a remote Open Edx API interface.
+
+    TODO: Look over this class. We'll probably need to completely re-implement
+    the import process.
     """
 
     URL_COURSES = "/api/courses/v1/courses/{course_key}"
