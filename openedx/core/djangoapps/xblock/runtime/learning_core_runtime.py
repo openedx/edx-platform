@@ -56,7 +56,6 @@ class LearningCoreFieldData(FieldData):
        blocks have changes to any of their fields. See the marked_unchanged
        method docstring for more details.
     """
-    NOT_FOUND = Sentinel('NOT_FOUND')
 
     def __init__(self):
         # set of UsageKeyV2 for blocks that were modified and need to be saved
@@ -116,10 +115,11 @@ class LearningCoreFieldData(FieldData):
 
         # Check to see if we're just setting the same value. If so, return
         # without doing anything.
-        if value == self.field_data[usage_key].get(name, self.NOT_FOUND):
+        block_fields = self.field_data[usage_key]
+        if (name in block_fields) and (block_fields[name] == value):
             return
 
-        self.field_data[usage_key][name] = value
+        block_fields[name] = value
         self.changed.add(usage_key)
 
     def has_changes(self, block):
@@ -281,7 +281,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         return component
 
-    def _lookup_asset_url(self, block: XBlock, asset_path: str):  # pylint: disable=unused-argument
+    def _lookup_asset_url(self, block: XBlock, asset_path: str) -> str | None:  # pylint: disable=unused-argument
         """
         Return an absolute URL for the specified static asset file that may
         belong to this XBlock.
