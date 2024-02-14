@@ -2,6 +2,7 @@
 Tests for courseware API
 """
 
+import itertools
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from typing import Optional
@@ -11,6 +12,7 @@ import ddt
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.test.client import RequestFactory
 
 from edx_django_utils.cache import TieredCache
@@ -430,17 +432,16 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert 'can_access_proctored_exams' in courseware_data
         assert courseware_data['can_access_proctored_exams'] == result
 
-    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=False)
-    def test_learning_assistant_enabled_disabled_waffle_flag(self):
-        response = self.client.get(self.url)
-        learning_assistant_enabled = response.json()['learning_assistant_enabled']
-        self.assertFalse(learning_assistant_enabled)
+    @ddt.idata(itertools.product((True, False), (True, False)))
+    @ddt.unpack
+    def test_learning_assistant_enabled(self, setting_enabled, flag_enabled):
+        with override_settings(LEARNING_ASSISTANT_AVAILABLE=setting_enabled), \
+                override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=flag_enabled):
+            response = self.client.get(self.url)
 
-    @override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=True)
-    def test_learning_assistant_enabled_enabled_waffle_flag(self):
-        response = self.client.get(self.url)
         learning_assistant_enabled = response.json()['learning_assistant_enabled']
-        self.assertTrue(learning_assistant_enabled)
+        expected_value = setting_enabled or flag_enabled
+        self.assertEqual(learning_assistant_enabled, expected_value)
 
 
 @ddt.ddt
