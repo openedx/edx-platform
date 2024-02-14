@@ -197,7 +197,10 @@ class TeamsDashboardView(GenericAPIView):
                 "teams": user_teams_data
             },
             "has_open_teamset": bool(teamset_counts_by_type[TeamsetType.open.value]),
-            "has_public_managed_teamset": bool(teamset_counts_by_type[TeamsetType.public_managed.value]),
+            "has_public_managed_teamset": bool(
+                teamset_counts_by_type[TeamsetType.public_managed.value] +
+                teamset_counts_by_type[TeamsetType.open_managed.value]
+            ),
             "has_managed_teamset": bool(
                 teamset_counts_by_type[TeamsetType.public_managed.value] +
                 teamset_counts_by_type[TeamsetType.private_managed.value]
