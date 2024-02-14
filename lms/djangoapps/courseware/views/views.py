@@ -125,6 +125,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
+from openedx.core.djangoapps.user_authn.toggles import should_enable_auto_generated_username
 from openedx.features.course_experience import course_home_url
 from openedx.features.course_experience.url_helpers import (
     get_courseware_url,
@@ -2147,7 +2148,7 @@ def financial_assistance_form(request, course_id=None):
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_details': {
             'email': user.email,
-            'username': user.username,
+            'username': '' if should_enable_auto_generated_username() else user.username,
             'name': user.profile.name,
             'country': str(user.profile.country.name),
         },
