@@ -34,14 +34,29 @@ def get_submissions(request, usage_id):
     return json.loads(response.content)
 
 
-def get_assessments(request, usage_id, submission_uuid, assessment_type):
+def get_given_assessments(request, usage_id, submission_uuid):
     """
-    Get a list of assessments from the ORA's 'list_assessments_grades' XBlock.json_handler
+    Get a list of given assessments from the ORA's 'list_given_assessments' XBlock.json_handler
     """
-    handler_name = "list_assessments"
-    body = {"item_id": usage_id, "submission_uuid": submission_uuid, "assessment_type": assessment_type}
+    handler_name = "list_given_assessments"
+    data = {"item_id": usage_id, "submission_uuid": submission_uuid}
 
-    response = call_xblock_json_handler(request, usage_id, handler_name, body)
+    response = call_xblock_json_handler(request, usage_id, handler_name, data)
+
+    if response.status_code != HTTPStatus.OK:
+        raise XBlockInternalError(context={"handler": handler_name})
+
+    return json.loads(response.content)
+
+
+def get_received_assessments(request, usage_id, submission_uuid):
+    """
+    Get a list of received assessments from the ORA's 'list_received_assessments' XBlock.json_handler
+    """
+    handler_name = "list_received_assessments"
+    data = {"submission_uuid": submission_uuid}
+
+    response = call_xblock_json_handler(request, usage_id, handler_name, data)
 
     if response.status_code != HTTPStatus.OK:
         raise XBlockInternalError(context={"handler": handler_name})
@@ -184,5 +199,5 @@ def batch_delete_submission_locks(request, usage_id, submission_uuids):
     response = call_xblock_json_handler(request, usage_id, handler_name, body)
 
     # Errors should raise a blanket exception. Otherwise body is empty, 200 is implicit success
-    if response.status_code != HTTPStatus.OK:
+    if response.status_code != 200:
         raise XBlockInternalError(context={"handler": handler_name})

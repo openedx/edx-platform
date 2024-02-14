@@ -24,7 +24,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from lms.djangoapps.ora_staff_grader.constants import (
     PARAM_ORA_LOCATION,
     PARAM_SUBMISSION_ID,
-    PARAM_ASSESSMENT_TYPE,
 )
 from lms.djangoapps.ora_staff_grader.errors import (
     BadOraLocationResponse,
@@ -44,7 +43,8 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
-    get_assessments,
+    get_given_assessments,
+    get_received_assessments,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
@@ -150,27 +150,79 @@ class InitializeView(StaffGraderBaseView):
             return UnknownErrorResponse()
 
 
-class AssessmentFeedbackView(StaffGraderBaseView):
+class AssessmentGivenFeedbackView(StaffGraderBaseView):
     """
-    GET data about Assessments by submission_uuid and ora_location
+    GET data about assessments given by a user.
 
     Response: {
-        assessments (list of dict): [
+        assessments (List[dict]): [
             {
-                "assessment_id: (string) assessment id
-                "scorer_name: (string) scorer name
-                "scorer_username: (string) scorer username
-                "scorer_email: (string) scorer email
-                "assessment_date: (string) assessment date
-                "assessment_scores (list of dict) [
+                "assessment_id: (str) assessment id
+                "scorer_name: (str) scorer name
+                "scorer_username: (str) scorer username
+                "scorer_email: (str) scorer email
+                "assessment_date: (str) assessment date
+                "assessment_scores (List[dict]) [
                     {
-                        "criterion_name: (string) criterion name
+                        "criterion_name: (str) criterion name
                         "score_earned: (int) score earned
-                        "score_type: (string) score type
+                        "score_type: (str) score type
                     }
                 ]
-                "problem_step (string) problem step (Self, Peer, or Staff)
-                "feedback: (string) feedback
+                "problem_step (str) problem step (Self, Peer, or Staff)
+                "feedback: (str) feedback
+            }
+        ]
+    }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - BadOraLocationResponse (HTTP 400) for bad ORA location
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
+    """
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
+    def get(self, request, ora_location, submission_uuid, *args, **kwargs):
+        """ Get data about assessments given by a user"""
+        try:
+            assessments_data = {"assessments": get_given_assessments(request, ora_location, submission_uuid)}
+            response_data = AssessmentFeedbackSerializer(assessments_data).data
+            return Response(response_data)
+
+        except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
+            return BadOraLocationResponse()
+
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+
+class AssessmentReceivedFeedbackView(StaffGraderBaseView):
+    """
+    GET data about assessments received by a user.
+
+    Response: {
+        assessments (List[dict]): [
+            {
+                "assessment_id: (str) assessment id
+                "scorer_name: (str) scorer name
+                "scorer_username: (str) scorer username
+                "scorer_email: (str) scorer email
+                "assessment_date: (str) assessment date
+                "assessment_scores (List[dict]) [
+                    {
+                        "criterion_name: (str) criterion name
+                        "score_earned: (int) score earned
+                        "score_type: (str) score type
+                    }
+                ]
+                "problem_step (str) problem step (Self, Peer, or Staff)
+                "feedback: (str) feedback
             }
         ]
     }
@@ -182,16 +234,11 @@ class AssessmentFeedbackView(StaffGraderBaseView):
     - UnknownError (HTTP 500) for other errors
     """
 
-    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID, PARAM_ASSESSMENT_TYPE])
-    def get(self, request, ora_location, submission_uuid, assessment_type, *args, **kwargs):
-
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
+    def get(self, request, ora_location, submission_uuid, *args, **kwargs):
+        """Get data about assessments received by a user"""
         try:
-            assessments_data = {
-                "assessments": get_assessments(
-                    request, ora_location, submission_uuid, assessment_type
-                )
-            }
-
+            assessments_data = {"assessments": get_received_assessments(request, ora_location, submission_uuid)}
             response_data = AssessmentFeedbackSerializer(assessments_data).data
             return Response(response_data)
 

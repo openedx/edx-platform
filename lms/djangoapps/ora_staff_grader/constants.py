@@ -3,7 +3,6 @@
 # Query params
 PARAM_ORA_LOCATION = "oraLocation"
 PARAM_SUBMISSION_ID = "submissionUUID"
-PARAM_ASSESSMENT_TYPE = "assessmentType"
 
 # Error codes
 ERR_UNKNOWN = "ERR_UNKNOWN"
