@@ -441,9 +441,8 @@ class XBlockRuntimeSystem:
         self.id_reader = id_reader or OpaqueKeyReader()
         self.id_generator = MemoryIdManager()  # We don't really use id_generator until we need to support asides
         self.runtime_class = runtime_class
-        # TODO: Figure out the dummy values here
-        self.authored_data_store = authored_data_store # or BlockstoreFieldData()
-        self.children_data_store = None # BlockstoreChildrenData(self.authored_data_store)
+        self.authored_data_store = authored_data_store
+        self.children_data_store = None
         assert student_data_mode in (StudentDataMode.Ephemeral, StudentDataMode.Persisted)
         self.student_data_mode = student_data_mode
 

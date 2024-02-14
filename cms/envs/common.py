@@ -1825,12 +1825,6 @@ INSTALLED_APPS = [
     "openedx_learning.core.publishing",
 ]
 
-OPENEDX_LEARNING = {
-    # Custom file storage, though this is better done through Django's
-    # STORAGES setting in Django >= 4.2
-    "STORAGE": None,
-}
-
 
 ################# EDX MARKETING SITE ##################################
 
