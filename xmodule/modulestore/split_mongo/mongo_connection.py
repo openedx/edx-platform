@@ -506,7 +506,7 @@ class MongoPersistenceBackend:
                 key_attr: getattr(course_key, key_attr)
                 for key_attr in ('org', 'course', 'run')
             }
-            return self.course_index.remove(query)
+            return self.course_index.delete_one(query)
 
     def get_definition(self, key, course_context=None):
         """
