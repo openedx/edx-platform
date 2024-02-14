@@ -28,7 +28,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cm
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-
 class ContentLibraryContentTestMixin:
     """
     Mixin for content library tests that creates two students and a library.
