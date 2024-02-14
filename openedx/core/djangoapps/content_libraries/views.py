@@ -70,7 +70,6 @@ import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
-from django.db.models import Q
 from django.db.transaction import atomic, non_atomic_requests
 from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404

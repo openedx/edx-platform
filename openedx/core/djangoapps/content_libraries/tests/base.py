@@ -6,14 +6,12 @@ from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
 
-from django.test import LiveServerTestCase
 from organizations.models import Organization
-from rest_framework.test import APITestCase, APITransactionTestCase, APIClient
+from rest_framework.test import APITransactionTestCase, APIClient
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.core.lib import blockstore_api
 from openedx.core.lib.blockstore_api.tests.base import (
     BlockstoreAppTestMixin,
 )

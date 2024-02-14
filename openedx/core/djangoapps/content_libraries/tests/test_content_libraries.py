@@ -1,7 +1,6 @@
 """
 Tests for Blockstore-based Content Libraries
 """
-from uuid import UUID
 from unittest.mock import Mock, patch
 from unittest import skip
 
@@ -28,8 +27,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_XBLOCK_HANDLER,
 )
-from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
-from openedx.core.lib import blockstore_api
+from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -140,6 +138,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         lib1['has_unpublished_changes'] = lib2['has_unpublished_changes'] = False
         lib1['has_unpublished_deletes'] = lib2['has_unpublished_deletes'] = False
 
+        result = self._list_libraries()
         assert len(result) == 2
         assert lib1 in result
         assert lib2 in result
@@ -354,7 +353,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         """
         lib = self._create_library(slug="list_blocks-slug", title="Library 1")
         block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
-        block2 = self._add_block_to_library(lib["id"], "unit", "unit1")
+        self._add_block_to_library(lib["id"], "unit", "unit1")
 
         response = self._get_library_blocks(lib["id"])
         result = response['results']
@@ -605,7 +604,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1):
             lib = self._create_library(slug="test_lib_limits", title="Limits Test Library", description="Testing XBlocks limits in a library")  # lint-amnesty, pylint: disable=line-too-long
             lib_id = lib["id"]
-            block_data = self._add_block_to_library(lib_id, "unit", "unit1")
+            self._add_block_to_library(lib_id, "unit", "unit1")
             # Second block should throw error
             self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
 

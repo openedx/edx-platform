@@ -647,8 +647,8 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
     """
     try:
         component = get_component_from_usage_key(usage_key)
-    except ObjectDoesNotExist:
-        raise ContentLibraryBlockNotFound(usage_key)
+    except ObjectDoesNotExist as exc:
+        raise ContentLibraryBlockNotFound(usage_key) from exc
 
     # The component might have existed at one point, but no longer does because
     # the draft was soft-deleted. This is actually a weird edge case and I'm not
@@ -918,7 +918,7 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     # This import breaks in the LMS so keep it here. The LMS doesn't generally
     # use content libraries APIs directly but some tests may want to use them to
     # create libraries and then test library learning or course-library integration.
-    from cms.djangoapps.contentstore.helpers import xblock_type_display_name
+    from cms.djangoapps.contentstore import helpers as studio_helpers
     # TODO: return support status and template options
     # See cms/djangoapps/contentstore/views/component.py
     block_types = sorted(name for name, class_ in XBlock.load_classes())
@@ -928,7 +928,9 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
         block_types = (name for name in block_types if name == lib.type)
     info = []
     for block_type in block_types:
-        display_name = xblock_type_display_name(block_type, None)
+        # TODO: unify the contentstore helper with the xblock.api version of
+        # xblock_type_display_name
+        display_name = studio_helpers.xblock_type_display_name(block_type, None)
         # For now as a crude heuristic, we exclude blocks that don't have a display_name
         if display_name:
             info.append(LibraryXBlockType(block_type=block_type, display_name=display_name))

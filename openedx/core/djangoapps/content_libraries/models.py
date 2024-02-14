@@ -32,6 +32,7 @@ logic assume no relationship or impact across the two applications.  The same
 reasoning applies to steps beyond the data model, such as at the XBlock
 runtime, authentication, and score handling, etc.
 """
+from __future__ import annotations
 
 import contextlib
 import logging
@@ -90,7 +91,7 @@ class ContentLibrary(models.Model):
     model in Studio should only be used to track settings specific to this Open
     edX instance, like who has permission to edit this content library.
     """
-    objects = ContentLibraryManager()
+    objects: ContentLibraryManager[ContentLibrary] = ContentLibraryManager()
 
     id = models.AutoField(primary_key=True)
     # Every Library is uniquely and permanently identified by an 'org' and a
@@ -551,4 +552,3 @@ class LtiGradedResource(models.Model):
 
     def __str__(self):
         return str(self.usage_key)
-
