@@ -16,6 +16,7 @@ import threading
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.core.components import api as components_api
+from openedx_learning.core.components.models import Component
 from openedx_learning.core.publishing import api as publishing_api
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
@@ -171,8 +172,20 @@ def xblock_type_display_name(block_type):
         return block_type  # Just use the block type as the name
 
 
-def _get_component_from_usage_key(usage_key):
-    learning_package = publishing_api.get_learning_package_by_key(str(usage_key.lib_key))
+def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
+    """
+    Fetch the Component object for a given usage key.
+
+    Raises a ObjectDoesNotExist error if no such Component exists.
+
+    This is a lower-level function that will return a Component even if there is
+    no current draft version of that Component (because it's been soft-deleted).
+    The get_library_block function is the one that will check to see if a draft
+    version exists or not before returning.
+    """
+    learning_package = publishing_api.get_learning_package_by_key(
+        str(usage_key.context_key)
+    )
     return components_api.get_component_by_key(
         learning_package.id,
         namespace='xblock.v1',
@@ -180,12 +193,13 @@ def _get_component_from_usage_key(usage_key):
         local_key=usage_key.block_id,
     )
 
+
 def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
     """
     Get the OLX source of the given XBlock.
     """
     # Inefficient but simple approach first
-    component = _get_component_from_usage_key(usage_key)
+    component = get_component_from_usage_key(usage_key)
     component_version = component.versioning.draft
 
     # TODO: we should probably make a method on ComponentVersion that returns
@@ -199,7 +213,7 @@ def get_block_display_name(block_or_key):
     if isinstance(block_or_key, XBlock):
         return block_or_key.display_name
     elif isinstance(block_or_key, UsageKeyV2):
-        component = _get_component_from_usage_key(block_or_key)
+        component = get_component_from_usage_key(block_or_key)
         return component.draft.title if component.draft else ""
 
     raise TypeError(

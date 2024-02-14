@@ -95,7 +95,7 @@ from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
-from openedx.core.djangoapps.xblock.api import xblock_type_display_name
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key, xblock_type_display_name
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore import ModuleStoreEnum
@@ -790,27 +790,6 @@ def component_already_exists(usage_key: UsageKeyV2) -> bool:
     except ObjectDoesNotExist:
         return False
     return True
-
-
-def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
-    """
-    Fetch the Component object for a given usage key.
-
-    Raises a ObjectDoesNotExist error if no such Component exists.
-
-    This is a lower-level function that will return a Component even if there is
-    no current draft version of that Component (because it's been soft-deleted).
-    The get_library_block function is the one that will check to see if a draft
-    version exists or not before returning.
-    """
-    content_lib = ContentLibrary.objects.get_by_key(usage_key.context_key)
-    learning_package = content_lib.learning_package
-    return components_api.get_component_by_key(
-        learning_package.id,
-        namespace='xblock.v1',
-        type_name=usage_key.block_type,
-        local_key=usage_key.block_id,
-    )
 
 
 def get_or_create_olx_media_type(block_type: str) -> MediaType:
