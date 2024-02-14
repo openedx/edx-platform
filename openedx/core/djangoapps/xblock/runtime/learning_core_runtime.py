@@ -6,7 +6,6 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from datetime import datetime, timezone
-from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.transaction import atomic
@@ -16,17 +15,15 @@ from openedx_learning.core.contents import api as contents_api
 from openedx_learning.core.publishing import api as publishing_api
 
 from lxml import etree
-from opaque_keys.edx.keys import AssetKey, UsageKeyV2
 
 from xblock.core import XBlock
-from xblock.exceptions import InvalidScopeError, NoSuchDefinition, NoSuchUsage
-from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope, Sentinel
-from xblock.field_data import FieldData, DictFieldData
+from xblock.exceptions import NoSuchUsage
+from xblock.fields import Field, Scope, ScopeIds, Sentinel
+from xblock.field_data import FieldData
 
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
-from .id_managers import OpaqueKeyReader
 
 
 log = logging.getLogger(__name__)
