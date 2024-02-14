@@ -157,6 +157,10 @@ class LearningCoreFieldData(FieldData):
 class LearningCoreXBlockRuntime(XBlockRuntime):
     """
     XBlock runtime that uses openedx-learning apps for content storage.
+
+    The superclass is doing all the hard stuff. This class only only has to
+    worry about the block storage, block serialization/de-serialization, and
+    (eventually) asset storage.
     """
 
     def get_block(self, usage_key, for_parent=None):
@@ -290,16 +294,6 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         This is called by the XBlockRuntime superclass in the .runtime module.
 
-        CURRENT STATUS
-
-        Right now we're not recognizing anything. We'd need to hook up something
-        to serve the static assets, and the biggest issue around that is
-        figuring out the permissions that need to be applied.
-
-        Idea: Have openedx-learning provide a simple view that will stream the
-        content, but have apps explicitly subclass or wrap it with permissions
-        checks and such. That way the actual logic of figuring out the
-        permissions stays out of openedx-learning, since it requires access to
-        tables that don't exist there.
+        TODO: Implement as part of larger static asset effort.
         """
         return None
