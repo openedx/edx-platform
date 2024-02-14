@@ -132,7 +132,7 @@ def get_block_metadata(block, includes=()):
     data = {
         "block_id": str(block.scope_ids.usage_id),
         "block_type": block.scope_ids.block_type,
-        "display_name": get_block_display_name(block),
+        "display_name": block.display_name,
     }
 
     if "index_dictionary" in includes:
@@ -206,19 +206,6 @@ def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
     content = component_version.contents.get(componentversioncontent__key="block.xml")
 
     return content.text
-
-
-def get_block_display_name(block_or_key):
-    if isinstance(block_or_key, XBlock):
-        return block_or_key.display_name
-    elif isinstance(block_or_key, UsageKeyV2):
-        component = get_component_from_usage_key(block_or_key)
-        return component.draft.title if component.draft else ""
-
-    raise TypeError(
-        "display_name lookup expects a UsageKeyV2 or XBlock, " +
-        f"got {type(block_or_key)}: {block_or_key} instead"
-    )
 
 
 def render_block_view(block, view_name, user):  # pylint: disable=unused-argument

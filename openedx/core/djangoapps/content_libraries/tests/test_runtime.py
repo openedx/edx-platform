@@ -175,7 +175,7 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         }, format='json')
         block_saved = xblock_api.load_block(block_key, self.staff_user)
         assert block_saved.data == '\n<p>test</p>\n'
-        assert xblock_api.get_block_display_name(block_saved) == 'New Display Name'
+        assert block_saved.display_name == 'New Display Name'
 
 
 class ContentLibraryRuntimeTest(ContentLibraryRuntimeTestMixin, BlockstoreAppTestMixin):

@@ -23,7 +23,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
-    get_block_display_name,
     get_block_metadata,
     get_handler_url as _get_handler_url,
     load_block,
@@ -201,7 +200,7 @@ class BlockFieldsView(APIView):
 
         block = load_block(usage_key, request.user)
         block_dict = {
-            "display_name": get_block_display_name(block),  # potentially duplicated from metadata
+            "display_name": block.display_name,  # potentially duplicated from metadata
             "data": block.data,
             "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
         }
