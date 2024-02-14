@@ -524,7 +524,6 @@ class LibraryBlocksView(APIView):
             )
         ],
     )
-
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
