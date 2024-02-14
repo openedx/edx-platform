@@ -332,16 +332,16 @@ def get_library(library_key):
     num_blocks = publishing_api.get_all_drafts(learning_package.id).count()
     last_publish_log = publishing_api.get_last_publish(learning_package.id)
     has_unpublished_changes = publishing_api.get_entities_with_unpublished_changes(
-                                  learning_package.id
-                              ).exists()
+                                                learning_package.id
+                                            ).exists()
 
     # TODO: I'm doing this one to match already-existing behavior, but this is
     # something that we should remove. It exists to accomodate some complexities
     # with how Blockstore staged changes, but Learning Core works differently,
     # and has_unpublished_changes should be sufficient.
     has_unpublished_deletes = publishing_api.get_entities_with_unpublished_deletes(
-                                  learning_package.id
-                              ).exists()
+                                                learning_package.id
+                                            ).exists()
 
     # Learning Core doesn't really have a notion of a global version number,but
     # we can sort of approximate it by using the primary key of the last publish

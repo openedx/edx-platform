@@ -21,15 +21,12 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_FIELDS_URL,
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED, CC_4_BY
+from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
-from openedx.core.lib import blockstore_api
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.unit_block import UnitBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
-from openedx_learning.core.publishing import api as publishing_api
 
 
 class ContentLibraryContentTestMixin:
@@ -167,7 +164,7 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         assert fields_get_result.data['metadata']['display_name'] == 'New Text Block'
 
         # Check the POST API for the block:
-        fields_post_result = client.post(URL_BLOCK_FIELDS_URL.format(block_key=block_key), data={
+        client.post(URL_BLOCK_FIELDS_URL.format(block_key=block_key), data={
             'data': '<p>test</p>',
             'metadata': {
                 'display_name': 'New Display Name',

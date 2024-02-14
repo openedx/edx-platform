@@ -4,7 +4,6 @@ Unit tests for Content Libraries models.
 
 
 from unittest import mock
-import uuid
 
 from django.test import TestCase
 from django.test import RequestFactory

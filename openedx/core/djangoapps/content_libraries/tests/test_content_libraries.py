@@ -391,7 +391,12 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         assert len(self._get_library_blocks(lib['id'], {'text_search': 'Video'})['results']) == 1
         assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo', 'block_type': 'video'})['results']) == 0
         assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': 'video'})['results']) == 1
-        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': ['video', 'html']})['results']) == 2
+        assert 2 == len(
+            self._get_library_blocks(
+                lib['id'],
+                {'text_search': 'Baz', 'block_type': ['video', 'html']}
+            )['results']
+        )
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})['results']) == 1
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})['results']) == 3
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})['results']) == 0
