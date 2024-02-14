@@ -6,6 +6,7 @@
 #   - ModelName.field_name
 ---
 MYSQL:
+    - ComponentVersionContent.key
     - CornerstoneGlobalConfiguration.key
     - CourseCompleteImageConfiguration.default
     - DegreedEnterpriseCustomerConfiguration.key
@@ -16,11 +17,13 @@ MYSQL:
     - HistoricalExperimentKeyValue.key
     - HistoricalGeneratedCertificate.key
     - KVStore.key
+    - LearningPackage.key
     - LTICredential.key
     - NotificationType.key
     - OAuth2ProviderConfig.key
     - ProctoredExamStudentAllowanceHistory.key
     - ProctoredExamStudentAllowance.key
+    - PublishableEntity.key
     - SAPSuccessFactorsEnterpriseCustomerConfiguration.key
     - Settings.interval
     - UserCourseTag.key

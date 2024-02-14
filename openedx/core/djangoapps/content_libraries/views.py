@@ -60,7 +60,6 @@ the api module instead.
     Historical note: These views used to be wrapped with @atomic because we
     wanted to make all views that operated on Blockstore data atomic:
         https://github.com/openedx/edx-platform/pull/30456
-
 """
 
 from functools import wraps
