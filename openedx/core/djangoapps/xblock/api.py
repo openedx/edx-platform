@@ -30,7 +30,6 @@ from openedx.core.djangoapps.xblock.learning_context.manager import get_learning
 
 from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreFieldData,
-    LearningCoreOpaqueKeyReader,
     LearningCoreXBlockRuntime,
 )
 
