@@ -1930,7 +1930,7 @@ class CreateThreadTest(
         with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
-            "author_label": "Staff",
+            "author_label": "Moderator",
             "id": "test_id",
             "course_id": str(self.course.id),
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
@@ -2339,7 +2339,7 @@ class CreateCommentTest(
             "thread_id": "test_thread",
             "parent_id": parent_id,
             "author": self.user.username,
-            "author_label": "Staff",
+            "author_label": "Moderator",
             "created_at": "2015-05-27T00:00:00Z",
             "updated_at": "2015-05-27T00:00:00Z",
             "raw_body": "Test body",
