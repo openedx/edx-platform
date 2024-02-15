@@ -45,6 +45,9 @@ def iterate_with_level(
 def get_course_tagged_object_and_children(
     course_key: CourseKey, object_tag_cache: ObjectTagByObjectIdDict
 ) -> tuple[TaggedContent, list[XBlock]]:
+    """
+    Returns a TaggedContent with course metadata with its tags, and its children.
+    """
     store = modulestore()
 
     course = store.get_course(course_key)
@@ -69,6 +72,9 @@ def get_course_tagged_object_and_children(
 def get_library_tagged_object_and_children(
     library_key: LibraryLocatorV2, object_tag_cache: ObjectTagByObjectIdDict
 ) -> tuple[TaggedContent, list[LibraryXBlockMetadata]]:
+    """
+    Returns a TaggedContent with library metadata with its tags, and its children.
+    """
     library = library_api.get_library(library_key)
     assert library is not None
 
@@ -90,6 +96,9 @@ def get_library_tagged_object_and_children(
 def get_xblock_tagged_object_and_children(
     usage_key: UsageKey, object_tag_cache: ObjectTagByObjectIdDict, store
 ) -> tuple[TaggedContent, list[XBlock]]:
+    """
+    Returns a TaggedContent with xblock metadata with its tags, and its children.
+    """
     block = store.get_item(usage_key)
     block_id = str(usage_key)
     tagged_block = TaggedContent(
@@ -106,6 +115,10 @@ def get_xblock_tagged_object_and_children(
 def get_library_block_tagged_object(
     library_block: LibraryXBlockMetadata, object_tag_cache: ObjectTagByObjectIdDict
 ) -> tuple[TaggedContent, None]:
+    """
+    Returns a TaggedContent with library content block metadata and its tags,
+    and 'None' as children.
+    """
     block_id = str(library_block.usage_key)
     tagged_library_block = TaggedContent(
         display_name=library_block.display_name,
