@@ -27,7 +27,7 @@ urlpatterns = [
         name="taxonomy-import-template",
     ),
     path(
-        "object_tags/<str:object_id>/export/",
+        "object_tags/<str:context_id>/export/",
         views.ObjectTagExportView.as_view(),
     ),
     path('', include(router.urls))

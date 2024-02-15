@@ -150,11 +150,11 @@ class ObjectTagOrgView(ObjectTagView):
 
 class ObjectTagExportView(APIView):
     """"
-    View to export a CSV with all children and tags for a given object_id.
+    View to export a CSV with all children and tags for a given course/context.
     """
     def get(self, request: Request, **kwargs) -> StreamingHttpResponse:
         """
-        Export a CSV with all children and tags for a given object_id.
+        Export a CSV with all children and tags for a given course/context.
         """
 
         class Echo(object):
@@ -197,12 +197,12 @@ class ObjectTagExportView(APIView):
 
                 yield csv_writer.writerow(block_data)
 
-        object_id: str = kwargs.get('object_id', None)
+        object_id: str = kwargs.get('context_id', None)
 
         try:
             content_key = CourseKey.from_string(object_id)
         except InvalidKeyError as e:
-            raise ValidationError("object_id is not a valid content key.") from e
+            raise ValidationError("context_id is not a valid course key.") from e
 
         # Check if the user has permission to view object tags for this object_id
         try:
