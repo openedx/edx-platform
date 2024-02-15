@@ -88,6 +88,7 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
             'core_web': True,
             'core_email': True,
             'core_push': True,
+            'core_email_cadence': 'Daily',
         }
         if overrides is not None:
             notification_app.update(overrides)
@@ -104,6 +105,7 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
             'web': True,
             'email': True,
             'push': True,
+            'email_cadence': 'Daily',
             'info': '',
             'non_editable': [],
             'content_template': '',
@@ -255,6 +257,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         for app_data in notification_apps.values():
             assert 'core_info' in app_data.keys()
             assert isinstance(app_data['non_editable'], list)
+            assert isinstance(app_data['core_email_cadence'], str)
             for key in bool_keys:
                 assert isinstance(app_data[key], bool)
 
@@ -290,6 +293,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
             assert 'content_template' in notification_type.keys()
             assert isinstance(notification_type['content_context'], dict)
             assert isinstance(notification_type['non_editable'], list)
+            assert isinstance(notification_type['email_cadence'], str)
             for key in str_keys:
                 assert isinstance(notification_type[key], str)
             for key in bool_keys:
