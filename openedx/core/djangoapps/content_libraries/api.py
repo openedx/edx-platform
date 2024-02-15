@@ -624,7 +624,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
     TODO: Full text search needs to be implemented as a custom lookup for MySQL,
     but it should have a fallback to still work in SQLite.
     """
-    lib = ContentLibrary.objects.get_by_key(library_key)
+    lib = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     learning_package = lib.learning_package
     components = components_api.get_components(
         learning_package.id,
