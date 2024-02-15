@@ -7,7 +7,7 @@ from itertools import groupby
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Exists, OuterRef, Q, QuerySet
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
@@ -149,7 +149,7 @@ def get_all_object_tags(
 
     # There is no API method in oel_tagging.api that does this yet,
     # so for now we have to build the ORM query directly.
-    all_object_tags = list(ContentObjectTag.objects.filter(
+    all_object_tags = list(ObjectTag.objects.filter(
         Q(object_id__startswith=block_id_prefix) | Q(object_id=content_key),
         Q(tag__isnull=False, tag__taxonomy__isnull=False),
     ).select_related("tag__taxonomy"))

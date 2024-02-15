@@ -346,28 +346,40 @@ class TestGetAllObjectTagsMixin:
         # Library tags and library contents need a unique block_id that is persisted along test runs
         self.block_sufix = str(round(time.time() * 1000))
 
-        self.library_tags = api.tag_content_object(
-            object_key=LibraryLocatorV2.from_string(f"lib:orgA:lib_{self.block_sufix}"),
+        api.tag_object(
+            object_id=f"lib:orgA:lib_{self.block_sufix}",
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.1'],
         )
+        self.library_tags = api.get_object_tags(f"lib:orgA:lib_{self.block_sufix}")
 
-        self.problem1_tags = api.tag_content_object(
-            object_key=UsageKey.from_string(f"lb:orgA:lib_{self.block_sufix}:problem:problem1_{self.block_sufix}"),
+        api.tag_object(
+            object_id=f"lb:orgA:lib_{self.block_sufix}:problem:problem1_{self.block_sufix}",
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.1'],
         )
+        self.problem1_tags = api.get_object_tags(
+            f"lb:orgA:lib_{self.block_sufix}:problem:problem1_{self.block_sufix}"
+        )
 
-        self.library_html_tags1 = api.tag_content_object(
-            object_key=UsageKey.from_string(f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}"),
+        api.tag_object(
+            object_id=f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}",
             taxonomy=self.taxonomy_1,
             tags=['Tag 1.2'],
         )
+        self.library_html_tags1 = api.get_object_tags(
+            object_id=f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}",
+            taxonomy_id=self.taxonomy_1.id,
+        )
 
-        self.library_html_tags2 = api.tag_content_object(
-            object_key=UsageKey.from_string(f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}"),
+        api.tag_object(
+            object_id=f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}",
             taxonomy=self.taxonomy_2,
             tags=['Tag 2.2'],
+        )
+        self.library_html_tags2 = api.get_object_tags(
+            object_id=f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}",
+            taxonomy_id=self.taxonomy_2.id,
         )
 
         # Create "deleted" object tags, which will be omitted from the results.
@@ -376,8 +388,8 @@ class TestGetAllObjectTagsMixin:
             f"lb:orgA:lib_{self.block_sufix}:problem:problem1_{self.block_sufix}",
             f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}",
         ):
-            ContentObjectTag.objects.create(
-                object_id=str(object_id),
+            ObjectTag.objects.create(
+                object_id=object_id,
                 taxonomy=None,
                 tag=None,
                 _value="deleted tag",

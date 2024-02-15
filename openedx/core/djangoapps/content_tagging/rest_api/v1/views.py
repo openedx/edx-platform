@@ -7,8 +7,8 @@ import csv
 from typing import Iterator
 
 from django.http import StreamingHttpResponse
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
@@ -28,6 +28,7 @@ from ...api import (
     set_taxonomy_orgs
 )
 from ...rules import get_admin_orgs
+from ...utils import get_content_key_from_string
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
 from .objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
 from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
@@ -198,10 +199,9 @@ class ObjectTagExportView(APIView):
 
         object_id: str = kwargs.get('context_id', None)
 
-        try:
-            content_key = CourseKey.from_string(object_id)
-        except InvalidKeyError as e:
-            raise ValidationError("context_id is not a valid course key.") from e
+        content_key = get_content_key_from_string(object_id)
+        if isinstance(content_key, UsageKey):
+            raise ValidationError("The object_id must be a CourseKey or a LibraryLocatorV2.")
 
         # Check if the user has permission to view object tags for this object_id
         try:
