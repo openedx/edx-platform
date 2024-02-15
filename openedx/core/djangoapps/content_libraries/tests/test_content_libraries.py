@@ -32,8 +32,8 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-@ddt.ddt
 @skip_unless_cms
+@ddt.ddt
 class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
     """
     General tests for Blockstore-based Content Libraries
