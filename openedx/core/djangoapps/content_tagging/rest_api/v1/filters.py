@@ -65,7 +65,7 @@ class ObjectTagTaxonomyOrgFilterBackend(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, _):
         if oel_tagging.is_taxonomy_admin(request.user):
-            return queryset
+            return queryset.prefetch_related('taxonomy__taxonomyorg_set')
 
         user_admin_orgs = get_admin_orgs(request.user)
         user_orgs = get_user_orgs(request.user)
@@ -87,4 +87,4 @@ class ObjectTagTaxonomyOrgFilterBackend(BaseFilterBackend):
                     )
                 )
             )
-        )
+        ).prefetch_related('taxonomy__taxonomyorg_set')

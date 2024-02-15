@@ -125,6 +125,11 @@ class TestTaxonomyObjectsMixin:
             email="staff@example.com",
             is_staff=True,
         )
+        self.superuser = User.objects.create(
+            username="superuser",
+            email="superuser@example.com",
+            is_superuser=True,
+        )
 
         self.staffA = User.objects.create(
             username="staffA",
@@ -1652,14 +1657,15 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        ("staff", status.HTTP_200_OK),
+        ("superuser", status.HTTP_200_OK),
+        ("staff", status.HTTP_403_FORBIDDEN),
         ("staffA", status.HTTP_403_FORBIDDEN),
         ("staffB", status.HTTP_403_FORBIDDEN),
     )
     @ddt.unpack
     def test_tag_cross_org(self, user_attr, expected_status):
         """
-        Tests that only global admins can add a taxonomy from orgA to an object from orgB
+        Tests that only superusers may add a taxonomy from orgA to an object from orgB
         """
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
@@ -1671,14 +1677,15 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == expected_status
 
     @ddt.data(
-        ("staff", status.HTTP_200_OK),
+        ("superuser", status.HTTP_200_OK),
+        ("staff", status.HTTP_403_FORBIDDEN),
         ("staffA", status.HTTP_403_FORBIDDEN),
         ("staffB", status.HTTP_403_FORBIDDEN),
     )
     @ddt.unpack
     def test_tag_no_org(self, user_attr, expected_status):
         """
-        Tests that only global admins can add a no-org taxonomy to an object
+        Tests that only superusers may add a no-org taxonomy to an object
         """
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
@@ -1771,15 +1778,15 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
     @ddt.data(
-        ('staff', 'courseA', 7),
-        ('staff', 'libraryA', 7),
-        ("content_creatorA", 'courseA', 13, False),
-        ("content_creatorA", 'libraryA', 13, False),
-        ("library_staffA", 'libraryA', 13, False),  # Library users can only view objecttags, not change them?
-        ("library_userA", 'libraryA', 13, False),
-        ("instructorA", 'courseA', 13),
-        ("course_instructorA", 'courseA', 13),
-        ("course_staffA", 'courseA', 13),
+        ('staff', 'courseA', 8),
+        ('staff', 'libraryA', 8),
+        ("content_creatorA", 'courseA', 11, False),
+        ("content_creatorA", 'libraryA', 11, False),
+        ("library_staffA", 'libraryA', 11, False),  # Library users can only view objecttags, not change them?
+        ("library_userA", 'libraryA', 11, False),
+        ("instructorA", 'courseA', 11),
+        ("course_instructorA", 'courseA', 11),
+        ("course_staffA", 'courseA', 11),
     )
     @ddt.unpack
     def test_object_tags_query_count(
@@ -2322,7 +2329,7 @@ class TestTaxonomyTagsViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     @ddt.data(
         ('staff', 11),
-        ("content_creatorA", 13),  # FIXME too many queries?
+        ("content_creatorA", 13),
         ("library_staffA", 13),
         ("library_userA", 13),
         ("instructorA", 13),
