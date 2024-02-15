@@ -358,9 +358,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         showTab: function(tab) {
             this.$('.modal-section .subsection-share-link-tab-button').removeClass('active');
-            this.$('.modal-section .subsection-share-link-tab-button[data-tab="' + tab + '"]').addClass('active');
+            this.$(`.modal-section .subsection-share-link-tab-button[data-tab="${tab}"]`).addClass('active');
             this.$('.modal-section .subsection-share-link-tab').hide();
-            this.$('.modal-section .' + tab).show();
+            this.$(`.modal-section .${tab}`).show();
         }
     });
 

@@ -1,7 +1,7 @@
 <ul class="subsection-share-link-tabs-header">
     <% _.each(tabs, function(tab) { %>
     <li class="subsection-share-link-tab-buttons">
-        <button class="subsection-share-link-tab-button" data-tab="<%- tab.name %>" href="#"><%- tab.displayName %></button>
+        <button type="button" class="subsection-share-link-tab-button" data-tab="<%- tab.name %>"><%- tab.displayName %></button>
     </li>
     <% }); %>
 </ul>
