@@ -35,8 +35,7 @@ from .serializers import (
     NotificationCourseEnrollmentSerializer,
     NotificationSerializer,
     UserCourseNotificationPreferenceSerializer,
-    UserNotificationPreferenceUpdateSerializer,
-    UserNotificationChannelPreferenceUpdateSerializer,
+    UserNotificationPreferenceUpdateSerializer, UserNotificationChannelPreferenceUpdateSerializer,
 )
 from .utils import get_show_notifications_tray
 
@@ -217,6 +216,10 @@ class UserNotificationPreferenceView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
+        if request.data.get('notification_channel', '') == 'email_cadence':
+            request.data['email_cadence'] = request.data['value']
+            del request.data['value']
+
         preference_update = UserNotificationPreferenceUpdateSerializer(
             user_course_notification_preference, data=request.data, partial=True
         )
@@ -238,7 +241,6 @@ class UserNotificationChannelPreferenceView(APIView):
     """
     Supports retrieving and patching the UserNotificationPreference
     model.
-
     **Example Requests**
         PATCH /api/notifications/configurations/{course_id}
     """
@@ -250,7 +252,6 @@ class UserNotificationChannelPreferenceView(APIView):
         Parameters:
             request (Request): The request object
             course_key_string (int): The ID of the course of the notification preference to be updated.
-
         Returns:
             200: The updated preference, serialized using the UserNotificationPreferenceSerializer
             404: If the preference does not exist
@@ -275,7 +276,6 @@ class UserNotificationChannelPreferenceView(APIView):
         preference_update.is_valid(raise_exception=True)
         updated_notification_preferences = preference_update.save()
         notification_preference_update_event(request.user, course_id, preference_update.validated_data)
-
         serializer_context = {
             'course_id': course_id,
             'user': request.user
