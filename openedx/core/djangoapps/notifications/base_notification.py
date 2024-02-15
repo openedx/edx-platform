@@ -4,7 +4,6 @@ Base setup for Notification Apps and Types.
 from django.utils.translation import gettext_lazy as _
 
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
-from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
 
@@ -132,7 +131,6 @@ COURSE_NOTIFICATION_TYPES = {
             'replier_name': 'replier name',
         },
         'email_template': '',
-        'visible_to': [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     },
     'response_endorsed_on_thread': {
         'notification_app': 'discussion',
