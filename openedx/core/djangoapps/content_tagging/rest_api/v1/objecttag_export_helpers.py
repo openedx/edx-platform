@@ -141,13 +141,13 @@ def build_object_tree_with_objecttags(
     store = modulestore()
 
     while blocks:
-        tagged_block, children = blocks.pop()
+        tagged_block, block_children = blocks.pop()
         tagged_block.children = []
 
-        if not children:
+        if not block_children:
             continue
 
-        for child in children:
+        for child in block_children:
             child_children: list | None
 
             if isinstance(child, UsageKey):
