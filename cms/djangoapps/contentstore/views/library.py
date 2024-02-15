@@ -98,7 +98,16 @@ def user_can_create_library(user, org):
     Helper method for returning the library creation status for a particular user,
     taking into account the value LIBRARIES_ENABLED.
 
-    users can only create libraries in orgs they are a part of.
+    if the ENABLE_CREATOR_GROUP value is False, then any user can create a library (in any org),
+    if library creation is enabled.
+
+    if the ENABLE_CREATOR_GROUP value is true, then what a user can do varies by thier role.
+
+    Global Staff: can make libraries in any org.
+    Course Creator Group Members: can make libraries in any org.
+    Organization Staff: Can make libraries in the organization for which they are staff.
+    Course Staff: Can make libraries in the organization which has courses of which they are staff.
+    Course Admin: Can make libraries in the organization which has courses of which they are Admin.
     """
     if org is None:
         return False
