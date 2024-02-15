@@ -29,7 +29,7 @@ class TaxonomyOrgListQueryParamsSerializer(TaxonomyListQueryParamsSerializer):
     def validate(self, attrs: dict) -> dict:
         """
         Validate the serializer data
-       """
+        """
         if "org" in attrs and "unassigned" in attrs:
             raise serializers.ValidationError(
                 "'org' and 'unassigned' params cannot be both defined"
