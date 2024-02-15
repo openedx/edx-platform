@@ -349,9 +349,8 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to perform acceptance and load test. Auto auth view is responsible for load
-    #   testing and is controlled by this feature flag. Auto-auth causes issues in Bok Choy tests because it resets the
-    #   requesting user. Session verification (of CacheBackedAuthenticationMiddleware) is a security feature, but it
-    #   can be turned off by enabling this feature flag.
+    #    testing and is controlled by this feature flag. Session verification (of CacheBackedAuthenticationMiddleware)
+    #    is a security feature, but it can be turned off by enabling this feature flag.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-07-25
     # .. toggle_warning: If this has been set to True then the account activation email will be skipped.
@@ -1148,7 +1147,7 @@ CACHES = {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
-        'TIMEOUT': '7200',
+        'TIMEOUT': '604800',  # 1 week
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
         'OPTIONS': {
             'no_delay': True,
@@ -5454,6 +5453,14 @@ EVENT_BUS_PRODUCER_CONFIG = {
              #   https://github.com/openedx/openedx-events/issues/265
              # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
              'enabled': False}
+    },
+    'org.openedx.learning.user.course_access_role.added.v1': {
+        'learning-course-access-role-lifecycle':
+            {'event_key_field': 'course_access_role_data.course_key', 'enabled': False},
+    },
+    'org.openedx.learning.user.course_access_role.removed.v1': {
+        'learning-course-access-role-lifecycle':
+            {'event_key_field': 'course_access_role_data.course_key', 'enabled': False},
     },
     # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
     # and the derivation fails if the keys are missing. If we ever fully decouple the lms and cms settings,

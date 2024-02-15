@@ -5,10 +5,8 @@ Viewset for auth/saml/v0/samlproviderconfig
 from django.shortcuts import get_list_or_404
 from django.db.utils import IntegrityError
 from edx_rbac.mixins import PermissionRequiredMixin
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError, ValidationError
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
@@ -20,7 +18,6 @@ from ..utils import convert_saml_slug_provider_id
 
 
 class SAMLProviderMixin:
-    authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderConfigSerializer
 

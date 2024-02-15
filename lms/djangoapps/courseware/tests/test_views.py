@@ -997,10 +997,15 @@ class ViewsTestCase(BaseViewsTestCase):
     )
     @ddt.data(
         ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_204_NO_CONTENT),
+        ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_403_FORBIDDEN),
         ('/financial-assistance/course-v1:invalid+ErrorX+Invalid_Course/apply/', status.HTTP_400_BAD_REQUEST)
     )
     @ddt.unpack
     def test_submit_financial_assistance_request_v2(self, referrer_url, expected_status, *args):
+        # We expect a 403 if the user account is not active
+        if expected_status == status.HTTP_403_FORBIDDEN:
+            self.user.is_active = False
+            self.user.save()
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',

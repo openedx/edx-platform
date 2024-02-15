@@ -9,8 +9,6 @@ import pytz
 import dateutil
 from celery.states import REVOKED
 from django.db import transaction
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import generics, status
 
@@ -35,10 +33,6 @@ class ListScheduledBulkEmailInstructorTasks(generics.ListAPIView):
                data also includes information about the and course email instance associated with each task.
         * 403: User does not have the required role to view this data.
     """
-    authentication_classes = (
-        JwtAuthentication,
-        SessionAuthentication,
-    )
     permission_classes = (
         CanViewOrModifyScheduledBulkCourseEmailTasks,
     )
@@ -74,10 +68,6 @@ class ModifyScheduledBulkEmailInstructorTask(generics.DestroyAPIView, generics.U
         * 403: User does not have permission to modify the object specified.
         * 404: Requested schedule object could not be found and thus could not be modified or removed.
     """
-    authentication_classes = (
-        JwtAuthentication,
-        SessionAuthentication,
-    )
     permission_classes = (
         CanViewOrModifyScheduledBulkCourseEmailTasks,
     )

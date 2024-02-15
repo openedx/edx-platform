@@ -22,7 +22,7 @@ cryptography==38.0.4
     #   -r requirements/edx-sandbox/py38.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.47.2
+fonttools==4.48.1
     # via matplotlib
 importlib-resources==6.1.1
     # via matplotlib
@@ -91,7 +91,7 @@ sympy==1.12
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-tqdm==4.66.1
+tqdm==4.66.2
     # via nltk
 zipp==3.17.0
     # via importlib-resources
