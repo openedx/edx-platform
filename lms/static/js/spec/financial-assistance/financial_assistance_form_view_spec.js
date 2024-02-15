@@ -167,6 +167,9 @@ define([
 
         it('should submit the form and show an error message if content is valid and API returns error', function() {
             failedSubmission(500);
+        });
+
+        it('should submit the form and show an error message if content is valid and API returns 403 error', function() {
             failedSubmission(403);
         });
 
