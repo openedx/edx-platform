@@ -198,7 +198,11 @@ class ObjectTagExportView(APIView):
 
         object_id: str = kwargs.get('context_id', None)
 
-        content_key = get_content_key_from_string(object_id)
+        try:
+            content_key = get_content_key_from_string(object_id)
+        except ValueError as e:
+            raise ValidationError from e
+
         if isinstance(content_key, UsageKey):
             raise ValidationError("The object_id must be a CourseKey or a LibraryLocatorV2.")
 
