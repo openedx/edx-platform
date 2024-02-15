@@ -85,7 +85,6 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
         """
         Return True if the taxonomy is associated with all orgs.
         """
-        is_all_orgs = False
         for taxonomy_org in obj.taxonomyorg_set.all():
             if taxonomy_org.org_id is None and taxonomy_org.rel_type == TaxonomyOrg.RelType.OWNER:
                 return True

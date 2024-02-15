@@ -229,13 +229,13 @@ def can_change_object_tag_objectid(user: UserType, object_id: str) -> bool:
 
     try:
         context_key = get_context_key_from_key_string(object_id)
-    except ValueError:
+        assert context_key.org
+    except (ValueError, AssertionError):
         return False
 
     if has_studio_write_access(user, context_key):
         return True
 
-    assert context_key.org
     object_org = rules_cache.get_orgs([context_key.org])
     return bool(object_org) and is_org_admin(user, object_org)
 
@@ -263,13 +263,13 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
 
     try:
         context_key = get_context_key_from_key_string(object_id)
-    except ValueError:
+        assert context_key.org
+    except (ValueError, AssertionError):
         return False
 
     if has_studio_read_access(user, context_key):
         return True
 
-    assert context_key.org
     object_org = rules_cache.get_orgs([context_key.org])
     return bool(object_org) and (is_org_admin(user, object_org) or is_org_user(user, object_org))
 
