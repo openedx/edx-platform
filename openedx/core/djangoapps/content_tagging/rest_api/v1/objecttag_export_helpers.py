@@ -61,12 +61,8 @@ def get_course_tagged_object_and_children(
         object_tags=object_tag_cache.get(course_id, {}),
         children=None,
     )
-    if course.has_children:
-        children = course.children
-    else:
-        children = []
 
-    return tagged_course, children
+    return tagged_course, course.children if course.has_children else []
 
 
 def get_library_tagged_object_and_children(
