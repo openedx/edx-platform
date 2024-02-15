@@ -518,6 +518,7 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                 non_editable_channels = expected_app_prefs['non_editable'].get(notification_type_name, [])
                 if notification_channel not in non_editable_channels:
                     expected_app_prefs['notification_types'][notification_type_name][notification_channel] = value
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             self.assertEqual(response.data, expected_data)
             event_name, event_data = mock_emit.call_args[0]
             self.assertEqual(event_name, 'edx.notifications.preferences.updated')
