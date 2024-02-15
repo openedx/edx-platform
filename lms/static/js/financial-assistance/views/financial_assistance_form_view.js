@@ -164,8 +164,8 @@
                 }
             },
 
-            // this. model.save() makes an ajax call, which, when it errors,
-            // should have its error messaged approrpiately in the banner
+            // this.model.save() makes an ajax call, which, when it errors,
+            // should have its error messaged displayed in the banner on the page
             handleAjaxError: function (event, request, settings, thrownError) {
                 this.saveError(request);
             }
