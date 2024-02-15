@@ -43,8 +43,8 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
-    get_given_assessments,
-    get_received_assessments,
+    get_assessments_given,
+    get_assessments_received,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
@@ -152,7 +152,11 @@ class InitializeView(StaffGraderBaseView):
 
 class AssessmentGivenFeedbackView(StaffGraderBaseView):
     """
-    GET data about assessments given by a user.
+    GET data about assessments given by a user in a submission
+
+    * Query Params:
+        - oraLocation (str): ORA location for XBlock handling
+        - submissionUUID (str): A submission to get assessments for
 
     Response: {
         assessments (List[dict]): [
@@ -185,7 +189,7 @@ class AssessmentGivenFeedbackView(StaffGraderBaseView):
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         """ Get data about assessments given by a user"""
         try:
-            assessments_data = {"assessments": get_given_assessments(request, ora_location, submission_uuid)}
+            assessments_data = {"assessments": get_assessments_given(request, ora_location, submission_uuid)}
             response_data = AssessmentFeedbackSerializer(assessments_data).data
             return Response(response_data)
 
@@ -204,7 +208,11 @@ class AssessmentGivenFeedbackView(StaffGraderBaseView):
 
 class AssessmentReceivedFeedbackView(StaffGraderBaseView):
     """
-    GET data about assessments received by a user.
+    GET data about assessments received by a user in a submission
+
+    * Query Params:
+        - oraLocation (str): ORA location for XBlock handling
+        - submissionUUID (str): A submission to get assessments for
 
     Response: {
         assessments (List[dict]): [
@@ -238,7 +246,7 @@ class AssessmentReceivedFeedbackView(StaffGraderBaseView):
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
         """Get data about assessments received by a user"""
         try:
-            assessments_data = {"assessments": get_received_assessments(request, ora_location, submission_uuid)}
+            assessments_data = {"assessments": get_assessments_received(request, ora_location, submission_uuid)}
             response_data = AssessmentFeedbackSerializer(assessments_data).data
             return Response(response_data)
 
