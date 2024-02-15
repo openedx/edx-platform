@@ -13,8 +13,8 @@ from lms.djangoapps.ora_staff_grader.views import (
     SubmissionLockView,
     SubmissionStatusFetchView,
     UpdateGradeView,
-    AssessmentGivenFeedbackView,
-    AssessmentReceivedFeedbackView,
+    AssessmentFeedbackToView,
+    AssessmentFeedbackFromView,
 )
 
 
@@ -24,8 +24,8 @@ app_name = "ora-staff-grader"
 urlpatterns += [
     path("mock/", include("lms.djangoapps.ora_staff_grader.mock.urls")),
     path("initialize", InitializeView.as_view(), name="initialize"),
-    path("assessments/feedback/from", AssessmentReceivedFeedbackView.as_view(), name="assessment-received-feedback"),
-    path("assessments/feedback/to", AssessmentGivenFeedbackView.as_view(), name="assessment-given-feedback"),
+    path("assessments/feedback/from", AssessmentFeedbackFromView.as_view(), name="assessment-feedback-from"),
+    path("assessments/feedback/to", AssessmentFeedbackToView.as_view(), name="assessment-feedback-to"),
     path("submission/batch/unlock", SubmissionBatchUnlockView.as_view(), name="batch-unlock"),
     path("submission/files", SubmissionFilesFetchView.as_view(), name="fetch-files"),
     path(

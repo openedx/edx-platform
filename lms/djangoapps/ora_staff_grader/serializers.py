@@ -169,9 +169,9 @@ class SubmissionMetadataSerializer(serializers.Serializer):
 
 class AssessmentScoresSerializer(serializers.Serializer):
     """
-    Score information associated with a specific assessment.
+    Serializer for score information associated with a specific assessment.
 
-    This serializer was intended for displaying assessment information in the Enhanced Staff Grader (ESG).
+    This serializer is included in the `AssessmentSerializer` as a `ListField`
     """
     criterion_name = serializers.CharField()
     score_earned = serializers.IntegerField()
@@ -188,16 +188,17 @@ class AssessmentScoresSerializer(serializers.Serializer):
 
 class AssessmentSerializer(serializers.Serializer):
     """
-    Data for displaying Assessment objects for the response from the assessment
-    feedback endpoint in Enhanced Staff Grader (ESG)
-    This serializer is included in the AssessmentFeedbackSerializer as a ListField
+    Serializer for the each assessment metadata in the response from the assessments
+    feedback endpoints (from/to) in Enhanced Staff Grader (ESG)
+
+    This serializer is included in the `AssessmentFeedbackSerializer` as a `ListField`
     """
     assessment_id = serializers.CharField()
     scorer_name = serializers.CharField(allow_null=True)
     scorer_username = serializers.CharField(allow_null=True)
     scorer_email = serializers.CharField(allow_null=True)
-    assesment_date = serializers.DateTimeField()
-    assesment_scores = serializers.ListField(child=AssessmentScoresSerializer())
+    assessment_date = serializers.DateTimeField()
+    assessment_scores = serializers.ListField(child=AssessmentScoresSerializer())
     problem_step = serializers.CharField(allow_null=True)
     feedback = serializers.CharField(allow_null=True)
 
@@ -207,8 +208,8 @@ class AssessmentSerializer(serializers.Serializer):
             "scorer_name",
             "scorer_username",
             "scorer_email",
-            "assesment_date",
-            "assesment_scores",
+            "assessment_date",
+            "assessment_scores",
             "problem_step",
             "feedback",
         ]
@@ -244,14 +245,14 @@ class InitializeSerializer(serializers.Serializer):
 
 class AssessmentFeedbackSerializer(serializers.Serializer):
     """
-    Serialize info for every assessment for the response from the assessment
-    feedback endpoint in Enhanced Staff Grader (ESG)
+    Serializer for a list of assessments for the response from the assessments
+    feedback endpoints (from/to) in Enhanced Staff Grader (ESG)
     """
 
     assessments = serializers.ListField(child=AssessmentSerializer())
 
     class Meta:
-        fields = ["assessments", ]
+        fields = ["assessments"]
         read_only_fields = fields
 
 

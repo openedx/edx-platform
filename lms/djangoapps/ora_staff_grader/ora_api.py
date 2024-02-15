@@ -13,6 +13,9 @@ These are checked (usually by checking for a {"success":false} response) and rai
 """
 import json
 from http import HTTPStatus
+
+from rest_framework.request import Request
+
 from lms.djangoapps.ora_staff_grader.errors import (
     LockContestedError,
     XBlockInternalError,
@@ -34,12 +37,23 @@ def get_submissions(request, usage_id):
     return json.loads(response.content)
 
 
-def get_assessments_given(request, usage_id, submission_uuid):
+def get_assessments_to(request: Request, usage_id: str, submission_uuid: str):
     """
-    Get a list of assessments given from the ORA's 'list_assessments_given' XBlock.json_handler
+    Get a list of assessments given from ORA `list_assessments_to` XBlock.json_handler.
+
+    Lists all assessments given by a user (according to their submissionUUID)
+    in an ORA assignment. Assessments can be Self, Peer and Staff.
+
+    Args:
+        request (Request): The request object
+        usage_id (str): Usage ID of the XBlock for running the handler
+        submission_uuid (str): The ORA submission UUID
     """
-    handler_name = "list_assessments_given"
-    data = {"item_id": usage_id, "submission_uuid": submission_uuid}
+    handler_name = "list_assessments_to"
+    data = {
+        "item_id": usage_id,
+        "submission_uuid": submission_uuid,
+    }
 
     response = call_xblock_json_handler(request, usage_id, handler_name, data)
 
@@ -49,12 +63,22 @@ def get_assessments_given(request, usage_id, submission_uuid):
     return json.loads(response.content)
 
 
-def get_assessments_received(request, usage_id, submission_uuid):
+def get_assessments_from(request: Request, usage_id: str, submission_uuid: str):
     """
-    Get a list of assessments received from the ORA's 'list_assessments_received' XBlock.json_handler
+    Get a list of assessments received from ORA `list_assessments_from` XBlock.json_handler
+
+    Lists all assessments received by a user (according to their submissionUUID)
+    in an ORA assignment. Assessments can be Self, Peer and Staff.
+
+    Args:
+        request (Request): The request object
+        usage_id (str): Usage ID of the XBlock for running the handler
+        submission_uuid (str): The ORA submission UUID
     """
-    handler_name = "list_assessments_received"
-    data = {"submission_uuid": submission_uuid}
+    handler_name = "list_assessments_from"
+    data = {
+        "submission_uuid": submission_uuid,
+    }
 
     response = call_xblock_json_handler(request, usage_id, handler_name, data)
 

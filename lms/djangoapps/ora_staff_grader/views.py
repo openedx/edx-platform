@@ -43,8 +43,8 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
-    get_assessments_given,
-    get_assessments_received,
+    get_assessments_to,
+    get_assessments_from,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
@@ -150,31 +150,32 @@ class InitializeView(StaffGraderBaseView):
             return UnknownErrorResponse()
 
 
-class AssessmentGivenFeedbackView(StaffGraderBaseView):
+class AssessmentFeedbackToView(StaffGraderBaseView):
     """
-    GET data about assessments given by a user in a submission
+    (GET) List all assessments given by a user (according to
+    their submissionUUID) in an ORA assignment.
 
-    * Query Params:
+    **Query Params**:
         - oraLocation (str): ORA location for XBlock handling
-        - submissionUUID (str): A submission to get assessments for
+        - submissionUUID (str): The ORA submission UUID
 
     Response: {
         assessments (List[dict]): [
             {
-                "assessment_id: (str) assessment id
-                "scorer_name: (str) scorer name
-                "scorer_username: (str) scorer username
-                "scorer_email: (str) scorer email
-                "assessment_date: (str) assessment date
+                "assessment_id: (str) Assessment id
+                "scorer_name: (str) Scorer name
+                "scorer_username: (str) Scorer username
+                "scorer_email: (str) Scorer email
+                "assessment_date: (str) Assessment date
                 "assessment_scores (List[dict]) [
                     {
-                        "criterion_name: (str) criterion name
-                        "score_earned: (int) score earned
-                        "score_type: (str) score type
+                        "criterion_name: (str) Criterion name
+                        "score_earned: (int) Score earned
+                        "score_type: (str) Score type
                     }
                 ]
-                "problem_step (str) problem step (Self, Peer, or Staff)
-                "feedback: (str) feedback
+                "problem_step (str) Problem step (Self, Peer, or Staff)
+                "feedback: (str) Feedback of the assessment
             }
         ]
     }
@@ -187,9 +188,9 @@ class AssessmentGivenFeedbackView(StaffGraderBaseView):
     """
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
-        """ Get data about assessments given by a user"""
+        """Get assessments given by a user in an ORA assignment"""
         try:
-            assessments_data = {"assessments": get_assessments_given(request, ora_location, submission_uuid)}
+            assessments_data = {"assessments": get_assessments_to(request, ora_location, submission_uuid)}
             response_data = AssessmentFeedbackSerializer(assessments_data).data
             return Response(response_data)
 
@@ -206,31 +207,32 @@ class AssessmentGivenFeedbackView(StaffGraderBaseView):
             return UnknownErrorResponse()
 
 
-class AssessmentReceivedFeedbackView(StaffGraderBaseView):
+class AssessmentFeedbackFromView(StaffGraderBaseView):
     """
-    GET data about assessments received by a user in a submission
+    (GET) List all assessments received by a user (according to
+    their submissionUUID) in an ORA assignment.
 
-    * Query Params:
+    **Query Params**:
         - oraLocation (str): ORA location for XBlock handling
-        - submissionUUID (str): A submission to get assessments for
+        - submissionUUID (str): The ORA submission UUID
 
     Response: {
         assessments (List[dict]): [
             {
-                "assessment_id: (str) assessment id
-                "scorer_name: (str) scorer name
-                "scorer_username: (str) scorer username
-                "scorer_email: (str) scorer email
-                "assessment_date: (str) assessment date
+                "assessment_id: (str) Assessment id
+                "scorer_name: (str) Scorer name
+                "scorer_username: (str) Scorer username
+                "scorer_email: (str) Scorer email
+                "assessment_date: (str) Assessment date
                 "assessment_scores (List[dict]) [
                     {
-                        "criterion_name: (str) criterion name
-                        "score_earned: (int) score earned
-                        "score_type: (str) score type
+                        "criterion_name: (str) Criterion name
+                        "score_earned: (int) Score earned
+                        "score_type: (str) Score type
                     }
                 ]
-                "problem_step (str) problem step (Self, Peer, or Staff)
-                "feedback: (str) feedback
+                "problem_step (str) Problem step (Self, Peer, or Staff)
+                "feedback: (str) Feedback of the assessment
             }
         ]
     }
@@ -244,9 +246,9 @@ class AssessmentReceivedFeedbackView(StaffGraderBaseView):
 
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get(self, request, ora_location, submission_uuid, *args, **kwargs):
-        """Get data about assessments received by a user"""
+        """Get assessments received by a user in an ORA assignment"""
         try:
-            assessments_data = {"assessments": get_assessments_received(request, ora_location, submission_uuid)}
+            assessments_data = {"assessments": get_assessments_from(request, ora_location, submission_uuid)}
             response_data = AssessmentFeedbackSerializer(assessments_data).data
             return Response(response_data)
 
