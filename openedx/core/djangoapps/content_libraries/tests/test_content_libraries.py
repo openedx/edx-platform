@@ -28,10 +28,12 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
+@skip_unless_cms
 class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
     """
     General tests for Blockstore-based Content Libraries
@@ -607,7 +609,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         Test that libraries don't allow more than specified blocks
         """
         with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1):
-            lib = self._create_library(slug="test_lib_limits", title="Limits Test Library", description="Testing XBlocks limits in a library")  # lint-amnesty, pylint: disable=line-too-long
+            lib = self._create_library(
+                slug="test_lib_limits",
+                title="Limits Test Library",
+                description="Testing XBlocks limits in a library"
+            )
             lib_id = lib["id"]
             self._add_block_to_library(lib_id, "unit", "unit1")
             # Second block should throw error
@@ -637,7 +643,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         """
         event_receiver = Mock()
         CONTENT_LIBRARY_CREATED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_event_create", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_event_create",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
         library_key = LibraryLocatorV2.from_string(lib['id'])
 
         event_receiver.assert_called_once()
@@ -659,7 +669,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         """
         event_receiver = Mock()
         CONTENT_LIBRARY_UPDATED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_event_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_event_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
 
         lib2 = self._update_library(lib["id"], title="New Title")
         library_key = LibraryLocatorV2.from_string(lib2['id'])
@@ -683,7 +697,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         """
         event_receiver = Mock()
         CONTENT_LIBRARY_DELETED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_event_delete", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_event_delete",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
         library_key = LibraryLocatorV2.from_string(lib['id'])
 
         self._delete_library(lib["id"])
@@ -707,7 +725,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         """
         event_receiver = Mock()
         LIBRARY_BLOCK_CREATED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_block_event_create", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_block_event_create",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
         lib_id = lib["id"]
         self._add_block_to_library(lib_id, "problem", "problem1")
 
@@ -737,7 +759,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         """
         event_receiver = Mock()
         LIBRARY_BLOCK_UPDATED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_block_event_olx_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_block_event_olx_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
         lib_id = lib["id"]
 
         library_key = LibraryLocatorV2.from_string(lib_id)
@@ -783,11 +809,16 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
     @skip("We still need to re-implement static asset handling.")
     def test_library_block_add_asset_update_event(self):
         """
-        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is uploaded associated with the XBlock.
+        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
+        uploaded associated with the XBlock.
         """
         event_receiver = Mock()
         LIBRARY_BLOCK_UPDATED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_block_event_add_asset_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_block_event_add_asset_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
         lib_id = lib["id"]
 
         library_key = LibraryLocatorV2.from_string(lib_id)
@@ -818,11 +849,16 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
     @skip("We still need to re-implement static asset handling.")
     def test_library_block_del_asset_update_event(self):
         """
-        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is removed from XBlock.
+        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
+        removed from XBlock.
         """
         event_receiver = Mock()
         LIBRARY_BLOCK_UPDATED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_block_event_del_asset_update", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_block_event_del_asset_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
         lib_id = lib["id"]
 
         library_key = LibraryLocatorV2.from_string(lib_id)
@@ -858,7 +894,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         """
         event_receiver = Mock()
         LIBRARY_BLOCK_DELETED.connect(event_receiver)
-        lib = self._create_library(slug="test_lib_block_event_delete", title="Event Test Library", description="Testing event in library")  # lint-amnesty, pylint: disable=line-too-long
+        lib = self._create_library(
+            slug="test_lib_block_event_delete",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
 
         lib_id = lib["id"]
         library_key = LibraryLocatorV2.from_string(lib_id)
