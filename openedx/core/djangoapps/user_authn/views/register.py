@@ -590,7 +590,7 @@ class RegistrationView(APIView):
 
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        authenticated_user = {'username': user.username, 'user_id': user.id}
+        authenticated_user = {'username': user.username, 'full_name': user.profile.name, 'user_id': user.id}
         response = self._create_response(
             request, {'authenticated_user': authenticated_user}, status_code=200, redirect_url=redirect_url
         )

@@ -421,7 +421,6 @@ class UnenrollmentView(APIView):
             If the request is successful, an HTTP 200 "OK" response is
             returned along with a list of all courses from which the user was unenrolled.
         """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
 
     def post(self, request):
@@ -1023,9 +1022,6 @@ class EnrollmentAllowedView(APIView):
     """
     A view that allows the retrieval and creation of enrollment allowed for a given user email and course id.
     """
-    authentication_classes = (
-        JwtAuthentication,
-    )
     permission_classes = (permissions.IsAdminUser,)
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = CourseEnrollmentAllowedSerializer

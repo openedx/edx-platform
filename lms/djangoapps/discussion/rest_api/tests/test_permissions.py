@@ -27,6 +27,7 @@ def _get_context(
     allow_anonymous=True,
     allow_anonymous_to_peers=False,
     has_moderation_privilege=False,
+    is_staff_or_admin=False,
 ):
     """Return a context suitable for testing the permissions module"""
     return {
@@ -39,6 +40,7 @@ def _get_context(
         "discussion_division_enabled": is_cohorted,
         "thread": thread,
         "has_moderation_privilege": has_moderation_privilege,
+        "is_staff_or_admin": is_staff_or_admin,
     }
 
 
@@ -96,7 +98,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
 @ddt.ddt
 class GetEditableFieldsTest(ModuleStoreTestCase):
     """Tests for get_editable_fields"""
-    @ddt.data(*itertools.product(*[[True, False] for _ in range(5)]))
+    @ddt.data(*itertools.product(*[[True, False] for _ in range(6)]))
     @ddt.unpack
     def test_thread(
         self,
@@ -105,6 +107,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         allow_anonymous,
         allow_anonymous_to_peers,
         has_moderation_privilege,
+        is_staff_or_admin,
     ):
         thread = Thread(user_id="5" if is_author else "6", type="thread")
         context = _get_context(
@@ -113,11 +116,14 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             allow_anonymous=allow_anonymous,
             allow_anonymous_to_peers=allow_anonymous_to_peers,
             has_moderation_privilege=has_moderation_privilege,
+            is_staff_or_admin=is_staff_or_admin,
         )
         actual = get_editable_fields(thread, context)
         expected = {"abuse_flagged", "copy_link", "following", "read", "voted"}
         if has_moderation_privilege:
-            expected |= {"closed", "pinned", "close_reason_code"}
+            expected |= {"closed", "close_reason_code"}
+        if has_moderation_privilege or is_staff_or_admin:
+            expected |= {"pinned"}
         if has_moderation_privilege and not is_author:
             expected |= {"edit_reason_code"}
         if is_author or has_moderation_privilege:
