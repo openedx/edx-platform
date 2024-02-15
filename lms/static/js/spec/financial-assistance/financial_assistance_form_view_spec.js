@@ -171,6 +171,7 @@ define([
 
         it('should submit the form and show an error message if content is valid and API returns 403 error', function() {
             failedSubmission(403);
+            expect(view.$('.message-copy').text()).toContain('You must confirm your email');
         });
 
         it('should allow form resubmission after a front end validation failure', function() {
