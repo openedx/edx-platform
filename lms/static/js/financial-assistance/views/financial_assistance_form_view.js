@@ -29,7 +29,7 @@
             el: '.financial-assistance-wrapper',
             events: {
                 'click .js-submit-form': 'submitForm',
-                'ajaxError': 'handleAjaxError',
+                'ajaxError': 'handleAjaxError'
             },
             tpl: formViewTpl,
             fieldTpl: formFieldTpl,
@@ -106,7 +106,7 @@
                     txt = [
                         'You must confirm your email to complete registration before applying for financial assistance.',
                         'If you continue to have issues please contact support.'
-                    ]
+                    ],
                     msg = gettext(txt.join(' '));
                 }
 
