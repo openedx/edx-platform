@@ -4,7 +4,7 @@ This module contains helper functions to build a object tree with object tags.
 
 from __future__ import annotations
 
-from typing import Iterator
+from typing import Any, Callable, Dict, Iterator, List, Tuple, Union
 
 from attrs import define
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -138,6 +138,12 @@ def build_object_tree_with_objecttags(
     """
     Returns the object with the tags associated with it.
     """
+    get_tagged_children: Union[
+        # _get_course_tagged_object_and_children type
+        Callable[[LibraryXBlockMetadata, Dict[str, Dict[int, List[Any]]]], Tuple[TaggedContent, None]],
+        # _get_library_block_tagged_object type
+        Callable[[UsageKey, Dict[str, Dict[int, List[Any]]]], Tuple[TaggedContent, List[Any]]]
+    ]
     if isinstance(content_key, CourseKey):
         tagged_content, children = _get_course_tagged_object_and_children(
             content_key, object_tag_cache
