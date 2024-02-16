@@ -22,6 +22,7 @@
             tpl: '#login-tpl',
             events: {
                 'click .js-login': 'submitForm',
+                'click .toggle-password': 'togglePassword',
                 'click .forgot-password': 'forgotPassword',
                 'click .login-provider': 'thirdPartyAuth',
                 'click .enterprise-login': 'enterpriseSlugLogin',
@@ -145,6 +146,14 @@
                 event.preventDefault();
                 $help = $('#login-help');
                 this.toggleHelp(event, $help);
+            },
+
+            togglePassword: function(event) {
+                event.preventDefault();
+                var passwordField = document.querySelector("#login-password")
+                var newType = passwordField.getAttribute("type") === "password" ? "text" : "password"
+                passwordField.setAttribute("type", newType);
+                $(event.target).toggleClass("fa-eye fa-eye-slash");
             },
 
             enterpriseSlugLogin: function(event) {
