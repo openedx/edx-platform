@@ -42,7 +42,7 @@ def iterate_with_level(
             yield from iterate_with_level(child, level + 1)
 
 
-def get_course_tagged_object_and_children(
+def _get_course_tagged_object_and_children(
     course_key: CourseKey, object_tag_cache: ObjectTagByObjectIdDict
 ) -> tuple[TaggedContent, list[XBlock]]:
     """
@@ -67,7 +67,7 @@ def get_course_tagged_object_and_children(
     return tagged_course, course.children if course.has_children else []
 
 
-def get_library_tagged_object_and_children(
+def _get_library_tagged_object_and_children(
     library_key: LibraryLocatorV2, object_tag_cache: ObjectTagByObjectIdDict
 ) -> tuple[TaggedContent, list[LibraryXBlockMetadata]]:
     """
@@ -92,12 +92,13 @@ def get_library_tagged_object_and_children(
     return tagged_library, children
 
 
-def get_xblock_tagged_object_and_children(
-    usage_key: UsageKey, object_tag_cache: ObjectTagByObjectIdDict, store
+def _get_xblock_tagged_object_and_children(
+    usage_key: UsageKey, object_tag_cache: ObjectTagByObjectIdDict
 ) -> tuple[TaggedContent, list[XBlock]]:
     """
     Returns a TaggedContent with xblock metadata with its tags, and its children.
     """
+    store = modulestore()
     block = store.get_item(usage_key)
     block_id = str(usage_key)
     tagged_block = TaggedContent(
@@ -111,7 +112,7 @@ def get_xblock_tagged_object_and_children(
     return tagged_block, block.children if block.has_children else []
 
 
-def get_library_block_tagged_object(
+def _get_library_block_tagged_object(
     library_block: LibraryXBlockMetadata, object_tag_cache: ObjectTagByObjectIdDict
 ) -> tuple[TaggedContent, None]:
     """
@@ -138,19 +139,17 @@ def build_object_tree_with_objecttags(
     Returns the object with the tags associated with it.
     """
     if isinstance(content_key, CourseKey):
-        tagged_content, children = get_course_tagged_object_and_children(
+        tagged_content, children = _get_course_tagged_object_and_children(
             content_key, object_tag_cache
         )
     elif isinstance(content_key, LibraryLocatorV2):
-        tagged_content, children = get_library_tagged_object_and_children(
+        tagged_content, children = _get_library_tagged_object_and_children(
             content_key, object_tag_cache
         )
     else:
         raise ValueError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
     blocks: list[tuple[TaggedContent, list | None]] = [(tagged_content, children)]
-
-    store = modulestore()
 
     while blocks:
         tagged_block, block_children = blocks.pop()
@@ -163,11 +162,11 @@ def build_object_tree_with_objecttags(
             child_children: list | None
 
             if isinstance(child, UsageKey):
-                tagged_child, child_children = get_xblock_tagged_object_and_children(
-                    child, object_tag_cache, store
+                tagged_child, child_children = _get_xblock_tagged_object_and_children(
+                    child, object_tag_cache
                 )
             elif isinstance(child, LibraryXBlockMetadata):
-                tagged_child, child_children = get_library_block_tagged_object(
+                tagged_child, child_children = _get_library_block_tagged_object(
                     child, object_tag_cache
                 )
             else:
