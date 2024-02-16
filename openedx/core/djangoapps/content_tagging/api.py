@@ -88,7 +88,7 @@ def set_taxonomy_orgs(
 
 def get_taxonomies_for_org(
     enabled=True,
-    org_owner: Organization | None = None,
+    org_short_name: str | None = None,
 ) -> QuerySet:
     """
     Generates a list of the enabled Taxonomies available for the given org, sorted by name.
@@ -101,7 +101,6 @@ def get_taxonomies_for_org(
     If you want the disabled Taxonomies, pass enabled=False.
     If you want all Taxonomies (both enabled and disabled), pass enabled=None.
     """
-    org_short_name = org_owner.short_name if org_owner else None
     return oel_tagging.get_taxonomies(enabled=enabled).filter(
         Exists(
             TaxonomyOrg.get_relationships(

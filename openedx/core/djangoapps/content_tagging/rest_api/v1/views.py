@@ -6,6 +6,7 @@ from __future__ import annotations
 import csv
 from typing import Iterator
 
+from django.db.models import Count
 from django.http import StreamingHttpResponse
 from opaque_keys.edx.keys import UsageKey
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
@@ -67,12 +68,7 @@ class TaxonomyOrgView(TaxonomyView):
         query_params = TaxonomyOrgListQueryParamsSerializer(data=self.request.query_params.dict())
         query_params.is_valid(raise_exception=True)
         enabled = query_params.validated_data.get("enabled", None)
-        unassigned = query_params.validated_data.get("unassigned", None)
         org = query_params.validated_data.get("org", None)
-
-        # Raise an error if both "org" and "unassigned" query params were provided
-        if "org" in query_params.validated_data and "unassigned" in query_params.validated_data:
-            raise ValidationError("'org' and 'unassigned' params cannot be both defined")
 
         # If org filtering was requested, then use it, even if the org is invalid/None
         if "org" in query_params.validated_data:
@@ -82,7 +78,13 @@ class TaxonomyOrgView(TaxonomyView):
         else:
             queryset = get_taxonomies(enabled)
 
-        return queryset.prefetch_related("taxonomyorg_set")
+        # Prefetch taxonomyorgs so we can check permissions
+        queryset = queryset.prefetch_related("taxonomyorg_set__org")
+
+        # Annotate with tags_count to avoid selecting all the tags
+        queryset = queryset.annotate(tags_count=Count("tag", distinct=True))
+
+        return queryset
 
     def perform_create(self, serializer):
         """
