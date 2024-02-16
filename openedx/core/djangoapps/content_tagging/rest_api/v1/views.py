@@ -200,14 +200,11 @@ class ObjectTagExportView(APIView):
 
         try:
             content_key = get_content_key_from_string(object_id)
-        except ValueError as e:
-            raise ValidationError from e
 
-        if isinstance(content_key, UsageKey):
-            raise ValidationError("The object_id must be a CourseKey or a LibraryLocatorV2.")
+            if isinstance(content_key, UsageKey):
+                raise ValidationError("The object_id must be a CourseKey or a LibraryLocatorV2.")
 
-        # Check if the user has permission to view object tags for this object_id
-        try:
+            # Check if the user has permission to view object tags for this object_id
             if not self.request.user.has_perm(
                 "oel_tagging.view_objecttag",
                 # The obj arg expects a model, but we are passing an object
@@ -216,11 +213,13 @@ class ObjectTagExportView(APIView):
                 raise PermissionDenied(
                     "You do not have permission to view object tags for this object_id."
                 )
+
+            all_object_tags, taxonomies = get_all_object_tags(content_key)
+            tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
+
         except ValueError as e:
             raise ValidationError from e
 
-        all_object_tags, taxonomies = get_all_object_tags(content_key)
-        tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
         pseudo_buffer = Echo()
 
         return StreamingHttpResponse(

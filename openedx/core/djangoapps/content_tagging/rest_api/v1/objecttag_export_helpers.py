@@ -51,7 +51,9 @@ def get_course_tagged_object_and_children(
     store = modulestore()
 
     course = store.get_course(course_key)
-    assert course is not None
+    if course is None:
+        raise ValueError(f"Course not found: {course_key}")
+
     course_id = str(course_key)
 
     tagged_course = TaggedContent(
@@ -72,7 +74,8 @@ def get_library_tagged_object_and_children(
     Returns a TaggedContent with library metadata with its tags, and its children.
     """
     library = library_api.get_library(library_key)
-    assert library is not None
+    if library is None:
+        raise ValueError(f"Library not found: {library_key}")
 
     library_id = str(library_key)
 
@@ -143,7 +146,7 @@ def build_object_tree_with_objecttags(
             content_key, object_tag_cache
         )
     else:
-        raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
+        raise ValueError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
     blocks: list[tuple[TaggedContent, list | None]] = [(tagged_content, children)]
 
