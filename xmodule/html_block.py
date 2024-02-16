@@ -85,15 +85,42 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA = 'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA'
 
     @XBlock.supports("multi_device")
-    def student_view(self, _context):
+    def student_view(self, context):
         """
         Return a fragment that contains the html for the student view
         """
+        if (context.get("translate_lang")):
+            return self.translated_view(context, context.get("translate_lang"))
+
         fragment = Fragment(self.get_html())
         add_sass_to_fragment(fragment, 'HtmlBlockDisplay.scss')
         add_webpack_js_to_fragment(fragment, 'HtmlBlockDisplay')
         shim_xmodule_js(fragment, 'HTMLModule')
         return fragment
+
+    def translated_view(self, _context, translate_lang):
+        """
+        Translated version of this content
+        """
+        # Translate HTML
+        translated_html = self.translate(self.data, translate_lang)
+
+        # Replace placeholder values
+        translated_html = self.replace_placeholders(translated_html)
+
+        # Convert to fragment and add resources
+        fragment = Fragment(translated_html)
+        add_sass_to_fragment(fragment, 'HtmlBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'HtmlBlockDisplay')
+        shim_xmodule_js(fragment, 'HTMLModule')
+        return fragment
+
+    def translate(self, content, language):
+        """ PLACEHOLDER translation call"""
+        fake_translation = f'This block, {self.location}, has been "translated" to lang "{language}"...' \
+             "Just kidding, I UPPERCASED EVERYTHING!"
+        fake_translation = fake_translation + content.upper()
+        return fake_translation
 
     @XBlock.supports("multi_device")
     def public_view(self, context):
