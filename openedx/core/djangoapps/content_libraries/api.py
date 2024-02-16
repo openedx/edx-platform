@@ -638,7 +638,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
 
 def get_library_block(usage_key) -> LibraryXBlockMetadata:
     """
-    Get metadata (LibraryXBlockMetadata) about one specific XBlock in a library
+    Get metadata about (the draft version of) one specific XBlock in a library.
 
     This will raise ContentLibraryBlockNotFound if there is no draft version of
     this block (i.e. it's been soft-deleted from Studio), even if there is a
@@ -765,7 +765,7 @@ def create_library_block(library_key, block_type, definition_id):
     if component_already_exists(usage_key):
         raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
 
-    create_component_for_block(ref, usage_key)
+    _create_component_for_block(ref, usage_key)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
@@ -804,7 +804,7 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def create_component_for_block(content_lib, usage_key):
+def _create_component_for_block(content_lib, usage_key):
     """
     Create a Component for an XBlock type, and initialize it.
 
