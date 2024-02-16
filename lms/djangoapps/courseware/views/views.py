@@ -1586,6 +1586,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         student_view_context = request.GET.dict()
         student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
         student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
+        student_view_context['translate_lang'] = request.GET.get('translate_lang')
 
         is_learning_mfe = is_request_from_learning_mfe(request)
         # Right now, we only care about this in regards to the Learning MFE because it results
