@@ -498,7 +498,6 @@ def _save_xblock(
                 publish = "make_public"
 
         # Make public after updating the xblock, in case the caller asked for both an update and a publish.
-        # Used by Bok Choy tests and by republishing of staff locks.
         if publish == "make_public":
             modulestore().publish(xblock.location, user.id)
 

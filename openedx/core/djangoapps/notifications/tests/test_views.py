@@ -36,6 +36,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
+from ..utils import get_notification_types_with_visibility_settings
 
 
 @ddt.ddt
@@ -281,7 +282,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, self._expected_api_response())
+        expected_response = self._expected_api_response()
+        expected_response = remove_notifications_with_visibility_settings(expected_response)
+        self.assertEqual(response.data, expected_response)
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
 
@@ -317,9 +320,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_response = self._expected_api_response()
         if not role:
-            expected_response['notification_preference_config']['discussion']['notification_types'].pop(
-                'new_question_post'
-            )
+            expected_response = remove_notifications_with_visibility_settings(expected_response)
+
         self.assertEqual(response.data, expected_response)
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
@@ -360,11 +362,13 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
         if update_type == 'app_update':
             expected_data = self._expected_api_response()
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             expected_data['notification_preference_config'][notification_app]['enabled'] = value
             self.assertEqual(response.data, expected_data)
 
         elif update_type == 'type_update':
             expected_data = self._expected_api_response()
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             expected_data['notification_preference_config'][notification_app][
                 'notification_types'][notification_type][notification_channel] = value
             self.assertEqual(response.data, expected_data)
@@ -514,6 +518,7 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                 non_editable_channels = expected_app_prefs['non_editable'].get(notification_type_name, [])
                 if notification_channel not in non_editable_channels:
                     expected_app_prefs['notification_types'][notification_type_name][notification_channel] = value
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             self.assertEqual(response.data, expected_data)
             event_name, event_data = mock_emit.call_args[0]
             self.assertEqual(event_name, 'edx.notifications.preferences.updated')
@@ -914,3 +919,15 @@ class NotificationReadAPIViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
+
+
+def remove_notifications_with_visibility_settings(expected_response):
+    """
+    Remove notifications with visibility settings from the expected response.
+    """
+    not_visible = get_notification_types_with_visibility_settings()
+    for notification_type, visibility_settings in not_visible.items():
+        expected_response['notification_preference_config']['discussion']['notification_types'].pop(
+            notification_type
+        )
+    return expected_response

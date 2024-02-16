@@ -1,7 +1,5 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -18,7 +16,6 @@ class DemographicsStatusView(APIView):
     The API will return whether or not to display the Demographics UI based on
     the User's status in the Platform
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
 
     def _response_context(self, user, user_demographics=None):

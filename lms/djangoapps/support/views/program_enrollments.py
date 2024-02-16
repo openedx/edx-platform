@@ -6,9 +6,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from social_django.models import UserSocialAuth
@@ -77,9 +75,6 @@ class LinkProgramEnrollmentSupportAPIView(APIView):
     """
     Support-only API View for linking learner enrollments by support staff.
     """
-    authentication_classes = (
-        JwtAuthentication, SessionAuthentication
-    )
     permission_classes = (
         IsAuthenticated,
     )
@@ -312,9 +307,6 @@ class ProgramEnrollmentsInspectorAPIView(ProgramEnrollmentInspector, APIView):
     information of a learner.
     """
 
-    authentication_classes = (
-        JwtAuthentication, SessionAuthentication
-    )
     permission_classes = (
         IsAuthenticated,
     )

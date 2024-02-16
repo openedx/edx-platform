@@ -41,6 +41,12 @@ working_config_block = {
                     "type": "private_managed",
                     "description": "Private Topic 2 desc",
                     "name": "Private Topic 2 Name"
+                },
+                {
+                    "id": "open_managed_topic_1_id",
+                    "type": "open_managed",
+                    "description": "Open Managed Topic 1 desc",
+                    "name": "Open Managed Topic 1 Name"
                 }
             ]
         }

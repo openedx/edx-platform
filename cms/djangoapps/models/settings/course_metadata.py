@@ -357,7 +357,7 @@ class CourseMetadata:
         """
         error_list = []
         valid_teamset_types = [TeamsetType.open.value, TeamsetType.public_managed.value,
-                               TeamsetType.private_managed.value]
+                               TeamsetType.private_managed.value, TeamsetType.open_managed.value]
         valid_keys = {'id', 'name', 'description', 'max_team_size', 'type'}
         teamset_type = topic_settings.get('type', {})
         if teamset_type:
