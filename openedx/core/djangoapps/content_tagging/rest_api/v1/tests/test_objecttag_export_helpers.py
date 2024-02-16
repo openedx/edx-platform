@@ -222,7 +222,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         )
 
         assert self.expected_library_tagged_xblock.children is not None  # type guard
-        # ToDo: Check the order of the children
+        # The children are sorted by the key
         self.expected_library_tagged_xblock.children.append(tagged_library_html)
         self.expected_library_tagged_xblock.children.append(tagged_problem)
         self.expected_library_tagged_xblock.children.append(untagged_problem)
