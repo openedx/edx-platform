@@ -142,10 +142,12 @@ def build_object_tree_with_objecttags(
         tagged_content, children = _get_course_tagged_object_and_children(
             content_key, object_tag_cache
         )
+        get_tagged_children = _get_xblock_tagged_object_and_children
     elif isinstance(content_key, LibraryLocatorV2):
         tagged_content, children = _get_library_tagged_object_and_children(
             content_key, object_tag_cache
         )
+        get_tagged_children = _get_library_block_tagged_object
     else:
         raise ValueError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
@@ -161,19 +163,8 @@ def build_object_tree_with_objecttags(
         for child in block_children:
             child_children: list | None
 
-            if isinstance(child, UsageKey):
-                tagged_child, child_children = _get_xblock_tagged_object_and_children(
-                    child, object_tag_cache
-                )
-            elif isinstance(child, LibraryXBlockMetadata):
-                tagged_child, child_children = _get_library_block_tagged_object(
-                    child, object_tag_cache
-                )
-            else:
-                raise NotImplementedError(f"Invalid child: {type(child)} -> {child}")
-
+            tagged_child, child_children = get_tagged_children(child, object_tag_cache)
             tagged_block.children.append(tagged_child)
-
             blocks.append((tagged_child, child_children))
 
     return tagged_content
