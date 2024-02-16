@@ -261,6 +261,9 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
     if not object_id:
         raise ValueError("object_id must be provided")
 
+    if not user.is_authenticated:
+        return False
+
     try:
         context_key = get_context_key_from_key_string(object_id)
         assert context_key.org
