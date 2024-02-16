@@ -451,7 +451,7 @@ def _accessible_courses_summary_iter_v2(request, org=None):
     courses_summary = get_courses_by_status(active_only, archived_only, courses_summary)
     courses_summary = get_courses_by_search_query(search_query, courses_summary)
     courses_summary = get_courses_order_by(order, courses_summary)
-    courses_summary = list(filter(course_filter, courses_summary))
+    courses_summary = filter(course_filter, courses_summary)
     in_process_course_actions = get_in_process_course_actions(request)
     return courses_summary, in_process_course_actions
 
