@@ -830,29 +830,30 @@ def _create_component_for_block(content_lib, usage_key):
 
     learning_package = content_lib.learning_package
 
-    component_type = components_api.get_or_create_component_type(
-        "xblock.v1", usage_key.block_type
-    )
-    component, component_version = components_api.create_component_and_version(
-        learning_package.id,
-        component_type=component_type,
-        local_key=usage_key.block_id,
-        title=display_name,
-        created=now,
-        created_by=None,
-    )
-    content = contents_api.get_or_create_text_content(
-        learning_package.id,
-        get_or_create_olx_media_type(usage_key.block_type).id,
-        text=xml_text,
-        created=now,
-    )
-    components_api.create_component_version_content(
-        component_version.pk,
-        content.id,
-        key="block.xml",
-        learner_downloadable=False
-    )
+    with transaction.atomic():
+        component_type = components_api.get_or_create_component_type(
+            "xblock.v1", usage_key.block_type
+        )
+        component, component_version = components_api.create_component_and_version(
+            learning_package.id,
+            component_type=component_type,
+            local_key=usage_key.block_id,
+            title=display_name,
+            created=now,
+            created_by=None,
+        )
+        content = contents_api.get_or_create_text_content(
+            learning_package.id,
+            get_or_create_olx_media_type(usage_key.block_type).id,
+            text=xml_text,
+            created=now,
+        )
+        components_api.create_component_version_content(
+            component_version.pk,
+            content.id,
+            key="block.xml",
+            learner_downloadable=False
+        )
 
 
 def delete_library_block(usage_key, remove_from_parent=True):
