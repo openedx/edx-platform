@@ -23,7 +23,10 @@ from common.djangoapps.student.models import (
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
+from openedx.core.djangoapps.user_api.accounts.utils import (
+    is_secondary_email_feature_enabled,
+    are_first_and_last_name_required_in_registration
+)
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from openedx.core.djangoapps.user_authn.views.registration_form import contains_html, contains_url
@@ -220,6 +223,14 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
                 }
             )
 
+        # Adding first_name and last_name value in data if they are required in REGISTRATION_EXTRA_FIELDS setting
+        if are_first_and_last_name_required_in_registration():
+            data.update({
+                "are_first_and_last_name_required_in_registration": True,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            })
+
         if self.custom_fields:
             fields = self.custom_fields
         elif user_profile:
@@ -266,9 +277,25 @@ class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFiel
 
     class Meta:
         model = User
-        fields = ("username", "email", "date_joined", "is_active", "password_toggle_history")
-        read_only_fields = fields
+        fields = ("username", "email", "first_name", "last_name", "date_joined", "is_active", "password_toggle_history")
+        read_only_fields = ("username", "email", "date_joined", "is_active", "password_toggle_history")
         explicit_read_only_fields = ()
+
+    def validate_first_name(self, first_name):
+        """ Enforce minimum length for name. """
+        if len(first_name) < NAME_MIN_LENGTH:
+            raise serializers.ValidationError(
+                f"The first name field must be at least {NAME_MIN_LENGTH} character long."
+            )
+        return first_name
+
+    def validate_last_name(self, last_name):
+        """ Enforce minimum length for name. """
+        if len(last_name) < NAME_MIN_LENGTH:
+            raise serializers.ValidationError(
+                f"The last name field must be at least {NAME_MIN_LENGTH} character long."
+            )
+        return last_name
 
 
 class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):

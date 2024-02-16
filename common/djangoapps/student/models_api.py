@@ -120,11 +120,11 @@ def get_pending_name_change(user):
         return None
 
 
-def do_name_change_request(user, new_name, rationale):
+def do_name_change_request(user, new_name, rationale, new_first_name=None, new_last_name=None):
     """
     Create a name change request. This either updates the user's current PendingNameChange, or creates
-    a new one if it doesn't exist. Returns the PendingNameChange object and a boolean describing whether
-    or not a new one was created.
+    a new one if it doesn't exist. It also stores the new first and last name in the profile meta.
+    Returns the PendingNameChange object and a boolean describing whether or not a new one was created.
     """
     user_profile = _UserProfile.objects.get(user=user)
     if user_profile.name == new_name:
@@ -143,6 +143,13 @@ def do_name_change_request(user, new_name, rationale):
         }
     )
 
+    if new_first_name and new_last_name:
+        meta = user_profile.get_meta()
+        meta['pending_first_name'] = new_first_name
+        meta['pending_last_name'] = new_last_name
+        user_profile.set_meta(meta)
+        user_profile.save()
+
     return pending_name_change, created
 
 
@@ -160,7 +167,15 @@ def confirm_name_change(user, pending_name_change):
     meta['old_names'].append(
         [user_profile.name, pending_name_change.rationale, datetime.datetime.now(UTC).isoformat()]
     )
+    pending_first_name = meta.pop('pending_first_name', None)
+    pending_last_name = meta.pop('pending_last_name', None)
     user_profile.set_meta(meta)
+
+    if pending_first_name and pending_last_name:
+        user = user_profile.user
+        user.first_name = pending_first_name
+        user.last_name = pending_last_name
+        user.save()
 
     user_profile.name = pending_name_change.new_name
     user_profile.save()

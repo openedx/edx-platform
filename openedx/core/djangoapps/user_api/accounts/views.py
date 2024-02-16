@@ -472,12 +472,15 @@ class NameChangeView(ViewSet):
         """
         user = request.user
         new_name = request.data.get('name', None)
+        new_first_name = request.data.get('first_name', None)
+        new_last_name = request.data.get('last_name', None)
+
         rationale = f'Name change requested through account API by {user.username}'
 
         serializer = PendingNameChangeSerializer(data={'new_name': new_name})
 
         if serializer.is_valid():
-            pending_name_change = do_name_change_request(user, new_name, rationale)[0]
+            pending_name_change = do_name_change_request(user, new_name, rationale, new_first_name, new_last_name)[0]
             if pending_name_change:
                 return Response(status=status.HTTP_201_CREATED)
             else:

@@ -482,6 +482,22 @@ class PendingNameChangeTests(SharedModuleStoreTestCase):
         do_name_change_request(self.user, self.new_name, self.rationale)
         self.assertEqual(PendingNameChange.objects.count(), 1)
 
+    def test_do_name_change_request_with_first_and_last_name(self):
+        """
+        Test that when name change request is made with name, first name and last name,
+        the new name is stored in PendingNameChange objects and thew new first name and
+        last name are stored in UserProfile.meta as pending_first_name and pending_last_name.
+        """
+        new_first_name = 'John'
+        new_last_name = 'Doe'
+        do_name_change_request(self.user, self.new_name, self.rationale, new_first_name, new_last_name)
+        self.assertEqual(PendingNameChange.objects.count(), 1)
+
+        user_profile = UserProfile.objects.get(user=self.user)
+        meta = user_profile.get_meta()
+        self.assertEqual(meta['pending_first_name'], new_first_name)
+        self.assertEqual(meta['pending_last_name'], new_last_name)
+
     def test_same_name(self):
         """
         Test that attempting a name change with the same name as the user's current profile
@@ -501,6 +517,26 @@ class PendingNameChangeTests(SharedModuleStoreTestCase):
         pending_name_change = PendingNameChange.objects.get(user=self.user)
         self.assertEqual(pending_name_change.new_name, self.updated_name)
 
+    def test_update_name_change_with_first_and_last_name(self):
+        """
+        Test that if a user already has a name change request, creating another request will
+        update the current PendingNameChange object and the new first and last name in
+        profile meta will be updated
+        """
+        updated_first_name = 'Margaret'
+        updated_last_name = 'Hamilton'
+        do_name_change_request(self.user, self.new_name, self.rationale, 'John', 'Doe')
+        do_name_change_request(self.user, self.updated_name, self.rationale, updated_first_name, updated_last_name)
+        self.assertEqual(PendingNameChange.objects.count(), 1)
+
+        pending_name_change = PendingNameChange.objects.get(user=self.user)
+        self.assertEqual(pending_name_change.new_name, self.updated_name)
+
+        user_profile = UserProfile.objects.get(user=self.user)
+        meta = user_profile.get_meta()
+        self.assertEqual(meta['pending_first_name'], updated_first_name)
+        self.assertEqual(meta['pending_last_name'], updated_last_name)
+
     def test_confirm_name_change(self):
         """
         Test that confirming a name change request updates the user's profile name and deletes
@@ -511,6 +547,35 @@ class PendingNameChangeTests(SharedModuleStoreTestCase):
         user_profile = UserProfile.objects.get(user=self.user)
         self.assertEqual(user_profile.name, self.new_name)
         self.assertEqual(PendingNameChange.objects.count(), 0)
+
+    def test_confirm_name_change_with_first_and_last_name(self):
+        """
+        Test that confirming a name change request updates the user's profile name and deletes
+        the request. It also updates User's first and last name from user's profile meta and
+        deletes pending_first_name and pending_last_name form user's profile meta
+        """
+        new_first_name = 'John'
+        new_last_name = 'Doe'
+        pending_name_change = do_name_change_request(
+            self.user, self.new_name, self.rationale, new_first_name, new_last_name
+        )[0]
+        confirm_name_change(self.user, pending_name_change)
+
+        # Verify that the name is stored in user profile
+        user_profile = UserProfile.objects.get(user=self.user)
+        self.assertEqual(user_profile.name, self.new_name)
+        self.assertEqual(PendingNameChange.objects.count(), 0)
+
+        # Verify that the first and last name is stored in user object
+        self.assertEqual(user_profile.user.first_name, new_first_name)
+        self.assertEqual(user_profile.user.last_name, new_last_name)
+
+        # Verify that the pending_first_name and pending_last_name are removed from the user profile meta
+        meta = user_profile.get_meta()
+        pending_first_name = meta.get('pending_first_name', None)
+        pending_last_name = meta.get('pending_last_name', None)
+        self.assertEqual(pending_first_name, None)
+        self.assertEqual(pending_last_name, None)
 
     def test_delete_by_user_removes_pending_name_change(self):
         do_name_change_request(self.user, self.new_name, self.rationale)

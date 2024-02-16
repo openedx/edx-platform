@@ -183,8 +183,10 @@ def update_account_settings(requesting_user, update, username=None):
 def _validate_read_only_fields(user, data, field_errors):
     # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
     read_only_fields = set(data.keys()).intersection(
-        # Remove email since it is handled separately below when checking for changing_email.
-        (set(AccountUserSerializer.get_read_only_fields()) - {"email"}) |
+        # Remove email from read only fields since it is handled separately below when checking for changing_email.
+        # Remove first_name and last_name from read only fields because we are splitting full name into
+        # first and last name if required in REGISTRATION_EXTRA_FIELDS.
+        (set(AccountUserSerializer.get_read_only_fields()) - {"email", "first_name", "last_name"}) |
         set(AccountLegacyProfileSerializer.get_read_only_fields() or set()) |
         get_enterprise_readonly_account_fields(user)
     )
@@ -263,6 +265,13 @@ def _validate_name_change(user_profile, data, field_errors):
             "developer_message": f"Error thrown from validate_name: '{err.message}'",
             "user_message": err.message
         }
+        return None
+
+    # This addresses a bug where verification required message overrides the error message for name field.
+    # Consequently, the name field is considered valid and id verification process is started. And when the
+    # invalid name (e.g; length more than 255 characters) is passed to name_change request an exception
+    # is raised causing 500 Server error.
+    if any(field in field_errors for field in ["name", "first_name", "last_name"]):
         return None
 
     if _does_name_change_require_verification(user_profile, old_name, new_name):

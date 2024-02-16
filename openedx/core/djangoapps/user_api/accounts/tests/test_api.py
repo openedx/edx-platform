@@ -16,6 +16,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
 from social_django.models import UserSocialAuth
@@ -365,6 +366,22 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert 'Valid e-mail address required.' in field_errors['email']['developer_message']
         assert 'Full Name cannot contain the following characters: < >' in field_errors['name']['user_message']
 
+    @override_settings(
+        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
+        REGISTRATION_EXTRA_FIELDS={"first_name": "required", "last_name": "required"}
+    )
+    def test_first_and_last_name_update_if_required_in_registration(self):
+        """Test that first and last name can be updated if required in registration"""
+        update = {
+            "first_name": "John",
+            "last_name": "Doe",
+        }
+
+        update_account_settings(self.user, update)
+        account_settings = get_account_settings(self.default_request)[0]
+        assert update["first_name"] == account_settings['first_name']
+        assert update["last_name"] == account_settings['last_name']
+
     def test_validate_name_change_same_name(self):
         """
         Test that saving the user's profile name without changing it should not raise an error.
@@ -640,6 +657,9 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'course_certificates': None,
             'phone_number': None,
             'pending_name_change': None,
+            'are_first_and_last_name_required_in_registration': None,
+            'first_name': None,
+            'last_name': None
         }
 
     def test_normalize_password(self):

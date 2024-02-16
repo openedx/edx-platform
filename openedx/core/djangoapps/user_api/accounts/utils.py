@@ -18,6 +18,7 @@ from social_django.models import UserSocialAuth
 
 from common.djangoapps.student.models import AccountRecovery, Registration, get_retired_email_by_email
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -258,3 +259,18 @@ def handle_retirement_cancellation(retirement, email_address=None):
     retirement.user.save()
 
     retirement.delete()
+
+
+def are_first_and_last_name_required_in_registration():
+    """
+    Returns True if the first_name and last_name fields are required in the
+    REGISTRATION_EXTRA_FIELDS setting otherwise false.
+    """
+    registration_extra_fields = configuration_helpers.get_value(
+        'REGISTRATION_EXTRA_FIELDS',
+        getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+    )
+    return (
+        registration_extra_fields.get('first_name', None) == 'required'
+        and registration_extra_fields.get('last_name', None) == 'required'
+    )

@@ -4195,6 +4195,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
         "id",
+        "first_name",
+        "last_name",
         "verified_name",
         "extended_profile",
         "gender",
@@ -4210,6 +4212,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "phone_number",
         "activation_key",
         "pending_name_change",
+        "are_first_and_last_name_required_in_registration",
     ]
 )
 
