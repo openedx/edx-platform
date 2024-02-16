@@ -636,7 +636,7 @@ class LibraryBlockOlxView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        xml_str = xblock_api.get_library_block_olx(key)
+        xml_str = xblock_api.get_block_draft_olx(key)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
     @convert_exceptions

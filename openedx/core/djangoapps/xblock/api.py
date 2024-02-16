@@ -192,9 +192,9 @@ def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
     )
 
 
-def get_library_block_olx(usage_key: LibraryUsageLocatorV2):
+def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
     """
-    Get the OLX source of the given XBlock.
+    Get the OLX source of the draft version of the given Learning-Core-backed XBlock.
     """
     # Inefficient but simple approach. Optimize later if needed.
     component = get_component_from_usage_key(usage_key)
