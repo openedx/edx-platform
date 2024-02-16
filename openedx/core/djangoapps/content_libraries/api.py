@@ -685,8 +685,8 @@ def set_library_block_olx(usage_key, new_olx_str):
     node = etree.fromstring(new_olx_str)
     if node.tag != usage_key.block_type:
         raise ValueError(
-            f"Tried to set the OLX of a {usage_key.block_type} block to a <{node.tag}> node. "
-            f"{usage_key='!s'}, {new_olx_str=}"
+            f"Tried to set the OLX of a {usage_key.block_type} block to a <node.tag> node. "
+            f"{usage_key=!s}, {new_olx_str=}"
         )
 
     # We're intentionally NOT checking if the XBlock type is installed, since

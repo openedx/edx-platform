@@ -132,7 +132,7 @@ def get_block_metadata(block, includes=()):
     data = {
         "block_id": str(block.scope_ids.usage_id),
         "block_type": block.scope_ids.block_type,
-        "display_name": block.display_name,
+        "display_name": get_block_display_name(block),
     }
 
     if "index_dictionary" in includes:
@@ -170,6 +170,17 @@ def xblock_type_display_name(block_type):
         return _(block_class.display_name.default)  # pylint: disable=translation-of-non-string
     else:
         return block_type  # Just use the block type as the name
+
+
+def get_block_display_name(block: XBlock) -> str:
+    """
+    Get the display name from an instatiated XBlock, falling back to the XBlock-type-defined-default.
+    """
+    display_name = getattr(block, "display_name", None)
+    if display_name is not None:
+        return display_name
+    else:
+        return xblock_type_display_name(xblock.block_type)
 
 
 def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
