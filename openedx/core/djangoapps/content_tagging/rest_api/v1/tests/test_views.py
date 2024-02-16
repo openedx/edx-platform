@@ -4,11 +4,12 @@ Tests tagging rest api views
 
 from __future__ import annotations
 
-from urllib.parse import parse_qs, urlparse
-import json
-from unittest.mock import MagicMock
-
 import abc
+import json
+from io import BytesIO
+from unittest.mock import MagicMock
+from urllib.parse import parse_qs, urlparse
+
 import ddt
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -27,17 +28,16 @@ from common.djangoapps.student.roles import (
     OrgContentCreatorRole,
     OrgInstructorRole,
     OrgLibraryUserRole,
-    OrgStaffRole,
+    OrgStaffRole
 )
-from openedx.core.djangoapps.content_libraries.api import (
-    AccessLevel,
-    create_library,
-    set_library_user_permissions,
-)
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
+
+from .test_objecttag_export_helpers import TaggedCourseMixin
 
 User = get_user_model()
 
@@ -45,6 +45,7 @@ TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 TAXONOMY_ORG_UPDATE_ORG_URL = "/api/content_tagging/v1/taxonomies/{pk}/orgs/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+OBJECT_TAGS_EXPORT_URL = "/api/content_tagging/v1/object_tags/{object_id}/export/"
 OBJECT_TAGS_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 TAXONOMY_CREATE_IMPORT_URL = "/api/content_tagging/v1/taxonomies/import/"
@@ -1784,6 +1785,77 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
 @skip_unless_cms
 @ddt.ddt
+class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # type: ignore[misc]
+    """
+    Tests exporting course children with tags
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.staff = UserFactory.create(
+            username="staff",
+            email="staff@example.com",
+            is_staff=True,
+        )
+
+        self.staffA = UserFactory.create(
+            username="staffA",
+            email="userA@example.com",
+        )
+        update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
+
+    @ddt.data(
+        "staff",
+        "staffA",
+    )
+    def test_export_course(self, user_attr) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == 'text/csv'
+
+        expected_csv = (
+            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
+            '"  test sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@test_'
+            'sequential","Tag 1.1, Tag 1.2","Tag 2.1"\r\n'
+            '"    test vertical1","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
+            'vertical1","","Tag 2.2"\r\n'
+            '"    test vertical2","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
+            'vertical2","",""\r\n'
+            '"      test html","html","block-v1:orgA+test_course+test_run+type@html+block@test_html","","Tag 2.1"\r\n'
+            '"  untagged sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@untagged_'
+            'sequential","",""\r\n'
+            '"    untagged vertical","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@untagged_'
+            'vertical","",""\r\n'
+        )
+
+        zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
+        assert zip_content == expected_csv.encode()
+
+    def test_export_course_anoymous_forbidden(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_export_course_user_forbidden(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_export_course_invalid_id(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id="invalid")
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@skip_unless_cms
+@ddt.ddt
 class TestDownloadTemplateView(APITestCase):
     """
     Tests the taxonomy template downloads.
@@ -1793,7 +1865,7 @@ class TestDownloadTemplateView(APITestCase):
         ("template.json", "application/json"),
     )
     @ddt.unpack
-    def test_download(self, filename, content_type):
+    def test_download(self, filename, content_type) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename=filename)
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -1801,12 +1873,12 @@ class TestDownloadTemplateView(APITestCase):
         assert response.headers['Content-Disposition'] == f'attachment; filename="{filename}"'
         assert int(response.headers['Content-Length']) > 0
 
-    def test_download_not_found(self):
+    def test_download_not_found(self) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
         response = self.client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_download_method_not_allowed(self):
+    def test_download_method_not_allowed(self) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
         response = self.client.post(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
