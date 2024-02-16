@@ -680,10 +680,15 @@ def set_library_block_olx(usage_key, new_olx_str):
     assert isinstance(usage_key, LibraryUsageLocatorV2)
 
     # Make sure the block exists:
-    _block_metadata = get_library_block(usage_key)
+#    _block_metadata = get_library_block(usage_key)
 
-    # Verify that the OLX parses, at least as generic XML:
+    # Verify that the OLX parses, at least as generic XML, and the root tag is correctd:
     node = etree.fromstring(new_olx_str)
+    if node.tag != usage_key.block_type:
+        raise ValueError(
+            f"Tried to set the OLX of a {usage_key.block_type} block to a <{node.tag}> node. "
+            f"{usage_key='!s'}, {new_olx_str=}"
+        )
 
     # We're intentionally NOT checking if the XBlock type is installed, since
     # this is one of the only tools you can reach for to edit content for an
