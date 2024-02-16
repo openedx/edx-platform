@@ -245,7 +245,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         # Add a 'problem' XBlock to the library:
         block_data = self._add_block_to_library(lib_id, "problem", "problem1")
         self.assertDictContainsEntries(block_data, {
-            "id": "lb:CL-TEST:testlib1:problem:problem1",
+            "id": "lb:CL-TعST:testlꜟط:problem:ࠒröblæm1",  # Non-ascii slugs to test unicode robustness.
             "display_name": "Blank Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
