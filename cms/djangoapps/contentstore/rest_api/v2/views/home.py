@@ -12,6 +12,32 @@ from cms.djangoapps.contentstore.utils import get_course_context_v2
 from cms.djangoapps.contentstore.rest_api.v2.serializers import CourseHomeTabSerializerV2
 
 
+class HomePageCoursesPaginator(PageNumberPagination):
+
+    def get_paginated_response(self, data):
+        """Return a paginated style `Response` object for the given output data."""
+        return Response(OrderedDict([
+            ('count', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data),
+        ]))
+
+    def paginate_queryset(self, queryset, request, view=None):
+        """
+        Paginate a queryset if required, either returning a page object,
+        or `None` if pagination is not configured for this view.
+
+        This method is a modified version of the original `paginate_queryset` method
+        from the `PageNumberPagination` class. The original method was modified to
+        handle the case where the `queryset` is a `filter` object.
+        """
+        if isinstance(queryset, filter):
+            queryset = list(queryset)
+
+        return super().paginate_queryset(queryset, request, view)
+
+
 @view_auth_classes(is_authenticated=True)
 class HomePageCoursesViewV2(APIView):
     """View for getting all courses available to the logged in user."""
@@ -97,18 +123,15 @@ class HomePageCoursesViewV2(APIView):
         }
         ```
         """
-
         courses, in_process_course_actions = get_course_context_v2(request)
-        paginator = PageNumberPagination()
-        courses_page = paginator.paginate_queryset(courses, self.request, view=self)
+        paginator = HomePageCoursesPaginator()
+        courses_page = paginator.paginate_queryset(
+            courses,
+            self.request,
+            view=self
+        )
         serializer = CourseHomeTabSerializerV2({
             'courses': courses_page,
             'in_process_course_actions': in_process_course_actions,
         })
-        return Response(OrderedDict([
-            ('count', paginator.page.paginator.count),
-            ('num_pages', paginator.page.paginator.num_pages),
-            ('next', paginator.get_next_link()),
-            ('previous', paginator.get_previous_link()),
-            ('results', serializer.data),
-        ]))
+        return paginator.get_paginated_response(serializer.data)
