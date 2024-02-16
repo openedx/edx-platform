@@ -87,7 +87,6 @@ from openedx_events.content_authoring.signals import (
 )
 from openedx_learning.core.publishing import api as publishing_api
 from openedx_learning.core.contents import api as contents_api
-from openedx_learning.core.contents.models import MediaType
 from openedx_learning.core.components import api as components_api
 from openedx_learning.core.components.models import Component
 from openedx_tagging.core.tagging import api as tagging_api
@@ -797,7 +796,7 @@ def component_already_exists(usage_key: UsageKeyV2) -> bool:
     return True
 
 
-def get_or_create_olx_media_type(block_type: str) -> MediaType:
+def get_or_create_olx_media_type(block_type: str) -> contents_api.MediaType:
     """
     Get or create a MediaType for the block type.
 
