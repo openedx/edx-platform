@@ -119,6 +119,10 @@
     ],
     "%s ago": "seit %s ",
     "%s from now": "%s von jetzt",
+    "%s selected option not visible": [
+      "%s ausgew\u00e4hlte Option nicht sichtbar",
+      "%s ausgew\u00e4hlte Optionen nicht sichtbar"
+    ],
     "(Add signatories for a certificate)": "(F\u00fcge Unterzeichner f\u00fcr ein Zertifikat hinzu)",
     "(Caption will be displayed when you start playing the video.)": "(Beschriftung wird angezeigt, sobald das Video gestartet wird.)",
     "(Community TA)": "(Gemeinschaftslehrkraft)",
@@ -1936,6 +1940,7 @@
     "Type": "Typ",
     "Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')": "Geben Sie eine URL ein oder verwenden Sie die Schaltfl\u00e4che \"Datei ausw\u00e4hlen\", um eine Datei von Ihrem Computer hochzuladen. (e.g. 'http://example.com/img/clouds.jpg')",
     "Type into this box to filter down the list of available %s.": "Durch Eingabe in diesem Feld l\u00e4sst sich die Liste der verf\u00fcgbaren %s eingrenzen.",
+    "Type into this box to filter down the list of selected %s.": "In diesem Feld tippen, um die Liste der ausgew\u00e4hlten %s einzuschr\u00e4nken.",
     "URL": "URL",
     "Unable to delete account": "Es ist nicht m\u00f6glich den Account zu l\u00f6schen.",
     "Unable to determine whether we should give you a refund because of System Error. Please try again later.": "Es konnte nicht festgestellt werden, ob wir Ihnen eine R\u00fcckerstattung wegen eines Systemfehlers gew\u00e4hren sollen. Bitte versuchen Sie es sp\u00e4ter noch einmal.",
@@ -2279,6 +2284,18 @@
     "[no tags]": "[no tags]",
     "a day": "ein Tag",
     "a timed exam": "eine terminierte Pr\u00fcfung",
+    "abbrev. month April\u0004Apr": "Apr",
+    "abbrev. month August\u0004Aug": "Aug",
+    "abbrev. month December\u0004Dec": "Dez",
+    "abbrev. month February\u0004Feb": "Feb",
+    "abbrev. month January\u0004Jan": "Jan",
+    "abbrev. month July\u0004Jul": "Jul",
+    "abbrev. month June\u0004Jun": "Jun",
+    "abbrev. month March\u0004Mar": "Mrz",
+    "abbrev. month May\u0004May": "Mai",
+    "abbrev. month November\u0004Nov": "Nov",
+    "abbrev. month October\u0004Oct": "Okt",
+    "abbrev. month September\u0004Sep": "Sep",
     "about %d hour": [
       "\u00dcber %d Stunde",
       "\u00dcber %d Stunden"

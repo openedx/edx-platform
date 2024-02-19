@@ -50,6 +50,12 @@
       "Wybrano %(sel)s z %(cnt)s"
     ],
     "%(type)s Component Template Menu": "%(type)s menu szablon\u00f3w elementu",
+    "%s selected option not visible": [
+      "%s wybrana opcja jest ukryta",
+      "%s wybrane opcje s\u0105 ukryte",
+      "%s wybranych opcji jest ukrytych",
+      "%s wybranych opcji jest ukrytych"
+    ],
     "(Add signatories for a certificate)": "(Dodaj sygnatariuszy certyfikatu)",
     "(Required Field)": "(Pole wymagane)",
     "(Self-paced) Ended {end}": "(we w\u0142asnym tempie) Zako\u0144czy\u0142 si\u0119 {end}",
@@ -1351,6 +1357,7 @@
     "Type": "Typ",
     "Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')": "Wklej adres URL lub u\u017cyj przycisku \"Wybierz plik\", aby przes\u0142a\u0107 plik ze swojego komputera. (np. 'http://example.com/img/clouds.jpg')",
     "Type into this box to filter down the list of available %s.": "Wpisz co\u015b tutaj, aby wyfiltrowa\u0107 list\u0119 dost\u0119pnych %s.",
+    "Type into this box to filter down the list of selected %s.": "Wpisz co\u015b tutaj, aby wyfiltrowa\u0107 list\u0119 wybranych %s.",
     "URL": "URL",
     "Unable to determine whether we should give you a refund because of System Error. Please try again later.": "Z powodu b\u0142\u0119du systemu nie uda\u0142o si\u0119 okre\u015bli\u0107 zasadno\u015bci przyznania zwrotu. Prosz\u0119 spr\u00f3bowa\u0107 ponownie p\u00f3\u017aniej.",
     "Unable to load": "Nie uda\u0142o si\u0119 wczyta\u0107",

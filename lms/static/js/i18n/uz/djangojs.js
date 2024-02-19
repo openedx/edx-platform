@@ -41,7 +41,7 @@
     "December": "Dekabr",
     "February": "Fevral",
     "Filter": "Filtrlash",
-    "Hide": "Yashirish",
+    "Hide": "Bekitish",
     "January": "Yanvar",
     "July": "Iyul",
     "June": "Iyun",
@@ -68,16 +68,14 @@
     "Tomorrow": "Ertaga",
     "Type into this box to filter down the list of available %s.": "Mavjud bo'lgan %s larni ro'yxatini filtrlash uchun ushbu maydonchaga kiriting.",
     "Yesterday": "Kecha",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Siz harakatni tanladingiz va alohida maydonlarda hech qanday o'zgartirishlar kiritmadingiz. Ehtimol siz Saqlash tugmasini emas, balki O'tish tugmasini qidirmoqdasiz.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Siz harakatni tanladingiz, lekin hali ham o'zgartirishlaringizni alohida maydonlarga saqlamadingiz. Iltimos saqlash uchun OK ni bosing. Harakatni qayta ishga tushurishingiz kerak bo'ladi.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Siz alohida tahrirlash mumkin bo'lgan maydonlarda saqlanmagan o\u2018zgarishlaringiz mavjud. Agar siz harakatni ishga tushirsangiz, saqlanmagan o'zgarishlaringiz yo'qotiladi.",
-    "one letter Friday\u0004F": "F",
-    "one letter Monday\u0004M": "M",
-    "one letter Saturday\u0004S": "S",
-    "one letter Sunday\u0004S": "S",
-    "one letter Thursday\u0004T": "T",
-    "one letter Tuesday\u0004T": "T",
-    "one letter Wednesday\u0004W": "W"
+    "one letter Friday\u0004F": "Ju",
+    "one letter Monday\u0004M": "Du",
+    "one letter Saturday\u0004S": "Sh",
+    "one letter Sunday\u0004S": "Ya",
+    "one letter Thursday\u0004T": "Pa",
+    "one letter Tuesday\u0004T": "Se",
+    "one letter Wednesday\u0004W": "Ch"
   };
   for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];

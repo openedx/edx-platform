@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n != 1);
+    const v = n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -23,6 +23,7 @@
   const newcatalog = {
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s seleccionado",
+      "%(sel)s de  %(cnt)s seleccionados",
       "%(sel)s de  %(cnt)s seleccionados"
     ],
     "6 a.m.": "6 a.m.",
@@ -52,10 +53,12 @@
     "Noon": "Mediod\u00eda",
     "Note: You are %s hour ahead of server time.": [
       "Nota: Usted esta a %s horas por delante de la hora del servidor.",
+      "Nota: Usted va %s horas por delante de la hora del servidor.",
       "Nota: Usted va %s horas por delante de la hora del servidor."
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: Usted esta a %s hora de retraso de tiempo de servidor.",
+      "Nota: Usted va %s horas por detr\u00e1s de la hora del servidor.",
       "Nota: Usted va %s horas por detr\u00e1s de la hora del servidor."
     ],
     "November": "Noviembre",
@@ -70,6 +73,7 @@
     "Today": "Hoy",
     "Tomorrow": "Ma\u00f1ana",
     "Type into this box to filter down the list of available %s.": "Escriba en este cuadro para filtrar la lista de %s disponibles",
+    "Type into this box to filter down the list of selected %s.": "Escriba en este cuadro para filtrar la lista de %s seleccionados.",
     "Yesterday": "Ayer",
     "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Ha seleccionado una acci\u00f3n y no ha realizado ning\u00fan cambio en campos individuales. Probablemente est\u00e9 buscando el bot\u00f3n 'Ir' en lugar del bot\u00f3n 'Guardar'.",
     "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Ha seleccionado una acci\u00f3n, pero a\u00fan no ha guardado los cambios en los campos individuales. Haga clic en Aceptar para guardar. Deber\u00e1 volver a ejecutar la acci\u00f3n.",
@@ -173,7 +177,7 @@
     "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d/m/Y H:i",
     "SHORT_DATE_FORMAT": "d/m/Y",
-    "THOUSAND_SEPARATOR": ".",
+    "THOUSAND_SEPARATOR": "\u00a0",
     "TIME_FORMAT": "H:i",
     "TIME_INPUT_FORMATS": [
       "%H:%M:%S",

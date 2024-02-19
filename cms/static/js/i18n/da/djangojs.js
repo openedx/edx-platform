@@ -25,6 +25,10 @@
       "%(sel)s af %(cnt)s valgt",
       "%(sel)s af %(cnt)s valgt"
     ],
+    "%s selected option not visible": [
+      "%s valgt mulighed ikke vist",
+      "%s valgte muligheder ikke vist"
+    ],
     "6 a.m.": "Klokken 6",
     "6 p.m.": "Klokken 18",
     "April": "April",
@@ -70,6 +74,7 @@
     "Today": "I dag",
     "Tomorrow": "I morgen",
     "Type into this box to filter down the list of available %s.": "Skriv i dette felt for at filtrere listen af tilg\u00e6ngelige %s.",
+    "Type into this box to filter down the list of selected %s.": "Skriv i dette felt for at filtrere listen af valgte %s.",
     "Yesterday": "I g\u00e5r",
     "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Du har valgt en handling, og du har ikke udf\u00f8rt nogen \u00e6ndringer p\u00e5 felter. Du s\u00f8ger formentlig Udf\u00f8r-knappen i stedet for Gem-knappen.",
     "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Du har valgt en handling, men du har ikke gemt dine \u00e6ndringer til et eller flere felter. Klik venligst OK for at gemme og v\u00e6lg dern\u00e6st handlingen igen.",

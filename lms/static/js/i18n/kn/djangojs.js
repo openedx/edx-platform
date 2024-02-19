@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = 0;
+    const v = (n > 1);
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {

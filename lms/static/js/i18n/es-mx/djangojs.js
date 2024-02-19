@@ -70,6 +70,7 @@
     "Today": "Hoy",
     "Tomorrow": "Ma\u00f1ana",
     "Type into this box to filter down the list of available %s.": "Escriba en esta casilla para filtrar la lista de %s disponibles.",
+    "Type into this box to filter down the list of selected %s.": "Escriba en este cuadro para filtrar la lista de %s seleccionados.",
     "Yesterday": "Ayer",
     "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Ha seleccionado una acci\u00f3n pero no ha realizado ninguna modificaci\u00f3n en campos individuales. Es probable que lo que necesite usar en realidad sea el bot\u00f3n Ejecutar y no el bot\u00f3n Guardar.",
     "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Ha seleccionado una acci\u00f3n y no ha realizado ning\u00fan cambio en campos individuales. Probablemente est\u00e9 buscando el bot\u00f3n 'Ir' en lugar del bot\u00f3n 'Guardar'.",

@@ -25,6 +25,10 @@
       "U p\u00ebrzgjodh %(sel)s nga %(cnt)s",
       "U p\u00ebrzgjodh\u00ebn %(sel)s nga %(cnt)s"
     ],
+    "%s selected option not visible": [
+      "%s mund\u00ebsi e p\u00ebrzgjedhur jo e dukshme",
+      "%s mund\u00ebsi t\u00eb p\u00ebrzgjedhura jo t\u00eb dukshme"
+    ],
     "6 a.m.": "6 a.m.",
     "6 p.m.": "6 p.m.",
     "April": "Prill",
@@ -73,6 +77,7 @@
     "Today": "Sot",
     "Tomorrow": "Nes\u00ebr",
     "Type into this box to filter down the list of available %s.": "Shkruani brenda kutiz\u00ebs q\u00eb t\u00eb filtrohet lista e %s t\u00eb passhme.",
+    "Type into this box to filter down the list of selected %s.": "Shtypni n\u00eb k\u00ebt\u00eb kuadrat, q\u00eb t\u00eb filtroni list\u00ebn e %s t\u00eb p\u00ebrzgjedhur.",
     "Unnamed Option": "Opsion i pa em\u00ebrtuar",
     "Warning": "Paralajm\u00ebrim",
     "Yesterday": "Dje",

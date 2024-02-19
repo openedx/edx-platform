@@ -123,7 +123,15 @@
     "DATE_INPUT_FORMATS": [
       "%Y-%m-%d",
       "%m/%d/%Y",
-      "%m/%d/%y"
+      "%m/%d/%y",
+      "%b %d %Y",
+      "%b %d, %Y",
+      "%d %b %Y",
+      "%d %b, %Y",
+      "%B %d %Y",
+      "%B %d, %Y",
+      "%d %B %Y",
+      "%d %B, %Y"
     ],
     "DECIMAL_SEPARATOR": ".",
     "FIRST_DAY_OF_WEEK": 0,

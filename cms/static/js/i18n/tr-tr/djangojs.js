@@ -139,6 +139,10 @@
     ],
     "%s ago": "%s \u00f6nce",
     "%s from now": "\u015eimdiden itibaren %s",
+    "%s selected option not visible": [
+      "%s se\u00e7ilen se\u00e7enek g\u00f6r\u00fcn\u00fcr de\u011fil",
+      "%s se\u00e7ilen se\u00e7enek g\u00f6r\u00fcn\u00fcr de\u011fil"
+    ],
     "(Add signatories for a certificate)": "(Sertifika i\u00e7in imza sahipleri ekle)",
     "(Caption will be displayed when you start playing the video.)": "(Altyaz\u0131 videoyu oynatmaya ba\u015flad\u0131\u011f\u0131n\u0131zda g\u00f6sterilecek.)",
     "(Community TA)": "(Topluluk Asistan\u0131)",
@@ -2014,6 +2018,7 @@
     "Type": "Tip",
     "Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')": "URL girerek ya da \"Dosya Se\u00e7\" d\u00fc\u011fmesine t\u0131klayarak bilgisayar\u0131n\u0131zdan bir dosya y\u00fckleyebilirsiniz. (\u00d6rn. 'http://example.com/img/clouds.jpg')",
     "Type into this box to filter down the list of available %s.": "Mevcut %s listesini s\u00fczmek i\u00e7in bu kutu i\u00e7ine yaz\u0131n.",
+    "Type into this box to filter down the list of selected %s.": "Se\u00e7ilen %s listesini s\u00fczmek i\u00e7in bu kutu i\u00e7ine yaz\u0131n.",
     "URL": "URL",
     "Unable to delete account": "Hesap silinemedi",
     "Unable to determine whether we should give you a refund because of System Error. Please try again later.": "\u015eu anda Sistem Hatas\u0131ndan dolay\u0131 geri \u00f6deme verip veremeyece\u011fimizi saptayam\u0131yoruz. L\u00fctfen daha sonra tekrar deneyiniz.",

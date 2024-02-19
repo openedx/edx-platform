@@ -38,6 +38,9 @@
       "%(cnt)s\u500b\u4e2d%(sel)s\u500b\u9078\u629e"
     ],
     "%(type)s Component Template Menu": "%(type)s \u30b3\u30f3\u30dd\u30fc\u30cd\u30f3\u30c8\u30c6\u30f3\u30d7\u30ec\u30fc\u30c8\u30e1\u30cb\u30e5\u30fc",
+    "%s selected option not visible": [
+      "\u9078\u629e\u3055\u308c\u305f%s\u4ef6\u306e\u30aa\u30d7\u30b7\u30e7\u30f3\u306f\u975e\u8868\u793a\u3067\u3059\u3002"
+    ],
     "(Add signatories for a certificate)": "(\u4fee\u4e86\u8a3c\u306e\u7f72\u540d\u3092\u8ffd\u52a0\u3059\u308b)",
     "(Required Field)": "(\u5fc5\u9808\u9805\u76ee)",
     "(contains %(student_count)s student)": [
@@ -1194,6 +1197,7 @@
     "Type": "\u30bf\u30a4\u30d7",
     "Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')": "URL\u3092\u5165\u529b\u3059\u308b\u304b\u3001\"\u30d5\u30a1\u30a4\u30eb\u3092\u9078\u3076\"\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30d5\u30a1\u30a4\u30eb\u3092\u30a2\u30c3\u30d7\u30ed\u30fc\u30c9\u3057\u3066\u304f\u3060\u3055\u3044\u3002(\u4f8b. 'http://example.com/img/clouds.jpg')",
     "Type into this box to filter down the list of available %s.": "\u4f7f\u7528\u53ef\u80fd\u306a %s \u306e\u30ea\u30b9\u30c8\u3092\u7d5e\u308a\u8fbc\u3080\u306b\u306f\u3001\u3053\u306e\u30dc\u30c3\u30af\u30b9\u306b\u5165\u529b\u3057\u307e\u3059\u3002",
+    "Type into this box to filter down the list of selected %s.": "\u9078\u629e\u3055\u308c\u305f%s\u306e\u30ea\u30b9\u30c8\u3092\u7d5e\u308a\u8fbc\u3080\u306b\u306f\u3001\u3053\u306e\u30dc\u30c3\u30af\u30b9\u306b\u5165\u529b\u3057\u307e\u3059\u3002",
     "URL": "URL",
     "Unable to determine whether we should give you a refund because of System Error. Please try again later.": "\u30b7\u30b9\u30c6\u30e0\u30a8\u30e9\u30fc\u306e\u305f\u3081\u6255\u3044\u623b\u3057\u304c\u3067\u304d\u308b\u304b\u3069\u3046\u304b\u6c7a\u5b9a\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u5f8c\u307b\u3069\u518d\u64cd\u4f5c\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
     "Unable to load": "\u8aad\u307f\u8fbc\u3081\u307e\u305b\u3093",
@@ -1422,6 +1426,18 @@
     "Zoom In": "\u30ba\u30fc\u30e0\u30a4\u30f3",
     "Zoom Out": "\u30ba\u30fc\u30e0\u30a2\u30a6\u30c8",
     "[no tags]": "[\u30bf\u30b0\u306a\u3057]",
+    "abbrev. month April\u0004Apr": "4\u6708",
+    "abbrev. month August\u0004Aug": "8\u6708",
+    "abbrev. month December\u0004Dec": "12\u6708",
+    "abbrev. month February\u0004Feb": "2\u6708",
+    "abbrev. month January\u0004Jan": "1\u6708",
+    "abbrev. month July\u0004Jul": "7\u6708",
+    "abbrev. month June\u0004Jun": "6\u6708",
+    "abbrev. month March\u0004Mar": "3\u6708",
+    "abbrev. month May\u0004May": "5\u6708",
+    "abbrev. month November\u0004Nov": "11\u6708",
+    "abbrev. month October\u0004Oct": "10\u6708",
+    "abbrev. month September\u0004Sep": "9\u6708",
     "and others": "\u3068\u305d\u306e\u4ed6",
     "anonymous": "\u533f\u540d",
     "bytes": "\u30d0\u30a4\u30c8",

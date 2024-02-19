@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n != 1);
+    const v = n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -139,6 +139,7 @@
     " to complete and submit the exam.": "para completar y enviar el examen.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s seleccionado",
+      "%(sel)s de  %(cnt)s seleccionados",
       "%(sel)s de  %(cnt)s seleccionados"
     ],
     "(required):": "(obligatorio):",
@@ -250,10 +251,12 @@
     "Not Selected": "No seleccionado",
     "Note: You are %s hour ahead of server time.": [
       "Nota: Usted esta a %s horas por delante de la hora del servidor.",
+      "Nota: Usted va %s horas por delante de la hora del servidor.",
       "Nota: Usted va %s horas por delante de la hora del servidor."
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: Usted esta a %s hora de retraso de tiempo de servidor.",
+      "Nota: Usted va %s horas por detr\u00e1s de la hora del servidor.",
       "Nota: Usted va %s horas por detr\u00e1s de la hora del servidor."
     ],
     "November": "Noviembre",
@@ -352,6 +355,7 @@
     "Total Responses": "Respuestas totales",
     "Training": "Pr\u00e1ctica",
     "Type into this box to filter down the list of available %s.": "Escriba en este cuadro para filtrar la lista de %s disponibles",
+    "Type into this box to filter down the list of selected %s.": "Escriba en este cuadro para filtrar la lista de %s seleccionados.",
     "Unable to load": "No se ha podido cargar",
     "Unexpected server error.": "Error inesperado del servidor",
     "Ungraded Practice Exam": "Examen de pr\u00e1ctica no graduado",
@@ -496,7 +500,7 @@
     "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d/m/Y H:i",
     "SHORT_DATE_FORMAT": "d/m/Y",
-    "THOUSAND_SEPARATOR": ".",
+    "THOUSAND_SEPARATOR": "\u00a0",
     "TIME_FORMAT": "H:i",
     "TIME_INPUT_FORMATS": [
       "%H:%M:%S",
