@@ -65,10 +65,9 @@ pull_plugin_translations:  ## Pull translations from Transifex for edx_django_ut
 pull_xblock_translations:  ## pull xblock translations via atlas
 	rm -rf conf/plugins-locale/xblock.v1  # Clean up existing atlas translations
 	rm -rf lms/static/i18n/xblock.v1 cms/static/i18n/xblock.v1  # Clean up existing xblock compiled translations
-	mkdir -p conf/plugins-locale/xblock.v1/ lms/static/js/xblock.v1-i18n cms/static/js
 	python manage.py lms pull_xblock_translations --verbose $(ATLAS_OPTIONS)
 	python manage.py lms compile_xblock_translations
-	cp -r lms/static/js/xblock.v1-i18n cms/static/js
+	python manage.py cms compile_xblock_translations
 
 pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale
