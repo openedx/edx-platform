@@ -1583,6 +1583,9 @@ def get_course_context(request):
 def get_course_context_v2(request):
     """Get context of the homepage course tab from the Studio Home."""
 
+    # Importing here to avoid circular imports:
+    # ImportError: cannot import name 'reverse_course_url' from partially initialized module
+    # 'cms.djangoapps.contentstore.utils' (most likely due to a circular import)
     from cms.djangoapps.contentstore.views.course import (
         get_courses_accessible_to_user_v2,
         ENABLE_GLOBAL_STAFF_OPTIMIZATION,
