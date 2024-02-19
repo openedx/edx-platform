@@ -414,45 +414,20 @@ def _accessible_courses_summary_iter(request, org=None):
     if org is not None:
         courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
     else:
-        courses_summary = modulestore().get_course_summaries()
-    courses_summary = filter(course_filter, courses_summary)
-    in_process_course_actions = get_in_process_course_actions(request)
-    return courses_summary, in_process_course_actions
-
-
-def _accessible_courses_summary_iter_v2(request, org=None):
-    """
-    List all courses available to the logged in user by iterating through all the courses.
-
-    Args:
-        request: the request object
-        org (string): if not None, this value will limit the courses returned. An empty
-            string will result in no courses, and otherwise only courses with the
-            specified org will be returned. The default value is None.
-    """
-    def course_filter(course_summary):
-        """
-        Filter out inaccessible courses for the current logged in user.
-
-        Args:
-            course_summary (CourseOverview): the course overview object.
-        """
-        return has_studio_read_access(request.user, course_summary.id)
-
-    if org is not None:
-        courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
-    else:
         courses_summary = CourseOverview.get_all_courses()
 
     search_query = request.GET.get('search')
     order = request.GET.get('order')
     active_only = get_bool_param(request, 'active_only', None)
     archived_only = get_bool_param(request, 'archived_only', None)
+
     courses_summary = get_courses_by_status(active_only, archived_only, courses_summary)
     courses_summary = get_courses_by_search_query(search_query, courses_summary)
     courses_summary = get_courses_order_by(order, courses_summary)
     courses_summary = filter(course_filter, courses_summary)
+
     in_process_course_actions = get_in_process_course_actions(request)
+
     return courses_summary, in_process_course_actions
 
 
@@ -546,53 +521,15 @@ def _accessible_courses_list_from_groups(request):
     if course_keys:
         courses_list = CourseOverview.get_all_courses(filter_={'id__in': course_keys})
 
-    return courses_list, []
-
-
-def _accessible_courses_list_from_groups_v2(request):
-    """
-    List all courses available to the logged in user by reversing access group names.
-
-    Args:
-        request: the request object.
-    """
-    def filter_ccx(course_access):
-        """ CCXs cannot be edited in Studio and should not be shown in this dashboard """
-        return not isinstance(course_access.course_id, CCXLocator)
-
-    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
-    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
-    all_courses = filter(filter_ccx, instructor_courses | staff_courses)
-    courses_list = []
-    course_keys = {}
-
-    user_global_orgs = set()
-    for course_access in all_courses:
-        if course_access.course_id is not None:
-            course_keys[course_access.course_id] = course_access.course_id
-        elif course_access.org:
-            user_global_orgs.add(course_access.org)
-        else:
-            raise AccessListFallback
-
-    if user_global_orgs:
-        # Getting courses from user global orgs
-        overviews = CourseOverview.get_all_courses(orgs=list(user_global_orgs))
-        overviews_course_keys = {overview.id: overview.id for overview in overviews}
-        course_keys.update(overviews_course_keys)
-
-    course_keys = list(course_keys.values())
-
-    if course_keys:
-        courses_list = CourseOverview.get_all_courses(filter_={'id__in': course_keys})
-
     search_query = request.GET.get('search')
     order = request.GET.get('order')
     active_only = get_bool_param(request, 'active_only', None)
     archived_only = get_bool_param(request, 'archived_only', None)
+
     courses_list = get_courses_by_status(active_only, archived_only, courses_list)
     courses_list = get_courses_by_search_query(search_query, courses_list)
     courses_list = get_courses_order_by(order, courses_list)
+
     return courses_list, []
 
 
@@ -780,32 +717,6 @@ def get_courses_accessible_to_user(request, org=None):
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
             courses, in_process_course_actions = _accessible_courses_summary_iter(request)
-    return courses, in_process_course_actions
-
-
-@function_trace('get_courses_accessible_to_user')
-def get_courses_accessible_to_user_v2(request, org=None):
-    """
-    Try to get all courses by first reversing django groups and fallback to old method if it fails
-    Note: overhead of pymongo reads will increase if getting courses from django groups fails
-
-    Args:
-        request: the request object
-        org (string): for global staff users ONLY, this value will be used to limit
-            the courses returned. A value of None will have no effect (all courses
-            returned), an empty string will result in no courses, and otherwise only courses with the
-            specified org will be returned. The default value is None.
-    """
-    if GlobalStaff().has_user(request.user):
-        # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_summary_iter_v2(request, org)
-    else:
-        try:
-            courses, in_process_course_actions = _accessible_courses_list_from_groups_v2(request)
-        except AccessListFallback:
-            # user have some old groups or there was some error getting courses from django groups
-            # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_summary_iter_v2(request)
     return courses, in_process_course_actions
 
 
