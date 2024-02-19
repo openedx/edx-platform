@@ -10,7 +10,8 @@ from openedx.core.lib.api.serializers import CourseKeyField
 
 
 class UnsucceededCourseSerializerV2(serializers.Serializer):
-    """Serializer for unsucceeded course"""
+    """Serializer for unsucceeded course."""
+
     display_name = serializers.CharField()
     course_key = CourseKeyField()
     org = serializers.CharField()
@@ -52,7 +53,7 @@ class CourseCommonSerializerV2(serializers.Serializer):
         return reverse_course_url('course_handler', obj.id)
 
     def get_is_active(self, obj):
-        """Check if the course is active."""
+        """Get whether the course is active or not."""
         return not obj.has_ended()
 
 
@@ -60,4 +61,8 @@ class CourseHomeTabSerializerV2(serializers.Serializer):
     """Serializer for course home tab V2 with unsucceeded courses and in process course actions."""
 
     courses = CourseCommonSerializerV2(required=False, many=True)
-    in_process_course_actions = UnsucceededCourseSerializerV2(many=True, required=False, allow_null=True)
+    in_process_course_actions = UnsucceededCourseSerializerV2(
+        many=True,
+        required=False,
+        allow_null=True
+    )
