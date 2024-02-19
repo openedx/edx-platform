@@ -853,17 +853,17 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         XBLOCK_DUPLICATED.connect(event_receiver)
         usage_key = self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         event_receiver.assert_called()
-        self.assertDictContainsSubset(
-            {
-                "signal": XBLOCK_DUPLICATED,
-                "sender": None,
-                "xblock_info": DuplicatedXBlockData(
-                    usage_key=usage_key,
-                    block_type=usage_key.block_type,
-                    source_usage_key=self.vert_usage_key,
-                ),
-            },
-            event_receiver.call_args.kwargs,
+        duplicated_event = {
+            "signal": XBLOCK_DUPLICATED,
+            "sender": None,
+            "xblock_info": DuplicatedXBlockData(
+                usage_key=usage_key,
+                block_type=usage_key.block_type,
+                source_usage_key=self.vert_usage_key,
+            ),
+        }
+        self.assertTrue(
+            duplicated_event.items() <= event_receiver.call_args.kwargs.items()
         )
 
     def test_ordering(self):
