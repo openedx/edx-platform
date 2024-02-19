@@ -3,7 +3,9 @@ Views for course info API
 """
 
 import logging
+from typing import Optional, Union
 
+import django
 from django.contrib.auth import get_user_model
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -16,7 +18,7 @@ from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
-from lms.djangoapps.mobile_api.course_info.serializers import CourseInfoOverviewSerializer
+from lms.djangoapps.mobile_api.course_info.serializers import CourseInfoOverviewSerializer, CourseAccessSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
@@ -25,6 +27,8 @@ from ..decorators import mobile_course_access, mobile_view
 
 User = get_user_model()
 log = logging.getLogger(__name__)
+
+UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
 
 
 @mobile_view()
@@ -271,25 +275,46 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         * 404 if the course is not available or cannot be seen.
     """
 
-    def get_certificate(self, request, course_id):
+
+    def get_requested_user(self, user: UserType, username: Optional[str] = None) -> Union[UserType, None]:
         """
-        Returns the information about the user's certificate in the course.
+        Return a user for whom the course blocks are fetched.
+
+        Arguments:
+            user: current user from request.
+            username: string with username.
+        Returns: A user object or None.
+        """
+        if user.is_anonymous:
+            return None
+        if username:
+            if (user.username == username or user.is_staff or user.is_superuser):
+                try:
+                    return User.objects.get(username=username)
+                except User.DoesNotExist:
+                    log.warning('Provided username does not correspond to an existing user %s', username)
+            return None
+        return user
+
+    def get_certificate(self, request, user, course_id):
+        """
+        Return the information about the user's certificate in the course.
 
         Arguments:
             request (Request): The request object.
+            user (User): The user object.
             course_id (str): The identifier of the course.
         Returns:
             (dict): A dict containing information about location of the user's certificate
             or an empty dictionary, if there is no certificate.
         """
-        if request.user.is_authenticated:
-            certificate_info = certificate_downloadable_status(request.user, course_id)
-            if certificate_info['is_downloadable']:
-                return {
-                    'url': request.build_absolute_uri(
-                        certificate_info['download_url']
-                    ),
-                }
+        certificate_info = certificate_downloadable_status(user, course_id)
+        if certificate_info['is_downloadable']:
+            return {
+                'url': request.build_absolute_uri(
+                    certificate_info['download_url']
+                ),
+            }
         return {}
 
     def list(self, request, **kwargs):  # pylint: disable=W0221
@@ -307,10 +332,20 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             course_id = request.query_params.get('course_id', None)
             course_key = CourseKey.from_string(course_id)
             course_overview = CourseOverview.get_from_id(course_key)
+            requested_username = request.query_params.get('username', None)
+
             course_data = {
-                'id': course_id,
-                'certificate': self.get_certificate(request, course_key),
+                "id": course_id
             }
             course_data.update(CourseInfoOverviewSerializer(course_overview).data)
+            if requested_user := self.get_requested_user(request.user, requested_username):
+                course_data.update({
+                    'certificate': self.get_certificate(request, requested_user, course_key),
+                    'coursewareAccess': CourseAccessSerializer({
+                        "user": requested_user,
+                        "course": course_overview,
+                        "course_id": course_key
+                    }).data,
+                 })
             response.data.update(course_data)
         return response
