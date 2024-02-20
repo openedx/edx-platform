@@ -8,6 +8,7 @@ from string import capwords
 from django.conf import settings
 
 from lms.djangoapps.verify_student.services import IDVerificationService
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -29,6 +30,7 @@ def generate_activation_email_context(user, registration):
         'name': user.profile.name,
         'key': registration.activation_key,
         'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'marketing_url': marketing_link('ROOT'),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'contact_mailing_address': configuration_helpers.get_value(
             'contact_mailing_address',
