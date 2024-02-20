@@ -164,12 +164,12 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         self.library = library_api.create_library(
             collection.uuid,
             self.orgA,
-            f"lib_{self.block_sufix}",
+            f"lib_{self.block_suffix}",
             "Test Library",
         )
         self.expected_library_tagged_xblock = TaggedContent(
             display_name="Test Library",
-            block_id=f"lib:orgA:lib_{self.block_sufix}",
+            block_id=f"lib:orgA:lib_{self.block_suffix}",
             category="library",
             children=[],
             object_tags={
@@ -180,11 +180,11 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         library_api.create_library_block(
             self.library.key,
             "problem",
-            f"problem1_{self.block_sufix}",
+            f"problem1_{self.block_suffix}",
         )
         tagged_problem = TaggedContent(
             display_name="Blank Problem",
-            block_id=f"lb:orgA:lib_{self.block_sufix}:problem:problem1_{self.block_sufix}",
+            block_id=f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}",
             category="problem",
             children=[],
             object_tags={
@@ -195,11 +195,11 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         library_api.create_library_block(
             self.library.key,
             "problem",
-            f"problem2_{self.block_sufix}",
+            f"problem2_{self.block_suffix}",
         )
         untagged_problem = TaggedContent(
             display_name="Blank Problem",
-            block_id=f"lb:orgA:lib_{self.block_sufix}:problem:problem2_{self.block_sufix}",
+            block_id=f"lb:orgA:lib_{self.block_suffix}:problem:problem2_{self.block_suffix}",
             category="problem",
             children=[],
             object_tags={},
@@ -208,11 +208,11 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         library_api.create_library_block(
             self.library.key,
             "html",
-            f"html_{self.block_sufix}",
+            f"html_{self.block_suffix}",
         )
         tagged_library_html = TaggedContent(
             display_name="Text",
-            block_id=f"lb:orgA:lib_{self.block_sufix}:html:html_{self.block_sufix}",
+            block_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
             category="html",
             children=[],
             object_tags={
