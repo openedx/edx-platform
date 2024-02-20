@@ -226,16 +226,13 @@ class TeamsetConfig:
         """
         JSON-friendly dictionary containing cleaned data from this TeamsConfig.
         """
-        cleaned_data = {
+        return {
             'id': self.teamset_id,
             'name': self.name,
             'description': self.description,
             'max_team_size': self.max_team_size,
             'type': self.teamset_type.value,
         }
-        if CONTENT_GROUPS_FOR_TEAMS.is_enabled(self._data.get('course_id')):
-            cleaned_data['dynamic_user_partition_id'] = self.dynamic_user_partition_id
-        return cleaned_data
 
     @cached_property
     def teamset_id(self):
