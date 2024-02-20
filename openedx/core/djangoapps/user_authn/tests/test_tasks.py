@@ -42,6 +42,7 @@ class SendActivationEmailTestCase(TestCase):
         assert self.msg.context['routed_user'] == self.student.username
         assert self.msg.context['routed_user_email'] == self.student.email
         assert self.msg.context['routed_profile_name'] == ''
+        assert self.msg.context['registration_flow'] is True
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
     @mock.patch('openedx.core.djangoapps.user_authn.tasks.log')
