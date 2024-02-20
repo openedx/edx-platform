@@ -7,7 +7,6 @@ Views for Enhanced Staff Grader
 # NOTE: we intentionally add extra args using @require_params
 # pylint: disable=arguments-differ
 import logging
-from typing import Callable
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
@@ -47,8 +46,7 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
-    get_assessments_to,
-    get_assessments_from,
+    get_assessments,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
@@ -160,17 +158,18 @@ class AssessmentFeedbackView(StaffGraderBaseView, ViewSet):
 
     **Methods**
 
-    * (GET) api/ora_staff_grader/assessments/feedback/from
+    * (GET) `api/ora_staff_grader/assessments/feedback/from`
         List all assessments received by a user (according to
         their submissionUUID) in an ORA assignment.
 
-    * (GET) api/ora_staff_grader/assessments/feedback/to
+    * (GET) `api/ora_staff_grader/assessments/feedback/to`
         List all assessments given by a user (according to
         their submissionUUID) in an ORA assignment.
 
     **Query Params**:
-        - oraLocation (str): ORA location for XBlock handling
-        - submissionUUID (str): The ORA submission UUID
+
+    * `oraLocation` (str): ORA location for XBlock handling
+    * `submissionUUID` (str): The ORA submission UUID
 
     **Response**:
 
@@ -196,38 +195,43 @@ class AssessmentFeedbackView(StaffGraderBaseView, ViewSet):
         }
 
     **Errors**:
-        - MissingParamResponse (HTTP 400) for missing params
-        - BadOraLocationResponse (HTTP 400) for bad ORA location
-        - XBlockInternalError (HTTP 500) for an issue with ORA
-        - UnknownError (HTTP 500) for other errors
+
+    * `MissingParamResponse` (HTTP 400) for missing params
+    * `BadOraLocationResponse` (HTTP 400) for bad ORA location
+    * `XBlockInternalError` (HTTP 500) for an issue with ORA
+    * `UnknownError` (HTTP 500) for other errors
     """
-    @action(methods=['get'], detail=False, url_path='from')
+    @action(methods=["get"], detail=False, url_path="from")
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get_from(self, request: Request, ora_location: str, submission_uuid: str, *args, **kwargs):
-        return self._get_assessments(request, get_assessments_from, ora_location, submission_uuid)
+        return self._get_assessments(request, ora_location, "list_assessments_from", submission_uuid)
 
-    @action(methods=['get'], detail=False, url_path='to')
+    @action(methods=["get"], detail=False, url_path="to")
     @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
     def get_to(self, request: Request, ora_location: str, submission_uuid: str, *args, **kwargs):
-        return self._get_assessments(request, get_assessments_to, ora_location, submission_uuid)
+        return self._get_assessments(request, ora_location, "list_assessments_to", submission_uuid)
 
     def _get_assessments(
-        self, request: Request, getter_func: Callable, ora_location: str, submission_uuid: str
+        self, request: Request, ora_location: str, handler_name: str, submission_uuid: str
     ):
         """
-        Fetches assessment data using the provided assessment getter function.
+        Fetches assessment data using the given handler name.
 
         Args:
             request (Request): The Django request object.
-            getter_func (Callable): A function that retrieves assessments based on criteria.
             ora_location (str): The ORA location for XBlock handling.
+            handler_name (str): The name of the XBlock handler to use.
             submission_uuid (str): The ORA submission UUID.
 
         Returns:
             A Django response object containing serialized assessment data or an error response.
         """
         try:
-            assessments_data = {"assessments": getter_func(request, ora_location, submission_uuid)}
+            assessments_data = {
+                "assessments": get_assessments(
+                    request, ora_location, handler_name, submission_uuid
+                )
+            }
             response_data = AssessmentFeedbackSerializer(assessments_data).data
             return Response(response_data)
 
