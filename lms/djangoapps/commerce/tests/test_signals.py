@@ -309,7 +309,12 @@ class TestRefundSignal(ModuleStoreTestCase):
                 f'{ZENDESK_USER}/token:{ZENDESK_API_KEY}'.encode('utf8')).decode('utf8')
             )
         }
-        self.assertDictContainsSubset(expected, last_request.headers)
+
+        # `last_request.headers` is of type `http.client.HTTPMessage`. Convert
+        #  it to `dict` because newer style dict comparison only works when both
+        # objects support mapping (https://docs.python.org/3.8/glossary.html#term-mapping)
+        headers_dict = dict(last_request.headers.items())
+        self.assertTrue(expected.items() <= headers_dict.items())
 
         # Verify the content
         expected = {
