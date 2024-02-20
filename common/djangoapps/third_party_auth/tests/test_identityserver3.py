@@ -97,13 +97,13 @@ class IdentityServer3Test(testutil.TestCase):
         Test user details fields are mapped to default keys
         """
         provider_config = self.configure_identityServer3_provider(enabled=True)
-        self.assertDictContainsSubset(
-            {
-                "username": "Edx",
-                "email": "edxopenid@example.com",
-                "first_name": "Edx",
-                "last_name": "Openid",
-                "fullname": "Edx Openid"
-            },
-            provider_config.backend_class().get_user_details(self.response)
+        user_details = {
+            "username": "Edx",
+            "email": "edxopenid@example.com",
+            "first_name": "Edx",
+            "last_name": "Openid",
+            "fullname": "Edx Openid"
+        }
+        self.assertTrue(
+            user_details.items() <= provider_config.backend_class().get_user_details(self.response).items()
         )

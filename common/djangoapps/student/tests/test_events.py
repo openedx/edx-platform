@@ -271,30 +271,30 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": COURSE_ENROLLMENT_CREATED,
-                "sender": None,
-                "enrollment": CourseEnrollmentData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=self.user.username,
-                            email=self.user.email,
-                            name=self.user.profile.name,
-                        ),
-                        id=self.user.id,
-                        is_active=self.user.is_active,
+        enrollment_created_event = {
+            "signal": COURSE_ENROLLMENT_CREATED,
+            "sender": None,
+            "enrollment": CourseEnrollmentData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
+                        name=self.user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=self.course.id,
-                        display_name=self.course.display_name,
-                    ),
-                    mode=enrollment.mode,
-                    is_active=enrollment.is_active,
-                    creation_date=enrollment.created,
+                    id=self.user.id,
+                    is_active=self.user.is_active,
                 ),
-            },
-            event_receiver.call_args.kwargs
+                course=CourseData(
+                    course_key=self.course.id,
+                    display_name=self.course.display_name,
+                ),
+                mode=enrollment.mode,
+                is_active=enrollment.is_active,
+                creation_date=enrollment.created,
+            ),
+        }
+        self.assertTrue(
+            enrollment_created_event.items() <= event_receiver.call_args.kwargs.items()
         )
 
     def test_enrollment_changed_event_emitted(self):
@@ -314,30 +314,30 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         enrollment.update_enrollment(mode="verified")
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": COURSE_ENROLLMENT_CHANGED,
-                "sender": None,
-                "enrollment": CourseEnrollmentData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=self.user.username,
-                            email=self.user.email,
-                            name=self.user.profile.name,
-                        ),
-                        id=self.user.id,
-                        is_active=self.user.is_active,
+        enrollment_changed_event = {
+            "signal": COURSE_ENROLLMENT_CHANGED,
+            "sender": None,
+            "enrollment": CourseEnrollmentData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
+                        name=self.user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=self.course.id,
-                        display_name=self.course.display_name,
-                    ),
-                    mode=enrollment.mode,
-                    is_active=enrollment.is_active,
-                    creation_date=enrollment.created,
+                    id=self.user.id,
+                    is_active=self.user.is_active,
                 ),
-            },
-            event_receiver.call_args.kwargs
+                course=CourseData(
+                    course_key=self.course.id,
+                    display_name=self.course.display_name,
+                ),
+                mode=enrollment.mode,
+                is_active=enrollment.is_active,
+                creation_date=enrollment.created,
+            ),
+        }
+        self.assertTrue(
+            enrollment_changed_event.items() <= event_receiver.call_args.kwargs.items()
         )
 
     def test_unenrollment_completed_event_emitted(self):
@@ -357,30 +357,30 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
         CourseEnrollment.unenroll(self.user, self.course.id)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": COURSE_UNENROLLMENT_COMPLETED,
-                "sender": None,
-                "enrollment": CourseEnrollmentData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=self.user.username,
-                            email=self.user.email,
-                            name=self.user.profile.name,
-                        ),
-                        id=self.user.id,
-                        is_active=self.user.is_active,
+        unenrollment_completed_event = {
+            "signal": COURSE_UNENROLLMENT_COMPLETED,
+            "sender": None,
+            "enrollment": CourseEnrollmentData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
+                        name=self.user.profile.name,
                     ),
-                    course=CourseData(
-                        course_key=self.course.id,
-                        display_name=self.course.display_name,
-                    ),
-                    mode=enrollment.mode,
-                    is_active=False,
-                    creation_date=enrollment.created,
+                    id=self.user.id,
+                    is_active=self.user.is_active,
                 ),
-            },
-            event_receiver.call_args.kwargs
+                course=CourseData(
+                    course_key=self.course.id,
+                    display_name=self.course.display_name,
+                ),
+                mode=enrollment.mode,
+                is_active=False,
+                creation_date=enrollment.created,
+            ),
+        }
+        self.assertTrue(
+            unenrollment_completed_event.items() <= event_receiver.call_args.kwargs.items()
         )
 
 
@@ -430,25 +430,25 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
         role.add_users(self.user)
 
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": COURSE_ACCESS_ROLE_ADDED,
-                "sender": None,
-                "course_access_role_data": CourseAccessRoleData(
-                    user=UserData(
-                        pii=UserPersonalData(
-                            username=self.user.username,
-                            email=self.user.email,
-                        ),
-                        id=self.user.id,
-                        is_active=self.user.is_active,
+        access_role_created_event = {
+            "signal": COURSE_ACCESS_ROLE_ADDED,
+            "sender": None,
+            "course_access_role_data": CourseAccessRoleData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=self.user.username,
+                        email=self.user.email,
                     ),
-                    course_key=self.course_key,
-                    org_key=self.course_key.org,
-                    role=role._role_name,  # pylint: disable=protected-access
+                    id=self.user.id,
+                    is_active=self.user.is_active,
                 ),
-            },
-            event_receiver.call_args.kwargs
+                course_key=self.course_key,
+                org_key=self.course_key.org,
+                role=role._role_name,  # pylint: disable=protected-access
+            ),
+        }
+        self.assertTrue(
+            access_role_created_event.items() <= event_receiver.call_args.kwargs.items()
         )
 
     @ddt.data(
