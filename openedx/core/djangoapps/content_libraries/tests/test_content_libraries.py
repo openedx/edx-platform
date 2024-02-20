@@ -82,17 +82,19 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
     def test_library_crud(self):
         """
         Test Create, Read, Update, and Delete of a Content Library
+
+        Tests with some non-ASCII chars in slug, title, description.
         """
         # Create:
         lib = self._create_library(
-            slug="lib-crud", title="A Test Library", description="Just Testing", license_type=CC_4_BY,
+            slug="téstlꜟط", title="A Tést Lꜟطrary", description="Just Téstꜟng", license_type=CC_4_BY,
         )
         expected_data = {
-            "id": "lib:CL-TEST:lib-crud",
+            "id": "lib:CL-TEST:téstlꜟط",
             "org": "CL-TEST",
-            "slug": "lib-crud",
-            "title": "A Test Library",
-            "description": "Just Testing",
+            "slug": "téstlꜟط",
+            "title": "A Tést Lꜟطrary",
+            "description": "Just Téstꜟng",
             "version": 0,
             "type": COMPLEX,
             "license": CC_4_BY,
@@ -234,8 +236,10 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         """
         Test the happy path of creating and working with XBlocks in a content
         library.
+
+        Tests with some non-ASCII chars in slugs, titles, descriptions.
         """
-        lib = self._create_library(slug="testlib1", title="A Test Library", description="Testing XBlocks")
+        lib = self._create_library(slug="téstlꜟط", title="A Tést Lꜟطrary", description="Tésting XBlocks")
         lib_id = lib["id"]
         assert lib['has_unpublished_changes'] is False
 
@@ -243,9 +247,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'problem' XBlock to the library:
-        block_data = self._add_block_to_library(lib_id, "problem", "problem1")
+        block_data = self._add_block_to_library(lib_id, "problem", "ࠒröblæm1")
         self.assertDictContainsEntries(block_data, {
-            "id": "lb:CL-TعST:testlꜟط:problem:ࠒröblæm1",  # Non-ascii slugs to test unicode robustness.
+            "id": "lb:CL-TEST:téstlꜟط:problem:ࠒröblæm1",
             "display_name": "Blank Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
