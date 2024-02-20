@@ -367,7 +367,7 @@ class CoursewareMeta:
         """
         Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
         """
-        return learning_assistant_is_active(self.course_key)
+        return getattr(settings, 'LEARNING_ASSISTANT_AVAILABLE', False) or learning_assistant_is_active(self.course_key)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
