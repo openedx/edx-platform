@@ -27,4 +27,13 @@
 
 .percentage {
     white-space: nowrap;
+    width: 55px !important;
+}
+
+.survey-table .survey-option .visible-mobile-only {
+width: calc(100% - 25px) !important;
+}
+
+.survey-table .survey-percentage .visible-mobile-only {
+width: calc(100% - 60px) !important;
 }
