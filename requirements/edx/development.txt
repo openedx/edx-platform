@@ -575,7 +575,7 @@ django-storages==1.14.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-stubs==1.16.0
+django-stubs==4.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
