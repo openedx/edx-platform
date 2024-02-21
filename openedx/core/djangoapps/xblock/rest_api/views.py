@@ -16,14 +16,15 @@ from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, No
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
+from xblock.exceptions import NoSuchUsage
 from xblock.fields import Scope
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
-    get_block_display_name,
     get_block_metadata,
+    get_block_display_name,
     get_handler_url as _get_handler_url,
     load_block,
     render_block_view as _render_block_view,
@@ -74,7 +75,11 @@ def render_block_view(request, usage_key_str, view_name):
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    block = load_block(usage_key, request.user)
+    try:
+        block = load_block(usage_key, request.user)
+    except NoSuchUsage as exc:
+        raise NotFound(f"{usage_key} not found") from exc
+
     fragment = _render_block_view(block, view_name, request.user)
     response_data = get_block_metadata(block)
     response_data.update(fragment.to_dict())

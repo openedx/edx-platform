@@ -40,7 +40,6 @@ Conventions
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-
 import importlib.util
 import sys
 import os
@@ -3343,8 +3342,15 @@ INSTALLED_APPS = [
 
     # Notifications
     'openedx.core.djangoapps.notifications',
+
     'openedx_events',
+
+    # Learning Core Apps, used by v2 content libraries (content_libraries app)
+    "openedx_learning.core.components",
+    "openedx_learning.core.contents",
+    "openedx_learning.core.publishing",
 ]
+
 
 ######################### CSRF #########################################
 

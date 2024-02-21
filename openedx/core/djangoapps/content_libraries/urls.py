@@ -31,10 +31,6 @@ urlpatterns = [
             path('', views.LibraryDetailsView.as_view()),
             # Get the list of XBlock types that can be added to this library
             path('block_types/', views.LibraryBlockTypesView.as_view()),
-            # Get the list of Blockstore Bundle Links for this library, or add a new one:
-            path('links/', views.LibraryLinksView.as_view()),
-            # Update or delete a link:
-            path('links/<str:link_id>/', views.LibraryLinkDetailView.as_view()),
             # Get the list of XBlocks in this library, or add a new one:
             path('blocks/', views.LibraryBlocksView.as_view()),
             # Commit (POST) or revert (DELETE) all pending changes to this library:

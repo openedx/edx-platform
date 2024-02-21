@@ -35,7 +35,7 @@ from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_li
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.core.lib import blockstore_api
+
 
 from .test_objecttag_export_helpers import TaggedCourseMixin
 
@@ -103,9 +103,7 @@ class TestTaxonomyObjectsMixin:
         """
         Create library for testing
         """
-        self.collection = blockstore_api.create_collection("Test library collection")
         self.content_libraryA = create_library(
-            collection_uuid=self.collection.uuid,
             org=self.orgA,
             slug="lib_a",
             title="Library Org A",
