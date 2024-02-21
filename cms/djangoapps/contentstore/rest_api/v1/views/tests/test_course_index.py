@@ -10,7 +10,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
 from cms.djangoapps.contentstore.rest_api.v1.mixins import PermissionAccessMixin
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import get_lms_link_for_item
+from cms.djangoapps.contentstore.utils import get_lms_link_for_item, get_pages_and_resources_url
 from cms.djangoapps.contentstore.views.course import _course_outline_json
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -82,6 +82,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "enable_in_context": True,
                 "enable_graded_units": False,
                 "unit_level_visibility": True,
+                'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
         }
@@ -128,6 +129,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "enable_in_context": True,
                 "enable_graded_units": False,
                 "unit_level_visibility": True,
+                'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
         }
