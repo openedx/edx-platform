@@ -766,7 +766,7 @@ def create_library_block(library_key, block_type, definition_id):
         usage_id=block_id,
     )
 
-    if component_already_exists(usage_key):
+    if _component_exists(usage_key):
         raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
 
     _create_component_for_block(ref, usage_key)
@@ -782,7 +782,7 @@ def create_library_block(library_key, block_type, definition_id):
     return get_library_block(usage_key)
 
 
-def component_already_exists(usage_key: UsageKeyV2) -> bool:
+def _component_exists(usage_key: UsageKeyV2) -> bool:
     """
     Does a Component exist for this usage key?
 
@@ -878,6 +878,7 @@ def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticF
     Returns a list of LibraryXBlockStaticFile objects, sorted by path.
 
     TODO: This is not yet implemented for Learning Core backed libraries.
+    TODO: Should this be in the general XBlock API rather than the libraries API?
     """
     return []
 
