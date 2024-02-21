@@ -985,9 +985,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
         getContext: function() {
-            return {
-                hasDiscussionEnabled: this.currentValue()
-            };
+            return $.extend(
+                {},
+                AbstractEditor.prototype.getContext.call(this),
+                {
+                    hasDiscussionEnabled: this.currentValue(),
+                    discussion_configuration_url: course.get('discussions_settings').discussion_configuration_url
+                }
+            );
         }
     });
 
