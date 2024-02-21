@@ -65,7 +65,12 @@ def get_assessments(request: Request, usage_id: str, handler_name: str, submissi
     if response.status_code != HTTPStatus.OK:
         raise XBlockInternalError(context={"handler": handler_name})
 
-    return json.loads(response.content)
+    try:
+        return json.loads(response.content)
+    except json.JSONDecodeError as exc:
+        raise XBlockInternalError(
+            context={"handler": handler_name, "details": response.content}
+        ) from exc
 
 
 def get_submission_info(request, usage_id, submission_uuid):
