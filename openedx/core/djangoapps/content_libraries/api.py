@@ -667,11 +667,11 @@ def set_library_block_olx(usage_key, new_olx_str):
     # Make sure the block exists:
     _block_metadata = get_library_block(usage_key)
 
-    # Verify that the OLX parses, at least as generic XML, and the root tag is correctd:
+    # Verify that the OLX parses, at least as generic XML, and the root tag is correct:
     node = etree.fromstring(new_olx_str)
     if node.tag != usage_key.block_type:
         raise ValueError(
-            f"Tried to set the OLX of a {usage_key.block_type} block to a <node.tag> node. "
+            f"Tried to set the OLX of a {usage_key.block_type} block to a <{node.tag}> node. "
             f"{usage_key=!s}, {new_olx_str=}"
         )
 
