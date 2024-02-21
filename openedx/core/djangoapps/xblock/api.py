@@ -15,7 +15,7 @@ import threading
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import BundleDefinitionLocator
+from opaque_keys.edx.locator import BlockUsageLocator, BundleDefinitionLocator
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchViewError
@@ -120,17 +120,27 @@ def get_block_metadata(block, includes=()):
         editable_children: children in the same bundle, as opposed to linked
             children in other bundles.
     """
+    usage_id = block.scope_ids.usage_id
+
+    if isinstance(usage_id, BlockUsageLocator):
+        # The second method is more efficient, but it doesn't work with the DescriptorSystem.
+        display_name = block.display_name
+    else:
+        display_name = get_block_display_name(block)
     data = {
-        "block_id": str(block.scope_ids.usage_id),
+        "block_id": str(usage_id),
         "block_type": block.scope_ids.block_type,
-        "display_name": get_block_display_name(block),
+        "display_name": display_name,
     }
 
     if "index_dictionary" in includes:
         data["index_dictionary"] = block.index_dictionary()
 
     if "student_view_data" in includes:
-        data["student_view_data"] = block.student_view_data() if hasattr(block, 'student_view_data') else None
+        if isinstance(usage_id, BlockUsageLocator):
+            data["student_view_data"] = render_block_view(block, 'student_view', None).content
+        else:
+            data["student_view_data"] = block.student_view_data() if hasattr(block, 'student_view_data') else None
 
     if "children" in includes:
         data["children"] = block.children if hasattr(block, 'children') else []  # List of usage keys of children

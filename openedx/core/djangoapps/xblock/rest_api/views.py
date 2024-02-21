@@ -18,8 +18,10 @@ from rest_framework.views import APIView
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
 from xblock.fields import Scope
 
+from lms.djangoapps.courseware.block_render import get_block_by_usage_id
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
     get_block_display_name,
@@ -52,7 +54,13 @@ def block_metadata(request, usage_key_str):
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    block = load_block(usage_key, request.user)
+    if isinstance(usage_key, BlockUsageLocator):
+        block, __ = get_block_by_usage_id(
+            request, str(usage_key.course_key), str(usage_key), disable_staff_debug_info=True
+        )
+    else:
+        block = load_block(usage_key, request.user)
+
     includes = request.GET.get("include", "").split(",")
     metadata_dict = get_block_metadata(block, includes=includes)
     if 'children' in metadata_dict:
@@ -74,7 +82,13 @@ def render_block_view(request, usage_key_str, view_name):
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    block = load_block(usage_key, request.user)
+    if isinstance(usage_key, BlockUsageLocator):
+        block, __ = get_block_by_usage_id(
+            request, str(usage_key.course_key), str(usage_key), disable_staff_debug_info=True
+        )
+    else:
+        block = load_block(usage_key, request.user)
+
     fragment = _render_block_view(block, view_name, request.user)
     response_data = get_block_metadata(block)
     response_data.update(fragment.to_dict())
@@ -152,7 +166,19 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
         raise AuthenticationFailed("Invalid user ID format.")
 
     request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
-    block = load_block(usage_key, user)
+
+    if isinstance(usage_key, BlockUsageLocator):
+        # HACK: These requests are coming from ajax calls, so they do not the authenticated HTTP client in in the
+        #  learning MFE. We don't want to modify the signature of the get_block_by_usage_id function, so we just
+        #  manually set the user on the request object. This is safe because the user permissions are checked above and
+        #  the request object is not used for anything else in the function.
+        request.user = user
+        block, __ = get_block_by_usage_id(
+            request, str(usage_key.course_key), str(usage_key), disable_staff_debug_info=True
+        )
+    else:
+        block = load_block(usage_key, user)
+
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)
