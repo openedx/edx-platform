@@ -5,24 +5,28 @@ Tests for course_info
 
 import ddt
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
+from django.test import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from rest_framework.test import APIClient  # pylint: disable=unused-import
 
-from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.mobile_api.course_info.views import BlocksInfoInCourseView
 from lms.djangoapps.course_api.blocks.tests.test_views import TestBlocksInCourseView
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
+
+
+User = get_user_model()
 
 
 @ddt.ddt
@@ -261,7 +265,7 @@ class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCas
 @ddt.ddt
 class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
-        Test class for BlocksInfoInCourseView
+    Test class for BlocksInfoInCourseView
     """
 
     def setUp(self):
@@ -269,6 +273,56 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
         self.url = reverse('blocks_info_in_course', kwargs={
             'api_version': 'v3',
         })
+        self.request = RequestFactory().get(self.url)
+        self.student_user = UserFactory.create(username="student_user")
+
+    @ddt.data(
+        ("anonymous", None, None),
+        ("staff", "student_user", "student_user"),
+        ("student", "student_user", "student_user"),
+        ("student", None, "student_user"),
+        ("student", "other_student", None),
+    )
+    @ddt.unpack
+    @patch("lms.djangoapps.mobile_api.course_info.views.User.objects.get")
+    def test_get_requested_user(self, user_role, username, expected_username, mock_get):
+        if user_role == "anonymous":
+            request_user = AnonymousUser()
+        elif user_role == "staff":
+            request_user = self.admin_user
+        elif user_role == "student":
+            request_user = self.user
+
+        self.request.user = request_user
+
+        if expected_username:
+            expected_user = User.objects.get(username=expected_username)
+            mock_get.return_value = expected_user
+        else:
+            expected_user = None
+
+        result_user = BlocksInfoInCourseView().get_requested_user(self.request.user, username)
+        if expected_user:
+            self.assertEqual(result_user.username, expected_username)
+            mock_get.assert_called_with(username=username)
+        else:
+            self.assertIsNone(result_user)
+
+    @ddt.data(
+        ({'is_downloadable': True, 'download_url': 'https://test_certificate_url'},
+         {'url': 'https://test_certificate_url'}),
+        ({'is_downloadable': False}, {}),
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.mobile_api.course_info.views.certificate_downloadable_status')
+    def test_get_certificate(self, certificate_status_return, expected_output, mock_certificate_status):
+        mock_certificate_status.return_value = certificate_status_return
+        self.request.user = self.user
+
+        certificate_info = BlocksInfoInCourseView().get_certificate(
+            self.request, self.user, 'course-v1:Test+T101+2021_T1'
+        )
+        self.assertEqual(certificate_info, expected_output)
 
     @patch('lms.djangoapps.mobile_api.course_info.views.certificate_downloadable_status')
     def test_additional_info_response(self, mock_certificate_downloadable_status):

@@ -50,7 +50,6 @@ class CourseAccessSerializer(serializers.Serializer):
     isTooEarly = serializers.SerializerMethodField()
     isStaff = serializers.SerializerMethodField()
 
-
     def get_hasUnmetPrerequisites(self, data: dict) -> bool:
         """
         Check whether or not a course has unmet prerequisites.
@@ -68,6 +67,3 @@ class CourseAccessSerializer(serializers.Serializer):
         Determine whether a user has staff access to this course.
         """
         return any(administrative_accesses_to_course_for_user(data.get("user"), data.get("course_id")))
-
-
-

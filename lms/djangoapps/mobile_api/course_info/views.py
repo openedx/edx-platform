@@ -275,7 +275,6 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         * 404 if the course is not available or cannot be seen.
     """
 
-
     def get_requested_user(self, user: UserType, username: Optional[str] = None) -> Union[UserType, None]:
         """
         Return a user for whom the course blocks are fetched.
@@ -346,6 +345,6 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                         "course": course_overview,
                         "course_id": course_key
                     }).data,
-                 })
+                })
             response.data.update(course_data)
         return response
