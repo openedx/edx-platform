@@ -74,7 +74,7 @@
 
                 getFeedbackForCurrentTranscript: function() {
                     var self = this;
-                    var url = self.aiTranslationsUrl + '/transcript-feedback' + '?transcript_language=' + self.currentTranscriptLanguage + '&video_id=' + self.videoId + '&user_id=' + self.userId;
+                    var url = self.aiTranslationsUrl + '/transcript-feedback' + '?transcript_language=' + self.currentTranscriptLanguage + '&source_id=' + self.videoId + '&user_id=' + self.userId;
 
                     $.ajax({
                         url: url,
@@ -172,7 +172,7 @@
                         dataType: 'json',
                         data: {
                             transcript_language: self.currentTranscriptLanguage,
-                            video_id: self.videoId,
+                            source_id: self.videoId,
                             user_id: self.userId,
                             value: feedbackValue,
                         },
