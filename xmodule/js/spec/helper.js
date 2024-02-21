@@ -196,15 +196,15 @@
                     status: 'Completed'
                 });
             } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'GET') {
-                if (settings.url.match(/.+&video_id=error.+$/)) {
+                if (settings.url.match(/.+&source_id=error.+$/)) {
                     return settings.error();
                 }
-                if (settings.url.match(/.+&video_id=negative.+$/)) {
+                if (settings.url.match(/.+&source_id=negative.+$/)) {
                     return settings.success({
                         value: false
                     });
                 }
-                if (settings.url.match(/.+&video_id=none.+$/)) {
+                if (settings.url.match(/.+&source_id=none.+$/)) {
                     return settings.success(null);
                 }
                 return settings.success({
