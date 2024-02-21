@@ -297,25 +297,29 @@ class CourseMetadata:
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
             return
 
-        teams_configuration_model = settings_dict.get('teams_configuration', {})
-        if teams_configuration_model == {}:
-            return
-        json_value = teams_configuration_model.get('value')
-        if json_value == '':
-            return
-
-        proposed_topics = json_value.get('topics')
-
-        if proposed_topics is None:
-            proposed_teamsets = json_value.get('team_sets')
-            if proposed_teamsets is None:
-                return
-            else:
-                proposed_topics = proposed_teamsets
-
+        proposed_topics = cls.get_team_sets(settings_dict)
         for index, proposed_topic in enumerate(proposed_topics):
             if not proposed_topic.get('dynamic_user_partition_id'):
                 proposed_topic['dynamic_user_partition_id'] = MINIMUM_DYNAMIC_TEAM_PARTITION_ID + index
+
+    @classmethod
+    def get_team_sets(cls, settings_dict):
+        """
+        Load team-sets from the course metadata settings.
+        """
+        teams_configuration_model = settings_dict.get('teams_configuration', {})
+        if teams_configuration_model == {}:
+            return {}
+
+        json_value = teams_configuration_model.get('value')
+        if json_value == '':
+            return {}
+
+        proposed_teamsets = json_value.get('team_sets')
+        if proposed_teamsets is None:
+            return {}
+
+        return proposed_teamsets
 
     @classmethod
     def update_from_dict(cls, key_values, block, user, save=True):
