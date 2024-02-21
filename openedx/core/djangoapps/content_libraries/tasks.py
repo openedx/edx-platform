@@ -343,8 +343,10 @@ def _sync_children(
     elif isinstance(library, library_api.ContentLibraryMetadata):
         # TODO: add filtering by capa_type when V2 library will support different problem types
         try:
-            source_blocks = library_api.get_library_blocks(library_key)
-            source_block_ids = [str(block.usage_key) for block in source_blocks]
+            source_block_ids = [
+                str(library_api.LibraryXBlockMetadata.from_component(library_key, component).usage_key)
+                for component in library_api.get_library_components(library_key)
+            ]
             _import_from_blockstore(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)

@@ -602,20 +602,6 @@ def _get_library_component_tags_count(library_key) -> dict:
     return tagging_api.get_object_tag_counts(library_key_pattern, count_implicit=True)
 
 
-def get_library_blocks(library_key, text_search=None, block_types=None) -> list[LibraryXBlockMetadata]:
-    """
-    Get the library blocks and filter.
-
-    TODO: This is primarily used in tests, but it's getting an unbounded list,
-    instead of a pagable queryset. We should get rid of this function
-    altogether.
-    """
-    return [
-        LibraryXBlockMetadata.from_component(library_key, component)
-        for component in get_library_components(library_key, text_search, block_types)
-    ]
-
-
 def get_library_components(library_key, text_search=None, block_types=None) -> QuerySet[Component]:
     """
     Get the library components and filter.
