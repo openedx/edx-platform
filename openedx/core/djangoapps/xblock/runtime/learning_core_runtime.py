@@ -175,6 +175,9 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # We can do this more efficiently in a single query later, but for now
         # just get it the easy way.
         component = self._get_component_from_usage_key(usage_key)
+        # TODO: For now, this runtime will only be used in CMS, so it's fine to just return the Draft version.
+        #       However, we will need the runtime to return the Published version for LMS (and Draft for LMS-Preview).
+        #       We should base this Draft vs Published decision on a runtime initialization parameter.
         component_version = component.versioning.draft
         if component_version is None:
             raise NoSuchUsage(usage_key)
