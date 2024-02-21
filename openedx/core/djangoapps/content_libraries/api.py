@@ -665,7 +665,7 @@ def set_library_block_olx(usage_key, new_olx_str):
     assert isinstance(usage_key, LibraryUsageLocatorV2)
 
     # Make sure the block exists:
-#    _block_metadata = get_library_block(usage_key)
+    _block_metadata = get_library_block(usage_key)
 
     # Verify that the OLX parses, at least as generic XML, and the root tag is correctd:
     node = etree.fromstring(new_olx_str)
