@@ -153,7 +153,7 @@ class LibraryXBlockCreationSerializer(serializers.Serializer):
     #
     # It doesn't look like the frontend actually uses this to put meaningful
     # slugs at the moment, but hopefully we can change this soon.
-    definition_id = serializers.SlugField()
+    definition_id = serializers.CharField(validators=(validate_unicode_slug, ))
 
 
 class LibraryXBlockOlxSerializer(serializers.Serializer):
