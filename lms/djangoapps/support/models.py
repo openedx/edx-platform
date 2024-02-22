@@ -1,7 +1,6 @@
 """
 Models used to implement support related models in such as SSO History model
 """
-from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.db.models import ForeignKey, DO_NOTHING, CASCADE, TextChoices
 from django.db.models.fields import BooleanField, CharField, DateTimeField
@@ -11,7 +10,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from simple_history import register
 from social_django.models import UserSocialAuth
 
-from common.djangoapps.student.models import CourseEnrollment, course_enrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 User = get_user_model()
 
@@ -25,7 +24,7 @@ class CourseResetCourseOptIn(TimeStampedModel):
     """
     course_id = CourseKeyField(max_length=255)
     active = BooleanField()
-    
+
     def __str__(self):
         return f'{self.course_id} - {"ACTIVE" if self.active else "INACTIVE"}'
 
