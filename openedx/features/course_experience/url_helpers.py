@@ -14,9 +14,9 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode, urlparse
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
+from lms.djangoapps.mfe_config_api.utils import get_mfe_config_for_site
+
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -126,8 +126,8 @@ def _get_new_courseware_url(
     )
 
 
-def get_learning_mfe_base_url() -> str:
-    mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+def get_learning_mfe_base_url(request=request, site=site) -> str:
+    mfe_config = get_mfe_config_for_site(request=request, site=site, mfe="learning")
     return mfe_config.get("LEARNING_BASE_URL", settings.LEARNING_MICROFRONTEND_URL)
 
 
