@@ -1816,7 +1816,13 @@ INSTALLED_APPS = [
 
     # alternative swagger generator for CMS API
     'drf_spectacular',
+
     'openedx_events',
+
+    # Learning Core Apps, used by v2 content libraries (content_libraries app)
+    "openedx_learning.core.components",
+    "openedx_learning.core.contents",
+    "openedx_learning.core.publishing",
 ]
 
 
