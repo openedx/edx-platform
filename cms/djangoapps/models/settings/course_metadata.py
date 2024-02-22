@@ -297,13 +297,13 @@ class CourseMetadata:
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
             return
 
-        proposed_topics = cls.get_team_sets(settings_dict)
+        proposed_topics = cls.get_team_sets_from_settings(settings_dict)
         for index, proposed_topic in enumerate(proposed_topics):
             if not proposed_topic.get('dynamic_user_partition_id'):
                 proposed_topic['dynamic_user_partition_id'] = MINIMUM_DYNAMIC_TEAM_PARTITION_ID + index
 
     @classmethod
-    def get_team_sets(cls, settings_dict):
+    def get_team_sets_from_settings(cls, settings_dict):
         """
         Load team-sets from the course metadata settings.
         """
@@ -386,7 +386,7 @@ class CourseMetadata:
                 continue
             if user_partition_id > MINIMUM_STATIC_PARTITION_ID or user_partition_id < MINIMUM_DYNAMIC_TEAM_PARTITION_ID:
                 message = (
-                    f"dynamic_user_partition_id must be greater than {str(MINIMUM_DYNAMIC_TEAM_PARTITION_ID)}"
+                    f"dynamic_user_partition_id must be greater or equal than {str(MINIMUM_DYNAMIC_TEAM_PARTITION_ID)}"
                     f" and less than {str(MINIMUM_STATIC_PARTITION_ID)}."
                 )
                 errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})

@@ -19,23 +19,27 @@ log = logging.getLogger(__name__)
 
 
 class TeamUserPartition(UserPartition):
-    """
-    Extends UserPartition to support dynamic groups pulled from the current course teams.
+    """Extends UserPartition to support dynamic gcreate_team_set_partition_with_course_idroups pulled from the current course teams.
+
+    Class attributes:
+        team_sets_mapping (dict): A mapping of partition IDs to team-set IDs.
     """
 
     team_sets_mapping = {}
 
     @property
     def groups(self):
-        """
-        Return the groups (based on CourseModes) for the course associated with this
-        EnrollmentTrackUserPartition instance. Note that only groups based on selectable
-        CourseModes are returned (which means that Credit will never be returned).
+        """Dynamically generate groups (based on teams) for this partition.
+
+        Returns:
+            list of Group: The groups in this partition.
         """
         course_key = CourseKey.from_string(self.parameters["course_id"])
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
             return []
 
+        # Get the team-set for this partition via the team_sets_mapping and then get the teams in that team-set
+        # to create the groups for this partition.
         team_sets = TeamsConfigurationService().get_teams_configuration(course_key).teamsets
         team_set_id = self.team_sets_mapping[self.id]
         team_set = next((team_set for team_set in team_sets if team_set.teamset_id == team_set_id), None)
@@ -46,8 +50,7 @@ class TeamUserPartition(UserPartition):
 
 
 class TeamPartitionScheme:
-    """
-    Uses course team memberships to map learners into partition groups.
+    """Uses course team memberships to map learners into partition groups.
 
     The scheme is only available if the CONTENT_GROUPS_FOR_TEAMS feature flag is enabled.
     This is how it works:
@@ -58,14 +61,23 @@ class TeamPartitionScheme:
 
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition):
-        """
-        Returns the (Content) Group from the specified user partition to which the user
-        is assigned, via their team membership and any mappings from teams to
+        """Get the (Content) Group from the specified user partition for the user.
+
+        A user is assigned to the group via their team membership and any mappings from teams to
         partitions / groups that might exist.
+
+        Args:
+            course_key (CourseKey): The course key.
+            user (User): The user.
+            user_partition (UserPartition): The user partition.
+
+        Returns:
+            Group: The group in the specified user partition
         """
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
             return None
 
+        # A user cannot belong to more than one team in a team-set, so we can just get the first team.
         teams = get_teams_in_teamset(str(course_key), user_partition.parameters["team_set_id"])
         team_ids = [team.team_id for team in teams]
         user_team = CourseTeamMembership.get_memberships(user.username, [str(course_key)], team_ids).first()
@@ -76,8 +88,7 @@ class TeamPartitionScheme:
 
     @classmethod
     def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):    # pylint: disable=redefined-builtin, invalid-name, unused-argument
-        """
-        Create a custom UserPartition to support dynamic groups.
+        """Create a custom UserPartition to support dynamic groups based on teams.
 
         A Partition has an id, name, scheme, description, parameters, and a list
         of groups. The id is intended to be unique within the context where these
@@ -89,6 +100,17 @@ class TeamPartitionScheme:
         Partitions can be marked as inactive by setting the "active" flag to False.
         Any group access rule referencing inactive partitions will be ignored
         when performing access checks.
+
+        Args:
+            id (int): The id of the partition.
+            name (str): The name of the partition.
+            description (str): The description of the partition.
+            groups (list of Group): The groups in the partition.
+            parameters (dict): The parameters for the partition.
+            active (bool): Whether the partition is active.
+
+        Returns:
+            TeamUserPartition: The user partition.
         """
         course_key = CourseKey.from_string(parameters["course_id"])
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):

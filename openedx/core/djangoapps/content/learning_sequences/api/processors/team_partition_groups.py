@@ -19,15 +19,20 @@ log = logging.getLogger(__name__)
 
 class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
     """
-    Processor for applying all team user partition groups.
+    Processor for applying all user partition groups to the course outline.
 
     This processor is used to remove content from the course outline based on
     the user's team membership. It is used in the courseware API to remove
     content from the course outline before it is returned to the client.
     """
     def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
+        """
+        Attributes:
+            current_user_groups (Dict[int, Group]): The groups to which the user
+                belongs in each partition.
+        """
         super().__init__(course_key, user, at_time)
-        self.current_user_groups: Dict[str, Group] = {}
+        self.current_user_groups: Dict[int, Group] = {}
 
     def load_data(self, _) -> None:
         """
@@ -48,9 +53,14 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
         """
         Is the user part of the group to which the block is restricting content?
 
-        This method returns True if the user is not part of the group to which
-        the block is restricting content. This means that the block should be
-        removed from the course outline.
+        Arguments:
+            user_partition_groups (Dict[int, Set(int)]): Mapping from partition
+                ID to the groups to which the user belongs in that partition.
+
+        Returns:
+            bool: True if the user is excluded from the content, False otherwise.
+            The user is excluded from the content if and only if, for a non-empty
+            partition group, the user is not in any of the groups for that partition.
         """
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(self.course_key):
             return False
@@ -72,6 +82,7 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
 
         This method returns the usage keys of all content that should be
         removed from the course outline based on the user's team membership.
+        In this context, a team within a team-set maps to a user partition group.
         """
         removed_usage_keys = set()
         for section in full_course_outline.sections:
