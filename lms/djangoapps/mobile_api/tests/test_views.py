@@ -291,20 +291,19 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
         elif user_role == "staff":
             request_user = self.admin_user
         elif user_role == "student":
-            request_user = self.user
+            request_user = self.student_user
 
         self.request.user = request_user
 
-        if expected_username:
-            expected_user = User.objects.get(username=expected_username)
-            mock_get.return_value = expected_user
-        else:
-            expected_user = None
+        if expected_username == "student_user":
+            mock_user = self.student_user
+            mock_get.return_value = mock_user
 
         result_user = BlocksInfoInCourseView().get_requested_user(self.request.user, username)
-        if expected_user:
+        if expected_username:
             self.assertEqual(result_user.username, expected_username)
-            mock_get.assert_called_with(username=username)
+            if username:
+                mock_get.assert_called_with(username=username)
         else:
             self.assertIsNone(result_user)
 
