@@ -767,6 +767,7 @@ EDLY_PANEL_RESTRICTED_USERS_GROUP = 'Edly Panel Restricted Users'
 EDLY_WP_ADMIN_USERS_GROUP = 'WordPress Edly Admin Users'
 EDLY_WP_SUBSCRIBER_USERS_GROUP = 'WordPress Subscriber Users'
 EDLY_API_USERS_GROUP = 'Edly API Users'
+EDLY_PANEL_SUPER_ADMIN = 'Edly Panel Super Admin'
 
 
 EDLY_USER_ROLES = {
@@ -775,7 +776,8 @@ EDLY_USER_ROLES = {
     'insights_admin': EDLY_INSIGHTS_GROUP,
     'panel_admin': EDLY_PANEL_ADMIN_USERS_GROUP,
     'subscriber': EDLY_WP_SUBSCRIBER_USERS_GROUP,
-    'edly_admin': EDLY_WP_ADMIN_USERS_GROUP
+    'edly_admin': EDLY_WP_ADMIN_USERS_GROUP,
+    'super_admin': EDLY_PANEL_SUPER_ADMIN
 }
 
 ENABLE_EDLY_ORGANIZATIONS_SWITCH = 'enable_edly_organizations'

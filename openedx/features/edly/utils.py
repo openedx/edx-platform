@@ -36,6 +36,7 @@ from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.edly.constants import ESSENTIALS, DEFAULT_COURSE_IMAGE, DEFAULT_COURSE_IMAGE_PATH
 from openedx.features.edly.context_processor import Colour
 from openedx.features.edly.models import EdlyMultiSiteAccess, EdlySubOrganization
+from common.djangoapps.student.models import UserProfile
 
 LOGGER = logging.getLogger(__name__)
 
@@ -67,7 +68,6 @@ def user_has_edly_organization_access(request):
     Returns:
         bool: Returns True if User has Edly Organization Access Otherwise False.
     """
-
     if request.user.is_superuser or request.user.is_staff:
         return True
 
@@ -87,6 +87,17 @@ def user_has_edly_organization_access(request):
 
     edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
     if edly_sub_org.slug == get_edly_sub_org_from_cookie(edly_user_info_cookie):
+        return True
+
+    edly_org = edly_sub_org.edly_organization
+    edly_slug = get_edly_org_from_cookie(edly_user_info_cookie)
+    edly_access_user = request.user.edly_multisite_user.filter(
+        Q(sub_org__lms_site=current_site) |
+        Q(sub_org__studio_site=current_site) |
+        Q(sub_org__preview_site=current_site)
+    )
+
+    if edly_access_user.exists() and edly_org.enable_all_edly_sub_org_login and edly_org.slug == edly_slug:
         return True
 
     return False
@@ -138,6 +149,24 @@ def get_edly_sub_org_from_cookie(encoded_cookie_data):
 
     decoded_cookie_data = decode_edly_user_info_cookie(encoded_cookie_data)
     return decoded_cookie_data['edly-sub-org']
+
+
+def get_edly_org_from_cookie(encoded_cookie_data):
+    """
+    Returns edly-org from the edly-user-info cookie.
+
+    Arguments:
+        encoded_cookie_data (dict): Edly user info cookie JWT encoded string.
+
+    Returns:
+        string
+    """
+
+    if not encoded_cookie_data:
+        return ''
+
+    decoded_cookie_data = decode_edly_user_info_cookie(encoded_cookie_data)
+    return decoded_cookie_data['edly-org']
 
 
 def get_edx_org_from_cookie(encoded_cookie_data):
@@ -659,7 +688,7 @@ def add_default_image_to_course_assets(course_key):
         contentstore().save(content)
         del_cached_content(content.location)
 
-from common.djangoapps.student.models import UserProfile
+
 def get_username_and_name_by_email(email):
     """
     helper function to return username if exists
@@ -673,3 +702,33 @@ def get_username_and_name_by_email(email):
     if userProfile.exists():
         userProfile = userProfile.first()
         return { "username": user.username, "name": userProfile.name }
+
+
+def create_super_user_multisite_access(request, user, groups_names):
+    """create an edly multisite access for a given user to all the organization sites"""
+    edly_sub_org = get_edly_sub_org_from_request(request)
+    sub_org = EdlySubOrganization.objects.filter(edly_organization=edly_sub_org.edly_organization)
+    groups = Group.objects.filter(name__in=groups_names)
+    
+    for org in sub_org:
+        edly_access_user, created = EdlyMultiSiteAccess.objects.get_or_create(
+            user=user,
+            sub_org=org
+        )
+        
+        if created:
+            for new_group in groups:
+                edly_access_user.groups.add(new_group)
+
+
+def create_user_access_role(request ,user ,groups_names):
+    """create the user access role based on panel role"""
+    panel_role = request.data.get('panel_role', None)
+    if settings.EDLY_USER_ROLES.get(panel_role, None)==settings.EDLY_PANEL_SUPER_ADMIN:
+        groups_names.append(settings.EDLY_PANEL_ADMIN_USERS_GROUP)
+        create_super_user_multisite_access(request, user, groups_names)
+    else:
+        edly_access_user = create_edly_access_role(request, user)
+        groups = Group.objects.filter(name__in=groups_names)
+        for new_group in groups:
+            edly_access_user.groups.add(new_group)

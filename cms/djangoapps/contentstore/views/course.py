@@ -19,6 +19,7 @@ import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
@@ -55,7 +56,8 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
-from openedx.features.edly.utils import filter_courses_based_on_org, get_edx_org_from_cookie, get_enabled_organizations
+from openedx.features.edly.models import EdlySubOrganization
+from openedx.features.edly.utils import filter_courses_based_on_org
 from openedx.features.edly.validators import is_courses_limit_reached_for_plan
 from common.djangoapps.student import auth
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
@@ -574,14 +576,9 @@ def course_listing(request):
 
     optimization_enabled = GlobalStaff().has_user(request.user) and \
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
-    org = request.GET.get('org', '') if optimization_enabled else None
 
-    enabled_organizations = get_enabled_organizations(request)
-    org = enabled_organizations[0].get('short_name', '') if enabled_organizations else None
-
-    edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
-    org = get_edx_org_from_cookie(edly_user_info_cookie)
-
+    site = get_current_site(request)
+    org = [EdlySubOrganization.objects.filter(studio_site=site).first().slug]
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
     libraries = _accessible_libraries_iter(request.user, org) if LIBRARIES_ENABLED else []
