@@ -425,6 +425,8 @@ def create_library(
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
 
+    library_type: Deprecated parameter, not really used. Set to COMPLEX.
+
     Returns a ContentLibraryMetadata instance.
     """
     assert isinstance(collection_uuid, UUID)
