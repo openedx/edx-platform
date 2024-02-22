@@ -246,9 +246,10 @@ class CourseStructureCache:
             data_size = len(compressed_pickled_data)
             tagger.measure('compressed_size', data_size)
 
-            # Structures are immutable, so we set a timeout of "never"
+            # We rely on the course structure cache default timeout, which should be
+            # high by default (~ a few days).
             try:
-                self.cache.set(key, compressed_pickled_data, None)
+                self.cache.set(key, compressed_pickled_data)
             except Exception:  # pylint: disable=broad-except
                 total_bytes_in_one_mb = 1024 * 1024
                 chunk_size_in_mbs = round(data_size / total_bytes_in_one_mb, 2)
@@ -506,7 +507,7 @@ class MongoPersistenceBackend:
                 key_attr: getattr(course_key, key_attr)
                 for key_attr in ('org', 'course', 'run')
             }
-            return self.course_index.remove(query)
+            return self.course_index.delete_one(query)
 
     def get_definition(self, key, course_context=None):
         """

@@ -85,6 +85,7 @@ def get_context(course, request, thread=None):
         "cc_requester": cc_requester,
         "has_moderation_privilege": has_moderation_privilege,
         "is_global_staff": is_global_staff,
+        "is_staff_or_admin": requester.id in course_staff_user_ids,
     }
 
 
@@ -202,14 +203,16 @@ class _ContentSerializer(serializers.Serializer):
 
     def _get_user_label(self, user_id):
         """
-        Returns the role label (i.e. "Staff" or "Community TA") for the user
+        Returns the role label (i.e. "Staff", "Moderator" or "Community TA") for the user
         with the given id.
         """
-        is_staff = user_id in self.context["course_staff_user_ids"] or user_id in self.context["moderator_user_ids"]
+        is_staff = user_id in self.context["course_staff_user_ids"]
+        is_moderator = user_id in self.context["moderator_user_ids"]
         is_ta = user_id in self.context["ta_user_ids"]
 
         return (
             "Staff" if is_staff else
+            "Moderator" if is_moderator else
             "Community TA" if is_ta else
             None
         )
@@ -217,7 +220,7 @@ class _ContentSerializer(serializers.Serializer):
     def _get_user_label_from_username(self, username):
         """
         Returns role label of user from username
-        Possible Role Labels: Staff, Community TA or None
+        Possible Role Labels: Staff, Moderator, Community TA or None
         """
         try:
             user = User.objects.get(username=username)

@@ -56,9 +56,6 @@ class VideoModelSerializer(serializers.Serializer):
     transcripts = serializers.ListField(
         child=serializers.CharField()
     )
-    usage_locations = serializers.ListField(
-        child=serializers.DictField()
-    )
 
 
 class VideoActiveTranscriptPreferencesSerializer(serializers.Serializer):
@@ -99,7 +96,6 @@ class CourseVideosSerializer(serializers.Serializer):
             child=serializers.CharField()
         )
     )
-    # transcript_available_languages = serializers.BooleanField(required=False, allow_null=True)
     video_transcript_settings = VideoTranscriptSettingsSerializer()
     pagination_context = serializers.DictField(
         child=serializers.CharField(),

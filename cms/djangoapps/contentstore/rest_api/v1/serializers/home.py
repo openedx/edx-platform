@@ -31,6 +31,16 @@ class LibraryViewSerializer(serializers.Serializer):
     can_edit = serializers.BooleanField()
 
 
+class CourseHomeTabSerializer(serializers.Serializer):
+    archived_courses = CourseCommonSerializer(required=False, many=True)
+    courses = CourseCommonSerializer(required=False, many=True)
+    in_process_course_actions = UnsucceededCourseSerializer(many=True, required=False, allow_null=True)
+
+
+class LibraryTabSerializer(serializers.Serializer):
+    libraries = LibraryViewSerializer(many=True, required=False, allow_null=True)
+
+
 class CourseHomeSerializer(serializers.Serializer):
     """Serializer for course home"""
     allow_course_reruns = serializers.BooleanField()

@@ -8,13 +8,14 @@ from asyncio.log import logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_progress_milestones_are_active
 from lms.djangoapps.utils import get_braze_client
 from common.djangoapps.student.helpers import EMAIL_EXISTS_MSG_FMT, USERNAME_EXISTS_MSG_FMT, AccountValidationError
 from common.djangoapps.student.models import (
+    CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentCelebration,
     PendingNameChange,
@@ -22,7 +23,12 @@ from common.djangoapps.student.models import (
     is_username_retired
 )
 from common.djangoapps.student.models_api import confirm_name_change
-from common.djangoapps.student.signals import USER_EMAIL_CHANGED
+from common.djangoapps.student.signals import (
+    emit_course_access_role_added,
+    emit_course_access_role_removed,
+    USER_EMAIL_CHANGED,
+)
+from openedx.core.djangoapps.safe_sessions.middleware import EmailChangeMiddleware
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 
 logger = logging.getLogger(__name__)
@@ -86,6 +92,29 @@ def create_course_enrollment_celebration(sender, instance, created, **kwargs):
         pass
 
 
+@receiver(post_save, sender=CourseAccessRole)
+def on_course_access_role_created(sender, instance, created, **kwargs):
+    """
+    Emit an event to the event-bus when a CourseAccessRole is created
+    """
+    # Updating a role instance to a different role is unhandled behavior at the moment
+    # this event assumes roles are only created or deleted
+    if not created:
+        return
+
+    user = instance.user
+    emit_course_access_role_added(user, instance.course_id, instance.org, instance.role)
+
+
+@receiver(post_delete, sender=CourseAccessRole)
+def listen_for_course_access_role_removed(sender, instance, **kwargs):
+    """
+    Emit an event to the event-bus when a CourseAccessRole is deleted
+    """
+    user = instance.user
+    emit_course_access_role_removed(user, instance.course_id, instance.org, instance.role)
+
+
 def listen_for_verified_name_approved(sender, user_id, profile_name, **kwargs):
     """
     If the user has a pending name change that corresponds to an approved verified name, confirm it.
@@ -105,8 +134,12 @@ if is_name_affirmation_installed():
 
 
 @receiver(USER_EMAIL_CHANGED)
-def _listen_for_user_email_changed(sender, user, **kwargs):
-    """ If user has changed their email, update that in email Braze. """
+def _listen_for_user_email_changed(sender, user, request, **kwargs):
+    """ If user has changed their email, update that in session and Braze profile. """
+
+    # Store the user's email for session consistency (used by EmailChangeMiddleware)
+    EmailChangeMiddleware.register_email_change(request, user.email)
+
     email = user.email
     user_id = user.id
     attributes = [{'email': email, 'external_id': user_id}]

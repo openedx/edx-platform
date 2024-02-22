@@ -83,6 +83,10 @@
                     return topicType.toLowerCase() !== 'open';
                 },
 
+                canJoinTeam: function(userInfo, topicType = '') {
+                    return userInfo.privileged || userInfo.staff || topicType.includes("open");
+                },
+
                 /** Shows info/error banner for team membership CSV upload
              * @param: content - string or array for display
              * @param: isError - true sets error styling, false/none uses info styling

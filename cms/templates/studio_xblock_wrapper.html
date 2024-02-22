@@ -29,6 +29,9 @@ block_is_unit = is_unit(xblock)
 <script type="text/template" id="xblock-validation-messages-tpl">
     <%static:include path="js/xblock-validation-messages.underscore" />
 </script>
+<script type="text/template" id="tag-count-tpl">
+    <%static:include path="js/tag-count.underscore" />
+</script>
 </%block>
 
 <script type="text/javascript">
@@ -40,6 +43,16 @@ block_is_unit = is_unit(xblock)
         $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
     );
 </script>
+
+<%static:webpack entry="js/factories/tag_count">
+    TagCountFactory({
+        tags_count: "${tags_count | n, js_escaped_string}",
+        content_id: "${xblock.location | n, js_escaped_string}",
+        course_authoring_url: "${course_authoring_url | n, js_escaped_string}",
+    },
+        $('li.tag-count[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
+</%static:webpack>
 
 % if not is_root:
     % if is_reorderable:
@@ -99,6 +112,9 @@ block_is_unit = is_unit(xblock)
             <ul class="actions-list nav-dd ui-right">
                 % if not is_root:
                     % if can_edit:
+                        % if use_tagging:
+                            <li class="action-item tag-count" data-locator="${xblock.location}"></li>
+                        % endif
                         % if not show_inline:
                             <li class="action-item action-edit">
                                 <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
@@ -128,7 +144,7 @@ block_is_unit = is_unit(xblock)
                                         % endif
                                         % if use_tagging:
                                             <li class="nav-item">
-                                                <a class="tags-button" href="#" role="button">${_("Manage tags")}</a>
+                                                <a class="manage-tags-button" href="#" role="button">${_("Manage Tags")}</a>
                                             </li>
                                         % endif
                                         % if is_course:

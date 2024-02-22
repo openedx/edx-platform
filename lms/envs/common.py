@@ -68,6 +68,10 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+try:
+    from skill_tagging.skill_tagging_mixin import SkillTaggingMixin
+except ImportError:
+    SkillTaggingMixin = None
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
@@ -345,9 +349,8 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to perform acceptance and load test. Auto auth view is responsible for load
-    #   testing and is controlled by this feature flag. Auto-auth causes issues in Bok Choy tests because it resets the
-    #   requesting user. Session verification (of CacheBackedAuthenticationMiddleware) is a security feature, but it
-    #   can be turned off by enabling this feature flag.
+    #    testing and is controlled by this feature flag. Session verification (of CacheBackedAuthenticationMiddleware)
+    #    is a security feature, but it can be turned off by enabling this feature flag.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-07-25
     # .. toggle_warning: If this has been set to True then the account activation email will be skipped.
@@ -1144,7 +1147,7 @@ CACHES = {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
-        'TIMEOUT': '7200',
+        'TIMEOUT': '604800',  # 1 week
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
         'OPTIONS': {
             'no_delay': True,
@@ -1342,7 +1345,12 @@ CONTEXT_PROCESSORS = [
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app'
+    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app',
+
+    # Context processor necesarry for the survey report message appear on the admin site
+    'openedx.features.survey_report.context_processors.admin_extra_context'
+
+
 ]
 
 # Django templating
@@ -1613,7 +1621,6 @@ HOTJAR_SITE_ID = 00000
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
 ALGOLIA_SEARCH_API_KEY = None
-ALGOLIA_COURSES_RECOMMENDATION_INDEX_NAME = ''
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -1629,6 +1636,8 @@ from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+if SkillTaggingMixin:
+    XBLOCK_MIXINS += (SkillTaggingMixin,)
 XBLOCK_EXTRA_MIXINS = ()
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
@@ -1758,8 +1767,8 @@ DATABASES = {
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-# This will be overridden through LMS config
-DEFAULT_HASHING_ALGORITHM = 'sha1'
+DEFAULT_HASHING_ALGORITHM = 'sha256'
+
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
@@ -2233,6 +2242,9 @@ MIDDLEWARE = [
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+
+    # Middleware to flush user's session in other browsers when their email is changed.
+    'openedx.core.djangoapps.safe_sessions.middleware.EmailChangeMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
@@ -4672,6 +4684,19 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
 
+# .. toggle_name: COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: If disabled (False), this switch causes the CourseTabView API (or whatever else calls
+#    check_course_open_for_learner()) to always return the legacy `course_not_started` error code in ALL cases where the
+#    course has not started.  If enabled (True), the API will respond with `course_not_started_enterprise_learner` in a
+#    subset of cases where the learner is enrolled via subsidy, and `course_not_started` in all other cases.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-12-18
+# .. toggle_target_removal_date: 2023-12-19
+# .. toggle_tickets: ENT-8078
+COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR = False
+
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
 # of a particular type of course enrollment mode. This is not to be confused
@@ -4815,18 +4840,8 @@ EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
-### SETTINGS FOR AMPLITUDE ####
-AMPLITUDE_URL = ''
-AMPLITUDE_API_KEY = ''
-DASHBOARD_AMPLITUDE_RECOMMENDATION_ID = ''
-COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID = ''
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
-
-GENERAL_RECOMMENDATIONS = []
-
-### DEFAULT KEY DICTIONARY FOR CROSS_PRODUCT_RECOMMENDATIONS ###
-CROSS_PRODUCT_RECOMMENDATIONS_KEYS = {}
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
@@ -5034,7 +5049,19 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
-LEARNER_HOME_MFE_REDIRECT_PERCENTAGE = 0
+############## Settings for EmailChangeMiddleware ###############
+
+# .. toggle_name: ENFORCE_SESSION_EMAIL_MATCH
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this setting invalidates sessions in other browsers
+#       upon email change, while preserving the session validity in the browser where the
+#       email change occurs. This toggle is just being used for rollout.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-12-07
+# .. toggle_target_removal_date: 2024-04-01
+# .. toggle_tickets: https://2u-internal.atlassian.net/browse/VAN-1797
+ENFORCE_SESSION_EMAIL_MATCH = False
 
 ############### Settings for the ace_common plugin #################
 # Note that all settings are actually defined by the plugin
@@ -5326,13 +5353,6 @@ OUTCOME_SURVEYS_EVENTS_ENABLED = True
 ######################## Settings for cancel retirement in Support Tools ########################
 COOL_OFF_DAYS = 14
 
-URLS_2U_LOBS = {
-    'executive_education': 'https://www.edx.org/executive-education',
-    'masters_degree': 'https://www.edx.org/masters',
-    'bachelors_degree': 'https://www.edx.org/bachelors',
-    'boot_camps': 'https://www.edx.org/boot-camps',
-}
-
 ############ Settings for externally hosted executive education courses ############
 EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
@@ -5427,6 +5447,14 @@ EVENT_BUS_PRODUCER_CONFIG = {
              # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
              'enabled': False}
     },
+    'org.openedx.learning.user.course_access_role.added.v1': {
+        'learning-course-access-role-lifecycle':
+            {'event_key_field': 'course_access_role_data.course_key', 'enabled': False},
+    },
+    'org.openedx.learning.user.course_access_role.removed.v1': {
+        'learning-course-access-role-lifecycle':
+            {'event_key_field': 'course_access_role_data.course_key', 'enabled': False},
+    },
     # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
     # and the derivation fails if the keys are missing. If we ever fully decouple the lms and cms settings,
     # we can remove these.
@@ -5448,3 +5476,31 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.cert
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
                          'learning-certificate-lifecycle', 'enabled')
 BEAMER_PRODUCT_ID = ""
+
+#### Survey Report ####
+# .. toggle_name: SURVEY_REPORT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: Set to True to enable the feature to generate and send survey reports.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-01-30
+SURVEY_REPORT_ENABLE = True
+# .. setting_name: SURVEY_REPORT_ENDPOINT
+# .. setting_default: Open edX organization endpoint
+# .. setting_description: Endpoint where the report will be sent.
+SURVEY_REPORT_ENDPOINT = 'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/'
+# .. toggle_name: ANONYMOUS_SURVEY_REPORT
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If enable, the survey report will be send a UUID as ID instead of use lms site name.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-02-21
+ANONYMOUS_SURVEY_REPORT = False
+# .. setting_name: SURVEY_REPORT_CHECK_THRESHOLD
+# .. setting_default: every 6 months
+# .. setting_description: Survey report banner will appear if a survey report is not sent in the months defined.
+SURVEY_REPORT_CHECK_THRESHOLD = 6
+# .. setting_name: SURVEY_REPORT_EXTRA_DATA
+# .. setting_default: empty dictionary
+# .. setting_description: Dictionary with additional information that you want to share in the report.
+SURVEY_REPORT_EXTRA_DATA = {}

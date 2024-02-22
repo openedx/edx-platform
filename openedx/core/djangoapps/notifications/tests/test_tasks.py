@@ -5,6 +5,7 @@ Tests for notifications tasks.
 from unittest.mock import patch
 
 import ddt
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 
@@ -206,6 +207,13 @@ class SendNotificationsTest(ModuleStoreTestCase):
         notification = Notification.objects.filter(user_id=self.user.id).first()
         self.assertIsNone(notification)
 
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    def test_notification_not_created_when_context_is_incomplete(self):
+        try:
+            send_notifications([self.user.id], str(self.course_1.id), "discussion", "new_comment", {}, "")
+        except Exception as exc:    # pylint: disable=broad-except
+            assert isinstance(exc, ValidationError)
+
 
 @ddt.ddt
 @patch('openedx.core.djangoapps.notifications.tasks.ENABLE_NOTIFICATIONS_FILTERS.is_enabled', lambda x: False)
@@ -345,7 +353,9 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         app_name = "discussion"
         context = {
             'post_title': 'Post title',
+            'username': 'Username',
             'replier_name': 'replier name',
+            'author_name': 'Authorname'
         }
         content_url = 'https://example.com/'
         send_notifications(user_ids, str(self.course.id), app_name, notification_type, context, content_url)

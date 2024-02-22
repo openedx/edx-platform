@@ -15,9 +15,12 @@ from edx_rest_framework_extensions.auth.session.authentication import (
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from openassessment.xblock.config_mixin import WAFFLE_NAMESPACE, ENHANCED_STAFF_GRADER
+from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -43,11 +46,13 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     get_assessment_info,
     get_submission_info,
     get_submissions,
+    get_assessments,
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
     FileListSerializer,
     InitializeSerializer,
+    AssessmentFeedbackSerializer,
     LockStatusSerializer,
     StaffAssessSerializer,
     SubmissionFetchSerializer,
@@ -142,6 +147,102 @@ class InitializeView(StaffGraderBaseView):
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+
+class AssessmentFeedbackView(StaffGraderBaseView, ViewSet):
+    """
+    View for fetching assessment feedback for a submission.
+
+    **Methods**
+
+    * (GET) `api/ora_staff_grader/assessments/feedback/from`
+        List all assessments received by a user (according to
+        their submissionUUID) in an ORA assignment.
+
+    * (GET) `api/ora_staff_grader/assessments/feedback/to`
+        List all assessments given by a user (according to
+        their submissionUUID) in an ORA assignment.
+
+    **Query Params**:
+
+    * `oraLocation` (str): ORA location for XBlock handling
+    * `submissionUUID` (str): The ORA submission UUID
+
+    **Response**:
+
+        {
+            assessments (List[dict]): [
+                {
+                    "assessment_id: (str) Assessment id
+                    "scorer_name: (str) Scorer name
+                    "scorer_username: (str) Scorer username
+                    "scorer_email: (str) Scorer email
+                    "assessment_date: (str) Assessment date
+                    "assessment_scores (List[dict]) [
+                        {
+                            "criterion_name: (str) Criterion name
+                            "score_earned: (int) Score earned
+                            "score_type: (str) Score type
+                        }
+                    ]
+                    "problem_step (str) Problem step (Self, Peer, or Staff)
+                    "feedback: (str) Feedback of the assessment
+                }
+            ]
+        }
+
+    **Errors**:
+
+    * `MissingParamResponse` (HTTP 400) for missing params
+    * `BadOraLocationResponse` (HTTP 400) for bad ORA location
+    * `XBlockInternalError` (HTTP 500) for an issue with ORA
+    * `UnknownError` (HTTP 500) for other errors
+    """
+    @action(methods=["get"], detail=False, url_path="from")
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
+    def get_from(self, request: Request, ora_location: str, submission_uuid: str, *args, **kwargs):
+        return self._get_assessments(request, ora_location, "list_assessments_from", submission_uuid)
+
+    @action(methods=["get"], detail=False, url_path="to")
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
+    def get_to(self, request: Request, ora_location: str, submission_uuid: str, *args, **kwargs):
+        return self._get_assessments(request, ora_location, "list_assessments_to", submission_uuid)
+
+    def _get_assessments(
+        self, request: Request, ora_location: str, handler_name: str, submission_uuid: str
+    ):
+        """
+        Fetches assessment data using the given handler name.
+
+        Args:
+            request (Request): The Django request object.
+            ora_location (str): The ORA location for XBlock handling.
+            handler_name (str): The name of the XBlock handler to use.
+            submission_uuid (str): The ORA submission UUID.
+
+        Returns:
+            A Django response object containing serialized assessment data or an error response.
+        """
+        try:
+            assessments_data = {
+                "assessments": get_assessments(
+                    request, ora_location, handler_name, submission_uuid
+                )
+            }
+            response_data = AssessmentFeedbackSerializer(assessments_data).data
+            return Response(response_data)
+
+        except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
+            return BadOraLocationResponse()
+
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
         except Exception as ex:
             log.exception(ex)
             return UnknownErrorResponse()
