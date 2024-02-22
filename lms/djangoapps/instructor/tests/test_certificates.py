@@ -82,10 +82,10 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self._assert_certificates_visible(False)
 
     @ddt.data("started", "error", "success")
-    def test_show_certificate_status(self, status):
+    def test_show_certificate_status(self, certificate_status):
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
-        with self._certificate_status("honor", status):
-            self._assert_certificate_status("honor", status)
+        with self._certificate_status("honor", certificate_status):
+            self._assert_certificate_status("honor", certificate_status)
 
     def test_show_enabled_button(self):
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
@@ -160,18 +160,18 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
             self.assertNotContains(response, "Student-Generated Certificates")
 
     @contextlib.contextmanager
-    def _certificate_status(self, description, status):
+    def _certificate_status(self, description, certificate_status):
         """Configure the certificate status by mocking the certificates API. """
         patched = 'lms.djangoapps.instructor.views.instructor_dashboard.certs_api.example_certificates_status'
         with mock.patch(patched) as certs_api_status:
             cert_status = [{
                 'description': description,
-                'status': status
+                'status': certificate_status
             }]
 
-            if status == 'error':
+            if certificate_status == 'error':
                 cert_status[0]['error_reason'] = self.ERROR_REASON
-            if status == 'success':
+            if certificate_status == 'success':
                 cert_status[0]['download_url'] = self.DOWNLOAD_URL
 
             certs_api_status.return_value = cert_status
