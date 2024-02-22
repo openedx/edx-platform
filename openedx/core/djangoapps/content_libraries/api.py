@@ -91,7 +91,15 @@ from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 from edx_rest_api_client.client import OAuthAPIClient
 from openedx.core.djangoapps.content_libraries import permissions
-from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME, COMPLEX
+# pylint: disable=unused-import
+from openedx.core.djangoapps.content_libraries.constants import (
+    ALL_RIGHTS_RESERVED,
+    CC_4_BY,
+    COMPLEX,
+    DRAFT_NAME,
+    PROBLEM,
+    VIDEO,
+)
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryBlockIndexer
 from openedx.core.djangoapps.content_libraries.models import (

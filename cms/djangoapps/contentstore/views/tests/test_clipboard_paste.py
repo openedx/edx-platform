@@ -233,6 +233,10 @@ class ClipboardLibraryContentPasteTestCase(BlockstoreAppTestMixin, LiveServerTes
             org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
             slug="lib",
             title="Library",
+            description="",
+            allow_public_learning=False,
+            allow_public_read=False,
+            library_license=library_api.ALL_RIGHTS_RESERVED,
         )
         # Populate it with a problem:
         problem_key = library_api.create_library_block(library.key, "problem", "p1").usage_key
