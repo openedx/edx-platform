@@ -15,6 +15,7 @@ import requests
 from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
+from edx_rest_api_client.client import OAuthAPIClient
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
@@ -118,9 +119,17 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         shim_xmodule_js(fragment, 'HTMLModule')
         return fragment
 
+    def _get_translations_client(self):
+        return OAuthAPIClient(
+            base_url=settings.TRANSLATIONS_SERVICE_EDX_OAUTH2_PROVIDER_URL,
+            client_id=settings.TRANSLATIONS_SERVICE_EDX_OAUTH2_KEY,
+            client_secret=settings.TRANSLATIONS_SERVICE_EDX_OAUTH2_SECRET,
+        )
+
     def translate(self, content, language):
         """ Request translated version of content from translations IDA"""
 
+        translation_client = self._get_translations_client()
         url = f'{settings.AI_TRANSLATIONS_API_URL}/translate-xblock/'
         headers = {
             'content-type': 'application/json',
@@ -134,7 +143,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
             "content_hash": sha256(content.encode('utf-8')).hexdigest(),
         }
 
-        response = requests.post(
+        response = translation_client.post(
             url,
             data=json.dumps(payload),
             headers=headers
