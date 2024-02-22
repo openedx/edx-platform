@@ -345,6 +345,14 @@ def _import_xml_node_to_parent(
     else:
         for child_node in child_nodes:
             _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
+
+    # ToDo: Check the better place to call it
+    # I tried to call it in the xml_block.py in the parse_xml() function,
+    # but the usage_key is not persited yet there
+    from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
+    if isinstance(new_xblock, TaggedBlockMixin):
+        new_xblock.add_tags_from_xml()
+
     return new_xblock
 
 

@@ -1,5 +1,5 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 
 class TaggedBlockMixin:
@@ -55,3 +55,25 @@ class TaggedBlockMixin:
         """
         super().add_xml_to_node(node)
         self.add_tags_to_node(node)
+
+    def add_tags_from_xml(self):
+        """
+        Parse and add tag data from xml
+        """
+        # This import is done here since we import and use TaggedBlockMixin in the cms settings, but the
+        # content_tagging app wouldn't have loaded yet, so importing it outside causes an error
+        from openedx.core.djangoapps.content_tagging.api import set_object_tags
+
+        tag_data = self.xml_attributes.get('tags-v1', None) if self.xml_attributes else None
+        if not tag_data:
+            return
+
+        serialized_tags = tag_data.split(';')
+        taxonomy_and_tags_dict = {}
+        for serialized_tag in serialized_tags:
+            taxonomy_export_id, tags = serialized_tag.split(':')
+            tags = tags.split(',')
+            tag_values = [unquote(tag) for tag in tags]
+            taxonomy_and_tags_dict[taxonomy_export_id] = tag_values
+
+        set_object_tags(self.usage_key, taxonomy_and_tags_dict)

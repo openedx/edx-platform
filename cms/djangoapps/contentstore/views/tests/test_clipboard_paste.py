@@ -7,6 +7,7 @@ import ddt
 from django.test import LiveServerTestCase
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
+from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
@@ -15,6 +16,7 @@ from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, Toy
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from blockstore.apps import api as blockstore_api
 
 CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
@@ -143,6 +145,78 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert dest_block.display_name == source_block.display_name
         # The new block should store a reference to where it was copied from
         assert dest_block.copied_from_block == str(source_block.location)
+
+    def test_copy_and_paste_unit_with_tags(self):
+        """
+        Test copying a unit (vertical) with tags from one course into another
+        """
+        course_key, client = self._setup_course()
+        dest_course = CourseFactory.create(display_name='Destination Course')
+        with self.store.bulk_operations(dest_course.id):
+            dest_chapter = BlockFactory.create(parent=dest_course, category='chapter', display_name='Section')
+            dest_sequential = BlockFactory.create(parent=dest_chapter, category='sequential', display_name='Subsection')
+
+        unit_key = course_key.make_usage_key("vertical", "vertical_test")
+        # Add tags to the unit
+        taxonomy_all_org = tagging_api.create_taxonomy("test_taxonomy", "Test Taxonomy")
+
+        taxonomy_all_org = tagging_api.create_taxonomy("test_taxonomy", "Test Taxonomy")
+        tagging_api.set_taxonomy_orgs(taxonomy_all_org, all_orgs=True)
+        Tag.objects.create(taxonomy=taxonomy_all_org, value="tag_1")
+        Tag.objects.create(taxonomy=taxonomy_all_org, value="tag_2")
+        # Removing a tag is causing tag_object to fail
+        # tag_removed = Tag.objects.create(taxonomy=taxonomy, value="tag_removed")
+        tagging_api.tag_object(
+            object_id=str(unit_key),
+            taxonomy=taxonomy_all_org,
+            # tags=["tag_1", "tag_2", "tag_removed"],
+            tags=["tag_1", "tag_2"],
+        )
+
+        taxonomy_all_org_removed = tagging_api.create_taxonomy("test_taxonomy_removed", "Test Taxonomy Removed")
+        tagging_api.set_taxonomy_orgs(taxonomy_all_org_removed, all_orgs=True)
+        Tag.objects.create(taxonomy=taxonomy_all_org_removed, value="tag_1")
+        Tag.objects.create(taxonomy=taxonomy_all_org_removed, value="tag_2")
+        tagging_api.tag_object(
+            object_id=str(unit_key),
+            taxonomy=taxonomy_all_org_removed,
+            tags=["tag_1", "tag_2"],
+        )
+        all_org_tags = tagging_api.get_object_tags(str(unit_key))
+
+        taxonomy_no_org = tagging_api.create_taxonomy("test_taxonomy_no_org", "Test Taxonomy No Org")
+        Tag.objects.create(taxonomy=taxonomy_no_org, value="tag_1")
+        Tag.objects.create(taxonomy=taxonomy_no_org, value="tag_2")
+        tagging_api.tag_object(
+            object_id=str(unit_key),
+            taxonomy=taxonomy_no_org,
+            tags=["tag_1", "tag_2"],
+        )
+
+
+        # Copy the unit
+        copy_response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(unit_key)}, format="json")
+        assert copy_response.status_code == 200
+
+        # tag_removed.delete()
+        taxonomy_all_org_removed.delete()
+
+        # Paste the unit
+        paste_response = client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(dest_sequential.location),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+        dest_unit_key = UsageKey.from_string(paste_response.json()["locator"])
+
+        # Only tags from the taxonomy that is associated with the dest org should be copied
+        tags = list(tagging_api.get_object_tags(str(dest_unit_key)))
+        assert len(tags) == 2
+        assert str(tags[0]) == '<ObjectTag> ' \
+            'block-v1:org.1+course_1+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_1'
+        assert str(tags[1]) == '<ObjectTag> ' \
+            'block-v1:org.1+course_1+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_2'
+
 
     def test_paste_with_assets(self):
         """
