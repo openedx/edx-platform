@@ -14,6 +14,8 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode, urlparse
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
@@ -124,6 +126,11 @@ def _get_new_courseware_url(
     )
 
 
+def get_learning_mfe_base_url() -> str:
+    mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+    return mfe_config.get("LEARNING_BASE_URL", settings.LEARNING_MICROFRONTEND_URL)
+
+
 def make_learning_mfe_courseware_url(
         course_key: CourseKey,
         sequence_key: Optional[UsageKey] = None,
@@ -159,7 +166,7 @@ def make_learning_mfe_courseware_url(
     strings. They're only ever used to concatenate a URL string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'{get_learning_mfe_base_url()}/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -189,7 +196,7 @@ def get_learning_mfe_home_url(
     `url_fragment` is an optional string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'{get_learning_mfe_base_url()}/course/{course_key}'
 
     if url_fragment:
         mfe_link += f'/{url_fragment}'
@@ -204,9 +211,9 @@ def is_request_from_learning_mfe(request: HttpRequest):
     """
     Returns whether the given request was made by the frontend-app-learning MFE.
     """
-    if not settings.LEARNING_MICROFRONTEND_URL:
+    if not get_learning_mfe_base_url():
         return False
 
-    url = urlparse(settings.LEARNING_MICROFRONTEND_URL)
+    url = urlparse(get_learning_mfe_base_url())
     mfe_url_base = f'{url.scheme}://{url.netloc}'
     return request.META.get('HTTP_REFERER', '').startswith(mfe_url_base)

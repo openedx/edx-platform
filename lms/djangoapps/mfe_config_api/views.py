@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
 class MFEConfigView(APIView):
@@ -60,12 +61,25 @@ class MFEConfigView(APIView):
         if not settings.ENABLE_MFE_CONFIG_API:
             return HttpResponseNotFound()
 
-        mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+        current_site = request.META.get("HTTP_X_FORWARDED_HOST", settings.LMS_BASE)
+        current_site = current_site.replace("apps.", "")
+        site_configuration = None
+        try:
+            site_configuration = SiteConfiguration.objects.get(site__domain=current_site)
+            if site_configuration.get_value("MFE_CONFIG"):
+                mfe_config = site_configuration.get_value("MFE_CONFIG")
+            else:
+                mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+        except SiteConfiguration.DoesNotExist:
+            mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
         if request.query_params.get('mfe'):
             mfe = str(request.query_params.get('mfe'))
-            app_config = configuration_helpers.get_value(
-                'MFE_CONFIG_OVERRIDES',
-                settings.MFE_CONFIG_OVERRIDES,
-            )
+            if site_configuration and site_configuration.get_value("MFE_CONFIG_OVERRIDES"):
+                app_config = site_configuration.get_value("MFE_CONFIG_OVERRIDES")
+            else:
+                app_config = configuration_helpers.get_value(
+                    'MFE_CONFIG_OVERRIDES',
+                    settings.MFE_CONFIG_OVERRIDES,
+                )
             mfe_config.update(app_config.get(mfe, {}))
         return JsonResponse(mfe_config, status=status.HTTP_200_OK)
