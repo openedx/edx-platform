@@ -29,11 +29,6 @@
 %if mathjax_mode is not Undefined and mathjax_mode == 'wiki':
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-    styles: {
-      '.MathJax_SVG>svg': { 'max-width': '100%', },
-      // This is to resolve for people who use center mathjax with tables
-      'table>tbody>tr>td>.MathJax_SVG>svg': { 'max-width': 'inherit'},
-    },
     CommonHTML: { linebreaks: { automatic: true } },
     SVG: { linebreaks: { automatic: true } },
     "HTML-CSS": { linebreaks: { automatic: true } },
@@ -44,11 +39,6 @@
 %else:
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-    styles: {
-      '.MathJax_SVG>svg': { 'max-width': '100%', },
-      // This is to resolve for people who use center mathjax with tables
-      'table>tbody>tr>td>.MathJax_SVG>svg': { 'max-width': 'inherit'},
-    },
     messageStyle: "none",
     CommonHTML: { linebreaks: { automatic: true } },
     SVG: { linebreaks: { automatic: true } },
@@ -116,11 +106,6 @@
           oldWidth = document.documentElement.scrollWidth;
           MathJax.Hub.Queue(
             ["Rerender", MathJax.Hub],
-            [() => $('.MathJax_SVG>svg').toArray().forEach(el => {
-              if ($(el).width() === 0) {
-                $(el).css('max-width', 'inherit');
-              }
-            })]
           );
           t = -1;
         }, delay);

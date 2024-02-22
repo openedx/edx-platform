@@ -2258,6 +2258,11 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
     @skip_unless_lms
     def test_register_success_with_redirect(self, next_url, course_id, expected_redirect):
+        expected_response = {
+            'username': self.USERNAME,
+            'full_name': self.NAME,
+            'user_id': 1
+        }
         post_params = {
             "email": self.EMAIL,
             "name": self.NAME,
@@ -2282,7 +2287,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         # Check that authenticated user details are also returned in
         # the response for successful registration
         decoded_response = json.loads(response.content.decode('utf-8'))
-        assert decoded_response['authenticated_user'] == {'username': self.USERNAME, 'user_id': 1}
+        assert decoded_response['authenticated_user'] == expected_response
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.register._record_is_marketable_attribute')
     def test_logs_for_error_when_setting_is_marketable_attribute(self, set_is_marketable_attr):

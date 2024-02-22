@@ -2,14 +2,13 @@
 from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
 from lms.djangoapps.user_tours.models import UserTour, UserDiscussionsTours
+from lms.djangoapps.user_tours.toggles import USER_TOURS_DISABLED
 from lms.djangoapps.user_tours.v1.serializers import UserTourSerializer, UserDiscussionsToursSerializer
 
 from rest_framework.views import APIView
@@ -24,7 +23,6 @@ class UserTourView(RetrieveUpdateAPIView):
         GET /api/user_tours/v1/{username}
         PATCH /api/user_tours/v1/{username}
     """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = UserTourSerializer
 
@@ -41,9 +39,12 @@ class UserTourView(RetrieveUpdateAPIView):
 
             400 if there is a not allowed request (requesting a user you don't have access to)
             401 if unauthorized request
-            403 if waffle flag is not enabled
+            403 if tours are disabled
             404 if the UserTour does not exist (shouldn't happen, but safety first)
         """
+        if USER_TOURS_DISABLED.is_enabled():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         if request.user.username != username and not request.user.is_staff:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -66,8 +67,11 @@ class UserTourView(RetrieveUpdateAPIView):
 
             400 if update was unsuccessful or there was nothing to update
             401 if unauthorized request
-            403 if waffle flag is not enabled
+            403 if tours are disabled
         """
+        if USER_TOURS_DISABLED.is_enabled():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         if request.user.username != username:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -104,7 +108,6 @@ class UserDiscussionsToursView(APIView):
     ]
     """
 
-    authentication_classes = (JwtAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, tour_id=None):
@@ -125,8 +128,11 @@ class UserDiscussionsToursView(APIView):
                     "user": 1
                 }
              ]
+            403 if the tours are disabled
 
         """
+        if USER_TOURS_DISABLED.is_enabled():
+            return Response(status=status.HTTP_403_FORBIDDEN)
         try:
             with transaction.atomic():
                 tours = UserDiscussionsTours.objects.filter(user=request.user)
@@ -158,9 +164,11 @@ class UserDiscussionsToursView(APIView):
         Returns:
             200: The updated tour, serialized using the UserDiscussionsToursSerializer
             404: If the tour does not exist
-            403: If the user does not have permission to update the tour
+            403: If the user does not have permission to update the tour or the tours are disabled
             400: Validation error
         """
+        if USER_TOURS_DISABLED.is_enabled():
+            return Response(status=status.HTTP_403_FORBIDDEN)
         tour = get_object_or_404(UserDiscussionsTours, pk=tour_id)
         if tour.user != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)

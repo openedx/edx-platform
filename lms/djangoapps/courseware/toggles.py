@@ -126,6 +126,19 @@ ENABLE_OPTIMIZELY_IN_COURSEWARE = WaffleSwitch(  # lint-amnesty, pylint: disable
     'RET.enable_optimizely_in_courseware', __name__
 )
 
+# .. toggle_name: courseware.discovery_default_language_filter
+# .. toggle_implementation: WaffleSwitch
+# .. toggle_default: False
+# .. toggle_description: Enable courses to be filtered by user language by default.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-11-02
+# .. toggle_target_removal_date: None
+# .. toggle_warning: The ENABLE_COURSE_DISCOVERY feature flag should be enabled.
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33647
+ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER = WaffleSwitch(
+    f'{WAFFLE_FLAG_NAMESPACE}.discovery_default_language_filter', __name__
+)
+
 
 def courseware_mfe_is_active() -> bool:
     """
