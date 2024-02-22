@@ -57,6 +57,7 @@ from common.djangoapps.student.roles import (
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_roles.api import get_all_courses_for_user_has_permission
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -154,7 +155,7 @@ def get_course_and_check_access(course_key, user, depth=0):
     Function used to calculate and return the locator and course block
     for the view functions in this file.
     """
-    if not has_studio_read_access(user, course_key):
+    if not has_studio_read_access(user, course_key) and not user.has_perm(CourseRolesPermission.MANAGE_CONTENT.perm_name, course_key):
         raise PermissionDenied()
     course_block = modulestore().get_course(course_key, depth=depth)
     return course_block
@@ -288,6 +289,7 @@ def course_handler(request, course_key_string=None):
                 course_key = CourseKey.from_string(course_key_string)
                 with modulestore().bulk_operations(course_key):
                     course_block = get_course_and_check_access(course_key, request.user, depth=None)
+                    print(course_block)
                     return JsonResponse(_course_outline_json(request, course_block))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
@@ -505,10 +507,13 @@ def _accessible_courses_list_from_groups(request):
         course_keys.update(overviews_course_keys)
 
     course_keys = list(course_keys.values())
-
+    course_keys_with_manage_content = get_all_courses_for_user_has_permission(
+        request.user, CourseRolesPermission.MANAGE_CONTENT
+    )
+    course_keys_with_manage_content = {str(course_key) for course_key in course_keys_with_manage_content}
+    course_keys = list(set(course_keys) | course_keys_with_manage_content)
     if course_keys:
         courses_list = CourseOverview.get_all_courses(filter_={'id__in': course_keys})
-
     return courses_list, []
 
 

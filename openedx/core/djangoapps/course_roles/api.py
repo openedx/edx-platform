@@ -10,8 +10,9 @@ from opaque_keys.edx.locator import LibraryLocator
 
 from edx_django_utils.cache import RequestCache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.course_roles.models import UserRole
 from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
+from openedx.core.djangoapps.course_roles.models import UserRole
+from openedx.core.djangoapps.course_roles.toggles import use_permission_checks
 from openedx.core.lib.exceptions import CourseNotFoundError
 
 
@@ -57,3 +58,41 @@ def get_all_user_permissions_for_a_course(
     cache.set(cache_key, permissions)
 
     return permissions
+
+
+def get_all_courses_for_user_has_permission(user: User, permission: CourseRolesPermission) -> set[CourseKey]:
+    """
+    Get all courses for a user with permission.
+    """
+    if not use_permission_checks():
+        return set()
+    if isinstance(user, AnonymousUser):
+        return set()
+    if not isinstance(user, User):
+        raise TypeError(f'user must be a User, not {type(user)}')
+    if not isinstance(permission, CourseRolesPermission):
+        raise TypeError(f'permission must be a CourseRolesPermission, not {type(permission)}')
+    cache = RequestCache("course_roles")
+    cache_key = f"all_courses_for_user_with_permission:{user.id}:{permission.value.name}"
+    cached_response = cache.get_cached_response(cache_key)
+    if cached_response.is_found:
+        return cached_response.value
+    courses_qset = UserRole.objects.filter(
+        Q(user=user) &
+        Q(role__permissions__name=permission.value.name) &
+        Q(course__isnull=False)
+    )
+    courses = set(CourseKey.from_string(str(course)) for course in courses_qset.values_list('course__id', flat=True))
+    orgs_qset = UserRole.objects.filter(
+        Q(user=user) &
+        Q(role__permissions__name=permission.value.name) &
+        Q(course__isnull=True)
+    )
+    orgs = set(org for org in orgs_qset.values_list('org__name', flat=True))
+    if orgs:
+        courses_qset = CourseOverview.objects.filter(
+            Q(org__in=orgs)
+        )
+        courses |= set(CourseKey.from_string(str(course)) for course in courses_qset.values_list('id', flat=True))
+    cache.set(cache_key, courses)
+    return courses

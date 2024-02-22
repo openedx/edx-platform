@@ -153,7 +153,6 @@ def handle_xblock(request, usage_key_string=None):
     if usage_key_string:
 
         usage_key = usage_key_with_run(usage_key_string)
-
         access_check = (
             has_studio_read_access
             if request.method == "GET"
@@ -527,10 +526,13 @@ def _create_block(request):
     """View for create blocks."""
     parent_locator = request.json["parent_locator"]
     usage_key = usage_key_with_run(parent_locator)
+    print("---here1---")
     if not has_studio_write_access(request.user, usage_key.course_key):
+        print("---here2---")
         raise PermissionDenied()
 
     if request.json.get("staged_content") == "clipboard":
+        print("---here3---")
         # Paste from the user's clipboard (content_staging app clipboard, not browser clipboard) into 'usage_key':
         try:
             created_xblock, notices = import_staged_content_from_user_clipboard(
@@ -552,7 +554,7 @@ def _create_block(request):
             "courseKey": str(created_xblock.location.course_key),
             "static_file_notices": asdict(notices),
         })
-
+    print("---here4---")
     category = request.json["category"]
     if isinstance(usage_key, LibraryUsageLocator):
         # Only these categories are supported at this time.
