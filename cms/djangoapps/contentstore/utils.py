@@ -1756,6 +1756,9 @@ def _get_course_index_context(request, course_key, course_block):
     proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
 
     user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
+    course_block.discussions_settings['discussion_configuration_url'] = (
+        f'{get_pages_and_resources_url(course_block.id)}/discussion/settings'
+    )
 
     course_index_context = {
         'language_code': request.LANGUAGE_CODE,
