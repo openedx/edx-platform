@@ -39,6 +39,9 @@ from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.decorators import xframe_allow_whitelisted
 from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
+from user_authn.utils import get_authn_mfe_base_url
+
+
 log = logging.getLogger(__name__)
 
 
@@ -219,7 +222,7 @@ def login_and_registration_form(request, initial_mode="login"):
             initial_mode,
             '?' + query_params if query_params else ''
         )
-        return redirect(settings.AUTHN_MICROFRONTEND_URL + url_path)
+        return redirect(get_authn_mfe_base_url(request=request) + url_path)
 
     # Account activation message
     account_activation_messages = [

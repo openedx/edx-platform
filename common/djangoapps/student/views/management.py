@@ -55,6 +55,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.tasks import send_activation_email
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
+from openedx.core.djangoapps.user_authn.views.utils import get_authn_mfe_base_url
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.enterprise_support.utils import is_enterprise_learner
@@ -639,7 +640,7 @@ def activate_account(request, key):
         if redirect_url:
             params['next'] = redirect_url
         url_path = '/login?{}'.format(urllib.parse.urlencode(params))
-        return redirect(settings.AUTHN_MICROFRONTEND_URL + url_path)
+        return redirect(get_authn_mfe_base_url(request=request) + url_path)
 
     response = redirect(redirect_url) if redirect_url and is_enterprise_learner(request.user) else redirect('dashboard')
     if show_account_activation_popup:

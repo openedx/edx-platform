@@ -12,6 +12,9 @@ from common.djangoapps.third_party_auth.models import clean_username
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 
+from lms.djangoapps.mfe_config_api.utils import get_mfe_config_for_site
+
+
 API_V1 = 'v1'
 UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 ENTERPRISE_ENROLLMENT_URL_REGEX = fr'/enterprise/{UUID4_REGEX}/course/{settings.COURSE_KEY_REGEX}/enroll'
@@ -108,3 +111,8 @@ def get_mfe_context(request, redirect_to, tpa_hint=None):
         'countryCode': country_code,
     })
     return context
+
+
+def get_authn_mfe_base_url(request=None, site=None) -> str:
+    mfe_config = get_mfe_config_for_site(request=request, site=site, mfe="authn")
+    return mfe_config.get("BASE_URL", settings.AUTHN_MICROFRONTEND_URL)
