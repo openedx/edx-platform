@@ -53,6 +53,7 @@ from xmodule.util.sandboxing import SandboxService
 from xmodule.services import EventPublishingService, RebindUserService, SettingsService, TeamsConfigurationService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
+from lms.djangoapps.ai_translation.service import AiTranslationService
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
@@ -633,6 +634,7 @@ def prepare_runtime_for_user(
         'teams_configuration': TeamsConfigurationService(),
         'call_to_action': CallToActionService(),
         'publish': EventPublishingService(user, course_id, track_function),
+        'ai_translation': AiTranslationService(),
     }
 
     runtime.get_block_for_descriptor = inner_get_block
