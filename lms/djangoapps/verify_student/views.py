@@ -1072,6 +1072,18 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
     reason = body_dict.get("Reason", "")
     error_code = body_dict.get("MessageType", "")
 
+    # TODO: These logs must be removed once the investigation in COSMO-184 is complete.
+    #       COSMO-196 was created to track the cleanup of these logs.
+    log.info(
+        "[COSMO-184] Software Secure review received for receipt_id={receipt_id}, "
+        "with result={result} and reason={reason}."
+        .format(
+            receipt_id=receipt_id,
+            result=result,
+            reason=reason,
+        )
+    )
+
     try:
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=receipt_id)
     except SoftwareSecurePhotoVerification.DoesNotExist:
@@ -1099,6 +1111,10 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
                 SoftwareSecurePhotoVerification.objects.filter(pk=previous_verification.pk
                                                                ).update(expiry_email_date=None)
         log.debug(f'Approving verification for {receipt_id}')
+
+        # TODO: These logs must be removed once the investigation in COSMO-184 is complete.
+        #       COSMO-196 was created to track the cleanup of these logs.
+        log.info("[COSMO-184] Approved verification for receipt_id={receipt_id}.".format(receipt_id=receipt_id))
         attempt.approve()
 
         expiration_datetime = attempt.expiration_datetime.date()
@@ -1121,6 +1137,11 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
 
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
+
+        # TODO: These logs must be removed once the investigation in COSMO-184 is complete.
+        #       COSMO-196 was created to track the cleanup of these logs.
+        log.info("[COSMO-184] Denied verification for receipt_id={receipt_id}.".format(receipt_id=receipt_id))
+
         attempt.deny(json.dumps(reason), error_code=error_code)
         reverify_url = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         verification_status_email_vars['reasons'] = reason

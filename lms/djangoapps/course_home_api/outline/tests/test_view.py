@@ -404,6 +404,16 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 200
         assert response.data['user_has_passing_grade'] is True
 
+    def test_hide_from_toc_field(self):
+        """
+        Test that the hide_from_toc field is returned in the response.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        for block in response.data["course_blocks"]["blocks"].values():
+            assert "hide_from_toc" in block
+
     def assert_can_enroll(self, can_enroll):
         response = self.client.get(self.url)
         assert response.status_code == 200

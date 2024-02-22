@@ -24,6 +24,7 @@ COURSE_KEY2 = CourseKey.from_string('course-v1:edx+math+1')
 TOPIC1 = 'topic-1'
 TOPIC2 = 'topic-2'
 TOPIC3 = 'topic-3'
+TOPIC4 = 'topic-4'
 
 DISCUSSION_TOPIC_ID = uuid4().hex
 
@@ -44,7 +45,8 @@ class PythonAPITests(SharedModuleStoreTestCase):
         topic_data = [
             (TOPIC1, TeamsetType.private_managed.value),
             (TOPIC2, TeamsetType.open.value),
-            (TOPIC3, TeamsetType.public_managed.value)
+            (TOPIC3, TeamsetType.public_managed.value),
+            (TOPIC4, TeamsetType.open_managed.value),
         ]
         topics = [
             {
@@ -55,7 +57,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
             } for topic_id, teamset_type in topic_data
         ]
         teams_config_1 = TeamsConfig({'topics': [topics[0]]})
-        teams_config_2 = TeamsConfig({'topics': [topics[1], topics[2]]})
+        teams_config_2 = TeamsConfig({'topics': [topics[1], topics[2], topics[3]]})
         cls.course1 = CourseFactory(
             org=COURSE_KEY1.org,
             course=COURSE_KEY1.course,
@@ -93,10 +95,12 @@ class PythonAPITests(SharedModuleStoreTestCase):
             topic_id=TOPIC2
         )
         cls.team3 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team3', topic_id=TOPIC3)
+        cls.team4 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team4', topic_id=TOPIC4)
 
         cls.team1.add_user(cls.user1)
         cls.team1.add_user(cls.user2)
         cls.team2.add_user(cls.user3)
+        cls.team4.add_user(cls.user3)
 
         cls.team1a.add_user(cls.user4)
         cls.team2a.add_user(cls.user4)
@@ -122,21 +126,25 @@ class PythonAPITests(SharedModuleStoreTestCase):
         assert not teams_api.is_team_discussion_private(None)
         assert not teams_api.is_team_discussion_private(self.team2)
         assert not teams_api.is_team_discussion_private(self.team3)
+        assert not teams_api.is_team_discussion_private(self.team4)
 
     def test_is_instructor_managed_team(self):
         assert teams_api.is_instructor_managed_team(self.team1)
         assert not teams_api.is_instructor_managed_team(self.team2)
         assert teams_api.is_instructor_managed_team(self.team3)
+        assert not teams_api.is_instructor_managed_team(self.team4)
 
     def test_is_instructor_managed_topic(self):
         assert teams_api.is_instructor_managed_topic(COURSE_KEY1, TOPIC1)
         assert not teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC2)
         assert teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC3)
+        assert not teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC4)
 
     def test_user_is_a_team_member(self):
         assert teams_api.user_is_a_team_member(self.user1, self.team1)
         assert not teams_api.user_is_a_team_member(self.user1, None)
         assert not teams_api.user_is_a_team_member(self.user1, self.team2)
+        assert not teams_api.user_is_a_team_member(self.user1, self.team4)
 
     def test_private_discussion_visible_by_user(self):
         assert teams_api.discussion_visible_by_user(DISCUSSION_TOPIC_ID, self.user1)
@@ -147,6 +155,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
         assert teams_api.discussion_visible_by_user(self.team2.discussion_topic_id, self.user1)
         assert teams_api.discussion_visible_by_user(self.team2.discussion_topic_id, self.user2)
         assert teams_api.discussion_visible_by_user('DO_NOT_EXISTS', self.user3)
+        assert teams_api.discussion_visible_by_user(self.team4.discussion_topic_id, self.user3)
 
     @ddt.unpack
     @ddt.data(

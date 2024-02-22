@@ -32,7 +32,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .save-button': 'saveSelectedLibraryComponents',
             'click .paste-component-button': 'pasteComponent',
-            'click .tags-button': 'openManageTags',
+            'click .manage-tags-button': 'openManageTags',
             'change .header-library-checkbox': 'toggleLibraryComponent',
             'click .collapse-button': 'collapseXBlock',
         },
@@ -111,6 +111,7 @@ function($, _, Backbone, gettext, BasePage,
                     el: this.$('.unit-tags'),
                     model: this.model
                 });
+                this.tagListView.setupMessageListener();
                 this.tagListView.render();
 
                 this.unitOutlineView = new UnitOutlineView({

@@ -110,7 +110,14 @@ from openedx.features.course_experience.url_helpers import (
     get_learning_mfe_home_url,
     make_learning_mfe_courseware_url
 )
+from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerUserFactory,
+    EnterpriseCustomerFactory
+)
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.features.enterprise_support.api import add_enterprise_customer_to_session
+from enterprise.api.v1.serializers import EnterpriseCustomerSerializer
 
 QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
@@ -358,7 +365,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(177, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(178, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -990,10 +997,15 @@ class ViewsTestCase(BaseViewsTestCase):
     )
     @ddt.data(
         ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_204_NO_CONTENT),
+        ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_403_FORBIDDEN),
         ('/financial-assistance/course-v1:invalid+ErrorX+Invalid_Course/apply/', status.HTTP_400_BAD_REQUEST)
     )
     @ddt.unpack
     def test_submit_financial_assistance_request_v2(self, referrer_url, expected_status, *args):
+        # We expect a 403 if the user account is not active
+        if expected_status == status.HTTP_403_FORBIDDEN:
+            self.user.is_active = False
+            self.user.save()
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',
@@ -1484,8 +1496,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "earned a certificate for this course.")
 
     @ddt.data(
-        (True, 53),
-        (False, 53),
+        (True, 54),
+        (False, 54),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1500,13 +1512,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with self.assertNumQueries(
-            53, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+            54, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
         ), check_mongo_calls(2):
             self._get_progress_page()
 
         for _ in range(2):
             with self.assertNumQueries(
-                37, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                38, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
 
@@ -3223,17 +3235,71 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     Test access utilities
     """
     @ddt.data(
-        (1, False),
-        (-1, True)
+        {
+            'start_date_modifier': 1,  # course starts in future
+            'setup_enterprise_enrollment': False,
+            'expected_has_access': False,
+            'expected_error_code': 'course_not_started',
+        },
+        {
+            'start_date_modifier': -1,  # course already started
+            'setup_enterprise_enrollment': False,
+            'expected_has_access': True,
+            'expected_error_code': None,
+        },
+        {
+            'start_date_modifier': 1,  # course starts in future
+            'setup_enterprise_enrollment': True,
+            'expected_has_access': False,
+            'expected_error_code': 'course_not_started_enterprise_learner',
+        },
+        {
+            'start_date_modifier': -1,  # course already started
+            'setup_enterprise_enrollment': True,
+            'expected_has_access': True,
+            'expected_error_code': None,
+        },
     )
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_is_course_open_for_learner(self, start_date_modifier, expected_value):
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
+    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
+    def test_is_course_open_for_learner(
+        self,
+        start_date_modifier,
+        setup_enterprise_enrollment,
+        expected_has_access,
+        expected_error_code,
+    ):
+        """
+        Test is_course_open_for_learner().
+
+        When setup_enterprise_enrollment == True, make an enterprise-subsidized enrollment, setting up one of each:
+        * CourseEnrollment
+        * EnterpriseCustomer
+        * EnterpriseCustomerUser
+        * EnterpriseCourseEnrollment
+        * A mock request session to pre-cache the enterprise customer data.
+        """
         staff_user = AdminFactory()
         start_date = datetime.now(UTC) + timedelta(days=start_date_modifier)
         course = CourseFactory.create(start=start_date)
+        request = RequestFactory().get('/')
+        request.user = staff_user
+        request.session = {}
+        if setup_enterprise_enrollment:
+            course_enrollment = CourseEnrollmentFactory(mode=CourseMode.VERIFIED, user=staff_user, course_id=course.id)
+            enterprise_customer = EnterpriseCustomerFactory(enable_learner_portal=True)
+            add_enterprise_customer_to_session(request, EnterpriseCustomerSerializer(enterprise_customer).data)
+            enterprise_customer_user = EnterpriseCustomerUserFactory(
+                user_id=staff_user.id,
+                enterprise_customer=enterprise_customer,
+            )
+            EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
+        set_current_request(request)
 
-        assert bool(check_course_open_for_learner(staff_user, course)) == expected_value
+        access_response = check_course_open_for_learner(staff_user, course)
+        assert bool(access_response) == expected_has_access
+        assert access_response.error_code == expected_error_code
 
 
 class DatesTabTestCase(TestCase):

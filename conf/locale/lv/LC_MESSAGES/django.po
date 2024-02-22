@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -9,14 +9,14 @@
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -25,7 +25,7 @@
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -49,7 +49,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-10 20:43+0000\n"
+"POT-Creation-Date: 2023-12-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Latvian (https://app.transifex.com/open-edx/teams/6205/lv/)\n"
@@ -7896,6 +7896,13 @@ msgstr "Profesija"
 msgid "Specialty"
 msgstr "Specialitāte"
 
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
 msgid ""
@@ -12487,6 +12494,10 @@ msgstr ""
 msgid "Invalid prerequisite course key"
 msgstr ""
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr ""
+
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -12693,10 +12704,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "Kurss ir veiksmīgi pārindeksots."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -22834,7 +22841,11 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -22842,7 +22853,7 @@ msgid "Manage tags"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -23154,6 +23165,10 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
 msgstr ""
 
 #: cms/templates/widgets/header.html
