@@ -3,6 +3,7 @@ Adapter to isolate django-oauth-toolkit dependencies
 """
 
 from oauth2_provider import models
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 
@@ -78,6 +79,16 @@ class DOTAdapter:
             user=user,
             expires=expires,
         )
+
+    def get_scopes_from_application_access(self, client_id):
+        """
+        Get the scopes for the given client_id.
+        """
+        try:
+            application_access = ApplicationAccess.objects.get(application__client_id=client_id)
+            return list(application_access.scopes)
+        except ApplicationAccess.DoesNotExist:
+            return None
 
     def get_token_scope_names(self, token):
         """

@@ -125,7 +125,13 @@ class AccessTokenView(_DispatchingView):
         """
         opaque_token_dict = json.loads(response.content.decode('utf-8'))
         use_asymmetric_key = request.POST.get('asymmetric_jwt', False)
-        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request),
+        adapter = self.get_adapter(request)
+        client_id = request.POST.get('client_id')
+        access_scopes = adapter.get_scopes_from_application_access(client_id)
+        if access_scopes is not None:
+            access_scopes_string = ' '.join(access_scopes)
+            opaque_token_dict['scope'] = access_scopes_string
+        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, adapter,
                                                use_asymmetric_key=use_asymmetric_key)
         return json.dumps(jwt_token_dict)
 
