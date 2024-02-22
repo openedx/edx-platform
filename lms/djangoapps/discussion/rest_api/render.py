@@ -9,7 +9,7 @@ import markdown
 
 ALLOWED_TAGS = bleach.ALLOWED_TAGS | {
     'br', 'dd', 'del', 'dl', 'dt', 'h1', 'h2', 'h3', 'h4', 'hr', 'img', 'kbd', 'p', 'pre', 's',
-    'strike', 'sub', 'sup'
+    'strike', 'sub', 'sup', 'table', 'thead', 'th', 'tbody', 'tr', 'td', 'tfoot'
 }
 ALLOWED_PROTOCOLS = {"http", "https", "ftp", "mailto"}
 ALLOWED_ATTRIBUTES = {
