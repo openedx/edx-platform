@@ -24,7 +24,12 @@ log = logging.getLogger('edx.celery.task')
 
 @shared_task
 @set_code_owner_attribute
-def check_pwned_password_and_send_track_event(user_id, password, internal_user=False, is_new_user=False):
+def check_pwned_password_and_send_track_event(
+    user_id, password,
+    internal_user=False,
+    is_new_user=False,
+    request_page=''
+):
     """
     Check the Pwned Databases and send its event to Segment.
     """
@@ -33,6 +38,7 @@ def check_pwned_password_and_send_track_event(user_id, password, internal_user=F
         if pwned_properties:
             pwned_properties['internal_user'] = internal_user
             pwned_properties['new_user'] = is_new_user
+            pwned_properties['user_request_page'] = request_page
             segment.track(user_id, 'edx.bi.user.pwned.password.status', pwned_properties)
         return pwned_properties
     except Exception:  # pylint: disable=W0703

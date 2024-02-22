@@ -288,7 +288,13 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
 def is_new_user(password, user):
     if user is not None:
         AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
-        check_pwned_password_and_send_track_event.delay(user.id, password, user.is_staff, True)
+        check_pwned_password_and_send_track_event.delay(
+            user_id=user.id,
+            password=password,
+            internal_user=user.is_staff,
+            is_new_user=True,
+            request_page='registration'
+        )
 
 
 def _link_user_to_third_party_provider(
