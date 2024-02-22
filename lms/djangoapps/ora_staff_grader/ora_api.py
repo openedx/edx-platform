@@ -34,7 +34,12 @@ def get_submissions(request, usage_id):
     if response.status_code != 200:
         raise XBlockInternalError(context={"handler": handler_name})
 
-    return json.loads(response.content)
+    try:
+        return json.loads(response.content)
+    except json.JSONDecodeError as exc:
+        raise XBlockInternalError(
+            context={"handler": handler_name, "details": response.content}
+        ) from exc
 
 
 def get_assessments(request: Request, usage_id: str, handler_name: str, submission_uuid: str):
