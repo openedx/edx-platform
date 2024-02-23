@@ -1796,7 +1796,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         for team_set in settings_dict["teams_configuration"]["value"]["team_sets"]:
             self.assertNotIn("dynamic_user_partition_id", team_set)
 
-    @patch("openedx.core.lib.teams_config.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
+    @patch("cms.djangoapps.models.settings.course_metadata.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
     def test_team_content_groups_on(self):
         """
         Tests that dynamic_user_partition_id is added to the model when content groups for teams are on.

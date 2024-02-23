@@ -393,7 +393,10 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         self._verify_masquerade_for_all_groups()
 
 
-@patch("openedx.core.lib.teams_config.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
+@patch(
+    "openedx.core.djangoapps.course_groups.team_partition_scheme.CONTENT_GROUPS_FOR_TEAMS.is_enabled",
+    lambda _: True
+)
 @skip_unless_lms
 class TestTeamPartitionScheme(ModuleStoreTestCase):
     """

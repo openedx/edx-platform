@@ -1969,7 +1969,10 @@ class ContentErrorTestCase(CacheIsolationTestCase):
         ]
 
 
-@patch("openedx.core.lib.teams_config.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
+@patch(
+    "openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups.CONTENT_GROUPS_FOR_TEAMS.is_enabled",  # lint-amnesty, pylint: disable=line-too-long
+    lambda _: True
+)
 @skip_unless_lms
 class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
     """Tests for team partitions processor that affects outlines."""
