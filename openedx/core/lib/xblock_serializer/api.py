@@ -23,5 +23,10 @@ def serialize_modulestore_block_for_blockstore(block):
             contain the OLX of its children, just refers to them, so you have to
             separately serialize them.)
         (3) a list of any static files required by the XBlock and their URL
+
+    TODO: We should deprecate this in favor of a new Learning Core implementation.
+    We've left it as-is for now partly because there are bigger questions that
+    we have around how we should rewrite this (e.g. are we going to
+    remove <xblock-include>?).
     """
     return XBlockSerializerForBlockstore(block)

@@ -3,12 +3,16 @@ Content Tagging APIs
 """
 from __future__ import annotations
 
+from itertools import groupby
+
 import openedx_tagging.core.tagging.api as oel_tagging
-from django.db.models import QuerySet, Exists, OuterRef
-from openedx_tagging.core.tagging.models import Taxonomy
+from django.db.models import Exists, OuterRef, Q, QuerySet
+from opaque_keys.edx.keys import CourseKey, LearningContextKey
+from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
 from .models import TaxonomyOrg
+from .types import ObjectTagByObjectIdDict, TaxonomyDict
 
 
 def create_taxonomy(
@@ -83,7 +87,7 @@ def set_taxonomy_orgs(
 
 def get_taxonomies_for_org(
     enabled=True,
-    org_owner: Organization | None = None,
+    org_short_name: str | None = None,
 ) -> QuerySet:
     """
     Generates a list of the enabled Taxonomies available for the given org, sorted by name.
@@ -96,7 +100,6 @@ def get_taxonomies_for_org(
     If you want the disabled Taxonomies, pass enabled=False.
     If you want all Taxonomies (both enabled and disabled), pass enabled=None.
     """
-    org_short_name = org_owner.short_name if org_owner else None
     return oel_tagging.get_taxonomies(enabled=enabled).filter(
         Exists(
             TaxonomyOrg.get_relationships(
@@ -124,6 +127,43 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
             )
         )
     )
+
+
+def get_all_object_tags(
+    content_key: LearningContextKey,
+) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
+    """
+    Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
+    """
+    # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
+    if isinstance(content_key, CourseKey):
+        course_key_str = str(content_key)
+        # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
+        # (course) in a single db query.
+        block_id_prefix = course_key_str.replace("course-v1:", "block-v1:", 1)
+    else:
+        raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
+
+    # There is no API method in oel_tagging.api that does this yet,
+    # so for now we have to build the ORM query directly.
+    all_object_tags = list(ObjectTag.objects.filter(
+        Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str),
+        Q(tag__isnull=False, tag__taxonomy__isnull=False),
+    ).select_related("tag__taxonomy"))
+
+    grouped_object_tags: ObjectTagByObjectIdDict = {}
+    taxonomies: TaxonomyDict = {}
+
+    for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
+        grouped_object_tags[object_id] = {}
+        for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
+            object_tags_list = list(taxonomy_tags)
+            grouped_object_tags[object_id][taxonomy_id] = object_tags_list
+
+            if taxonomy_id not in taxonomies:
+                taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
+
+    return grouped_object_tags, taxonomies
 
 
 # Expose the oel_tagging APIs

@@ -177,7 +177,9 @@ def compose_activation_email(user, user_registration=None, route_enabled=False, 
     Construct all the required params for the activation email
     through celery task
     """
+    registration_flow = True
     if user_registration is None:
+        registration_flow = False
         user_registration = Registration.objects.get(user=user)
 
     message_context = generate_activation_email_context(user, user_registration)
@@ -187,6 +189,7 @@ def compose_activation_email(user, user_registration=None, route_enabled=False, 
         'routed_user': user.username,
         'routed_user_email': user.email,
         'routed_profile_name': profile_name,
+        'registration_flow': registration_flow,
     })
 
     if route_enabled:

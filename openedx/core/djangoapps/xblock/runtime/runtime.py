@@ -3,7 +3,7 @@ Common base classes for all new XBlock runtimes.
 """
 from __future__ import annotations
 import logging
-from typing import Callable
+from typing import Callable, Optional
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
@@ -21,7 +21,7 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import FieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
-from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
+from xblock.runtime import IdReader, KvsFieldData, MemoryIdManager, Runtime
 
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
@@ -38,7 +38,6 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.types import User as UserType
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.data import StudentDataMode
-from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreChildrenData, BlockstoreFieldData
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
@@ -420,6 +419,8 @@ class XBlockRuntimeSystem:
         handler_url: Callable[[UsageKey, str, UserType | None], str],
         student_data_mode: StudentDataMode,
         runtime_class: type[XBlockRuntime],
+        id_reader: Optional[IdReader] = None,
+        authored_data_store: Optional[FieldData] = None,
     ):
         """
         args:
@@ -436,11 +437,11 @@ class XBlockRuntimeSystem:
             runtime_class: What runtime to use, e.g. BlockstoreXBlockRuntime
         """
         self.handler_url = handler_url
-        self.id_reader = OpaqueKeyReader()
+        self.id_reader = id_reader or OpaqueKeyReader()
         self.id_generator = MemoryIdManager()  # We don't really use id_generator until we need to support asides
         self.runtime_class = runtime_class
-        self.authored_data_store = BlockstoreFieldData()
-        self.children_data_store = BlockstoreChildrenData(self.authored_data_store)
+        self.authored_data_store = authored_data_store
+        self.children_data_store = None
         assert student_data_mode in (StudentDataMode.Ephemeral, StudentDataMode.Persisted)
         self.student_data_mode = student_data_mode
 

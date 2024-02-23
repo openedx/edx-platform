@@ -98,11 +98,11 @@ define([
             expect(view.$('.js-success-message').length).toEqual(1);
         };
 
-        failedSubmission = function() {
+        failedSubmission = function(statusCode) {
             expect(view.$('.js-success-message').length).toEqual(0);
             expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             validSubmission();
-            view.model.trigger('error', {status: 500});
+            view.model.trigger('error', {status: statusCode});
             expect(view.$('.js-success-message').length).toEqual(0);
             expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
         };
@@ -166,7 +166,12 @@ define([
         });
 
         it('should submit the form and show an error message if content is valid and API returns error', function() {
-            failedSubmission();
+            failedSubmission(500);
+        });
+
+        it('should submit the form and show an error message if content is valid and API returns 403 error', function() {
+            failedSubmission(403);
+            expect(view.$('.message-copy').text()).toContain('You must confirm your email');
         });
 
         it('should allow form resubmission after a front end validation failure', function() {
@@ -176,7 +181,7 @@ define([
         });
 
         it('should allow form resubmission after an API error is returned', function() {
-            failedSubmission();
+            failedSubmission(500);
             successfulSubmission();
         });
 

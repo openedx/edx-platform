@@ -4,11 +4,12 @@ Tests tagging rest api views
 
 from __future__ import annotations
 
-from urllib.parse import parse_qs, urlparse
-import json
-from unittest.mock import MagicMock
-
 import abc
+import json
+from io import BytesIO
+from unittest.mock import MagicMock
+from urllib.parse import parse_qs, urlparse
+
 import ddt
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -27,17 +28,16 @@ from common.djangoapps.student.roles import (
     OrgContentCreatorRole,
     OrgInstructorRole,
     OrgLibraryUserRole,
-    OrgStaffRole,
+    OrgStaffRole
 )
-from openedx.core.djangoapps.content_libraries.api import (
-    AccessLevel,
-    create_library,
-    set_library_user_permissions,
-)
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.core.lib import blockstore_api
+
+
+from .test_objecttag_export_helpers import TaggedCourseMixin
 
 User = get_user_model()
 
@@ -45,6 +45,7 @@ TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 TAXONOMY_ORG_UPDATE_ORG_URL = "/api/content_tagging/v1/taxonomies/{pk}/orgs/"
 OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+OBJECT_TAGS_EXPORT_URL = "/api/content_tagging/v1/object_tags/{object_id}/export/"
 OBJECT_TAGS_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
 TAXONOMY_CREATE_IMPORT_URL = "/api/content_tagging/v1/taxonomies/import/"
@@ -102,9 +103,7 @@ class TestTaxonomyObjectsMixin:
         """
         Create library for testing
         """
-        self.collection = blockstore_api.create_collection("Test library collection")
         self.content_libraryA = create_library(
-            collection_uuid=self.collection.uuid,
             org=self.orgA,
             slug="lib_a",
             title="Library Org A",
@@ -124,6 +123,11 @@ class TestTaxonomyObjectsMixin:
             username="staff",
             email="staff@example.com",
             is_staff=True,
+        )
+        self.superuser = User.objects.create(
+            username="superuser",
+            email="superuser@example.com",
+            is_superuser=True,
         )
 
         self.staffA = User.objects.create(
@@ -497,27 +501,37 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
             if user_attr == "staffA":
                 assert response.data["orgs"] == [self.orgA.short_name]
 
-    def test_list_taxonomy_query_count(self):
+    @ddt.data(
+        ('staff', 11),
+        ("content_creatorA", 16),
+        ("library_staffA", 16),
+        ("library_userA", 16),
+        ("instructorA", 16),
+        ("course_instructorA", 16),
+        ("course_staffA", 16),
+    )
+    @ddt.unpack
+    def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
         """
         Test how many queries are used when retrieving taxonomies and permissions
         """
-        url = TAXONOMY_ORG_LIST_URL + f'?org=${self.orgA.short_name}&enabled=true'
-
-        self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(16):  # TODO Why so many queries?
+        url = TAXONOMY_ORG_LIST_URL + f'?org={self.orgA.short_name}&enabled=true'
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        with self.assertNumQueries(expected_queries):
             response = self.client.get(url)
 
         assert response.status_code == 200
-        assert response.data["can_add_taxonomy"]
-        assert len(response.data["results"]) == 2
+        assert response.data["can_add_taxonomy"] == user.is_staff
+        assert len(response.data["results"]) == 4
         for taxonomy in response.data["results"]:
             if taxonomy["system_defined"]:
                 assert not taxonomy["can_change_taxonomy"]
                 assert not taxonomy["can_delete_taxonomy"]
                 assert taxonomy["can_tag_object"]
             else:
-                assert taxonomy["can_change_taxonomy"]
-                assert taxonomy["can_delete_taxonomy"]
+                assert taxonomy["can_change_taxonomy"] == user.is_staff
+                assert taxonomy["can_delete_taxonomy"] == user.is_staff
                 assert taxonomy["can_tag_object"]
 
 
@@ -752,7 +766,7 @@ class TestTaxonomyDetailExportMixin(TestTaxonomyObjectsMixin):
             user_attr=user_attr,
             taxonomy_attr="ot1",
             expected_status=status.HTTP_404_NOT_FOUND,
-            reason="Only staff should see taxonomies with no org",
+            reason="Only taxonomy admins should see taxonomies with no org",
         )
 
     @ddt.data(
@@ -1231,11 +1245,12 @@ class TestTaxonomyUpdateOrg(TestTaxonomyObjectsMixin, APITestCase):
         self.client.force_authenticate(user=user)
 
         response = self.client.put(url, {"orgs": []}, format="json")
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code in [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND]
 
         # Check that the orgs didn't change
         url = TAXONOMY_ORG_DETAIL_URL.format(pk=self.tA1.pk)
         response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
         assert response.data["orgs"] == [self.orgA.short_name]
 
     def test_update_org_check_permissions_orgA(self) -> None:
@@ -1641,14 +1656,15 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
-        ("staff", status.HTTP_200_OK),
+        ("superuser", status.HTTP_200_OK),
+        ("staff", status.HTTP_403_FORBIDDEN),
         ("staffA", status.HTTP_403_FORBIDDEN),
         ("staffB", status.HTTP_403_FORBIDDEN),
     )
     @ddt.unpack
     def test_tag_cross_org(self, user_attr, expected_status):
         """
-        Tests that only global admins can add a taxonomy from orgA to an object from orgB
+        Tests that only superusers may add a taxonomy from orgA to an object from orgB
         """
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
@@ -1660,14 +1676,15 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == expected_status
 
     @ddt.data(
-        ("staff", status.HTTP_200_OK),
+        ("superuser", status.HTTP_200_OK),
+        ("staff", status.HTTP_403_FORBIDDEN),
         ("staffA", status.HTTP_403_FORBIDDEN),
         ("staffB", status.HTTP_403_FORBIDDEN),
     )
     @ddt.unpack
     def test_tag_no_org(self, user_attr, expected_status):
         """
-        Tests that only global admins can add a no-org taxonomy to an object
+        Tests that only superusers may add a no-org taxonomy to an object
         """
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
@@ -1759,27 +1776,115 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert status.is_success(response3.status_code)
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
-    def test_object_tags_query_count(self):
+    @ddt.data(
+        ('staff', 'courseA', 8),
+        ('staff', 'libraryA', 8),
+        ("content_creatorA", 'courseA', 11, False),
+        ("content_creatorA", 'libraryA', 11, False),
+        ("library_staffA", 'libraryA', 11, False),  # Library users can only view objecttags, not change them?
+        ("library_userA", 'libraryA', 11, False),
+        ("instructorA", 'courseA', 11),
+        ("course_instructorA", 'courseA', 11),
+        ("course_staffA", 'courseA', 11),
+    )
+    @ddt.unpack
+    def test_object_tags_query_count(
+            self,
+            user_attr: str,
+            object_attr: str,
+            expected_queries: int,
+            expected_perm: bool = True):
         """
         Test how many queries are used when retrieving object tags and permissions
         """
-        object_key = self.courseA
+        object_key = getattr(self, object_attr)
         object_id = str(object_key)
         tagging_api.tag_object(object_id=object_id, taxonomy=self.t1, tags=["anvil", "android"])
         expected_tags = [
-            {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": True},
-            {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": True},
+            {"value": "android", "lineage": ["ALPHABET", "android"], "can_delete_objecttag": expected_perm},
+            {"value": "anvil", "lineage": ["ALPHABET", "anvil"], "can_delete_objecttag": expected_perm},
         ]
-
         url = OBJECT_TAGS_URL.format(object_id=object_id)
-        self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(7):  # TODO Why so many queries?
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        with self.assertNumQueries(expected_queries):
             response = self.client.get(url)
 
         assert response.status_code == 200
         assert len(response.data[object_id]["taxonomies"]) == 1
-        assert response.data[object_id]["taxonomies"][0]["can_tag_object"]
+        assert response.data[object_id]["taxonomies"][0]["can_tag_object"] == expected_perm
         assert response.data[object_id]["taxonomies"][0]["tags"] == expected_tags
+
+
+@skip_unless_cms
+@ddt.ddt
+class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # type: ignore[misc]
+    """
+    Tests exporting course children with tags
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.staff = UserFactory.create(
+            username="staff",
+            email="staff@example.com",
+            is_staff=True,
+        )
+
+        self.staffA = UserFactory.create(
+            username="staffA",
+            email="userA@example.com",
+        )
+        update_org_role(self.staff, OrgStaffRole, self.staffA, [self.orgA.short_name])
+
+    @ddt.data(
+        "staff",
+        "staffA",
+    )
+    def test_export_course(self, user_attr) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers['Content-Type'] == 'text/csv'
+
+        expected_csv = (
+            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
+            '"  test sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@test_'
+            'sequential","Tag 1.1, Tag 1.2","Tag 2.1"\r\n'
+            '"    test vertical1","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
+            'vertical1","","Tag 2.2"\r\n'
+            '"    test vertical2","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
+            'vertical2","",""\r\n'
+            '"      test html","html","block-v1:orgA+test_course+test_run+type@html+block@test_html","","Tag 2.1"\r\n'
+            '"  untagged sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@untagged_'
+            'sequential","",""\r\n'
+            '"    untagged vertical","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@untagged_'
+            'vertical","",""\r\n'
+        )
+
+        zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
+        assert zip_content == expected_csv.encode()
+
+    def test_export_course_anoymous_forbidden(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_export_course_user_forbidden(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_export_course_invalid_id(self) -> None:
+        url = OBJECT_TAGS_EXPORT_URL.format(object_id="invalid")
+        self.client.force_authenticate(user=self.staff)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @skip_unless_cms
@@ -1793,7 +1898,7 @@ class TestDownloadTemplateView(APITestCase):
         ("template.json", "application/json"),
     )
     @ddt.unpack
-    def test_download(self, filename, content_type):
+    def test_download(self, filename, content_type) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename=filename)
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -1801,12 +1906,12 @@ class TestDownloadTemplateView(APITestCase):
         assert response.headers['Content-Disposition'] == f'attachment; filename="{filename}"'
         assert int(response.headers['Content-Length']) > 0
 
-    def test_download_not_found(self):
+    def test_download_not_found(self) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
         response = self.client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_download_method_not_allowed(self):
+    def test_download_method_not_allowed(self) -> None:
         url = TAXONOMY_TEMPLATE_URL.format(filename="template.txt")
         response = self.client.post(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
@@ -2292,19 +2397,30 @@ class TestTaxonomyTagsViewSet(TestTaxonomyObjectsMixin, APITestCase):
     """
     Test cases for TaxonomyTagsViewSet retrive action.
     """
-    def test_taxonomy_tags_query_count(self):
+    @ddt.data(
+        ('staff', 11),
+        ("content_creatorA", 13),
+        ("library_staffA", 13),
+        ("library_userA", 13),
+        ("instructorA", 13),
+        ("course_instructorA", 13),
+        ("course_staffA", 13),
+    )
+    @ddt.unpack
+    def test_taxonomy_tags_query_count(self, user_attr: str, expected_queries: int):
         """
         Test how many queries are used when retrieving small taxonomies+tags and permissions
         """
         url = f"{TAXONOMY_TAGS_URL}?search_term=an&parent_tag=ALPHABET".format(pk=self.t1.id)
 
-        self.client.force_authenticate(user=self.staff)
-        with self.assertNumQueries(13):  # TODO Why so many queries?
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+        with self.assertNumQueries(expected_queries):
             response = self.client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["can_add_tag"]
+        assert response.data["can_add_tag"] == user.is_staff
         assert len(response.data["results"]) == 2
         for taxonomy in response.data["results"]:
-            assert taxonomy["can_change_tag"]
-            assert taxonomy["can_delete_tag"]
+            assert taxonomy["can_change_tag"] == user.is_staff
+            assert taxonomy["can_delete_tag"] == user.is_staff

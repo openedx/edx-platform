@@ -1,0 +1,11 @@
+boto3
+click
+pyyaml
+backoff
+requests
+edx-rest-api-client
+jenkinsapi
+unicodecsv
+simplejson
+simple-salesforce
+google-api-python-client

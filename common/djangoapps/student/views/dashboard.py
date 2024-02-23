@@ -18,7 +18,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import WaffleFlag
-from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import DashboardRenderStarted
 from pytz import UTC
@@ -53,7 +52,7 @@ from openedx.features.enterprise_support.api import (
     get_enterprise_learner_portal_context,
 )
 from openedx.features.enterprise_support.utils import is_enterprise_learner
-from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+
 from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from common.djangoapps.student.models import (
@@ -787,9 +786,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         if fbe_is_on:
             enrollments_fbe_is_on.append(course_key)
 
-    ip_address = get_client_ip(request)[0]
-    country_code = country_code_from_ip(ip_address).upper()
-
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -844,7 +840,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
         'disable_unenrollment': disable_unenrollment,
-        'country_code': country_code,
         # TODO: clean when experiment(Merchandise 2U LOBs - Dashboard) would be stop. [VAN-1097]
         'is_enterprise_user': is_enterprise_learner(user),
     }

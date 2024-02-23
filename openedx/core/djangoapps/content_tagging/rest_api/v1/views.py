@@ -1,6 +1,15 @@
 """
 Tagging Org API Views
 """
+from __future__ import annotations
+
+import csv
+from typing import Iterator
+
+from django.db.models import Count
+from django.http import StreamingHttpResponse
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
@@ -8,18 +17,21 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ...api import (
     create_taxonomy,
-    get_taxonomy,
+    get_all_object_tags,
     get_taxonomies,
     get_taxonomies_for_org,
+    get_taxonomy,
     get_unassigned_taxonomies,
-    set_taxonomy_orgs,
+    set_taxonomy_orgs
 )
 from ...rules import get_admin_orgs
-from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
+from .objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
+from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -56,12 +68,7 @@ class TaxonomyOrgView(TaxonomyView):
         query_params = TaxonomyOrgListQueryParamsSerializer(data=self.request.query_params.dict())
         query_params.is_valid(raise_exception=True)
         enabled = query_params.validated_data.get("enabled", None)
-        unassigned = query_params.validated_data.get("unassigned", None)
         org = query_params.validated_data.get("org", None)
-
-        # Raise an error if both "org" and "unassigned" query params were provided
-        if "org" in query_params.validated_data and "unassigned" in query_params.validated_data:
-            raise ValidationError("'org' and 'unassigned' params cannot be both defined")
 
         # If org filtering was requested, then use it, even if the org is invalid/None
         if "org" in query_params.validated_data:
@@ -71,7 +78,13 @@ class TaxonomyOrgView(TaxonomyView):
         else:
             queryset = get_taxonomies(enabled)
 
-        return queryset.prefetch_related("taxonomyorg_set")
+        # Prefetch taxonomyorgs so we can check permissions
+        queryset = queryset.prefetch_related("taxonomyorg_set__org")
+
+        # Annotate with tags_count to avoid selecting all the tags
+        queryset = queryset.annotate(tags_count=Count("tag", distinct=True))
+
+        return queryset
 
     def perform_create(self, serializer):
         """
@@ -135,3 +148,83 @@ class ObjectTagOrgView(ObjectTagView):
     Refer to ObjectTagView docstring for usage details.
     """
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
+
+
+class ObjectTagExportView(APIView):
+    """"
+    View to export a CSV with all children and tags for a given course/context.
+    """
+    def get(self, request: Request, **kwargs) -> StreamingHttpResponse:
+        """
+        Export a CSV with all children and tags for a given course/context.
+        """
+
+        class Echo(object):
+            """
+            Class that implements just the write method of the file-like interface,
+            used for the streaming response.
+            """
+            def write(self, value):
+                return value
+
+        def _generate_csv_rows() -> Iterator[str]:
+            """
+            Receives the blocks, tags and taxonomies and returns a CSV string
+            """
+
+            header = {"name": "Name", "type": "Type", "id": "ID"}
+
+            # Prepare the header for the taxonomies
+            for taxonomy_id, taxonomy in taxonomies.items():
+                header[f"taxonomy_{taxonomy_id}"] = taxonomy.export_id
+
+            csv_writer = csv.DictWriter(pseudo_buffer, fieldnames=header.keys(), quoting=csv.QUOTE_NONNUMERIC)
+            yield csv_writer.writerow(header)
+
+            # Iterate over the blocks and yield the rows
+            for item, level in iterate_with_level(tagged_content):
+                block_data = {
+                    "name": level * "  " + item.display_name,
+                    "type": item.category,
+                    "id": item.block_id,
+                }
+
+                # Add the tags for each taxonomy
+                for taxonomy_id in taxonomies:
+                    if taxonomy_id in item.object_tags:
+                        block_data[f"taxonomy_{taxonomy_id}"] = ", ".join([
+                            object_tag.value
+                            for object_tag in item.object_tags[taxonomy_id]
+                        ])
+
+                yield csv_writer.writerow(block_data)
+
+        object_id: str = kwargs.get('context_id', None)
+
+        try:
+            content_key = CourseKey.from_string(object_id)
+        except InvalidKeyError as e:
+            raise ValidationError("context_id is not a valid course key.") from e
+
+        # Check if the user has permission to view object tags for this object_id
+        try:
+            if not self.request.user.has_perm(
+                "oel_tagging.view_objecttag",
+                # The obj arg expects a model, but we are passing an object
+                oel_tagging_rules.ObjectTagPermissionItem(taxonomy=None, object_id=object_id),  # type: ignore[arg-type]
+            ):
+                raise PermissionDenied(
+                    "You do not have permission to view object tags for this object_id."
+                )
+        except ValueError as e:
+            raise ValidationError from e
+
+        all_object_tags, taxonomies = get_all_object_tags(content_key)
+        tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
+        pseudo_buffer = Echo()
+
+        return StreamingHttpResponse(
+            streaming_content=_generate_csv_rows(),
+            content_type="text/csv",
+            headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
+        )

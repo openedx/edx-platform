@@ -65,10 +65,9 @@ pull_plugin_translations:  ## Pull translations from Transifex for edx_django_ut
 pull_xblock_translations:  ## pull xblock translations via atlas
 	rm -rf conf/plugins-locale/xblock.v1  # Clean up existing atlas translations
 	rm -rf lms/static/i18n/xblock.v1 cms/static/i18n/xblock.v1  # Clean up existing xblock compiled translations
-	mkdir -p conf/plugins-locale/xblock.v1/ lms/static/js/xblock.v1-i18n cms/static/js
 	python manage.py lms pull_xblock_translations --verbose $(ATLAS_OPTIONS)
 	python manage.py lms compile_xblock_translations
-	cp -r lms/static/js/xblock.v1-i18n cms/static/js
+	python manage.py cms compile_xblock_translations
 
 pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale
@@ -138,7 +137,9 @@ REQ_FILES = \
 	requirements/edx/development \
 	requirements/edx/assets \
 	requirements/edx/semgrep \
-	scripts/xblock/requirements
+	scripts/xblock/requirements \
+	scripts/user_retirement/requirements/base \
+	scripts/user_retirement/requirements/testing
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
 # This is a temporary solution to override the real common_constraints.txt\n# In edx-lint, until the pyjwt constraint in edx-lint has been removed.\n# See BOM-2721 for more details.\n# Below is the copied and edited version of common_constraints\n

@@ -14,10 +14,12 @@ importlib-metadata==7.0.1
     # via build
 packaging==23.2
     # via build
-pip-tools==7.3.0
+pip-tools==7.4.0
     # via -r requirements/pip-tools.in
 pyproject-hooks==1.0.0
-    # via build
+    # via
+    #   build
+    #   pip-tools
 tomli==2.0.1
     # via
     #   build
