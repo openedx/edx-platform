@@ -394,6 +394,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
 
 
 @patch("openedx.core.lib.teams_config.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
+@skip_unless_lms
 class TestTeamPartitionScheme(ModuleStoreTestCase):
     """
     Test the TeamPartitionScheme partition scheme and its related functions.

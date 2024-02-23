@@ -1965,6 +1965,7 @@ class ContentErrorTestCase(CacheIsolationTestCase):
             ContentErrorData(message="Content is Hard", usage_key=None),
         ]
 
+
 @patch("openedx.core.lib.teams_config.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
 @skip_unless_lms
 class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
@@ -2081,7 +2082,6 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
                 )
             ]
         )
-
 
     @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
     @patch("openedx.core.djangoapps.course_groups.partition_generator.get_team_sets")

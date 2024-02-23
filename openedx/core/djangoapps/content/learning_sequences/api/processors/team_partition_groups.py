@@ -28,11 +28,11 @@ class TeamPartitionGroupsOutlineProcessor(OutlineProcessor):
     def __init__(self, course_key: CourseKey, user: types.User, at_time: datetime):
         """
         Attributes:
-            current_user_groups (Dict[int, Group]): The groups to which the user
+            current_user_groups (Dict[str, Group]): The groups to which the user
                 belongs in each partition.
         """
         super().__init__(course_key, user, at_time)
-        self.current_user_groups: Dict[int, Group] = {}
+        self.current_user_groups: Dict[str, Group] = {}
 
     def load_data(self, _) -> None:
         """
