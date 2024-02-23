@@ -2,7 +2,6 @@
 Tests for courseware API
 """
 
-import itertools
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from typing import Optional
@@ -34,7 +33,6 @@ from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.courseware.toggles import (
-    COURSEWARE_LEARNING_ASSISTANT,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
 )
@@ -432,16 +430,16 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert 'can_access_proctored_exams' in courseware_data
         assert courseware_data['can_access_proctored_exams'] == result
 
-    @ddt.idata(itertools.product((True, False), (True, False)))
-    @ddt.unpack
-    def test_learning_assistant_enabled(self, setting_enabled, flag_enabled):
-        with override_settings(LEARNING_ASSISTANT_AVAILABLE=setting_enabled), \
-                override_waffle_flag(COURSEWARE_LEARNING_ASSISTANT, active=flag_enabled):
+    @ddt.data(
+        True,
+        False
+    )
+    def test_learning_assistant_enabled(self, setting_enabled):
+        with override_settings(LEARNING_ASSISTANT_AVAILABLE=setting_enabled):
             response = self.client.get(self.url)
 
         learning_assistant_enabled = response.json()['learning_assistant_enabled']
-        expected_value = setting_enabled or flag_enabled
-        self.assertEqual(learning_assistant_enabled, expected_value)
+        self.assertEqual(learning_assistant_enabled, setting_enabled)
 
 
 @ddt.ddt
