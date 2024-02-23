@@ -8,7 +8,6 @@ from enum import Enum
 
 from django.utils.functional import cached_property
 
-from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
 
 # "Arbitrarily large" but still limited
 MANAGED_TEAM_MAX_TEAM_SIZE = 200

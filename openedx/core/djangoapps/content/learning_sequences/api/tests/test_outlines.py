@@ -16,7 +16,10 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 import attr
 import ddt
-from openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups import TeamPartitionGroupsOutlineProcessor
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups import (
+    TeamPartitionGroupsOutlineProcessor,
+)
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 import pytest
 
@@ -2032,7 +2035,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         groups.
         - A student enrolled in the course and added to one of the teams.
         """
-        from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+        super().setUpTestData()
         cls.visibility = VisibilityData(
             hide_from_toc=False,
             visible_to_staff_only=False
@@ -2119,7 +2122,8 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
     @patch("openedx.core.djangoapps.course_groups.partition_generator.get_team_sets")
     def test_user_not_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
         """
-        Test that the team partition groups processor correctly determines if a user is excluded by the partition groups.
+        Test that the team partition groups processor correctly determines if a user is excluded by the partition
+        groups.
 
         Expected result:
         - The user should not be excluded by the partition groups meaning the method should return False.
@@ -2136,14 +2140,18 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         }
         team_partition_groups_processor.load_data(self.outline)
 
-        assert not team_partition_groups_processor._is_user_excluded_by_partition_group(sequence_partition_groups)
+        # pylint: disable=protected-access
+        assert not team_partition_groups_processor._is_user_excluded_by_partition_group(
+            sequence_partition_groups
+        )
         assert not team_partition_groups_processor._is_user_excluded_by_partition_group([])
 
     @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
     @patch("openedx.core.djangoapps.course_groups.partition_generator.get_team_sets")
     def test_user_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
         """
-        Test that the team partition groups processor correctly determines if a user is excluded by the partition groups.
+        Test that the team partition groups processor correctly determines if a user is excluded by the partition
+        groups.
 
         Expected result:
         - The user should not be excluded by the partition groups meaning the method should return False.
@@ -2159,6 +2167,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         }
         team_partition_groups_processor.load_data(self.outline)
 
+        # pylint: disable=protected-access
         assert team_partition_groups_processor._is_user_excluded_by_partition_group(sequence_partition_groups)
 
     @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")

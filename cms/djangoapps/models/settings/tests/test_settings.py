@@ -440,7 +440,10 @@ class TeamsConfigurationTests(unittest.TestCase):
         (config_block_no_global_max_team_size, set()),
         (config_block_course_max_team_size, {'max_team_size cannot be greater than 500'}),
         (config_block_teamset_max_team_size, {'max_team_size cannot be greater than 500'}),
-        (config_block_invalid_dynamic_partition_ids, {'dynamic_user_partition_id must be greater or equal than 51 and less than 100.'})
+        (
+            config_block_invalid_dynamic_partition_ids,
+            {'dynamic_user_partition_id must be greater or equal than 51 and less than 100.'}
+        )
     )
     @ddt.unpack
     def test_team_settings(self, config_block, error_message):

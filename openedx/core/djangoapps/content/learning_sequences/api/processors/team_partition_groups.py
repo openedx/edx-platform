@@ -3,7 +3,7 @@ Outline processors for applying team user partition groups.
 """
 import logging
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict
 
 from opaque_keys.edx.keys import CourseKey
 

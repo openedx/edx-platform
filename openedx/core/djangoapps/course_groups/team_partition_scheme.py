@@ -19,7 +19,8 @@ log = logging.getLogger(__name__)
 
 
 class TeamUserPartition(UserPartition):
-    """Extends UserPartition to support dynamic gcreate_team_set_partition_with_course_idroups pulled from the current course teams.
+    """Extends UserPartition to support dynamic gcreate_team_set_partition_with_course_idroups pulled from the current
+    course teams.
 
     Class attributes:
         team_sets_mapping (dict): A mapping of partition IDs to team-set IDs.
