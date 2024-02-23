@@ -416,20 +416,64 @@ def _accessible_courses_summary_iter(request, org=None):
     else:
         courses_summary = CourseOverview.get_all_courses()
 
-    search_query = request.GET.get('search')
-    order = request.GET.get('order')
-    active_only = get_bool_param(request, 'active_only', None)
-    archived_only = get_bool_param(request, 'archived_only', None)
+    search_query, order, active_only, archived_only = get_query_params_if_present(request)
+    courses_summary = get_filtered_and_ordered_courses(
+        courses_summary,
+        active_only,
+        archived_only,
+        search_query,
+        order,
+    )
 
-    courses_summary = get_courses_by_status(active_only, archived_only, courses_summary)
-    courses_summary = get_courses_by_search_query(search_query, courses_summary)
-    courses_summary = get_courses_order_by(order, courses_summary)
     courses_summary = filter(course_filter, courses_summary)
-
     in_process_course_actions = get_in_process_course_actions(request)
 
     return courses_summary, in_process_course_actions
 
+def get_query_params_if_present(request):
+    """
+    Returns the query params from request if present.
+
+    Arguments:
+        request: the request object
+
+    Returns:
+        search_query (str): any string used to filter Course Overviews based on visible fields.
+        order (str): any string used to order Course Overviews.
+        active_only (str): if not None, this value will limit the courses returned to active courses.
+            The default value is None.
+        archived_only (str): if not None, this value will limit the courses returned to archived courses.
+            The default value is None.
+    """
+    if not request.GET:
+        return None, None, None, None
+    search_query = request.GET.get('search')
+    order = request.GET.get('order')
+    active_only = get_bool_param(request, 'active_only', None)
+    archived_only = get_bool_param(request, 'archived_only', None)
+    return search_query, order, active_only, archived_only
+
+
+def get_filtered_and_ordered_courses(course_overviews, active_only, archived_only, search_query, order):
+    """
+    Returns the filtered and ordered courses based on the query params.
+
+    Arguments:
+        courses_summary (Course Overview objects): course overview queryset to be filtered.
+        active_only (str): if not None, this value will limit the courses returned to active courses.
+            The default value is None.
+        archived_only (str): if not None, this value will limit the courses returned to archived courses.
+            The default value is None.
+        search_query (str): any string used to filter Course Overviews based on visible fields.
+        order (str): any string used to order Course Overviews.
+
+    Returns:
+        Course Overview objects: queryset filtered and ordered based on the query params.
+    """
+    course_overviews = get_courses_by_status(active_only, archived_only, course_overviews)
+    course_overviews = get_courses_by_search_query(search_query, course_overviews)
+    course_overviews = get_courses_order_by(order, course_overviews)
+    return course_overviews
 
 def _accessible_courses_iter(request):
     """
@@ -521,14 +565,14 @@ def _accessible_courses_list_from_groups(request):
     if course_keys:
         courses_list = CourseOverview.get_all_courses(filter_={'id__in': course_keys})
 
-    search_query = request.GET.get('search')
-    order = request.GET.get('order')
-    active_only = get_bool_param(request, 'active_only', None)
-    archived_only = get_bool_param(request, 'archived_only', None)
-
-    courses_list = get_courses_by_status(active_only, archived_only, courses_list)
-    courses_list = get_courses_by_search_query(search_query, courses_list)
-    courses_list = get_courses_order_by(order, courses_list)
+    search_query, order, active_only, archived_only = get_query_params_if_present(request)
+    courses_list = get_filtered_and_ordered_courses(
+        courses_list,
+        active_only,
+        archived_only,
+        search_query,
+        order,
+    )
 
     return courses_list, []
 
