@@ -2,11 +2,14 @@
 Serializers for edly_api
 """
 import json
+import logging
 
 from rest_framework import serializers
 
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.edly.models import EdlyMultiSiteAccess
 from openedx.features.edly.utils import get_marketing_link
+LOGGER = logging.getLogger(__name__)
 
 
 class UserSiteSerializer(serializers.Serializer):
@@ -59,10 +62,20 @@ class MutiSiteAccessSerializer(serializers.ModelSerializer):
     
     name = serializers.CharField(source='sub_org.name', read_only=True)
     slug = serializers.CharField(source='sub_org.slug', read_only=True)
+    panel_base_url =  serializers.SerializerMethodField()
+
+    def get_panel_base_url(self, instance):
+        """Add support to get the panel_base_url from site configuration"""
+        site_configuration = dict(SiteConfiguration.objects.filter(site=instance.sub_org.lms_site).first().site_values)
+        notification_url = site_configuration.get('PANEL_NOTIFICATIONS_BASE_URL', '')
+        if not notification_url:
+            LOGGER.info("Current site have no notification url")
+
+        return notification_url if notification_url.endswith("/") else f"{notification_url}/"
 
     class Meta:
         """
         Meta attribute for the MutiSiteAccess Model
         """
         model = EdlyMultiSiteAccess
-        fields = ['id', 'name', 'slug']
+        fields = ['id', 'name', 'slug', 'panel_base_url']
