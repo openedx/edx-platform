@@ -4,6 +4,7 @@ allow users to paste XBlocks that were copied using the staged_content/clipboard
 APIs.
 """
 import ddt
+import unittest
 from django.test import LiveServerTestCase
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
@@ -268,6 +269,7 @@ class ClipboardLibraryContentPasteTestCase(BlockstoreAppTestMixin, LiveServerTes
         orig_child = self.store.get_item(self.orig_lc_block.children[0])
         assert orig_child.display_name == "MCQ"
 
+    @unittest.skip("Quince doesn't support using V2 libraries via library content block; this test was backported")
     def test_paste_library_content_block(self):
         """
         Test the special handling of copying and pasting library content
