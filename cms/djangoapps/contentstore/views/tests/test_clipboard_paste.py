@@ -190,7 +190,6 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
             tags=["tag_1", "tag_2"],
         )
 
-
         # Copy the unit
         copy_response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(unit_key)}, format="json")
         assert copy_response.status_code == 200
@@ -213,7 +212,6 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
             'block-v1:org.1+course_1+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_1'
         assert str(tags[1]) == '<ObjectTag> ' \
             'block-v1:org.1+course_1+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_2'
-
 
     def test_paste_with_assets(self):
         """
