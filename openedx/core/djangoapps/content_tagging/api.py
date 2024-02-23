@@ -134,6 +134,9 @@ def get_all_object_tags(
     content_key: LibraryLocatorV2 | CourseKey,
 ) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
     """
+    Get all the object tags applied to components in the given course/library.
+
+    Includes any tags applied to the course/library as a whole.
     Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
     """
     context_key_str = str(content_key)
