@@ -43,7 +43,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
-from lms.djangoapps.courseware.toggles import course_exit_page_is_active, learning_assistant_is_active
+from lms.djangoapps.courseware.toggles import course_exit_page_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -367,7 +367,7 @@ class CoursewareMeta:
         """
         Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
         """
-        return getattr(settings, 'LEARNING_ASSISTANT_AVAILABLE', False) or learning_assistant_is_active(self.course_key)
+        return getattr(settings, 'LEARNING_ASSISTANT_AVAILABLE', False)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
