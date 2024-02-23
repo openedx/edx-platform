@@ -430,6 +430,7 @@ def _accessible_courses_summary_iter(request, org=None):
 
     return courses_summary, in_process_course_actions
 
+
 def get_query_params_if_present(request):
     """
     Returns the query params from request if present.
@@ -474,6 +475,7 @@ def get_filtered_and_ordered_courses(course_overviews, active_only, archived_onl
     course_overviews = get_courses_by_search_query(search_query, course_overviews)
     course_overviews = get_courses_order_by(order, course_overviews)
     return course_overviews
+
 
 def _accessible_courses_iter(request):
     """
