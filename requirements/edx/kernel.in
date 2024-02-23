@@ -117,7 +117,8 @@ openedx-calc                        # Library supporting mathematical calculatio
 openedx-django-require
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
-openedx-learning                    # Open edX Learning core (experimental)
+# openedx-learning                    # Open edX Learning core (experimental)
+openedx-learning @ git+https://github.com/open-craft/openedx-learning@rpenido/fal-3675-add-get-taxonomy-by-external-id-function
 openedx-mongodbproxy
 openedx-django-wiki
 openedx-blockstore
