@@ -1283,7 +1283,7 @@ snowflake-connector-python==3.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-social-auth-app-django==5.0.0
+social-auth-app-django==5.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
