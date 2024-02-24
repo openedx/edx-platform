@@ -179,7 +179,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
             taxonomy=taxonomy_all_org_removed,
             tags=["tag_1", "tag_2"],
         )
-        all_org_tags = tagging_api.get_object_tags(str(unit_key))
+        tagging_api.get_object_tags(str(unit_key))
 
         taxonomy_no_org = tagging_api.create_taxonomy("test_taxonomy_no_org", "Test Taxonomy No Org")
         Tag.objects.create(taxonomy=taxonomy_no_org, value="tag_1")
@@ -209,9 +209,9 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         tags = list(tagging_api.get_object_tags(str(dest_unit_key)))
         assert len(tags) == 2
         assert str(tags[0]) == '<ObjectTag> ' \
-            'block-v1:org.1+course_1+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_1'
+            'block-v1:org.2025+course_2025+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_1'
         assert str(tags[1]) == '<ObjectTag> ' \
-            'block-v1:org.1+course_1+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_2'
+            'block-v1:org.2025+course_2025+Destination_Course+type@vertical+block@vertical1: test_taxonomy=tag_2'
 
     def test_paste_with_assets(self):
         """
