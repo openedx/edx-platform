@@ -286,14 +286,15 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         """
         if user.is_anonymous:
             return None
-        if username:
-            if (user.username == username or user.is_staff or user.is_superuser):
-                try:
-                    return User.objects.get(username=username)
-                except User.DoesNotExist:
-                    log.warning('Provided username does not correspond to an existing user %s', username)
-            return None
-        return user
+
+        if not username or (username and user.username == username):
+            return user
+        if username and (user.is_staff or user.is_superuser):
+            try:
+                return User.objects.get(username=username)
+            except User.DoesNotExist:
+                log.warning('Provided username does not correspond to an existing user %s', username)
+        return None
 
     def get_certificate(self, request, user, course_id):
         """
