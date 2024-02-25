@@ -46,23 +46,23 @@ class CourseAccessSerializer(serializers.Serializer):
     Get info whether a user should be able to view course material.
     """
 
-    hasUnmetPrerequisites = serializers.SerializerMethodField()
-    isTooEarly = serializers.SerializerMethodField()
-    isStaff = serializers.SerializerMethodField()
+    hasUnmetPrerequisites = serializers.SerializerMethodField(method_name="get_has_unmet_prerequisites")
+    isTooEarly = serializers.SerializerMethodField(method_name="get_is_too_early")
+    isStaff = serializers.SerializerMethodField(method_name="get_is_staff")
 
-    def get_hasUnmetPrerequisites(self, data: dict) -> bool:
+    def get_has_unmet_prerequisites(self, data: dict) -> bool:
         """
         Check whether or not a course has unmet prerequisites.
         """
         return any(get_pre_requisite_courses_not_completed(data.get("user"), [data.get("course_id")]))
 
-    def get_isTooEarly(self, data: dict) -> bool:
+    def get_is_too_early(self, data: dict) -> bool:
         """
         Determine if the course is open to a learner (course has started or user has early beta access).
         """
         return not check_course_open_for_learner(data.get("user"), data.get("course"))
 
-    def get_isStaff(self, data: dict) -> bool:
+    def get_is_staff(self, data: dict) -> bool:
         """
         Determine whether a user has staff access to this course.
         """
