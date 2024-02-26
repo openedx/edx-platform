@@ -146,7 +146,6 @@ class CourseMetadata:
             exclude_list.append('allow_anonymous')
             exclude_list.append('allow_anonymous_to_peers')
             exclude_list.append('discussion_topics')
-
         return exclude_list
 
     @classmethod
@@ -358,7 +357,7 @@ class CourseMetadata:
         """
         error_list = []
         valid_teamset_types = [TeamsetType.open.value, TeamsetType.public_managed.value,
-                               TeamsetType.private_managed.value]
+                               TeamsetType.private_managed.value, TeamsetType.open_managed.value]
         valid_keys = {'id', 'name', 'description', 'max_team_size', 'type'}
         teamset_type = topic_settings.get('type', {})
         if teamset_type:

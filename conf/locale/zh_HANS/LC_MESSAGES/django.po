@@ -100,7 +100,7 @@
 # 赵宏鑫 <zhaohongxinxin@aol.com>, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -151,7 +151,7 @@
 # 肖寒 <bookman@vip.163.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -280,7 +280,7 @@
 # 黄鸿飞 <853885165@qq.com>, 2015
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -7954,6 +7954,13 @@ msgstr "从事职业"
 msgid "Specialty"
 msgstr "专业技能"
 
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
 msgid ""
@@ -12226,6 +12233,10 @@ msgstr "“{0}”的副本"
 msgid "Invalid prerequisite course key"
 msgstr "先修课程标识无效"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr "设置日期"
+
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -12433,10 +12444,6 @@ msgstr "仅限同行评估"
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "课程重新索引成功。"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr "设置日期"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -13642,7 +13649,7 @@ msgstr "已完成"
 
 #: lms/templates/seq_block.html
 msgid "New Unit"
-msgstr ""
+msgstr "新的单元"
 
 #: lms/templates/seq_block.html
 msgid "Paste as new unit"
@@ -22169,6 +22176,10 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr ""
 
@@ -22496,6 +22507,10 @@ msgstr "课程导航"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "大纲"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

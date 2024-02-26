@@ -500,7 +500,6 @@ class LibraryContentBlock(
         """
         user_service = self.runtime.service(self, 'user')
         if user_service:
-            # May be None when creating bok choy test fixtures
             user_id = user_service.get_current_user().opt_attrs.get('edx-platform.user_id', None)
         else:
             user_id = None

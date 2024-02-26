@@ -428,6 +428,8 @@ class XmlMixin:
         """
         For exporting, set data on `node` from ourselves.
         """
+        # Importing here to avoid circular import
+        from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
         # Get the definition
         xml_object = self.definition_to_xml(self.runtime.export_fs)
 
@@ -497,6 +499,10 @@ class XmlMixin:
             # add org and course attributes on the pointer tag
             node.set('org', self.location.org)
             node.set('course', self.location.course)
+
+        # Serialize and add tag data if any
+        if isinstance(self, TaggedBlockMixin):
+            self.add_tags_to_node(node)
 
     def definition_to_xml(self, resource_fs):
         """

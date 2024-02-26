@@ -5,7 +5,8 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from django.test import override_settings
+from django.test import override_settings, LiveServerTestCase
+from django.http import HttpRequest
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from organizations.models import Organization
@@ -13,6 +14,8 @@ from organizations.models import Organization
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from openedx.core.djangoapps.content_libraries.api import create_library, create_library_block, delete_library_block
+from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 
 from .. import api
 from ..models.base import TaxonomyOrg
@@ -51,7 +54,12 @@ class LanguageTaxonomyTestMixin:
 
 @skip_unless_cms  # Auto-tagging is only available in the CMS
 @override_waffle_flag(CONTENT_TAGGING_AUTO, active=True)
-class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):  # type: ignore[misc]
+class TestAutoTagging(  # type: ignore[misc]
+    LanguageTaxonomyTestMixin,
+    ModuleStoreTestCase,
+    BlockstoreAppTestMixin,
+    LiveServerTestCase
+):
     """
     Test if the Course and XBlock tags are automatically created
     """
@@ -64,7 +72,7 @@ class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):  # type: 
 
         If value is None, check if the ObjectTag does not exists
         """
-        object_tags = list(api.get_content_tags(object_key, taxonomy_id=taxonomy_id))
+        object_tags = list(api.get_object_tags(str(object_key), taxonomy_id=taxonomy_id))
         object_tag = object_tags[0] if len(object_tags) == 1 else None
         if len(object_tags) > 1:
             raise ValueError("Found too many object tags")
@@ -157,7 +165,11 @@ class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):  # type: 
 
         # Simulates user manually changing a tag
         lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
-        api.tag_content_object(course.id, lang_taxonomy, ["Español (España)"])
+        api.tag_object(
+            object_id=str(course.id),
+            taxonomy=lang_taxonomy,
+            tags=["Español (España)"]
+        )
 
         # Update course language
         course.language = "en"
@@ -234,6 +246,59 @@ class TestAutoTagging(LanguageTaxonomyTestMixin, ModuleStoreTestCase):  # type: 
 
         # Delete the XBlock
         self.store.delete_item(vertical.location, self.user_id)
+
+        # Still no tags
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
+
+    def test_create_delete_library_block(self):
+        # Create library
+        library = create_library(
+            org=self.orgA,
+            slug="lib_a",
+            title="Library Org A",
+            description="This is a library from Org A",
+        )
+
+        fake_request = HttpRequest()
+        fake_request.LANGUAGE_CODE = "pt-br"
+        with patch('crum.get_current_request', return_value=fake_request):
+            # Create Library Block
+            library_block = create_library_block(library.key, "problem", "Problem1")
+
+        usage_key_str = str(library_block.usage_key)
+
+        # Check if the tags are created in the Library Block with the user's preferred language
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, 'Português (Brasil)')
+
+        # Delete the XBlock
+        delete_library_block(library_block.usage_key)
+
+        # Check if the tags are deleted
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
+
+    @override_waffle_flag(CONTENT_TAGGING_AUTO, active=False)
+    def test_waffle_disabled_create_delete_library_block(self):
+        # Create library
+        library = create_library(
+            org=self.orgA,
+            slug="lib_a2",
+            title="Library Org A 2",
+            description="This is a library from Org A 2",
+        )
+
+        fake_request = HttpRequest()
+        fake_request.LANGUAGE_CODE = "pt-br"
+        with patch('crum.get_current_request', return_value=fake_request):
+            # Create Library Block
+            library_block = create_library_block(library.key, "problem", "Problem2")
+
+        usage_key_str = str(library_block.usage_key)
+
+        # No tags created
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
+
+        # Delete the XBlock
+        delete_library_block(library_block.usage_key)
 
         # Still no tags
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)

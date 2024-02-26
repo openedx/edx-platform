@@ -61,6 +61,8 @@ conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
 # this was a mistake in i18n_tools, now fixed.
 conf/locale/messages.mo
+conf/plugins-locale/
+/*/static/js/xblock.v1-i18n/
 
 ### Testing artifacts
 .testids/

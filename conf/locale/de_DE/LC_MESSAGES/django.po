@@ -45,7 +45,7 @@
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -72,7 +72,7 @@
 # Vassili Simon <vassifht@googlemail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -115,7 +115,7 @@
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -146,7 +146,7 @@
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -166,9 +166,9 @@
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (https://app.transifex.com/open-edx/teams/6205/de_DE/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # Translators:
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-12-24 20:43+0000\n"
+"POT-Creation-Date: 2024-01-14 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://app.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -8330,6 +8330,13 @@ msgstr "Beruf"
 msgid "Specialty"
 msgstr "Spezialgebiet"
 
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
 msgid ""
@@ -13174,6 +13181,10 @@ msgstr "Duplikat von '{0}'"
 msgid "Invalid prerequisite course key"
 msgstr "Ungültiger Vorbedingungskursschlüssel."
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr "Datum festlegen"
+
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -13390,10 +13401,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "Kurs wurde erfolgreich neuindiziert."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr "Datum festlegen"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -24501,6 +24508,10 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr ""
 
@@ -24872,6 +24883,10 @@ msgstr "Kursnavigation"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Übersicht"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

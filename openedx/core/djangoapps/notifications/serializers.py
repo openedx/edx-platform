@@ -156,10 +156,65 @@ class UserNotificationPreferenceUpdateSerializer(serializers.Serializer):
         return instance
 
 
+class UserNotificationChannelPreferenceUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for user notification preferences update for an entire channel.
+    """
+
+    notification_app = serializers.CharField()
+    value = serializers.BooleanField()
+    notification_channel = serializers.CharField(required=False)
+
+    def validate(self, attrs):
+        """
+        Validation for notification preference update form
+        """
+        notification_app = attrs.get('notification_app')
+        notification_channel = attrs.get('notification_channel')
+
+        notification_app_config = self.instance.notification_preference_config
+
+        if not notification_channel:
+            raise ValidationError(
+                'notification_channel is required for notification_type.'
+            )
+
+        if not notification_app_config.get(notification_app, None):
+            raise ValidationError(
+                f'{notification_app} is not a valid notification app.'
+            )
+
+        if notification_channel and notification_channel not in get_notification_channels():
+            raise ValidationError(
+                f'{notification_channel} is not a valid notification channel.'
+            )
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        """
+        Update notification preference config.
+        """
+        notification_app = validated_data.get('notification_app')
+        notification_channel = validated_data.get('notification_channel')
+        value = validated_data.get('value')
+        user_notification_preference_config = instance.notification_preference_config
+
+        app_prefs = user_notification_preference_config[notification_app]
+        for notification_type_name, notification_type_preferences in app_prefs['notification_types'].items():
+            non_editable_channels = app_prefs['non_editable'].get(notification_type_name, [])
+            if notification_channel not in non_editable_channels:
+                app_prefs['notification_types'][notification_type_name][notification_channel] = value
+
+        instance.save()
+        return instance
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     """
     Serializer for the Notification model.
     """
+
     class Meta:
         model = Notification
         fields = (

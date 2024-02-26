@@ -456,7 +456,6 @@ class NameChangeView(ViewSet):
     """
     Viewset to manage profile name change requests.
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request):
@@ -514,7 +513,6 @@ class AccountDeactivationView(APIView):
     Account deactivation viewset. Currently only supports POST requests.
     Only admins can deactivate accounts.
     """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanDeactivateUser)
 
     def post(self, request, username):
@@ -693,7 +691,6 @@ class AccountRetirementPartnerReportView(ViewSet):
     ORIGINAL_NAME_KEY = 'original_name'
     STUDENT_ID_KEY = 'student_id'
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
     parser_classes = (JSONParser,)
     serializer_class = UserRetirementStatusSerializer
@@ -831,7 +828,6 @@ class CancelAccountRetirementStatusView(ViewSet):
     """
     Provides API endpoints for canceling retirement process for a user's account.
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, CanCancelUserRetirement,)
 
     def cancel_retirement(self, request):
@@ -873,7 +869,6 @@ class AccountRetirementStatusView(ViewSet):
     """
     Provides API endpoints for managing the user retirement process.
     """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
     parser_classes = (JSONParser,)
     serializer_class = UserRetirementStatusSerializer
@@ -1080,7 +1075,6 @@ class LMSAccountRetirementView(ViewSet):
     """
     Provides an API endpoint for retiring a user in the LMS.
     """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
     parser_classes = (JSONParser,)
 
@@ -1136,7 +1130,6 @@ class AccountRetirementView(ViewSet):
     """
     Provides API endpoint for retiring a user.
     """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
     parser_classes = (JSONParser,)
 
@@ -1276,7 +1269,6 @@ class UsernameReplacementView(APIView):
     This API will be called first, before calling the APIs in other services as this
     one handles the checks on the usernames provided.
     """
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)
 
     def post(self, request):

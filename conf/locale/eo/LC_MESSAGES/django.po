@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2024-01-08 19:21+0000\n"
-"PO-Revision-Date: 2024-01-08 19:21:26.035640\n"
+"POT-Creation-Date: 2024-01-21 20:36+0000\n"
+"PO-Revision-Date: 2024-01-21 20:36:14.373996\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -9552,6 +9552,13 @@ msgstr "Pröféssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Specialty"
 msgstr "Spéçïältý Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr "Wörk éxpérïénçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
@@ -27918,12 +27925,12 @@ msgid "Select this problem"
 msgstr "Séléçt thïs prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage Access"
-msgstr "Mänägé Àççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+msgid "Manage Tags"
+msgstr "Mänägé Tägs Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Manage tags"
-msgstr "Mänägé tägs Ⱡ'σяєм ιρѕυм ∂σłσя #"
+msgid "Manage Access"
+msgstr "Mänägé Àççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
@@ -28338,6 +28345,10 @@ msgstr "Çöürsé Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Öütlïné Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr "Vïdéös Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

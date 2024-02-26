@@ -4,7 +4,8 @@
   docker_auth docker_build docker_tag_build_push_lms docker_tag_build_push_lms_dev \
   docker_tag_build_push_cms docker_tag_build_push_cms_dev docs extract_translations \
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
-  pre-requirements pull pull_translations push_translations requirements shell swagger \
+  pre-requirements pull pull_xblock_translations pull_translations push_translations \
+  requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
@@ -55,8 +56,22 @@ endif
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
 
-pull_translations:  ## pull translations from Transifex
+pull_plugin_translations:  ## Pull translations from Transifex for edx_django_utils.plugins for both lms and cms
+	rm -rf conf/plugins-locale/plugins  # Clean up existing atlas translations
+	mkdir -p conf/plugins-locale/plugins
+	python manage.py lms pull_plugin_translations --verbose $(ATLAS_OPTIONS)
+	python manage.py lms compile_plugin_translations
+
+pull_xblock_translations:  ## pull xblock translations via atlas
+	rm -rf conf/plugins-locale/xblock.v1  # Clean up existing atlas translations
+	rm -rf lms/static/i18n/xblock.v1 cms/static/i18n/xblock.v1  # Clean up existing xblock compiled translations
+	python manage.py lms pull_xblock_translations --verbose $(ATLAS_OPTIONS)
+	python manage.py lms compile_xblock_translations
+	python manage.py cms compile_xblock_translations
+
+pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale
+ifeq ($(OPENEDX_ATLAS_PULL),)
 	i18n_tool transifex pull
 	i18n_tool extract
 	i18n_tool dummy
@@ -64,6 +79,13 @@ pull_translations:  ## pull translations from Transifex
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
 	i18n_tool validate --verbose
+else
+	make pull_xblock_translations
+	make pull_plugin_translations
+	find conf/locale -mindepth 1 -maxdepth 1 -type d -exec rm -r {} \;
+	atlas pull $(ATLAS_OPTIONS) translations/edx-platform/conf/locale:conf/locale
+	i18n_tool generate
+endif
 	paver i18n_compilejs
 
 
@@ -115,7 +137,9 @@ REQ_FILES = \
 	requirements/edx/development \
 	requirements/edx/assets \
 	requirements/edx/semgrep \
-	scripts/xblock/requirements
+	scripts/xblock/requirements \
+	scripts/user_retirement/requirements/base \
+	scripts/user_retirement/requirements/testing
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
 # This is a temporary solution to override the real common_constraints.txt\n# In edx-lint, until the pyjwt constraint in edx-lint has been removed.\n# See BOM-2721 for more details.\n# Below is the copied and edited version of common_constraints\n
@@ -133,6 +157,8 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	@# so that if there are any failures we'll know now, rather than the next
 	@# time someone tries to use the outputs.
 	sed '/^django-simple-history==/d' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+	sed 's/Django<4.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt

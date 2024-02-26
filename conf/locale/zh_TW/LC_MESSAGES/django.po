@@ -44,7 +44,7 @@
 # 陳子琦 <christtabris@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://app.transifex.com/open-edx/edx-platform/language/zh_TW/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -72,7 +72,7 @@
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014-2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://app.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -114,7 +114,7 @@
 # 薛念林 <nlhsueh@mail.fcu.edu.tw>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://app.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -7567,6 +7567,13 @@ msgstr ""
 msgid "Specialty"
 msgstr ""
 
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
 msgid ""
@@ -11770,6 +11777,10 @@ msgstr "與'{0}'重複"
 msgid "Invalid prerequisite course key"
 msgstr "無效的預備課程key"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr ""
+
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -11976,10 +11987,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "課程已經成功重新索引。"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -21563,6 +21570,10 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr ""
 
@@ -21884,6 +21895,10 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "課程大綱"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

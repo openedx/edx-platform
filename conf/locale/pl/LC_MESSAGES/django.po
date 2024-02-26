@@ -42,7 +42,7 @@
 # Dyfeomorfizm <ximixd@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://app.transifex.com/open-edx/edx-platform/language/pl/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -58,7 +58,7 @@
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://app.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -94,7 +94,7 @@
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://app.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -7995,6 +7995,13 @@ msgstr "Zawód"
 msgid "Specialty"
 msgstr "Specjalność"
 
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
 msgid ""
@@ -12622,6 +12629,10 @@ msgstr "Duplikat '{0}'"
 msgid "Invalid prerequisite course key"
 msgstr "Błędny klucz kursu poprzedzającego"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr "Ustaw datę"
+
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -12839,10 +12850,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "Kurs został pomyślnie przeindeksowany."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr "Ustaw datę"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -23446,6 +23453,10 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr ""
 
@@ -23813,6 +23824,10 @@ msgstr "Nawigacja po kursie"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Program"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

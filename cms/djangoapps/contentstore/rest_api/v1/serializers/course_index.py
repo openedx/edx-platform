@@ -20,6 +20,7 @@ class CourseIndexSerializer(serializers.Serializer):
     deprecated_blocks_info = serializers.DictField()
     discussions_incontext_feedback_url = serializers.CharField()
     discussions_incontext_learnmore_url = serializers.CharField()
+    discussions_settings = serializers.DictField()
     initial_state = InitialIndexStateSerializer()
     initial_user_clipboard = serializers.DictField()
     language_code = serializers.CharField()
@@ -29,3 +30,5 @@ class CourseIndexSerializer(serializers.Serializer):
     proctoring_errors = ProctoringErrorListSerializer(many=True)
     reindex_link = serializers.CharField()
     rerun_notification_id = serializers.IntegerField()
+    advance_settings_url = serializers.CharField()
+    is_custom_relative_dates_active = serializers.BooleanField()

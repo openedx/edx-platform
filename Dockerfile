@@ -147,6 +147,9 @@ COPY . .
 # Install Python requirements again in order to capture local projects
 RUN pip install -e .
 
+# Setting edx-platform directory as safe for git commands
+RUN git config --global --add safe.directory /edx/app/edxapp/edx-platform
+
 # Production target
 FROM base as production
 

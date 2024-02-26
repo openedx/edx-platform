@@ -137,7 +137,10 @@ from openedx.features.enterprise_support.api import data_sharing_consent_require
 
 from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor
 from ..tabs import _get_dynamic_tabs
-from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
+from ..toggles import (
+    COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
+    ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER,
+)
 
 log = logging.getLogger("edx.courseware")
 
@@ -275,6 +278,7 @@ def courses(request):
     """
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
+    set_default_filter = ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER.is_enabled()
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = get_courses(request.user)
 
@@ -292,6 +296,7 @@ def courses(request):
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
+            'set_default_filter': set_default_filter,
             'programs_list': programs_list,
         }
     )
@@ -2008,6 +2013,10 @@ def financial_assistance_request(request):
         username = data['username']
         if request.user.username != username:
             return HttpResponseForbidden()
+        # Require email verification
+        if request.user.is_active is not True:
+            logging.warning('FA_v1: User %s tried to submit app without activating their account.', username)
+            return HttpResponseForbidden('Please confirm your email before applying for financial assistance.')
 
         course_id = data['course']
         course = modulestore().get_course(CourseKey.from_string(course_id))
@@ -2080,6 +2089,10 @@ def financial_assistance_request_v2(request):
         # submitting an FA request
         if request.user.username != username:
             return HttpResponseForbidden()
+        # Require email verification
+        if request.user.is_active is not True:
+            logging.warning('FA_v2: User %s tried to submit app without activating their account.', username)
+            return HttpResponseForbidden('Please confirm your email before applying for financial assistance.')
 
         course_id = data['course']
         if course_id and course_id not in request.META.get('HTTP_REFERER'):

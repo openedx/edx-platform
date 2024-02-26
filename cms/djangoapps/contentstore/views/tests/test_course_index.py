@@ -6,7 +6,6 @@ Unit tests for getting the list of courses and the course outline.
 import datetime
 import json
 from unittest import mock, skip
-from unittest.mock import patch
 
 import ddt
 import lxml
@@ -644,7 +643,7 @@ class TestCourseOutline(CourseTestCase):
         )
 
     @override_settings(FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True})
-    @patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
+    @mock.patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
     def test_proctoring_link_is_visible(self, mock_validate_proctoring_settings):
         """
         Test to check proctored exam settings mfe url is rendering properly
@@ -685,9 +684,11 @@ class TestCourseReIndex(CourseTestCase):
 
     ENABLED_SIGNALS = ['course_published']
 
+    @mock.patch('cms.djangoapps.contentstore.signals.handlers.transaction.on_commit',
+                new=mock.Mock(side_effect=lambda func: func()), )  # run index right away
     def setUp(self):
         """
-        Set up the for the course outline tests.
+        Set up the for the course reindex tests.
         """
 
         super().setUp()

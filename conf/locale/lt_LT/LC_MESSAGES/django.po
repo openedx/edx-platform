@@ -13,7 +13,7 @@
 # 99ff332f197efc0398f769062a4c5442_2965e21 <ad7ca3c3a61916261d41c81ab558ff7e_129326>, 2013
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://app.transifex.com/open-edx/edx-platform/language/lt_LT/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -24,7 +24,7 @@
 # 99ff332f197efc0398f769062a4c5442_2965e21 <ad7ca3c3a61916261d41c81ab558ff7e_129326>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://app.transifex.com/open-edx/edx-platform/language/lt_LT/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -40,7 +40,7 @@
 # 99ff332f197efc0398f769062a4c5442_2965e21 <ad7ca3c3a61916261d41c81ab558ff7e_129326>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://app.transifex.com/open-edx/edx-platform/language/lt_LT/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -7454,6 +7454,13 @@ msgstr ""
 msgid "Specialty"
 msgstr ""
 
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
 msgid ""
@@ -11627,6 +11634,10 @@ msgstr " '{0}' kopija"
 msgid "Invalid prerequisite course key"
 msgstr "Neteisingas būtino kurso raktas"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr ""
+
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -11833,10 +11844,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "Kursas sėkmingai perindeksuotas."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -22006,6 +22013,10 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr ""
 
@@ -22344,6 +22355,10 @@ msgstr "Kurso navigacija"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Planas"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

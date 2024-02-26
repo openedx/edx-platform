@@ -65,6 +65,7 @@ You have the following settings to customize the behavior of your reports.
 
 - ``ANONYMOUS_SURVEY_REPORT``: This is a boolean to specify if you want to use your LMS domain as ID for your report or to send the information anonymously with a UUID. By default, this setting is False.
 
+- ``SURVEY_REPORT_ENABLE``: This is a boolean to specify if you want to enable or disable the survey report feature completely. The banner will disappear and the report generation will be disabled if set to False. By default, this setting is True.
 
 About the Survey Report Admin Banner
 -------------------------------------
@@ -74,4 +75,4 @@ This app implements a banner to make it easy for the Open edX operators to gener
     .. image:: docs/_images/survey_report_banner.png
         :alt: Survey Report Banner
 
-**Note:** The banner will appear if a survey report is not sent in the months defined in the ``context_processor`` file, by default, is set to appear monthly.
+**Note:** The banner will appear if a survey report is not sent in the months defined in the ``context_processor`` file, by default, is set to appear every 6 months.

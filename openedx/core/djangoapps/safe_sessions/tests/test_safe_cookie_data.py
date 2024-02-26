@@ -236,7 +236,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
             "|HvGnjXf1b3jU"
             "|ImExZWZiNzVlZGFmM2FkZWZmYjM4YjI0ZmZkOWU4MzExODU0MTk4NmVlNGRiYzBlODdhYWUzOGM5MzVlNzk4NjUi"
             ":1m6Hve"
-            ":OMhY2FL2pudJjSSXChtI-zR8QVA"
+            ":Pra4iochviPvKUoIV33gdVZFDgG-cMDlIYfl8iFIMaY"
         )
 
     @pytest.mark.skipif(django.VERSION[0] < 4, reason="For django42 default algorithm is sha256. No need for django32.")

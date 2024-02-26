@@ -47,7 +47,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.modulestore.store_utilities import derived_key
+from xmodule.util.keys import derive_key
 
 from . import api
 from .models import ContentLibraryBlockImportTask
@@ -92,7 +92,7 @@ def _import_block(store, user_id, source_block, dest_parent_key):
         """
         Deterministically generate an ID for the new block and return the key.
         Keys are generated such that they appear identical to a v1 library with
-        the same input block_id, library name, library organization, and parent block using derived_key
+        the same input block_id, library name, library organization, and parent block using derive_key
         """
         if not isinstance(source_key.lib_key, LibraryLocatorV2):
             raise TypeError(f"Expected source library key of type LibraryLocatorV2, got {source_key.lib_key} instead.")
@@ -101,16 +101,11 @@ def _import_block(store, user_id, source_block, dest_parent_key):
             library=source_key.lib_key.slug,
             branch='library'
         )
-        source_key_usage_id_as_block_key = BlockKey(
-            type=source_key.block_type,
-            id=source_key.usage_id,
+        derived_block_key = derive_key(
+            source=source_key_as_v1_course_key.make_usage_key(source_key.block_type, source_key.block_id),
+            dest_parent=BlockKey(dest_parent_key.block_type, dest_parent_key.block_id),
         )
-        block_id = derived_key(
-            source_key_as_v1_course_key,
-            source_key_usage_id_as_block_key,
-            BlockKey(dest_parent_key.block_type, dest_parent_key.block_id)
-        )
-        return dest_parent_key.context_key.make_usage_key(source_key.block_type, block_id.id)
+        return dest_parent_key.context_key.make_usage_key(*derived_block_key)
 
     source_key = source_block.scope_ids.usage_id
     new_block_key = generate_block_key(source_key, dest_parent_key)
@@ -348,8 +343,10 @@ def _sync_children(
     elif isinstance(library, library_api.ContentLibraryMetadata):
         # TODO: add filtering by capa_type when V2 library will support different problem types
         try:
-            source_blocks = library_api.get_library_blocks(library_key)
-            source_block_ids = [str(block.usage_key) for block in source_blocks]
+            source_block_ids = [
+                str(library_api.LibraryXBlockMetadata.from_component(library_key, component).usage_key)
+                for component in library_api.get_library_components(library_key)
+            ]
             _import_from_blockstore(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)

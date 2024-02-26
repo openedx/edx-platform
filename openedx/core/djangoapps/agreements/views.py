@@ -3,11 +3,9 @@ Views served by the Agreements app
 """
 
 from django.conf import settings
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from opaque_keys.edx.keys import CourseKey
 
@@ -34,7 +32,6 @@ class AuthenticatedAPIView(APIView):
     """
     Authenticated API View.
     """
-    authentication_classes = (SessionAuthentication, JwtAuthentication)
     permission_classes = (IsAuthenticated,)
 
 

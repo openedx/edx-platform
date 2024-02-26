@@ -24,7 +24,7 @@
 # 鈴木 陽一 <gacco.ysuzuki@gmail.com>, 2017
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Japanese (Japan) (http://app.transifex.com/open-edx/edx-platform/language/ja_JP/).
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -40,7 +40,7 @@
 # わたカフェの店長, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Japanese (Japan) (http://app.transifex.com/open-edx/edx-platform/language/ja_JP/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -70,7 +70,7 @@
 # わたカフェの店長, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Japanese (Japan) (http://app.transifex.com/open-edx/edx-platform/language/ja_JP/)
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -7547,6 +7547,13 @@ msgstr ""
 msgid "Specialty"
 msgstr ""
 
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
 msgid ""
@@ -11781,6 +11788,10 @@ msgstr "'{0}' の重複"
 msgid "Invalid prerequisite course key"
 msgstr "無効な履習要件コースキー"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr ""
+
 #. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/video_storage_handlers.py
@@ -11988,10 +11999,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
 msgstr "講座の見出し再作成が完了しました。"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -21750,6 +21757,10 @@ msgid "Select this problem"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr ""
 
@@ -22082,6 +22093,10 @@ msgstr "講座ナビゲーション"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "アウトライン"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

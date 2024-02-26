@@ -1,10 +1,12 @@
 """ Contenstore API v1 URLs. """
 
+from django.conf import settings
 from django.urls import re_path, path
 
 from openedx.core.constants import COURSE_ID_PATTERN
 
 from .views import (
+    ContainerHandlerView,
     CourseDetailsView,
     CourseTeamView,
     CourseIndexView,
@@ -99,6 +101,11 @@ urlpatterns = [
         fr'^course_rerun/{COURSE_ID_PATTERN}$',
         CourseRerunView.as_view(),
         name="course_rerun"
+    ),
+    re_path(
+        fr'^container_handler/{settings.USAGE_KEY_PATTERN}$',
+        ContainerHandlerView.as_view(),
+        name="container_handler"
     ),
 
     # Authoring API

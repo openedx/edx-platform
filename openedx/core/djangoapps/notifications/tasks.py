@@ -7,13 +7,17 @@ from typing import List
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.notifications.base_notification import get_default_values_of_preference
+from openedx.core.djangoapps.notifications.base_notification import (
+    get_default_values_of_preference,
+    get_notification_content
+)
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATIONS_FILTERS
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.filters import NotificationFilter
@@ -93,6 +97,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
 
+    if not is_notification_valid(notification_type, context):
+        raise ValidationError(f"Notification is not valid {app_name} {notification_type} {context}")
+
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
 
@@ -155,6 +162,17 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             generated_notification_audience, app_name, notification_type, course_key, content_url,
             notification_content, sender_id=sender_id
         )
+
+
+def is_notification_valid(notification_type, context):
+    """
+    Validates notification before creation
+    """
+    try:
+        get_notification_content(notification_type, context)
+    except Exception:        # pylint: disable=broad-except
+        return False
+    return True
 
 
 def update_user_preference(preference: CourseNotificationPreference, user_id, course_id):

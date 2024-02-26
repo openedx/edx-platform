@@ -7,6 +7,8 @@ import os
 
 from lxml import etree
 
+from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
+
 from .data import StaticFile
 from . import utils
 
@@ -112,6 +114,10 @@ class XBlockSerializer:
             olx_node.attrib["editor"] = block.editor
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
+
+        # Serialize and add tag data if any
+        if isinstance(block, TaggedBlockMixin):
+            block.add_tags_to_node(olx_node)
 
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")

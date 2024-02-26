@@ -298,11 +298,23 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 #################### Credentials Settings ####################
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
+
+########################## ORA MFE APP ##############################
+ORA_MICROFRONTEND_URL = 'http://localhost:1992'
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
+############################ CSRF ##################################
+
+# MFEs that will call this service in devstack
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3001',  # frontend-app-library-authoring
+    'http://localhost:2001',  # frontend-app-course-authoring
+    'http://localhost:1992',  # frontend-app-ora
+]
 
 #################### Event bus backend ########################
 

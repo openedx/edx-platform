@@ -426,6 +426,8 @@ class ViewsQueryCountTestCase(
 
 
 @ddt.ddt
+@disable_signal(views, 'comment_flagged')
+@disable_signal(views, 'thread_flagged')
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
         ForumsEnableMixin,
@@ -1714,7 +1716,13 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread", "body": 'dummy body'},
+            {
+                "closed": False,
+                "commentable_id": commentable_id,
+                "thread_id": "dummy_thread",
+                "body": 'dummy body',
+                "course_id": str(self.course.id)
+            },
         )
         for action in ["upvote_comment", "downvote_comment", "un_flag_abuse_for_comment", "flag_abuse_for_comment"]:
             response = self.client.post(
@@ -1735,7 +1743,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "body": "dummy body"},
+            {"closed": False, "commentable_id": commentable_id, "body": "dummy body", "course_id": str(self.course.id)}
         )
         for action in ["upvote_thread", "downvote_thread", "un_flag_abuse_for_thread", "flag_abuse_for_thread",
                        "follow_thread", "unfollow_thread"]:

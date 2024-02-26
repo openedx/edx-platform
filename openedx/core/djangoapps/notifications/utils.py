@@ -4,6 +4,7 @@ Utils function for notifications app
 from typing import Dict, List
 
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.lib.cache_utils import request_cached
 
@@ -65,6 +66,10 @@ def filter_course_wide_preferences(course_key, preferences):
     if ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course_key):
         return preferences
     course_wide_notification_types = ['new_discussion_post', 'new_question_post']
+
+    if not ENABLE_REPORTED_CONTENT_NOTIFICATIONS.is_enabled(course_key):
+        course_wide_notification_types.append('content_reported')
+
     config = preferences['notification_preference_config']
     for app_prefs in config.values():
         notification_types = app_prefs['notification_types']

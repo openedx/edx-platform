@@ -53,7 +53,6 @@ DEFAULT_LEGACY_CONFIGURATION = {
     'division_scheme': 'none',
     'available_division_schemes': [],
     'reported_content_email_notifications': False,
-    'reported_content_email_notifications_flag': False,
 }
 DEFAULT_LTI_CONFIGURATION = {
     'lti_1p1_client_key': '',
