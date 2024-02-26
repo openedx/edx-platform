@@ -49,22 +49,22 @@ class TaggedBlockMixin:
         if tag_data:
             node.set('tags-v1', tag_data)
 
-    def add_xml_to_node(self, node):
+    def read_tags_from_node(self, node):
         """
-        Include the serialized tag data in XML when adding to node
+        Deserialize and read tag data from node
         """
-        super().add_xml_to_node(node)
-        self.add_tags_to_node(node)
+        if 'tags-v1' in node.attrib:
+            self.xml_attributes['tags-v1'] = str(node.attrib['tags-v1'])
 
     def add_tags_from_xml(self):
         """
-        Parse and add tag data from xml
+        Parse and add tag data from xml_attributes
         """
         # This import is done here since we import and use TaggedBlockMixin in the cms settings, but the
         # content_tagging app wouldn't have loaded yet, so importing it outside causes an error
         from openedx.core.djangoapps.content_tagging.api import set_object_tags
 
-        tag_data = self.xml_attributes.get('tags-v1', None) if self.xml_attributes else None
+        tag_data = self.xml_attributes.get('tags-v1', None) if hasattr(self, 'xml_attributes') else None
         if not tag_data:
             return
 
