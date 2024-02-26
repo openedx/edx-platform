@@ -286,6 +286,14 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
     @ddt.unpack
     @patch("lms.djangoapps.mobile_api.course_info.views.User.objects.get")
     def test_get_requested_user(self, user_role, username, expected_username, mock_get):
+        """
+        Test get_requested_user utility from the BlocksInfoInCourseView.
+
+        Parameters:
+        user_role: type of the user that making a request.
+        username: username query parameter from the request.
+        expected_username: username of the returned user.
+        """
         if user_role == "anonymous":
             request_user = AnonymousUser()
         elif user_role == "staff":
@@ -302,7 +310,7 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
         result_user = BlocksInfoInCourseView().get_requested_user(self.request.user, username)
         if expected_username:
             self.assertEqual(result_user.username, expected_username)
-            if username:
+            if username and request_user.username != username:
                 mock_get.assert_called_with(username=username)
         else:
             self.assertIsNone(result_user)
@@ -315,6 +323,13 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
     @ddt.unpack
     @patch('lms.djangoapps.mobile_api.course_info.views.certificate_downloadable_status')
     def test_get_certificate(self, certificate_status_return, expected_output, mock_certificate_status):
+        """
+        Test get_certificate utility from the BlocksInfoInCourseView.
+
+        Parameters:
+        certificate_status_return: returned value of the mocked certificate_downloadable_status function.
+        expected_output: return_value of the get_certificate function with specified mock return_value.
+        """
         mock_certificate_status.return_value = certificate_status_return
         self.request.user = self.user
 
