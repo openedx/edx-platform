@@ -52,7 +52,8 @@
                     header_text: context.header_text,
                     course_id: context.course_id,
                     platform_name: context.platform_name,
-                    account_settings_url: context.account_settings_url
+                    account_settings_url: context.account_settings_url,
+                    auto_generated_username_enabled: context.auto_generated_username_enabled,
                 };
 
                 // Make the value accessible to this View
