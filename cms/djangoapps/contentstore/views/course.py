@@ -1622,7 +1622,12 @@ def group_configurations_detail_handler(request, course_key_string, group_config
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = get_course_and_check_access(course_key, request.user)
+        if (
+            not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
+        ):
+            course = get_course_and_check_access(course_key, request.user)
+        else:
+            course = store.get_course(course_key, depth=0)
         matching_id = [p for p in course.user_partitions
                        if str(p.id) == str(group_configuration_id)]
         if matching_id:
