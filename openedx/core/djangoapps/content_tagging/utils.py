@@ -93,7 +93,9 @@ class TaggingRulesCache:
         if library_orgs is None:
             library_orgs = {
                 library.org.short_name: library.org
-                for library in get_libraries_for_user(user).select_related('org').only('org')
+                # Note: We don't actually need .learning_package here, but it's already select_related'ed by
+                # get_libraries_for_user(), so we need to include it in .only() otherwise we get an ORM error.
+                for library in get_libraries_for_user(user).select_related('org').only('org', 'learning_package')
             }
             self.request_cache.set(cache_key, library_orgs)
 
