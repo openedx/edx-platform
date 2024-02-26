@@ -172,14 +172,14 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-def compose_activation_email(user, user_registration=None, route_enabled=False, profile_name='', redirect_url=None):
+def compose_activation_email(
+    user, user_registration=None, route_enabled=False, profile_name='', redirect_url=None, registration_flow=False
+):
     """
     Construct all the required params for the activation email
     through celery task
     """
-    registration_flow = True
     if user_registration is None:
-        registration_flow = False
         user_registration = Registration.objects.get(user=user)
 
     message_context = generate_activation_email_context(user, user_registration)
@@ -190,6 +190,7 @@ def compose_activation_email(user, user_registration=None, route_enabled=False, 
         'routed_user_email': user.email,
         'routed_profile_name': profile_name,
         'registration_flow': registration_flow,
+        'is_enterprise_learner': is_enterprise_learner(user),
     })
 
     if route_enabled:
@@ -225,7 +226,9 @@ def _get_activation_confirmation_link(activation_key, redirect_url=None):
     return urllib.parse.urlunparse((scheme, netloc, path, params, query, fragment))
 
 
-def compose_and_send_activation_email(user, profile, user_registration=None, redirect_url=None):
+def compose_and_send_activation_email(
+    user, profile, user_registration=None, redirect_url=None, registration_flow=False,
+):
     """
     Construct all the required params and send the activation email
     through celery task
@@ -235,10 +238,13 @@ def compose_and_send_activation_email(user, profile, user_registration=None, red
         profile: profile object of the current logged-in user
         user_registration: registration of the current logged-in user
         redirect_url: The URL to redirect to after successful activation
+        registration_flow: Is the request coming from registration workflow
     """
     route_enabled = settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL')
 
-    msg = compose_activation_email(user, user_registration, route_enabled, profile.name, redirect_url)
+    msg = compose_activation_email(
+        user, user_registration, route_enabled, profile.name, redirect_url, registration_flow
+    )
     from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS') or (
         configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     )
