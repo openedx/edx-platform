@@ -1105,6 +1105,10 @@ def grading_handler(request, course_key_string, grader_index=None):
                 else:
                     return JsonResponse(CourseGradingModel.fetch_grader(course_key, grader_index))
             elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+                if (
+                    not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
+                ):
+                    raise PermissionDenied()
                 # update credit course requirements if 'minimum_grade_credit'
                 # field value is changed
                 if 'minimum_grade_credit' in request.json:
