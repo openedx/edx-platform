@@ -23,6 +23,9 @@ perms[CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name] = (
 perms[CourseRolesPermission.MANAGE_ADVANCED_SETTINGS.perm_name] = (
     HasPermissionRule(CourseRolesPermission.MANAGE_ADVANCED_SETTINGS)
 )
+perms[CourseRolesPermission.VIEW_COURSE_SETTINGS.perm_name] = (
+    HasPermissionRule(CourseRolesPermission.VIEW_COURSE_SETTINGS)
+)
 perms[CourseRolesPermission.VIEW_ALL_CONTENT.perm_name] = HasPermissionRule(CourseRolesPermission.VIEW_ALL_CONTENT)
 perms[CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT.perm_name] = (
     HasPermissionRule(CourseRolesPermission.VIEW_LIVE_PUBLISHED_CONTENT)
