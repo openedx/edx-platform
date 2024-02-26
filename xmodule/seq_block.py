@@ -403,6 +403,7 @@ class SequenceBlock(
         meta['display_name'] = self.display_name_with_default
         meta['format'] = getattr(self, 'format', '')
         meta['is_hidden_after_due'] = is_hidden_after_due
+        meta['is_after_due'] = self.due is not None and self.due < datetime.now(UTC)
         return meta
 
     @classmethod

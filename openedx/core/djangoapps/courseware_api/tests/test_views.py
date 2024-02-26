@@ -488,6 +488,7 @@ class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
         response = self.client.get(f'/api/courseware/sequence/{sequence.location}')
         assert response.status_code == 200
         assert response.data['is_hidden_after_due'] == expected_hidden
+        assert response.data['is_after_due'] == is_past_due
         assert bool(response.data['banner_text']) == expected_banner
 
 
