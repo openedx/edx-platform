@@ -1106,6 +1106,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                     return JsonResponse(CourseGradingModel.fetch_grader(course_key, grader_index))
             elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
                 if (
+                    not has_studio_write_access(request.user, course_key) and
                     not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
                 ):
                     raise PermissionDenied()
@@ -1125,6 +1126,11 @@ def grading_handler(request, course_key_string, grader_index=None):
                         CourseGradingModel.update_grader_from_json(course_key, request.json, request.user)
                     )
             elif request.method == "DELETE" and grader_index is not None:
+                if (
+                    not has_studio_write_access(request.user, course_key) and
+                    not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
+                ):
+                    raise PermissionDenied()
                 CourseGradingModel.delete_grader(course_key, grader_index, request.user)
                 return JsonResponse()
 
