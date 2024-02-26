@@ -1524,7 +1524,13 @@ def group_configurations_list_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = get_course_and_check_access(course_key, request.user)
+        if (
+            not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key) and
+            not request.user.has_perm(CourseRolesPermission.VIEW_COURSE_SETTINGS.perm_name, course_key)
+        ):
+            course = get_course_and_check_access(course_key, request.user)
+        else:
+            course = store.get_course(course_key, depth=0)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
