@@ -77,22 +77,22 @@ class PersistentGradeEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixi
         PERSISTENT_GRADE_SUMMARY_CHANGED.connect(event_receiver)
         grade = PersistentCourseGrade.update_or_create(**self.params)
         self.assertTrue(self.receiver_called)
-        self.assertDictContainsSubset(
-            {
-                "signal": PERSISTENT_GRADE_SUMMARY_CHANGED,
-                "sender": None,
-                "grade": PersistentCourseGradeData(
-                    user_id=self.params["user_id"],
-                    course=CourseData(
-                        course_key=self.params["course_id"],
-                    ),
-                    course_edited_timestamp=self.params["course_edited_timestamp"],
-                    course_version=self.params["course_version"],
-                    grading_policy_hash='',
-                    percent_grade=self.params["percent_grade"],
-                    letter_grade=self.params["letter_grade"],
-                    passed_timestamp=grade.passed_timestamp
-                )
-            },
-            event_receiver.call_args.kwargs
+        persistent_grade_changed_event = {
+            "signal": PERSISTENT_GRADE_SUMMARY_CHANGED,
+            "sender": None,
+            "grade": PersistentCourseGradeData(
+                user_id=self.params["user_id"],
+                course=CourseData(
+                    course_key=self.params["course_id"],
+                ),
+                course_edited_timestamp=self.params["course_edited_timestamp"],
+                course_version=self.params["course_version"],
+                grading_policy_hash='',
+                percent_grade=self.params["percent_grade"],
+                letter_grade=self.params["letter_grade"],
+                passed_timestamp=grade.passed_timestamp
+            )
+        }
+        self.assertTrue(
+            persistent_grade_changed_event.items() <= event_receiver.call_args.kwargs.items()
         )
