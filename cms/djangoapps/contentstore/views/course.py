@@ -57,6 +57,7 @@ from common.djangoapps.student.roles import (
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -1081,7 +1082,11 @@ def grading_handler(request, course_key_string, grader_index=None):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        if not has_studio_read_access(request.user, course_key):
+        if (
+            not has_studio_read_access(request.user, course_key) and
+            not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key) and
+            not request.user.has_perm(CourseRolesPermission.VIEW_COURSE_SETTINGS.perm_name, course_key)
+        ):
             raise PermissionDenied()
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
