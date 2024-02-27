@@ -35,6 +35,9 @@ class FakeContentTask(FakeInfo):
 
     def __init__(self, email_id, num_sent, num_failed, sent_to):  # lint-amnesty, pylint: disable=unused-argument
         super().__init__()
+        self.task_id = random.randint(1, 15401)
+        self.task_type = 'test_task'
+        self.task_key = random.randint(1, 15401)
         self.task_input = {'email_id': email_id}
         self.task_input = json.dumps(self.task_input)
         self.task_output = {'succeeded': num_sent, 'failed': num_failed}
