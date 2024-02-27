@@ -157,16 +157,12 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         # Add tags to the unit
         taxonomy_all_org = tagging_api.create_taxonomy("test_taxonomy", "Test Taxonomy")
 
-        taxonomy_all_org = tagging_api.create_taxonomy("test_taxonomy", "Test Taxonomy")
         tagging_api.set_taxonomy_orgs(taxonomy_all_org, all_orgs=True)
         Tag.objects.create(taxonomy=taxonomy_all_org, value="tag_1")
         Tag.objects.create(taxonomy=taxonomy_all_org, value="tag_2")
-        # Removing a tag is causing tag_object to fail
-        # tag_removed = Tag.objects.create(taxonomy=taxonomy, value="tag_removed")
         tagging_api.tag_object(
             object_id=str(unit_key),
             taxonomy=taxonomy_all_org,
-            # tags=["tag_1", "tag_2", "tag_removed"],
             tags=["tag_1", "tag_2"],
         )
 
@@ -194,7 +190,6 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         copy_response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(unit_key)}, format="json")
         assert copy_response.status_code == 200
 
-        # tag_removed.delete()
         taxonomy_all_org_removed.delete()
 
         # Paste the unit
