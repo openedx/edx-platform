@@ -10,7 +10,7 @@ from django.views.decorators.cache import cache_page
 from rest_framework import status
 from rest_framework.views import APIView
 
-from mfe_config_api.utils import get_mfe_config_for_site
+from lms.djangoapps.mfe_config_api.utils import get_mfe_config_for_site
 
 
 class MFEConfigView(APIView):

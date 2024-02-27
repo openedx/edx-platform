@@ -126,7 +126,7 @@ def _get_new_courseware_url(
     )
 
 
-def get_learning_mfe_base_url(request=request, site=site) -> str:
+def get_learning_mfe_base_url(request=None, site=None) -> str:
     mfe_config = get_mfe_config_for_site(request=request, site=site, mfe="learning")
     return mfe_config.get("LEARNING_BASE_URL", settings.LEARNING_MICROFRONTEND_URL)
 
