@@ -249,13 +249,47 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'info': 'Notifications for responses and comments on your posts, and the ones you’re '
                                     'following, including endorsements to your responses and on your posts.'
                         },
-                        'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
-                        'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''},
-                        'content_reported': {'web': True, 'email': True, 'push': True, 'info': ''},
+                        'new_discussion_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'info': ''
+                        },
+                        'new_question_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'info': ''
+                        },
+                        'content_reported': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'info': ''
+                        },
                     },
                     'non_editable': {
                         'core': ['web']
                     }
+                },
+                'updates': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'course_update': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'info': 'Notifications for new announcements and updates from the course team.'
+                        }
+                    },
+                    'non_editable': {}
                 }
             }
         }
@@ -293,8 +327,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
     @mock.patch.dict(COURSE_NOTIFICATION_TYPES, {
         **COURSE_NOTIFICATION_TYPES,
         **{
-            'new_question_post': {
-                'name': 'new_question_post',
+            'content_reported': {
+                'name': 'content_reported',
                 'visible_to': [FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADMINISTRATOR]
             }
         }
@@ -318,7 +352,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         expected_response = self._expected_api_response()
+
         if not role:
             expected_response = remove_notifications_with_visibility_settings(expected_response)
 
@@ -474,6 +510,27 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                     'non_editable': {
                         'core': ['web']
                     }
+                },
+                'updates': {
+                    'enabled': True,
+                    'core_notification_types': [
+
+                    ],
+                    'notification_types': {
+                        'course_update': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'info': 'Notifications for new announcements and updates from the course team.'
+                        }
+                    },
+                    'non_editable': {}
                 }
             }
         }
@@ -742,7 +799,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['count'], 4)
             self.assertEqual(response.data['count_by_app_name'], {
-                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0})
+                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0})
             self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
@@ -763,7 +820,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
-        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0})
+        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0})
 
     def test_get_expiry_days_in_count_view(self):
         """
