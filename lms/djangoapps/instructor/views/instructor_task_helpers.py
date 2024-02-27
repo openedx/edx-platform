@@ -61,7 +61,7 @@ def extract_email_features(email_task):
 
     email = CourseEmail.objects.get(id=task_input_information['email_id'])
     try:
-        instructor_task_schedule = InstructorTaskSchedule.objects.get(task=email_task)
+        instructor_task_schedule = InstructorTaskSchedule.objects.get(task__task_id=email_task.task_id)
         scheduled_time = instructor_task_schedule.task_due
         email_feature_dict = {
             'created': get_default_time_display(scheduled_time),
