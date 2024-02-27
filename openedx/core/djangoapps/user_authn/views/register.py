@@ -247,7 +247,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
     else:
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        compose_and_send_activation_email(user, profile, registration, redirect_url)
+        compose_and_send_activation_email(user, profile, registration, redirect_url, True)
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
