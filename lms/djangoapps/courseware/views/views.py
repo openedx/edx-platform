@@ -33,6 +33,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
+from lms.djangoapps.ai_translation.waffle import whole_course_translations_enabled_for_course
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -1586,7 +1587,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         student_view_context = request.GET.dict()
         student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
         student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
-        student_view_context['translate_lang'] = request.GET.get('translate_lang')
 
         is_learning_mfe = is_request_from_learning_mfe(request)
         # Right now, we only care about this in regards to the Learning MFE because it results
@@ -1634,6 +1634,12 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             if getattr(seq_block, 'is_time_limited', None):
                 if not _check_sequence_exam_access(request, seq_block.location):
                     return HttpResponseForbidden("Access to exam content is restricted")
+
+        # AI Translations feature for course content, passes a translation language to blocks
+        # which can call through the ai_translation service (passed through XBlock runtime)
+        # to receive translated versions of course content.
+        if whole_course_translations_enabled_for_course(course_key):
+            student_view_context['translate_lang'] = request.GET.get('translate_lang')
 
         fragment = block.render(requested_view, context=student_view_context)
         optimization_flags = get_optimization_flags_for_content(block, fragment)
