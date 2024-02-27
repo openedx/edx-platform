@@ -1,7 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
 import copy
-import json
 import logging
 import os
 import re
