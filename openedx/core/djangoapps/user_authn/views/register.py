@@ -740,6 +740,8 @@ class RegistrationValidationView(APIView):
         return get_confirm_email_validation_error(confirm_email, email)
 
     def password_handler(self, request):
+        if request.data.get('social_auth_provider') is not None:
+            return ""
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
