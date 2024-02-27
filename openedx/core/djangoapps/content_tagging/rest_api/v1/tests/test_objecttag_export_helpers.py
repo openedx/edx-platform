@@ -4,7 +4,6 @@ Test the objecttag_export_helpers module
 from unittest.mock import patch
 
 from openedx.core.djangoapps.content_libraries import api as library_api
-from openedx.core.lib import blockstore_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
