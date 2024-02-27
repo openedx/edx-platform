@@ -5,7 +5,6 @@ APIs.
 """
 import ddt
 from django.test import LiveServerTestCase
-from django.urls import reverse
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
 from xmodule.modulestore.django import contentstore, modulestore
@@ -235,7 +234,7 @@ class ClipboardLibraryContentPasteTestCase(LiveServerTestCase, ModuleStoreTestCa
             'category': 'html',
             'display_name': 'HTML Content',
         }
-        response = self.client.ajax_post(reverse('xblock_handler'), data)
+        response = self.client.ajax_post(XBLOCK_ENDPOINT, data)
         self.assertEqual(response.status_code, 200)
         course = CourseFactory.create(display_name='Course')
         orig_lc_block = BlockFactory.create(
@@ -255,10 +254,10 @@ class ClipboardLibraryContentPasteTestCase(LiveServerTestCase, ModuleStoreTestCa
         assert copy_response.status_code == 200
 
         # Paste the Library content block:
-        paste_response = self.client.post(XBLOCK_ENDPOINT, {
+        paste_response = self.client.ajax_post(XBLOCK_ENDPOINT, {
             "parent_locator": str(course.location),
             "staged_content": "clipboard",
-        }, format="json")
+        })
         assert paste_response.status_code == 200
         dest_lc_block_key = UsageKey.from_string(paste_response.json()["locator"])
 
