@@ -40,7 +40,7 @@ glom==22.1.0
     # via semgrep
 idna==3.6
     # via requests
-importlib-resources==6.1.1
+importlib-resources==6.1.2
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -80,7 +80,7 @@ semgrep==1.52.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.1
     # via semgrep
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via
     #   rich
     #   semgrep
@@ -89,7 +89,7 @@ urllib3==1.26.18
     #   -c requirements/edx/../constraints.txt
     #   requests
     #   semgrep
-wcmatch==8.5
+wcmatch==8.5.1
     # via semgrep
 zipp==3.17.0
     # via importlib-resources

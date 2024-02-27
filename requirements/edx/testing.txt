@@ -103,20 +103,20 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.45
+boto3==1.34.50
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.45
+botocore==1.34.50
     # via
     #   -r requirements/edx/base.txt
     #   boto3
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.txt
-cachetools==5.3.2
+cachetools==5.3.3
     # via tox
 celery==5.3.6
     # via
@@ -207,7 +207,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.4.1
+coverage[toml]==7.4.3
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -234,7 +234,7 @@ cssutils==2.9.0
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
-ddt==1.7.1
+ddt==1.7.2
     # via -r requirements/edx/testing.in
 defusedxml==0.7.1
     # via
@@ -683,7 +683,7 @@ factory-boy==3.3.0
     # via -r requirements/edx/testing.in
 faker==23.2.1
     # via factory-boy
-fastapi==0.109.2
+fastapi==0.110.0
     # via pact-python
 fastavro==1.9.4
     # via
@@ -712,7 +712,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-pyfs
-future==0.18.3
+future==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   pyjwkest
@@ -921,7 +921,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==9.6.0
+newrelic==9.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -987,7 +987,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.0.34
+ora2==6.1.0
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1092,9 +1092,9 @@ pycryptodomex==3.20.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.6.1
+pydantic==2.6.2
     # via fastapi
-pydantic-core==2.16.2
+pydantic-core==2.16.3
     # via pydantic
 pygments==2.17.2
     # via
@@ -1181,7 +1181,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-pytest==8.0.1
+pytest==8.0.2
     # via
     #   -r requirements/edx/testing.in
     #   pylint-pytest
@@ -1404,9 +1404,9 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-sniffio==1.3.0
+sniffio==1.3.1
     # via anyio
-snowflake-connector-python==3.7.0
+snowflake-connector-python==3.7.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1442,7 +1442,7 @@ staff-graded-xblock==2.2.0
     # via -r requirements/edx/base.txt
 starlette==0.36.3
     # via fastapi
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1491,7 +1491,7 @@ tqdm==4.66.2
     #   -r requirements/edx/base.txt
     #   nltk
     #   openai
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via
     #   -r requirements/edx/base.txt
     #   annotated-types
@@ -1550,7 +1550,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.25.0
+virtualenv==20.25.1
     # via tox
 voluptuous==0.14.2
     # via

@@ -101,13 +101,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.45
+boto3==1.34.50
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.45
+botocore==1.34.50
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -668,7 +668,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-pyfs
-future==0.18.3
+future==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   pyjwkest
@@ -864,7 +864,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==9.6.0
+newrelic==9.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -930,7 +930,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.0.34
+ora2==6.1.0
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1279,7 +1279,7 @@ smmap==5.0.1
     # via gitdb
 snowballstemmer==2.2.0
     # via sphinx
-snowflake-connector-python==3.7.0
+snowflake-connector-python==3.7.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1349,7 +1349,7 @@ sqlparse==0.4.4
     #   openedx-blockstore
 staff-graded-xblock==2.2.0
     # via -r requirements/edx/base.txt
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1386,7 +1386,7 @@ tqdm==4.66.2
     #   -r requirements/edx/base.txt
     #   nltk
     #   openai
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via
     #   -r requirements/edx/base.txt
     #   asgiref

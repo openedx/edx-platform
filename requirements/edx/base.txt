@@ -74,13 +74,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.34.45
+boto3==1.34.50
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.45
+botocore==1.34.50
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -583,7 +583,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-pyfs
-future==0.18.3
+future==1.0.0
     # via pyjwkest
 geoip2==4.8.0
     # via -r requirements/edx/kernel.in
@@ -734,7 +734,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==9.6.0
+newrelic==9.7.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -795,7 +795,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
-ora2==6.0.34
+ora2==6.1.0
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
@@ -1083,7 +1083,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==3.7.0
+snowflake-connector-python==3.7.1
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
@@ -1113,7 +1113,7 @@ sqlparse==0.4.4
     #   openedx-blockstore
 staff-graded-xblock==2.2.0
     # via -r requirements/edx/bundled.in
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
@@ -1138,7 +1138,7 @@ tqdm==4.66.2
     # via
     #   nltk
     #   openai
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via
     #   -r requirements/edx/paver.txt
     #   asgiref

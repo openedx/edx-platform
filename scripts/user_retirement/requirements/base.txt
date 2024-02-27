@@ -14,15 +14,15 @@ backports-zoneinfo==0.2.1
     # via
     #   django
     #   pendulum
-boto3==1.34.26
+boto3==1.34.50
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.34.26
+botocore==1.34.50
     # via
     #   boto3
     #   s3transfer
-cachetools==5.3.2
+cachetools==5.3.3
     # via google-auth
-certifi==2023.11.17
+certifi==2024.2.2
     # via requests
 cffi==1.16.0
     # via
@@ -34,9 +34,9 @@ click==8.1.7
     # via
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==42.0.0
+cryptography==42.0.5
     # via simple-salesforce
-django==4.2.9
+django==4.2.10
     # via
     #   django-crum
     #   django-waffle
@@ -49,11 +49,11 @@ edx-django-utils==5.10.1
     # via edx-rest-api-client
 edx-rest-api-client==5.6.1
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.15.0
+google-api-core==2.17.1
     # via google-api-python-client
-google-api-python-client==2.115.0
+google-api-python-client==2.119.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.26.2
+google-auth==2.28.1
     # via
     #   google-api-core
     #   google-api-python-client
@@ -68,7 +68,7 @@ httplib2==0.22.0
     #   google-auth-httplib2
 idna==3.6
     # via requests
-importlib-resources==6.1.1
+importlib-resources==6.1.2
     # via pendulum
 isodate==0.6.1
     # via zeep
@@ -78,19 +78,19 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-lxml==4.9.3
+lxml==5.1.0
     # via zeep
 more-itertools==10.2.0
     # via simple-salesforce
-newrelic==9.5.0
+newrelic==9.7.0
     # via edx-django-utils
 pbr==6.0.0
     # via stevedore
 pendulum==3.0.0
     # via simple-salesforce
-platformdirs==4.1.0
+platformdirs==4.2.0
     # via zeep
-protobuf==4.25.2
+protobuf==4.25.3
     # via
     #   google-api-core
     #   googleapis-common-protos
@@ -117,7 +117,7 @@ python-dateutil==2.8.2
     #   botocore
     #   pendulum
     #   time-machine
-pytz==2023.3.post1
+pytz==2024.1
     # via
     #   jenkinsapi
     #   zeep
@@ -134,7 +134,7 @@ requests==2.31.0
     #   simple-salesforce
     #   slumber
     #   zeep
-requests-file==1.5.1
+requests-file==2.0.0
     # via zeep
 requests-toolbelt==1.0.0
     # via zeep
@@ -151,18 +151,17 @@ six==1.16.0
     #   isodate
     #   jenkinsapi
     #   python-dateutil
-    #   requests-file
 slumber==0.7.1
     # via edx-rest-api-client
 sqlparse==0.4.4
     # via django
-stevedore==5.1.0
+stevedore==5.2.0
     # via edx-django-utils
 time-machine==2.13.0
     # via pendulum
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via asgiref
-tzdata==2023.4
+tzdata==2024.1
     # via pendulum
 unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.in
