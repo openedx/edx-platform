@@ -6,12 +6,13 @@ APIs.
 import ddt
 import unittest
 from django.test import LiveServerTestCase
+from django.urls import reverse
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
 from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
-from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, LibraryFactory, ToyCourseFactory
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
@@ -227,6 +228,12 @@ class ClipboardLibraryContentPasteTestCase(BlockstoreAppTestMixin, LiveServerTes
         self.client = APIClient()
         self.client.login(username=self.user.username, password=self.user_password)
         self.store = modulestore()
+
+    @unittest.skip("Quince doesn't support using V2 libraries via library content block; this test was backported")
+    def test_paste_library_content_block(self):
+        """
+        Test the special handling of copying and pasting library content
+        """
         # Create a content library:
         library = library_api.create_library(
             collection_uuid=blockstore_api.create_collection("Collection").uuid,
@@ -268,12 +275,6 @@ class ClipboardLibraryContentPasteTestCase(BlockstoreAppTestMixin, LiveServerTes
         self._sync_lc_block_from_library('orig_lc_block')
         orig_child = self.store.get_item(self.orig_lc_block.children[0])
         assert orig_child.display_name == "MCQ"
-
-    @unittest.skip("Quince doesn't support using V2 libraries via library content block; this test was backported")
-    def test_paste_library_content_block(self):
-        """
-        Test the special handling of copying and pasting library content
-        """
         # Copy a library content block that has children:
         copy_response = self.client.post(CLIPBOARD_ENDPOINT, {
             "usage_key": str(self.orig_lc_block.location)
@@ -297,6 +298,54 @@ class ClipboardLibraryContentPasteTestCase(BlockstoreAppTestMixin, LiveServerTes
         # Otherwise, user state saved against this child will be lost when it syncs.
         self._sync_lc_block_from_library('dest_lc_block')
         updated_dest_child = self.store.get_item(self.dest_lc_block.children[0])
+        assert dest_child.location == updated_dest_child.location
+
+    def test_paste_library_content_block_v1(self):
+        """
+        Same as the above test, but uses modulestore (v1) content library
+        """
+        library = LibraryFactory.create()
+        data = {
+            'parent_locator': str(library.location),
+            'category': 'html',
+            'display_name': 'HTML Content',
+        }
+        response = self.client.ajax_post(reverse('xblock_handler'), data)
+        self.assertEqual(response.status_code, 200)
+        course = CourseFactory.create(display_name='Course')
+        orig_lc_block = BlockFactory.create(
+            parent=course,
+            category="library_content",
+            source_library_id=str(library.location.library_key),
+            display_name="LC Block",
+            publish_item=False,
+        )
+        orig_lc_block.refresh_children()
+        orig_child = self.store.get_item(orig_lc_block.children[0])
+        assert orig_child.display_name == "HTML Content"
+        # Copy a library content block that has children:
+        copy_response = self.client.post(CLIPBOARD_ENDPOINT, {
+            "usage_key": str(orig_lc_block.location)
+        }, format="json")
+        assert copy_response.status_code == 200
+
+        # Paste the Library content block:
+        paste_response = self.client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(course.location),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+        dest_lc_block_key = UsageKey.from_string(paste_response.json()["locator"])
+
+        # Get the ID of the new child:
+        dest_lc_block = self.store.get_item(dest_lc_block_key)
+        dest_child = self.store.get_item(dest_lc_block.children[0])
+        assert dest_child.display_name == "HTML Content"
+
+        # Importantly, the ID of the child must not changed when the library content is synced.
+        # Otherwise, user state saved against this child will be lost when it syncs.
+        dest_lc_block.refresh_children()
+        updated_dest_child = self.store.get_item(dest_lc_block.children[0])
         assert dest_child.location == updated_dest_child.location
 
     def _sync_lc_block_from_library(self, attr_name):
