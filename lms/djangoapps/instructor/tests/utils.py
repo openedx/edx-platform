@@ -9,8 +9,6 @@ import random
 
 from pytz import UTC
 
-from common.djangoapps.util.date_utils import get_default_time_display
-
 
 class FakeInfo:
     """Parent class for faking objects used in tests"""
@@ -105,7 +103,7 @@ class FakeEmailInfo(FakeInfo):
 
     def __init__(self, fake_email, num_sent, num_failed):
         super().__init__()
-        self.created = get_default_time_display(fake_email.created)
+        self.created = fake_email.created.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         number_sent = str(num_sent) + ' sent'
         if num_failed > 0:
