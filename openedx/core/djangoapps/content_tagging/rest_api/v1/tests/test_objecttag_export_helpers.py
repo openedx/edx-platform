@@ -159,10 +159,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         ]
 
         # Create a library
-        collection = blockstore_api.create_collection("Content Library Test Collection")
-
         self.library = library_api.create_library(
-            collection.uuid,
             self.orgA,
             f"lib_{self.block_suffix}",
             "Test Library",
@@ -222,17 +219,17 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         )
 
         assert self.expected_library_tagged_xblock.children is not None  # type guard
-        # The children are sorted by the key
-        self.expected_library_tagged_xblock.children.append(tagged_library_html)
+        # The children are sorted by add order
         self.expected_library_tagged_xblock.children.append(tagged_problem)
         self.expected_library_tagged_xblock.children.append(untagged_problem)
+        self.expected_library_tagged_xblock.children.append(tagged_library_html)
 
         self.all_library_object_tags, _ = api.get_all_object_tags(self.library.key)
         self.expected_library_tagged_content_list = [
             (self.expected_library_tagged_xblock, 0),
-            (tagged_library_html, 1),
             (tagged_problem, 1),
             (untagged_problem, 1),
+            (tagged_library_html, 1),
         ]
 
 
@@ -253,7 +250,7 @@ class TestContentTagChildrenExport(TaggedCourseMixin):  # type: ignore[misc]
         """
         Test if we can export a library
         """
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(8):
             tagged_library = build_object_tree_with_objecttags(self.library.key, self.all_library_object_tags)
 
         assert tagged_library == self.expected_library_tagged_xblock
