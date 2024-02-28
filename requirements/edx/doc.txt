@@ -101,11 +101,7 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-<<<<<<< HEAD
 boto3==1.34.45
-=======
-boto3==1.33.12
->>>>>>> feat: some cleanup
     # via
     #   -r requirements/edx/base.txt
     #   django-ses

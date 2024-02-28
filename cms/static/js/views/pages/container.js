@@ -129,7 +129,7 @@ function($, _, Backbone, gettext, BasePage,
             return {
                 el: this.$('.wrapper-xblock'),
                 model: this.model,
-                view: this.view
+                view: this.options.asidesOnly ? "studio_view" : this.view
             };
         },
 
@@ -152,7 +152,7 @@ function($, _, Backbone, gettext, BasePage,
             
             // Render the xblock
             xblockView.render({
-                done: function() {        
+                done: function() {
                 // If request needs to render asides only
                 if (self.options.asidesOnly){
                     self.$('.xblock_asides-v1').each(function() {
@@ -161,7 +161,7 @@ function($, _, Backbone, gettext, BasePage,
                         self.initRuntimeData(aside, options);
                     }
                     self.$('.wrapper-comp-plugins').addClass('is-active');
-                    
+
                     // Removing Xblock as we only need Asides
                     xblockView.remove();
                 });

@@ -33,15 +33,12 @@ from openedx.core.djangoapps.content_tagging.api import get_object_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from ..toggles import use_new_unit_page
-from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url, get_unit_url
-from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
-    add_container_page_publishing_info,
     create_xblock_info,
     load_services_for_studio,
 )
 from django.views.decorators.clickjacking import xframe_options_exempt
-from openedx.core.lib.xblock_utils import wrap_xblock_aside
+from openedx.core.lib.xblock_utils import wrap_xblock_aside, request_token
 
 __all__ = [
     'container_handler',
@@ -156,7 +153,7 @@ def asides_handler(request, usage_key_string):
                                   view="studio_view",
                                   frag=fragment, context=context,
                                   usage_id_serializer=str,
-                                  request_token="1df72f76a3d911ee936b0242ac12000d").content
+                                  request_token=request_token(request)).content
                 for aside, fragment in asides_fragments
             ]
 
