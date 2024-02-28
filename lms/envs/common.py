@@ -1036,7 +1036,7 @@ FEATURES = {
     # .. if user is registering before enrollment start date or after enrollment end date
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-06-06
-    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/29538'
     'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
 
     # .. toggle_name: FEATURES['SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS']

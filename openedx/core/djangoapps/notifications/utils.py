@@ -121,19 +121,19 @@ def filter_out_visible_notifications(
     :param user_forum_roles: List of forum roles for the user
     :return: Updated user preferences dictionary
     """
-    for key in user_preferences:
-        if 'notification_types' in user_preferences[key]:
-            # Iterate over the types to remove and pop them from the dictionary
-            for notification_type, is_visible_to in notifications_with_visibility.items():
-                is_visible = False
-                for role in is_visible_to:
-                    if role in user_forum_roles:
-                        is_visible = True
-                        break
-                if is_visible:
-                    continue
+    discussion_user_preferences = user_preferences.get('discussion', {})
+    if 'notification_types' in discussion_user_preferences:
+        # Iterate over the types to remove and pop them from the dictionary
+        for notification_type, is_visible_to in notifications_with_visibility.items():
+            is_visible = False
+            for role in is_visible_to:
+                if role in user_forum_roles:
+                    is_visible = True
+                    break
+            if is_visible:
+                continue
 
-                user_preferences[key]['notification_types'].pop(notification_type)
+            discussion_user_preferences['notification_types'].pop(notification_type)
     return user_preferences
 
 

@@ -1016,7 +1016,9 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     # can be either and sometimes django is rewriting one to the other:
     elif request.method in ('POST', 'PUT'):
         try:
-            return JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
+            return JsonResponse(update_course_updates(
+                usage_key, request.json, provided_id, request.user, request.method
+            ))
         except:  # lint-amnesty, pylint: disable=bare-except
             return HttpResponseBadRequest(
                 "Failed to save",
