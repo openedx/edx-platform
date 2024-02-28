@@ -7,7 +7,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication
 
+from common.djangoapps.util.json_request import JsonResponse
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import third_party_auth_context
 
 REDIRECT_KEY = 'redirect_to'
@@ -54,3 +58,24 @@ class TPAContextView(APIView):
             status=status.HTTP_200_OK,
             data=context
         )
+
+
+class CookieRefreshView(APIView):
+    """
+    API to regenerate the cookie for a user, when creating a new site
+    """
+    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+
+    def get(self, request, *args, **kwargs):
+        """
+        GET /api/cookie/refresh/
+
+        This API endpoint is used to update the cookie value, authenticated
+        user send a get request and user cookie is regenerated and set with list 
+        of update sites.
+        """
+        response = JsonResponse({
+            'success': True,
+        })
+        response = set_logged_in_cookies(request, response, request.user)
+        return response
