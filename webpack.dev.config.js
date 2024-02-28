@@ -58,7 +58,7 @@ module.exports = _.values(Merge.smart(commonConfig, {
             ]
         },
         watchOptions: {
-            ignored: [/node_modules/, /\.git/]
+            ignored: ['/node_modules/', '/\.git/']
         }
     }
 }));
