@@ -95,7 +95,6 @@ class CourseResetAPIView(APIView):
             })
         return Response(result)
 
-
     @method_decorator(require_support_permission)
     def post(self, request, username_or_email):
         """
@@ -126,22 +125,25 @@ class CourseResetAPIView(APIView):
         course_overview = enrollment.course_overview
         course_reset_audit = CourseResetAudit.objects.filter(course_enrollment=enrollment).first()
 
-        if course_reset_audit and course_reset_audit.status == CourseResetAudit.CourseResetStatus.FAILED and not user_passed:
+        if course_reset_audit and (
+            course_reset_audit.status == CourseResetAudit.CourseResetStatus.FAILED
+            and not user_passed
+        ):
             course_reset_audit.status = CourseResetAudit.CourseResetStatus.ENQUEUED
             course_reset_audit.save()
-            status = f"In progress - Started on {course_reset_audit.modified} by {course_reset_audit.reset_by.username}"
             # Call celery task
             resp = {
                 'course_id': course_id,
-                'status': status,
+                'status': course_reset_audit.status_message(),
                 'can_reset': False,
                 'display_name': course_overview.display_name
             }
             return Response(resp, status=200)
 
-        elif course_reset_audit and \
-            (course_reset_audit.status == CourseResetAudit.CourseResetStatus.IN_PROGRESS or
-             course_reset_audit.status == CourseResetAudit.CourseResetStatus.ENQUEUED):
+        elif course_reset_audit and course_reset_audit.status in (
+            CourseResetAudit.CourseResetStatus.IN_PROGRESS,
+            CourseResetAudit.CourseResetStatus.ENQUEUED
+        ):
             return Response(None, status=204)
 
         if enrollment and opt_in_course and not user_passed:
@@ -150,15 +152,14 @@ class CourseResetAPIView(APIView):
                 course_enrollment=enrollment,
                 reset_by=request.user,
             )
-            status = f"In progress - Started on {course_reset_audit.modified} by {course_reset_audit.reset_by.username}"
             resp = {
                 'course_id': course_id,
-                'status': status,
+                'status': course_reset_audit.status_message(),
                 'can_reset': False,
                 'display_name': course_overview.display_name
             }
-            # Call celery task
 
+            # Call celery task
             return Response(resp, status=201)
         else:
             return Response(None, status=400)

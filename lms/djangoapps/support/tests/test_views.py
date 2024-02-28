@@ -2359,10 +2359,7 @@ class TestResetCourseViewPost(SupportViewTestCase):
             course_id=self.course.id,
             user=self.user
         )
-        CourseResetCourseOptIn.objects.create(
-            course_id=self.course_id,
-            active=True
-        )
+        self.opt_in = CourseResetCourseOptInFactory.create(course_id=self.course.id)
 
         self.other_course = CourseFactory.create(
             org='x',
@@ -2422,7 +2419,9 @@ class TestResetCourseViewPost(SupportViewTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_course_reset_dupe(self):
-        response = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
-        self.assertEqual(response.status_code, 201)
-        resp = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
-        self.assertEqual(resp.status_code, 204)
+        CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+        )
+        response2 = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
+        self.assertEqual(response2.status_code, 204)
