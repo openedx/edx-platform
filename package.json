@@ -105,7 +105,7 @@
     "karma-jasmine-html-reporter": "0.2.2",
     "karma-junit-reporter": "1.1.0",
     "karma-requirejs": "0.2.6",
-    "karma-selenium-webdriver-launcher": "0.0.4",
+    "karma-selenium-webdriver-launcher": "github:brian-smith-tcril/karma-selenium-webdriver-launcher#loosen-deps",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.20",
     "karma-webpack": "2.0.9",
