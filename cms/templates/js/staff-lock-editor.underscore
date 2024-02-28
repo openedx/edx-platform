@@ -6,6 +6,7 @@
         <%- gettext('Section Visibility') %>
     <% } %>
 </h3>
+<div class="list-fields list-input content-visibility" role="group" aria-labelledby="content_visibility_label">
 <div class="modal-section-content staff-lock">
     <label class="label">
       <% var inputType = enableHideFromTOCUI ? 'radio' : 'checkbox'; %>
@@ -27,7 +28,6 @@
   <% } %>
 </div>
 <% if (enableHideFromTOCUI) { %>
-<div class="list-fields list-input content-visibility" role="group" aria-labelledby="content_visibility_label">
   <div class="modal-section-content hide-from-toc">
     <% if (!xblockInfo.isVertical()) { %>
       <label class="label">
@@ -47,7 +47,7 @@
           <input type="radio" id="visible_to_learners" name="content-visibility" class="input input-radio" />
           <span> <%- gettext('Visible to learners') %> </span>
       </label>
-      <p class='field-message' id='staff-lock-description'> <%- gettext('It is visible to learners, ensuring that all learners can view its contents.') %> </p>
+      <p class='field-message' id='visible-to-learners-description'> <%- gettext('It is visible to learners, ensuring that all learners can view its contents.') %> </p>
   </div>
 </div>
 <% } %>
