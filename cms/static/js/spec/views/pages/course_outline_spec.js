@@ -42,6 +42,8 @@ describe('CourseOutlinePage', function() {
             user_partition_info: {},
             highlights_enabled: true,
             highlights_enabled_for_messaging: false,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -69,6 +71,8 @@ describe('CourseOutlinePage', function() {
             user_partition_info: {},
             highlights_enabled: true,
             highlights_enabled_for_messaging: false,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -94,6 +98,8 @@ describe('CourseOutlinePage', function() {
             user_partition_info: {},
             highlights: [],
             highlights_enabled: true,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -144,6 +150,8 @@ describe('CourseOutlinePage', function() {
             user_partitions: [],
             group_access: {},
             user_partition_info: {},
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options);
     };
 
