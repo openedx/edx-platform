@@ -1,8 +1,12 @@
+"""
+Utilities related to searching content libraries
+"""
 import logging
 
 from django.utils.text import slugify
 
 from openedx.core.djangoapps.content_libraries import api as lib_api
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 
 log = logging.getLogger(__name__)
@@ -36,7 +40,7 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
         # Now we have
         # { 'capa_content': '...', 'problem_types': ['multiplechoiceresponse'] }
         doc.update(block_data)
-    except Exception as err:
+    except Exception as err:  # pylint: disable=broad-except
         log.exception(f"Failed to get index_dictionary for {metadata.usage_key}: {err}")
     # The data below must always override any values from index_dictionary:
     doc.update({
@@ -53,4 +57,15 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
         "context_key": str(metadata.usage_key.context_key),  # same as lib_key
         "org": str(metadata.usage_key.context_key.org),
     })
+    # Add tags. Note that we could improve performance for indexing many components from the same library,
+    # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
+    # tags for each component separately.
+    for obj_tag in tagging_api.get_object_tags(metadata.usage_key).all():
+        key = f"tags:{obj_tag.name}"  # Taxonomy name
+        if key not in doc:
+            doc[key] = []
+        # Add the tag and all its parent tags, which are implied
+        for tag_value in obj_tag.get_lineage():
+            if tag_value not in doc[key]:
+                doc[key].append(tag_value)
     return doc
