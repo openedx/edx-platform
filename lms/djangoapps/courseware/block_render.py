@@ -30,7 +30,6 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.permissions import JwtRestrictedApplication
 from edx_when.field_data import DateLookupFieldData
 from eventtracking import tracker
-from lms.djangoapps.ai_translation.waffle import whole_course_translations_enabled_for_course
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.decorators import api_view
@@ -635,11 +634,8 @@ def prepare_runtime_for_user(
         'teams_configuration': TeamsConfigurationService(),
         'call_to_action': CallToActionService(),
         'publish': EventPublishingService(user, course_id, track_function),
+        'ai_translation': AiTranslationService(),
     }
-
-    # Make AI translations service available for course, only where enabled
-    if whole_course_translations_enabled_for_course(course_id):
-        services['ai_translation'] = AiTranslationService()
 
     runtime.get_block_for_descriptor = inner_get_block
 
