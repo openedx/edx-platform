@@ -10,6 +10,8 @@ from datetime import datetime
 
 from django.conf import settings
 from fs.errors import ResourceNotFound
+from lms.djangoapps.ai_translation.waffle import whole_course_translations_enabled_for_course
+from lms.djangoapps.courseware.courses import get_course
 from lxml import etree
 from path import Path as path
 from web_fragments.fragment import Fragment
@@ -91,7 +93,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return a fragment that contains the html for the student view
         """
         # If a translation is requested and the ai_translation service is available, use translate_view
-        if (context.get("translate_lang") and self.runtime.service(self, 'ai_translation')):
+        if (self.should_translate_content(context)):
             html = self.get_translated_html(context)
         else:
             html = self.get_html()
@@ -101,6 +103,26 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         add_webpack_js_to_fragment(fragment, 'HtmlBlockDisplay')
         shim_xmodule_js(fragment, 'HTMLModule')
         return fragment
+
+    def should_translate_content(self, context):
+        """ Determines whether to translate content, based on feature config and args. """
+
+        # Feature must be enabled
+        if not whole_course_translations_enabled_for_course(self.location.course_key):
+            return False
+
+        # Service must be enabled
+        if not self.runtime.service(self, 'ai_translation'):
+            return False
+
+        # Both source and destination language must be supplied
+        # and they must be different than each other to trigger translation
+        src_lang = get_course(self.location.course_key).language
+        target_lang = context.get("translate_lang")
+        if src_lang and target_lang and (src_lang != target_lang):
+            return True
+
+        return False
 
     def get_translated_html(self, context):
         """ Returns translated html required for rendering the block, replacing placeholder values"""
