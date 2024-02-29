@@ -1,4 +1,6 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""
+Content tagging functionality for XBlocks.
+"""
 from urllib.parse import quote, unquote
 
 
@@ -6,6 +8,17 @@ class TaggedBlockMixin:
     """
     Mixin containing XML serializing and parsing functionality for tagged blocks
     """
+    def studio_post_duplicate(self, store, source_item):
+        """
+        Duplicates content tags from the source_item.
+        """
+        if hasattr(super(), 'studio_post_duplicate'):
+            super().studio_post_duplicate()
+
+        if hasattr(source_item, 'serialize_tag_data'):
+            tags = source_item.serialize_tag_data()
+            self.xml_attributes['tags-v1'] = tags
+        self.add_tags_from_xml()
 
     def serialize_tag_data(self):
         """

@@ -203,3 +203,4 @@ delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
 get_object_tags = oel_tagging.get_object_tags
 tag_object = oel_tagging.tag_object
+add_tag_to_taxonomy = oel_tagging.add_tag_to_taxonomy
