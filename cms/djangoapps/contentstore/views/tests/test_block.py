@@ -1129,11 +1129,11 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         tagging_api.add_tag_to_taxonomy(taxonomyB, "four")
 
         # Tag the chapter
-        tagging_api.tag_object(taxonomyA, ["one", "two"], str(source_chapter.location))
-        tagging_api.tag_object(taxonomyB, ["three", "four"], str(source_chapter.location))
+        tagging_api.tag_object(str(source_chapter.location), taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(source_chapter.location), taxonomyB, ["three", "four"])
 
         # Tag the child block
-        tagging_api.tag_object(taxonomyA, ["two"], str(source_block.location))
+        tagging_api.tag_object(str(source_block.location), taxonomyA, ["two"],)
 
         # Refresh.
         source_chapter = self.store.get_item(source_chapter.location)
