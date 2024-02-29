@@ -62,8 +62,8 @@ class Command(MeiliCommandMixin, BaseCommand):
                 Fields.block_type,
                 Fields.context_key,
                 Fields.org,
+                Fields.tags,
                 Fields.type,
-                # TODO: tags
             ])
 
             ############## Libraries ##############

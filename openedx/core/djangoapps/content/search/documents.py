@@ -1,10 +1,11 @@
 """
 Utilities related to searching content libraries
 """
+from __future__ import annotations
 import logging
 
 from django.utils.text import slugify
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, LearningContextKey
 
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
@@ -27,6 +28,16 @@ class Fields:
     org = "org"
     # type: "course_block", "library_block"
     type = "type"
+    # tags (dictionary)
+    # See https://blog.meilisearch.com/nested-hierarchical-facets-guide/
+    # and https://www.algolia.com/doc/api-reference/widgets/hierarchical-menu/js/
+    # For details on the format of the hierarchical tag data.
+    tags = "tags"
+    tags_taxonomy = "taxonomy"
+    tags_level0 = "level0"
+    tags_level1 = "level1"
+    tags_level2 = "level2"
+    tags_level3 = "level3"
 
 
 class DocType:
@@ -92,6 +103,53 @@ def _fields_from_block(block) -> dict:
     return block_data
 
 
+def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the tag data for its index doc.
+
+    See the comments above on "Field.tags" for an explanation of the format.
+
+    e.g. for something tagged "Difficulty: Hard" and "Location: Vancouver" this
+    would return:
+        {
+            "tags": {
+                "taxonomy": ["Location", "Difficulty"],
+                "level0": ["Location\tNorth America", "Difficulty\tHard"],
+                "level1": ["Location\tNorth America\tCanada"],
+                "level2": ["Location\tNorth America\tCanada\tVancouver"],
+            }
+        }
+    """
+    # Note that we could improve performance for indexing many components from the same library/course,
+    # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
+    # tags for each component separately.
+    all_tags = tagging_api.get_object_tags(object_id).all()
+    if not all_tags:
+        return {}
+    result = {
+        Fields.tags_taxonomy: [],
+        Fields.tags_level0: [],
+        # ... other levels added as needed
+    }
+    for obj_tag in all_tags:
+        # Add the taxonomy name:
+        if obj_tag.name not in result[Fields.tags_taxonomy]:
+            result[Fields.tags_taxonomy].append(obj_tag.name)
+        # Taxonomy name plus each level of tags, in a list:
+        parts = [obj_tag.name] + obj_tag.get_lineage()  # e.g. ["Location", "North America", "Canada", "Vancouver"]
+        parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator
+        for level in range(0, 4):
+            new_value = " > ".join(parts[0:level + 2])
+            if not f"level{level}" in result:
+                result[f"level{level}"] = [new_value]
+            elif new_value not in result[f"level{level}"]:
+                result[f"level{level}"].append(new_value)
+            if len(parts) == level + 2:
+                break
+
+    return {Fields.tags: result}
+
+
 def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -115,18 +173,8 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
         })
     else:
         doc.update(_fields_from_block(block))
+    doc.update(_tags_for_content_object(metadata.usage_key))
     doc[Fields.type] = DocType.library_block
-    # Add tags. Note that we could improve performance for indexing many components from the same library,
-    # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
-    # tags for each component separately.
-    for obj_tag in tagging_api.get_object_tags(metadata.usage_key).all():
-        key = f"tags:{obj_tag.name}"  # Taxonomy name
-        if key not in doc:
-            doc[key] = []
-        # Add the tag and all its parent tags, which are implied
-        for tag_value in obj_tag.get_lineage():
-            if tag_value not in doc[key]:
-                doc[key].append(tag_value)
     return doc
 
 
@@ -137,16 +185,6 @@ def searchable_doc_for_course_block(block) -> dict:
     found using faceted search.
     """
     doc = _fields_from_block(block)
+    doc.update(_tags_for_content_object(block.usage_key))
     doc[Fields.type] = DocType.course_block
-    # Add tags. Note that we could improve performance for indexing many components from the same library,
-    # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
-    # tags for each component separately.
-    for obj_tag in tagging_api.get_object_tags(block.usage_key).all():
-        key = f"tags:{obj_tag.name}"  # Taxonomy name
-        if key not in doc:
-            doc[key] = []
-        # Add the tag and all its parent tags, which are implied
-        for tag_value in obj_tag.get_lineage():
-            if tag_value not in doc[key]:
-                doc[key].append(tag_value)
     return doc
