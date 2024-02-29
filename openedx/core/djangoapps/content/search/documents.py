@@ -13,6 +13,30 @@ from openedx.core.djangoapps.xblock import api as xblock_api
 log = logging.getLogger(__name__)
 
 
+class Fields:
+    """
+    Fields that exist on the documents in our search index
+    """
+    # Meilisearch primary key. String.
+    id = "id"
+    usage_key = "usage_key"
+    block_id = "block_id"
+    display_name = "display_name"
+    block_type = "block_type"
+    context_key = "context_key"
+    org = "org"
+    # type: "course_block", "library_block"
+    type = "type"
+
+
+class DocType:
+    """
+    Values for the 'type' field on each doc in the search index
+    """
+    course_block = "course_block"
+    library_block = "library_block"
+
+
 def _meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     """
     Meilisearch requires each document to have a primary key that's either an
@@ -56,14 +80,14 @@ def _fields_from_block(block) -> dict:
         log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
         block_data = {}
     block_data.update({
-        "id": _meili_id_from_opaque_key(block.usage_key),
-        "usage_key": str(block.usage_key),
-        "block_id": str(block.usage_key.block_id),
-        "display_name": block.display_name,  # TODO: there is some function to get the fallback display_name
-        "type": block.scope_ids.block_type,
+        Fields.id: _meili_id_from_opaque_key(block.usage_key),
+        Fields.usage_key: str(block.usage_key),
+        Fields.block_id: str(block.usage_key.block_id),
+        Fields.display_name: block.display_name,  # TODO: there is some function to get the fallback display_name
+        Fields.block_type: block.scope_ids.block_type,
         # This is called context_key so it's the same for courses and libraries
-        "context_key": str(block.usage_key.context_key),  # same as lib_key
-        "org": str(block.usage_key.context_key.org),
+        Fields.context_key: str(block.usage_key.context_key),  # same as lib_key
+        Fields.org: str(block.usage_key.context_key.org),
     })
     return block_data
 
@@ -81,16 +105,17 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
         log.exception(f"Failed to load XBlock {metadata.usage_key}: {err}")
         # Even though we couldn't load the block, we can still include basic data about it in the index, from 'metadata'
         doc.update({
-            "id": _meili_id_from_opaque_key(metadata.usage_key),
-            "usage_key": str(metadata.usage_key),
-            "block_id": str(metadata.usage_key.block_id),
-            "display_name": metadata.display_name,
-            "type": metadata.usage_key.block_type,
-            "context_key": str(metadata.usage_key.context_key),
-            "org": str(metadata.usage_key.context_key.org),
+            Fields.id: _meili_id_from_opaque_key(metadata.usage_key),
+            Fields.usage_key: str(metadata.usage_key),
+            Fields.block_id: str(metadata.usage_key.block_id),
+            Fields.display_name: metadata.display_name,
+            Fields.type: metadata.usage_key.block_type,
+            Fields.context_key: str(metadata.usage_key.context_key),
+            Fields.org: str(metadata.usage_key.context_key.org),
         })
     else:
         doc.update(_fields_from_block(block))
+    doc[Fields.type] = DocType.library_block
     # Add tags. Note that we could improve performance for indexing many components from the same library,
     # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
     # tags for each component separately.
@@ -112,6 +137,7 @@ def searchable_doc_for_course_block(block) -> dict:
     found using faceted search.
     """
     doc = _fields_from_block(block)
+    doc[Fields.type] = DocType.course_block
     # Add tags. Note that we could improve performance for indexing many components from the same library,
     # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
     # tags for each component separately.
