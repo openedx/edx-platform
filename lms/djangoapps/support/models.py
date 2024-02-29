@@ -28,6 +28,14 @@ class CourseResetCourseOptIn(TimeStampedModel):
     def __str__(self):
         return f'{self.course_id} - {"ACTIVE" if self.active else "INACTIVE"}'
 
+    @staticmethod
+    def all_active():
+        return CourseResetCourseOptIn.objects.filter(active=True)
+
+    @staticmethod
+    def all_active_course_ids():
+        return [course.course_id for course in CourseResetCourseOptIn.all_active()]
+
 
 class CourseResetAudit(TimeStampedModel):
     """
@@ -57,3 +65,15 @@ class CourseResetAudit(TimeStampedModel):
         default=CourseResetStatus.ENQUEUED,
     )
     completed_at = DateTimeField(default=None, null=True, blank=True)
+
+    def status_message(self):
+        """ Return a string message about the status of this audit """
+        if self.status == self.CourseResetStatus.FAILED:
+            return f"Failed on {self.modified}"
+        if self.status == self.CourseResetStatus.ENQUEUED:
+            return f"Enqueued - Created {self.created} by {self.reset_by.username}"
+        if self.status == self.CourseResetStatus.COMPLETE:
+            return f"Completed on {self.completed_at} by {self.reset_by.username}"
+        if self.status == self.CourseResetStatus.IN_PROGRESS:
+            return f"In progress - Started on {self.modified} by {self.reset_by.username}"
+        return self.status

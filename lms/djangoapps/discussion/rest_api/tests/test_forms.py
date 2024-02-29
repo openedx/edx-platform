@@ -207,7 +207,8 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
             'page': 2,
             'page_size': 13,
             'flagged': False,
-            'requested_fields': set()
+            'requested_fields': set(),
+            'merge_question_type_responses': False
         }
 
     def test_missing_thread_id(self):
