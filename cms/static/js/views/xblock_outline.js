@@ -112,6 +112,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 includesChildren: this.shouldRenderChildren(),
                 hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                 staffOnlyMessage: this.model.get('staff_only_message'),
+                hideFromTOCMessage: this.model.get('hide_from_toc_message'),
                 course: course,
                 enableCopyPasteUnits: this.model.get("enable_copy_paste_units"), // ENABLE_COPY_PASTE_UNITS waffle flag
                 useTaggingTaxonomyListPage: this.model.get("use_tagging_taxonomy_list_page"), // ENABLE_TAGGING_TAXONOMY_LIST_PAGE waffle flag
