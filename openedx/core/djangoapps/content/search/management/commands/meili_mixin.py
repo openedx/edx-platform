@@ -1,30 +1,20 @@
 """
-Command to build or re-build the search index for content libraries.
+Mixin for Django management commands that interact with Meilisearch
 """
-import logging
+from contextlib import contextmanager
 import time
 
 from django.conf import settings
-from django.core.management import BaseCommand, CommandError
+from django.core.management import CommandError
 import meilisearch
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
-
-from openedx.core.djangoapps.content_libraries import api as lib_api
-from openedx.core.djangoapps.content_libraries.search import searchable_doc_for_library_block
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-
-
-log = logging.getLogger(__name__)
-
-LIBRARIES_INDEX_NAME = "content_libraries"
 
 
 class MeiliCommandMixin:
     """
     Mixin for Django management commands that interact with Meilisearch
     """
-
     def get_meilisearch_client(self):
         """
         Get the Meiliesearch client
@@ -73,72 +63,40 @@ class MeiliCommandMixin:
             return False
         return True
 
-
-class Command(MeiliCommandMixin, BaseCommand):
-    """
-    Build or re-build the search index for content libraries.
-    """
-
-    def handle(self, *args, **options):
+    @contextmanager
+    def using_temp_index(self, target_index):
         """
-        Build a new search index
+        Create a new temporary Meilisearch index, populate it, then swap it to
+        become the active index.
         """
         client = self.get_meilisearch_client()
-
-        # Get the list of libraries
-        self.stdout.write("Counting libraries...")
-        lib_keys = [lib.library_key for lib in ContentLibrary.objects.select_related('org').only('org', 'slug')]
-        blocks_by_lib_key = {}
-        num_blocks = 0
-        for lib_key in lib_keys:
-            blocks_by_lib_key[lib_key] = []
-            for component in lib_api.get_library_components(lib_key):
-                blocks_by_lib_key[lib_key].append(lib_api.LibraryXBlockMetadata.from_component(lib_key, component))
-                num_blocks += 1
-
-        self.stdout.write(f"Found {num_blocks} XBlocks among {len(lib_keys)} libraries.")
-
-        # Check if the index exists already:
         self.stdout.write("Checking index...")
-        index_name = settings.MEILISEARCH_INDEX_PREFIX + LIBRARIES_INDEX_NAME
-        temp_index_name = index_name + "_new"
+        temp_index_name = target_index + "_new"
         if self.index_exists(temp_index_name):
-            self.stdout.write("Index already exists. Deleting it...")
+            self.stdout.write("Temporary index already exists. Deleting it...")
             self.wait_for_meili_task(client.delete_index(temp_index_name))
 
         self.stdout.write("Creating new index...")
         self.wait_for_meili_task(
             client.create_index(temp_index_name, {'primaryKey': 'id'})
         )
-
-        self.stdout.write("Indexing documents...")
-        num_done = 0
-        for lib_key in lib_keys:
-            self.stdout.write(f"{num_done}/{num_blocks}. Now indexing {lib_key}")
-            docs = []
-            for metadata in blocks_by_lib_key[lib_key]:
-                doc = searchable_doc_for_library_block(metadata)
-                docs.append(doc)
-            # Add all the docs in this library at once (usually faster than adding one at a time):
-            self.wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
-            num_done += len(docs)
-
         new_index_created = client.get_index(temp_index_name).created_at
-        if not self.index_exists(index_name):
+
+        yield temp_index_name
+
+        if not self.index_exists(target_index):
             # We have to create the "target" index before we can successfully swap the new one into it:
             self.stdout.write("Preparing to swap into index (first time)...")
-            self.wait_for_meili_task(client.create_index(index_name))
+            self.wait_for_meili_task(client.create_index(target_index))
         self.stdout.write("Swapping index...")
-        client.swap_indexes([{'indexes': [temp_index_name, index_name]}])
+        client.swap_indexes([{'indexes': [temp_index_name, target_index]}])
         # If we're using an API key that's restricted to certain index prefix(es), we won't be able to get the status
         # of this request unfortunately. https://github.com/meilisearch/meilisearch/issues/4103
         while True:
             time.sleep(1)
-            if client.get_index(index_name).created_at != new_index_created:
+            if client.get_index(target_index).created_at != new_index_created:
                 self.stdout.write("Waiting for swap completion...")
             else:
                 break
         self.stdout.write("Deleting old index...")
         self.wait_for_meili_task(client.delete_index(temp_index_name))
-
-        self.stdout.write(f"Done! {num_blocks} blocks indexed.")

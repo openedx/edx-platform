@@ -1776,6 +1776,9 @@ INSTALLED_APPS = [
     'openedx_tagging.core.tagging.apps.TaggingConfig',
     'openedx.core.djangoapps.content_tagging',
 
+    # Search
+    'openedx.core.djangoapps.content.search.apps.ContentSearchConfig',
+
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
