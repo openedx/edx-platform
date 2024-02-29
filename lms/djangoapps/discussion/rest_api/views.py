@@ -948,6 +948,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
             form.cleaned_data["page_size"],
             form.cleaned_data["flagged"],
             form.cleaned_data["requested_fields"],
+            form.cleaned_data["merge_question_type_responses"]
         )
 
     def list_by_user(self, request):
