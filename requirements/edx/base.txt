@@ -785,7 +785,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
-openedx-learning @ git+https://github.com/open-craft/openedx-learning@rpenido/fal-3675-add-get-taxonomy-by-external-id-function
+openedx-learning==0.6.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
