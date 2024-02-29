@@ -46,6 +46,5 @@ staff-graded-xblock                 # https://github.com/openedx/staff_graded-xb
 edx-sga                             # The more well known "staff graded assignment" XBlock, from MIT.
 ora2>=4.5.0                         # Open Response Assessment XBlock
 xblock-poll                         # Xblock for polling users
-# xblock-drag-and-drop-v2             # Drag and Drop XBlock
-xblock-drag-and-drop-v2 @ git+https://github.com/open-craft/xblock-drag-and-drop-v2@rpenido/fal-3621-paste-tags-when-pasting-xblocks-with-tag-data
+xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
