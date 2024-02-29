@@ -1,0 +1,47 @@
+<table style="background: #00262B; color: white; width: 100%; padding:1.875rem">
+    <tbody>
+        <tr align="center">
+            <td>
+                <img src="{{ logo_url }}" style="width: 64px;" height="auto" alt=""/>
+            </td>
+        </tr>
+        <tr align="center">
+            <td style="line-height: 36px; font-size: 2rem; font-weight:700">
+                {{ digest_frequency }} email digest
+            </td>
+        </tr>
+        <tr align="center">
+            <td style="line-height: 28px; font-size: 0.875rem; font-weight:400; color: #BFC9CA;">
+                {{ start_date }} {% if digest_frequency == "Weekly" %} - {{ end_date }} {% endif %}
+            </td>
+        </tr>
+        <tr align="center">
+            <td>
+                <table width="100%">
+                    <tbody>
+                        <tr>
+                            {% for update in updates %}
+                                <td width="50%">
+                                    <table width="100%"  style="background: #1B3B40;color: white;border-radius: 8px; padding: 1.25rem 1rem">
+                                        <tbody>
+                                            <tr align="center">
+                                                <td style="font-weight: 700; font-size: 2rem; line-height: 44px">
+                                                    {{update.count}}
+                                                </td>
+                                            </tr>
+                                            <tr align="center">
+                                                <td style="font-weight: 600; font-size: 0.875rem; line-height: 20px">
+                                                    {{update.type}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
