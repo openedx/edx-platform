@@ -20,7 +20,7 @@ openedx/core/djangoapps/credit                                      @openedx/2U-
 openedx/core/djangoapps/heartbeat/
 openedx/core/djangoapps/oauth_dispatch
 openedx/core/djangoapps/user_api/                                   @openedx/2U-aperture
-openedx/core/djangoapps/user_authn/
+openedx/core/djangoapps/user_authn/                                 @openedx/2U-vanguards                                 
 openedx/features/course_experience/
 xmodule/
 
