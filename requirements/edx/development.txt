@@ -2187,7 +2187,7 @@ xblock[django]==1.10.0
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2==3.4.0
+xblock-drag-and-drop-v2 @ git+https://github.com/open-craft/xblock-drag-and-drop-v2@rpenido/fal-3621-paste-tags-when-pasting-xblocks-with-tag-data
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
