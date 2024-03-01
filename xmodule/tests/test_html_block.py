@@ -84,7 +84,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         PUBLIC_VIEW,
     )
     @patch("xmodule.html_block.whole_course_translations_enabled_for_course", return_value=False)
-    def test_student_preview_view(self, view, mock_translations_enabled):
+    def test_student_preview_view(self, view, mock_translations_enabled):  # pylint: disable=unused-argument
         """
         Ensure that student_view and public_view renders correctly.
         """
