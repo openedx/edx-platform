@@ -57,6 +57,7 @@ from common.djangoapps.student.roles import (
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_roles.data import CourseRolesPermission
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -1081,7 +1082,11 @@ def grading_handler(request, course_key_string, grader_index=None):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        if not has_studio_read_access(request.user, course_key):
+        if (
+            not has_studio_read_access(request.user, course_key) and
+            not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key) and
+            not request.user.has_perm(CourseRolesPermission.VIEW_COURSE_SETTINGS.perm_name, course_key)
+        ):
             raise PermissionDenied()
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -1100,6 +1105,11 @@ def grading_handler(request, course_key_string, grader_index=None):
                 else:
                     return JsonResponse(CourseGradingModel.fetch_grader(course_key, grader_index))
             elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+                if (
+                    not has_studio_write_access(request.user, course_key) and
+                    not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
+                ):
+                    raise PermissionDenied()
                 # update credit course requirements if 'minimum_grade_credit'
                 # field value is changed
                 if 'minimum_grade_credit' in request.json:
@@ -1116,6 +1126,11 @@ def grading_handler(request, course_key_string, grader_index=None):
                         CourseGradingModel.update_grader_from_json(course_key, request.json, request.user)
                     )
             elif request.method == "DELETE" and grader_index is not None:
+                if (
+                    not has_studio_write_access(request.user, course_key) and
+                    not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
+                ):
+                    raise PermissionDenied()
                 CourseGradingModel.delete_grader(course_key, grader_index, request.user)
                 return JsonResponse()
 
@@ -1515,7 +1530,13 @@ def group_configurations_list_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = get_course_and_check_access(course_key, request.user)
+        if (
+            not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key) and
+            not request.user.has_perm(CourseRolesPermission.VIEW_COURSE_SETTINGS.perm_name, course_key)
+        ):
+            course = get_course_and_check_access(course_key, request.user)
+        else:
+            course = store.get_course(course_key, depth=0)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
@@ -1607,7 +1628,12 @@ def group_configurations_detail_handler(request, course_key_string, group_config
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = get_course_and_check_access(course_key, request.user)
+        if (
+            not request.user.has_perm(CourseRolesPermission.MANAGE_COURSE_SETTINGS.perm_name, course_key)
+        ):
+            course = get_course_and_check_access(course_key, request.user)
+        else:
+            course = store.get_course(course_key, depth=0)
         matching_id = [p for p in course.user_partitions
                        if str(p.id) == str(group_configuration_id)]
         if matching_id:

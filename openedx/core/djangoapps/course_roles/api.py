@@ -6,6 +6,7 @@ from __future__ import annotations
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
 
 from edx_django_utils.cache import RequestCache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -26,6 +27,8 @@ def get_all_user_permissions_for_a_course(
         return set()
     if not isinstance(course_key, CourseKey):
         raise TypeError(f'course_key must be a CourseKey, not {type(course_key)}')
+    if isinstance(course_key, LibraryLocator):
+        return set()
     if not isinstance(user, User):
         raise TypeError(f'user must be a User, not {type(user)}')
     cache = RequestCache("course_roles")
