@@ -6,6 +6,9 @@ from edx_ace.message import MessageType
 
 
 class EmailNotificationMessageType(MessageType):
+    """
+    Edx-ace MessageType for Email Notifications
+    """
 
     NAME = "notifications"
 

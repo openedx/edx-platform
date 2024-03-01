@@ -59,7 +59,7 @@ def create_email_template_context():
 
 
 def create_email_digest_content(start_date, end_date=None, digest_frequency="Daily",
-                                notifications_count=0, updates_count=0, email_content=[]):
+                                notifications_count=0, updates_count=0, email_content=None):
     """
     Creates email context based on content
     start_date: datetime instance
@@ -76,7 +76,7 @@ def create_email_digest_content(start_date, end_date=None, digest_frequency="Dai
             {"count": updates_count, "type": "Updates"},
             {"count": notifications_count, "type": "Notifications"}
         ],
-        "email_content": email_content,
+        "email_content": email_content if email_content else [],
         "get_icon_url_for_notification_type": get_icon_url_for_notification_type,
     })
     return context
