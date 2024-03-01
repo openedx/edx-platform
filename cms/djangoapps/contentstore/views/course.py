@@ -411,6 +411,7 @@ def _accessible_courses_summary_iter(request, org=None):
             return False
 
         return has_studio_read_access(request.user, course_summary.id)
+
     if org is not None:
         courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
     else:
