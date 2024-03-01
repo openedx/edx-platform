@@ -349,7 +349,7 @@ def _import_xml_node_to_parent(
     from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
     if isinstance(new_xblock, TaggedBlockMixin):
         new_xblock.read_tags_from_node(node)
-        new_xblock.add_tags_from_xml()
+        new_xblock.add_tags_from_field()
 
     return new_xblock
 

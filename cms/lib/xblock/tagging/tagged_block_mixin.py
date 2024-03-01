@@ -36,7 +36,7 @@ class TaggedBlockMixin:
         if hasattr(source_item, 'serialize_tag_data'):
             tags = source_item.serialize_tag_data()
             self.tags_v1 = tags
-        self.add_tags_from_xml()
+        self.add_tags_from_field()
 
     def serialize_tag_data(self):
         """
@@ -87,7 +87,7 @@ class TaggedBlockMixin:
         if 'tags-v1' in node.attrib:
             self.tags_v1 = str(node.attrib['tags-v1'])
 
-    def add_tags_from_xml(self):
+    def add_tags_from_field(self):
         """
         Parse and add tag data from tags_v1 field
         """
