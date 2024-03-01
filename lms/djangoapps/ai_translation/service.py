@@ -32,7 +32,7 @@ class AiTranslationService:
             client_secret=settings.TRANSLATIONS_SERVICE_EDX_OAUTH2_SECRET,
         )
 
-    def translate(self, content, language, block_id):
+    def translate(self, content, source_language, target_language, block_id):
         """Request translated version of content from translations IDA"""
 
         url = f"{settings.AI_TRANSLATIONS_API_URL}/translate-xblock/"
@@ -42,8 +42,8 @@ class AiTranslationService:
         }
         payload = {
             "block_id": str(block_id),
-            "source_language": "en",
-            "target_language": language,
+            "source_language": source_language,
+            "target_language": target_language,
             "content": content,
             "content_hash": sha256(content.encode("utf-8")).hexdigest(),
         }

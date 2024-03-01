@@ -11,7 +11,6 @@ from datetime import datetime
 from django.conf import settings
 from fs.errors import ResourceNotFound
 from lms.djangoapps.ai_translation.waffle import whole_course_translations_enabled_for_course
-from lms.djangoapps.courseware.courses import get_course
 from lxml import etree
 from path import Path as path
 from web_fragments.fragment import Fragment
@@ -117,9 +116,9 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
 
         # Both source and destination language must be supplied
         # and they must be different than each other to trigger translation
-        src_lang = get_course(self.location.course_key).language
-        target_lang = context.get("translate_lang")
-        if src_lang and target_lang and (src_lang != target_lang):
+        src_lang = context.get("src_lang")
+        dest_lang = context.get("dest_lang")
+        if src_lang and dest_lang and (src_lang != dest_lang):
             return True
 
         return False
@@ -127,9 +126,10 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     def get_translated_html(self, context):
         """ Returns translated html required for rendering the block, replacing placeholder values"""
         if self.data:
-            translate_lang = context.get("translate_lang")
+            src_lang = context.get("src_lang")
+            dest_lang = context.get("dest_lang")
             translation_service = self.runtime.service(self, 'ai_translation')
-            translated_html = translation_service.translate(self.data, translate_lang, self.location)
+            translated_html = translation_service.translate(self.data, src_lang, dest_lang, self.location)
             return self.substitute_keywords(translated_html)
         return self.data
 
