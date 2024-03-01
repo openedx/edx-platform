@@ -93,7 +93,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return a fragment that contains the html for the student view
         """
         # If a translation is requested and the ai_translation service is available, use translate_view
-        if (self.should_translate_content(context)):
+        if self.should_translate_content(context):
             html = self.get_translated_html(context)
         else:
             html = self.get_html()
