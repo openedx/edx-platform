@@ -1,12 +1,42 @@
 """HomePageCoursesViewV2 APIView for getting content available to the logged in user."""
 import edx_api_doc_tools as apidocs
-from rest_framework.request import Request
+from collections import OrderedDict
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from cms.djangoapps.contentstore.utils import get_course_context_v2
 from cms.djangoapps.contentstore.rest_api.v2.serializers import CourseHomeTabSerializerV2
+
+
+class HomePageCoursesPaginator(PageNumberPagination):
+
+    def get_paginated_response(self, data):
+        """Return a paginated style `Response` object for the given output data."""
+        return Response(OrderedDict([
+            ('count', self.page.paginator.count),
+            ('num_pages', self.page.paginator.num_pages),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data),
+        ]))
+
+    def paginate_queryset(self, queryset, request, view=None):
+        """
+        Paginate a queryset if required, either returning a page object,
+        or `None` if pagination is not configured for this view.
+
+        This method is a modified version of the original `paginate_queryset` method
+        from the `PageNumberPagination` class. The original method was modified to
+        handle the case where the `queryset` is a `filter` object.
+        """
+        if isinstance(queryset, filter):
+            queryset = list(queryset)
+
+        return super().paginate_queryset(queryset, request, view)
 
 
 @view_auth_classes(is_authenticated=True)
@@ -40,6 +70,11 @@ class HomePageCoursesViewV2(APIView):
                 apidocs.ParameterLocation.QUERY,
                 description="Query param to filter by archived courses only",
             ),
+            apidocs.string_parameter(
+                "page",
+                apidocs.ParameterLocation.QUERY,
+                description="Query param to paginate the courses",
+            ),
         ],
         responses={
             200: CourseHomeTabSerializerV2,
@@ -58,6 +93,7 @@ class HomePageCoursesViewV2(APIView):
             GET /api/contentstore/v2/home/courses?order=-org
             GET /api/contentstore/v2/home/courses?active_only=true
             GET /api/contentstore/v2/home/courses?archived_only=true
+            GET /api/contentstore/v2/home/courses?page=2
 
         **Response Values**
 
@@ -88,11 +124,15 @@ class HomePageCoursesViewV2(APIView):
         }
         ```
         """
-
         courses, in_process_course_actions = get_course_context_v2(request)
-        courses_context = {
-            "courses": courses,
-            "in_process_course_actions": in_process_course_actions,
-        }
-        serializer = CourseHomeTabSerializerV2(courses_context)
-        return Response(serializer.data)
+        paginator = HomePageCoursesPaginator()
+        courses_page = paginator.paginate_queryset(
+            courses,
+            self.request,
+            view=self
+        )
+        serializer = CourseHomeTabSerializerV2({
+            'courses': courses_page,
+            'in_process_course_actions': in_process_course_actions,
+        })
+        return paginator.get_paginated_response(serializer.data)
