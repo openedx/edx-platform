@@ -3,11 +3,29 @@ Content tagging functionality for XBlocks.
 """
 from urllib.parse import quote, unquote
 
+from xblock.fields import Scope, String
+
+
+def _(text):
+    """
+    A noop underscore function that marks strings for extraction.
+    """
+    return text
+
 
 class TaggedBlockMixin:
     """
     Mixin containing XML serializing and parsing functionality for tagged blocks
     """
+
+    tags_v1 = String(
+        display_name=_("Tags v1"),
+        name="tags-v1",
+        help=_("Serialized content tags"),
+        default="",
+        scope=Scope.settings
+    )
+
     def studio_post_duplicate(self, store, source_item):
         """
         Duplicates content tags from the source_item.
@@ -17,7 +35,7 @@ class TaggedBlockMixin:
 
         if hasattr(source_item, 'serialize_tag_data'):
             tags = source_item.serialize_tag_data()
-            self.xml_attributes['tags-v1'] = tags
+            self.tags_v1 = tags
         self.add_tags_from_xml()
 
     def serialize_tag_data(self):
@@ -67,17 +85,17 @@ class TaggedBlockMixin:
         Deserialize and read tag data from node
         """
         if 'tags-v1' in node.attrib:
-            self.xml_attributes['tags-v1'] = str(node.attrib['tags-v1'])
+            self.tags_v1 = str(node.attrib['tags-v1'])
 
     def add_tags_from_xml(self):
         """
-        Parse and add tag data from xml_attributes
+        Parse and add tag data from tags_v1 field
         """
         # This import is done here since we import and use TaggedBlockMixin in the cms settings, but the
         # content_tagging app wouldn't have loaded yet, so importing it outside causes an error
         from openedx.core.djangoapps.content_tagging.api import set_object_tags
 
-        tag_data = self.xml_attributes.get('tags-v1', None) if hasattr(self, 'xml_attributes') else None
+        tag_data = self.tags_v1
         if not tag_data:
             return
 
