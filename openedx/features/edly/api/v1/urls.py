@@ -6,7 +6,7 @@ from openedx.features.edly.api.v1.views.user_mutisites import MultisitesViewset
 
 
 router = routers.SimpleRouter()
-router.register(r'courses/user_sites', UserSitesViewSet, base_name='user_sites')
+router.register(r'user_sites', UserSitesViewSet, base_name='user_sites')
 router.register(r'user_link_sites', MultisitesViewset, base_name='mutisite_access')
 
 router.register(
