@@ -156,6 +156,7 @@ class BadgeAssertion(TimeStampedModel):
     backend = models.CharField(max_length=50)
     image_url = models.URLField()
     assertion_url = models.URLField()
+    is_viewed = models.BooleanField(default=False)
 
     def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
         return HTML("<{username} Badge Assertion for {slug} for {issuing_component}").format(
