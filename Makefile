@@ -86,7 +86,8 @@ else
 	atlas pull $(ATLAS_OPTIONS) translations/edx-platform/conf/locale:conf/locale
 	i18n_tool generate
 endif
-	paver i18n_compilejs
+	python manage.py lms compilejsi18n
+	python manage.py cms compilejsi18n
 
 
 detect_changed_source_translations: ## check if translation files are up-to-date
