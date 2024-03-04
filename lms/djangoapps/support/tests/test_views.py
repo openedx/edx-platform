@@ -343,14 +343,15 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
         assert len(data) == 1
-        self.assertDictContainsSubset({
+        expected_data = {
             'mode': CourseMode.AUDIT,
             'manual_enrollment': {},
             'user': self.student.username,
             'course_id': str(self.course.id),
             'is_active': True,
             'verified_upgrade_deadline': None,
-        }, data[0])
+        }
+        self.assertTrue(expected_data.items(), data[0].items())
         assert {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR, CourseMode.NO_ID_PROFESSIONAL_MODE,
                 CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
         assert 'enterprise_course_enrollments' not in data[0]
@@ -453,10 +454,12 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         response = self.client.get(self.url)
         assert response.status_code == 200
-        self.assertDictContainsSubset({
+        data = json.loads(response.content.decode('utf-8'))[0]['manual_enrollment']
+        expected_data = {
             'enrolled_by': self.user.email,
             'reason': 'Financial Assistance',
-        }, json.loads(response.content.decode('utf-8'))[0]['manual_enrollment'])
+        }
+        self.assertTrue(expected_data.items() <= data.items())
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
