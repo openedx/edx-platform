@@ -129,10 +129,12 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         assert metadata_view_result.data['display_name'] == 'New Multi Choice Question'
         assert 'children' not in metadata_view_result.data
         assert 'editable_children' not in metadata_view_result.data
-        self.assertDictContainsSubset({
+        index_dictionary = metadata_view_result.data["index_dictionary"]
+        index_dictionary_subset = {
             "content_type": "CAPA",
             "problem_types": ["multiplechoiceresponse"],
-        }, metadata_view_result.data["index_dictionary"])
+        }
+        self.assertTrue(index_dictionary_subset.items() <= index_dictionary.items())
         assert metadata_view_result.data['student_view_data'] is None
         # Capa doesn't provide student_view_data
 
