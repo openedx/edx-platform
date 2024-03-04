@@ -9,6 +9,7 @@ from django.conf import settings
 from xblock.exceptions import NoSuchServiceError
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.student.auth import is_ccx_course
 
 
 def edxnotes(cls):
@@ -34,6 +35,9 @@ def edxnotes(cls):
             return original_get_html(self, *args, **kwargs)
 
         is_studio = getattr(self.runtime, "is_author_mode", False)
+        # Right now, if the course is a CCX, the course.id value contains a course id with branches.
+        # This causes discrepancy in the notes data, since the course_id for the note is being saved using
+        # branches and meanwhile the notes tab searches for the course without branches.
         course = getattr(self, 'descriptor', self).runtime.modulestore.get_course(self.scope_ids.usage_id.context_key)
 
         # Must be disabled when:
@@ -58,7 +62,8 @@ def edxnotes(cls):
                 "params": {
                     # Use camelCase to name keys.
                     "usageId": self.scope_ids.usage_id,
-                    "courseId": course.id,
+                    # We need to change the value when the course is a CCX because of the issue commented above.
+                    "courseId": course.id if not is_ccx_course(course.id) else course.id.for_branch(branch=None),
                     "token": get_edxnotes_id_token(user),
                     "tokenUrl": get_token_url(course.id),
                     "endpoint": get_public_endpoint(),
