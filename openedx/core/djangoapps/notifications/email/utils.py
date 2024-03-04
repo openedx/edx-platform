@@ -3,6 +3,7 @@ Email Notifications Utils
 """
 from django.conf import settings
 from lms.djangoapps.branding.api import get_logo_url_for_email
+from .notification_icons import NotificationTypeIcons
 
 
 def create_datetime_string(datetime_instance):
@@ -13,27 +14,7 @@ def get_icon_url_for_notification_type(notification_type):
     """
     Returns icon url for notification type
     """
-    check_circle_green = "https://edx-notifications-static.edx.org/icons/check_circle_green.png"
-    help_outline = "https://edx-notifications-static.edx.org/icons/help_outline.png"
-    newspaper = "https://edx-notifications-static.edx.org/icons/newspaper.png"
-    post_outline = "https://edx-notifications-static.edx.org/icons/post_outline.png"
-    question_answer_outline = "https://edx-notifications-static.edx.org/icons/question_answer_outline.png"
-    report_red = "https://edx-notifications-static.edx.org/icons/report_red.png"
-    verified = "https://edx-notifications-static.edx.org/icons/verified.png"
-    notification_type_dict = {
-        "new_comment_on_response": question_answer_outline,
-        "new_comment": question_answer_outline,
-        "new_response": question_answer_outline,
-        "new_discussion_post": post_outline,
-        "new_question_post": help_outline,
-        "response_on_followed_post": question_answer_outline,
-        "comment_on_followed_post": question_answer_outline,
-        "content_reported": report_red,
-        "response_endorsed_on_thread": verified,
-        "response_endorsed": check_circle_green,
-        "course_update": newspaper,
-    }
-    return notification_type_dict.get(notification_type, post_outline)
+    return NotificationTypeIcons.get_icon_url_for_notification_type(notification_type)
 
 
 def create_email_template_context():
