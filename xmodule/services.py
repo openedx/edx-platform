@@ -335,7 +335,7 @@ class ProblemFeedbackService(Service):
         Returns if the problem is past its due date.
         """
         if self._xblock:
-            return (self._xblock.close_date is not None and
+            return (self._xblock.close_date is None or
                     datetime.now(UTC) > self._xblock.close_date)
         return False
 
@@ -360,7 +360,7 @@ class ProblemFeedbackService(Service):
         """
         if self.used_all_attempts():
             return True
-        if self.is_past_due():
+        if (self.xblock is None or self._xblock.close_date is not None) and self.is_past_due():
             return True
         return False
 
@@ -369,29 +369,25 @@ class ProblemFeedbackService(Service):
         Returns whether correctness is available now, for the given attributes.
         """
         if self._xblock:
-            show_correctness = self._xblock.show_correctness
             show_answer = self._xblock.showanswer
             max_attempts = self._xblock.max_attempts
             attempts = self._xblock.attempts
             is_correct = self._xblock.is_correct()
             required_attempts = self._xblock.attempts_before_showanswer_button
         else:
-            show_correctness = ''
             show_answer = ''
             max_attempts = 0
             attempts = 0
             required_attempts = 0
             is_correct = False
+        has_due_date = getattr(self._xblock, 'close_date', None) is not None
         past_due = self.is_past_due()
         is_attempted = self.is_attempted()
         used_all_attempts = self.used_all_attempts()
         closed = self.closed()
 
-        if not show_correctness:
+        if not self.correctness_available():
             # If correctness is being withheld, then don't show answers either.
-            return False
-        elif show_correctness == ShowCorrectness.NEVER:
-            # If correctness is being hidden the answer is not shown
             return False
         elif show_answer == ShowAnswer.NEVER:
             return False
@@ -400,7 +396,7 @@ class ProblemFeedbackService(Service):
             # unless the sequence/problem explicitly prevents it
             return True
         elif show_answer == ShowAnswer.ATTEMPTED:
-            return is_attempted or past_due
+            return is_attempted or (has_due_date and past_due)
         elif show_answer == ShowAnswer.ANSWERED:
             # NOTE: this is slightly different from 'attempted' -- resetting the problems
             # makes lcp.done False, but leaves attempts unchanged.
@@ -410,7 +406,7 @@ class ProblemFeedbackService(Service):
         elif show_answer == ShowAnswer.FINISHED:
             return closed or is_correct
         elif show_answer == ShowAnswer.CORRECT_OR_PAST_DUE:
-            return is_correct or past_due
+            return is_correct or (has_due_date and past_due)
         elif show_answer == ShowAnswer.PAST_DUE:
             return past_due
         elif show_answer == ShowAnswer.AFTER_SOME_NUMBER_OF_ATTEMPTS:
@@ -432,10 +428,8 @@ class ProblemFeedbackService(Service):
         Returns whether correctness is available now, for the given attributes.
         """
         if self._xblock:
-            due_date = self._xblock.due
             show_correctness = self._xblock.show_correctness
         else:
-            due_date = None
             show_correctness = ''
 
         if show_correctness == ShowCorrectness.NEVER:
@@ -446,6 +440,5 @@ class ProblemFeedbackService(Service):
             return True
         elif show_correctness == ShowCorrectness.PAST_DUE:
             # Is it now past the due date?
-            return (due_date is None or
-                    due_date < datetime.now(UTC))
+            return self.is_past_due()
         return True

@@ -241,7 +241,9 @@ class TestProblemFeedbackService(unittest.TestCase):
         self._xblock.show_correctness = ShowCorrectness.PAST_DUE
         if due_date_str is None:
             self._xblock.due = None
+            self._xblock.close_date = None
         else:
             self._xblock.due = getattr(self, due_date_str)
+            self._xblock.close_date = getattr(self, due_date_str)
         assert ProblemFeedbackService(self._xblock, user_is_staff=has_staff_access).correctness_available() ==\
                expected_result
