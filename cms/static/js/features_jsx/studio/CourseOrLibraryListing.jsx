@@ -36,6 +36,7 @@ export function CourseOrLibraryListing(props) {
             },
             body: JSON.stringify(requestData),
         });
+        clarity('set', 'has_viewed_course', 'true');
     };
 
     return (

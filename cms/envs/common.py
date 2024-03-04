@@ -2476,3 +2476,6 @@ EXPIRE_REDIRECT_URL = 'http://wordpress.edx.devstack.lms/pricing-and-plans/'
 
 # OPEN AI API KEY
 OPENAI_SECRET_KEY = 'set-secret-key'
+
+# MS CLARITY PROJECT ID
+CLARITY_PROJECT_ID = 'replace-me'
