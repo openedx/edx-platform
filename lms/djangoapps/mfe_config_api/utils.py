@@ -21,16 +21,22 @@ def get_mfe_config_for_site(request=None, site=None, mfe=None):
         except SiteConfiguration.DoesNotExist:
             mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
 
-        if (request and request.query_params.get('mfe')) or mfe:
-            mfe = str(request.query_params.get('mfe')) or mfe
-            if site_configuration and site_configuration.get_value("MFE_CONFIG_OVERRIDES"):
-                app_config = site_configuration.get_value("MFE_CONFIG_OVERRIDES")
-            else:
-                app_config = configuration_helpers.get_value(
-                    'MFE_CONFIG_OVERRIDES',
-                    settings.MFE_CONFIG_OVERRIDES,
-                )
-            mfe_config.update(app_config.get(mfe, {}))
+        if request:
+            if not mfe:
+                if getattr(request, "query_params", None):
+                    mfe = str(request.query_params.get("mfe"))
+                else:
+                    mfe = request.GET.get("mfe")
+
+            if mfe:
+                if site_configuration and site_configuration.get_value("MFE_CONFIG_OVERRIDES"):
+                    app_config = site_configuration.get_value("MFE_CONFIG_OVERRIDES")
+                else:
+                    app_config = configuration_helpers.get_value(
+                        'MFE_CONFIG_OVERRIDES',
+                        settings.MFE_CONFIG_OVERRIDES,
+                    )
+                mfe_config.update(app_config.get(mfe, {}))
     else:
         mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
         if mfe:

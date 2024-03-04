@@ -115,4 +115,4 @@ def get_mfe_context(request, redirect_to, tpa_hint=None):
 
 def get_authn_mfe_base_url(request=None, site=None) -> str:
     mfe_config = get_mfe_config_for_site(request=request, site=site, mfe="authn")
-    return mfe_config.get("BASE_URL", settings.AUTHN_MICROFRONTEND_URL)
+    return mfe_config.get("AUTHN_MICROFRONTEND_URL", settings.AUTHN_MICROFRONTEND_URL)

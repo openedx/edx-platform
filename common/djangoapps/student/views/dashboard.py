@@ -33,6 +33,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.learner_home.waffle import should_redirect_to_learner_home_mfe
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.mfe_config_api.utils import get_mfe_config_for_site
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_pseudo_session_for_entitlement,
@@ -499,6 +500,11 @@ def check_for_unacknowledged_notices(context):
     return notice_url
 
 
+def get_learner_dashboard_mfe_base_url(request=None, site=None) -> str:
+    mfe_config = get_mfe_config_for_site(request=request, site=site, mfe="learner-dashboard")
+    return mfe_config.get("LEARNER_HOME_MICROFRONTEND_URL", settings.LEARNER_HOME_MICROFRONTEND_URL)
+
+
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner
@@ -522,7 +528,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         return redirect(reverse('account_settings'))
 
     if should_redirect_to_learner_home_mfe(user):
-        return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
+        return redirect(get_learner_dashboard_mfe_base_url(request=request))
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 

@@ -24,7 +24,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
-from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, get_learning_mfe_base_url
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ def send_ace_message(goal):
 
     course_home_url = get_learning_mfe_home_url(course_key=goal.course_key, url_fragment='home')
 
-    goals_unsubscribe_url = f'{settings.LEARNING_MICROFRONTEND_URL}/goal-unsubscribe/{goal.unsubscribe_token}'
+    goals_unsubscribe_url = f'{get_learning_mfe_base_url(site=site)}/goal-unsubscribe/{goal.unsubscribe_token}'
 
     language = get_user_preference(user, LANGUAGE_KEY)
 
