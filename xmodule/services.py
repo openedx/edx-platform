@@ -335,8 +335,8 @@ class ProblemFeedbackService(Service):
         Returns if the problem is past its due date.
         """
         if self._xblock:
-            return (self._xblock.close_date is None or
-                    datetime.now(UTC) > self._xblock.close_date)
+            due_date = getattr(self._xblock, 'close_date', None) or getattr(self._xblock, 'due', None)
+            return (due_date is None or datetime.now(UTC) > due_date)
         return False
 
     def is_attempted(self):
