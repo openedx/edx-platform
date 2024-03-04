@@ -266,6 +266,7 @@ git+https://github.com/open-craft/xblock-vectordraw.git@v0.4#egg=vectordraw-xblo
 -e git+https://github.com/edly-io/ai-coach-xblock.git@develop-juniper#egg=ai-coach-xblock==develop-juniper
 -e git+https://github.com/PakistanX/xblock-image-explorer.git@v2.1#egg=xblock-image-explorer==v2.1
 -e git+https://github.com/edly-io/carousel-xblock.git@v1.0.0#egg=edly-carousel-xblock
+-e git+https://github.com/edly-io/zoom-meeting-xblock.git@v-1.0.0#egg=zoom_meeting_xblock==v-1.0.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
