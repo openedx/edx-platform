@@ -12,6 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
 from django.utils.translation import gettext as _
+from eventtracking import tracker
 from pytz import UTC
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
@@ -679,11 +680,14 @@ def _validate_password(password, username=None, email=None, reset_password_page=
         (settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY and reset_password_page) or
         (settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY and not reset_password_page)
     ):
-        pwned_response = check_pwned_password(password)
-        if pwned_response.get('vulnerability', 'no') == 'yes':
+        pwned_properties = check_pwned_password(password)
+        if pwned_properties.get('vulnerability', 'no') == 'yes':
+            if reset_password_page is False:
+                pwned_properties['user_request_page'] = 'registration'
+                tracker.emit('edx.bi.user.pwned.password.status', pwned_properties)
             if (
                 reset_password_page or
-                pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+                pwned_properties.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
             ):
                 raise errors.AccountPasswordInvalid(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
 

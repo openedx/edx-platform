@@ -54,7 +54,7 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from common.test.utils import disable_signal
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from lms.djangoapps.support.models import CourseResetAudit
+from lms.djangoapps.support.models import CourseResetAudit, CourseResetCourseOptIn
 from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.support.tests.factories import CourseResetCourseOptInFactory, CourseResetAuditFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -2331,3 +2331,97 @@ class TestResetCourseViewGET(SupportViewTestCase):
             'can_reset': True,
             'status': most_recent_audit.status_message()
         }])
+
+
+class TestResetCourseViewPost(SupportViewTestCase):
+    """
+    Tests for creating course request
+    """
+
+    def setUp(self):
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+
+        self.course_id = 'course-v1:a+b+c'
+
+        self.other_user = User.objects.create(username='otheruser', password='test')
+
+        self.course = CourseFactory.create(
+            org='a',
+            course='b',
+            run='c',
+            enable_proctored_exams=True,
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
+        )
+        self.enrollment = CourseEnrollmentFactory(
+            is_active=True,
+            mode='verified',
+            course_id=self.course.id,
+            user=self.user
+        )
+        self.opt_in = CourseResetCourseOptInFactory.create(course_id=self.course.id)
+
+        self.other_course = CourseFactory.create(
+            org='x',
+            course='y',
+            run='z',
+        )
+
+    def _url(self, username):
+        return reverse("support:course_reset", kwargs={'username_or_email': username})
+
+    def test_wrong_username(self):
+        """
+        Test that a request with a username which does not exits returns 404
+        """
+        response = self.client.post(self._url(username='does_not_exist'), data={'course_id': 'course-v1:aa+bb+c'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_learner_course_reset(self):
+        response = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, {
+            'course_id': self.course_id,
+            'status': response.data['status'],
+            'can_reset': False,
+            'display_name': self.course.display_name
+        })
+
+    def test_course_not_opt_in(self):
+        response = self.client.post(self._url(username=self.user.username), data={'course_id': 'course-v1:aa+bb+c'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_reset_failed(self):
+        course = CourseFactory.create(
+            org='xx',
+            course='yy',
+            run='zz',
+        )
+        enrollment = CourseEnrollmentFactory(
+            is_active=True,
+            mode='verified',
+            course_id=course.id,
+            user=self.user
+        )
+
+        opt_in_course = CourseResetCourseOptIn.objects.create(
+            course_id=course.id,
+            active=True
+        )
+
+        CourseResetAudit.objects.create(
+            course=opt_in_course,
+            course_enrollment=enrollment,
+            reset_by=self.other_user,
+            status=CourseResetAudit.CourseResetStatus.FAILED
+        )
+        response = self.client.post(self._url(username=self.user.username), data={'course_id': course.id})
+        self.assertEqual(response.status_code, 200)
+
+    def test_course_reset_dupe(self):
+        CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+        )
+        response2 = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
+        self.assertEqual(response2.status_code, 204)
