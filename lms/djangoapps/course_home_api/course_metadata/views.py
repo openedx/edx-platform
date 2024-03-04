@@ -24,6 +24,7 @@ from lms.djangoapps.courseware.context_processor import user_timezone_locale_pre
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.ai_translation.waffle import whole_course_translations_enabled_for_course
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -137,6 +138,8 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'user_timezone': user_timezone,
             'can_view_certificate': certificates_viewable_for_course(course),
             'course_modes': course_modes,
+            'language': course.language,
+            'whole_course_translation_enabled': whole_course_translations_enabled_for_course(course_key),
         }
         context = self.get_serializer_context()
         context['course'] = course
