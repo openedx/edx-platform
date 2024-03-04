@@ -418,11 +418,12 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         submit_result = client.post(problem_check_url, data={problem_key: "choice_3"})
         assert submit_result.status_code == 200
         submit_data = json.loads(submit_result.content.decode('utf-8'))
-        self.assertDictContainsSubset({
+        submit_subset_data = {
             "current_score": 0,
             "total_possible": 1,
             "attempts_used": 1,
-        }, submit_data)
+        }
+        self.assertTrue(submit_subset_data.items() <= submit_data.items())
 
         # Now test that the score is also persisted in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
@@ -434,11 +435,12 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         submit_result = client.post(problem_check_url, data={problem_key: "choice_1"})
         assert submit_result.status_code == 200
         submit_data = json.loads(submit_result.content.decode('utf-8'))
-        self.assertDictContainsSubset({
+        submit_subset_data = {
             "current_score": 1,
             "total_possible": 1,
             "attempts_used": 2,
-        }, submit_data)
+        }
+        self.assertTrue(submit_subset_data.items(), submit_data.items())
         # Now test that the score is also updated in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
         sm = get_score(self.student_a, block_id)
