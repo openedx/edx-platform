@@ -507,6 +507,18 @@ $outline-indent-width: $baseline;
     }
   }
 
+  // CASE: is hidden from TOC
+  &.is-hidden-from-toc {
+    // needed to make sure direct children only
+    > .section-status,
+    > .subsection-status,
+    > .unit-status {
+      .status-message .icon {
+        color: $color-hide-from-toc;
+      }
+    }
+  }
+
   // CASE: has gated content
   &.is-gated {
 
@@ -603,6 +615,11 @@ $outline-indent-width: $baseline;
         border-left-color: $color-staff-only;
       }
 
+      // CASE: is hidden from TOC
+      &.is-hidden-from-toc {
+        border-left-color: $color-hide-from-toc;
+      }
+
       // CASE: has gated content
       &.is-gated {
         border-left-color: $color-gated;
@@ -696,6 +713,11 @@ $outline-indent-width: $baseline;
     // CASE: is presented for staff only
     &.is-staff-only {
       border-left-color: $color-staff-only;
+    }
+
+    // CASE: is hidden from TOC
+    &.is-hidden-from-toc {
+      border-left-color: $color-hide-from-toc;
     }
 
     // CASE: is presented for gated

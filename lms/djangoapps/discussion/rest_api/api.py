@@ -1168,7 +1168,8 @@ def get_learner_active_thread_list(request, course_key, query_params):
         })
 
 
-def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None):
+def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None,
+                     merge_question_type_responses=False):
     """
     Return the list of comments in the given thread.
 
@@ -1211,13 +1212,13 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
             "response_skip": response_skip,
             "response_limit": page_size,
             "reverse_order": reverse_order,
+            "merge_question_type_responses": merge_question_type_responses
         }
     )
-
     # Responses to discussion threads cannot be separated by endorsed, but
     # responses to question threads must be separated by endorsed due to the
     # existing comments service interface
-    if cc_thread["thread_type"] == "question":
+    if cc_thread["thread_type"] == "question" and not merge_question_type_responses:
         if endorsed is None:  # lint-amnesty, pylint: disable=no-else-raise
             raise ValidationError({"endorsed": ["This field is required for question threads."]})
         elif endorsed:
@@ -1229,10 +1230,11 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
             responses = cc_thread["non_endorsed_responses"]
             resp_total = cc_thread["non_endorsed_resp_total"]
     else:
-        if endorsed is not None:
-            raise ValidationError(
-                {"endorsed": ["This field may not be specified for discussion threads."]}
-            )
+        if not merge_question_type_responses:
+            if endorsed is not None:
+                raise ValidationError(
+                    {"endorsed": ["This field may not be specified for discussion threads."]}
+                )
         responses = cc_thread["children"]
         resp_total = cc_thread["resp_total"]
 
