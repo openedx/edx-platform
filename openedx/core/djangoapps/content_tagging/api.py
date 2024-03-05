@@ -7,7 +7,8 @@ from itertools import groupby
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Exists, OuterRef, Q, QuerySet
-from opaque_keys.edx.keys import CourseKey, LearningContextKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
@@ -130,24 +131,28 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
 
 
 def get_all_object_tags(
-    content_key: LearningContextKey,
+    content_key: LibraryLocatorV2 | CourseKey,
 ) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
     """
+    Get all the object tags applied to components in the given course/library.
+
+    Includes any tags applied to the course/library as a whole.
     Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
     """
-    # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
+    context_key_str = str(content_key)
+    # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
+    # (course/library) in a single db query.
     if isinstance(content_key, CourseKey):
-        course_key_str = str(content_key)
-        # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
-        # (course) in a single db query.
-        block_id_prefix = course_key_str.replace("course-v1:", "block-v1:", 1)
+        block_id_prefix = context_key_str.replace("course-v1:", "block-v1:", 1)
+    elif isinstance(content_key, LibraryLocatorV2):
+        block_id_prefix = context_key_str.replace("lib:", "lb:", 1)
     else:
         raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
     # There is no API method in oel_tagging.api that does this yet,
     # so for now we have to build the ORM query directly.
     all_object_tags = list(ObjectTag.objects.filter(
-        Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str),
+        Q(object_id__startswith=block_id_prefix) | Q(object_id=content_key),
         Q(tag__isnull=False, tag__taxonomy__isnull=False),
     ).select_related("tag__taxonomy"))
 

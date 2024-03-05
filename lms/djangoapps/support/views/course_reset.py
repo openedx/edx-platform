@@ -97,4 +97,69 @@ class CourseResetAPIView(APIView):
 
     @method_decorator(require_support_permission)
     def post(self, request, username_or_email):
-        """ Other Ticket """
+        """
+        Resets a course for the given learner
+
+        returns a dicts with the format {
+            'course_id': <course id>
+            'display_name': <course display name>
+            'status': <status of the enrollment wrt/reset, to be displayed to user>
+            'can_reset': (boolean) <can the course be reset for this learner>
+        }
+        """
+        course_id = request.data['course_id']
+        try:
+            user = get_user_by_username_or_email(username_or_email)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist'}, status=404)
+        try:
+            opt_in_course = CourseResetCourseOptIn.objects.get(course_id=course_id)
+        except CourseResetCourseOptIn.DoesNotExist:
+            return Response({'error': 'Course is not eligible'}, status=404)
+        enrollment = CourseEnrollment.objects.get(
+            course=course_id,
+            user=user,
+            is_active=True
+        )
+        user_passed = user_has_passing_grade_in_course(enrollment=enrollment)
+        course_overview = enrollment.course_overview
+        course_reset_audit = CourseResetAudit.objects.filter(course_enrollment=enrollment).first()
+
+        if course_reset_audit and (
+            course_reset_audit.status == CourseResetAudit.CourseResetStatus.FAILED
+            and not user_passed
+        ):
+            course_reset_audit.status = CourseResetAudit.CourseResetStatus.ENQUEUED
+            course_reset_audit.save()
+            # Call celery task
+            resp = {
+                'course_id': course_id,
+                'status': course_reset_audit.status_message(),
+                'can_reset': False,
+                'display_name': course_overview.display_name
+            }
+            return Response(resp, status=200)
+
+        elif course_reset_audit and course_reset_audit.status in (
+            CourseResetAudit.CourseResetStatus.IN_PROGRESS,
+            CourseResetAudit.CourseResetStatus.ENQUEUED
+        ):
+            return Response(None, status=204)
+
+        if enrollment and opt_in_course and not user_passed:
+            course_reset_audit = CourseResetAudit.objects.create(
+                course=opt_in_course,
+                course_enrollment=enrollment,
+                reset_by=request.user,
+            )
+            resp = {
+                'course_id': course_id,
+                'status': course_reset_audit.status_message(),
+                'can_reset': False,
+                'display_name': course_overview.display_name
+            }
+
+            # Call celery task
+            return Response(resp, status=201)
+        else:
+            return Response(None, status=400)
