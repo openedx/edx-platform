@@ -43,14 +43,12 @@ class TestOAuthDispatchAPI(TestCase):
         token = api.create_dot_access_token(HttpRequest(), self.user, self.client)
         assert token['access_token']
         assert token['refresh_token']
-        self.assertDictContainsSubset(
-            {
-                'token_type': 'Bearer',
-                'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                'scope': '',
-            },
-            token,
-        )
+        expected_token_subset = {
+            'token_type': 'Bearer',
+            'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
+            'scope': '',
+        }
+        self.assertTrue(expected_token_subset.items() <= token.items())
         self._assert_stored_token(token['access_token'], self.user, self.client)
 
     def test_create_token_another_user(self):
@@ -63,5 +61,8 @@ class TestOAuthDispatchAPI(TestCase):
         token = api.create_dot_access_token(
             HttpRequest(), self.user, self.client, expires_in=expires_in, scopes=['profile'],
         )
-        self.assertDictContainsSubset({'scope': 'profile'}, token)
-        self.assertDictContainsSubset({'expires_in': expires_in}, token)
+        expected_token_subset = {
+            'scope': 'profile',
+            'expires_in': expires_in
+        }
+        self.assertTrue(expected_token_subset.items() <= token.items())
