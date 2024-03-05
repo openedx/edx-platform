@@ -2880,6 +2880,8 @@ BEAMER_PRODUCT_ID = ""
 # can only use the index(es) that start with this prefix.
 # See https://www.meilisearch.com/docs/learn/security/tenant_tokens
 MEILISEARCH_INDEX_PREFIX = ""
-# Set this to None to disable search functionality
+# Meilisearch URL that the python backend can use. Often points to another docker container or k8s service.
 MEILISEARCH_URL = "http://meilisearch"
+# URL that browsers (end users) can user to reach Meilisearch. Should be HTTPS in production.
+MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 MEILISEARCH_API_KEY = "devkey"

@@ -15,6 +15,7 @@ from openedx.core.djangoapps.content.search.documents import (
     Fields,
     searchable_doc_for_course_block,
     searchable_doc_for_library_block,
+    STUDIO_INDEX_NAME,
 )
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -22,8 +23,6 @@ from .meili_mixin import MeiliCommandMixin
 
 
 log = logging.getLogger(__name__)
-
-STUDIO_INDEX_NAME = "studio_content"
 
 
 class Command(MeiliCommandMixin, BaseCommand):

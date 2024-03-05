@@ -12,6 +12,7 @@ from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 
 log = logging.getLogger(__name__)
+STUDIO_INDEX_NAME = "studio_content"
 
 
 class Fields:
