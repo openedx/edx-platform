@@ -47,16 +47,19 @@ class Command(MeiliCommandMixin, BaseCommand):
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             all_courses = store.get_courses()
         num_courses = len(all_courses)
+
+        # Some counters so we can track our progress as indexing progresses:
         num_contexts = num_courses + num_libraries
-        num_contexts_done = 0  # How many courses/libraries we've done
-        num_blocks_done = 0
+        num_contexts_done = 0  # How many courses/libraries we've indexed
+        num_blocks_done = 0  # How many individual components/XBlocks we've indexed
 
         self.stdout.write(f"Found {num_courses} courses and {num_libraries} libraries.")
         index_name = settings.MEILISEARCH_INDEX_PREFIX + STUDIO_INDEX_NAME
         with self.using_temp_index(index_name) as temp_index_name:
             ############## Configure the index ##############
-            # usage_key is not the primary key but nevertheless must be unique:
+            # Mark usage_key as unique (it's not the primary key for the index, but nevertheless must be unique):
             client.index(temp_index_name).update_distinct_attribute(Fields.usage_key)
+            # Mark which attributes can be used for filtering/faceted search:
             client.index(temp_index_name).update_filterable_attributes([
                 Fields.block_type,
                 Fields.context_key,
@@ -95,7 +98,7 @@ class Command(MeiliCommandMixin, BaseCommand):
 
                 self.recurse_children(course, add_with_children)
 
-                # Add all the docs in this library at once (usually faster than adding one at a time):
+                # Add all the docs in this course at once (usually faster than adding one at a time):
                 self.wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
                 num_contexts_done += 1
                 num_blocks_done += len(docs)

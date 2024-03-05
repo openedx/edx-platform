@@ -60,7 +60,10 @@ class MeiliCommandMixin:
         try:
             client.get_index(index_name)
         except MeilisearchError as err:
-            return False
+            if err.code == "index_not_found":
+                return False
+            else:
+                raise err
         return True
 
     @contextmanager
