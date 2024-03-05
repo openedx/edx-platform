@@ -140,7 +140,9 @@ REQ_FILES = \
 	requirements/edx/semgrep \
 	scripts/xblock/requirements \
 	scripts/user_retirement/requirements/base \
-	scripts/user_retirement/requirements/testing
+	scripts/user_retirement/requirements/testing \
+	scripts/common/requirements/base \
+	scripts/common/requirements/testing
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
 # This is a temporary solution to override the real common_constraints.txt\n# In edx-lint, until the pyjwt constraint in edx-lint has been removed.\n# See BOM-2721 for more details.\n# Below is the copied and edited version of common_constraints\n
