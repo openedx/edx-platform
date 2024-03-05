@@ -17,15 +17,11 @@ def checklists_handler(request, course_key_string=None):
     '''
     The restful handler for course checklists.
     It allows retrieval of the checklists (as an HTML page).
-
-    GET
-        html: return an html page which will show course checklists. Note that only the checklists container
-            is returned and that the actual data is determined with a client-side request.
     '''
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
     mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
     if mfe_base_url:
-        studio_home_url = f'{mfe_base_url}/home'
+        studio_home_url = f'{mfe_base_url}/checklist'
         redirect(studio_home_url)
