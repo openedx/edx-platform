@@ -14,7 +14,7 @@ def undo_copy(apps, schema_editor):
 class Migration(migrations.Migration):
     """
     Adds new field 'language_specific_templates_enabled'.
-    Also adds field 'self_generation_enabled' which is a 
+    Also adds field 'self_generation_enabled' which is a
     replacement for 'enabled'
     Lastly, copies data from 'enabled' to 'self_generation_enabled'
     """
