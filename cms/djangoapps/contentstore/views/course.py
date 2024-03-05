@@ -578,7 +578,7 @@ def course_listing(request):
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
 
     site = get_current_site(request)
-    org = [EdlySubOrganization.objects.filter(studio_site=site).first().slug]
+    org = [org for org in EdlySubOrganization.objects.filter(studio_site=site).first().edx_organizations.values_list('short_name', flat=True)]
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
     libraries = _accessible_libraries_iter(request.user, org) if LIBRARIES_ENABLED else []
