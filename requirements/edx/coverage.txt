@@ -6,7 +6,7 @@
 #
 chardet==5.2.0
     # via diff-cover
-coverage==7.4.1
+coverage==7.4.3
     # via -r requirements/edx/coverage.in
 diff-cover==8.0.3
     # via -r requirements/edx/coverage.in

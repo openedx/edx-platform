@@ -57,6 +57,7 @@ backports-zoneinfo[tzdata]==0.2.1
     # via
     #   celery
     #   django
+    #   edx-milestones
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.3
@@ -74,13 +75,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.34.45
+boto3==1.34.55
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.45
+botocore==1.34.55
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -172,7 +173,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.10
+django==4.2.11
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -489,7 +490,7 @@ edx-i18n-tools==1.3.0
     # via
     #   -r requirements/edx/bundled.in
     #   ora2
-edx-milestones==0.5.0
+edx-milestones==0.6.0
     # via -r requirements/edx/kernel.in
 edx-name-affirmation==2.3.7
     # via -r requirements/edx/kernel.in
@@ -584,7 +585,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-pyfs
-future==0.18.3
+future==1.0.0
     # via pyjwkest
 geoip2==4.8.0
     # via -r requirements/edx/kernel.in
@@ -719,7 +720,7 @@ maxminddb==2.5.2
     # via geoip2
 mock==5.1.0
     # via -r requirements/edx/paver.txt
-mongoengine==0.27.0
+mongoengine==0.28.1
     # via -r requirements/edx/kernel.in
 monotonic==1.6
     # via
@@ -735,7 +736,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==9.6.0
+newrelic==9.7.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -796,7 +797,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
-ora2==6.0.34
+ora2==6.3.0
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
@@ -915,7 +916,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/kernel.in
     #   edxval
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
     # via
     #   -r requirements/edx/kernel.in
     #   analytics-python
@@ -928,13 +929,13 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-ipware==2.0.1
+python-ipware==2.0.2
     # via django-ipware
 python-memcached==1.62
     # via -r requirements/edx/paver.txt
 python-slugify==8.0.4
     # via code-annotations
-python-swiftclient==4.4.0
+python-swiftclient==4.5.0
     # via ora2
 python3-openid==3.2.0 ; python_version >= "3"
     # via
@@ -977,7 +978,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==2.1.1
     # via -r requirements/edx/bundled.in
-redis==5.0.1
+redis==5.0.2
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1084,7 +1085,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==3.7.0
+snowflake-connector-python==3.7.1
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
@@ -1114,7 +1115,7 @@ sqlparse==0.4.4
     #   openedx-blockstore
 staff-graded-xblock==2.2.0
     # via -r requirements/edx/bundled.in
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
@@ -1127,19 +1128,19 @@ super-csv==3.1.0
     # via edx-bulk-grades
 sympy==1.12
     # via openedx-calc
-testfixtures==8.0.0
+testfixtures==8.1.0
     # via edx-enterprise
 text-unidecode==1.3
     # via python-slugify
 tinycss2==1.2.1
     # via bleach
-tomlkit==0.12.3
+tomlkit==0.12.4
     # via snowflake-connector-python
 tqdm==4.66.2
     # via
     #   nltk
     #   openai
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via
     #   -r requirements/edx/paver.txt
     #   asgiref
@@ -1206,7 +1207,7 @@ webob==1.8.7
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/paver.txt
-xblock[django]==1.10.0
+xblock[django]==2.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
