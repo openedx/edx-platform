@@ -59,20 +59,17 @@ def extract_email_features(email_task):
         return email_error_information()
 
     email = CourseEmail.objects.get(id=task_input_information['email_id'])
+    email_feature_dict = {
+        'created': email.created,
+        'sent_to': [target.long_display() for target in email.targets.all()],
+        'requester': str(email_task.requester),
+    }
     try:
         instructor_task_schedule = InstructorTaskSchedule.objects.get(task__task_id=email_task.task_id)
         scheduled_time = instructor_task_schedule.task_due
-        email_feature_dict = {
-            'created': scheduled_time,
-            'sent_to': [target.long_display() for target in email.targets.all()],
-            'requester': str(email_task.requester),
-        }
+        email_feature_dict['created'] = scheduled_time
     except InstructorTaskSchedule.DoesNotExist:
-        email_feature_dict = {
-            'created': email.created,
-            'sent_to': [target.long_display() for target in email.targets.all()],
-            'requester': str(email_task.requester),
-        }
+        pass
     features = ['subject', 'html_message', 'id']
     email_info = {feature: str(getattr(email, feature)) for feature in features}
 

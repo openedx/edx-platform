@@ -3786,7 +3786,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
             self.tasks[email_id] = FakeContentTask(email_id, num_sent, failed, 'expected')
             self.emails[email_id] = FakeEmail(email_id)
             self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent, failed)
-            if with_schedules and random.randint(1, 15401) % 2 == 0:
+            if with_schedules and email_id % 2 == 0:
                 instructor_task = InstructorTask.create(self.course.id, self.tasks[email_id].task_type,
                                                         self.tasks[email_id].task_key, self.tasks[email_id].task_input,
                                                         self.instructor)
