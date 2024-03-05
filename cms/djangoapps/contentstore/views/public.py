@@ -69,12 +69,13 @@ def howitworks(request):
         return render_to_response('howitworks.html', {})
 
 
-def accessibility(request):
+def accessibility():
     """
     Display the accessibility accommodation form.
     """
     if ENABLE_ACCESSIBILITY_POLICY_PAGE.is_enabled():
-        return render_to_response('accessibility.html', {
-            'language_code': request.LANGUAGE_CODE
-        })
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if mfe_base_url:
+            studio_home_url = f'{mfe_base_url}/home'
+            redirect(studio_home_url)
     raise Http404
