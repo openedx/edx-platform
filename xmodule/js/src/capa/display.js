@@ -729,6 +729,7 @@
                 answers = response.answers;
                 $.each(answers, function(key, value) {
                     var safeKey = key.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
+                    safeKey = safeKey.replace(/\./g, '\\.'); // fix for courses which use url_names with periods. e.g. question1.1
                     var answer;
                     if (!$.isArray(value)) {
                         answer = that.$('#answer_' + safeKey + ', #solution_' + safeKey);
@@ -1089,8 +1090,9 @@
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    $inputLabel = $element.find('#input_' + inputId + '_' + choice + ' + label');
-                    $inputStatus = $element.find('#status_' + inputId);
+                    safeId = inputId.replace(/\./g, '\\.'); // fix for courses which use url_names with periods. e.g. question1.1
+                    $inputLabel = $element.find('#input_' + safeId + '_' + choice + ' + label');
+                    $inputStatus = $element.find('#status_' + safeId);
                     // If the correct answer was already Submitted before "Show Answer" was selected,
                     // the status HTML will already be present. Otherwise, inject the status HTML.
 
