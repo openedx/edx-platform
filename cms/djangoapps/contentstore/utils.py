@@ -1975,7 +1975,7 @@ def send_course_update_notification(course_key, content, user):
             **extra_context,
         },
         notification_type="course_update",
-        content_url=f"{settings.LMS_BASE}/courses/{str(course_key)}/course/updates",
+        content_url=f"{settings.LMS_ROOT_URL}/courses/{str(course_key)}/course/updates",
         app_name="updates",
         audience_filters={},
     )
