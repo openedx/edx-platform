@@ -15,6 +15,7 @@ from lxml import etree
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Integer, ReferenceValueDict, Scope, String
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import UserPartitionList
@@ -172,10 +173,20 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     def child(self):
         """
         Return the user bound child block for the partition or None.
+
+        Handles the AttributeError exception that may occur when attempting to retrieve
+        an icon for the split_test xblock within the CMS.
         """
-        if self.child_block is not None:
-            return self.runtime.get_block_for_descriptor(self.child_block)
-        else:
+        try:
+            if self.child_block is not None:
+                return self.runtime.get_block_for_descriptor(self.child_block)
+            else:
+                return None
+        except AttributeError:
+            log.warning(
+                "Error while getting block instance for descriptor with location: [%s]",
+                self.location
+            )
             return None
 
     def get_child_block_by_location(self, location):
@@ -212,13 +223,31 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     def get_child_blocks(self):
         """
         For grading--return just the chosen child.
+
+        Handles the NoSuchServiceError and ValueError exception that may occur when attempting to retrieve
+        an icon for the split_test xblock within the CMS.
         """
-        group_id = self.get_group_id()
+        try:
+            group_id = self.get_group_id()
+        except NoSuchServiceError:
+            log.warning(
+                "Error while getting user service in runtime with location: [%s]",
+                self.location
+            )
+            return []
+        except ValueError:
+            log.warning(
+                "Error while getting group ID for partition with location: [%s]",
+                self.location
+            )
+            return []
+
         if group_id is None:
             return []
 
         # group_id_to_child comes from json, so it has to have string keys
         str_group_id = str(group_id)
+        child_block = None
         if str_group_id in self.group_id_to_child:
             child_location = self.group_id_to_child[str_group_id]
             child_block = self.get_child_block_by_location(child_location)
