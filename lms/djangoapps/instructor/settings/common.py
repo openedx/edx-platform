@@ -91,6 +91,13 @@ def plugin_settings(settings):
         #   generation is not explicitly enabled globally or for the specific course.
         # .. toggle_use_cases: opt_in
         'CERTIFICATES_INSTRUCTOR_GENERATION': False,
+        
+        # .. toggle_name: FEATURES['ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE]  # lint-amnesty, pylint: disable=annotation-missing-token
+        # .. toggle_implementation: DjangoSetting
+        # .. toggle_default: False
+        # .. toggle_description: Allow course instructors to manage certificates from the instructor dashboard.
+        # .. toggle_use_cases: opt_in
+        'ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE': False,
 
         # .. toggle_name: FEATURES['BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT']
         # .. toggle_implementation: DjangoSetting
