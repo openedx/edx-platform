@@ -1138,11 +1138,11 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         # Refresh.
         source_chapter = self.store.get_item(source_chapter.location)
         expected_chapter_tags = 'A:one,two;B:four,three'
-        assert source_chapter.serialize_tag_data() == expected_chapter_tags
+        assert source_chapter.serialize_tag_data(source_chapter.location) == expected_chapter_tags
 
         source_block = self.store.get_item(source_block.location)
         expected_block_tags = 'A:two'
-        assert source_block.serialize_tag_data() == expected_block_tags
+        assert source_block.serialize_tag_data(source_block.location) == expected_block_tags
 
         # Duplicate the chapter (and its children)
         dupe_location = duplicate_block(
@@ -1155,8 +1155,8 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         dupe_block = dupe_chapter.get_children()[0]
 
         # Check that the duplicated blocks also duplicated tags
-        assert dupe_chapter.serialize_tag_data() == expected_chapter_tags
-        assert dupe_block.serialize_tag_data() == expected_block_tags
+        assert dupe_chapter.serialize_tag_data(dupe_chapter.location) == expected_chapter_tags
+        assert dupe_block.serialize_tag_data(dupe_block.location) == expected_block_tags
 
 
 @ddt.ddt
