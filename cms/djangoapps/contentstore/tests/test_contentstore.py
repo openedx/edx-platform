@@ -2157,6 +2157,7 @@ class EntryPageTestCase(TestCase):
     def test_accessibility(self):
         self._test_page('/accessibility', 302)
 
+
 def _create_course(test, course_key, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.

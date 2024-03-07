@@ -21,5 +21,5 @@ def checklists_handler(request, course_key_string=None):
         raise PermissionDenied()
     mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
     if mfe_base_url:
-        studio_checklist_url = f'{mfe_base_url}/checklist'
+        studio_checklist_url = f'{mfe_base_url}/course/{course_key_string}/checklist'
         return redirect(studio_checklist_url)
