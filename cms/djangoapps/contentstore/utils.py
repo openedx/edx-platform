@@ -74,14 +74,17 @@ from cms.djangoapps.contentstore.toggles import (
     split_library_view_on_dashboard,
     use_new_advanced_settings_page,
     use_new_course_outline_page,
+    use_new_certificates_page,
     use_new_export_page,
     use_new_files_uploads_page,
     use_new_grading_page,
+    use_new_group_configurations_page,
     use_new_course_team_page,
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
     use_new_text_editor,
+    use_new_textbooks_page,
     use_new_unit_page,
     use_new_updates_page,
     use_new_video_editor,
@@ -427,6 +430,45 @@ def get_unit_url(course_locator, unit_locator) -> str:
     if use_new_unit_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}/container/{unit_locator}'
+        if mfe_base_url:
+            unit_url = course_mfe_url
+    return unit_url
+
+
+def get_certificates_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for certificates page view.
+    """
+    unit_url = None
+    if use_new_certificates_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/certificates'
+        if mfe_base_url:
+            unit_url = course_mfe_url
+    return unit_url
+
+
+def get_textbooks_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for textbooks page view.
+    """
+    unit_url = None
+    if use_new_textbooks_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/pages-and-resources/textbooks'
+        if mfe_base_url:
+            unit_url = course_mfe_url
+    return unit_url
+
+
+def get_group_configurations_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for group configurations page view.
+    """
+    unit_url = None
+    if use_new_group_configurations_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/group_configurations'
         if mfe_base_url:
             unit_url = course_mfe_url
     return unit_url
