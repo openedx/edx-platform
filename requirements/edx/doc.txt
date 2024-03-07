@@ -931,7 +931,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2 @ git+https://github.com/open-craft/edx-ora2@rpenido/fal-3621-revert-tag-serialize-and-deserialize-changes
+ora2==6.4.0
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
