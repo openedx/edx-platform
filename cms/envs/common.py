@@ -2874,3 +2874,32 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
 REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
 
 BEAMER_PRODUCT_ID = ""
+
+
+################## Studio Sock URLs #####################
+
+SHOW_SOCK_LINKS_BTN = True
+
+SOCK_LINKS = [
+            {
+                'href': 'http://docs.edx.org',
+                'sr_mouseover_text': 'Access documentation on http://docs.edx.org',
+                'text': 'edX Documentation',
+                'condition': True
+            }, {
+                'href': 'https://open.edx.org',
+                'sr_mouseover_text': 'Access the Open edX Portal',
+                'text': 'Open edX Portal',
+                'condition': True
+            }, {
+                'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
+                'sr_mouseover_text': 'Enroll in edX101: Overview of Creating an edX Course',
+                'text': 'Enroll in edX101',
+                'condition': True
+            }, {
+                'href': 'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
+                'sr_mouseover_text': 'Enroll in StudioX: Creating a Course with edX Studio',
+                'text': 'Enroll in StudioX',
+                'condition': True
+            }
+        ]

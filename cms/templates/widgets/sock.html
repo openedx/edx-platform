@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 %>
 <%namespace file="sock_links.html" import="get_sock_links" />
 
+% if settings.SHOW_SOCK_LINKS_BTN:
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
@@ -26,7 +27,7 @@ from django.utils.translation import gettext as _
           % for link in links:
             % if link['condition']:
               <li class="action-item">
-                <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${link['text']}</a>
+                <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${_(link['text'])}</a>
                 <span class="tip">${link['sr_mouseover_text']}</span>
               </li>
             %endif
@@ -36,3 +37,4 @@ from django.utils.translation import gettext as _
     </section>
   </div>
 </div>
+% endif
