@@ -1086,11 +1086,11 @@
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
                 inputId = inputId.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
+                var safeId = inputId.replace(/\./g, '\\.'); // fix for courses which use url_names with periods. e.g. question1.1
                 answer = answers[inputId];
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    safeId = inputId.replace(/\./g, '\\.'); // fix for courses which use url_names with periods. e.g. question1.1
                     $inputLabel = $element.find('#input_' + safeId + '_' + choice + ' + label');
                     $inputStatus = $element.find('#status_' + safeId);
                     // If the correct answer was already Submitted before "Show Answer" was selected,
