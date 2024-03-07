@@ -34,7 +34,7 @@ def get_content_key_from_string(key_str: str) -> ContentKey:
 
 def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
     """
-    Get context key from an key
+    Returns the context key from a given content key.
     """
     # If the content key is a CourseKey or a LibraryLocatorV2, return it
     if isinstance(content_key, (CourseKey, LibraryLocatorV2)):
