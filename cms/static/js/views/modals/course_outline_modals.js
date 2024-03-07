@@ -7,10 +7,10 @@
  */
 define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     'js/views/modals/base_modal', 'date', 'js/views/utils/xblock_utils',
-    'js/utils/date_utils', 'edx-ui-toolkit/js/utils/html-utils',
+    'js/utils/date_utils', 'js/utils/copy_to_clipboard', 'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils'
 ], function(
-    $, Backbone, _, gettext, BaseView, BaseModal, date, XBlockViewUtils, DateUtils, HtmlUtils, StringUtils
+    $, Backbone, _, gettext, BaseView, BaseModal, date, XBlockViewUtils, DateUtils, ClipboardUtils, HtmlUtils, StringUtils
 ) {
     'use strict';
 
@@ -19,7 +19,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         ReleaseDateEditor, DueDateEditor, SelfPacedDueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
         AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,
-        DiscussionEditor, SummaryConfigurationEditor;
+        DiscussionEditor, SummaryConfigurationEditor, SubsectionShareLinkXBlockModal, FullPageShareLinkEditor,
+        EmbedLinkShareLinkEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -298,6 +299,71 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    SubsectionShareLinkXBlockModal = CourseOutlineXBlockModal.extend({
+
+        initializeEditors: function() {
+            var tabsTemplate;
+            var tabs = this.options.tabs;
+            if (tabs && tabs.length > 0) {
+                    tabsTemplate = this.loadTemplate('subsection-share-link-modal-tabs');
+                    HtmlUtils.setHtml(this.$('.modal-section'), HtmlUtils.HTML(tabsTemplate({tabs: tabs})));
+                    _.each(this.options.tabs, function(tab) {
+                        // eslint-disable-next-line prefer-spread
+                        this.options.editors.push.apply(
+                            this.options.editors,
+                            _.map(tab.editors, function(Editor) {
+                                return new Editor({
+                                    parent: this,
+                                    parentElement: this.$(`.modal-section .${tab.name}`),
+                                    model: this.model,
+                                    xblockType: this.options.xblockType,
+                                });
+                            }, this)
+                        );
+                    }, this);
+                    this.showTab(tabs[0].name);
+            } else {
+                CourseOutlineXBlockModal.prototype.initializeEditors.call(this);
+            }
+        },
+
+        events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
+            'click .subsection-share-link-tab-button': 'handleShowTab',
+            'click #full-page-link-button': 'copyToClipboard',
+            'click #embed-link-button': 'copyToClipboard',
+        }),
+
+        getTitle: function() {
+            return StringUtils.interpolate(
+                gettext('Share {display_name} subsection'),
+                {display_name: this.model.get('display_name')}
+            );
+        },
+
+        copyToClipboard: function(event) {
+            return ClipboardUtils.copyToClipboard(
+                $(event.currentTarget).attr('id'),
+                $(event.currentTarget).data('clipboard-text')
+            );
+        },
+
+        addActionButtons: function() {
+            this.addActionButton('cancel', gettext('Close'));
+        },
+
+        handleShowTab: function(event) {
+            event.preventDefault();
+            this.showTab($(event.target).data('tab'));
+        },
+
+        showTab: function(tab) {
+            this.$('.modal-section .subsection-share-link-tab-button').removeClass('active');
+            this.$(`.modal-section .subsection-share-link-tab-button[data-tab="${tab}"]`).addClass('active');
+            this.$('.modal-section .subsection-share-link-tab').hide();
+            this.$(`.modal-section .${tab}`).show();
+        }
+    });
+
     AbstractEditor = BaseView.extend({
         tagName: 'section',
         templateName: null,
@@ -307,7 +373,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.parentElement = this.options.parentElement;
             this.render();
         },
-
         render: function() {
             var xblockInfo = this.model;
             var isTimeLimited = xblockInfo.get('is_time_limited');
@@ -316,6 +381,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var isOnboardingExam = xblockInfo.get('is_onboarding_exam');
             var enableHideFromTOCUI = xblockInfo.get('enable_hide_from_toc_ui');
             var hideFromTOC = xblockInfo.get('hide_from_toc');
+            var lmsUrl = xblockInfo.get('lms_url');
+            var embedLmsUrl = xblockInfo.get('embed_lms_url');
             var html = this.template($.extend({}, {
                 xblockInfo: xblockInfo,
                 xblockType: this.options.xblockType,
@@ -327,6 +394,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 isOnboardingExam: isOnboardingExam,
                 enableHideFromTOCUI: enableHideFromTOCUI,
                 hideFromTOC: hideFromTOC,
+                lmsUrl: lmsUrl,
+                embedLmsUrl: embedLmsUrl,
                 isTimedExam: isTimeLimited && !(
                     isProctoredExam || isPracticeExam || isOnboardingExam
                 ),
@@ -507,6 +576,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 }
             };
         }
+    });
+
+    FullPageShareLinkEditor = AbstractEditor.extend({
+        templateName: 'full-page-share-link-editor',
+        className: 'edit-settings-full-page-share-link',
+    });
+
+    EmbedLinkShareLinkEditor = AbstractEditor.extend({
+        templateName: 'embed-link-share-link-editor',
+        className: 'edit-settings-embed-link-share-link',
     });
 
     TimedExaminationPreferenceEditor = AbstractEditor.extend({
@@ -1289,7 +1368,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return this.getHighlightsModal(xblockInfo, options);
             } else if (type === 'highlights_enable') {
                 return this.getHighlightsEnableModal(xblockInfo, options);
-            } else {
+            } else if (type === 'subsection_share_link') {
+                return this.getSubsectionShareLinkModal(xblockInfo, options);
+            }
+            else {
                 return null;
             }
         },
@@ -1393,6 +1475,26 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getHighlightsEnableModal: function(xblockInfo, options) {
             return new HighlightsEnableXBlockModal($.extend({
                 editors: [HighlightsEnableEditor],
+                model: xblockInfo
+            }, options));
+        },
+
+        getSubsectionShareLinkModal: function(xblockInfo, options) {
+            let tabs = [
+                {
+                    name: 'full_page',
+                    displayName: gettext('Full Page'),
+                    editors: [FullPageShareLinkEditor],
+                },
+                {
+                    name: 'embed_link',
+                    displayName: gettext('Embed Link'),
+                    editors: [EmbedLinkShareLinkEditor],
+                }
+            ]
+            return new SubsectionShareLinkXBlockModal($.extend({
+                tabs: tabs,
+                editors: [FullPageShareLinkEditor, EmbedLinkShareLinkEditor],
                 model: xblockInfo
             }, options));
         }
