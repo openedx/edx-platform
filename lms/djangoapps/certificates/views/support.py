@@ -10,7 +10,7 @@ import logging
 import urllib
 from functools import wraps
 
-import bleach
+import nh3
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
@@ -89,7 +89,7 @@ def search_certificates(request):
 
     """
     unbleached_filter = urllib.parse.unquote(urllib.parse.quote_plus(request.GET.get("user", "")))
-    user_filter = bleach.clean(unbleached_filter)
+    user_filter = nh3.clean(unbleached_filter)
     if not user_filter:
         msg = _("user is not given.")
         return HttpResponseBadRequest(msg)
