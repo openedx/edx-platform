@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http.response import Http404
 from django.shortcuts import redirect
 from opaque_keys.edx.keys import CourseKey
 
@@ -21,5 +22,6 @@ def checklists_handler(request, course_key_string=None):
         raise PermissionDenied()
     mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
     if mfe_base_url:
-        studio_checklist_url = f'{mfe_base_url}/course/{course_key_string}/checklist'
+        studio_checklist_url = f'{mfe_base_url}/course/{course_key_string}/checklists'
         return redirect(studio_checklist_url)
+    raise Http404
