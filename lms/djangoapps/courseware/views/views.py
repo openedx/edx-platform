@@ -1587,10 +1587,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
         student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
 
-        # AI Translation args
-        student_view_context['src_lang'] = request.GET.get('src_lang')
-        student_view_context['dest_lang'] = request.GET.get('dest_lang')
-
         is_learning_mfe = is_request_from_learning_mfe(request)
         # Right now, we only care about this in regards to the Learning MFE because it results
         # in a bad UX if we display blocks with access errors (repeated upgrade messaging).
