@@ -26,17 +26,15 @@ from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xbl
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.helpers import is_unit
 from cms.djangoapps.contentstore.toggles import use_new_problem_editor, use_new_unit_page
-from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import load_services_for_studio
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
+    create_xblock_info,
+    load_services_for_studio,
+)
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_tagging.api import get_object_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from ..toggles import use_new_unit_page
-from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
-    create_xblock_info,
-    load_services_for_studio,
-)
 from django.views.decorators.clickjacking import xframe_options_exempt
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, request_token
 
