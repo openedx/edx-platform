@@ -439,39 +439,39 @@ def get_certificates_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for certificates page view.
     """
-    unit_url = None
+    certificates_url = None
     if use_new_certificates_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}/certificates'
         if mfe_base_url:
-            unit_url = course_mfe_url
-    return unit_url
+            certificates_url = course_mfe_url
+    return certificates_url
 
 
 def get_textbooks_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for textbooks page view.
     """
-    unit_url = None
+    textbooks_url = None
     if use_new_textbooks_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}/pages-and-resources/textbooks'
         if mfe_base_url:
-            unit_url = course_mfe_url
-    return unit_url
+            textbooks_url = course_mfe_url
+    return textbooks_url
 
 
 def get_group_configurations_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for group configurations page view.
     """
-    unit_url = None
+    group_configurations_url = None
     if use_new_group_configurations_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}/group_configurations'
         if mfe_base_url:
-            unit_url = course_mfe_url
-    return unit_url
+            group_configurations_url = course_mfe_url
+    return group_configurations_url
 
 
 def get_custom_pages_url(course_locator) -> str:
