@@ -593,9 +593,22 @@ class LibraryContentBlock(
 
         Otherwise we'll end up losing data on the next refresh.
         """
+        if hasattr(super(), 'studio_post_duplicate'):
+            super().studio_post_duplicate(store, source_block)
+
         self._validate_sync_permissions()
         self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
         return True  # Children have been handled.
+
+    def studio_post_paste(self, store, source_node) -> bool:
+        """
+        Pull the children from the library and let library_tools assign their IDs.
+        """
+        if hasattr(super(), 'studio_post_paste'):
+            super().studio_post_paste(store, source_node)
+
+        self.sync_from_library(upgrade_to_latest=False)
+        return True  # Children have been handled
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """

@@ -10,7 +10,9 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 
 ContentKey = Union[LibraryLocatorV2, CourseKey, UsageKey]
+ContextKey = Union[LibraryLocatorV2, CourseKey]
 
 ObjectTagByTaxonomyIdDict = Dict[int, List[ObjectTag]]
 ObjectTagByObjectIdDict = Dict[str, ObjectTagByTaxonomyIdDict]
 TaxonomyDict = Dict[int, Taxonomy]
+TagValuesByTaxonomyExportIdDict = Dict[str, List[str]]
