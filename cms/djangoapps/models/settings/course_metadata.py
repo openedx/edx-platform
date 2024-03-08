@@ -69,6 +69,8 @@ class CourseMetadata:
         'self_paced',
         'show_correctness',
         'is_completion_tracked',
+        'thumbnail',
+        'lesson_type',
         'chrome',
         'default_tab',
         'highlights_enabled_for_messaging',

@@ -17,7 +17,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor, CompletionTrackingEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,ThumbnailUploadEditor, LessonTypeEditor, CompletionTrackingEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -103,7 +103,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var requestData = _.map(this.options.editors, function(editor) {
                 return editor.getRequestData();
             });
-
             return $.extend.apply(this, [true, {}].concat(requestData));
         },
 
@@ -944,6 +943,90 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+
+  ThumbnailUploadEditor = AbstractEditor.extend({
+    templateName: 'thumbnail-upload',
+    className: 'thumbnail-upload',
+
+    afterRender: function() {
+      AbstractEditor.prototype.afterRender.call(this);
+      this.setValue(this.model.get('thumbnail'));
+    },
+
+    setValue: function(value) {
+      this.$('#thumbnail-src').html('<a href="'+value+'" target="_blank">'+value+'</a>');
+    },
+
+    currentValue: function() {
+      return this.$('input[name=thumbnail]').val();
+    },
+
+    hasChanges: function() {
+      return this.model.get('thumbnail') !== this.currentValue();
+    },
+
+    getRequestData: function() {
+      var formData = new FormData();
+      var fileURL;
+      var file = this.$('#thumbnail')[0].files[0]
+      if (file){
+        formData.append('file',file );
+        $.ajax({
+          url: '/genplus/upload-thumbnail/',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          cache: false,
+          async: false,
+          enctype: 'multipart/form-data',
+          success: function (data) {
+            fileURL = data.file_url;
+          },
+          error: function (data) {
+            console.error("Error:", data);
+          }
+        });
+
+        return {
+          metadata: {
+            thumbnail: fileURL
+          }
+        }
+
+      }
+    }
+  });
+
+  LessonTypeEditor = AbstractEditor.extend({
+    templateName: 'lesson-type-selector',
+    className: 'lesson_type_select',
+
+    afterRender: function() {
+      AbstractEditor.prototype.afterRender.call(this);
+      this.setValue(this.model.get('lesson_type'));
+    },
+
+    setValue: function(value) {
+      this.$('#lesson_type_select option[value="' + value + '"]').prop('selected', true);
+    },
+
+    hasChanges: function() {
+      return this.model.get('lesson_type') !== this.$('#lesson_type_select option:selected').val();
+    },
+
+    getRequestData: function() {
+      return {
+        publish: 'republish',
+          metadata: {
+            lesson_type: this.$('#lesson_type_select option:selected').val()
+          }
+        };
+    }
+  });
+
+
+
     ShowCorrectnessEditor = AbstractEditor.extend({
         templateName: 'show-correctness-editor',
         className: 'edit-show-correctness',
@@ -1107,13 +1190,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     }
                 ];
                 if (xblockInfo.isChapter()) {
-                    tabs[0].editors = [ReleaseDateEditor];
+                    tabs[0].editors = [ReleaseDateEditor, ThumbnailUploadEditor];
                     tabs[1].editors = [StaffLockEditor];
                 } else if (xblockInfo.isSequential()) {
                     tabs[0].editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
                     tabs[1].editors = [ContentVisibilityEditor, ShowCorrectnessEditor];
 
-                    advancedTab.editors.push(CompletionTrackingEditor);
+                    advancedTab.editors.push(LessonTypeEditor, CompletionTrackingEditor);
                     if (options.enable_proctored_exams || options.enable_timed_exams) {
                         advancedTab.editors.push(TimedExaminationPreferenceEditor);
                     }

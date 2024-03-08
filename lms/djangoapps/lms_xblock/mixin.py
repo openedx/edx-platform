@@ -94,7 +94,15 @@ class LmsBlockMixin(XBlockMixin):
     )
     is_completion_tracked = Boolean(
         help=_("If true, problems completion will be tracked"),
-        default=True,
+        default='',
+        scope=Scope.settings,
+    )
+    thumbnail = String(
+        help=_("Upload thumbnail Image for the block"),
+        scope=Scope.settings,
+    )
+    lesson_type = String(
+        help=_("Select lesson type to shown the specific icon"),
         scope=Scope.settings,
     )
     group_access = GroupAccessDict(

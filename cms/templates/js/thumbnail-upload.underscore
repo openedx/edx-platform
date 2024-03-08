@@ -1,0 +1,16 @@
+<form>
+<h3 class="modal-section-title" id="upload_thumbnail_label"><%- gettext('Upload Thumbnail') %></h3>
+<div class="modal-section-content thumbnail">
+    <div class="form-group">
+        <div class="file-upload">
+            <input type="file" name="thumbnail" id="thumbnail" class="file-upload-input" accept="image/*">
+            <label id='thumbnail-src' for="thumbnail" class="file-upload-label">
+                <%- gettext('Choose a file') %>
+            </label>
+        </div>
+        <p class="help-block">
+            <%- gettext('The thumbnail should be a square image with a minimum size of 200x200 pixels.') %>
+        </p>
+    </div>
+</div>
+</form>

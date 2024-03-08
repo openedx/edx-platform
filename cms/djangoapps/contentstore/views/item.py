@@ -1239,6 +1239,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             'user_partitions': user_partitions,
             'show_correctness': xblock.show_correctness,
             'is_completion_tracked': xblock.is_completion_tracked,
+            'thumbnail': xblock.thumbnail,
+            'lesson_type': xblock.lesson_type,
         })
 
         if xblock.category == 'sequential':
