@@ -183,7 +183,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
 
         # Verify fetched accessible courses list is a list of CourseSummery instances
-        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list_by_staff))
+        self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list_by_staff))
 
         # Now count the db queries for staff
         with check_mongo_calls(2):
@@ -207,7 +207,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # Verify fetched accessible courses list is a list of CourseSummery instances and only one course
         # is returned
-        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_summary_list))
+        self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_summary_list))
         self.assertEqual(len(courses_summary_list), 1)
 
         # get courses by reversing group name formats

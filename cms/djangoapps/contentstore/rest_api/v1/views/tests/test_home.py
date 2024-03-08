@@ -88,6 +88,7 @@ class HomePageCoursesViewTest(CourseTestCase):
             id=self.course.id,
             org=self.course.org,
             display_name=self.course.display_name,
+            display_number_with_default=self.course.number,
         )
 
     def test_home_page_response(self):
