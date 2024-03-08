@@ -415,7 +415,7 @@ def _accessible_courses_summary_iter(request, org=None):
     if org is not None:
         courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
     else:
-        courses_summary = courses_summary = modulestore().get_course_summaries()
+        courses_summary = CourseOverview.get_all_courses()
 
     search_query, order, active_only, archived_only = get_query_params_if_present(request)
     courses_summary = get_filtered_and_ordered_courses(
