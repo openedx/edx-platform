@@ -1135,15 +1135,6 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         # Tag the child block
         tagging_api.tag_object(str(source_block.location), taxonomyA, ["two"],)
 
-        # Refresh.
-        source_chapter = self.store.get_item(source_chapter.location)
-        expected_chapter_tags = 'A:one,two;B:four,three'
-        assert source_chapter.serialize_tag_data(source_chapter.location) == expected_chapter_tags
-
-        source_block = self.store.get_item(source_block.location)
-        expected_block_tags = 'A:two'
-        assert source_block.serialize_tag_data(source_block.location) == expected_block_tags
-
         # Duplicate the chapter (and its children)
         dupe_location = duplicate_block(
             parent_usage_key=source_course.location,
@@ -1155,8 +1146,19 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         dupe_block = dupe_chapter.get_children()[0]
 
         # Check that the duplicated blocks also duplicated tags
-        assert dupe_chapter.serialize_tag_data(dupe_chapter.location) == expected_chapter_tags
-        assert dupe_block.serialize_tag_data(dupe_block.location) == expected_block_tags
+        expected_chapter_tags = [
+            f'<ObjectTag> {str(dupe_chapter.location)}: A=one',
+            f'<ObjectTag> {str(dupe_chapter.location)}: A=two',
+            f'<ObjectTag> {str(dupe_chapter.location)}: B=four',
+            f'<ObjectTag> {str(dupe_chapter.location)}: B=three',
+        ]
+        dupe_chapter_tags = [str(object_tag) for object_tag in tagging_api.get_object_tags(str(dupe_chapter.location))]
+        assert dupe_chapter_tags == expected_chapter_tags
+        expected_block_tags = [
+            f'<ObjectTag> {str(dupe_block.location)}: A=two',
+        ]
+        dupe_block_tags = [str(object_tag) for object_tag in tagging_api.get_object_tags(str(dupe_block.location))]
+        assert dupe_block_tags == expected_block_tags
 
 
 @ddt.ddt
