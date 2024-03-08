@@ -13,6 +13,7 @@ from cms.djangoapps.contentstore.rest_api.v2.serializers import CourseHomeTabSer
 
 
 class HomePageCoursesPaginator(PageNumberPagination):
+    """Custom paginator for the home page courses view version 2."""
 
     def get_paginated_response(self, data):
         """Return a paginated style `Response` object for the given output data."""
