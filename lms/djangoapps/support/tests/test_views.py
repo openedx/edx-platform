@@ -2377,7 +2377,8 @@ class TestResetCourseViewPost(SupportViewTestCase):
         response = self.client.post(self._url(username='does_not_exist'), data={'course_id': 'course-v1:aa+bb+c'})
         self.assertEqual(response.status_code, 404)
 
-    def test_learner_course_reset(self):
+    @patch('lms.djangoapps.support.views.course_reset.reset_student_course')
+    def test_learner_course_reset(self, mock_reset_student_course):
         response = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, {
@@ -2386,12 +2387,16 @@ class TestResetCourseViewPost(SupportViewTestCase):
             'can_reset': False,
             'display_name': self.course.display_name
         })
+        self.assertEqual(
+            mock_reset_student_course.delay.call_count, 1
+        )
 
     def test_course_not_opt_in(self):
         response = self.client.post(self._url(username=self.user.username), data={'course_id': 'course-v1:aa+bb+c'})
         self.assertEqual(response.status_code, 404)
 
-    def test_course_reset_failed(self):
+    @patch('lms.djangoapps.support.views.course_reset.reset_student_course')
+    def test_course_reset_failed(self, mock_reset_student_course):
         course = CourseFactory.create(
             org='xx',
             course='yy',
@@ -2416,6 +2421,9 @@ class TestResetCourseViewPost(SupportViewTestCase):
             status=CourseResetAudit.CourseResetStatus.FAILED
         )
         response = self.client.post(self._url(username=self.user.username), data={'course_id': course.id})
+        self.assertEqual(
+            mock_reset_student_course.delay.call_count, 1
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_course_reset_dupe(self):
