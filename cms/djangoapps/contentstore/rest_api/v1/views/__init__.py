@@ -1,6 +1,7 @@
 """
 Views for v1 contentstore API.
 """
+from .certificates import CourseCertificatesView
 from .course_details import CourseDetailsView
 from .course_index import CourseIndexView
 from .course_team import CourseTeamView
