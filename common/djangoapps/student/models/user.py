@@ -816,7 +816,7 @@ def user_post_save_callback(sender, **kwargs):
         user,
         user,
         sender._meta.db_table,
-        excluded_fields=['last_login', 'first_name', 'last_name'],
+        excluded_fields=['last_login'],
         hidden_fields=['password']
     )
 
