@@ -45,6 +45,8 @@ def get_report_data() -> dict:
 
 def generate_report() -> None:
     """ Generate a report with relevant data."""
+    if not settings.SURVEY_REPORT_ENABLE:
+        raise Exception("Survey report generation is not enabled")
     data = {}
     survey_report = SurveyReport(**data)
     survey_report.save()
@@ -53,6 +55,7 @@ def generate_report() -> None:
         data = get_report_data()
         data["state"] = SURVEY_REPORT_GENERATED
         update_report(survey_report.id, data)
+        send_report_to_external_api(survey_report.id)
     except (Exception, ) as update_report_error:
         update_report(survey_report.id, {"state": SURVEY_REPORT_ERROR})
         raise Exception(update_report_error) from update_report_error
