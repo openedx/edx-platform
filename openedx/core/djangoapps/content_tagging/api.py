@@ -13,7 +13,8 @@ from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
 from .models import TaxonomyOrg
-from .types import ObjectTagByObjectIdDict, TaxonomyDict
+from .types import ContentKey, ObjectTagByObjectIdDict, TagValuesByTaxonomyExportIdDict, TaxonomyDict
+from .utils import check_taxonomy_context_key_org, get_context_key_from_key
 
 
 def create_taxonomy(
@@ -161,14 +162,40 @@ def get_all_object_tags(
 
     for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
         grouped_object_tags[object_id] = {}
-        for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
+        for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id if x.tag else 0):
             object_tags_list = list(taxonomy_tags)
             grouped_object_tags[object_id][taxonomy_id] = object_tags_list
 
             if taxonomy_id not in taxonomies:
+                assert object_tags_list[0].tag
+                assert object_tags_list[0].tag.taxonomy
                 taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
 
     return grouped_object_tags, taxonomies
+
+
+def set_object_tags(
+    content_key: ContentKey,
+    object_tags: TagValuesByTaxonomyExportIdDict,
+) -> None:
+    """
+    Sets the tags for the given content object.
+    """
+    context_key = get_context_key_from_key(content_key)
+
+    for taxonomy_export_id, tags_values in object_tags.items():
+        taxonomy = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
+        if not taxonomy:
+            continue
+
+        if not check_taxonomy_context_key_org(taxonomy, context_key):
+            continue
+
+        oel_tagging.tag_object(
+            object_id=str(content_key),
+            taxonomy=taxonomy,
+            tags=tags_values,
+        )
 
 
 # Expose the oel_tagging APIs
@@ -181,3 +208,4 @@ delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
 get_object_tags = oel_tagging.get_object_tags
 tag_object = oel_tagging.tag_object
+add_tag_to_taxonomy = oel_tagging.add_tag_to_taxonomy

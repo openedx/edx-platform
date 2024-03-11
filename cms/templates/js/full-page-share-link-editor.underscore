@@ -1,0 +1,20 @@
+<div class="modal-section-content">
+    <div class="subsection-share-link-container">
+        <div>
+            <p>
+                <%- gettext('When sharing this link with your learners, they will see the content of the subsection along with the header and footer of your LMS.') %>
+            </p>
+            <button
+                type="button"
+                id="full-page-link-button"
+                data-clipboard-text="<%- lmsUrl %>"
+                title="<%- gettext('Click to copy link to clipboard') %>"
+                class="button btn-primary copy-link-button"
+            >
+                <span class="icon fa fa-clipboard icon-copy-clipboard"></span>
+                <span class="copy-link-button-text"><%- gettext('Copy link') %></span>
+            </button>
+        </div>
+        <img class="share-link-animated-svg" src="/static/studio/images/subsection-full-page.svg">
+    </div>
+</div>

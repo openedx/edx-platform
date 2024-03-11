@@ -7,11 +7,13 @@ from edx_django_utils.cache import RequestCache
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
 from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
 
-from .types import ContentKey
+from .types import ContentKey, ContextKey
+from .models import TaxonomyOrg
 
 
 def get_content_key_from_string(key_str: str) -> ContentKey:
@@ -30,11 +32,10 @@ def get_content_key_from_string(key_str: str) -> ContentKey:
                 raise ValueError("object_id must be a CourseKey, LibraryLocatorV2 or a UsageKey") from usage_key_error
 
 
-def get_context_key_from_key_string(key_str: str) -> CourseKey | LibraryLocatorV2:
+def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
     """
-    Get context key from an key string
+    Returns the context key from a given content key.
     """
-    content_key = get_content_key_from_string(key_str)
     # If the content key is a CourseKey or a LibraryLocatorV2, return it
     if isinstance(content_key, (CourseKey, LibraryLocatorV2)):
         return content_key
@@ -48,6 +49,31 @@ def get_context_key_from_key_string(key_str: str) -> CourseKey | LibraryLocatorV
     raise ValueError("context must be a CourseKey or a LibraryLocatorV2")
 
 
+def get_context_key_from_key_string(key_str: str) -> ContextKey:
+    """
+    Get context key from an key string
+    """
+    content_key = get_content_key_from_string(key_str)
+    return get_context_key_from_key(content_key)
+
+
+def check_taxonomy_context_key_org(taxonomy: Taxonomy, context_key: ContextKey) -> bool:
+    """
+    Returns True if the given taxonomy can tag a object with the given context_key.
+    """
+    if not context_key.org:
+        return False
+
+    is_all_org, taxonomy_orgs = TaxonomyOrg.get_organizations(taxonomy)
+
+    if is_all_org:
+        return True
+
+    # Ensure the object_id's org is among the allowed taxonomy orgs
+    object_org = rules_cache.get_orgs([context_key.org])
+    return bool(object_org) and object_org[0] in taxonomy_orgs
+
+
 class TaggingRulesCache:
     """
     Caches data required for computing rules for the duration of the request.
@@ -57,7 +83,7 @@ class TaggingRulesCache:
         """
         Initializes the request cache.
         """
-        self.request_cache = RequestCache('openedx.core.djangoapps.content_tagging.rules')
+        self.request_cache = RequestCache('openedx.core.djangoapps.content_tagging.utils')
 
     def get_orgs(self, org_names: list[str] | None = None) -> list[Organization]:
         """
@@ -102,3 +128,6 @@ class TaggingRulesCache:
         return [
             library_orgs[org_name] for org_name in org_names if org_name in library_orgs
         ]
+
+
+rules_cache = TaggingRulesCache()

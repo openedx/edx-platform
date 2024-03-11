@@ -131,7 +131,7 @@ describe('CourseOutlinePage', function() {
             group_access: {},
             user_partition_info: {},
             hide_from_toc: false,
-            enable_hide_from_toc_ui: true
+            enable_hide_from_toc_ui: true,
         }, options, {child_info: {children: children}});
     };
 
@@ -323,7 +323,8 @@ describe('CourseOutlinePage', function() {
             'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
-            'course-highlights-enable', 'course-video-sharing-enable', 'summary-configuration-editor'
+            'course-highlights-enable', 'course-video-sharing-enable', 'summary-configuration-editor',
+            'subsection-share-link-modal-tabs', 'full-page-share-link-editor', 'embed-link-share-link-editor',
         ]);
         appendSetFixtures(mockOutlinePage);
         mockCourseJSON = createMockCourseJSON({}, [
