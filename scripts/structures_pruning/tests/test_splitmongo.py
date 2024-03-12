@@ -22,7 +22,7 @@ from pymongo import MongoClient
 # Add top-level project path to sys.path before importing scripts code
 sys.path.append(path.abspath(path.join(path.dirname(__file__), '../..')))
 
-from scripts.common.utils.splitmongo import (
+from scripts.structures_pruning.utils.splitmongo import (
     ActiveVersionBranch, ChangePlan, Structure, SplitMongoBackend, StructuresGraph
 )
 

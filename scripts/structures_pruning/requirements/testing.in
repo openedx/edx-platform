@@ -1,4 +1,4 @@
 -r base.txt
 
-pytest
 ddt
+pytest

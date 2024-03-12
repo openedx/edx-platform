@@ -15,7 +15,7 @@ import click_log
 # Add top-level project path to sys.path before importing scripts code
 sys.path.append(path.abspath(path.join(path.dirname(__file__), '../..')))
 
-from scripts.common.utils.splitmongo import SplitMongoBackend, ChangePlan
+from scripts.structures_pruning.utils.splitmongo import SplitMongoBackend, ChangePlan
 
 # Add top-level module path to sys.path before importing tubular code.
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

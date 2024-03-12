@@ -1,9 +1,11 @@
-Common Scripts
-==============
+Structures Pruning Scripts
+==========================
 
-`This <https://github.com/openedx/edx-platform/tree/master/scripts/common>`_ directory contains some common python scripts. Some of them are migrated from the other repositories.
+`This <https://github.com/openedx/edx-platform/tree/master/scripts/structures_pruning>`_ directory contains mongo db structures pruning script that is migrated from the 
+`tubular <https://github.com/openedx/tubular>`_ repository.
 
-These scripts could be called from any automation/CD framework.
+
+This script could be called from any automation/CD framework.
 
 How to run the scripts
 ======================
@@ -17,7 +19,7 @@ To download the scripts, you can perform a partial clone of the edx-platform rep
 
     repo_url=git@github.com:openedx/edx-platform.git
     branch=master
-    directory=scripts/common
+    directory=scripts/structures_pruning
 
     git clone --branch $branch --single-branch --depth=1 --filter=tree:0 $repo_url
     cd edx-platform
@@ -41,7 +43,7 @@ Install the required pip packages using the provided requirements file:
 
 .. code-block:: bash
 
-    pip install -r scripts/common/requirements/base.txt
+    pip install -r scripts/structures_pruning/requirements/base.txt
 
 
 Execute Script
@@ -51,7 +53,7 @@ You can simply execute Python scripts with python command
 
 .. code-block:: bash
 
-    python scripts/common/structures.py prune plan_file.json
+    python scripts/structures_pruning/structures.py prune plan_file.json
 
 Feel free to customize these steps according to your specific environment and requirements.
 
@@ -62,10 +64,10 @@ Before running test cases, install the testing requirements:
 
 .. code-block:: bash
 
-    pip install -r scripts/common/requirements/testing.txt
+    pip install -r scripts/structures_pruning/requirements/testing.txt
 
 Run the test cases using pytest:
 
 .. code-block:: bash
 
-    pytest scripts/common
+    pytest scripts/structures_pruning
