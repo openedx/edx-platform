@@ -3,7 +3,6 @@
 from datetime import datetime
 import logging
 from celery import shared_task
-from submissions import api as sub_api
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.student.models.course_enrollment import CourseEnrollment
@@ -17,7 +16,7 @@ from lms.djangoapps.support.models import CourseResetAudit
 log = logging.getLogger(__name__)
 
 
-def update_audit_fields(audit_instance, status, completed_at=False):
+def update_audit_status(audit_instance, status, completed_at=False):
     audit_instance.status = status
     if completed_at:
         audit_instance.completed_at = datetime.now()
@@ -39,7 +38,7 @@ def reset_student_course(course_id, learner_email, reset_by_user_email):
     )
     course_overview = enrollment.course_overview
     course_reset_audit = CourseResetAudit.objects.filter(course_enrollment=enrollment).first()
-    update_audit_fields(course_reset_audit, CourseResetAudit.CourseResetStatus.IN_PROGRESS)
+    update_audit_status(course_reset_audit, CourseResetAudit.CourseResetStatus.IN_PROGRESS)
 
     try:
         course = get_course(course_overview.id, depth=4)
@@ -49,7 +48,7 @@ def reset_student_course(course_id, learner_email, reset_by_user_email):
                 reset_student_attempts(course.id, user, data.scope_ids.usage_id, reset_by_user, True)
             except StudentModule.DoesNotExist:
                 pass
-        update_audit_fields(course_reset_audit, CourseResetAudit.CourseResetStatus.COMPLETE, True)
-    except sub_api.SubmissionError as e:
+        update_audit_status(course_reset_audit, CourseResetAudit.CourseResetStatus.COMPLETE, True)
+    except Exception as e:  # pylint: disable=broad-except
         logging.exception(e)
-        update_audit_fields(course_reset_audit, CourseResetAudit.CourseResetStatus.FAILED)
+        update_audit_status(course_reset_audit, CourseResetAudit.CourseResetStatus.FAILED)
