@@ -7,9 +7,9 @@ from openedx.core.djangoapps.content_libraries import api as library_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
-from .... import api
-from ....tests.test_api import TestGetAllObjectTagsMixin
-from ..objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
+from .. import api
+from ..tests.test_api import TestGetAllObjectTagsMixin
+from .objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
 
 
 class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type: ignore[misc]

@@ -4,17 +4,27 @@ Content Tagging APIs
 from __future__ import annotations
 
 from itertools import groupby
+import csv
+from typing import Iterator
+from opaque_keys.edx.keys import UsageKey
 
 import openedx_tagging.core.tagging.api as oel_tagging
+from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from django.db.models import Exists, OuterRef, Q, QuerySet
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from .helpers.objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
 
 from .models import TaxonomyOrg
 from .types import ContentKey, ObjectTagByObjectIdDict, TagValuesByTaxonomyExportIdDict, TaxonomyDict
-from .utils import check_taxonomy_context_key_org, get_context_key_from_key
+from .utils import (
+    check_taxonomy_context_key_org,
+    get_context_key_from_key,
+    get_content_key_from_string,
+)
 
 
 def create_taxonomy(
@@ -196,6 +206,56 @@ def set_object_tags(
             taxonomy=taxonomy,
             tags=tags_values,
         )
+
+
+def generate_csv(object_id, user, buffer) -> Iterator[str]:
+    """
+    Returns a CSV string with tags and taxonomies of all blocks of `content_key`
+    """
+    content_key = get_content_key_from_string(object_id)
+
+    if isinstance(content_key, UsageKey):
+        raise ValidationError("The object_id must be a CourseKey or a LibraryLocatorV2.")
+
+    # Check if the user has permission to view object tags for this object_id
+    if not user.has_perm(
+        "oel_tagging.view_objecttag",
+        # The obj arg expects a model, but we are passing an object
+        oel_tagging_rules.ObjectTagPermissionItem(taxonomy=None, object_id=object_id),  # type: ignore[arg-type]
+    ):
+        raise PermissionDenied(
+            "You do not have permission to view object tags for this object_id."
+        )
+
+    all_object_tags, taxonomies = get_all_object_tags(content_key)
+    tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
+
+    header = {"name": "Name", "type": "Type", "id": "ID"}
+
+    # Prepare the header for the taxonomies
+    for taxonomy_id, taxonomy in taxonomies.items():
+        header[f"taxonomy_{taxonomy_id}"] = taxonomy.export_id
+
+    csv_writer = csv.DictWriter(buffer, fieldnames=header.keys(), quoting=csv.QUOTE_NONNUMERIC)
+    yield csv_writer.writerow(header)
+
+    # Iterate over the blocks and yield the rows
+    for item, level in iterate_with_level(tagged_content):
+        block_data = {
+            "name": level * "  " + item.display_name,
+            "type": item.category,
+            "id": item.block_id,
+        }
+
+        # Add the tags for each taxonomy
+        for taxonomy_id in taxonomies:
+            if taxonomy_id in item.object_tags:
+                block_data[f"taxonomy_{taxonomy_id}"] = ", ".join([
+                    object_tag.value
+                    for object_tag in item.object_tags[taxonomy_id]
+                ])
+
+        yield csv_writer.writerow(block_data)
 
 
 # Expose the oel_tagging APIs

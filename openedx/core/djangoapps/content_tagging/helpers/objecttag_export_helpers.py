@@ -15,7 +15,7 @@ import openedx.core.djangoapps.content_libraries.api as library_api
 from openedx.core.djangoapps.content_libraries.api import LibraryXBlockMetadata
 from xmodule.modulestore.django import modulestore
 
-from ...types import ObjectTagByObjectIdDict, ObjectTagByTaxonomyIdDict
+from ..types import ObjectTagByObjectIdDict, ObjectTagByTaxonomyIdDict
 
 
 @define
