@@ -12,6 +12,7 @@ from datetime import datetime
 from functools import reduce
 from django.conf import settings
 
+import pytz
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
@@ -743,6 +744,7 @@ class SequenceBlock(
         """
         # Avoid circular imports.
         from openedx.core.lib.xblock_utils import get_icon
+        from openedx.features.course_experience.utils import dates_banner_should_display
 
         render_blocks = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
@@ -759,6 +761,7 @@ class SequenceBlock(
             self.display_name_with_default
         ]
         contents = []
+        can_reset_deadlines, _ = dates_banner_should_display(self.scope_ids.usage_id.context_key, user)
         for block in children:
             item_type = get_icon(block)
             usage_id = block.scope_ids.usage_id
@@ -804,6 +807,13 @@ class SequenceBlock(
             if is_user_authenticated:
                 if block.location.block_type == 'vertical' and completion_service:
                     block_info['complete'] = completion_service.vertical_is_complete(block)
+
+                block_info['can_reset_deadlines'] = (
+                    can_reset_deadlines
+                    and block_info['complete'] is False
+                    and self.due
+                    and self.due < datetime.now(pytz.UTC)
+                )
 
             contents.append(block_info)
 
