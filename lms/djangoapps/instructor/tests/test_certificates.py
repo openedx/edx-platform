@@ -62,11 +62,10 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
 
         # Enable the certificate generation feature
         CertificateGenerationConfiguration.objects.create(enabled=True)
-
     def test_visible_only_to_global_staff(self):
-        # Instructors see see the certificates section
+        # Instructors don't see the certificates section
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
-        self._assert_certificates_visible(True)
+        self._assert_certificates_visible(False)
 
         # Global staff can see the certificates section
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
@@ -80,6 +79,12 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         # Now even global staff can't see the certificates section
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         self._assert_certificates_visible(False)
+        
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE': True})
+    def test_visible_for_instructors_when_feature_is_enabled(self):
+            self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
+            self._assert_certificates_visible(True)
+
 
     @ddt.data("started", "error", "success")
     def test_show_certificate_status(self, certificate_status):
@@ -233,15 +238,16 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
     def test_allow_only_global_staff(self, url_name):
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 
-        # Instructors have access
+        # Instructors do not have access
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == status.HTTP_302_FOUND
-
+        assert response.status_code == 302
+        
         # Global staff have access
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == status.HTTP_302_FOUND
+        assert response.status_code == 302
+
 
     @ddt.data(True, False)
     def test_enable_certificate_generation(self, is_enabled):
@@ -282,12 +288,12 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
         response = self.client.post(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == 403
 
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == status.HTTP_200_OK
-
+        assert response.status_code == 200
+        
     def test_certificate_generation_api_with_global_staff(self):
         """
         Test certificates generation api endpoint returns success status when called with
