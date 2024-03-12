@@ -334,33 +334,39 @@ class ProblemFeedbackService(Service):
         """
         Returns if the problem is past its due date.
         """
-        if self._xblock:
-            due_date = getattr(self._xblock, 'close_date', None) or getattr(self._xblock, 'due', None)
-            return (due_date is None or datetime.now(UTC) > due_date)
-        return False
+        if not self._xblock:
+            return False
+
+        due_date = getattr(self._xblock, 'close_date', None) or getattr(self._xblock, 'due', None)
+        return (due_date is None or datetime.now(UTC) > due_date)
 
     def is_attempted(self):
         """
         Has the problem been attempted?
         """
-        if self._xblock:
-            return self._xblock.attempts > 0
-        return False
+        if not self._xblock:
+            return False
+
+        return self._xblock.attempts > 0
 
     def used_all_attempts(self):
         """ All attempts have been used """
-        if self._xblock:
-            return (self._xblock.max_attempts is not None and
-                    self._xblock.attempts >= self._xblock.max_attempts)
-        return False
+        if not self._xblock:
+            return False
+
+        return (self._xblock.max_attempts is not None and
+                self._xblock.attempts >= self._xblock.max_attempts)
 
     def closed(self):
         """
         Is the student still allowed to submit answers?
         """
+        if not self._xblock:
+            return False
+
         if self.used_all_attempts():
             return True
-        if (self.xblock is None or self._xblock.close_date is not None) and self.is_past_due():
+        elif (self.xblock is None or self._xblock.close_date is not None) and self.is_past_due():
             return True
         return False
 
@@ -368,19 +374,15 @@ class ProblemFeedbackService(Service):
         """
         Returns whether correctness is available now, for the given attributes.
         """
-        if self._xblock:
-            show_answer = self._xblock.showanswer
-            max_attempts = self._xblock.max_attempts
-            attempts = self._xblock.attempts
-            is_correct = self._xblock.is_correct()
-            required_attempts = self._xblock.attempts_before_showanswer_button
-        else:
-            show_answer = ''
-            max_attempts = 0
-            attempts = 0
-            required_attempts = 0
-            is_correct = False
-        has_due_date = getattr(self._xblock, 'close_date', None) is not None
+        if not self._xblock:
+            return False
+
+        show_answer = self._xblock.showanswer
+        max_attempts = self._xblock.max_attempts
+        attempts = self._xblock.attempts
+        is_correct = self._xblock.is_correct()
+        required_attempts = self._xblock.attempts_before_showanswer_button
+        has_due_date = getattr(self._xblock, 'due', None) is not None
         past_due = self.is_past_due()
         is_attempted = self.is_attempted()
         used_all_attempts = self.used_all_attempts()
@@ -427,10 +429,10 @@ class ProblemFeedbackService(Service):
         """
         Returns whether correctness is available now, for the given attributes.
         """
-        if self._xblock:
-            show_correctness = self._xblock.show_correctness
-        else:
-            show_correctness = ''
+        if not self._xblock:
+            return False
+
+        show_correctness = self._xblock.show_correctness
 
         if show_correctness == ShowCorrectness.NEVER:
             return False
