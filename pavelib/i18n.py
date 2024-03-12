@@ -96,6 +96,7 @@ def i18n_validate_gettext():
         sys.stderr.write(msg)
         sys.exit(1)
 
+
 @task
 @timed
 def i18n_clean():

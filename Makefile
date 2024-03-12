@@ -45,27 +45,24 @@ extract_translations: ## extract localizable strings from sources
 	cd conf/locale/en/LC_MESSAGES && rm wiki.po edx_proctoring_proctortrack.po mako.po underscore.po
 
 pull_plugin_translations:  ## Pull translations for edx_django_utils.plugins for both lms and cms
-	rm -rf conf/plugins-locale/plugins  # Clean up existing atlas translations
-	mkdir -p conf/plugins-locale/plugins
 	python manage.py lms pull_plugin_translations --verbose $(ATLAS_OPTIONS)
 	python manage.py lms compile_plugin_translations
 
 pull_xblock_translations:  ## pull xblock translations via atlas
-	rm -rf conf/plugins-locale/xblock.v1  # Clean up existing atlas translations
-	rm -rf lms/static/i18n/xblock.v1 cms/static/i18n/xblock.v1  # Clean up existing xblock compiled translations
 	python manage.py lms pull_xblock_translations --verbose $(ATLAS_OPTIONS)
 	python manage.py lms compile_xblock_translations
 	python manage.py cms compile_xblock_translations
 
 pull_translations: ## pull translations via atlas
-	git clean -fdX conf/locale conf/plugins-locale/studio-frontend
+	# Clean up the existing translations
+	git clean -fdX conf/locale conf/plugins-locale */static/js/i18n/ */static/js/xblock.v1-i18n/
+
 	make pull_xblock_translations
 	make pull_plugin_translations
-	find conf/locale -mindepth 1 -maxdepth 1 -type d -exec rm -r {} \;
 	atlas pull $(ATLAS_OPTIONS) \
 	    translations/edx-platform/conf/locale:conf/locale \
 	    translations/studio-frontend/src/i18n/messages:conf/plugins-locale/studio-frontend
-	python manage.py compilemessages
+	python manage.py lms compilemessages
 	python manage.py lms compilejsi18n
 	python manage.py cms compilejsi18n
 
