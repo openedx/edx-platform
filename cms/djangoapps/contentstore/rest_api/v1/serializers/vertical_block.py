@@ -78,6 +78,7 @@ class ContainerHandlerSerializer(serializers.Serializer):
     assets_url = serializers.SerializerMethodField()
     unit_block_id = serializers.CharField(source="unit.location.block_id")
     subsection_location = serializers.CharField(source="subsection.location")
+    course_sequence_ids = serializers.ListField(child=serializers.CharField())
 
     def get_assets_url(self, obj):
         """

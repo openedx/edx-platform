@@ -596,6 +596,15 @@ def ancestor_has_staff_lock(xblock, parent_xblock=None):
     return parent_xblock.visible_to_staff_only
 
 
+def get_sequence_usage_keys(course):
+    """
+    Extracts a list of 'subsections' usage_keys
+    """
+    return [str(subsection.location)
+            for section in course.get_children()
+            for subsection in section.get_children()]
+
+
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     """
     Creates the URL for the given handler.
@@ -1816,6 +1825,7 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
     )
     from openedx.core.djangoapps.content_staging import api as content_staging_api
 
+    course_sequence_ids = get_sequence_usage_keys(course)
     component_templates = get_component_templates(course)
     ancestor_xblocks = []
     parent = get_parent_xblock(xblock)
@@ -1916,6 +1926,7 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
         # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
         'user_clipboard': user_clipboard,
         'is_fullwidth_content': is_library_xblock,
+        'course_sequence_ids': course_sequence_ids,
     }
     return context
 
