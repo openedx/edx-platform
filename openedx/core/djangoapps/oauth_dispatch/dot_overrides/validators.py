@@ -94,11 +94,13 @@ class EdxOAuth2Validator(OAuth2Validator):
     def get_default_scopes(self, client_id, request, *args, **kwargs):
         """
         If the request payload does not have `scopes` attribute for a grant_type of
-        client credentials, it should use available scopes as default.
+        client credentials, it should add `user_id` in the default scopes.
         """
+        default_scopes = super().get_default_scopes(client_id, request, *args, **kwargs)
         if request.grant_type == 'client_credentials' and not request.scopes:
-            return get_scopes_backend().get_available_scopes(application=request.client, request=request)
-        return super().get_default_scopes(client_id, request, *args, **kwargs)
+            if get_scopes_backend().has_user_id_in_application_scopes(application=request.client):
+                default_scopes.append('user_id')
+        return default_scopes
 
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
         """

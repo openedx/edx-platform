@@ -5,6 +5,7 @@ Test of custom django-oauth-toolkit behavior
 # pylint: disable=protected-access
 
 import datetime
+from unittest import mock
 
 from django.conf import settings
 from django.test import RequestFactory, TestCase
@@ -76,6 +77,40 @@ class CustomValidationTestCase(TestCase):
         self.user.save()
         request = self.request_factory.get('/')
         assert self.validator.validate_user('darkhelmet', self.TEST_PASSWORD, client=None, request=request)
+
+    @mock.patch(
+        'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes.has_user_id_in_application_scopes'
+    )
+    @mock.patch('oauth2_provider.oauth2_validators.OAuth2Validator.get_default_scopes')
+    def test_get_updated_default_scopes(self, mock_get_default_scopes, mock_has_user_id_in_application_scopes):
+        """
+        Test that get_default_scopes returns the default scopes plus the user_id scope if it's available.
+        """
+        default_scopes = ['profile', 'email']
+        mock_get_default_scopes.return_value = default_scopes.copy()
+        mock_has_user_id_in_application_scopes.return_value = True
+
+        request = mock.Mock(grant_type='client_credentials', client=None, scopes=None)
+        overriden_default_scopes = self.validator.get_default_scopes(request=request, client_id='client_id')
+
+        self.assertEqual(overriden_default_scopes, default_scopes + ['user_id'])
+
+    @mock.patch(
+        'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes.has_user_id_in_application_scopes'
+    )
+    @mock.patch('oauth2_provider.oauth2_validators.OAuth2Validator.get_default_scopes')
+    def test_get_default_scopes(self, mock_get_default_scopes, mock_has_user_id_in_application_scopes):
+        """
+        Test that get_default_scopes returns the default scopes if user_id scope is not available.
+        """
+        default_scopes = ['profile', 'email']
+        mock_get_default_scopes.return_value = default_scopes.copy()
+        mock_has_user_id_in_application_scopes.return_value = False
+
+        request = mock.Mock(grant_type='client_credentials', client=None, scopes=None)
+        overriden_default_scopes = self.validator.get_default_scopes(request=request, client_id='client_id')
+
+        self.assertEqual(overriden_default_scopes, default_scopes)
 
 
 @skip_unless_lms
