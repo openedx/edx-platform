@@ -31,6 +31,7 @@ from openedx.core.djangoapps.user_api.accounts import (
     EMAIL_MAX_LENGTH,
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
+    REQUIRED_FIELD_PASSWORD_MSG,
     REQUIRED_FIELD_CONFIRM_EMAIL_MSG,
     REQUIRED_FIELD_COUNTRY_MSG,
     USERNAME_BAD_LENGTH_MSG,
@@ -479,7 +480,7 @@ class RegistrationViewTestV1(
 
     USERNAME = "bob"
     EMAIL = "bob@example.com"
-    PASSWORD = "password"
+    PASSWORD = "password123"
     NAME = "Bob Smith"
     EDUCATION = "m"
     YEAR_OF_BIRTH = "1998"
@@ -2189,6 +2190,27 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
                 "errorMessages": {
                     "required": "The email addresses do not match",
                 }
+            }
+        )
+
+    def test_register_password_validation(self):
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": 'test',
+        })
+
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "password": [{
+                    "user_message": REQUIRED_FIELD_PASSWORD_MSG,
+                }],
+                "error_code": "invalid-password"
             }
         )
 

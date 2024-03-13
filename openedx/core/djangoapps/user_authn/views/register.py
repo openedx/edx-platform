@@ -6,6 +6,7 @@ Registration related views.
 import datetime
 import json
 import logging
+import re
 
 from django.conf import settings
 from django.contrib.auth import login as django_login
@@ -585,7 +586,9 @@ class RegistrationView(APIView):
         response = self._handle_duplicate_email_username(request, data)
         if response:
             return response
-
+        response = self._handle_password_validation(request, data)
+        if response:
+            return response
         response = self._handle_country_code_validation(request, data)
         if response:
             return response
@@ -629,6 +632,19 @@ class RegistrationView(APIView):
             errors['country'] = [{'user_message': error_message}]
         elif country and not is_valid_country_code:
             errors['country'] = [{'user_message': error_message}]
+
+        if errors:
+            return self._create_response(request, errors, status_code=400, error_code=error_code)
+
+    def _handle_password_validation(self, request, data):
+        # pylint: disable=no-member
+        password = data.get('password')
+
+        errors = {}
+        error_code = 'invalid-password'
+        error_message = accounts_settings.REQUIRED_FIELD_PASSWORD_MSG
+        if (password is not None and ((len(password)<8) or (not re.search('[a-zA-Z]', password)) or (not re.search('[0-9]', password)))):
+            errors['password'] = [{'user_message': error_message}]
 
         if errors:
             return self._create_response(request, errors, status_code=400, error_code=error_code)
