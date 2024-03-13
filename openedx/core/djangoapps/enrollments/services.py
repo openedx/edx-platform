@@ -53,7 +53,7 @@ class EnrollmentsService:
         """
         try:
             return USER_MODEL.objects.get(id=user_id)
-        except USER_MODEL.DoesNotExist:            
+        except USER_MODEL.DoesNotExist:
             return None
 
     def _get_enrollments_for_course_proctoring_eligible_modes(self, course_id, allow_honor_mode=False):
