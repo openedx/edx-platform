@@ -135,6 +135,10 @@ class CoursewareMeta:
         return self.course.license
 
     @property
+    def language(self):
+        return self.course.language
+
+    @property
     def notes(self):
         """
         Return whether edxnotes is enabled and visible.
