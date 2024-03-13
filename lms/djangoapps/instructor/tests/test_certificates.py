@@ -14,7 +14,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.utils import override_settings
 from django.urls import reverse
-from rest_framework import status
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -62,6 +61,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
 
         # Enable the certificate generation feature
         CertificateGenerationConfiguration.objects.create(enabled=True)
+
     def test_visible_only_to_global_staff(self):
         # Instructors don't see the certificates section
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
@@ -79,12 +79,11 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         # Now even global staff can't see the certificates section
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         self._assert_certificates_visible(False)
-        
+
     @mock.patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE': True})
     def test_visible_for_instructors_when_feature_is_enabled(self):
-            self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
-            self._assert_certificates_visible(True)
-
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
+        self._assert_certificates_visible(True)
 
     @ddt.data("started", "error", "success")
     def test_show_certificate_status(self, certificate_status):
@@ -242,12 +241,11 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
         assert response.status_code == 302
-        
+
         # Global staff have access
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
         assert response.status_code == 302
-
 
     @ddt.data(True, False)
     def test_enable_certificate_generation(self, is_enabled):
@@ -293,7 +291,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
         assert response.status_code == 200
-        
+
     def test_certificate_generation_api_with_global_staff(self):
         """
         Test certificates generation api endpoint returns success status when called with

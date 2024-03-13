@@ -206,8 +206,8 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # Note: This is hidden for all CCXs
     certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
     certs_instructor_enabled = settings.FEATURES.get('ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE', False)
-    
-    if certs_enabled and ( access['admin'] or (access['instructor'] and certs_instructor_enabled) ):
+
+    if certs_enabled and (access['admin'] or (access['instructor'] and certs_instructor_enabled)):
         sections.append(_section_certificates(course))
 
     openassessment_blocks = modulestore().get_items(
