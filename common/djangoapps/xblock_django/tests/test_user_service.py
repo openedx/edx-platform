@@ -191,14 +191,6 @@ class UserServiceTestCase(TestCase):
         django_user_service = DjangoXBlockUserService(self.user)
         assert django_user_service.get_user_by_anonymous_id('invalid-anon-id') is None
 
-    def test_get_current_django_user(self):
-        """
-        Tests that get_current_django_user returns django user.
-        """
-        django_user_service = DjangoXBlockUserService(self.user)
-        django_user = django_user_service.get_current_django_user()
-        self.assertEqual(django_user, self.user)
-
     def test_external_id(self):
         """
         Tests that external ids differ based on type.

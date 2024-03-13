@@ -65,12 +65,6 @@ class DjangoXBlockUserService(UserService):
         """
         return self._convert_django_user_to_xblock_user(self._django_user)
 
-    def get_current_django_user(self):
-        """
-        Returns the currently-logged in user, as an instance of Django AUTH_USER_MODEL
-        """
-        return self._django_user
-
     def get_external_user_id(self, type_name):
         """
         Returns an external user id of the given type.

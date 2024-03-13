@@ -58,22 +58,32 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
         Test that it returns a list of active enrollments for a course and user
         """
         enrollment = self.service.get_active_enrollments_by_course_and_user(
-            user=self.users[0],
-            course_id=str(self.course.id),
+            str(self.course.id),
+            self.users[0].id,
         )
         expected_values = {'username': 'user0', 'mode': 'audit'}
         self.assertDictEqual(self.enrollment_to_dict(enrollment), expected_values)
 
-    def test_get_active_enrollments_by_course_and_user_none(self):
+    def test_get_active_enrollments_by_course_and_user_none_course(self):
         """
         Test that it returns a list of active enrollments for a course and user
         for a non existing enrollment
         """
         enrollments = self.service.get_active_enrollments_by_course_and_user(
-            user=self.users[0],
-            course_id='course-v1:testx+none+123',
+            'course-v1:testx+none+123',
+            self.users[0].id,
         )
         self.assertIsNone(enrollments)
+
+    def test_get_active_enrollments_by_course_and_user_none_user(self):
+        """
+        Test getting enrollments for a course and non existing user raise error
+        """
+        with self.assertRaises(AssertionError):
+            self.service.get_active_enrollments_by_course_and_user(
+                str(self.course.id),
+                0000,
+            )
 
     def test_get_enrollments_can_take_proctored_exams_by_course(self):
         """
