@@ -94,7 +94,7 @@ class LmsBlockMixin(XBlockMixin):
     )
     is_completion_tracked = Boolean(
         help=_("If true, problems completion will be tracked"),
-        default='',
+        default=True,
         scope=Scope.settings,
     )
     thumbnail = String(
