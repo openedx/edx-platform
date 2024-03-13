@@ -8,11 +8,14 @@ import re
 import sys
 import textwrap
 from datetime import datetime
+from hashlib import sha256
 
 from django.conf import settings
+import requests
 from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
+from edx_rest_api_client.client import OAuthAPIClient
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
@@ -43,7 +46,6 @@ _ = lambda text: text
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
 @XBlock.needs("user")
-@XBlock.wants("ai_translation")
 class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
     XModuleToXBlockMixin, ResourceTemplates, XModuleMixin,
@@ -91,26 +93,63 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """
         Return a fragment that contains the html for the student view
         """
-        # If a translation is requested and the ai_translation service is available, use translate_view
-        if (context.get("translate_lang") and self.runtime.service(self, 'ai_translation')):
-            html = self.get_translated_html(context)
-        else:
-            html = self.get_html()
+        if (context.get("translate_lang")):
+            return self.translated_view(context, context.get("translate_lang"))
 
-        fragment = Fragment(html)
+        fragment = Fragment(self.get_html())
         add_sass_to_fragment(fragment, 'HtmlBlockDisplay.scss')
         add_webpack_js_to_fragment(fragment, 'HtmlBlockDisplay')
         shim_xmodule_js(fragment, 'HTMLModule')
         return fragment
 
-    def get_translated_html(self, context):
-        """ Returns translated html required for rendering the block, replacing placeholder values"""
-        if self.data:
-            translate_lang = context.get("translate_lang")
-            translation_service = self.runtime.service(self, 'ai_translation')
-            translated_html = translation_service.translate(self.data, translate_lang, self.location)
-            return self.substitute_keywords(translated_html)
-        return self.data
+    def translated_view(self, _context, translate_lang):
+        """
+        Translated version of this content
+        """
+        # Translate HTML
+        translated_html = self.translate(self.data, translate_lang)
+
+        # Replace placeholder values
+        translated_html = self.replace_placeholders(translated_html)
+
+        # Convert to fragment and add resources
+        fragment = Fragment(translated_html)
+        add_sass_to_fragment(fragment, 'HtmlBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'HtmlBlockDisplay')
+        shim_xmodule_js(fragment, 'HTMLModule')
+        return fragment
+
+    def _get_translations_client(self):
+        return OAuthAPIClient(
+            base_url=settings.TRANSLATIONS_SERVICE_EDX_OAUTH2_PROVIDER_URL,
+            client_id=settings.TRANSLATIONS_SERVICE_EDX_OAUTH2_KEY,
+            client_secret=settings.TRANSLATIONS_SERVICE_EDX_OAUTH2_SECRET,
+        )
+
+    def translate(self, content, language):
+        """ Request translated version of content from translations IDA"""
+
+        translation_client = self._get_translations_client()
+        url = f'{settings.AI_TRANSLATIONS_API_URL}/translate-xblock/'
+        headers = {
+            'content-type': 'application/json',
+            'use-jwt-cookie': 'true',
+        }
+        payload = {
+            "block_id": str(self.location),
+            "source_language": "en",
+            "target_language": language,
+            "content": content,
+            "content_hash": sha256(content.encode('utf-8')).hexdigest(),
+        }
+
+        response = translation_client.post(
+            url,
+            data=json.dumps(payload),
+            headers=headers
+        )
+
+        return response.json().get('translated_content')
 
     @XBlock.supports("multi_device")
     def public_view(self, context):
@@ -134,12 +173,12 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     def get_html(self):
         """ Returns html required for rendering the block, replacing placeholder values"""
         if self.data:
-            return self.substitute_keywords(self.data)
+            return self.replace_placeholders(self.data)
         return self.data
-
-    def substitute_keywords(self, html_with_placeholders):
+    
+    def replace_placeholders(self, html_with_placeholders):
         """
-        The HTML block allows replacing of some tags with contextual info.
+        The HTML block allows replacing of some placeholder tags with contextual info.
 
         Currently implemented:
         %%USER_ID%% - User ID
