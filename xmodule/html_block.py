@@ -1,17 +1,14 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
 import copy
-import json
 import logging
 import os
 import re
 import sys
 import textwrap
 from datetime import datetime
-from hashlib import sha256
 
 from django.conf import settings
-import requests
 from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
@@ -119,28 +116,11 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         return fragment
 
     def translate(self, content, language):
-        """ Request translated version of content from translations IDA"""
-
-        url = f'{settings.AI_TRANSLATIONS_API_URL}/translate-xblock/'
-        headers = {
-            'content-type': 'application/json',
-            'use-jwt-cookie': 'true',
-        }
-        payload = {
-            "block_id": str(self.location),
-            "source_language": "en",
-            "target_language": language,
-            "content": content,
-            "content_hash": sha256(content.encode('utf-8')).hexdigest(),
-        }
-
-        response = requests.post(
-            url,
-            data=json.dumps(payload),
-            headers=headers
-        )
-
-        return response.json().get('translated_content')
+        """ PLACEHOLDER translation call"""
+        fake_translation = f'This block, {self.location}, has been "translated" to lang "{language}"...' \
+             "Just kidding, I UPPERCASED EVERYTHING!"
+        fake_translation = fake_translation + content.upper()
+        return fake_translation
 
     @XBlock.supports("multi_device")
     def public_view(self, context):
