@@ -2155,7 +2155,7 @@ class EntryPageTestCase(TestCase):
 
     @override_waffle_switch(waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE, active=True)
     def test_accessibility(self):
-        self._test_page('/accessibility')
+        self._test_page('/accessibility', 302)
 
 
 def _create_course(test, course_key, course_data):
