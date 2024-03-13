@@ -232,9 +232,8 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         return self.test_system.get_block_for_descriptor(block)
 
     @patch('xmodule.x_module.block_global_local_resource_url')
-    @patch('xmodule.html_block.whole_course_translations_enabled_for_course', return_value=False)
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
-    def test_conditional_block(self, _, mock_translate):  # pylint: disable=unused-argument
+    def test_conditional_block(self, _):
         """Make sure that conditional block works"""
         # edx - HarvardX
         # cond_test - ER22x

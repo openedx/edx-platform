@@ -1,7 +1,7 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import ddt
 from django.contrib.auth.models import AnonymousUser
@@ -83,8 +83,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         STUDENT_VIEW,
         PUBLIC_VIEW,
     )
-    @patch("xmodule.html_block.whole_course_translations_enabled_for_course", return_value=False)
-    def test_student_preview_view(self, view, mock_translations_enabled):  # pylint: disable=unused-argument
+    def test_student_preview_view(self, view):
         """
         Ensure that student_view and public_view renders correctly.
         """

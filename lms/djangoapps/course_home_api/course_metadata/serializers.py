@@ -57,5 +57,3 @@ class CourseHomeMetadataSerializer(VerifiedModeSerializer):
     user_timezone = serializers.CharField()
     can_view_certificate = serializers.BooleanField()
     course_modes = CourseModeSerrializer(many=True)
-    language = serializers.CharField()
-    whole_course_translation_enabled = serializers.BooleanField()
