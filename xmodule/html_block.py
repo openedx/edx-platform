@@ -115,34 +115,19 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
             }
 
     def get_html(self):
-        """ Returns html required for rendering the block, replacing placeholder values"""
+        """ Returns html required for rendering the block. """
         if self.data:
-            return self.replace_placeholders(self.data)
+            data = self.data
+            user_id = (
+                self.runtime.service(self, 'user')
+                .get_current_user()
+                .opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
+            )
+            if user_id:
+                data = data.replace("%%USER_ID%%", user_id)
+            data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
+            return data
         return self.data
-    
-    def replace_placeholders(self, html_with_placeholders):
-        """
-        The HTML block allows replacing of some placeholder tags with contextual info.
-
-        Currently implemented:
-        %%USER_ID%% - User ID
-        %%COURSE_ID%% - Course ID
-        """
-        # Replace %%USER_ID%%
-        user_id = (
-            self.runtime.service(self, 'user')
-            .get_current_user()
-            .opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
-        )
-        if user_id:
-            html = html_with_placeholders.replace("%%USER_ID%%", user_id)
-        else:
-            html = html_with_placeholders
-
-        # Replace %%COURSE_ID%%
-        html = html.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
-
-        return html
 
     def studio_view(self, _context):
         """
