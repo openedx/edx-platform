@@ -78,6 +78,7 @@ class ContainerHandlerSerializer(serializers.Serializer):
     assets_url = serializers.SerializerMethodField()
     unit_block_id = serializers.CharField(source="unit.location.block_id")
     subsection_location = serializers.CharField(source="subsection.location")
+    course_sequence_ids = serializers.ListField(child=serializers.CharField())
 
     def get_assets_url(self, obj):
         """
@@ -90,3 +91,21 @@ class ContainerHandlerSerializer(serializers.Serializer):
                 "assets_handler", kwargs={"course_key_string": context_course.id}
             )
         return None
+
+
+class ChildVerticalContainerSerializer(serializers.Serializer):
+    """
+    Serializer for representing a xblock child of vertical container.
+    """
+
+    name = serializers.CharField(source="display_name_with_default")
+    block_id = serializers.CharField(source="location")
+
+
+class VerticalContainerSerializer(serializers.Serializer):
+    """
+    Serializer for representing a vertical container with state and children.
+    """
+
+    children = ChildVerticalContainerSerializer(many=True)
+    is_published = serializers.BooleanField()

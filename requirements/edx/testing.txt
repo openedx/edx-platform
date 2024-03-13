@@ -577,7 +577,7 @@ edx-drf-extensions==10.2.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.13.5
+edx-enterprise==4.13.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -747,8 +747,9 @@ idna==3.6
     #   yarl
 import-linter==2.0
     # via -r requirements/edx/testing.in
-importlib-metadata==7.0.1
+importlib-metadata==6.11.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   markdown
     #   pytest-randomly

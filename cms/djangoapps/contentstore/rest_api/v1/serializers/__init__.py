@@ -21,4 +21,4 @@ from .videos import (
     VideoUsageSerializer,
     VideoDownloadSerializer
 )
-from .vertical_block import ContainerHandlerSerializer
+from .vertical_block import ContainerHandlerSerializer, VerticalContainerSerializer
