@@ -1884,7 +1884,7 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         url = OBJECT_TAGS_EXPORT_URL.format(object_id="invalid")
         self.client.force_authenticate(user=self.staff)
         response = self.client.get(url)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @skip_unless_cms

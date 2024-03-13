@@ -13,10 +13,11 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from ...auth import has_view_object_tags_access
 
 from ...api import (
     create_taxonomy,
-    generate_csv,
+    generate_csv_rows,
     get_taxonomies,
     get_taxonomies_for_org,
     get_taxonomy,
@@ -164,11 +165,15 @@ class ObjectTagExportView(APIView):
         object_id: str = kwargs.get('context_id', None)
         pseudo_buffer = Echo()
 
+        if not has_view_object_tags_access(self.request.user, object_id):
+            raise PermissionDenied(
+                "You do not have permission to view object tags for this object_id."
+            )
+
         try:
             return StreamingHttpResponse(
-                streaming_content=generate_csv(
+                streaming_content=generate_csv_rows(
                     object_id,
-                    self.request.user,
                     pseudo_buffer,
                 ),
                 content_type="text/csv",

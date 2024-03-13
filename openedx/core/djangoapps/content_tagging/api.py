@@ -2,6 +2,7 @@
 Content Tagging APIs
 """
 from __future__ import annotations
+import io
 
 from itertools import groupby
 import csv
@@ -9,13 +10,11 @@ from typing import Iterator
 from opaque_keys.edx.keys import UsageKey
 
 import openedx_tagging.core.tagging.api as oel_tagging
-from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from django.db.models import Exists, OuterRef, Q, QuerySet
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
-from rest_framework.exceptions import PermissionDenied, ValidationError
 from .helpers.objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
 
 from .models import TaxonomyOrg
@@ -208,24 +207,14 @@ def set_object_tags(
         )
 
 
-def generate_csv(object_id, user, buffer) -> Iterator[str]:
+def generate_csv_rows(object_id, buffer) -> Iterator[str]:
     """
-    Returns a CSV string with tags and taxonomies of all blocks of `content_key`
+    Returns a CSV string with tags and taxonomies of all blocks of `object_id`
     """
     content_key = get_content_key_from_string(object_id)
 
     if isinstance(content_key, UsageKey):
-        raise ValidationError("The object_id must be a CourseKey or a LibraryLocatorV2.")
-
-    # Check if the user has permission to view object tags for this object_id
-    if not user.has_perm(
-        "oel_tagging.view_objecttag",
-        # The obj arg expects a model, but we are passing an object
-        oel_tagging_rules.ObjectTagPermissionItem(taxonomy=None, object_id=object_id),  # type: ignore[arg-type]
-    ):
-        raise PermissionDenied(
-            "You do not have permission to view object tags for this object_id."
-        )
+        raise ValueError("The object_id must be a CourseKey or a LibraryLocatorV2.")
 
     all_object_tags, taxonomies = get_all_object_tags(content_key)
     tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
@@ -257,6 +246,20 @@ def generate_csv(object_id, user, buffer) -> Iterator[str]:
 
         yield csv_writer.writerow(block_data)
 
+
+def export_tags_in_csv_file(object_id, file_dir, file_name) -> None:
+    """
+    Writes a CSV file with tags and taxonomies of all blocks of `object_id`
+    """
+    buffer = io.StringIO()
+    for _ in generate_csv_rows(object_id, buffer):
+        # The generate_csv_rows function is a generator,
+        # we don't need to do anything with the result here
+        pass
+
+    with file_dir.open(file_name, 'w') as csv_file:
+        buffer.seek(0)
+        csv_file.write(buffer.read())
 
 # Expose the oel_tagging APIs
 
