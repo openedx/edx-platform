@@ -117,8 +117,9 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 name=certificate.name,
             ),
         }
-        self.assertTrue(
-            certificate_created_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            certificate_created_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_send_certificate_changed_event(self):
@@ -170,8 +171,9 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 name=certificate.name,
             ),
         }
-        self.assertTrue(
-            certificate_changed_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            certificate_changed_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_send_certificate_revoked_event(self):
@@ -222,6 +224,7 @@ class CertificateEventTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 name=certificate.name,
             ),
         }
-        self.assertTrue(
-            certificate_revoked_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            certificate_revoked_event.items(),
+            event_receiver.call_args.kwargs.items()
         )

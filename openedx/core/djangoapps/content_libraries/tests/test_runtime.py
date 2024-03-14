@@ -134,7 +134,7 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
             "content_type": "CAPA",
             "problem_types": ["multiplechoiceresponse"],
         }
-        self.assertTrue(index_dictionary_subset.items() <= index_dictionary.items())
+        self.assertLessEqual(index_dictionary_subset.items(), index_dictionary.items())
         assert metadata_view_result.data['student_view_data'] is None
         # Capa doesn't provide student_view_data
 
@@ -423,7 +423,7 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
             "total_possible": 1,
             "attempts_used": 1,
         }
-        self.assertTrue(submit_subset_data.items() <= submit_data.items())
+        self.assertLessEqual(submit_subset_data.items(), submit_data.items())
 
         # Now test that the score is also persisted in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
@@ -440,7 +440,7 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
             "total_possible": 1,
             "attempts_used": 2,
         }
-        self.assertTrue(submit_subset_data.items(), submit_data.items())
+        self.assertLessEqual(submit_subset_data.items(), submit_data.items())
         # Now test that the score is also updated in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
         sm = get_score(self.student_a, block_id)

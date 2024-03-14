@@ -584,7 +584,10 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             task_result (dict): Return value of `CourseGradeReport.generate`.
         """
         expected_successful_result = {'attempted': 2, 'succeeded': 2, 'failed': 0}
-        self.assertTrue(expected_successful_result.items() <= task_result.items())
+        self.assertLessEqual(
+            expected_successful_result.items(),
+            task_result.items()
+        )
 
     def verify_grades_in_csv(self, students_grades, ignore_other_columns=False):
         """

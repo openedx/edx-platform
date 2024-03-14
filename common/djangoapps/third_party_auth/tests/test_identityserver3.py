@@ -104,6 +104,7 @@ class IdentityServer3Test(testutil.TestCase):
             "last_name": "Openid",
             "fullname": "Edx Openid"
         }
-        self.assertTrue(
-            user_details.items() <= provider_config.backend_class().get_user_details(self.response).items()
+        self.assertLessEqual(
+            user_details.items(),
+            provider_config.backend_class().get_user_details(self.response).items()
         )

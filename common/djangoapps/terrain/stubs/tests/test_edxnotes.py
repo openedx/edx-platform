@@ -82,7 +82,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         assert 'created' in response_content
         assert 'updated' in response_content
         assert 'annotator_schema_version' in response_content
-        self.assertTrue(dummy_note.items() <= response_content.items())
+        self.assertLessEqual(dummy_note.items(), response_content.items())
 
     def test_note_read(self):
         notes = self._get_notes()

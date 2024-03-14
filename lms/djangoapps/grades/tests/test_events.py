@@ -93,6 +93,7 @@ class PersistentGradeEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixi
                 passed_timestamp=grade.passed_timestamp
             )
         }
-        self.assertTrue(
-            persistent_grade_changed_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            persistent_grade_changed_event.items(),
+            event_receiver.call_args.kwargs.items()
         )

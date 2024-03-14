@@ -144,7 +144,7 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         token_payload = self.assert_valid_jwt_access_token(
             jwt_token, self.user, self.default_scopes, aud=aud, secret=secret,
         )
-        self.assertTrue(additional_claims.items() <= token_payload.items())
+        self.assertLessEqual(additional_claims.items(), token_payload.items())
         assert user_email_verified == token_payload['email_verified']
         assert token_payload['roles'] == mock_create_roles.return_value
 

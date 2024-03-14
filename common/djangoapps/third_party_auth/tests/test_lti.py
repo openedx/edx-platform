@@ -59,7 +59,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             'custom_extra': 'parameter',
             'user_id': '292832126'
         }
-        self.assertTrue(subset_params.items() <= parameters.items())
+        self.assertLessEqual(subset_params.items(), parameters.items())
 
     def test_validate_lti_valid_request_with_get_params(self):
         request = Request(
@@ -77,7 +77,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             'custom_extra': 'parameter',
             'user_id': '292832126'
         }
-        self.assertTrue(subset_params.items() <= parameters.items())
+        self.assertLessEqual(subset_params.items(), parameters.items())
 
     def test_validate_lti_old_timestamp(self):
         request = Request(

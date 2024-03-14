@@ -88,7 +88,7 @@ class AccessTokenMixin:
 
         expected['grant_type'] = grant_type or ''
 
-        self.assertTrue(expected.items() <= payload.items())
+        self.assertLessEqual(expected.items(), payload.items())
 
         if expires_in:
             assert payload['exp'] == payload['iat'] + expires_in

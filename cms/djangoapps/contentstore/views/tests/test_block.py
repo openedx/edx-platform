@@ -862,8 +862,9 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
                 source_usage_key=self.vert_usage_key,
             ),
         }
-        self.assertTrue(
-            duplicated_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            duplicated_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_ordering(self):

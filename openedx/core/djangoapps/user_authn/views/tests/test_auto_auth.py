@@ -186,7 +186,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
             'created_status': 'Logged in',
             'anonymous_id': anonymous_id_for_user(user, None),
         }
-        self.assertTrue(expected_response_subset.items() <= response_data.items())
+        self.assertLessEqual(expected_response_subset.items(), response_data.items())
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack

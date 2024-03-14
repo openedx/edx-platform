@@ -1677,7 +1677,10 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         Verifies the result is as expected when returning video data from VAL.
         """
         test_profile = result.pop("encoded_videos")[self.TEST_PROFILE]
-        self.assertTrue(test_profile.items() <= self.TEST_ENCODED_VIDEO.items())
+        self.assertLessEqual(
+            test_profile.items(),
+            self.TEST_ENCODED_VIDEO.items()
+        )
         self.assertDictEqual(
             result,
             {
@@ -2048,7 +2051,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             video.edx_video_id,
             val_transcript_language_code
         )
-        self.assertTrue(val_transcript_data.items() <= video_transcript_from_val.items())
+        self.assertLessEqual(
+            val_transcript_data.items(),
+            video_transcript_from_val.items()
+        )
 
         # Verify that transcript from sub field is imported.
         sub_transcript_data = self.get_video_transcript_data(
@@ -2059,7 +2065,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             video.edx_video_id,
             self.block.transcript_language
         )
-        self.assertTrue(sub_transcript_data.items() <= video_transcript_from_sub.items())
+        self.assertLessEqual(
+            sub_transcript_data.items(),
+            video_transcript_from_sub.items()
+        )
 
         # Verify that transcript from transcript field is imported.
         field_transcript_data = self.get_video_transcript_data(
@@ -2070,7 +2079,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             video.edx_video_id,
             external_transcript_language_code
         )
-        self.assertTrue(field_transcript_data.items() <= video_transcript_from_field.items())
+        self.assertLessEqual(
+            field_transcript_data.items(),
+            video_transcript_from_field.items()
+        )
 
     def test_import_no_video_id(self):
         """
@@ -2150,7 +2162,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             video.edx_video_id,
             val_transcript_language_code
         )
-        self.assertTrue(val_transcript_data.items() <= video_transcript_from_val.items())
+        self.assertLessEqual(
+            val_transcript_data.items(),
+            video_transcript_from_val.items()
+        )
 
     @ddt.data(
         (
@@ -2286,7 +2301,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
 
         # Verify that correct transcripts are imported.
         video_transcript = get_video_transcript(video.edx_video_id, language_code)
-        self.assertTrue(expected_transcript.items() <= video_transcript.items())
+        self.assertLessEqual(
+            expected_transcript.items(),
+            video_transcript.items()
+        )
 
     def test_import_val_data_invalid(self):
         create_profile('mobile')

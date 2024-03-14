@@ -351,7 +351,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'is_active': True,
             'verified_upgrade_deadline': None,
         }
-        self.assertTrue(expected_data.items(), data[0].items())
+        self.assertLessEqual(expected_data.items(), data[0].items())
         assert {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR, CourseMode.NO_ID_PROFESSIONAL_MODE,
                 CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
         assert 'enterprise_course_enrollments' not in data[0]
@@ -459,7 +459,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'enrolled_by': self.user.email,
             'reason': 'Financial Assistance',
         }
-        self.assertTrue(expected_data.items() <= data.items())
+        self.assertLessEqual(expected_data.items(), data.items())
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')

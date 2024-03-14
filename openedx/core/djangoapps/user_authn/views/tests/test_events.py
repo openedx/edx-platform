@@ -96,8 +96,9 @@ class RegistrationEventTest(UserAPITestCase, OpenEdxEventsTestMixin):
                 is_active=user.is_active,
             ),
         }
-        self.assertTrue(
-            registration_completed_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            registration_completed_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
 
@@ -178,6 +179,7 @@ class LoginSessionEventTest(UserAPITestCase, OpenEdxEventsTestMixin):
                 is_active=user.is_active,
             ),
         }
-        self.assertTrue(
-            login_completed_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            login_completed_event.items(),
+            event_receiver.call_args.kwargs.items()
         )

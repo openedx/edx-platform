@@ -401,8 +401,9 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                 "auth_entry": "login",
                 "next": expected_next_url
             }
-            self.assertTrue(
-                partial_request_data.items() <= request_data.dict().items()
+            self.assertLessEqual(
+                partial_request_data.items(),
+                request_data.dict().items()
             )
             assert next_url == expected_next_url
             assert '<samlp:AuthnRequest' in xml
@@ -414,8 +415,9 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             partial_response_data = {
                 "RelayState": idp_name
             }
-            self.assertTrue(
-                partial_response_data.items() <= response_data.dict().items()
+            self.assertLessEqual(
+                partial_response_data.items(),
+                response_data.dict().items()
             )
             assert 'SAMLResponse' in response_data
             assert next_url == expected_next_url

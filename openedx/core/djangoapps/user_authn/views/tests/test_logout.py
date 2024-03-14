@@ -76,14 +76,14 @@ class LogoutTests(TestCase):
         expected = {
             'target': urllib.parse.unquote(redirect_url),
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
     def test_no_redirect_supplied(self):
         response = self.client.get(reverse('logout'), HTTP_HOST='testserver')
         expected = {
             'target': '/',
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
     @ddt.data(
         ('https://www.amazon.org', 'edx.org'),
@@ -100,7 +100,7 @@ class LogoutTests(TestCase):
         expected = {
             'target': '/',
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
     def test_client_logout(self):
         """ Verify the context includes a list of the logout URIs of the authenticated OpenID Connect clients.
@@ -113,7 +113,7 @@ class LogoutTests(TestCase):
             'logout_uris': [],
             'target': '/',
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
     @mock.patch(
         'django.conf.settings.IDA_LOGOUT_URI_LIST',
@@ -138,7 +138,7 @@ class LogoutTests(TestCase):
             'logout_uris': expected_logout_uris,
             'target': '/',
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
     @mock.patch(
         'django.conf.settings.IDA_LOGOUT_URI_LIST',
@@ -161,7 +161,7 @@ class LogoutTests(TestCase):
             'logout_uris': expected_logout_uris,
             'target': '/',
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
     def test_filter_referring_service(self):
         """ Verify that, if the user is directed to the logout page from a service, that service's logout URL
@@ -174,7 +174,7 @@ class LogoutTests(TestCase):
             'target': '/',
             'show_tpa_logout_link': False,
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
     def test_learner_portal_logout_having_idp_logout_url(self):
         """
@@ -194,7 +194,7 @@ class LogoutTests(TestCase):
                 'tpa_logout_url': idp_logout_url,
                 'show_tpa_logout_link': True,
             }
-            self.assertTrue(expected.items() <= response.context_data.items())
+            self.assertLessEqual(expected.items(), response.context_data.items())
 
     @mock.patch('django.conf.settings.TPA_AUTOMATIC_LOGOUT_ENABLED', True)
     def test_automatic_tpa_logout_url_redirect(self):
@@ -239,4 +239,4 @@ class LogoutTests(TestCase):
         expected = {
             'target': bleach.clean(urllib.parse.unquote(redirect_url)),
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())

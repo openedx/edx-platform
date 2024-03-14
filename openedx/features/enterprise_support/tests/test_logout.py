@@ -60,7 +60,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
         expected = {
             'enterprise_target': enterprise_target,
         }
-        self.assertTrue(expected.items() <= response.context_data.items())
+        self.assertLessEqual(expected.items(), response.context_data.items())
 
         if enterprise_target:
             self.assertContains(response, 'We are signing you in.')

@@ -314,7 +314,7 @@ class TestRefundSignal(ModuleStoreTestCase):
         #  it to `dict` because newer style dict comparison only works when both
         # objects support mapping (https://docs.python.org/3.8/glossary.html#term-mapping)
         headers_dict = dict(last_request.headers.items())
-        self.assertTrue(expected.items() <= headers_dict.items())
+        self.assertLessEqual(expected.items(), headers_dict.items())
 
         # Verify the content
         expected = {

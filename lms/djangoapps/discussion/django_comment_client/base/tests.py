@@ -1820,8 +1820,9 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
             "signal": FORUM_THREAD_RESPONSE_CREATED,
             "sender": None,
         }
-        self.assertTrue(
-            thread_response_created_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            thread_response_created_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
         self.assertIn(
@@ -1862,8 +1863,9 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
             "signal": FORUM_RESPONSE_COMMENT_CREATED,
             "sender": None,
         }
-        self.assertTrue(
-            response_comment_created_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            response_comment_created_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
         self.assertIn(
@@ -1923,8 +1925,9 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
             "signal": forum_event,
             "sender": None,
         }
-        self.assertTrue(
-            forum_event_created.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            forum_event_created.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
         self.assertIn(

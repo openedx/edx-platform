@@ -293,8 +293,9 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 creation_date=enrollment.created,
             ),
         }
-        self.assertTrue(
-            enrollment_created_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            enrollment_created_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_enrollment_changed_event_emitted(self):
@@ -336,8 +337,9 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 creation_date=enrollment.created,
             ),
         }
-        self.assertTrue(
-            enrollment_changed_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            enrollment_changed_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_unenrollment_completed_event_emitted(self):
@@ -379,8 +381,9 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                 creation_date=enrollment.created,
             ),
         }
-        self.assertTrue(
-            unenrollment_completed_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            unenrollment_completed_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
 
@@ -447,8 +450,9 @@ class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
                 role=role._role_name,  # pylint: disable=protected-access
             ),
         }
-        self.assertTrue(
-            access_role_created_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            access_role_created_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     @ddt.data(

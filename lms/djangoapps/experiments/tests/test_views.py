@@ -42,7 +42,7 @@ class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amne
         ExperimentData.objects.get(user=user)
 
         data['user'] = user.username
-        self.assertTrue(data.items() <= response.data.items())
+        self.assertLessEqual(data.items(), response.data.items())
 
     def test_list_permissions(self):
         """ Users should only be able to list their own data. """

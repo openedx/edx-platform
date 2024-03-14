@@ -287,7 +287,10 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 400)
         invalid_course_team_user = {'team': ['Course team user does not exist']}
-        self.assertTrue(invalid_course_team_user.items() <= response.data.items())
+        self.assertLessEqual(
+            invalid_course_team_user.items(),
+            response.data.items()
+        )
 
     def test_images_upload(self):
         # http://www.django-rest-framework.org/api-guide/parsers/#fileuploadparser

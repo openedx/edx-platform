@@ -48,7 +48,7 @@ class TestOAuthDispatchAPI(TestCase):
             'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
             'scope': '',
         }
-        self.assertTrue(expected_token_subset.items() <= token.items())
+        self.assertLessEqual(expected_token_subset.items(), token.items())
         self._assert_stored_token(token['access_token'], self.user, self.client)
 
     def test_create_token_another_user(self):
@@ -65,4 +65,4 @@ class TestOAuthDispatchAPI(TestCase):
             'scope': 'profile',
             'expires_in': expires_in
         }
-        self.assertTrue(expected_token_subset.items() <= token.items())
+        self.assertLessEqual(expected_token_subset.items(), token.items())

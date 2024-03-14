@@ -759,7 +759,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 course_key=test_course.id,
             ),
         }
-        self.assertTrue(course_created_event.items() <= event_receiver.call_args.kwargs.items())
+        self.assertLessEqual(
+            course_created_event.items(),
+            event_receiver.call_args.kwargs.items()
+        )
 
     @ddt.data(ModuleStoreEnum.Type.split)
     def test_xblock_create_event(self, default_ms):
@@ -836,7 +839,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 block_type=sequential.location.block_type,
             ),
         }
-        self.assertTrue(xblock_published_event.items() <= event_receiver.call_args.kwargs.items())
+        self.assertLessEqual(
+            xblock_published_event.items(),
+            event_receiver.call_args.kwargs.items()
+        )
 
     @ddt.data(ModuleStoreEnum.Type.split)
     def test_xblock_delete_event(self, default_ms):
@@ -860,7 +866,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.delete_item(vertical.location, self.user_id)
 
         event_receiver.assert_called()
-        xblock_deleted_event ={
+        xblock_deleted_event = {
             "signal": XBLOCK_DELETED,
             "sender": None,
             "xblock_info": XBlockData(
@@ -868,7 +874,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 block_type=vertical.location.block_type,
             ),
         }
-        self.assertTrue(xblock_deleted_event.items() <= event_receiver.call_args.kwargs.items())
+        self.assertLessEqual(
+            xblock_deleted_event.items(),
+            event_receiver.call_args.kwargs.items()
+        )
 
     def setup_has_changes(self, default_ms):
         """

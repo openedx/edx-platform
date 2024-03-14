@@ -685,8 +685,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 update_blocks=False,
             ),
         }
-        self.assertTrue(
-            library_created_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_created_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_content_library_update_event(self):
@@ -713,8 +714,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 update_blocks=False,
             ),
         }
-        self.assertTrue(
-            library_updated_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_updated_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_content_library_delete_event(self):
@@ -741,8 +743,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 update_blocks=False,
             ),
         }
-        self.assertTrue(
-            library_deleted_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_deleted_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_library_block_create_event(self):
@@ -775,8 +778,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_key=usage_key
             ),
         }
-        self.assertTrue(
-            library_block_created_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_block_created_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_library_block_olx_update_event(self):
@@ -828,8 +832,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_key=usage_key
             ),
         }
-        self.assertTrue(
-            library_block_updated_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_block_updated_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     @skip("We still need to re-implement static asset handling.")
@@ -868,8 +873,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_key=usage_key
             ),
         }
-        self.assertTrue(
-            library_block_updated_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_block_updated_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     @skip("We still need to re-implement static asset handling.")
@@ -910,8 +916,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_key=usage_key
             ),
         }
-        self.assertTrue(
-            library_block_updated_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_block_updated_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
     def test_library_block_delete_event(self):
@@ -949,8 +956,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_key=usage_key
             ),
         }
-        self.assertTrue(
-            library_block_deleted_event.items() <= event_receiver.call_args.kwargs.items()
+        self.assertLessEqual(
+            library_block_deleted_event.items(),
+            event_receiver.call_args.kwargs.items()
         )
 
 
