@@ -12,7 +12,10 @@ import lxml.etree
 from fs.osfs import OSFS
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
-from openedx.core.djangoapps.content_tagging.api import export_tags_in_csv_file
+from openedx.core.djangoapps.content_tagging.api import (
+    export_tags_in_csv_file,
+    get_object_tag_counts
+)
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
@@ -283,7 +286,13 @@ class CourseExportManager(ExportManager):
 
         _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
 
-        export_tags_in_csv_file(str(self.courselike_key), export_fs, 'tags.csv')
+        courselike_key_str = str(self.courselike_key)
+        block_id_pattern = f"{courselike_key_str.replace('course-v1:', 'block-v1:', 1)}*"
+
+        tags_count = get_object_tag_counts(block_id_pattern)
+
+        if tags_count:
+            export_tags_in_csv_file(courselike_key_str, export_fs, 'tags.csv')
 
 
 class LibraryExportManager(ExportManager):
