@@ -100,10 +100,13 @@ class EdxOAuth2Validator(OAuth2Validator):
         client credentials, add `user_id` as a default scope if it is an allowed scope.
         """
         default_scopes = super().get_default_scopes(client_id, request, *args, **kwargs)
-        if settings.FEATURES.get('ENABLE_USER_ID_SCOPE', False):
+        if settings.FEATURES.get('ENABLE_USER_ID_SCOPE', True):
             if request.grant_type == 'client_credentials' and not request.scopes:
                 if get_scopes_backend().has_user_id_in_application_scopes(application=request.client):
-                    default_scopes.append('user_id')
+                    # copy the default scopes and add user_id to it to avoid modifying the original list
+                    extended_default_scopes = default_scopes.copy()
+                    extended_default_scopes.append('user_id')
+                    return extended_default_scopes
         return default_scopes
 
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
