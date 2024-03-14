@@ -881,7 +881,7 @@ nltk==3.8.1
     #   chem
 nodeenv==1.8.0
     # via -r requirements/edx/base.txt
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   -r requirements/edx/base.txt
     #   chem

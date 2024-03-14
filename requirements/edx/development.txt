@@ -1247,7 +1247,7 @@ nodeenv==1.8.0
     #   -r requirements/edx/assets.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
