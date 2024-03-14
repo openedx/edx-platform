@@ -44,7 +44,7 @@ from openedx.core.djangolib.markup import HTML
         <div class="banner-cta-button">
             <button class="btn btn-outline-primary" onclick="emit_event(${vertical_banner_cta['event_data']})">${vertical_banner_cta['link_name']}</button>
         </div>
-      % else:
+      % elif vertical_banner_cta.get('link'):
         <div class="banner-cta-button">
           <form method="post" action="${vertical_banner_cta['link']}">
             <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
