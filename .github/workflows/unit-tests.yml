@@ -57,14 +57,19 @@ jobs:
             sudo apt-get update && sudo apt-get install -y mongodb-org="${{ matrix.mongo-version }}.*"
           fi
 
-      - name: checkout repo
-        uses: actions/checkout@v3
-
       - name: start mongod server for tests
         run: |
           sudo mkdir -p /data/db
           sudo chmod -R a+rw /data/db
           mongod &
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: checkout repo
+        uses: actions/checkout@v3
 
       - name: install requirements
         run: |
