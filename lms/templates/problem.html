@@ -68,7 +68,8 @@ from openedx.core.djangolib.markup import HTML, Text
           </span>
           <span class="sr">(${submit_disabled_cta['description']})</span>
         % else:
-            <form class="submit-cta" method="post" action="${submit_disabled_cta['link']}">
+          <form class="submit-cta" method="post" action="${submit_disabled_cta.get('link')}">
+            % if submit_disabled_cta.get('link'):
               <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
               % for form_name, form_value in submit_disabled_cta['form_values'].items():
                   <input type="hidden" name="${form_name}" value="${form_value}">
@@ -76,13 +77,14 @@ from openedx.core.djangolib.markup import HTML, Text
               <button class="submit-cta-link-button btn-link btn-small">
                 ${submit_disabled_cta['link_name']}
               </button>
-              <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
-                <span data-tooltip="${submit_disabled_cta['description']}" data-tooltip-show-on-click="true"
-                  class="fa fa-info-circle fa-lg" aria-hidden="true">
-                </span>
+            % endif
+            <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
+              <span data-tooltip="${submit_disabled_cta['description']}" data-tooltip-show-on-click="true"
+                class="fa fa-info-circle fa-lg" aria-hidden="true">
               </span>
-              <span class="sr">(${submit_disabled_cta['description']})</span>
-            </form>
+            </span>
+            <span class="sr">(${submit_disabled_cta['description']})</span>
+          </form>
         % endif
       % endif
       <div class="submission-feedback ${'cta-enabled' if submit_disabled_cta else ''}" id="submission_feedback_${short_id}">
