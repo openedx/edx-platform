@@ -5,6 +5,7 @@ Classes that override default django-oauth-toolkit behavior
 
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -93,13 +94,16 @@ class EdxOAuth2Validator(OAuth2Validator):
 
     def get_default_scopes(self, client_id, request, *args, **kwargs):
         """
+        Returns the default scopes.
+
         If the request payload does not have `scopes` attribute for a grant_type of
-        client credentials, it should add `user_id` in the default scopes.
+        client credentials, add `user_id` as a default scope if it is an allowed scope.
         """
         default_scopes = super().get_default_scopes(client_id, request, *args, **kwargs)
-        if request.grant_type == 'client_credentials' and not request.scopes:
-            if get_scopes_backend().has_user_id_in_application_scopes(application=request.client):
-                default_scopes.append('user_id')
+        if settings.FEATURES.get('ENABLE_USER_ID_SCOPE', False):
+            if request.grant_type == 'client_credentials' and not request.scopes:
+                if get_scopes_backend().has_user_id_in_application_scopes(application=request.client):
+                    default_scopes.append('user_id')
         return default_scopes
 
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
