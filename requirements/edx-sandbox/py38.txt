@@ -49,7 +49,7 @@ nltk==3.8.1
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   chem
     #   contourpy
