@@ -22,12 +22,16 @@ class Fields:
     # Meilisearch primary key. String.
     id = "id"
     usage_key = "usage_key"
-    block_id = "block_id"
+    type = "type"  # DocType.course_block or DocType.library_block (see below)
+    block_id = "block_id"  # The block_id part of the usage key. Sometimes human-readable, sometimes a random hex ID
     display_name = "display_name"
     block_type = "block_type"
     context_key = "context_key"
     org = "org"
-    type = "type"  # DocType.course_block or DocType.library_block (see below)
+    # breadcrumbs: an array of {"display_name": "..."} entries. First one is the name of the course/library itself.
+    # After that is the name of any parent Section/Subsection/Unit/etc.
+    # It's a list of dictionaries because for now we just include the name of each but in future we may add their IDs.
+    breadcrumbs = "breadcrumbs"
     # tags (dictionary)
     # See https://blog.meilisearch.com/nested-hierarchical-facets-guide/
     # and https://www.algolia.com/doc/api-reference/widgets/hierarchical-menu/js/
@@ -81,7 +85,18 @@ def _fields_from_block(block) -> dict:
         # This is called context_key so it's the same for courses and libraries
         Fields.context_key: str(block.usage_key.context_key),  # same as lib_key
         Fields.org: str(block.usage_key.context_key.org),
+        Fields.breadcrumbs: []
     }
+    # Get the breadcrumbs (course, section, subsection, etc.):
+    if block.usage_key.context_key.is_course:  # Getting parent is not yet implemented in Learning Core (for libraries).
+        cur_block = block
+        while cur_block.parent:
+            if not cur_block.has_cached_parent:
+                # This is not a big deal, but if you're updating many blocks in the same course at once,
+                # this would be very inefficient. Better to recurse the tree top-down with the parent blocks loaded.
+                log.warning(f"Updating Studio search index for XBlock {block.usage_key} but ancestors weren't cached.")
+            cur_block = cur_block.get_parent()
+            block_data[Fields.breadcrumbs].insert(0, {"display_name": cur_block.display_name})
     try:
         content_data = block.index_dictionary()
         # Will be something like:
@@ -160,6 +175,7 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
     like Meilisearch or Elasticsearch, so that the given library block can be
     found using faceted search.
     """
+    library_name = lib_api.get_library(metadata.usage_key.context_key).title
     doc = {}
     try:
         block = xblock_api.load_block(metadata.usage_key, user=None)
@@ -179,6 +195,8 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
         doc.update(_fields_from_block(block))
     doc.update(_tags_for_content_object(metadata.usage_key))
     doc[Fields.type] = DocType.library_block
+    # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
+    doc[Fields.breadcrumbs] = [{"display_name": library_name}]
     return doc
 
 
