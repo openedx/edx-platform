@@ -412,7 +412,7 @@ def _accessible_courses_summary_iter(request, org=None):
 
         return has_studio_read_access(request.user, course_summary.id)
 
-    enable_home_page_v2_api = settings.FEATURES["ENABLE_HOME_PAGE_COURSE_V2_API"]
+    enable_home_page_v2_api = settings.FEATURES["ENABLE_HOME_PAGE_COURSE_API_V2"]
 
     if org is not None:
         courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])

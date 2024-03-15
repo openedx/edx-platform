@@ -19,7 +19,7 @@ from cms.djangoapps.contentstore.views.course import ENABLE_GLOBAL_STAFF_OPTIMIZ
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_V2_API'] = True
+FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = True
 
 
 @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
@@ -233,7 +233,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - Courses are read from the modulestore.
         """
-        with override_settings(FEATURES={'ENABLE_HOME_PAGE_COURSE_V2_API': False}):
+        with override_settings(FEATURES={'ENABLE_HOME_PAGE_COURSE_API_V2': False}):
             response = self.client.get(self.api_v1_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
