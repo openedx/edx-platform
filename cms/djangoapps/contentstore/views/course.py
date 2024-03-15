@@ -412,17 +412,17 @@ def _accessible_courses_summary_iter(request, org=None):
 
         return has_studio_read_access(request.user, course_summary.id)
 
-    enable_home_page_v2_api = settings.FEATURES["ENABLE_HOME_PAGE_COURSE_API_V2"]
+    enable_home_page_api_v2 = settings.FEATURES["ENABLE_HOME_PAGE_COURSE_API_V2"]
 
     if org is not None:
         courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
-    elif enable_home_page_v2_api:
+    elif enable_home_page_api_v2:
         # If the new home page API is enabled, we should use the Django ORM to filter and order the courses
         courses_summary = CourseOverview.get_all_courses()
     else:
         courses_summary = modulestore().get_course_summaries()
 
-    if enable_home_page_v2_api:
+    if enable_home_page_api_v2:
         search_query, order, active_only, archived_only = get_query_params_if_present(request)
         courses_summary = get_filtered_and_ordered_courses(
             courses_summary,
