@@ -713,7 +713,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Try uploading some non-CSV file and verify that it is rejected
         """
-        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \xC3\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
