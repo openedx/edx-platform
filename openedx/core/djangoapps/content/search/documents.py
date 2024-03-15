@@ -118,9 +118,9 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
         {
             "tags": {
                 "taxonomy": ["Location", "Difficulty"],
-                "level0": ["Location\tNorth America", "Difficulty\tHard"],
-                "level1": ["Location\tNorth America\tCanada"],
-                "level2": ["Location\tNorth America\tCanada\tVancouver"],
+                "level0": ["Location > North America", "Difficulty > Hard"],
+                "level1": ["Location > North America > Canada"],
+                "level2": ["Location > North America > Canada > Vancouver"],
             }
         }
     """
@@ -142,7 +142,7 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
         # Taxonomy name plus each level of tags, in a list:
         parts = [obj_tag.name] + obj_tag.get_lineage()  # e.g. ["Location", "North America", "Canada", "Vancouver"]
         parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator
-        for level in range(0, 4):
+        for level in range(4):
             new_value = " > ".join(parts[0:level + 2])
             if f"level{level}" not in result:
                 result[f"level{level}"] = [new_value]
