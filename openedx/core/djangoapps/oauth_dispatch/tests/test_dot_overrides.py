@@ -57,6 +57,7 @@ class CustomValidationTestCase(TestCase):
 
     In particular, inactive users should be able to validate.
     """
+
     def setUp(self):
         super().setUp()
         self.TEST_PASSWORD = 'Password1234'
@@ -92,6 +93,19 @@ class CustomValidationTestCase(TestCase):
 
         self.assertEqual(overriden_default_scopes, self.default_scopes + ['user_id'])
 
+    @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=False)
+    def test_get_default_scopes_without_user_id(self):
+        """
+        Test that if `ENABLE_USER_ID_SCOPE` flag is turned off, the get_default_scopes returns 
+        the default scopes without `user_id` even if it's allowed.
+        """
+        application_access = ApplicationAccessFactory(scopes=['user_id'])
+
+        request = mock.Mock(grant_type='client_credentials', client=application_access.application, scopes=None)
+        overriden_default_scopes = self.validator.get_default_scopes(request=request, client_id='client_id')
+
+        self.assertEqual(overriden_default_scopes, self.default_scopes)
+
     @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=True)
     def test_get_default_scopes(self):
         """
@@ -112,6 +126,7 @@ class CustomAuthorizationViewTestCase(TestCase):
     an application even if the access token is expired.
     (This is a temporary override until Auth Scopes is implemented.)
     """
+
     def setUp(self):
         super().setUp()
         self.TEST_PASSWORD = 'Password1234'
