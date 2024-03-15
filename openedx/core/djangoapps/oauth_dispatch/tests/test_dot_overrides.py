@@ -96,7 +96,7 @@ class CustomValidationTestCase(TestCase):
     @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=False)
     def test_get_default_scopes_without_user_id(self):
         """
-        Test that if `ENABLE_USER_ID_SCOPE` flag is turned off, the get_default_scopes returns 
+        Test that if `ENABLE_USER_ID_SCOPE` flag is turned off, the get_default_scopes returns
         the default scopes without `user_id` even if it's allowed.
         """
         application_access = ApplicationAccessFactory(scopes=['user_id'])
