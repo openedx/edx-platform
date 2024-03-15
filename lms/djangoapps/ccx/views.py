@@ -301,15 +301,6 @@ def create_ccx(request, course, ccx=None):
     for rec, response in responses:
         log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
-    # Adding an extension point to create the institution_ccx for PearsonVUE.
-    if is_course_licensing_enabled:
-        run_extension_point(
-            'PCO_CREATE_INSTITUTION_CCX_INSTANCE',
-            ccx_id=ccx_id,
-            custom_course=ccx,
-            user=request.user,
-        )
-
     # .. event_implemented_name: COURSE_CREATED
     COURSE_CREATED.send_event(
         time=datetime.datetime.now(tz=timezone.utc),
