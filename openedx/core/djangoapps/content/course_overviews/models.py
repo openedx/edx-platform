@@ -707,8 +707,7 @@ class CourseOverview(TimeStampedModel):
 
         Args:
             query: required parameter that allows filtering based on the CourseOverview.
-            course_overviews: queryset of CourseOverview objects to filter on. If not provided,
-                all CourseOverview objects will be used.
+            course_overviews: queryset of CourseOverview objects to filter on.
         """
         return course_overviews.filter(
             Q(display_name__icontains=query) |
@@ -724,8 +723,7 @@ class CourseOverview(TimeStampedModel):
         Args:
             active_only: when True, only active courses will be returned.
             archived_only: when True, only archived courses will be returned.
-            course_overviews: queryset of CourseOverview objects to filter on. If not provided,
-                all CourseOverview objects will be used.
+            course_overviews: queryset of CourseOverview objects to filter on.
         """
         if active_only:
             return course_overviews.filter(
