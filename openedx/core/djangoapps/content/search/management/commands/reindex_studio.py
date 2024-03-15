@@ -6,6 +6,7 @@ See also cms/djangoapps/contentstore/management/commands/reindex_course.py which
 indexes LMS (published) courses in ElasticSearch.
 """
 import logging
+import time
 
 from django.conf import settings
 from django.core.management import BaseCommand
@@ -34,6 +35,7 @@ class Command(MeiliCommandMixin, BaseCommand):
         """
         Build a new search index for Studio, containing content from courses and libraries
         """
+        start_time = time.perf_counter()
         client = self.get_meilisearch_client()
         store = modulestore()
 
@@ -111,7 +113,11 @@ class Command(MeiliCommandMixin, BaseCommand):
                 num_contexts_done += 1
                 num_blocks_done += len(docs)
 
-        self.stdout.write(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses and libraries.")
+        elapsed_time = time.perf_counter() - start_time
+        self.stdout.write(
+            f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses "
+            f"and libraries in {elapsed_time:.0f}s."
+        )
 
     def recurse_children(self, block, fn):
         """
