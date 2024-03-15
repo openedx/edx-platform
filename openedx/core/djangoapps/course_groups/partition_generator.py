@@ -13,7 +13,6 @@ from xmodule.services import TeamsConfigurationService
 
 log = logging.getLogger(__name__)
 
-FEATURES = getattr(settings, 'FEATURES', {})
 MINIMUM_DYNAMIC_TEAM_PARTITION_ID = 51
 TEAM_SCHEME = "team"
 
