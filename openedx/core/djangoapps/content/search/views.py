@@ -6,14 +6,12 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
-from opaque_keys.edx.keys import CourseKey
 import meilisearch
-from rest_framework import serializers
-from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core import types
@@ -46,6 +44,10 @@ class StudioSearchView(APIView):
         """
         if not settings.MEILISEARCH_ENABLED:
             raise NotFound("Meilisearch features are not enabled.")
+        if not GlobalStaff().has_user(request.user):
+            # Until we enforce permissions properly (see below), this endpoint is restricted to global staff,
+            # because it lets you search data from any course/library.
+            raise PermissionDenied("For the moment, use of this search preview is restricted to global staff.")
         client = meilisearch.Client(settings.MEILISEARCH_URL, settings.MEILISEARCH_API_KEY)
         index_name = settings.MEILISEARCH_INDEX_PREFIX + STUDIO_INDEX_NAME
 
