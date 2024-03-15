@@ -27,7 +27,7 @@ class Fields:
     block_type = "block_type"
     context_key = "context_key"
     org = "org"
-    type = "type"  # "course_block" or "library_block"
+    type = "type"  # DocType.course_block or DocType.library_block (see below)
     # tags (dictionary)
     # See https://blog.meilisearch.com/nested-hierarchical-facets-guide/
     # and https://www.algolia.com/doc/api-reference/widgets/hierarchical-menu/js/
@@ -38,6 +38,10 @@ class Fields:
     tags_level1 = "level1"
     tags_level2 = "level2"
     tags_level3 = "level3"
+    # The "content" field is a dictionary of arbitrary data, depending on the block_type.
+    # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
+    # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
+    content = "content"
 
 
 class DocType:
@@ -68,29 +72,7 @@ def _fields_from_block(block) -> dict:
     class implementation returns only:
         {"content": {"display_name": "..."}, "content_type": "..."}
     """
-    try:
-        block_data = block.index_dictionary()
-        # Will be something like:
-        # {
-        #     'content': {'display_name': '...', 'capa_content': '...'},
-        #     'content_type': 'CAPA',
-        #     'problem_types': ['multiplechoiceresponse']
-        # }
-        # Which we need to flatten:
-        if "content_type" in block_data:
-            del block_data["content_type"]  # Redundant with our "type" field that we add later
-        if "content" in block_data and isinstance(block_data["content"], dict):
-            content = block_data["content"]
-            if "display_name" in content:
-                del content["display_name"]
-            del block_data["content"]
-            block_data.update(content)
-        # Now we have something like:
-        # { 'capa_content': '...', 'problem_types': ['multiplechoiceresponse'] }
-    except Exception as err:  # pylint: disable=broad-except
-        log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
-        block_data = {}
-    block_data.update({
+    block_data = {
         Fields.id: _meili_id_from_opaque_key(block.usage_key),
         Fields.usage_key: str(block.usage_key),
         Fields.block_id: str(block.usage_key.block_id),
@@ -99,7 +81,29 @@ def _fields_from_block(block) -> dict:
         # This is called context_key so it's the same for courses and libraries
         Fields.context_key: str(block.usage_key.context_key),  # same as lib_key
         Fields.org: str(block.usage_key.context_key.org),
-    })
+    }
+    try:
+        content_data = block.index_dictionary()
+        # Will be something like:
+        # {
+        #     'content': {'display_name': '...', 'capa_content': '...'},
+        #     'content_type': 'CAPA',
+        #     'problem_types': ['multiplechoiceresponse']
+        # }
+        # Which we need to flatten:
+        if "content_type" in content_data:
+            del content_data["content_type"]  # Redundant with our standard Fields.block_type field.
+        if "content" in content_data and isinstance(content_data["content"], dict):
+            content = content_data["content"]
+            if "display_name" in content:
+                del content["display_name"]
+            del content_data["content"]
+            content_data.update(content)
+        # Now we have something like:
+        # { 'capa_content': '...', 'problem_types': ['multiplechoiceresponse'] }
+        block_data[Fields.content] = content_data
+    except Exception as err:  # pylint: disable=broad-except
+        log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
     return block_data
 
 

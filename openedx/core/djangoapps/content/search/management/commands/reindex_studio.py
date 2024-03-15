@@ -67,6 +67,14 @@ class Command(MeiliCommandMixin, BaseCommand):
                 Fields.tags,
                 Fields.type,
             ])
+            # Mark which attributes are used for keyword search, in order of importance:
+            client.index(temp_index_name).update_searchable_attributes([
+                Fields.display_name,
+                Fields.block_id,
+                Fields.content,
+                Fields.tags,
+                # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
+            ])
 
             ############## Libraries ##############
             self.stdout.write("Indexing libraries...")
