@@ -1,23 +1,28 @@
 """
 Unit tests for home page view.
 """
+from collections import OrderedDict
 from datetime import datetime, timedelta
+from unittest.mock import patch
+
 import ddt
 import pytz
 from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
-from collections import OrderedDict
-from edx_toggles.toggles.testutils import (
-    override_waffle_switch,
-)
+from edx_toggles.toggles.testutils import override_waffle_switch
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views.course import ENABLE_GLOBAL_STAFF_OPTIMIZATION
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from cms.djangoapps.contentstore.utils import reverse_course_url
+
+FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
+FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_V2_API'] = True
 
 
+@override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
 @ddt.ddt
 class HomePageCoursesViewV2Test(CourseTestCase):
     """
@@ -26,7 +31,8 @@ class HomePageCoursesViewV2Test(CourseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.url = reverse("cms.djangoapps.contentstore:v2:courses")
+        self.api_v2_url = reverse("cms.djangoapps.contentstore:v2:courses")
+        self.api_v1_url = reverse("cms.djangoapps.contentstore:v1:courses")
         self.active_course = CourseOverviewFactory.create(
             id=self.course.id,
             org=self.course.org,
@@ -47,7 +53,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         - A paginated response.
         - A list of courses available to the logged in user.
         """
-        response = self.client.get(self.url)
+        response = self.client.get(self.api_v2_url)
         course_id = str(self.course.id)
         archived_course_id = str(self.archived_course.id)
 
@@ -104,7 +110,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - A list of courses available to the logged in user for the specified org.
         """
-        response = self.client.get(self.url, {"org": "demo-org"})
+        response = self.client.get(self.api_v2_url, {"org": "demo-org"})
 
         self.assertEqual(len(response.data['results']['courses']), 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -116,7 +122,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - An empty list of courses available to the logged in user.
         """
-        response = self.client.get(self.url)
+        response = self.client.get(self.api_v2_url)
 
         self.assertEqual(len(response.data['results']['courses']), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -127,7 +133,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - A list of active courses available to the logged in user.
         """
-        response = self.client.get(self.url, {"active_only": "true"})
+        response = self.client.get(self.api_v2_url, {"active_only": "true"})
 
         self.assertEqual(len(response.data["results"]["courses"]), 1)
         self.assertEqual(response.data["results"]["courses"], [OrderedDict([
@@ -150,7 +156,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - A list of archived courses available to the logged in user.
         """
-        response = self.client.get(self.url, {"archived_only": "true"})
+        response = self.client.get(self.api_v2_url, {"archived_only": "true"})
 
         self.assertEqual(len(response.data["results"]["courses"]), 1)
         self.assertEqual(response.data["results"]["courses"], [OrderedDict([
@@ -176,7 +182,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - A list of courses (active or inactive) available to the logged in user for the specified search.
         """
-        response = self.client.get(self.url, {"search": "sample"})
+        response = self.client.get(self.api_v2_url, {"search": "sample"})
 
         self.assertEqual(len(response.data["results"]["courses"]), 1)
         self.assertEqual(response.data["results"]["courses"], [OrderedDict([
@@ -202,7 +208,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - A list of courses (active or inactive) available to the logged in user for the specified order.
         """
-        response = self.client.get(self.url, {"order": "org"})
+        response = self.client.get(self.api_v2_url, {"order": "org"})
 
         self.assertEqual(len(response.data["results"]["courses"]), 2)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -214,7 +220,22 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         Expected result:
         - A list of courses (active or inactive) available to the logged in user for the specified page.
         """
-        response = self.client.get(self.url, {"page": 1})
+        response = self.client.get(self.api_v2_url, {"page": 1})
 
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @patch("cms.djangoapps.contentstore.views.course.CourseOverview")
+    @patch("cms.djangoapps.contentstore.views.course.modulestore")
+    def test_api_v2_is_disabled(self, mock_modulestore, mock_course_overview):
+        """Get list of courses when home page course v2 API is disabled.
+
+        Expected result:
+        - Courses are read from the modulestore.
+        """
+        with override_settings(FEATURES={'ENABLE_HOME_PAGE_COURSE_V2_API': False}):
+            response = self.client.get(self.api_v1_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mock_modulestore().get_course_summaries.assert_called_once()
+        mock_course_overview.get_all_courses.assert_not_called()
