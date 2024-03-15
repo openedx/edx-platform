@@ -561,6 +561,17 @@ FEATURES = {
     # .. toggle_creation_date: 2024-02-29
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
     'ENABLE_HIDE_FROM_TOC_UI': False,
+
+    # .. toggle_name: FEATURES['ENABLE_HOME_PAGE_COURSE_V2_API']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the new home page course v2 API, which is a new version of the home page course
+    #   API with pagination, filter and ordering capabilities.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-03-14
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34173
+    'ENABLE_HOME_PAGE_COURSE_V2_API': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE

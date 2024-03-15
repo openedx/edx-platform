@@ -412,19 +412,24 @@ def _accessible_courses_summary_iter(request, org=None):
 
         return has_studio_read_access(request.user, course_summary.id)
 
+    enable_home_page_v2_api = settings.FEATURES["ENABLE_HOME_PAGE_COURSE_V2_API"]
+
     if org is not None:
         courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
-    else:
+    elif enable_home_page_v2_api:
         courses_summary = CourseOverview.get_all_courses()
+    else:
+        courses_summary = modulestore().get_course_summaries()
 
-    search_query, order, active_only, archived_only = get_query_params_if_present(request)
-    courses_summary = get_filtered_and_ordered_courses(
-        courses_summary,
-        active_only,
-        archived_only,
-        search_query,
-        order,
-    )
+    if enable_home_page_v2_api:
+        search_query, order, active_only, archived_only = get_query_params_if_present(request)
+        courses_summary = get_filtered_and_ordered_courses(
+            courses_summary,
+            active_only,
+            archived_only,
+            search_query,
+            order,
+        )
 
     courses_summary = filter(course_filter, courses_summary)
     in_process_course_actions = get_in_process_course_actions(request)
