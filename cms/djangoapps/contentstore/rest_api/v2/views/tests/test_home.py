@@ -49,7 +49,6 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         """
         response = self.client.get(self.url)
         course_id = str(self.course.id)
-        archived_course_id = str(self.archived_course.id)
 
         expected_data = {
             "courses": [
@@ -68,14 +67,8 @@ class HomePageCoursesViewV2Test(CourseTestCase):
                 OrderedDict([
                     ("course_key", str(self.archived_course.id)),
                     ("display_name", self.archived_course.display_name),
-                    (
-                        "lms_link",
-                        f'//{settings.LMS_BASE}/courses/{archived_course_id}/jump_to/{self.archived_course.location}'
-                    ),
-                    (
-                        "cms_link",
-                        f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}',
-                    ),
+                    ("lms_link", f'//{settings.LMS_BASE}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}'),
+                    ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}'),
                     ("number", self.archived_course.number),
                     ("org", self.archived_course.org),
                     ("rerun_link", f'/course_rerun/{str(self.archived_course.id)}'),
@@ -90,7 +83,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             ('count', 2),
             ('num_pages', 1),
             ('next', None),
-            ('previous', None),
+            ('previous',None),
             ('results', expected_data),
         ])
 
@@ -156,10 +149,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.data["results"]["courses"], [OrderedDict([
             ("course_key", str(self.archived_course.id)),
             ("display_name", self.archived_course.display_name),
-            (
-                "lms_link",
-                f'//{settings.LMS_BASE}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}',
-            ),
+            ("lms_link", f'//{settings.LMS_BASE}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}'),
             ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}'),
             ("number", self.archived_course.number),
             ("org", self.archived_course.org),
@@ -182,10 +172,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.data["results"]["courses"], [OrderedDict([
             ("course_key", str(self.archived_course.id)),
             ("display_name", self.archived_course.display_name),
-            (
-                "lms_link",
-                f'//{settings.LMS_BASE}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}',
-            ),
+            ("lms_link", f'//{settings.LMS_BASE}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}'),
             ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}'),
             ("number", self.archived_course.number),
             ("org", self.archived_course.org),
@@ -196,17 +183,19 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         ])])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_order_query_if_passed(self):
+    @ddt.data(("org", "demo-org"), ("-org", "org.4"))
+    @ddt.unpack
+    def test_order_query_if_passed(self, order_query, expected_first_org):
         """Get list of courses when order filter passed as a query param.
 
         Expected result:
         - A list of courses (active or inactive) available to the logged in user for the specified order.
         """
-        response = self.client.get(self.url, {"order": "org"})
+        response = self.client.get(self.url, {"order": order_query})
 
         self.assertEqual(len(response.data["results"]["courses"]), 2)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["results"]["courses"][0]["org"], "demo-org")
+        self.assertEqual(response.data["results"]["courses"][0]["org"], expected_first_org)
 
     def test_page_query_if_passed(self):
         """Get list of courses when page filter passed as a query param.
