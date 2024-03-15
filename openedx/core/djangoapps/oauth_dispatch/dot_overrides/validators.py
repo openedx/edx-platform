@@ -104,10 +104,10 @@ class EdxOAuth2Validator(OAuth2Validator):
         # .. toggle_implementation:DjangoSetting
         # .. toggle_description: If enabled, the user_id scope will be added to the default scopes for client_credentials grant type.
         # .. toggle_default: False
-        # .. toggle_use_cases: Temporary Feature Flag
+        # .. toggle_use_cases: temporary
         # .. toggle_creation_date: 2024-03-16
         # .. toggle_warnings: This feature flag is temporary and will be removed once the feature is fully tested.
-        # .. toggle_ticket: https://2u-internal.atlassian.net/browse/ENT-8641 (toggle removal ticket)
+        # .. toggle_ticket: https://github.com/openedx/edx-platform/issues/34381 (toggle removal ticket)
         if settings.FEATURES.get('ENABLE_USER_ID_SCOPE', False):
             if request.grant_type == 'client_credentials' and not request.scopes:
                 if get_scopes_backend().has_user_id_in_application_scopes(application=request.client):
