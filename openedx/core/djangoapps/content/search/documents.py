@@ -80,7 +80,7 @@ def _fields_from_block(block) -> dict:
         Fields.id: _meili_id_from_opaque_key(block.usage_key),
         Fields.usage_key: str(block.usage_key),
         Fields.block_id: str(block.usage_key.block_id),
-        Fields.display_name: block.display_name,  # TODO: there is some function to get the fallback display_name
+        Fields.display_name: xblock_api.get_block_display_name(block),
         Fields.block_type: block.scope_ids.block_type,
         # This is called context_key so it's the same for courses and libraries
         Fields.context_key: str(block.usage_key.context_key),  # same as lib_key
