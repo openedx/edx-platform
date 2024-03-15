@@ -417,6 +417,7 @@ def _accessible_courses_summary_iter(request, org=None):
     if org is not None:
         courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
     elif enable_home_page_v2_api:
+        # If the new home page API is enabled, we should use the Django ORM to filter and order the courses
         courses_summary = CourseOverview.get_all_courses()
     else:
         courses_summary = modulestore().get_course_summaries()
