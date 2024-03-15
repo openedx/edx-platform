@@ -38,7 +38,7 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from xmodule.course_block import CourseSummary  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 TOTAL_COURSES_COUNT = 10
 USER_COURSES_COUNT = 1
