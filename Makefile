@@ -55,8 +55,8 @@ pull_xblock_translations:  ## pull xblock translations via atlas
 
 pull_translations: ## pull translations via atlas
 	# Clean up the existing translations
-	git clean -fdX conf/locale conf/plugins-locale */static/js/i18n/ */static/js/xblock.v1-i18n/
-
+	git clean -fdX conf/locale
+	rm -rf conf/plugins-locale cms/static/js/i18n/ lms/static/js/i18n/ cms/static/js/xblock.v1-i18n/ lms/static/js/xblock.v1-i18n/
 	make pull_xblock_translations
 	make pull_plugin_translations
 	atlas pull $(ATLAS_OPTIONS) \
