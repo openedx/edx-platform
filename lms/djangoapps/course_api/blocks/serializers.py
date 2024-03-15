@@ -57,6 +57,8 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
     SupportedFieldType('is_completion_tracked'),
+    SupportedFieldType('thumbnail;'),
+    SupportedFieldType('lesson_type'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
     # 'student_view_multi_device'
