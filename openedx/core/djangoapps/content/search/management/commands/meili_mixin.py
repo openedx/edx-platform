@@ -22,8 +22,8 @@ class MeiliCommandMixin:
         if hasattr(self, "_meili_client"):
             return self._meili_client
         # Connect to Meilisearch
-        if not settings.MEILISEARCH_URL:
-            raise CommandError("MEILISEARCH_URL is not set - search functionality disabled.")
+        if not settings.MEILISEARCH_ENABLED:
+            raise CommandError("MEILISEARCH_ENABLED is not set - search functionality disabled.")
 
         self._meili_client = meilisearch.Client(settings.MEILISEARCH_URL, settings.MEILISEARCH_API_KEY)
         try:

@@ -44,6 +44,8 @@ class StudioSearchView(APIView):
         """
         Give user details on how they can search studio content
         """
+        if not settings.MEILISEARCH_ENABLED:
+            raise NotFound("Meilisearch features are not enabled.")
         client = meilisearch.Client(settings.MEILISEARCH_URL, settings.MEILISEARCH_API_KEY)
         index_name = settings.MEILISEARCH_INDEX_PREFIX + STUDIO_INDEX_NAME
 
