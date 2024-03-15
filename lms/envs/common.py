@@ -5393,7 +5393,8 @@ EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 99
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
-DEFAULT_NOTIFICATION_ICON_URL = "https://edx-notifications-static.edx.org/icons/newspaper.png"
+NOTIFICATION_ASSETS_ROOT_URL = ""
+DEFAULT_NOTIFICATION_ICON_URL = ""
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'

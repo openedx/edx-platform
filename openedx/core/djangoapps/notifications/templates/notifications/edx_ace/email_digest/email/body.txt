@@ -1,5 +1,5 @@
-<div style="margin:0; padding:0; min-width: 100%">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" bgcolor="#fbfaf9" width="100%" style="line-height:1.5; max-width:600px; font:Inter">
+<div style="margin:0; padding:0; min-width: 100%; background-color: background-color:#C9C9C9">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="line-height:1.5; max-width:600px; font-family:Inter">
         <tbody style="background-color:#f5f5f5">
             <tr>
                 <td>
@@ -7,12 +7,12 @@
                 </td>
             </tr>
             <tr>
-                <td style="padding:1.875rem; background-color:white">
+                <td style="padding:0.75rem 1.5rem; background-color:white">
                     {% include 'notifications/digest_content.html' %}
                 </td>
             </tr>
             <tr>
-                <td>
+                <td style="padding: 1.5rem; background-color: #F2F0EF">
                     {% include 'notifications/digest_footer.html' %}
                 </td>
             </tr>
