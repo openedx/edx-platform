@@ -2878,7 +2878,6 @@ BEAMER_PRODUCT_ID = ""
 # Enable Studio search features (powered by Meilisearch) (beta, off by default)
 MEILISEARCH_ENABLED = False
 # Meilisearch URL that the python backend can use. Often points to another docker container or k8s service.
-# Set this to None (default) to disable 
 MEILISEARCH_URL = "http://meilisearch"
 # URL that browsers (end users) can user to reach Meilisearch. Should be HTTPS in production.
 MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"

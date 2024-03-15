@@ -12,10 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.roles import GlobalStaff
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.masquerade import setup_masquerade
-from openedx.core import types
-from openedx.core.lib.api.view_utils import validate_course_key, view_auth_classes
+from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.content.search.documents import STUDIO_INDEX_NAME
 
 User = get_user_model()

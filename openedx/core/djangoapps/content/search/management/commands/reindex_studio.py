@@ -41,7 +41,7 @@ class Command(MeiliCommandMixin, BaseCommand):
         self.stdout.write("Counting libraries...")
         lib_keys = [lib.library_key for lib in lib_api.ContentLibrary.objects.select_related('org').only('org', 'slug')]
         num_libraries = len(lib_keys)
-        
+
         # Get the list of courses
         self.stdout.write("Counting courses...")
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):

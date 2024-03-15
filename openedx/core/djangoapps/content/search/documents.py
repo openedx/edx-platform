@@ -27,8 +27,7 @@ class Fields:
     block_type = "block_type"
     context_key = "context_key"
     org = "org"
-    # type: "course_block", "library_block"
-    type = "type"
+    type = "type"  # "course_block" or "library_block"
     # tags (dictionary)
     # See https://blog.meilisearch.com/nested-hierarchical-facets-guide/
     # and https://www.algolia.com/doc/api-reference/widgets/hierarchical-menu/js/
@@ -141,7 +140,7 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
         parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator
         for level in range(0, 4):
             new_value = " > ".join(parts[0:level + 2])
-            if not f"level{level}" in result:
+            if f"level{level}" not in result:
                 result[f"level{level}"] = [new_value]
             elif new_value not in result[f"level{level}"]:
                 result[f"level{level}"].append(new_value)
