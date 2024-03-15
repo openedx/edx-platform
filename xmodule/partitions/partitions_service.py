@@ -82,6 +82,9 @@ def _get_dynamic_partitions(course):
     for generator in dynamic_partition_generators:
         generated_partition = generator(course)
         if generated_partition:
+            # If the generator returns a list of partitions, add them all to the list.
+            # Otherwise, just add the single partition. This is needed for cases where
+            # a single generator can return multiple partitions, such as the TeamUserPartition.
             if isinstance(generated_partition, list):
                 generated_partitions.extend(generated_partition)
             else:
