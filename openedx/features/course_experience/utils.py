@@ -152,7 +152,7 @@ def dates_banner_should_display(course_key, user, allow_warning=False):
         course_key (CourseKey)
         user (User)
         allow_warning (bool): whether to ignore relative_dates_disable_reset_flag, in order to render
-            warnings for past-due incomplete sequentials.
+            warnings for past-due incomplete units.
 
     Returns:
         (missed_deadlines, missed_gated_content):
