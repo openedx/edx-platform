@@ -6,7 +6,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from cms.djangoapps.contentstore.utils import get_container_handler_context
+from cms.djangoapps.contentstore.utils import (
+    get_container_handler_context,
+    get_user_partition_info,
+    get_visibility_partition_info,
+)
 from cms.djangoapps.contentstore.views.component import _get_item_in_course
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.rest_api.v1.serializers import (
@@ -184,15 +188,24 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
             "children": [
                 {
                     "name": "Drag and Drop",
-                    "block_id": "block-v1:org+101+101+type@drag-and-drop-v2+block@7599275ace6b46f5a482078a2954ca16"
+                    "block_id": "block-v1:org+101+101+type@drag-and-drop-v2+block@7599275ace6b46f5a482078a2954ca16",
+                    "block_type": "drag-and-drop-v2",
+                    "user_partition_info": {},
+                    "user_partitions": {}
                 },
                 {
                     "name": "Video",
-                    "block_id": "block-v1:org+101+101+type@video+block@0e3d39b12d7c4345981bda6b3511a9bf"
+                    "block_id": "block-v1:org+101+101+type@video+block@0e3d39b12d7c4345981bda6b3511a9bf",
+                    "block_type": "video",
+                    "user_partition_info": {},
+                    "user_partitions": {}
                 },
                 {
                     "name": "Text",
-                    "block_id": "block-v1:org+101+101+type@html+block@3e3fa1f88adb4a108cd14e9002143690"
+                    "block_id": "block-v1:org+101+101+type@html+block@3e3fa1f88adb4a108cd14e9002143690",
+                    "block_type": "html",
+                    "user_partition_info": {},
+                    "user_partitions": {}
                 }
             ],
             "is_published": false
@@ -203,9 +216,21 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
         current_xblock = get_xblock(usage_key, request.user)
 
         with modulestore().bulk_operations(usage_key.course_key):
-            children = [
-                modulestore().get_item(child) for child in current_xblock.children
-            ]
+            # load course once to reuse it for user_partitions query
+            course = modulestore().get_course(current_xblock.location.course_key)
+            children = []
+            for child in current_xblock.children:
+                child_info = modulestore().get_item(child)
+                user_partition_info = get_visibility_partition_info(child_info, course=course)
+                user_partitions = get_user_partition_info(child_info, course=course)
+                children.append({
+                    "name": child_info.display_name_with_default,
+                    "block_id": child_info.location,
+                    "block_type": child_info.location.block_type,
+                    "user_partition_info": user_partition_info,
+                    "user_partitions": user_partitions,
+                })
+
             is_published = not modulestore().has_changes(current_xblock)
             container_data = {"children": children, "is_published": is_published}
             serializer = VerticalContainerSerializer(container_data)

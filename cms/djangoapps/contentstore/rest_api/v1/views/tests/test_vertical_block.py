@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.django import (
     modulestore,
 )  # lint-amnesty, pylint: disable=wrong-import-order
@@ -154,14 +155,42 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         url = self.get_reverse_url(self.vertical.location)
         response = self.client.get(url)
 
+        expected_user_partition_info = {
+            "selectable_partitions": [],
+            "selected_partition_index": -1,
+            "selected_groups_label": ""
+        }
+
+        expected_user_partitions = [
+            {
+                "id": ENROLLMENT_TRACK_PARTITION_ID,
+                "name": "Enrollment Track Groups",
+                "scheme": "enrollment_track",
+                "groups": [
+                    {
+                        "id": 1,
+                        "name": "Audit",
+                        "selected": False,
+                        "deleted": False
+                    }
+                ]
+            }
+        ]
+
         expected_response = [
             {
                 "name": self.html_unit_first.display_name_with_default,
                 "block_id": str(self.html_unit_first.location),
+                "block_type": self.html_unit_first.location.block_type,
+                "user_partition_info": expected_user_partition_info,
+                "user_partitions": expected_user_partitions
             },
             {
                 "name": self.html_unit_second.display_name_with_default,
                 "block_id": str(self.html_unit_second.location),
+                "block_type": self.html_unit_second.location.block_type,
+                "user_partition_info": expected_user_partition_info,
+                "user_partitions": expected_user_partitions,
             },
         ]
         self.assertEqual(response.data["children"], expected_response)

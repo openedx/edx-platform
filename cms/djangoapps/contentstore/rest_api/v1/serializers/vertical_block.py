@@ -98,8 +98,11 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
     Serializer for representing a xblock child of vertical container.
     """
 
-    name = serializers.CharField(source="display_name_with_default")
-    block_id = serializers.CharField(source="location")
+    name = serializers.CharField()
+    block_id = serializers.CharField()
+    block_type = serializers.CharField()
+    user_partition_info = serializers.DictField()
+    user_partitions = serializers.ListField()
 
 
 class VerticalContainerSerializer(serializers.Serializer):
