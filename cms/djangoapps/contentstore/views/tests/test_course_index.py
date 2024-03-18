@@ -59,6 +59,11 @@ class TestCourseIndex(CourseTestCase):
             number='test-2.3_course',
             display_name='dotted.course.name-2',
         )
+        CourseOverviewFactory.create(
+            id=self.odd_course.id,
+            org=self.odd_course.org,
+            display_name=self.odd_course.display_name,
+        )
 
     def check_courses_on_index(self, authed_client, expected_course_tab_len):
         """
@@ -425,10 +430,10 @@ class TestCourseIndexArchived(CourseTestCase):
         (True, 'staff', None, 0, 21),
         (False, 'staff', None, 0, 21),
         # Base user has global staff access
-        (True, 'user', ORG, 2, 21),
-        (False, 'user', ORG, 2, 21),
-        (True, 'user', None, 2, 21),
-        (False, 'user', None, 2, 21),
+        (True, 'user', ORG, 0, 21),
+        (False, 'user', ORG, 0, 21),
+        (True, 'user', None, 0, 21),
+        (False, 'user', None, 0, 21),
     )
     @ddt.unpack
     def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
