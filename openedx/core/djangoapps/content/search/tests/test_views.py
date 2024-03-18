@@ -6,19 +6,20 @@ from rest_framework.test import APITestCase, APIClient
 from unittest import mock
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_cms
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 
 
 @skip_unless_cms
-class StudioSearchViewTest(CacheIsolationTestCase, APITestCase):
+class StudioSearchViewTest(APITestCase):
     """
     General tests for the Studio search REST API.
     """
 
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpClass(cls):
+        super().setUpClass()
         cls.staff = UserFactory.create(
             username='staff', email='staff@example.com', is_staff=True, password='staff_pass'
         )
