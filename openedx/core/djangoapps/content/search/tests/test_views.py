@@ -54,7 +54,7 @@ class StudioSearchViewTest(CacheIsolationTestCase, APITestCase):
         self.client.login(username='student', password='student_pass')
         result = self.client.get(STUDIO_SEARCH_ENDPOINT_URL)
         assert result.status_code == 404
-    
+
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_studio_search_student_forbidden(self):
         """
