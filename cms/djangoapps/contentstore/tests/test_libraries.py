@@ -366,6 +366,7 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(resp.status_code, 200)
 
         lc_block = modulestore().get_item(lc_block.location)
+
         # Source library id should be set to the new bad one...
         assert lc_block.source_library_id == bad_library_id
         # ...but old source library version should be preserved...

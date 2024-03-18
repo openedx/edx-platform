@@ -1911,6 +1911,7 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
         'unit': unit,
         'is_unit_page': is_unit_page,
         'is_collapsible': is_library_xblock,
+        'is_library_xblock': is_library_xblock,
         'subsection': subsection,
         'section': section,
         'position': index,

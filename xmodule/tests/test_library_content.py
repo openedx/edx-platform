@@ -3,19 +3,24 @@ Basic unit tests for LibraryContentBlock
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
+from __future__ import annotations
+
+import itertools
 from unittest.mock import MagicMock, Mock, patch
 
 import ddt
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
-from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
+from xmodule import library_content_block
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
@@ -25,6 +30,7 @@ from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_block import ProblemBlock
+from xmodule.util.keys import BlockKey
 from common.djangoapps.student.tests.factories import UserFactory
 
 from .test_course_block import DummySystem as TestImportSystem
@@ -32,8 +38,7 @@ from .test_course_block import DummySystem as TestImportSystem
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 
-@skip_unless_cms
-class LibraryContentTest(MixedSplitTestCase):
+class LibraryContentTestMixin:
     """
     Base class for tests of LibraryContentBlock (library_content_block.py)
     """
@@ -87,8 +92,9 @@ class LibraryContentTest(MixedSplitTestCase):
         block.runtime.get_block_for_descriptor = get_block
 
 
+@skip_unless_cms
 @ddt.ddt
-class LibraryContentGeneralTest(LibraryContentTest):
+class LibraryContentGeneralTest(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Test the base functionality of the LibraryContentBlock.
     """
@@ -133,7 +139,8 @@ class LibraryContentGeneralTest(LibraryContentTest):
         assert len(self.lc_block.children) == len(self.lib_blocks)
 
 
-class TestLibraryContentExportImport(LibraryContentTest):
+@skip_unless_cms
+class TestLibraryContentExportImport(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Export and import tests for LibraryContentBlock
     """
@@ -173,7 +180,8 @@ class TestLibraryContentExportImport(LibraryContentTest):
         assert imported_lc_block.display_name == self.lc_block.display_name
         assert imported_lc_block.source_library_id == self.lc_block.source_library_id
         assert imported_lc_block.source_library_version == self.lc_block.source_library_version
-        assert imported_lc_block.mode == self.lc_block.mode
+        assert imported_lc_block.shuffle == self.lc_block.shuffle
+        assert imported_lc_block.manual == self.lc_block.manual
         assert imported_lc_block.max_count == self.lc_block.max_count
         assert imported_lc_block.capa_type == self.lc_block.capa_type
         assert len(imported_lc_block.children) == len(self.lc_block.children)
@@ -424,8 +432,8 @@ class LibraryContentBlockTestMixin:
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
-        assert LibraryContentBlock.mode in non_editable_metadata_fields
         assert LibraryContentBlock.display_name not in non_editable_metadata_fields
+        assert LibraryContentBlock.source_library_version in non_editable_metadata_fields
 
     def test_overlimit_blocks_chosen_randomly(self):
         """
@@ -502,8 +510,9 @@ class LibraryContentBlockTestMixin:
 search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
 
 
+@skip_unless_cms
 @patch.object(SearchEngine, 'get_search_engine', Mock(return_value=None, autospec=True))
-class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
+class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTestMixin, MixedSplitTestCase):
     """
     Tests for library container with mocked search engine response.
     """
@@ -527,12 +536,13 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
         search_index_mock.search = Mock(side_effect=self._get_search_response)
 
 
+@skip_unless_cms
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
 @patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
-class TestLibraryContentRender(LibraryContentTest):
+class TestLibraryContentRender(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Rendering unit tests for LibraryContentBlock
     """
@@ -559,7 +569,8 @@ class TestLibraryContentRender(LibraryContentTest):
         # but some js initialization should happen
 
 
-class TestLibraryContentAnalytics(LibraryContentTest):
+@skip_unless_cms
+class TestLibraryContentAnalytics(LibraryContentTestMixin, MixedSplitTestCase):
     """
     Test analytics features of LibraryContentBlock
     """
@@ -736,3 +747,624 @@ class TestLibraryContentAnalytics(LibraryContentTest):
                  'original_usage_key': str(keep_block_lib_usage_key),
                  'original_usage_version': str(keep_block_lib_version), 'descendants': []}]
         assert event_data['reason'] == 'invalid'
+
+
+def _mock_selection_shuffle(wrapped):
+    """
+    Replace "shuffling" with simply "reversing".
+
+    That is, make it so that when `shuffle==True`, the order of a learner's selection is just the
+    order of the learner's children, backwards.
+
+    Reversing simulates shuffling well enough for our purposes, and it gives us two nice guarantees:
+    * Selection order is stable. This makes it easier to debug test failures, and lowers the risk of test flakiness.
+    * When `len(selection) >= 2` and `shuffle=True`, the selection order will always be different than order of the
+      LCB's children. This avoids false-positive situations, wherein a test passes only because the shuffled selection
+      happened to be the same order as the original children.
+    """
+    def _mock_shuffle(selected: list):
+        selected.reverse()
+    return patch.object(library_content_block.random, "shuffle", _mock_shuffle)(wrapped)
+
+
+def _mock_selection_sample(wrapped):
+    """
+    Use a fake, deterministic "random sample" algorithm for when the selection must be build from a random subset of
+    the children/candidates. To maximize test stability, input order does not matter, but output order is stable.
+    """
+    def _mock_sample(pool, count: int) -> list:
+        """
+        Until count is reached, pick sample one-at-a-time from sorted pool using this pattern:
+          last, 1st, 2nd-to-last, 2nd, 3rd-to-last, 3rd, 4th-to-last, 4th, etc.
+        For example:
+             random.sample(['b','c','a','e','d'], 4)
+          == random.sample(['a','b','c','d','e'], 4)
+          == ['e', 'a', 'b', 'd']
+        """
+        assert count <= len(set(pool))
+        sample = []
+        remaining = sorted(set(pool))
+        while len(sample) < count:
+            remaining = list(reversed(remaining))
+            sample.append(remaining.pop(0))
+        assert len(set(sample)) == count  # Sanity check our algorithm
+        return sample
+    return patch.object(library_content_block.random, "sample", _mock_sample)(wrapped)
+
+
+def _mock_child_key_derivation(wrapped):
+    """
+    Generate LCB child keys in a way that allows us to write readable unit tests.
+    """
+    def _mock_derive_key(source: UsageKey, dest_parent: BlockKey) -> BlockKey:
+        """
+        Instead of making a hash digest, just smash the source+dest key parts together with underscores.
+        """
+        source_library = source.context_key
+        return BlockKey(
+            source.block_type,
+            f"{source.context_key.org}_{source.context_key.library}_{source.block_id}_{dest_parent.id}",
+        )
+    return patch.object(library_content_block, "derive_key", _mock_derive_key)(wrapped)
+
+
+@skip_unless_lms
+@ddt.ddt
+@_mock_selection_shuffle
+@_mock_selection_sample
+@_mock_child_key_derivation
+class TestLibraryContentSelection(MixedSplitTestCase):
+    """
+    Test library content selection for the various modes of the LibraryContentBlock.
+
+    This is tested entirely using LMS features, so no actual Content Libraries are created or synced from.
+    Instead, we create a LibraryContentBlock (LCB) and add/remove children.
+    This simulates how the CMS would add/remove children as part of the sync_from_library process.
+    """
+    def setUp(self):
+        super().setUp()
+        self.user_id = UserFactory().id
+        self.course = CourseFactory.create(modulestore=self.store)
+        chapter = self.make_block("chapter", self.course)
+        sequential = self.make_block("sequential", chapter)
+        vertical = self.make_block("vertical", sequential)
+        self.lc_block = self.make_block("library_content", vertical)
+        self.source_library_key = LibraryLocator.from_string("library-v1:myorg+mylib")
+
+    def _create_lc_block_children(self, block_ids: list[str]) -> None:
+        """
+        Add HTML blocks as children of the LCB, simluating an item being added to the source library.
+
+        Each item should be the .block_id part of a UsageKey.
+        """
+        selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon re-load, so we manuallay save+fix it.
+        self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
+        for block_id in block_ids:
+            new_block = self.make_block(category="html", parent_block=self.lc_block, display_name=block_id)
+        self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
+        self.lc_block.selected = selected  # TODO/HACK
+
+    def _set_lc_block_candidates(self, block_ids: list[str]) -> None:
+        """
+        Set HTML blocks as the candiates of the LCB.
+        """
+        self.lc_block.candidates = [
+            str(self.source_library_key.make_usage_key("html", block_id)) for block_id in block_ids
+        ]
+
+    def _remove_lc_block_child(self, block_key: tuple[str, str], delete_child=True, remove_candidate=True) -> None:
+        """
+        Simulate the removal of a block from the source library and/or the candidates list.
+
+        If `delete_child`, remove it from the LCB's list of children and from modulestore entirely.
+        If `remove_candidate`, remove it fromthe LCB's list of candidates.
+        """
+        assert delete_child or remove_candidate
+        if remove_candidate:
+            # candidates may contain tuples or lists, depending on whether it's been
+            # loaded from modulestore recently. Handle both cases.
+            try:
+                self.lc_block.candidates.remove(tuple(block_key))
+            except ValueError:
+                assert list(block_key) in self.lc_block.candidates
+                self.lc_block.candidates.remove(list(block_key))
+        if delete_child:
+            block_usage_key = self.course.id.make_usage_key(*block_key)
+            assert block_usage_key in self.lc_block.children
+            selected = self.lc_block.selected  # TODO/HACK: 'selected' is lost upon reload, so we manually save+fix it.
+            self.store.update_item(self.lc_block, self.user_id)  # Persist any changes so we can reload later.
+            self.store.delete_item(block_usage_key, self.user_id)
+            self.lc_block = self.store.get_item(self.lc_block.location)  # Reload to update '.children'.
+            self.lc_block.selected = selected  # TODO/HACK
+
+    @ddt.data(
+        dict(
+            # "Randomized mode" with empty library.
+            manual=False,
+            shuffle=True,
+            children=[],
+            candidates=[],
+        ),
+        dict(
+            # "Randomized mode" with empty library. There are fake entries in candidates, which shouldn't matter.
+            manual=False,
+            shuffle=False,  # disabling shuffling -- shouldn't affect anything.
+            children=[],
+            candidates=['i-do-not-exist', 'i-am-not-real'],
+        ),
+        dict(
+            # "Static mode" with library items but no candidates.
+            manual=True,
+            shuffle=False,
+            children=['a', 'b', 'c'],
+            candidates=[],
+        ),
+        dict(
+            # "Static mode with shuffling" with library items and candidates, but the candidates don't actually exist.
+            manual=True,
+            shuffle=True,
+            children=['a', 'b', 'c'],
+            candidates=['i-do-not-exist', 'i-am-not-real'],
+        ),
+    )
+    @ddt.unpack
+    def test_none_available_for_selection(self, manual, shuffle, children, candidates):
+        """
+        Test various scennarios in which there are no blocks available to be selected.
+        """
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        self._create_lc_block_children(children)
+        self._set_lc_block_candidates(candidates)
+        assert self.lc_block.available_children() == []
+        assert self.lc_block.selected_children() == []
+
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=[],
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child)
+            manual=True,
+            shuffle=False,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child)
+            manual=True,
+            shuffle=True,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+        ),
+    )
+    @ddt.unpack
+    def test_expanding_selection(self, manual, shuffle, initial_children, initial_candidates):
+        """
+        Test that increasing max_count and/or available children results in an expanded selection.
+        """
+        # Start with 4 available blocks.
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        self._create_lc_block_children(initial_children)
+        self._set_lc_block_candidates(initial_candidates)
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
+
+        # Start with 2 selected.
+        self.lc_block.max_count = 2
+        selection_of_2 = self.lc_block.selected_children()
+        assert len(selection_of_2) == 2
+
+        # Increase to 3 selected. Original 2 should remain selected.
+        self.lc_block.max_count = 3
+        selection_of_3 = self.lc_block.selected_children()
+        assert len(selection_of_3) == 3
+        assert set(selection_of_2) < set(selection_of_3)
+
+        # Increase to -1 (all 4 blocks selected). The original 3 should remain selected.
+        self.lc_block.max_count = -1
+        selection_of_all_4 = self.lc_block.selected_children()
+        assert len(selection_of_all_4) == 4
+        assert set(selection_of_3) < set(selection_of_all_4)
+        if shuffle:
+            assert set(selection_of_all_4) == set(self.lc_block.available_children())
+        else:
+            assert selection_of_all_4 == self.lc_block.available_children()
+
+        # Toss a new block into the children list, and add it to candidates list too.
+        additional_child = 'e'
+        self._create_lc_block_children([additional_child])
+        self.lc_block.candidates += [additional_child]
+
+        # MANUAL ONLY: toss another non-candidate block into the children -- should be ignored.
+        if manual:
+            self._create_lc_block_children(['y'])  # Another additional non-candidate child
+
+        # Since -1 means "use all available children", 5 should be selected, including the 4 from last step.
+        assert len(self.lc_block.available_children()) == 5
+        selection_of_all_5 = self.lc_block.selected_children()
+        assert len(selection_of_all_5) == 5
+        assert set(selection_of_all_4) < set(selection_of_all_5)
+        if shuffle:
+            assert set(selection_of_all_5) == set(self.lc_block.available_children())
+        else:
+            assert selection_of_all_5 == self.lc_block.available_children()
+
+        # Increase max_count past the number of available children.
+        # Since "too many" is treated the same as "all", the selection should be unchanged.
+        # Even when shuffle==True, the order should be unchanged, since the selected set is unchanged.
+        self.lc_block.max_count = 10
+        assert self.lc_block.selected_children() == selection_of_all_5
+
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=[],
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child)
+            manual=True,
+            shuffle=False,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child)
+            manual=True,
+            shuffle=True,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+        ),
+    )
+    @ddt.unpack
+    def test_overlimit_selection(self, manual, shuffle, initial_children, initial_candidates):
+        """
+        Test that decreasing the max_count value leads a reduced version of the original selection.
+        """
+        # Start with 4 available blocks.
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        self._create_lc_block_children(initial_children)
+        self._set_lc_block_candidates(initial_candidates)
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
+
+        # Start with max selection.
+        self.lc_block.max_count = -1
+        selection_of_all_4 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_4) == 4
+        assert selection_of_all_4 == set(self.lc_block.available_children())
+
+        # Then drop it down to 3... should be a subset.
+        self.lc_block.max_count = 3
+        selection_of_all_3 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_3) == 3
+        assert selection_of_all_3 < selection_of_all_4
+
+        # Then drop it down to 2... should be a smaller subset.
+        self.lc_block.max_count = 2
+        selection_of_all_2 = set(self.lc_block.selected_children())
+        assert len(selection_of_all_2) == 2
+        assert selection_of_all_2 < selection_of_all_3
+
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=0,
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=[],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+        dict(
+            # "Randomized mode", but we also remove from the candidates list (which should have no extra effect)
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+            delete_child=True,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child).
+            manual=True,
+            shuffle=False,
+            index_of_selected_to_keep=0,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+            delete_child=False,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child).
+            # TWIST: Remove from underling lib, not candidates. Should have the same effect of removing from candidates.
+            manual=True,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+    )
+    @ddt.unpack
+    def test_unavailable_block_with_replacement(
+        self,
+        manual,
+        shuffle,
+        initial_children,
+        initial_candidates,
+        index_of_selected_to_keep,
+        delete_child,
+        remove_candidate,
+    ):
+        """
+        Test that if a selected block becomes unavailable (either by library removal or candidate removal)
+        when there are ARE other replacement blocks available, then it is just replaced with one of those.
+        Other selected blocks should remain selected.
+        """
+        # Start with 4 available blocks.
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        self._create_lc_block_children(initial_children)
+        self._set_lc_block_candidates(initial_candidates)
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
+
+        # Start with 2 selected blocks.
+        self.lc_block.max_count = 2
+        initial_selection = self.lc_block.selected_children()
+        assert len(initial_selection) == 2
+
+        # Keep one, remove one.
+        selected_child_to_keep = initial_selection[index_of_selected_to_keep]
+        (selected_child_to_remove,) = set(initial_selection) - {selected_child_to_keep}
+        self._remove_lc_block_child(
+            selected_child_to_remove, delete_child=delete_child, remove_candidate=remove_candidate
+        )
+        assert len(self.lc_block.available_children()) == 3
+
+        # New selection should still have 2 blocks: the kept block, and another lib block
+        new_selection = self.lc_block.selected_children()
+        assert len(new_selection) == 2
+        assert selected_child_to_keep in new_selection
+        assert selected_child_to_remove not in new_selection
+
+    @ddt.data(
+        dict(
+            # "Randomized mode"
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=0,
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=[],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+        dict(
+            # "Randomized mode", but we also remove from the candidates list (which should have no extra effect)
+            manual=False,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=['a', 'b', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+            delete_child=True,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode" (with one non-candidate child).
+            manual=True,
+            shuffle=False,
+            index_of_selected_to_keep=0,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+            delete_child=False,
+            remove_candidate=True,
+        ),
+        dict(
+            # "Static mode with shuffling" (with one non-candidate child).
+            # TWIST: Remove from underling lib, not candidates. Should have the same effect of removing from candidates.
+            manual=True,
+            shuffle=True,
+            index_of_selected_to_keep=1,
+            initial_children=['a', 'b', 'x', 'c', 'd'],
+            initial_candidates=['a', 'b', 'c', 'd'],
+            delete_child=True,
+            remove_candidate=False,
+        ),
+    )
+    @ddt.unpack
+    def test_unavilable_block_without_replacement(
+        self,
+        manual,
+        shuffle,
+        initial_children,
+        initial_candidates,
+        index_of_selected_to_keep,
+        delete_child,
+        remove_candidate,
+    ):
+        """
+        Test that if a selected block becomes unavailable (either by library removal or candidate removal)
+        when there are ARE other replacement blocks available, then it is just replaced with one of those.
+        Other selected blocks should remain selected.
+        """
+        # Start with 4 available blocks.
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        self._create_lc_block_children(initial_children)
+        self._set_lc_block_candidates(initial_candidates)
+        assert len(self.lc_block.available_children()) == 4  # Sanity check ddt input
+
+        # Start with 2 selected blocks.
+        self.lc_block.max_count = 2
+        initial_selection = self.lc_block.selected_children()
+        assert len(initial_selection) == 2
+
+        # Choose just one of them to keep; remove all other children.
+        selected_child_to_keep = initial_selection[index_of_selected_to_keep]
+        for child in self.lc_block.available_children():
+            if child != selected_child_to_keep:
+                self._remove_lc_block_child(
+                    child, delete_child=delete_child, remove_candidate=remove_candidate
+                )
+        assert len(self.lc_block.available_children()) == 1
+
+        # New selection should have just the 1 remaining block, even though max_count is still 2
+        assert self.lc_block.selected_children() == [selected_child_to_keep]
+        assert self.lc_block.max_count == 2
+
+        # Finally, remove that last remaining block, and ensure that the selection is empty.
+        self._remove_lc_block_child(
+            selected_child_to_keep, delete_child=delete_child, remove_candidate=remove_candidate
+        )
+        assert self.lc_block.available_children() == []
+        assert self.lc_block.selected_children() == []
+        assert self.lc_block.max_count == 2
+
+    @ddt.data(*itertools.product((True, False), (True, False), (0, 1), (0, 1)))
+    @ddt.unpack
+    def test_complex_scenario(self, manual, shuffle, index_of_selected_to_keep, index_of_unselected_to_keep):
+        """
+        Test that if blocks are added to the source lib, AND blocks are deleted, AND max_count
+        changes, then everything works out according to the rules of make_selection.
+        """
+        # Start with 4 available blocks
+        self.lc_block.manual = manual
+        self.lc_block.shuffle = shuffle
+        initial_children = ['a', 'b', 'c', 'd']
+        self._create_lc_block_children(initial_children)
+        initial_candidates = ['a', 'b', 'c', 'd']
+        self._set_lc_block_candidates(initial_candidates)
+        self.lc_block.candidates = initial_children
+        if manual:
+            self._create_lc_block_children(['x'])  # unavailable child
+        assert self.lc_block.available_children() == initial_children
+
+        # Start with a selection of 2
+        self.lc_block.max_count = 2
+        initial_selection = self.lc_block.selected_children()
+        assert len(initial_selection) == 2
+
+        # From the selection: keep one, but remove the other from the children.
+        selected_child_to_keep = initial_selection[index_of_selected_to_keep]
+        (selected_child_to_remove,) = set(initial_selection) - {selected_child_to_keep}
+        self._remove_lc_block_child(selected_child_to_remove)
+
+        # Now from the *unselected* children: keep one, and remove the other.
+        unselected_children = [child for child in initial_children if child not in initial_selection]
+        unselected_child_to_keep = unselected_children[index_of_unselected_to_keep]
+        (unselected_child_to_remove,) = set(unselected_children) - {unselected_child_to_keep}
+        self._remove_lc_block_child(unselected_child_to_remove)
+
+        # Finally, add 2 new children.
+        additional_children = ['e', 'f']
+        self._create_lc_block_children(additional_children)
+        self.lc_block.candidates += additional_children
+
+        # Sanity check
+        new_children = self.lc_block.available_children()
+        assert set(new_children) == {selected_child_to_keep, unselected_child_to_keep, *additional_children}
+
+        # THE TEST: Up the max count to 3 and reselect.
+        # We expect a selection containing 1 block from the old selection, and 2 new ones.
+        self.lc_block.max_count = 3
+        new_selection = self.lc_block.selected_children()
+        assert len(new_selection) == 3
+        still_selected = set(new_selection) & set(initial_selection)
+        newly_selected = set(new_selection) - set(initial_selection)
+        assert still_selected == {selected_child_to_keep}
+        assert len(newly_selected) == 2
+        assert newly_selected < {unselected_child_to_keep, *additional_children}
+
+    @ddt.data(True, False)
+    def test_toggle_manual_when_selecting_all(self, shuffle):
+        """
+        Test the behavior of toggling `manual` on and off when `max_count==-1` (i,e., "select all").
+        """
+        # 4 children, 2 of which are candidates.
+        self.lc_block.shuffle = shuffle
+        children = ['a', 'b', 'c', 'd']
+        self._create_lc_block_children(children)
+        candidates = ['a', 'c']
+        self._set_lc_block_candidates(candidates)
+
+        # Select all available.
+        self.lc_block.max_count = -1
+
+        # Non-manual mode: All children are selected.
+        self.lc_block.manual = False
+        assert self.lc_block.available_children() == children
+        if shuffle:
+            assert set(self.lc_block.selected_children()) == set(children)
+        else:
+            assert self.lc_block.selected_children() == children
+
+        # Manual mode: All candidates are selected.
+        self.lc_block.manual = True
+        assert self.lc_block.available_children() == candidates
+        if shuffle:
+            assert set(self.lc_block.selected_children()) == set(candidates)
+        else:
+            assert self.lc_block.selected_children() == candidates
+
+        # Back to non-manual mode: All children are selected.
+        self.lc_block.manual = False
+        assert self.lc_block.available_children() == children
+        if shuffle:
+            assert set(self.lc_block.selected_children()) == set(children)
+        else:
+            assert self.lc_block.selected_children() == children
+
+    @ddt.data(True, False)
+    def test_toggle_manual_when_selecting_subset(self, shuffle):
+        """
+        Test the behavior of toggling `manual` on and off when `max_count` equals the number of candidates, but there
+        are additional non-candidates.
+        """
+        # 4 children.
+        self.lc_block.shuffle = shuffle
+        self.lc_block.max_count = 2
+        children = ['a', 'b', 'c', 'd']
+        self._create_lc_block_children(children)
+
+        # Non-manual mode: Any 2 of 4 children are selected.
+        self.lc_block.manual = False
+        assert self.lc_block.available_children() == children
+        nonmanual_selected = self.lc_block.selected_children()
+        assert len(nonmanual_selected) == 2
+        assert set(nonmanual_selected) < set(children)
+
+        # Pick 2 candidates: 1 of which is currently selected, and 1 of which is not.
+        candidates = [nonmanual_selected[0]]
+        for child in children:
+            if child not in nonmanual_selected:
+                candidates.append(child)
+                break
+        assert len(candidates) == 2  # Sanity chek
+        self._set_lc_block_candidates(candidates)
+
+        # Manual mode: Just the 2 candidates should now be selected.
+        self.lc_block.manual = True
+        assert self.lc_block.available_children() == candidates
+        manual_selected = self.lc_block.selected_children()
+        assert len(manual_selected) == 2
+        if shuffle:
+            assert set(manual_selected) == set(candidates)
+        else:
+            assert manual_selected == candidates
+
+        # Back to non-manual mode:
+        # Selection should be unchanged! Even though all children are now available for selection,
+        # the selection criteria (max_count==2) is still satisfied, so the selection should remain unchanged.
+        self.lc_block.manual = False
+        nonmanual_selected_new = self.lc_block.selected_children()
+        assert nonmanual_selected_new == manual_selected

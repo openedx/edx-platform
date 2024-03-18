@@ -121,6 +121,11 @@ function($, _, Backbone, gettext, BasePage,
                 this.unitOutlineView.render();
 
             }
+            if (this.isLibraryContentPage) {
+                this.selectedLibraryComponents = [];
+                this.storedSelectedLibraryComponents = [];
+                this.getSelectedLibraryComponents();
+            }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
         },
@@ -370,11 +375,13 @@ function($, _, Backbone, gettext, BasePage,
                 var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
                     useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
                     useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
+                    useNewLibraryContentEditor = primaryHeader.attr('use-new-editor-library-content'),
                     blockType = primaryHeader.attr('data-block-type');
 
                 if((useNewTextEditor === 'True' && blockType === 'html')
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
+                        || (useNewLibraryContentEditor === 'True' && blockType === 'library_content')
                 ) {
                     var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
                     window.location.href = destinationUrl;
@@ -639,12 +646,11 @@ function($, _, Backbone, gettext, BasePage,
         getSelectedLibraryComponents: function() {
             var self = this;
             var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
-            console.log(ModuleUtils);
             $.getJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
                 function(data) {
-                    self.selectedLibraryComponents = Array.from(data.source_block_ids);
-                    self.storedSelectedLibraryComponents = Array.from(data.source_block_ids);
+                    self.selectedLibraryComponents = Array.from(data.candidates);
+                    self.storedSelectedLibraryComponents = Array.from(data.candidates);
                 }
             );
         },
@@ -655,7 +661,7 @@ function($, _, Backbone, gettext, BasePage,
             e.preventDefault();
             $.postJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/submit_studio_edits',
-                {values: {source_block_ids: self.storedSelectedLibraryComponents}},
+                {values: {candidates: self.storedSelectedLibraryComponents}},
                 function() {
                     self.selectedLibraryComponents = Array.from(self.storedSelectedLibraryComponents);
                     self.toggleSaveButton();
@@ -665,6 +671,7 @@ function($, _, Backbone, gettext, BasePage,
 
         toggleLibraryComponent: function(event) {
             var componentId = $(event.target).closest('.studio-xblock-wrapper').data('locator');
+
             var storeIndex = this.storedSelectedLibraryComponents.indexOf(componentId);
             if (storeIndex > -1) {
                 this.storedSelectedLibraryComponents.splice(storeIndex, 1);

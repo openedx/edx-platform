@@ -21,5 +21,6 @@ django-stubs                            # Typing stubs for Django, so it works w
 djangorestframework-stubs               # Typing stubs for DRF
 mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events
+types-bleach                            # Typing stubs for bleach, so it works with mypy
 vulture                                 # Detects possible dead/unused code, used in scripts/find-dead-code.sh
 watchdog                                # Used by `npm run watch` to auto-recompile when assets are changed

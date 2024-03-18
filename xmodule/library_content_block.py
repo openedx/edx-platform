@@ -8,6 +8,7 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext, gettext
+from typing import TYPE_CHECKING, Any, Callable
 
 import bleach
 from django.conf import settings
@@ -17,17 +18,20 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
+from xblock.utils.studio_editable import StudioEditableXBlockMixin
 
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment
+from xmodule.util.keys import BlockKey, derive_key
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
@@ -38,6 +42,13 @@ from xmodule.x_module import (
     shim_xmodule_js,
 )
 
+
+if TYPE_CHECKING:
+    # This class is only needed for a type annotation.
+    # To avoid circular import, only import it for type checking.
+    from xmodule.library_tools import LibraryToolsService
+
+
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
@@ -47,23 +58,28 @@ logger = logging.getLogger(__name__)
 ANY_CAPA_TYPE_VALUE = 'any'
 
 
-def _get_human_name(problem_class):
+def _get_human_name(problem_class: type) -> str:
     """
     Get the human-friendly name for a problem type.
     """
     return getattr(problem_class, 'human_name', problem_class.__name__)
 
 
-def _get_capa_types():
+def _get_capa_types() -> list[dict[str, str]]:
     """
     Gets capa types tags and labels
     """
     capa_types = {tag: _get_human_name(registry.get_class_for_tag(tag)) for tag in registry.registered_tags()}
-
-    return [{'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')}] + sorted([
-        {'value': capa_type, 'display_name': caption}
-        for capa_type, caption in capa_types.items()
-    ], key=lambda item: item.get('display_name'))
+    return [
+        {'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')},
+        *sorted(
+            [
+                {'value': capa_type, 'display_name': caption}
+                for capa_type, caption in capa_types.items()
+            ],
+            key=lambda item: item['display_name']
+        ),
+    ]
 
 
 class LibraryToolsUnavailable(ValueError):
@@ -79,8 +95,9 @@ class LibraryToolsUnavailable(ValueError):
 @XBlock.wants('user')
 @XBlock.needs('mako')
 class LibraryContentBlock(
-    MakoTemplateBlockBase,
     XmlMixin,
+    MakoTemplateBlockBase,
+    StudioEditableXBlockMixin,
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
@@ -95,6 +112,8 @@ class LibraryContentBlock(
     any particular student.
     """
     # pylint: disable=abstract-method
+
+    editable_fields = ("candidates",)
     has_children = True
     has_author_view = True
 
@@ -105,68 +124,87 @@ class LibraryContentBlock(
 
     show_in_read_only_mode = True
 
-    # noinspection PyMethodParameters
     @classproperty
-    def completion_mode(cls):  # pylint: disable=no-self-argument
+    def completion_mode(cls) -> str:  # pylint: disable=no-self-argument
         """
         Allow overriding the completion mode with a feature flag.
-
         This is a property, so it can be dynamically overridden in tests, as it is not evaluated at runtime.
         """
-        if settings.FEATURES.get('MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW', False):
+        if settings.FEATURES.get('MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW', False):  # type: ignore
             return XBlockCompletionMode.COMPLETABLE
 
         return XBlockCompletionMode.AGGREGATOR
 
-    display_name = String(
+    resources_dir = 'assets/library_content'
+
+    # NOTE: These field type annotations are correct on an *instance* of LibraryContentBlock, but on the
+    #       LibraryContentBlock class itself, these would all actually be XBlock Field objects.
+    #       Until then, these annotations are the only way to thoroughly typecheck this module.
+    display_name: str = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
-        default="Randomized Content Block",
+        default="Library Content",
         scope=Scope.settings,
     )
-    source_library_id = String(
+    source_library_id: str | None = String(
         display_name=_("Library"),
         help=_("Select the library from which you want to draw content."),
         scope=Scope.settings,
         values_provider=lambda instance: instance.source_library_values(),
     )
-    source_library_version = String(
+    source_library_version: str | None = String(
         # This is a hidden field that stores the version of source_library when we last pulled content from it
         display_name=_("Library Version"),
         scope=Scope.settings,
     )
-    mode = String(
-        display_name=_("Mode"),
-        help=_("Determines how content is drawn from the library"),
-        default="random",
-        values=[
-            {"display_name": _("Choose n at random"), "value": "random"}
-            # Future addition: Choose a new random set of n every time the student refreshes the block, for self tests
-            # Future addition: manually selected blocks
-        ],
-        scope=Scope.settings,
-    )
-    max_count = Integer(
+    max_count: int = Integer(
         display_name=_("Count"),
         help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
         default=1,
         scope=Scope.settings,
     )
-    capa_type = String(
+    capa_type: str = String(
         display_name=_("Problem Type"),
         help=_('Choose a problem type to fetch from the library. If "Any Type" is selected no filtering is applied.'),
         default=ANY_CAPA_TYPE_VALUE,
         values=_get_capa_types(),
         scope=Scope.settings,
     )
-    selected = List(
-        # This is a list of (block_type, block_id) tuples used to record
-        # which random/first set of matching blocks was selected per user
+    candidates: list[str] = List(
+        # This is a list of stringified library block usage keys representing the library subset that the author
+        # has manually picked as candidates for selection. Note: these are the keys of *blocks in the
+        # source library*, not of the keys of this block's children.
+        display_name=_("Manually Selected Blocks"),
+        default=[],
+        scope=Scope.settings,
+    )
+    selected: list[list[str]] = List(
+        # This is a list of [block_type, block_id] pairs used to record
+        # which set of matching blocks was selected per user
         default=[],
         scope=Scope.user_state,
     )
+    shuffle: bool = Boolean(
+        # Do we shuffle (randomize order) of selected blocks for each learner?
+        # True -> Order is randomized for each learner. \n False -> Original order from candidates/children is used.
+        # False -> is the block content only drawn from content which is in the candidates list?
+        display_name=_("Shuffle Components"),
+        help=_("When enabled, each learner will see the components in a randomized order."),
+        default=True,
+        scope=Scope.settings,
+
+    )
+    manual: bool = Boolean(
+        # Should selected blocks be limited to the manually-picked candidates?
+        # True -> Draw selections from `candidates`.
+        # False -> Draw selections from `children`.
+        display_name=_("Limit Components to Selection"),
+        help=_("When enabled, only the checked-off components on the 'View' page are available to learners."),
+        default=False,
+        scope=Scope.settings,
+    )
     # This cannot be called `show_reset_button`, because children blocks inherit this as a default value.
-    allow_resetting_children = Boolean(
+    allow_resetting_children: bool = Boolean(
         display_name=_("Show Reset Button"),
         help=_("Determines whether a 'Reset Problems' button is shown, so users may reset their answers and reshuffle "
                "selected items."),
@@ -181,74 +219,30 @@ class LibraryContentBlock(
 
         Supports either library v1 or library v2 locators.
         """
-        try:
-            return LibraryLocator.from_string(self.source_library_id)
-        except InvalidKeyError:
-            return LibraryLocatorV2.from_string(self.source_library_id)
+        return self.get_source_library_key(self.source_library_id)
 
     @classmethod
-    def make_selection(cls, selected, children, max_count, mode):
+    def get_source_library_key(cls, source_library_id):
         """
-        Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
-
-        Arguments:
-            selected - list of (block_type, block_id) tuples assigned to this student
-            children - children of this block
-            max_count - number of components to display to each student
-            mode - how content is drawn from the library
-
-        Returns:
-            A dict containing the following keys:
-
-            'selected' (set) of (block_type, block_id) tuples assigned to this student
-            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
-            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
-            'added' (set) of newly added (block_type, block_id) tuples
+        A static method for the implementation of source_library_key
+        For use in block transformers, which don't have access to non-static methods.
         """
-        rand = random.Random()
+        try:
+            return LibraryLocator.from_string(source_library_id)
+        except InvalidKeyError:
+            return LibraryLocatorV2.from_string(source_library_id)
 
-        selected_keys = {tuple(k) for k in selected}  # set of (block_type, block_id) tuples assigned to this student
-
-        # Determine which of our children we will show:
-        valid_block_keys = {(c.block_type, c.block_id) for c in children}
-
-        # Remove any selected blocks that are no longer valid:
-        invalid_block_keys = (selected_keys - valid_block_keys)
-        if invalid_block_keys:
-            selected_keys -= invalid_block_keys
-
-        # If max_count has been decreased, we may have to drop some previously selected blocks:
-        overlimit_block_keys = set()
-        if len(selected_keys) > max_count:
-            num_to_remove = len(selected_keys) - max_count
-            overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
-            selected_keys -= overlimit_block_keys
-
-        # Do we have enough blocks now?
-        num_to_add = max_count - len(selected_keys)
-
-        added_block_keys = None
-        if num_to_add > 0:
-            # We need to select [more] blocks to display to this user:
-            pool = valid_block_keys - selected_keys
-            if mode == "random":
-                num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(rand.sample(pool, num_to_add))
-                # We now have the correct n random children to show for this user.
-            else:
-                raise NotImplementedError("Unsupported mode.")
-            selected_keys |= added_block_keys
-
-        if any((invalid_block_keys, overlimit_block_keys, added_block_keys)):
-            selected = list(selected_keys)
-            random.shuffle(selected)
-
-        return {
-            'selected': selected,
-            'invalid': invalid_block_keys,
-            'overlimit': overlimit_block_keys,
-            'added': added_block_keys,
-        }
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        This variable contains a list of the XBlock fields that should not be displayed in the Studio editor.
+        """
+        non_editable_fields = super().non_editable_metadata_fields
+        non_editable_fields.extend([
+            LibraryContentBlock.source_library_version,
+            LibraryContentBlock.candidates,
+        ])
+        return non_editable_fields
 
     def _publish_event(self, event_name, result, **kwargs):
         """
@@ -257,7 +251,7 @@ class LibraryContentBlock(
         event_data = {
             "location": str(self.location),
             "result": result,
-            "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
+            "previous_count": getattr(self, "_last_event_result_count", len(self.selected_block_keys)),
             "max_count": self.max_count,
         }
         event_data.update(kwargs)
@@ -265,7 +259,186 @@ class LibraryContentBlock(
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
-    def publish_selected_children_events(cls, block_keys, format_block_keys, publish_event):
+    def _derive_child_block_key(cls, lcb_usage_key: UsageKey, library_block_usage_key: UsageKey) -> BlockKey:
+        """
+        Compute the appropriate block key for the child of a LibraryContentBlock (aka LCB)
+        that is sourced from a certain library block.
+
+        That is, given they keys of LibraryContentBlock and LibBlock2, we want to find the key of CHILD:
+
+                  Course                            Library
+                    |                                  |
+                    V                                  |
+                   ...                                 |
+                    |                                  |
+                    v                     LibBlock1 <--|
+            LibraryContentBlock                        |
+                    |                                  |
+                    |             + - - - LibBlock2 <--|
+                    v             .                    |
+                  CHILD < - - - - +                    |
+                                          LibBlock3 <--+
+        """
+        # Historically, BlockKeys for children have been generated using V1 Library keys (LibraryLocators).
+        # As we migrate V1 libraries to V2 libraries, we must keep the derived BlockKeys stable in order to maintain
+        # student state across the migration.
+        # So, for V2 libraries, we actually convert the V2 library key back into an "equivalent" V1 library key.
+        # We will have to maintain this historical artifact even after V1 libraries are deprecated and removed.
+        # TODO: Confirm that we still want to migrate V1->V2 libraries in-place like this
+        #       (https://github.com/openedx/edx-platform/issues/33640).
+        true_source_context = library_block_usage_key.context_key
+        derivable_source_context: LibraryLocator
+        if isinstance(true_source_context, LibraryLocator):
+            derivable_source_context = true_source_context
+        elif isinstance(true_source_context, LibraryLocatorV2):
+            derivable_source_context = LibraryLocator(
+                true_source_context.org,  # type: ignore[abstract]
+                true_source_context.slug,
+            )
+        else:
+            raise TypeError(
+                f"Source context for '{library_block_usage_key}' is '{true_source_context}'. "
+                f"Expected source context to be 'library-v1:' (a V1 library) or 'lib:' (a V2 library)."
+            )
+        source_block = BlockKey.from_usage_key(library_block_usage_key)
+        derivable_source_usage = derivable_source_context.make_usage_key(*source_block)
+        dest_parent_block = BlockKey.from_usage_key(lcb_usage_key)
+        return derive_key(source=derivable_source_usage, dest_parent=dest_parent_block)
+
+    def available_children(self) -> list[BlockKey]:
+        """
+        Returns an ordered list of LCB child BlockKeys which are possible for selection, based on either:
+         * this LCB's candidates (if manual), or
+         * this LCB's full children list (if not).
+
+        In the manual case, we filter out any candidates which do not actually map to a child of this LCB,
+        which could happen in the case of a poorly-formed OLX import.
+        """
+        return self.get_available_children(
+            usage_key=self.location,
+            all_children=self.children,
+            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
+            manual=self.manual,
+        )
+
+    @classmethod
+    def _get_candidates_as_children(cls, lcb_usage_key: UsageKey, candidates: list[UsageKey]) -> list[BlockKey]:
+        return [
+            cls._derive_child_block_key(lcb_usage_key=lcb_usage_key, library_block_usage_key=candidate)
+            for candidate in candidates
+        ]
+
+    @classmethod
+    def get_available_children(
+        cls,
+        usage_key: UsageKey,
+        all_children: list[UsageKey],
+        candidates: list[UsageKey],
+        manual: bool,
+    ) -> list[BlockKey]:
+        """
+        Static implementation of available_children.
+        """
+        all_children_block_keys = [BlockKey(child.block_type, child.block_id) for child in all_children]
+        if manual:
+            return [
+                child
+                for child in cls._get_candidates_as_children(lcb_usage_key=usage_key, candidates=candidates)
+                if child in all_children_block_keys
+            ]
+        else:
+            return all_children_block_keys
+
+    @classmethod
+    def make_selection(
+        cls,
+        usage_key: UsageKey,
+        old_selected: list[BlockKey],
+        all_children: list[UsageKey],
+        candidates: list[UsageKey],
+        max_count: int,
+        manual: bool,
+        shuffle: bool,
+    ) -> dict[str, list[BlockKey]]:
+        """
+        Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
+        The blocks returned are kept consistent for a user,
+        unless changes have been made to the library's contents or the settings of the block.
+        Returns:
+           A dict containing the following keys:
+            'selected': ordered list of BlockKeys assigned to this student
+            'invalid': unordered list of BlockKeys that were dropped because they're no longer available
+            'overlimit': unordered list of BlockKeys that were dropped because they no longer fit
+            'added': unordered list of newly-added BlockKeys
+
+        When generating randomized content to show to a user, we want the following user experience:
+        1. When a learner first interacts with the block, they are shown $max_count items from the available children
+           at random, or all available children if $max_count is -1. If $shuffle is enabled, the order is random.
+           If $shuffle is disabled, then the order is author-determined.
+        2. Every subsequent time they view that content, they are given the same content in the same order,
+           unless one or more of the below conditions is met:
+              A. The max_count is increased, requiring the learner to see more.
+              B. The max_count is decreased, requiring the learner to see less.
+              C. Blocks previously assigned to a learner become unavailable (via deletion or removal from candidates).
+              D. max_count is -1 and more blocks become available, requiring the learner to see those new blocks.
+        3. In case A, we take the selected blocks that were valid before the edit,
+           and supplement those with new blocks chosen at random until the number of blocks is $max_count.
+        4. In case B, we take the selected blocks that were valid before the edit, and remove blocks randomly
+           until he number of blocks is <= $max_count.
+        5. In case C, we remove the blocks that are now unavailable, and supplement those remaining with new blocks
+           chosen at random until the number of blocks is $max_count.
+        6. In case D, we supplement the selected blocks with the newly-available blocks.
+        7. In all cases A-D, if $shuffle is enabled, then the order is re-randomized.
+        """
+        selected: list[BlockKey] = old_selected.copy()
+        available: list[BlockKey] = cls.get_available_children(
+            usage_key=usage_key,
+            all_children=all_children,
+            candidates=candidates,
+            manual=manual,
+        )
+
+        # Remove blocks from selection if they're no longer candidates/children.
+        selected = [block for block in selected if block in available]
+        invalid: set[BlockKey] = set(old_selected) - set(selected)
+
+        # Remove or add blocks if we don't have the correct number in the selection.
+        additions: set[BlockKey] = set()
+        overlimit: set[BlockKey] = set()
+        desired_size: int = min(max_count, len(available)) if max_count >= 0 else len(available)
+        if len(selected) > desired_size:
+            num_to_remove = len(selected) - desired_size
+            overlimit = set(random.sample(selected, num_to_remove))
+            selected = [block for block in selected if block not in overlimit]
+        elif len(selected) < desired_size:
+            num_to_add = desired_size - len(selected)
+            available_additions: set[BlockKey] = set(available) - set(selected)
+            additions = set(random.sample(available_additions, num_to_add))
+            selected = [block for block in available if block in (additions | set(selected))]
+
+        # If we've made any change AND if shuffling is enabled, then re-shuffle.
+        # In other words, always shuffle UNLESS:
+        #  * no changes have been made (because we don't want to re-order a learner's blocks for no reason); OR
+        #  * shuffling is disabled (the code above ensures that we're using the order from the library).
+        # Otherwise, use the pre-existing order.
+        if shuffle and (invalid or overlimit or additions):
+            random.shuffle(selected)
+
+        # return lists because things get json serialized down the line.
+        return {
+            'selected': selected,
+            'invalid': list(invalid),
+            'overlimit': list(overlimit),
+            'added': list(additions),
+        }
+
+    @classmethod
+    def publish_selected_children_events(
+        cls,
+        block_keys: dict[str, list[BlockKey]],
+        format_block_keys: Callable[[list[BlockKey]], list],
+        publish_event: Callable[..., None],
+    ) -> None:
         """
         Helper method for publishing events when children blocks are
         selected/updated for a user.  This helper is also used by
@@ -319,22 +492,39 @@ class LibraryContentBlock(
                 added=format_block_keys(block_keys['added'])
             )
 
-    def selected_children(self):
+    @property
+    def selected_block_keys(self) -> list[BlockKey]:
+        """
+        Same as self.selected, but converted from JSON-friendly 2-element-lists into typing-friendly BlockKeys.
+        """
+        return [BlockKey(block_type, block_id) for block_type, block_id in self.selected]
+
+    @selected_block_keys.setter
+    def selected_block_keys(self, value: list[BlockKey]) -> None:
+        """
+        Convert BlockKeys back into 2-element-lists.
+        """
+        self.selected = [[block_type, block_id] for block_type, block_id in value]
+
+    def selected_children(self) -> list[BlockKey]:
         """
         Returns a [] of block_ids indicating which of the possible children
         have been selected to display to the current user.
 
         This reads and updates the "selected" field, which has user_state scope.
-
-        Note: the return value (self.selected) contains block_ids. To get
-        actual BlockUsageLocators, it is necessary to use self.children,
-        because the block_ids alone do not specify the block type.
         """
         max_count = self.max_count
         if max_count < 0:
             max_count = len(self.children)
-
-        block_keys = self.make_selection(self.selected, self.children, max_count, "random")  # pylint: disable=no-member
+        block_keys = self.make_selection(
+            usage_key=self.location,
+            old_selected=self.selected_block_keys,
+            all_children=self.children,
+            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
+            max_count=self.max_count,
+            manual=self.manual,
+            shuffle=self.shuffle,
+        )
 
         # Publish events for analytics purposes:
         lib_tools = self.get_tools()
@@ -348,9 +538,9 @@ class LibraryContentBlock(
         if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
             # Save our selections to the user state, to ensure consistency:
             selected = block_keys['selected']
-            self.selected = selected  # TODO: this doesn't save from the LMS "Progress" page.
+            self.selected_block_keys = selected  # TODO: this doesn't save from the LMS "Progress" page.
 
-        return self.selected
+        return self.selected_block_keys
 
     @XBlock.handler
     def reset_selected_children(self, _, __):
@@ -370,7 +560,7 @@ class LibraryContentBlock(
                 block.reset_problem(None)
                 block.save()
 
-        self.selected = []
+        self.selected_block_keys = []
         return Response(json.dumps(self.student_view({}).content))
 
     def _get_selected_child_blocks(self):
@@ -382,6 +572,9 @@ class LibraryContentBlock(
             yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
 
     def student_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
+        """
+        Renders the view that learners see.
+        """
         fragment = Fragment()
         contents = []
         child_context = {} if not context else copy(context)
@@ -436,15 +629,11 @@ class LibraryContentBlock(
                 max_count = self.max_count
                 if max_count < 0:
                     max_count = len(self.children)
-
-                fragment.add_content(self.runtime.service(self, 'mako').render_cms_template(
-                    "library-block-author-preview-header.html", {
-                        'max_count': max_count,
-                        'display_name': self.display_name or self.url_name,
-                    }))
+                context = {} if not context else copy(context)
                 context['can_edit_visibility'] = False
                 context['can_move'] = False
                 context['can_collapse'] = True
+                context['selectable'] = True
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
@@ -457,10 +646,10 @@ class LibraryContentBlock(
 
     def studio_view(self, _context):
         """
-        Return the studio view.
+        Render a form for editing this XBlock
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
@@ -473,19 +662,7 @@ class LibraryContentBlock(
         """
         return list(self._get_selected_child_blocks())
 
-    @property
-    def non_editable_metadata_fields(self):
-        non_editable_fields = super().non_editable_metadata_fields
-        # The only supported mode is currently 'random'.
-        # Add the mode field to non_editable_metadata_fields so that it doesn't
-        # render in the edit form.
-        non_editable_fields.extend([
-            LibraryContentBlock.mode,
-            LibraryContentBlock.source_library_version,
-        ])
-        return non_editable_fields
-
-    def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
+    def get_tools(self, to_read_library_content: bool = False) -> LibraryToolsService:
         """
         Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
         """
@@ -505,6 +682,38 @@ class LibraryContentBlock(
             user_id = None
         return user_id
 
+    def render_children(
+        self,
+        context: dict[str, Any],
+        fragment: Fragment,
+        can_reorder: bool = False,
+        can_add: bool = False,
+    ) -> None:
+        """
+        Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
+        then the children will be rendered to support drag and drop.
+        """
+        contents = []
+        for child in self.get_children():  # pylint: disable=no-member
+            if can_reorder:
+                context['reorderable_items'].add(child.location)
+            context['can_add'] = can_add
+
+            context['is_selected'] = [child.location.block_type, child.location.block_id] in self.candidates
+            rendered_child = child.render(StudioEditableBlock.get_preview_view_name(child), context)
+            fragment.add_fragment_resources(rendered_child)
+            contents.append({
+                'id': str(child.location),
+                'content': rendered_child.content
+            })
+
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+            'items': contents,
+            'xblock_context': context,
+            'can_add': can_add,
+            'can_reorder': can_reorder,
+        }))
+
     def _validate_sync_permissions(self):
         """
         Raises PermissionDenied() if we can't confirm that user has write on this block and read on source library.
@@ -518,6 +727,25 @@ class LibraryContentBlock(
         if self.source_library_key:
             if not user_perms.can_read(self.source_library_key):
                 raise PermissionDenied(f"Cannot read library at {self.source_library_key}")
+
+    @XBlock.handler
+    def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        Return candidates for selection, represented as usage keys of this LCB's children.
+        """
+        return Response(
+            json.dumps(
+                {
+                    'candidates': [
+                        str(self.location.context_key.make_usage_key(*block_key))
+                        for block_key in self._get_candidates_as_children(
+                            lcb_usage_key=self.location,
+                            candidates=[UsageKey.from_string(candidate) for candidate in self.candidates],
+                        )
+                    ],
+                }
+            )
+        )
 
     @XBlock.handler
     def upgrade_and_sync(self, request=None, suffix=None):  # pylint: disable=unused-argument
@@ -738,7 +966,8 @@ class LibraryContentBlock(
 
     def post_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
-        If source library or capa_type have been edited, upgrade library & sync automatically.
+        If source library, library version or capa_type have been edited, upgrade library,
+        clear the candidates & sync automatically.
 
         TODO: capa_type doesn't really need to trigger an upgrade once we've migrated to V2.
         """
@@ -747,6 +976,7 @@ class LibraryContentBlock(
         if source_lib_changed or capa_filter_changed:
             try:
                 self.sync_from_library(upgrade_to_latest=True)
+                self.candidates = []
             except (ObjectDoesNotExist, LibraryToolsUnavailable):
                 # The validation area will display an error message, no need to do anything now.
                 pass
@@ -754,7 +984,7 @@ class LibraryContentBlock(
     def has_dynamic_children(self):
         """
         Inform the runtime that our children vary per-user.
-        See get_child_blocks() above
+        See get_child_blocks()
         """
         return True
 
@@ -773,6 +1003,9 @@ class LibraryContentBlock(
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
+        """
+        parses the definition and child objects from a piece of xml, the storage format for xblocks.
+        """
         children = []
 
         for child in xml_object.getchildren():
