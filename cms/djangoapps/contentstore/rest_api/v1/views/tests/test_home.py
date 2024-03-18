@@ -81,6 +81,7 @@ class HomePageViewTest(CourseTestCase):
             f'{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/taxonomies'
         )
 
+
 @override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API)
 @ddt.ddt
 class HomePageCoursesViewTest(CourseTestCase):

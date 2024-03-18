@@ -473,7 +473,14 @@ class TestCourseIndexArchived(CourseTestCase):
         (False, 'user', None, 0, 21),
     )
     @ddt.unpack
-    def test_separate_archived_courses_with_home_page_course_v2_api(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
+    def test_separate_archived_courses_with_home_page_course_v2_api(
+        self,
+        separate_archived_courses,
+        username,
+        org,
+        mongo_queries,
+        sql_queries
+    ):
         """
         Ensure that archived courses are shown as expected for all user types, when the feature is enabled/disabled.
         Also ensure that enabling the feature does not adversely affect the database query count.
