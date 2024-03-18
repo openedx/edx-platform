@@ -2,6 +2,9 @@
 Setup script for the Open edX package.
 """
 
+import os
+import re
+
 from setuptools import setup
 
 XBLOCKS = [
