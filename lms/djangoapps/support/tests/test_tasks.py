@@ -14,6 +14,7 @@ from lms.djangoapps.support.models import CourseResetAudit
 from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import SupportStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
+from xmodule.video_block import VideoBlock
 
 
 class ResetStudentCourse(TestSubmittingProblems):
@@ -41,6 +42,7 @@ class ResetStudentCourse(TestSubmittingProblems):
         self.p1 = ''
         self.p2 = ''
         self.p3 = ''
+        self.video = ''
 
     def basic_setup(self):
         """
@@ -72,6 +74,23 @@ class ResetStudentCourse(TestSubmittingProblems):
         self.p1 = self.add_dropdown_to_section(vertical.location, 'p1', 1)
         self.p2 = self.add_dropdown_to_section(vertical.location, 'p2', 1)
         self.p3 = self.add_dropdown_to_section(vertical.location, 'p3', 1)
+        video_sample_xml = """
+        <video display_name="Test Video"
+                youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                show_captions="false"
+                from="1.0"
+                to="60.0">
+            <source src="http://www.example.com/file.mp4"/>
+            <track src="http://www.example.com/track"/>
+        </video>
+        """
+        video_data = VideoBlock.parse_video_xml(video_sample_xml)
+        video_data.pop('source')
+        self.video = BlockFactory.create(
+            category='video',
+            parent_location=vertical.location,
+            **video_data
+        )
 
         self.refresh_course()
 
@@ -102,6 +121,13 @@ class ResetStudentCourse(TestSubmittingProblems):
                     self.course.id,
                     self.student_user,
                     self.p3.location,
+                    self.user,
+                    True
+                ),
+                call(
+                    self.course.id,
+                    self.student_user,
+                    self.video.location,
                     self.user,
                     True
                 )
