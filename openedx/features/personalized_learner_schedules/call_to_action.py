@@ -118,18 +118,7 @@ class PersonalizedLearnerScheduleCallToAction:
         from lms.urls import RESET_COURSE_DEADLINES_NAME
 
         if RELATIVE_DATES_DISABLE_RESET_FLAG.is_enabled(course_key):
-            return {
-                "description": Text("{b_open}{header}{b_close} {explanation}").format(
-                    b_open=HTML("<b>"),
-                    b_close=HTML("</b>"),
-                    form_values={},
-                    header=_("It looks like you missed some important deadlines based on our suggested schedule."),
-                    explanation=_(
-                        "Unfortunately you can't update this schedule and shift the past due "
-                        "assignments into the future. Contact your course team for  more information."
-                    ),
-                ),
-            }
+            return {"description": _("The deadline to complete this assignment has passed.")}
 
         course_key = xblock.scope_ids.usage_id.context_key
 
