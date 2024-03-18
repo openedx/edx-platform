@@ -98,11 +98,11 @@ class LmsBlockMixin(XBlockMixin):
         scope=Scope.settings,
     )
     thumbnail = String(
-        help=_("Upload thumbnail Image for the block"),
+        help=_("Thumbnail which will be viewed within the class dashboard"),
         scope=Scope.settings,
     )
     lesson_type = String(
-        help=_("Select lesson type to shown the specific icon"),
+        help=_("Icon for Gen+ learning zone menu"),
         scope=Scope.settings,
     )
     group_access = GroupAccessDict(
