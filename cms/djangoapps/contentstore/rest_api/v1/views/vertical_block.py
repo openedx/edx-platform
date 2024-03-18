@@ -192,6 +192,9 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "drag-and-drop-v2",
                     "user_partition_info": {},
                     "user_partitions": {}
+                    "actions": {
+                        "can_manage_tags": true,
+                    }
                 },
                 {
                     "name": "Video",
@@ -199,14 +202,20 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "video",
                     "user_partition_info": {},
                     "user_partitions": {}
+                    "actions": {
+                        "can_manage_tags": true,
+                    }
                 },
                 {
                     "name": "Text",
                     "block_id": "block-v1:org+101+101+type@html+block@3e3fa1f88adb4a108cd14e9002143690",
                     "block_type": "html",
                     "user_partition_info": {},
-                    "user_partitions": {}
-                }
+                    "user_partitions": {},
+                    "actions": {
+                        "can_manage_tags": true,
+                    }
+                },
             ],
             "is_published": false
         }
