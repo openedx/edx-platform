@@ -88,7 +88,9 @@ class Command(MeiliCommandMixin, BaseCommand):
                     doc = searchable_doc_for_library_block(metadata)
                     docs.append(doc)
                     num_blocks_done += 1
-                # Add all the docs in this library at once (usually faster than adding one at a time):
+                if docs:
+                    # Add all the docs in this library at once (usually faster than adding one at a time):
+                    self.wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
                 self.wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
                 num_contexts_done += 1
 
@@ -108,8 +110,9 @@ class Command(MeiliCommandMixin, BaseCommand):
 
                 self.recurse_children(course, add_with_children)
 
-                # Add all the docs in this course at once (usually faster than adding one at a time):
-                self.wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                if docs:
+                    # Add all the docs in this course at once (usually faster than adding one at a time):
+                    self.wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
                 num_contexts_done += 1
                 num_blocks_done += len(docs)
 
