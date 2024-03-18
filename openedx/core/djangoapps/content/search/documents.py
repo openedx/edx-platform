@@ -1,7 +1,8 @@
 """
-Utilities related to searching content libraries
+Utilities related to indexing content for search
 """
 from __future__ import annotations
+import hashlib
 import logging
 
 from django.utils.text import slugify
@@ -64,7 +65,13 @@ def _meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     requirement, we transform them to a similar slug ID string that does.
     """
     # The slugified key _may_ not be unique so we append a hashed number too
-    return slugify(str(usage_key)) + "-" + str(hash(str(usage_key)) % 1_000)
+    key_bin = str(usage_key).encode()
+    try:
+        suffix = hashlib.sha1(key_bin, usedforsecurity=False).hexdigest()[:7]
+    except TypeError:
+        # Remove this when we don't need to support Python 3.8 and older
+        suffix = hashlib.sha1(key_bin).hexdigest()[:7]
+    return slugify(str(usage_key)) + "-" + suffix
 
 
 def _fields_from_block(block) -> dict:
