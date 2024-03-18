@@ -103,7 +103,7 @@ def _fields_from_block(block) -> dict:
                 # this would be very inefficient. Better to recurse the tree top-down with the parent blocks loaded.
                 log.warning(f"Updating Studio search index for XBlock {block.usage_key} but ancestors weren't cached.")
             cur_block = cur_block.get_parent()
-            block_data[Fields.breadcrumbs].insert(0, {"display_name": cur_block.display_name})
+            block_data[Fields.breadcrumbs].insert(0, {"display_name": xblock_api.get_block_display_name(cur_block)})
     try:
         content_data = block.index_dictionary()
         # Will be something like:
