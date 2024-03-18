@@ -556,10 +556,9 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: When enabled, exposes hide_from_toc xblock attribute so course authors can configure it as
-    # a section visibility option in Studio.
+    #  a section visibility option in Studio.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2024-02-29
-    # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
     'ENABLE_HIDE_FROM_TOC_UI': False,
 }
