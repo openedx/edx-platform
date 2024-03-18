@@ -212,18 +212,19 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list = list(courses_iter)
         self.assertEqual(len(courses_list), 1)
 
-        courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
-        courses_summary_list = list(courses_summary_iter)
-
         with override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API):
             # Verify fetched accessible courses list is a list of CourseOverview instances when home page course v2
             # api is enabled.
+            courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
+            courses_summary_list = list(courses_summary_iter)
             self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_summary_list))
             self.assertEqual(len(courses_summary_list), 1)
 
         with override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API):
             # Verify fetched accessible courses list is a list of CourseSummery instances and only one course
             # is returned
+            courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
+            courses_summary_list = list(courses_summary_iter)
             self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_summary_list))
             self.assertEqual(len(courses_summary_list), 1)
 
