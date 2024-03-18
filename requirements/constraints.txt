@@ -48,9 +48,6 @@ django-webpack-loader==0.7.0
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
 
-# scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
-scipy<1.8.0
-
 # edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
 # Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
 charset-normalizer<2.1.0
