@@ -5,15 +5,15 @@
                 <table width="100%">
                     <tbody>
                         <tr>
-                            <td width="25%" align="left">
+                            <td width="25%" align="left" style="padding: 0">
                                 <img src="{{ logo_url }}" style="width: auto;" height="24" alt="Logo"/></a>
                             </td>
-                            <td width="75%" align="right">
+                            <td width="75%" align="right" style="padding: 0">
                                 <table>
                                     <tbody>
                                         <tr>
                                             {% for social_name, social_data in social_media.items %}
-                                                <td>
+                                                <td style="padding: 0">
                                                     <a href="{{social_data.url}}">
                                                         <img src="{{social_data.icon}}" style="max-height: 24px; max-width: 24px; margin-left: 0.6rem" alt="{{social_name}}" />
                                                     </a>
@@ -30,10 +30,10 @@
         </tr>
         <tr>
             <td>
-                <p style="margin-top: 1.5rem; margin-bottom: 0.625rem;">
+                <p style="margin: 1.5rem 0 0 0;">
                     You are receiving this email because you have subscribed to email digest
                 </p>
-                <p style="margin-bottom: 0.625rem">
+                <p style="margin: 0.625rem 0">
                     <a href="{{notification_settings_url}}" rel="noopener noreferrer" target="_blank" style="color: black">
                         Notification Settings
                     </a>
