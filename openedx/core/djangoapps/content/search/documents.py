@@ -206,7 +206,7 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
 def searchable_doc_for_course_block(block) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
-    like Meilisearch or Elasticsearch, so that the given library block can be
+    like Meilisearch or Elasticsearch, so that the given course block can be
     found using faceted search.
     """
     doc = _fields_from_block(block)
