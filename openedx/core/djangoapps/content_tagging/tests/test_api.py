@@ -6,7 +6,7 @@ from django.test.testcases import TestCase
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
-from openedx_tagging.core.tagging.models import ObjectTag, Tag
+from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
 
 from .. import api
@@ -42,25 +42,25 @@ class TestTaxonomyMixin:
         self.taxonomy_no_orgs = api.create_taxonomy(name="No orgs")
 
         # Tags
-        self.tag_disabled = Tag.objects.create(
+        self.tag_disabled = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_disabled,
-            value="learning",
+            tag="learning",
         )
-        self.tag_all_orgs = Tag.objects.create(
+        self.tag_all_orgs = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_all_orgs,
-            value="learning",
+            tag="learning",
         )
-        self.tag_both_orgs = Tag.objects.create(
+        self.tag_both_orgs = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_both_orgs,
-            value="learning",
+            tag="learning",
         )
-        self.tag_one_org = Tag.objects.create(
+        self.tag_one_org = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_one_org,
-            value="learning",
+            tag="learning",
         )
-        self.tag_no_orgs = Tag.objects.create(
+        self.tag_no_orgs = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_no_orgs,
-            value="learning",
+            tag="learning",
         )
         # ObjectTags
         api.tag_object(
@@ -249,25 +249,25 @@ class TestGetAllObjectTagsMixin:
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
         self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
         api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
-        Tag.objects.create(
+        api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_1,
-            value="Tag 1.1",
+            tag="Tag 1.1",
         )
-        Tag.objects.create(
+        api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_1,
-            value="Tag 1.2",
+            tag="Tag 1.2",
         )
 
         self.taxonomy_2 = api.create_taxonomy(name="Taxonomy 2")
         api.set_taxonomy_orgs(self.taxonomy_2, all_orgs=True)
 
-        Tag.objects.create(
+        api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_2,
-            value="Tag 2.1",
+            tag="Tag 2.1",
         )
-        Tag.objects.create(
+        api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_2,
-            value="Tag 2.2",
+            tag="Tag 2.2",
         )
 
         api.tag_object(
