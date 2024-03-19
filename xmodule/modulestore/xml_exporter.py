@@ -291,6 +291,7 @@ class CourseExportManager(ExportManager):
 
         tags_count = get_object_tag_counts(block_id_pattern)
 
+        # TODO Verify with course, sections and subsections
         if tags_count:
             export_tags_in_csv_file(courselike_key_str, export_fs, 'tags.csv')
 
