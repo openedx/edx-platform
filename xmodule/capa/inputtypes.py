@@ -542,7 +542,9 @@ class ChoiceGroup(InputTypeBase):
                 if not text_only:
                     text = stringify_children(choice)
                 else:
-                    text = choice.text
+                    text_string = choice.xpath('string()')
+                    cleaned_text = re.sub(r'[^a-zA-Z0-9\s]', '', text_string).strip()
+                    text = cleaned_text or text_string
                 choices.append((choice.get("name"), text))
             else:
                 if choice.tag != 'compoundhint':
