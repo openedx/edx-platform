@@ -149,6 +149,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                         releaseDate: this.model.get('release_date'),
                         releaseDateFrom: this.model.get('release_date_from'),
                         hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
+                        hideFromTOC: this.model.get('hide_from_toc'),
                         staffLockFrom: this.model.get('staff_lock_from'),
                         enableCopyUnit: this.model.get('enable_copy_paste_units'),
                         course: window.course,

@@ -8,6 +8,7 @@ from lxml import etree
 from mimetypes import guess_type
 
 from attrs import frozen, Factory
+from django.conf import settings
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
@@ -17,11 +18,11 @@ from xblock.runtime import IdGenerator
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
-from xmodule.library_content_block import LibraryContentBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
@@ -123,6 +124,34 @@ def xblock_studio_url(xblock, parent_xblock=None, find_parent=False):
         return reverse_library_url('library_handler', library_key)
     else:
         return reverse_usage_url('container_handler', xblock.location)
+
+
+def xblock_lms_url(xblock) -> str:
+    """
+    Returns the LMS URL for the specified xblock.
+
+    Args:
+        xblock: The xblock to get the LMS URL for.
+
+    Returns:
+        str: The LMS URL for the specified xblock.
+    """
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    return f"{lms_root_url}/courses/{xblock.location.course_key}/jump_to/{xblock.location}"
+
+
+def xblock_embed_lms_url(xblock) -> str:
+    """
+    Returns the LMS URL for the specified xblock in embed mode.
+
+    Args:
+        xblock: The xblock to get the LMS URL for.
+
+    Returns:
+        str: The LMS URL for the specified xblock in embed mode.
+    """
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    return f"{lms_root_url}/xblock/{xblock.location}"
 
 
 def xblock_type_display_name(xblock, default_display_name=None):
@@ -337,14 +366,18 @@ def _import_xml_node_to_parent(
     new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)
     store.update_item(parent_xblock, user_id)
-    if isinstance(new_xblock, LibraryContentBlock):
-        # Special case handling for library content. If we need this for other blocks in the future, it can be made into
-        # an API, and we'd call new_block.studio_post_paste() instead of this code.
-        # In this case, we want to pull the children from the library and let library_tools assign their IDs.
-        new_xblock.sync_from_library(upgrade_to_latest=False)
-    else:
+
+    children_handled = False
+    if hasattr(new_xblock, 'studio_post_paste'):
+        # Allow an XBlock to do anything fancy it may need to when pasted from the clipboard.
+        # These blocks may handle their own children or parenting if needed. Let them return booleans to
+        # let us know if we need to handle these or not.
+        children_handed = new_xblock.studio_post_paste(store, node)
+
+    if not children_handled:
         for child_node in child_nodes:
             _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
+
     return new_xblock
 
 

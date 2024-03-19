@@ -591,7 +591,10 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
             _handle_failed_authentication(user, possibly_authenticated_user)
 
         pwned_properties = check_pwned_password_and_send_track_event(
-            user.id, request.POST.get('password'), user.is_staff
+            user_id=user.id,
+            password=request.POST.get('password'),
+            internal_user=user.is_staff,
+            request_page='login'
         ) if not is_user_third_party_authenticated else {}
         # Set default for third party login
         password_frequency = pwned_properties.get('frequency', -1)

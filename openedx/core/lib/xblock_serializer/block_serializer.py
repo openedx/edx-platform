@@ -89,6 +89,11 @@ class XBlockSerializer:
                     with filesystem.open(file_path, 'rb') as fh:
                         data = fh.read()
                     self.static_files.append(StaticFile(name=unit_file.name, data=data, url=None))
+
+        # Serialize and add tag data if any
+        if isinstance(block, TaggedBlockMixin):
+            block.add_tags_to_node(olx_node)
+
         if block.has_children:
             self._serialize_children(block, olx_node)
         return olx_node

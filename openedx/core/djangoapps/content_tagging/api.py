@@ -7,12 +7,14 @@ from itertools import groupby
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Exists, OuterRef, Q, QuerySet
-from opaque_keys.edx.keys import CourseKey, LearningContextKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
 
 from .models import TaxonomyOrg
-from .types import ObjectTagByObjectIdDict, TaxonomyDict
+from .types import ContentKey, ObjectTagByObjectIdDict, TagValuesByTaxonomyExportIdDict, TaxonomyDict
+from .utils import check_taxonomy_context_key_org, get_context_key_from_key
 
 
 def create_taxonomy(
@@ -130,24 +132,28 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
 
 
 def get_all_object_tags(
-    content_key: LearningContextKey,
+    content_key: LibraryLocatorV2 | CourseKey,
 ) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
     """
+    Get all the object tags applied to components in the given course/library.
+
+    Includes any tags applied to the course/library as a whole.
     Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
     """
-    # ToDo: Add support for other content types (like LibraryContent and LibraryBlock)
+    context_key_str = str(content_key)
+    # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
+    # (course/library) in a single db query.
     if isinstance(content_key, CourseKey):
-        course_key_str = str(content_key)
-        # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
-        # (course) in a single db query.
-        block_id_prefix = course_key_str.replace("course-v1:", "block-v1:", 1)
+        block_id_prefix = context_key_str.replace("course-v1:", "block-v1:", 1)
+    elif isinstance(content_key, LibraryLocatorV2):
+        block_id_prefix = context_key_str.replace("lib:", "lb:", 1)
     else:
         raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
 
     # There is no API method in oel_tagging.api that does this yet,
     # so for now we have to build the ORM query directly.
     all_object_tags = list(ObjectTag.objects.filter(
-        Q(object_id__startswith=block_id_prefix) | Q(object_id=course_key_str),
+        Q(object_id__startswith=block_id_prefix) | Q(object_id=content_key),
         Q(tag__isnull=False, tag__taxonomy__isnull=False),
     ).select_related("tag__taxonomy"))
 
@@ -156,14 +162,40 @@ def get_all_object_tags(
 
     for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
         grouped_object_tags[object_id] = {}
-        for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id):
+        for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id if x.tag else 0):
             object_tags_list = list(taxonomy_tags)
             grouped_object_tags[object_id][taxonomy_id] = object_tags_list
 
             if taxonomy_id not in taxonomies:
+                assert object_tags_list[0].tag
+                assert object_tags_list[0].tag.taxonomy
                 taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
 
     return grouped_object_tags, taxonomies
+
+
+def set_object_tags(
+    content_key: ContentKey,
+    object_tags: TagValuesByTaxonomyExportIdDict,
+) -> None:
+    """
+    Sets the tags for the given content object.
+    """
+    context_key = get_context_key_from_key(content_key)
+
+    for taxonomy_export_id, tags_values in object_tags.items():
+        taxonomy = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
+        if not taxonomy:
+            continue
+
+        if not check_taxonomy_context_key_org(taxonomy, context_key):
+            continue
+
+        oel_tagging.tag_object(
+            object_id=str(content_key),
+            taxonomy=taxonomy,
+            tags=tags_values,
+        )
 
 
 # Expose the oel_tagging APIs
@@ -176,3 +208,4 @@ delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
 get_object_tags = oel_tagging.get_object_tags
 tag_object = oel_tagging.tag_object
+add_tag_to_taxonomy = oel_tagging.add_tag_to_taxonomy

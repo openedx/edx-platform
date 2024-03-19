@@ -1445,6 +1445,23 @@ class ContentStoreTest(ContentStoreTestCase):
         ).replace('REPLACE', r'([0-9]|[a-f]){3,}')
         self.assertRegex(data['locator'], retarget)
 
+    @ddt.data(True, False)
+    def test_hide_xblock_from_toc_via_handler(self, hide_from_toc):
+        """Test that the hide_from_toc field can be set via the xblock_handler."""
+        course = CourseFactory.create()
+        sequential = BlockFactory.create(parent_location=course.location)
+        data = {
+            "metadata": {
+                "hide_from_toc": hide_from_toc
+            }
+        }
+
+        response = self.client.ajax_post(get_url("xblock_handler", sequential.location), data)
+        sequential = self.store.get_item(sequential.location)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(hide_from_toc, sequential.hide_from_toc)
+
     def test_capa_block(self):
         """Test that a problem treats markdown specially."""
         course = CourseFactory.create()
@@ -2138,7 +2155,7 @@ class EntryPageTestCase(TestCase):
 
     @override_waffle_switch(waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE, active=True)
     def test_accessibility(self):
-        self._test_page('/accessibility')
+        self._test_page('/accessibility', 302)
 
 
 def _create_course(test, course_key, course_data):

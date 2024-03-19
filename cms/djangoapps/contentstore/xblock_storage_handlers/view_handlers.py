@@ -48,6 +48,7 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.xblock_utils import get_icon
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
@@ -78,6 +79,8 @@ from ..helpers import (
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
     is_unit,
+    xblock_embed_lms_url,
+    xblock_lms_url,
     xblock_primary_child_category,
     xblock_studio_url,
     xblock_type_display_name,
@@ -1070,6 +1073,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "published": published,
                 "published_on": published_on,
                 "studio_url": xblock_studio_url(xblock, parent_xblock),
+                "lms_url": xblock_lms_url(xblock),
+                "embed_lms_url": xblock_embed_lms_url(xblock),
                 "released_to_students": datetime.now(UTC) > xblock.start,
                 "release_date": release_date,
                 "visibility_state": visibility_state,
@@ -1089,6 +1094,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "group_access": xblock.group_access,
                 "user_partitions": user_partitions,
                 "show_correctness": xblock.show_correctness,
+                "hide_from_toc": xblock.hide_from_toc,
+                "enable_hide_from_toc_ui": settings.FEATURES.get("ENABLE_HIDE_FROM_TOC_UI", False),
+                "xblock_type": get_icon(xblock),
             }
         )
 
@@ -1216,6 +1224,15 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 )
             else:
                 xblock_info["staff_only_message"] = False
+
+            if xblock_info["hide_from_toc"]:
+                xblock_info["hide_from_toc_message"] = True
+            elif child_info and child_info["children"]:
+                xblock_info["hide_from_toc_message"] = all(
+                    child["hide_from_toc_message"] for child in child_info["children"]
+                )
+            else:
+                xblock_info["hide_from_toc_message"] = False
 
             # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
             if use_tagging_taxonomy_list_page():
@@ -1345,6 +1362,7 @@ class VisibilityState:
     needs_attention = "needs_attention"
     staff_only = "staff_only"
     gated = "gated"
+    hide_from_toc = "hide_from_toc"
 
 
 def _compute_visibility_state(
@@ -1355,6 +1373,8 @@ def _compute_visibility_state(
     """
     if xblock.visible_to_staff_only:
         return VisibilityState.staff_only
+    elif xblock.hide_from_toc:
+        return VisibilityState.hide_from_toc
     elif is_unit_with_changes:
         # Note that a unit that has never been published will fall into this category,
         # as well as previously published units with draft content.
@@ -1362,22 +1382,27 @@ def _compute_visibility_state(
 
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = is_course_self_paced or datetime.now(UTC) > xblock.start
-    if child_info and child_info.get("children", []):
+    if child_info and child_info.get("children", []):  # pylint: disable=too-many-nested-blocks
         all_staff_only = True
         all_unscheduled = True
         all_live = True
+        all_hide_from_toc = True
         for child in child_info["children"]:
             child_state = child["visibility_state"]
             if child_state == VisibilityState.needs_attention:
                 return child_state
             elif not child_state == VisibilityState.staff_only:
                 all_staff_only = False
-                if not child_state == VisibilityState.unscheduled:
-                    all_unscheduled = False
-                    if not child_state == VisibilityState.live:
-                        all_live = False
+                if not child_state == VisibilityState.hide_from_toc:
+                    all_hide_from_toc = False
+                    if not child_state == VisibilityState.unscheduled:
+                        all_unscheduled = False
+                        if not child_state == VisibilityState.live:
+                            all_live = False
         if all_staff_only:
             return VisibilityState.staff_only
+        elif all_hide_from_toc:
+            return VisibilityState.hide_from_toc
         elif all_unscheduled:
             return (
                 VisibilityState.unscheduled

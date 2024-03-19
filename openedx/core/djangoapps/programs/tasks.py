@@ -18,7 +18,9 @@ from requests.exceptions import HTTPError
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import available_date_for_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.credentials.api import is_credentials_enabled
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import (
     get_credentials,
@@ -755,22 +757,21 @@ def update_certificate_visible_date_on_course_update(self, course_key):
 @set_code_owner_attribute
 def update_certificate_available_date_on_course_update(self, course_key):
     """
-    This task is designed to be called whenever a course-run's `certificate_available_date` is updated.
+    This task is designed to be enqueued whenever a course run's Certificate Display Behavior (CDB) or Certificate
+    Available Date (CAD) has been updated in the CMS.
 
-    When executed, this task will determine if we need to enqueue an
-    `update_credentials_course_certificate_configuration_available_date` task associated with the specified course-run
-    key from this task. If so, this subtask is responsible for making a REST API call to the Credentials IDA to update
-    the specified course-run's Course Certificate configuration with the new `certificate_available_date` value.
+    When executed, this task is responsible for enqueuing an additional subtask responsible for syncing the updated CAD
+    value in the Credentials IDA's internal records.
 
     Args:
-        course_key(str): The course identifier
+        course_key(str): The course run's identifier
     """
     countdown = 2**self.request.retries
 
     # If the CredentialsApiConfig configuration model is disabled for this feature, it may indicate a condition where
     # processing of such tasks has been temporarily disabled. Since this is a recoverable situation, mark this task for
     # retry instead of failing it.
-    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+    if not is_credentials_enabled():
         error_msg = (
             "Cannot execute the `update_certificate_visible_date_on_course_update` task. Issuing user credentials "
             "through the Credentials IDA is disabled."
@@ -782,39 +783,43 @@ def update_certificate_available_date_on_course_update(self, course_key):
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
 
-    course_overview = CourseOverview.get_from_id(course_key)
-    # Update the Credentials service's CourseCertificate configuration with the new `certificate_available_date` if:
-    #   - The course-run is instructor-paced, AND
-    #   - The `certificates_display_behavior` is set to "end_with_date",
-    if (
-        course_overview
-        and course_overview.self_paced is False
-        and course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
-    ):
-        LOGGER.info(
-            f"Queueing task to update the `certificate_available_date` of course-run {course_key} to "
-            f"[{course_overview.certificate_available_date}] in the Credentials service"
-        )
-        update_credentials_course_certificate_configuration_available_date.delay(
-            str(course_key), str(course_overview.certificate_available_date)
-        )
-    # OR,
-    #   - The course-run is self-paced, AND
-    #   - The `certificate_available_date` is (now) None. (This task will be executed after an update to the course
-    #     overview)
-    # There are times when the CourseCertificate configuration of a self-paced course-run in Credentials can become
-    # associated with a `certificate_available_date`. This ends up causing learners' certificate to be incorrectly
-    # hidden. This is due to the Credentials IDA not understanding the concept of course pacing. Thus, we need a way
-    # to remove this value from self-paced courses in Credentials.
-    elif course_overview and course_overview.self_paced is True and course_overview.certificate_available_date is None:
-        LOGGER.info(
-            "Queueing task to remove the `certificate_available_date` in the Credentials service for course-run "
-            f"{course_key}"
-        )
-        update_credentials_course_certificate_configuration_available_date.delay(str(course_key), None)
-    # ELSE, we don't meet the criteria to update the course cert config in the Credentials IDA
-    else:
+    course_overview = get_course_overview_or_none(course_key)
+    if not course_overview:
         LOGGER.warning(
-            f"Skipping update of the `certificate_available_date` for course {course_key} in the Credentials service. "
-            "This course-run does not meet the required criteria for an update."
+            f"Unable to send the updated certificate available date of course run [{course_key}] to Credentials. A "
+            "course overview for this course run could not be found"
         )
+        return
+
+    # When updating the certificate available date of instructor-paced course runs,
+    #   - If the display behavior is set to "A date after the course end date" (END_WITH_DATE), we should send the
+    #     certificate available date set by the course team in Studio (and stored as part of the course runs Course
+    #     Overview)
+    #   - If the display behavior is set to "End date of course" (END), we should send the end date of the course run
+    #     as the certificate available date. We send the end date because the Credentials IDA doesn't understand the
+    #     concept of course pacing and needs an explicit date in order to correctly gate the visibility of course and
+    #     program certificates.
+    #   - If the display behavior is set to "Immediately upon passing" (EARLY_NO_INFO), we should always send None for
+    #     the course runs certificate available date. A course run configured with this display behavior must not have a
+    #     certificate available date associated with or the Credentials system will incorrectly hide certificates from
+    #     learners.
+    if course_overview.self_paced is False:
+        if course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE:
+            new_certificate_available_date = str(course_overview.certificate_available_date)
+        elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END:
+            new_certificate_available_date = str(course_overview.end)  # `end_date` is deprecated, use `end` instead
+        elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.EARLY_NO_INFO:
+            new_certificate_available_date = None
+    # Else, this course run is self-paced, and having a certificate available date associated with a self-paced course
+    # run is not allowed. Course runs with this type of pacing should always award a certificate to learners immediately
+    # upon passing. If the system detects that an update must be sent to Credentials, we *always* send a certificate
+    # available date of `None`. We are aware of a defect that sometimes allows a certificate available date to be saved
+    # for a self-paced course run. This is an attempt to prevent bad data from being synced to the Credentials service
+    # too.
+    else:
+        new_certificate_available_date = None
+
+    update_credentials_course_certificate_configuration_available_date.delay(
+        str(course_key),
+        new_certificate_available_date
+    )
