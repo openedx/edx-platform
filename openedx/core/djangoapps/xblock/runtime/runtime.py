@@ -36,6 +36,7 @@ from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.types import User as UserType
+from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.data import StudentDataMode
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
@@ -298,6 +299,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
             )
         elif service_name == 'publish':
             return EventPublishingService(self.user, context_key, make_track_function())
+        elif service_name == 'enrollments':
+            return EnrollmentsService()
 
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
