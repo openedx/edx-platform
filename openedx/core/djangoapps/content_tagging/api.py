@@ -132,13 +132,17 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
 
 
 def get_all_object_tags(
-    content_key: LibraryLocatorV2 | CourseKey,
+    content_key: LibraryLocatorV2 | CourseKey | ContentKey,
+    prefetch_orgs: bool = False,
 ) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
     """
     Get all the object tags applied to components in the given course/library.
 
     Includes any tags applied to the course/library as a whole.
     Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
+
+    If `prefetch_orgs` is set, then the returned ObjectTag taxonomies will have their TaxonomyOrgs prefetched,
+    which makes checking permissions faster.
     """
     context_key_str = str(content_key)
     # We use a block_id_prefix (i.e. the modified course id) to get the tags for the children of the Content
@@ -148,14 +152,22 @@ def get_all_object_tags(
     elif isinstance(content_key, LibraryLocatorV2):
         block_id_prefix = context_key_str.replace("lib:", "lb:", 1)
     else:
-        raise NotImplementedError(f"Invalid content_key: {type(content_key)} -> {content_key}")
+        # No context, so we'll just match the object_id, with no prefix.
+        block_id_prefix = None
 
     # There is no API method in oel_tagging.api that does this yet,
     # so for now we have to build the ORM query directly.
-    all_object_tags = list(ObjectTag.objects.filter(
-        Q(object_id__startswith=block_id_prefix) | Q(object_id=content_key),
+    object_id_clause = Q(object_id=content_key)
+    if block_id_prefix:
+        object_id_clause |= Q(object_id__startswith=block_id_prefix)
+
+    all_object_tags = ObjectTag.objects.filter(
         Q(tag__isnull=False, tag__taxonomy__isnull=False),
-    ).select_related("tag__taxonomy"))
+        object_id_clause,
+    ).select_related("tag__taxonomy")
+
+    if prefetch_orgs:
+        all_object_tags = all_object_tags.prefetch_related("tag__taxonomy__taxonomyorg_set")
 
     grouped_object_tags: ObjectTagByObjectIdDict = {}
     taxonomies: TaxonomyDict = {}
@@ -177,14 +189,24 @@ def get_all_object_tags(
 def set_object_tags(
     content_key: ContentKey,
     object_tags: TagValuesByTaxonomyExportIdDict,
+    taxonomy_cache: dict = None,
 ) -> None:
     """
     Sets the tags for the given content object.
+
+    (Optional) provide a cache of taxonomies keyed by export_id to save refetching from the database.
     """
     context_key = get_context_key_from_key(content_key)
 
+    if taxonomy_cache is None:
+        taxonomy_cache = {}
+
     for taxonomy_export_id, tags_values in object_tags.items():
-        taxonomy = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
+
+        if taxonomy_export_id not in taxonomy_cache:
+            taxonomy_cache[taxonomy_export_id] = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
+        taxonomy = taxonomy_cache.get(taxonomy_export_id)
+
         if not taxonomy:
             continue
 
@@ -201,38 +223,33 @@ def set_object_tags(
 def copy_object_tags(
     source_content_key: ContentKey,
     dest_content_key: ContentKey,
-) -> int:
+) -> None:
     """
     Copies the permitted object tags on source_object_id to dest_object_id.
 
     If an source object tag is not available for use on the dest_object_id, it will not be copied.
-
-    Returns the number of tags copied.
     """
-    all_object_tags = get_object_tags(
-        object_id=str(source_content_key),
-    ).prefetch_related("taxonomy__taxonomyorg_set")
+    all_object_tags, taxonomies = get_all_object_tags(
+        content_key=source_content_key,
+        prefetch_orgs=True,
+    )
 
-    dest_context_key = get_context_key_from_key(dest_content_key)
-    tags_count = 0
+    # Convert data to use it with set_object_tags
+    src_object_tags = all_object_tags.get(str(source_content_key), {})
+    object_tags: TagValuesByTaxonomyExportIdDict = {}
+    taxonomy_cache = {
+        taxonomy.export_id: taxonomy
+        for taxonomy in taxonomies.values()
+    }
+    for taxonomy_id, tags in src_object_tags.items():
+        taxonomy = taxonomies[taxonomy_id]
+        object_tags[taxonomy.export_id] = [tag.value for tag in tags]
 
-    # get_object_tags sorts by taxonomy
-    # so grouping by taxonomy ID yields the the full list of object tags per taxonomy.
-    for _id, grouped_tags in groupby(all_object_tags, lambda x: x.tag.taxonomy_id if x.tag else 0):
-        object_tags = list(grouped_tags)
-        taxonomy = object_tags[0].taxonomy
-        tags = [tag.value for tag in object_tags]
-
-        if taxonomy and check_taxonomy_context_key_org(taxonomy, dest_context_key):
-            oel_tagging.tag_object(
-                object_id=str(dest_content_key),
-                taxonomy=taxonomy,
-                tags=tags,
-            )
-
-            tags_count += len(tags)
-
-    return tags_count
+    set_object_tags(
+        content_key=dest_content_key,
+        object_tags=object_tags,
+        taxonomy_cache=taxonomy_cache
+    )
 
 
 # Expose the oel_tagging APIs

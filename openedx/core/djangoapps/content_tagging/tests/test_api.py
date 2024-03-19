@@ -464,8 +464,7 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
             assert not list(api.get_object_tags(object_id=str(dst_key)))
 
         # Copy tags from the source block
-        num_copied = api.copy_object_tags(src_key, dst_key)
-        assert num_copied == len(expected_tags)
+        api.copy_object_tags(src_key, dst_key)
 
         with self.assertNumQueries(1):
             dst_tags = list(api.get_object_tags(object_id=str(dst_key)))
