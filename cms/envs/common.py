@@ -551,6 +551,16 @@ FEATURES = {
     #   https://github.com/openedx/openedx-events/issues/265
     # .. toggle_tickets: https://github.com/edx/edx-arch-experiments/issues/381
     'ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS': False,
+
+    # .. toggle_name: FEATURES['ENABLE_HIDE_FROM_TOC_UI']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, exposes hide_from_toc xblock attribute so course authors can configure it as
+    #  a section visibility option in Studio.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-02-29
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
+    'ENABLE_HIDE_FROM_TOC_UI': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
