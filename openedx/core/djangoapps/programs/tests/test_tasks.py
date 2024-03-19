@@ -250,7 +250,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         Checks that the task will be aborted and not retried if the username
         passed was not found, and that an exception is logged.
         """
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             tasks.award_program_certificates.delay("nonexistent-username").get()
             assert mock_exception.called
         for mock_helper in mock_helpers:
@@ -355,15 +355,12 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
             TASKS_MODULE + ".LOGGER.exception"
         ) as mock_warning:
             tasks.award_program_certificates.delay(self.student.username).get()
-
         assert mock_award_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            "Failed to award certificate for program {uuid} to user {username}.".format(
-                uuid=1, username=self.student.username
-            )
+            f"Failed to award program certificate to user {self.student} in program 1: boom"
         )
-        mock_info.assert_any_call(f"Awarded certificate for program {1} to user {self.student.username}")
-        mock_info.assert_any_call(f"Awarded certificate for program {2} to user {self.student.username}")
+        mock_info.assert_any_call(f"Awarded program certificate to user {self.student} in program 1")
+        mock_info.assert_any_call(f"Awarded program certificate to user {self.student} in program 2")
 
     def test_retry_on_programs_api_errors(self, mock_get_completed_programs, *_mock_helpers):
         """
@@ -608,7 +605,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         """
         Test that the post method is never called if the user isn't found by username
         """
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             # Use a random username here since this user won't be found in the DB
             tasks.award_course_certificate.delay("random_username", str(self.course.id)).get()
         assert mock_exception.called
@@ -619,7 +616,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         Test that the post method is never called if the certificate doesn't exist for the user and course
         """
         self.certificate.delete()
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         assert mock_exception.called
         assert not mock_post_course_certificate.called
@@ -629,7 +626,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         Test that the post method is never called if the CourseOverview isn't found
         """
         self.course.delete()
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             # Use the certificate course id here since the course will be deleted
             tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
         assert mock_exception.called
@@ -780,7 +777,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         Checks that the task will be aborted and not retried if the username
         passed was not found, and that an exception is logged.
         """
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             tasks.revoke_program_certificates.delay("nonexistent-username", self.course_key).get()
             assert mock_exception.called
         for mock_helper in mock_helpers:
@@ -819,18 +816,16 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         mock_revoke_program_certificate.side_effect = self._make_side_effect([Exception("boom"), None])
 
         with mock.patch(TASKS_MODULE + ".LOGGER.info") as mock_info, mock.patch(
-            TASKS_MODULE + ".LOGGER.warning"
+            TASKS_MODULE + ".LOGGER.exception"
         ) as mock_warning:
             tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
         assert mock_revoke_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            "Failed to revoke certificate for program {uuid} of user {username}.".format(
-                uuid=1, username=self.student.username
-            )
+            f"Failed to revoke program certificate from user {self.student} in program 1: boom"
         )
-        mock_info.assert_any_call(f"Revoked certificate for program {1} for user {self.student.username}")
-        mock_info.assert_any_call(f"Revoked certificate for program {2} for user {self.student.username}")
+        mock_info.assert_any_call(f"Revoked program certificate from user {self.student} in program 1")
+        mock_info.assert_any_call(f"Revoked program certificate from user {self.student} in program 2")
 
     def test_retry_on_credentials_api_errors(
         self,
