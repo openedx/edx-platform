@@ -67,10 +67,6 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
-try:
-    from skill_tagging.skill_tagging_mixin import SkillTaggingMixin
-except ImportError:
-    SkillTaggingMixin = None
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
@@ -1645,8 +1641,6 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
 )
-if SkillTaggingMixin:
-    XBLOCK_MIXINS += (SkillTaggingMixin,)
 
 # .. setting_name: XBLOCK_EXTRA_MIXINS
 # .. setting_default: ()
