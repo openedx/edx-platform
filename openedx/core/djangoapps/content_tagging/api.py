@@ -231,16 +231,11 @@ def generate_csv_rows(object_id, buffer) -> Iterator[str]:
     # Iterate over the blocks and yield the rows
     for item, level in iterate_with_level(tagged_content):
         block_key = get_content_key_from_string(item.block_id)
-        block_id = None
-        if isinstance(block_key, CourseKey):
-            block_id = block_key
-        else:
-            block_id = block_key.block_id
 
         block_data = {
             "name": level * "  " + item.display_name,
             "type": item.category,
-            "id": block_id,
+            "id": getattr(block_key, 'block_id', item.block_id),
         }
 
         # Add the tags for each taxonomy

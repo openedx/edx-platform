@@ -1850,24 +1850,8 @@ class TestContentObjectChildrenExportView(TaggedCourseMixin, APITestCase):  # ty
         assert response.status_code == status.HTTP_200_OK
         assert response.headers['Content-Type'] == 'text/csv'
 
-        expected_csv = (
-            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
-            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
-            '"  test sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@test_'
-            'sequential","Tag 1.1, Tag 1.2","Tag 2.1"\r\n'
-            '"    test vertical1","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
-            'vertical1","","Tag 2.2"\r\n'
-            '"    test vertical2","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@test_'
-            'vertical2","",""\r\n'
-            '"      test html","html","block-v1:orgA+test_course+test_run+type@html+block@test_html","","Tag 2.1"\r\n'
-            '"  untagged sequential","sequential","block-v1:orgA+test_course+test_run+type@sequential+block@untagged_'
-            'sequential","",""\r\n'
-            '"    untagged vertical","vertical","block-v1:orgA+test_course+test_run+type@vertical+block@untagged_'
-            'vertical","",""\r\n'
-        )
-
         zip_content = BytesIO(b"".join(response.streaming_content)).getvalue()  # type: ignore[attr-defined]
-        assert zip_content == expected_csv.encode()
+        assert zip_content == self.expected_csv.encode()
 
     def test_export_course_anoymous_forbidden(self) -> None:
         url = OBJECT_TAGS_EXPORT_URL.format(object_id=str(self.course.id))

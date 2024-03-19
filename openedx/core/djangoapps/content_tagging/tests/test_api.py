@@ -281,27 +281,14 @@ class TestExportTags(TaggedCourseMixin):
     """
     Tests for export functions
     """
-    def setUp(self):
-        super().setUp()
-        self.expected_csv = (
-            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\n'
-            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\n'
-            '"  test sequential","sequential","test_sequential","Tag 1.1, Tag 1.2","Tag 2.1"\n'
-            '"    test vertical1","vertical","test_vertical1","","Tag 2.2"\n'
-            '"    test vertical2","vertical","test_vertical2","",""\n'
-            '"      test html","html","test_html","","Tag 2.1"\n'
-            '"  untagged sequential","sequential","untagged_sequential","",""\n'
-            '"    untagged vertical","vertical","untagged_vertical","",""\n'
-        )
 
     def test_generate_csv_rows(self) -> None:
         buffer = io.StringIO()
         list(api.generate_csv_rows(str(self.course.id), buffer))
         buffer.seek(0)
         csv_content = buffer.getvalue()
-        cleaned_content = csv_content.replace('\r\n', '\n')
 
-        assert cleaned_content == self.expected_csv
+        assert csv_content == self.expected_csv
 
     def test_export_tags_in_csv_file(self) -> None:
         file_dir_name = tempfile.mkdtemp()
@@ -317,4 +304,6 @@ class TestExportTags(TaggedCourseMixin):
         with open(file_path, 'r') as f:
             content = f.read()
 
-        self.assertEqual(content, self.expected_csv)
+        cleaned_content = content.replace('\r\n', '\n')
+        cleaned_expected_csv = self.expected_csv.replace('\r\n', '\n')
+        self.assertEqual(cleaned_content, cleaned_expected_csv)
