@@ -5,6 +5,11 @@ import logging
 
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.courseware.masquerade import (
+    get_course_masquerade,
+    get_masquerading_user_group,
+    is_masquerading_as_specific_student
+)
 from lms.djangoapps.teams.api import get_teams_in_teamset
 from lms.djangoapps.teams.models import CourseTeamMembership
 from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
@@ -77,6 +82,14 @@ class TeamPartitionScheme:
         """
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
             return None
+
+        # First, check if we have to deal with masquerading.
+        # If the current user is masquerading as a specific student, use the
+        # same logic as normal to return that student's group. If the current
+        # user is masquerading as a generic student in a specific group, then
+        # return that group.
+        if get_course_masquerade(user, course_key) and not is_masquerading_as_specific_student(user, course_key):
+            return get_masquerading_user_group(course_key, user, user_partition)
 
         # A user cannot belong to more than one team in a team-set, so we can just get the first team.
         teams = get_teams_in_teamset(str(course_key), user_partition.parameters["team_set_id"])

@@ -554,3 +554,36 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
         assert TeamPartitionScheme.get_group_for_user(
             self.course_key, self.student, team_partition_scheme
         ) is None
+
+    @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.get_course_masquerade")
+    @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.get_masquerading_user_group")
+    @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.is_masquerading_as_specific_student")
+    def test_group_for_user_masquerading(
+        self,
+        mock_is_masquerading_as_specific_student,
+        mock_get_masquerading_user_group,
+        mock_get_course_masquerade
+    ):
+        """
+        Test that the TeamPartitionScheme returns the correct group for a student when masquerading.
+
+        Expected result:
+        - The group returned matches the masquerading group.
+        """
+        team_partition_scheme = TeamPartitionScheme.create_user_partition(
+            id=51,
+            name="Team set 1st TeamSet groups",
+            description="Partition for segmenting users by team-set",
+            parameters={
+                "course_id": str(self.course_key),
+                "team_set_id": 1,
+            }
+        )
+        mock_get_course_masquerade.return_value = True
+        mock_is_masquerading_as_specific_student.return_value = False
+
+        TeamPartitionScheme.get_group_for_user(
+            self.course_key, self.student, team_partition_scheme
+        )
+
+        mock_get_masquerading_user_group.assert_called_once_with(self.course_key, self.student, team_partition_scheme)
