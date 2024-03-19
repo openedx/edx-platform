@@ -64,13 +64,9 @@ def _meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     hyphens (-) and underscores (_). Since our opaque keys don't meet this
     requirement, we transform them to a similar slug ID string that does.
     """
-    # The slugified key _may_ not be unique so we append a hashed number too
+    # The slugified key _may_ not be unique so we append a hashed string to make it unique:
     key_bin = str(usage_key).encode()
-    try:
-        suffix = hashlib.sha1(key_bin, usedforsecurity=False).hexdigest()[:7]
-    except TypeError:
-        # Remove this when we don't need to support Python 3.8 and older
-        suffix = hashlib.sha1(key_bin).hexdigest()[:7]
+    suffix = hashlib.sha1(key_bin).hexdigest()[:7]  # When we use Python 3.9+, should add usedforsecurity=False here.
     return slugify(str(usage_key)) + "-" + suffix
 
 

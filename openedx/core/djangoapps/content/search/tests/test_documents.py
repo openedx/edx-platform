@@ -32,9 +32,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             data="<problem>What is a test?<multiplechoiceresponse></multiplechoiceresponse></problem>",
         )
 
-    def setUp(self):
-        super().setUp()
-
     def test_problem_block(self):
         """
         Test how a problem block gets represented in the search index
