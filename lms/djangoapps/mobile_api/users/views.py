@@ -4,6 +4,7 @@ Views for user API
 
 
 import logging
+from typing import List, Optional
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
@@ -29,9 +30,10 @@ from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.mobile_api.models import MobileConfig
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3, API_V4
 from openedx.features.course_duration_limits.access import check_course_expired
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -263,6 +265,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         An additional attribute "expiration" has been added to the response, which lists the date
         when access to the course will expire or null if it doesn't expire.
 
+        In v4 we added to the response primary object. Primary object contains the latest user's enrollment
+        or course where user has the latest progress. Primary object has been cut from user's
+        enrolments array and inserted into separated section with key `primary`.
+
     **Example Request**
 
         GET /api/mobile/v1/users/{username}/course_enrollments/
@@ -343,6 +349,29 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
     def get_queryset(self):
         api_version = self.kwargs.get('api_version')
+        mobile_available = self.get_mobile_available_enrollments()
+
+        not_duration_limited = (
+            enrollment for enrollment in mobile_available
+            if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
+        )
+
+        if api_version == API_V4:
+            primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
+            if primary_enrollment_obj:
+                mobile_available.remove(primary_enrollment_obj)
+
+        if api_version == API_V05:
+            # for v0.5 don't return expired courses
+            return list(not_duration_limited)
+        else:
+            # return all courses, with associated expiration
+            return mobile_available
+
+    def get_mobile_available_enrollments(self) -> List[Optional[CourseEnrollment]]:
+        """
+        Gets list with `CourseEnrollment` for mobile available courses.
+        """
         enrollments = self.queryset.filter(
             user__username=self.kwargs['username'],
             is_active=True
@@ -357,30 +386,63 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             enrollment for enrollment in same_org
             if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
         )
-        not_duration_limited = (
-            enrollment for enrollment in mobile_available
-            if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
-        )
-
-        if api_version == API_V05:
-            # for v0.5 don't return expired courses
-            return list(not_duration_limited)
-        else:
-            # return all courses, with associated expiration
-            return list(mobile_available)
+        return list(mobile_available)
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         api_version = self.kwargs.get('api_version')
 
-        if api_version in (API_V2, API_V3):
+        if api_version in (API_V2, API_V3, API_V4):
             enrollment_data = {
                 'configs': MobileConfig.get_structured_configs(),
                 'enrollments': response.data
             }
+            if api_version == API_V4:
+                primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
+                if primary_enrollment_obj:
+                    serializer = self.get_serializer(primary_enrollment_obj)
+                    enrollment_data.update({'primary': serializer.data})
+
             return Response(enrollment_data)
 
         return response
+
+    def get_primary_enrollment_by_latest_enrollment_or_progress(self) -> Optional[CourseEnrollment]:
+        """
+        Gets primary enrollment obj by latest enrollment or latest progress on the course.
+        """
+        mobile_available = self.get_mobile_available_enrollments()
+        if not mobile_available:
+            return None
+
+        mobile_available_course_ids = [enrollment.course_id for enrollment in mobile_available]
+
+        latest_enrollment = self.queryset.filter(
+            user__username=self.kwargs['username'],
+            is_active=True,
+            course__id__in=mobile_available_course_ids,
+        ).order_by('-created').first()
+
+        if not latest_enrollment:
+            return None
+
+        latest_progress = StudentModule.objects.filter(
+            student__username=self.kwargs['username'],
+            course_id__in=mobile_available_course_ids,
+        ).order_by('-modified').first()
+
+        if not latest_progress:
+            return latest_enrollment
+
+        enrollment_with_latest_progress = self.queryset.filter(
+            course_id=latest_progress.course_id,
+            user__username=self.kwargs['username'],
+        ).first()
+
+        if latest_enrollment.created > latest_progress.modified:
+            return latest_enrollment
+        else:
+            return enrollment_with_latest_progress
 
     # pylint: disable=attribute-defined-outside-init
     @property
@@ -394,7 +456,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         super().paginator  # pylint: disable=expression-not-assigned
         api_version = self.kwargs.get('api_version')
 
-        if self._paginator is None and api_version == API_V3:
+        if self._paginator is None and api_version in (API_V3, API_V4):
             self._paginator = DefaultPagination()
 
         return self._paginator
