@@ -12,8 +12,8 @@ from organizations.models import Organization
 
 from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
 
-from .types import ContentKey, ContextKey
 from .models import TaxonomyOrg
+from .types import ContentKey, ContextKey
 
 
 def get_content_key_from_string(key_str: str) -> ContentKey:
@@ -84,6 +84,12 @@ class TaggingRulesCache:
         Initializes the request cache.
         """
         self.request_cache = RequestCache('openedx.core.djangoapps.content_tagging.utils')
+
+    def clear(self):
+        """
+        Clears the rules cache.
+        """
+        self.request_cache.clear()
 
     def get_orgs(self, org_names: list[str] | None = None) -> list[Organization]:
         """

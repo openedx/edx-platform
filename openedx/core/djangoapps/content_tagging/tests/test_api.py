@@ -3,13 +3,13 @@ import time
 
 import ddt
 from django.test.testcases import TestCase
-
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
 
 from .. import api
+from ..utils import rules_cache
 
 
 class TestTaxonomyMixin:
@@ -114,6 +114,9 @@ class TestTaxonomyMixin:
         self.taxonomy_disabled.enabled = False
         self.taxonomy_disabled.save()
         self.disabled_course_tag.refresh_from_db()  # Update its cached .taxonomy
+
+        # Clear the rules cache in between test runs
+        rules_cache.clear()
 
 
 @ddt.ddt
