@@ -2016,6 +2016,22 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
     return context
 
 
+def get_textbooks_context(course):
+    """
+    Utils is used to get context for textbooks for course.
+    It is used for both DRF and django views.
+    """
+
+    upload_asset_url = reverse_course_url('assets_handler', course.id)
+    textbook_url = reverse_course_url('textbooks_list_handler', course.id)
+    return {
+        'context_course': course,
+        'textbooks': course.pdf_textbooks,
+        'upload_asset_url': upload_asset_url,
+        'textbook_url': textbook_url,
+    }
+
+
 class StudioPermissionsService:
     """
     Service that can provide information about a user's permissions.

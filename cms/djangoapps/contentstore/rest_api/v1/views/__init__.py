@@ -9,6 +9,7 @@ from .grading import CourseGradingView
 from .proctoring import ProctoredExamSettingsView, ProctoringErrorsView
 from .home import HomePageView, HomePageCoursesView, HomePageLibrariesView
 from .settings import CourseSettingsView
+from .textbooks import CourseTextbooksView
 from .videos import (
     CourseVideosView,
     VideoUsageView,
