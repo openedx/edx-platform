@@ -36,7 +36,10 @@ jobs:
           - "common-with-cms"
           - "xmodule-with-lms"
           - "xmodule-with-cms"
-    name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
+        mongo-version:
+          - "4.4"
+          - "7.0"
+    name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},mongo-${{ matrix.mongo-version }}${{ matrix.shard_name }}
     steps:
       - uses: actions/checkout@v2
 
@@ -46,7 +49,7 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.7.0
         with:
-          mongodb-version: 4.4
+          mongodb-version: ${{ matrix.mongo-version}}
 
       - name: Setup Python
         uses: actions/setup-python@v4

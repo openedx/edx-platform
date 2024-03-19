@@ -666,6 +666,29 @@ $outline-indent-width: $baseline;
       .icon {
         @include margin-right($baseline/4);
       }
+
+      .status-message {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+      }
+
+      .subsection-share-link-button {
+        border-radius: ($baseline/4);
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        margin: 0 1rem;
+
+        .icon-share-link {
+          color: $white !important;
+          transform: rotate(90deg);
+        }
+      }
     }
 
     .status-message-copy {

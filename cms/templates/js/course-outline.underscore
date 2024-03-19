@@ -419,8 +419,15 @@ if (is_proctored_exam) {
             <div class="status-messages">
             <% for (var i=0; i<statusMessages.length; i++) { %>
                 <div class="status-message">
-                    <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
-                    <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                    <div>
+                        <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
+                        <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                    </div>
+                    <% if (enableHideFromTOC && xblockInfo.isSequential()) { %>
+                        <button type="button" class="button btn-primary subsection-share-link-button">
+                            <span class="icon fa fa-link icon-share-link"></span><%- gettext('Share') %>
+                        </button>
+                    <% } %>
                 </div>
             <% } %>
             </div>

@@ -5,12 +5,15 @@ from functools import reduce
 from operator import or_
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
+
+USER_MODEL = get_user_model()
 
 
 class EnrollmentsService:
@@ -24,6 +27,34 @@ class EnrollmentsService:
         Returns a list of active enrollments for a course
         """
         return CourseEnrollment.objects.filter(course_id=course_id, is_active=True)
+
+    def get_active_enrollments_by_course_and_user(self, course_id, user_id):
+        """
+        Returns a list of active enrollments for a course and user.
+
+        Parameters:
+        * course_id: course ID for the course
+        * user_id: ID of User object
+        """
+        user = self._get_user_by_id(user_id)
+        enrollment = CourseEnrollment.get_enrollment(user, course_id)
+        if not enrollment or not enrollment.is_active:
+            # not enrolled
+            return None
+
+        return enrollment
+
+    def _get_user_by_id(self, user_id):
+        """
+        Returns s User object for give ID
+
+        Parameters:
+        * user_id: ID of User object
+        """
+        try:
+            return USER_MODEL.objects.get(id=user_id)
+        except USER_MODEL.DoesNotExist:
+            return None
 
     def _get_enrollments_for_course_proctoring_eligible_modes(self, course_id, allow_honor_mode=False):
         """

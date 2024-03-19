@@ -48,6 +48,7 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.xblock_utils import get_icon
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
@@ -78,6 +79,8 @@ from ..helpers import (
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
     is_unit,
+    xblock_embed_lms_url,
+    xblock_lms_url,
     xblock_primary_child_category,
     xblock_studio_url,
     xblock_type_display_name,
@@ -1070,6 +1073,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "published": published,
                 "published_on": published_on,
                 "studio_url": xblock_studio_url(xblock, parent_xblock),
+                "lms_url": xblock_lms_url(xblock),
+                "embed_lms_url": xblock_embed_lms_url(xblock),
                 "released_to_students": datetime.now(UTC) > xblock.start,
                 "release_date": release_date,
                 "visibility_state": visibility_state,
@@ -1091,6 +1096,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "show_correctness": xblock.show_correctness,
                 "hide_from_toc": xblock.hide_from_toc,
                 "enable_hide_from_toc_ui": settings.FEATURES.get("ENABLE_HIDE_FROM_TOC_UI", False),
+                "xblock_type": get_icon(xblock),
             }
         )
 
