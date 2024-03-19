@@ -198,6 +198,43 @@ def set_object_tags(
         )
 
 
+def copy_object_tags(
+    source_content_key: ContentKey,
+    dest_content_key: ContentKey,
+) -> int:
+    """
+    Copies the permitted object tags on source_object_id to dest_object_id.
+
+    If an source object tag is not available for use on the dest_object_id, it will not be copied.
+
+    Returns the number of tags copied.
+    """
+    all_object_tags = get_object_tags(
+        object_id=str(source_content_key),
+    ).prefetch_related("taxonomy__taxonomyorg_set")
+
+    dest_context_key = get_context_key_from_key(dest_content_key)
+    tags_count = 0
+
+    # get_object_tags sorts by taxonomy
+    # so grouping by taxonomy ID yields the the full list of object tags per taxonomy.
+    for _id, grouped_tags in groupby(all_object_tags, lambda x: x.tag.taxonomy_id if x.tag else 0):
+        object_tags = list(grouped_tags)
+        taxonomy = object_tags[0].taxonomy
+        tags = [tag.value for tag in object_tags]
+
+        if taxonomy and check_taxonomy_context_key_org(taxonomy, dest_context_key):
+            oel_tagging.tag_object(
+                object_id=str(dest_content_key),
+                taxonomy=taxonomy,
+                tags=tags,
+            )
+
+            tags_count += len(tags)
+
+    return tags_count
+
+
 # Expose the oel_tagging APIs
 
 get_taxonomy = oel_tagging.get_taxonomy

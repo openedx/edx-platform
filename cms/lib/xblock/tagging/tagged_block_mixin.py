@@ -103,19 +103,6 @@ class TaggedBlockMixin:
         super().add_xml_to_node(node)
         self.add_tags_to_node(node)
 
-    def studio_post_duplicate(self, store, source_item) -> bool:
-        """
-        Duplicates content tags from the source_item.
-
-        Returns False to indicate the children have not been handled.
-        """
-        if hasattr(super(), 'studio_post_duplicate'):
-            super().studio_post_duplicate()
-
-        self.tags_v1 = self.serialize_tag_data(source_item.scope_ids.usage_id)
-        self.add_tags_from_field()
-        return False
-
     def studio_post_paste(self, store, source_node) -> bool:
         """
         Copies content tags from the source_node.

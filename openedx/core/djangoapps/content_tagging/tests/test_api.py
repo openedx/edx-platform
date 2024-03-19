@@ -4,7 +4,7 @@ import time
 import ddt
 from django.test.testcases import TestCase
 
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
@@ -246,7 +246,6 @@ class TestGetAllObjectTagsMixin:
     def setUp(self):
         super().setUp()
 
-        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
         self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
         api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
         api.add_tag_to_taxonomy(
@@ -276,6 +275,14 @@ class TestGetAllObjectTagsMixin:
             tags=['Tag 1.1'],
         )
         self.course_tags = api.get_object_tags("course-v1:orgA+test_course+test_run")
+
+        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
+        self.orgB = Organization.objects.create(name="Organization B", short_name="orgB")
+        self.taxonomy_3 = api.create_taxonomy(name="Taxonomy 3", orgs=[self.orgA])
+        api.add_tag_to_taxonomy(
+            taxonomy=self.taxonomy_3,
+            tag="Tag 3.1",
+        )
 
         # Tag blocks
         api.tag_object(
@@ -410,9 +417,9 @@ class TestGetAllObjectTagsMixin:
         }
 
 
-class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
+class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
     """
-    Test get_all_object_tags api function
+    Tests object tag API functions.
     """
 
     def test_get_course_object_tags(self):
@@ -444,3 +451,56 @@ class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
             self.taxonomy_1.id: self.taxonomy_1,
             self.taxonomy_2.id: self.taxonomy_2,
         }
+
+    def _test_copy_object_tags(self, src_key, dst_key, expected_tags):
+        """
+        Test copying object tags to a new object.
+        """
+        # Destination block doesn't have any tags yet
+        with self.assertNumQueries(1):
+            assert not list(api.get_object_tags(object_id=str(dst_key)))
+
+        # Copy tags from the source block
+        num_copied = api.copy_object_tags(src_key, dst_key)
+        assert num_copied == len(expected_tags)
+
+        with self.assertNumQueries(1):
+            dst_tags = list(api.get_object_tags(object_id=str(dst_key)))
+
+        # Check that the destination tags match the expected list (name + value only; object_id will differ)
+        with self.assertNumQueries(0):
+            assert len(dst_tags) == len(expected_tags)
+            for idx, src_tag in enumerate(expected_tags):
+                dst_tag = dst_tags[idx]
+                assert src_tag.name == dst_tag.name
+                assert src_tag.value == dst_tag.value
+
+    def test_copy_object_tags(self):
+        """
+        Test copying object tags to a new object.
+        """
+        src_key = UsageKey.from_string("block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential")
+        dst_key = UsageKey.from_string("block-v1:orgB+test_course+test_run+type@sequential+block@test_sequential")
+        expected_tags = list(self.sequential_tags1) + list(self.sequential_tags2)
+        with self.assertNumQueries(30):  # TODO why so high?
+            self._test_copy_object_tags(src_key, dst_key, expected_tags)
+
+    def test_copy_cross_org_tags(self):
+        """
+        Test copying object tags to a new object in a different org.
+        Ensure only the permitted tags are copied.
+        """
+        src_key = UsageKey.from_string("block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential")
+        dst_key = UsageKey.from_string("block-v1:orgB+test_course+test_run+type@sequential+block@test_sequential")
+
+        # Add another tag from an orgA-specific taxonomy
+        api.tag_object(
+            object_id=str(src_key),
+            taxonomy=self.taxonomy_3,
+            tags=["Tag 3.1"],
+        )
+
+        # Destination block should have all of the source block's tags, except for the orgA-specific one.
+        expected_tags = list(self.sequential_tags1) + list(self.sequential_tags2)
+        with self.assertNumQueries(32):  # TODO why so high?
+            self._test_copy_object_tags(src_key, dst_key, expected_tags)
