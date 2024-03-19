@@ -260,6 +260,6 @@ xss-utils==0.2.0          # via -r requirements/edx/base.in
 django-tinymce==3.4.0
 youtube-dl==2020.12.2
 pafy==0.5.5
-
+openedx-completion-aggregator==4.0.3
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
