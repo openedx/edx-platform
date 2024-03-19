@@ -2171,7 +2171,7 @@ wrapt==1.16.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   astroid
-xblock[django]==1.10.0
+xblock[django]==3.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
