@@ -565,10 +565,11 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
         mock_get_course_masquerade
     ):
         """
-        Test that the TeamPartitionScheme returns the correct group for a student when masquerading.
+        Test that the TeamPartitionScheme calls the masquerading functions when
+        the user is masquerading.
 
         Expected result:
-        - The group returned matches the masquerading group.
+        - The masquerading functions are called.
         """
         team_partition_scheme = TeamPartitionScheme.create_user_partition(
             id=51,
