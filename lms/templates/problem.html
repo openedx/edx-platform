@@ -90,7 +90,9 @@ from openedx.core.djangolib.markup import HTML, Text
         % if attempts_allowed and (not submit_disabled_cta or attempts_used == 0):
           ${ngettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}
         % endif
-        <div>${Text(_("Grading method: {grading_method}")).format(grading_method=grading_method)}</div>
+        % if grading_method:
+          <div>${Text(_("Grading method: {grading_method}")).format(grading_method=grading_method)}</div>
+        % endif
         <span class="sr">${_("Some problems have options such as save, reset, hints, or show answer. These options follow the Submit button.")}</span>
       </div>
     </div>

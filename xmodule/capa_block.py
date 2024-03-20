@@ -491,8 +491,10 @@ class ProblemBlock(
 
         return self.display_name
 
-    def grading_method_display_name(self) -> str:
-        """Return the display name for the grading method."""
+    def should_show_grading_method(self) -> str | bool:
+        """
+        If the feature flag is enabled, return the grading method, else return False.
+        """
         _ = self.runtime.service(self, "i18n").gettext
         display_name = {
             GRADING_METHOD.LAST_SCORE: _("Last Score"),
@@ -500,7 +502,13 @@ class ProblemBlock(
             GRADING_METHOD.HIGHEST_SCORE: _("Highest Score"),
             GRADING_METHOD.AVERAGE_SCORE: _("Average Score"),
         }
-        return display_name[self.grading_method]
+        if self.enable_grading_method:
+            return display_name[self.grading_method]
+        return False
+
+    @property
+    def enable_grading_method(self):
+        return settings.FEATURES.get('ENABLE_GRADING_METHOD_IN_PROBLEMS', False)
 
     @property
     def debug(self):
@@ -556,6 +564,8 @@ class ProblemBlock(
             #   https://github.com/openedx/public-engineering/issues/192
             ProblemBlock.matlab_api_key,
         ])
+        if not self.enable_grading_method:
+            non_editable_fields.append(ProblemBlock.grading_method)
         return non_editable_fields
 
     @property
@@ -1289,7 +1299,7 @@ class ProblemBlock(
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
-            'grading_method': self.grading_method_display_name(),
+            'grading_method': self.should_show_grading_method(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
             'demand_hint_possible': demand_hint_possible,
@@ -1803,7 +1813,10 @@ class ProblemBlock(
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
-            self._set_score()
+            if self.enable_grading_method:
+                self._set_score()
+            else:
+                self.set_score(self.score_from_lcp(self.lcp))
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -2215,7 +2228,11 @@ class ProblemBlock(
         event_info['orig_score'] = orig_score.raw_earned
         event_info['orig_total'] = orig_score.raw_possible
         try:
-            calculated_score = self.get_rescore()
+            if self.enable_grading_method:
+                calculated_score = self.get_rescore()
+            else:
+                self.update_correctness()
+                calculated_score = self.calculate_score()
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:  # lint-amnesty, pylint: disable=unused-variable
             log.warning("Input error in capa_block:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
@@ -2261,7 +2278,7 @@ class ProblemBlock(
         Returns:
             Score: The score calculated based on the grading method.
         """
-        self.update_correctness()
+        self.update_correctness_list()
         self.score_history = self.calculate_score_list()
         grading_method_handler = GradingMethodHandler(
             self.score,
@@ -2288,6 +2305,18 @@ class ProblemBlock(
         return self.score
 
     def update_correctness(self):
+        """
+        Updates correct map of the LCP.
+        Operates by creating a new correctness map based on the current
+        state of the LCP, and updating the old correctness map of the LCP.
+        """
+        # Make sure that the attempt number is always at least 1 for grading purposes,
+        # even if the number of attempts have been reset and this problem is regraded.
+        self.lcp.context['attempt'] = max(self.attempts, 1)
+        new_correct_map = self.lcp.get_grade_from_current_answers(None)
+        self.lcp.correct_map.update(new_correct_map)
+
+    def update_correctness_list(self):
         """
         Updates the `correct_map_history` and the `correct_map` of the LCP.
 

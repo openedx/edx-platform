@@ -466,6 +466,46 @@ class LoncapaProblem(object):
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
 
+    def get_grade_from_current_answers(self, student_answers):
+        """
+        Gets the grade for the currently-saved problem state, but does not save it
+        to the block.
+
+        For new student_answers being graded, `student_answers` is a dict of all the
+        entries from request.POST, but with the first part of each key removed
+        (the string before the first "_").  Thus, for example,
+        input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123.
+
+        For rescoring, `student_answers` is None.
+
+        Calls the Response for each question in this problem, to do the actual grading.
+        """
+        # old CorrectMap
+        oldcmap = self.correct_map
+
+        # start new with empty CorrectMap
+        newcmap = CorrectMap()
+        # Call each responsetype instance to do actual grading
+        for responder in self.responders.values():
+            # File objects are passed only if responsetype explicitly allows
+            # for file submissions.  But we have no way of knowing if
+            # student_answers contains a proper answer or the filename of
+            # an earlier submission, so for now skip these entirely.
+            # TODO: figure out where to get file submissions when rescoring.
+            if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
+                _ = self.capa_system.i18n.gettext
+                raise Exception(_("Cannot rescore problems with possible file submissions"))
+
+            # use 'student_answers' only if it is provided, and if it might contain a file
+            # submission that would not exist in the persisted "student_answers".
+            if 'filesubmission' in responder.allowed_inputfields and student_answers is not None:
+                results = responder.evaluate_answers(student_answers, oldcmap)
+            else:
+                results = responder.evaluate_answers(self.student_answers, oldcmap)
+            newcmap.update(results)
+
+        return newcmap
+
     def get_grade_from_answers(
         self, student_answers: dict, correct_map: Optional[CorrectMap] = None
     ) -> CorrectMap:
