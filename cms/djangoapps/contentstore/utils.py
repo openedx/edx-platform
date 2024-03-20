@@ -91,12 +91,12 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_uploads_page,
     use_new_custom_pages,
     use_tagging_taxonomy_list_page,
-    # use_xpert_translations_component,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from xmodule.library_tools import LibraryToolsService
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1260,8 +1260,16 @@ def load_services_for_studio(runtime, user):
 
 def update_course_details(request, course_key, payload, course_block):
     """
-    Utils is used to update course details.
-    It is used for both DRF and django views.
+    Utility function used to update course details. It is used for both DRF and legacy Django views.
+
+    Args:
+        request (WSGIRequest): Django HTTP request object
+        course_key (CourseLocator): The course run key
+        payload (dict): Dictionary of course run settings
+        course_block (CourseBlockWithMixins): A course run instance
+
+    Returns:
+        None
     """
 
     from .views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
@@ -1287,10 +1295,9 @@ def update_course_details(request, course_key, payload, course_block):
                 if milestone["namespace"] != entrance_exam_namespace:
                     remove_prerequisite_course(course_key, milestone)
 
-    # If the entrance exams feature has been enabled, we'll need to check for some
-    # feature-specific settings and handle them accordingly
-    # We have to be careful that we're only executing the following logic if we actually
-    # need to create or delete an entrance exam from the specified course
+    # If the entrance exams feature has been enabled, we'll need to check for some feature-specific settings and handle
+    # them accordingly. We have to be careful that we're only executing the following logic if we actually need to
+    # create or delete an entrance exam from the specified course
     if core_toggles.ENTRANCE_EXAMS.is_enabled():
         course_entrance_exam_present = course_block.entrance_exam_enabled
         entrance_exam_enabled = payload.get('entrance_exam_enabled', '') == 'true'
@@ -1312,11 +1319,21 @@ def update_course_details(request, course_key, payload, course_block):
             # If there's no entrance exam defined, we'll create a new one
             else:
                 create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
-
-        # If the entrance exam box on the settings screen has been unchecked,
-        # and the course has an entrance exam attached...
+        # If the entrance exam box on the settings screen has been unchecked, and the course has an entrance exam
+        # attached...
         elif not entrance_exam_enabled and course_entrance_exam_present:
             delete_entrance_exam(request, course_key)
+
+    # Fix any potential issues with the display behavior and availability date of certificates before saving the update.
+    # A self-paced course run should *never* have a display behavior of anything other than "Immediately Upon Passing"
+    # ("early_no_info") and does not support having a certificate available date. We are aware of an issue with the
+    # legacy Django template-based frontend where bad data is allowed to creep into the system, which can cause
+    # downstream services (e.g. the Credentials IDA) to go haywire. This bad data is most often seen when a course run
+    # is updated from instructor-paced to self-paced (self_paced == True in our JSON payload), so we check and fix
+    # during these updates. Otherwise, the legacy UI seems to do the right thing.
+    if "self_paced" in payload and payload["self_paced"]:
+        payload["certificate_available_date"] = None
+        payload["certificates_display_behavior"] = CertificatesDisplayBehaviors.EARLY_NO_INFO
 
     # Perform the normal update workflow for the CourseDetails model
     return CourseDetails.update_from_json(course_key, payload, request.user)
