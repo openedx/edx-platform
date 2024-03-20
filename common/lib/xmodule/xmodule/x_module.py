@@ -1868,6 +1868,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
         self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
+        self.user = user
 
         if user:
             self.user_id = user.id
@@ -1919,6 +1920,19 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         Returns:
             An object implementing the requested service, or None.
         """
+        if service_name == "user" and self.user:
+            from common.djangoapps.xblock_django.user_service import (
+                DjangoXBlockUserService,
+            )
+            from lms.djangoapps.courseware.access import has_access
+
+            return DjangoXBlockUserService(
+                self.user,
+                user_is_staff=bool(
+                    has_access(self.user, "staff", block, self.course_id)
+                ),
+            )
+
         # getting the service from parent module. making sure of block service declarations.
         service = super(ModuleSystem, self).service(block=block, service_name=service_name)
         # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
