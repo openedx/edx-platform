@@ -29,4 +29,4 @@ class CourseTextbooksSerializer(serializers.Serializer):
     Serializer for representing course's textbooks.
     """
 
-    textbooks = serializers.ListField()
+    textbooks = CourseTextbookItemSerializer(many=True)
