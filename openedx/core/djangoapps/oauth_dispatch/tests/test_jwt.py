@@ -3,6 +3,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import ddt
+import jwt
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
@@ -77,6 +78,33 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
     @override_settings(JWT_AUTH_FORCE_CREATE_ASYMMETRIC=True)
     def test_dot_create_jwt_for_token_forced_asymmetric(self):
         jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=False)
+        self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=True)
+
+    def test_kid_not_in_jwt_header_with_symmetric_key_and_kid_disabled(self):
+        jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=False)
+        header = jwt.get_unverified_header(jwt_token)
+        assert 'kid' not in header
+        self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=False)
+
+    def test_kid_not_in_jwt_header_with_asymmetric_key_and_kid_disabled(self):
+        jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=True)
+        header = jwt.get_unverified_header(jwt_token)
+        assert 'kid' not in header
+        self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=True)
+
+    @override_settings(JWT_AUTH_ADD_KID_HEADER=True)
+    def test_kid_not_in_jwt_header_with_symmetric_key_and_kid_enabled(self):
+        jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=False)
+        header = jwt.get_unverified_header(jwt_token)
+        assert 'kid' not in header
+        self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=False)
+
+    @override_settings(JWT_AUTH_ADD_KID_HEADER=True)
+    def test_kid_in_jwt_header_with_asymmetric_key_and_kid_enabled(self):
+        jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=True)
+        header = jwt.get_unverified_header(jwt_token)
+        assert 'kid' in header
+        assert header['kid'] == 'BTZ9HA6K'
         self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=True)
 
     def test_create_jwt_for_token_default_expire_seconds(self):
