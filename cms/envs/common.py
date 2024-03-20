@@ -2810,6 +2810,9 @@ INACTIVE_USER_LOGIN = True
 # Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
 INACTIVE_USER_URL = f'http://{CMS_BASE}'
 
+# String length for the configurable part of the auto-generated username
+AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
+
 ######################## BRAZE API SETTINGS ########################
 
 EDX_BRAZE_API_KEY = None
