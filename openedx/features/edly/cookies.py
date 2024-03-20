@@ -76,19 +76,19 @@ def _get_edly_user_info_cookie_string(request):
             edly_access_user = user.edly_multisite_user.get(sub_org=edly_sub_organization)
             user_groups.extend(edly_access_user.groups.all().values_list('name', flat=True))
 
-        sub_org = list( 
-                EdlyMultiSiteAccess.objects.filter(
+        sub_org = EdlyMultiSiteAccess.objects.filter(
                     user=request.user,
                     sub_org__in=EdlySubOrganization.objects.filter(
                         edly_organization=edly_sub_organization.edly_organization
                     )
-                ).values_list('sub_org__slug',flat=True)
-            )
+                )
         
+        edx_orgs = list(sub_org.values_list('sub_org__edx_organizations__short_name', flat=True))
+        sub_org = list(sub_org.values_list('sub_org__slug',flat=True))
         edly_user_info_cookie_data = {
             'edly-org': edly_sub_organization.edly_organization.slug,
             'edly-sub-org': edly_sub_organization.slug,
-            'edx-orgs': sub_org,
+            'edx-orgs': edx_orgs,
             'is_course_creator': auth.user_has_role(
                 request.user,
                 CourseCreatorRole()
