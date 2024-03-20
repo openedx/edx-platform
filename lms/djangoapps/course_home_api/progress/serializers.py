@@ -145,3 +145,4 @@ class ProgressTabSerializer(VerifiedModeSerializer):
     username = serializers.CharField()
     user_has_passing_grade = serializers.BooleanField()
     verification_data = VerificationDataSerializer()
+    disable_progress_graph = serializers.BooleanField()
