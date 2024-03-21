@@ -14,6 +14,7 @@ from .proctoring import (
     ProctoringErrorsSerializer
 )
 from .settings import CourseSettingsSerializer
+from .textbooks import CourseTextbooksSerializer
 from .videos import (
     CourseVideosSerializer,
     VideoUploadSerializer,

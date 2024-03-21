@@ -9,6 +9,7 @@ from .views import (
     ContainerHandlerView,
     CourseDetailsView,
     CourseTeamView,
+    CourseTextbooksView,
     CourseIndexView,
     CourseGradingView,
     CourseRerunView,
@@ -102,6 +103,11 @@ urlpatterns = [
         fr'^course_rerun/{COURSE_ID_PATTERN}$',
         CourseRerunView.as_view(),
         name="course_rerun"
+    ),
+    re_path(
+        fr'^textbooks/{COURSE_ID_PATTERN}$',
+        CourseTextbooksView.as_view(),
+        name="textbooks"
     ),
     re_path(
         fr'^container_handler/{settings.USAGE_KEY_PATTERN}$',
