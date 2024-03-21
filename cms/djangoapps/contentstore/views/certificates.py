@@ -40,7 +40,7 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_studio_write_access
-from common.djangoapps.student.roles import GlobalStaff, CourseInstructorRole
+from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
