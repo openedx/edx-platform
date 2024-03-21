@@ -1208,7 +1208,7 @@ webob==1.8.7
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/paver.txt
-xblock[django]==1.10.0
+xblock[django]==3.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
