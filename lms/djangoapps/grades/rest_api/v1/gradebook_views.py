@@ -9,7 +9,6 @@ from contextlib import contextmanager
 from functools import wraps
 
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.db.models import Case, Exists, F, OuterRef, Q, When
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -670,22 +669,16 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data, **users_counts)
 
-    def _get_user_count(self, query_args, cache_time=3600, annotations=None):
+    def _get_user_count(self, query_args, annotations=None):
         """
         Return the user count for the given query arguments to CourseEnrollment.
-
-        caches the count for cache_time seconds.
         """
         queryset = CourseEnrollment.objects
         if annotations:
             queryset = queryset.annotate(**annotations)
         queryset = queryset.filter(*query_args)
 
-        cache_key = 'usercount.%s' % queryset.query
-        user_count = cache.get(cache_key, None)
-        if user_count is None:
-            user_count = queryset.count()
-            cache.set(cache_key, user_count, cache_time)
+        user_count = queryset.count()
 
         return user_count
 
