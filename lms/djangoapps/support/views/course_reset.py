@@ -14,6 +14,7 @@ from lms.djangoapps.support.models import (
     CourseResetCourseOptIn,
     CourseResetAudit
 )
+from ..tasks import reset_student_course
 
 User = get_user_model()
 
@@ -131,7 +132,8 @@ class CourseResetAPIView(APIView):
         ):
             course_reset_audit.status = CourseResetAudit.CourseResetStatus.ENQUEUED
             course_reset_audit.save()
-            # Call celery task
+            reset_student_course.delay(course_id, user.email, request.user.email)
+
             resp = {
                 'course_id': course_id,
                 'status': course_reset_audit.status_message(),
@@ -159,7 +161,7 @@ class CourseResetAPIView(APIView):
                 'display_name': course_overview.display_name
             }
 
-            # Call celery task
+            reset_student_course.delay(course_id, user.email, request.user.email)
             return Response(resp, status=201)
         else:
             return Response(None, status=400)
