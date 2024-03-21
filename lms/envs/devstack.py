@@ -559,6 +559,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:1992',  # frontend-app-ora
     'http://localhost:2002',  # frontend-app-discussions
     'http://localhost:1991',  # frontend-app-admin-portal
+    'http://localhost:1999',  # frontend-app-authn
 ]
 
 
