@@ -442,7 +442,10 @@ class LoncapaProblem(object):
 
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
-        new_cmap = self.get_grade_from_answers(answers)
+        if settings.FEATURES.get("ENABLE_GRADING_METHOD_IN_PROBLEMS", False):
+            new_cmap = self.get_grade_from_answers(answers)
+        else:
+            new_cmap = self.get_grade_from_current_answers(answers)
         self.correct_map = new_cmap  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.correct_map_history.append(deepcopy(new_cmap))
         return self.correct_map
