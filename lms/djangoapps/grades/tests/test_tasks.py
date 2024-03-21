@@ -14,14 +14,13 @@ import pytz
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from edx_toggles.toggles.testutils import override_waffle_flag
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
+from stevedore.extension import Extension, ExtensionManager
 
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, get_event_transaction_id
 from common.djangoapps.util.date_utils import to_timestamp
+from lms.djangoapps.courseware.tests.test_group_access import MemoryUserPartitionScheme
 from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
@@ -36,6 +35,10 @@ from lms.djangoapps.grades.tasks import (
     recalculate_subsection_grade_v3
 )
 from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, check_mongo_calls
+from xmodule.partitions.partitions import USER_PARTITION_SCHEME_NAMESPACE, Group, UserPartition
 
 from .utils import mock_get_score
 
@@ -208,6 +211,48 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             sequentials_signalled,
             {self.sequential.location, accessible_seq.location},
         )
+
+    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
+    def test_problem_block_with_restricted_access(self, mock_subsection_signal):
+        """
+        Test that `SUBSECTION_SCORE_CHANGED` is sent for a restricted problem block.
+        """
+        self.set_up_course()
+
+        UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
+            [
+                Extension(
+                    "memory",
+                    USER_PARTITION_SCHEME_NAMESPACE,
+                    MemoryUserPartitionScheme(),
+                    None
+                )
+            ],
+            namespace=USER_PARTITION_SCHEME_NAMESPACE
+        )
+        verified_group = Group(60, 'verified')
+        verified_partition = UserPartition(
+            0,
+            'Verified Partition',
+            'Verified Learners',
+            [verified_group],
+            scheme=UserPartition.get_scheme("memory"),
+        )
+
+        accessible_seq = BlockFactory.create(parent=self.chapter, category='sequential')
+        restricted_problem = BlockFactory.create(
+            parent=accessible_seq,
+            category='problem',
+            display_name='Restricted Problem',
+            group_access={verified_partition.id: [verified_group.id]}
+        )
+
+        self.recalculate_subsection_grade_kwargs['usage_id'] = str(restricted_problem.location)
+        verified_partition.scheme.set_group_for_user(self.user, verified_partition, verified_group)
+
+        self._apply_recalculate_subsection_grade()
+        assert mock_subsection_signal.call_count == 1
+        UserPartition.scheme_extensions = None
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 2, 41),

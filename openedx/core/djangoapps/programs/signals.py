@@ -7,6 +7,8 @@ import logging
 
 from django.dispatch import receiver
 
+from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
+from openedx.core.djangoapps.credentials.api import is_credentials_enabled
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
 from openedx.core.djangoapps.signals.signals import (
     COURSE_CERT_AWARDED,
@@ -21,41 +23,24 @@ LOGGER = logging.getLogger(__name__)
 @receiver(COURSE_CERT_AWARDED)
 def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs):  # pylint: disable=unused-argument
     """
-    If programs is enabled and a learner is awarded a course certificate,
-    schedule a celery task to process any programs certificates for which
-    the learner may now be eligible.
+    If use of the Credentials IDA is enabled and a learner is awarded a course certificate, schedule a celery task to
+    determine if the learner is also eligible to be awarded any program certificates.
 
     Args:
-        sender:
-            class of the object instance that sent this signal
-        user:
-            django.contrib.auth.User - the user to whom a cert was awarded
-        course_key:
-            refers to the course run for which the cert was awarded
-        mode:
-            mode / certificate type, e.g. "verified"
-        status:
-            either "downloadable" or "generating"
+        sender: class of the object instance that sent this signal
+        user(User): The user to whom a course certificate was awarded
+        course_key(CourseLocator): The course run key for which the course certificate was awarded
+        mode(str): The "mode" of the course (e.g. Audit, Honor, Verified, etc.)
+        status(str): The status of the course certificate that was awarded (e.g. "downloadable")
 
     Returns:
         None
-
     """
-    # Import here instead of top of file since this module gets imported before
-    # the credentials app is loaded, resulting in a Django deprecation warning.
-    from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-
-    # Avoid scheduling new tasks if certification is disabled.
-    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+    if not is_credentials_enabled():
         return
 
-    # schedule background task to process
     LOGGER.debug(
-        'handling COURSE_CERT_AWARDED: username=%s, course_key=%s, mode=%s, status=%s',
-        user,
-        course_key,
-        mode,
-        status,
+        f"Handling COURSE_CERT_AWARDED: user={user}, course_key={course_key}, mode={mode}, status={status}"
     )
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks import award_program_certificates
@@ -63,75 +48,43 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
 
 
 @receiver(COURSE_CERT_CHANGED)
-def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs):
+def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs):  # pylint: disable=unused-argument
     """
-        If a learner is awarded a course certificate,
-        schedule a celery task to process that course certificate
+    When the system updates a course certificate, enqueue a celery task responsible for syncing this change in the
+    Credentials IDA
 
-        Args:
-            sender:
-                class of the object instance that sent this signal
-            user:
-                django.contrib.auth.User - the user to whom a cert was awarded
-            course_key:
-                refers to the course run for which the cert was awarded
-            mode:
-                mode / certificate type, e.g. "verified"
-            status:
-                "downloadable"
+    ***** Important *****
+    While the current name of the enqueue'd task is `award_course_certificate` it is *actually* responsible for both
+    awarding and revocation of course certificates in Credentials.
+    *********************
 
-        Returns:
-            None
+    Args:
+        sender: class of the object instance that sent this signal
+        user(User): The user to whom a course certificate was awarded
+        course_key(CourseLocator): The course run key for which the course certificate was awarded
+        mode(str): The "mode" of the course (e.g. Audit, Honor, Verified, etc.)
+        status(str): The status of the course certificate that was awarded (e.g. "downloadable")
+
+    Returns:
+        None
     """
-    # Import here instead of top of file since this module gets imported before
-    # the credentials app is loaded, resulting in a Django deprecation warning.
-    from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-
     verbose = kwargs.get('verbose', False)
     if verbose:
-        msg = "Starting handle_course_cert_changed with params: "\
-            "sender [{sender}], "\
-            "user [{username}], "\
-            "course_key [{course_key}], "\
-            "mode [{mode}], "\
-            "status [{status}], "\
-            "kwargs [{kw}]"\
-            .format(
-                sender=sender,
-                username=getattr(user, 'username', None),
-                course_key=str(course_key),
-                mode=mode,
-                status=status,
-                kw=kwargs
-            )
+        LOGGER.info(
+            f"Starting handle_course_cert_changed with params: sender [{sender}], user [{user}], course_key "
+            f"[{course_key}], mode [{mode}], status [{status}], kwargs [{kwargs}]"
+        )
 
-        LOGGER.info(msg)
-
-    # Avoid scheduling new tasks if certification is disabled.
-    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
-        if verbose:
-            LOGGER.info("Skipping send cert: is_learner_issuance_enabled False")
+    if not is_credentials_enabled():
         return
 
     # Avoid scheduling new tasks if learner records are disabled for this site (right now, course certs are only
     # used for learner records -- when that changes, we can remove this bit and always send course certs).
     if not is_learner_records_enabled_for_org(course_key.org):
-        if verbose:
-            LOGGER.info(
-                "Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
-                    org=course_key.org
-                )
-            )
+        LOGGER.warning(f"Skipping send cert: the Learner Record feature is disabled for org [{course_key.org}]")
         return
 
-    # schedule background task to process
-    LOGGER.debug(
-        'handling COURSE_CERT_CHANGED: username=%s, course_key=%s, mode=%s, status=%s',
-        user,
-        course_key,
-        mode,
-        status,
-    )
+    LOGGER.debug(f"Handling COURSE_CERT_CHANGED: user={user}, course_key={course_key}, mode={mode}, status={status}")
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks import award_course_certificate
     award_course_certificate.delay(user.username, str(course_key))
@@ -140,68 +93,76 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 @receiver(COURSE_CERT_REVOKED)
 def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs):  # pylint: disable=unused-argument
     """
-    If programs is enabled and a learner's course certificate is revoked,
-    schedule a celery task to revoke any related program certificates.
+    If use of the Credentials IDA is enabled and a learner has a course certificate revoked, schedule a celery task
+    to determine if there are any program certificates that must be revoked too.
 
     Args:
-        sender:
-            class of the object instance that sent this signal
-        user:
-            django.contrib.auth.User - the user for which a cert was revoked
-        course_key:
-            refers to the course run for which the cert was revoked
-        mode:
-            mode / certificate type, e.g. "verified"
-        status:
-            revoked
+        sender: class of the object instance that sent this signal
+        user(User): The user to whom a course certificate was revoked
+        course_key(CourseLocator): The course run key for which the course certificate was revoked
+        mode(str): The "mode" of the course (e.g. "audit", "honor", "verified", etc.)
+        status(str): The status of the course certificate that was revoked (e.g. "revoked")
 
     Returns:
         None
-
     """
-    # Import here instead of top of file since this module gets imported before
-    # the credentials app is loaded, resulting in a Django deprecation warning.
-    from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-
-    # Avoid scheduling new tasks if certification is disabled.
-    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+    if not is_credentials_enabled():
         return
 
-    # schedule background task to process
-    LOGGER.info(
-        f"handling COURSE_CERT_REVOKED: user={user.id}, course_key={course_key}, mode={mode}, status={status}"
-    )
+    LOGGER.info(f"Handling COURSE_CERT_REVOKED: user={user}, course_key={course_key}, mode={mode}, status={status}")
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks import revoke_program_certificates
     revoke_program_certificates.delay(user.username, str(course_key))
 
 
 @receiver(COURSE_CERT_DATE_CHANGE, dispatch_uid='course_certificate_date_change_handler')
-def handle_course_cert_date_change(sender, course_key, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def handle_course_cert_date_change(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
-    If a course-run's `certificate_available_date` is updated, schedule a celery task to update the `visible_date`
-    attribute of all (course) credentials awarded in the Credentials service.
+    When a course run's configuration has been updated, and the system has detected an update related to the display
+    behavior or availability date of the certificates issued in that course, we should enqueue celery tasks responsible
+    for:
+        - updating the `visible_date` attribute of any previously awarded certificates the Credentials IDA manages
+        - updating the certificate available date of the course run's course certificate configuration in Credentials
 
     Args:
-        course_key(CourseLocator): refers to the course whose certificate_available_date was updated.
-    """
-    # Import here instead of top of file since this module gets imported before the credentials app is loaded, resulting
-    # in a Django deprecation warning.
-    from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+        sender: class of the object instance that sent this signal
+        course_key(CourseLocator): The course run key of the course run which was updated
 
-    # Avoid scheduling new tasks if we're not using the Credentials IDA
-    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
-        LOGGER.warning(
-            f"Skipping handling of COURSE_CERT_DATE_CHANGE for course {course_key}. Use of the Credentials service is "
-            "disabled."
-        )
+    Returns:
+        None
+    """
+    if not is_credentials_enabled():
         return
 
     LOGGER.info(f"Handling COURSE_CERT_DATE_CHANGE for course {course_key}")
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
-    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
     from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
-    # update the awarded credentials `visible_date` attribute in the Credentials service after a date update
+    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
     update_certificate_visible_date_on_course_update.delay(str(course_key))
-    # update the (course) certificate configuration in the Credentials service after a date update
     update_certificate_available_date_on_course_update.delay(str(course_key))
+
+
+@receiver(COURSE_PACING_CHANGED, dispatch_uid="update_credentials_on_pacing_change")
+def handle_course_pacing_change(sender, updated_course_overview, **kwargs):  # pylint: disable=unused-argument
+    """
+    If the pacing of a course run has been updated, we should enqueue the tasks responsible for updating the certificate
+    available date (CAD) stored in the Credentials IDA's internal records. This ensures that we are correctly managing
+    the visibiltiy of certificates on learners' program records.
+
+    Args:
+        sender: class of the object instance that sent this signal
+        updated_course_overview(CourseOverview): The course overview of the course run which was just updated
+
+    Returns:
+        None
+    """
+    if not is_credentials_enabled():
+        return
+
+    course_id = str(updated_course_overview.id)
+    LOGGER.info(f"Handling COURSE_PACING_CHANGED for course {course_id}")
+    # import here, because signal is registered at startup, but items in tasks are not yet loaded
+    from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
+    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
+    update_certificate_available_date_on_course_update.delay(course_id)
+    update_certificate_visible_date_on_course_update.delay(course_id)

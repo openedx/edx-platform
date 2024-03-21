@@ -314,6 +314,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3001',  # frontend-app-library-authoring
     'http://localhost:2001',  # frontend-app-course-authoring
     'http://localhost:1992',  # frontend-app-ora
+    'http://localhost:1999',  # frontend-app-authn
 ]
 
 #################### Event bus backend ########################

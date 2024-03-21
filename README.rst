@@ -63,7 +63,7 @@ Services:
 
 * MySQL 5.7
 
-* Mongo 4.x
+* Mongo 7.x
 
 * Memcached
 

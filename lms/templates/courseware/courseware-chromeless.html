@@ -209,7 +209,9 @@ ${HTML(fragment.foot_html())}
       observer.observe(document.body, { attributes: true, childList: true, subtree: true });
 
       window.addEventListener('load', dispatchResizeMessage);
-      window.addEventListener('resize', dispatchResizeMessage);
+
+      const resizeObserver = new ResizeObserver(dispatchResizeMessage);
+      resizeObserver.observe(document.body);
     }
   }());
 </script>

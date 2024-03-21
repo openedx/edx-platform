@@ -5,6 +5,7 @@ Test of custom django-oauth-toolkit behavior
 # pylint: disable=protected-access
 
 import datetime
+from unittest import mock
 
 from django.conf import settings
 from django.test import RequestFactory, TestCase
@@ -12,6 +13,7 @@ from django.utils import timezone
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationAccessFactory
 
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -55,6 +57,7 @@ class CustomValidationTestCase(TestCase):
 
     In particular, inactive users should be able to validate.
     """
+
     def setUp(self):
         super().setUp()
         self.TEST_PASSWORD = 'Password1234'
@@ -65,6 +68,7 @@ class CustomValidationTestCase(TestCase):
         )
         self.validator = EdxOAuth2Validator()
         self.request_factory = RequestFactory()
+        self.default_scopes = list(settings.OAUTH2_DEFAULT_SCOPES.keys())
 
     def test_active_user_validates(self):
         assert self.user.is_active
@@ -77,6 +81,41 @@ class CustomValidationTestCase(TestCase):
         request = self.request_factory.get('/')
         assert self.validator.validate_user('darkhelmet', self.TEST_PASSWORD, client=None, request=request)
 
+    @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=True)
+    def test_get_default_scopes_with_user_id(self):
+        """
+        Test that get_default_scopes returns the default scopes plus the user_id scope if it's available.
+        """
+        application_access = ApplicationAccessFactory(scopes=['user_id'])
+
+        request = mock.Mock(grant_type='client_credentials', client=application_access.application, scopes=None)
+        overriden_default_scopes = self.validator.get_default_scopes(request=request, client_id='client_id')
+
+        self.assertEqual(overriden_default_scopes, self.default_scopes + ['user_id'])
+
+    @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=False)
+    def test_get_default_scopes_without_user_id(self):
+        """
+        Test that if `ENABLE_USER_ID_SCOPE` flag is turned off, the get_default_scopes returns
+        the default scopes without `user_id` even if it's allowed.
+        """
+        application_access = ApplicationAccessFactory(scopes=['user_id'])
+
+        request = mock.Mock(grant_type='client_credentials', client=application_access.application, scopes=None)
+        overriden_default_scopes = self.validator.get_default_scopes(request=request, client_id='client_id')
+
+        self.assertEqual(overriden_default_scopes, self.default_scopes)
+
+    @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=True)
+    def test_get_default_scopes(self):
+        """
+        Test that get_default_scopes returns the default scopes if user_id scope is not available.
+        """
+        request = mock.Mock(grant_type='client_credentials', client=None, scopes=None)
+        overriden_default_scopes = self.validator.get_default_scopes(request=request, client_id='client_id')
+
+        self.assertEqual(overriden_default_scopes, self.default_scopes)
+
 
 @skip_unless_lms
 class CustomAuthorizationViewTestCase(TestCase):
@@ -87,6 +126,7 @@ class CustomAuthorizationViewTestCase(TestCase):
     an application even if the access token is expired.
     (This is a temporary override until Auth Scopes is implemented.)
     """
+
     def setUp(self):
         super().setUp()
         self.TEST_PASSWORD = 'Password1234'

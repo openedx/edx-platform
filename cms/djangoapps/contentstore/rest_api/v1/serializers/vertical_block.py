@@ -5,6 +5,7 @@ API Serializers for unit page
 from django.urls import reverse
 from rest_framework import serializers
 
+from cms.djangoapps.contentstore.toggles import use_tagging_taxonomy_list_page
 from cms.djangoapps.contentstore.helpers import (
     xblock_studio_url,
     xblock_type_display_name,
@@ -98,8 +99,24 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
     Serializer for representing a xblock child of vertical container.
     """
 
-    name = serializers.CharField(source="display_name_with_default")
-    block_id = serializers.CharField(source="location")
+    name = serializers.CharField()
+    block_id = serializers.CharField()
+    block_type = serializers.CharField()
+    user_partition_info = serializers.DictField()
+    user_partitions = serializers.ListField()
+    actions = serializers.SerializerMethodField()
+
+    def get_actions(self, obj):  # pylint: disable=unused-argument
+        """
+        Method to get actions for each child xlock of the unit.
+        """
+
+        can_manage_tags = use_tagging_taxonomy_list_page()
+        actions = {
+            "can_manage_tags": can_manage_tags,
+        }
+
+        return actions
 
 
 class VerticalContainerSerializer(serializers.Serializer):

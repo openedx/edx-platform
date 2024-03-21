@@ -376,7 +376,18 @@ class SequenceBlock(
         meta['display_name'] = self.display_name_with_default
         meta['format'] = getattr(self, 'format', '')
         meta['is_hidden_after_due'] = is_hidden_after_due
+        meta['navigation_disabled'] = self.is_sequence_navigation_disabled()
         return meta
+
+    def is_sequence_navigation_disabled(self):
+        """
+        Returns whether the navigation to other sequences is disabled.
+
+        As of today, this is used to disable the navigation to other sequences when the
+        current sequence is configured as Hide from Table of Contents. But it can be
+        extended to other use cases in the future.
+        """
+        return getattr(self, "hide_from_toc", False)
 
     @classmethod
     def verify_current_content_visibility(cls, date, hide_after_date):
