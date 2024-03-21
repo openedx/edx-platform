@@ -64,7 +64,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         assert doc == {
             # Note the 'id' has been stripped of special characters to meet Meilisearch requirements.
             # The '-8516ed8' suffix is deterministic based on the original usage key.
-            "id": "block-v1edxtoy2012_falltypeproblemblocktest_problem-8516ed8",
+            "id": "block-v1edxtoy2012_falltypeproblemblocktest_problem-f46b6f1e",
             "type": "course_block",
             "block_type": "problem",
             "usage_key": "block-v1:edX+toy+2012_Fall+type@problem+block@Test_Problem",
@@ -98,7 +98,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         block = self.store.get_item(self.html_block_key)
         doc = searchable_doc_for_course_block(block)
         assert doc == {
-            "id": "block-v1edxtoy2012_falltypehtmlblocktoyjumpto-b0b4a10",
+            "id": "block-v1edxtoy2012_falltypehtmlblocktoyjumpto-efb9c601",
             "type": "course_block",
             "block_type": "html",
             "usage_key": "block-v1:edX+toy+2012_Fall+type@html+block@toyjumpto",
@@ -132,7 +132,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         block = self.store.get_item(block_usage_key)
         doc = searchable_doc_for_course_block(block)
         assert doc == {
-            "id": "block-v1edxtoy2012_falltypevideoblockwelcome-b47fb14",
+            "id": "block-v1edxtoy2012_falltypevideoblockwelcome-0c9fd626",
             "type": "course_block",
             "block_type": "video",
             "usage_key": "block-v1:edX+toy+2012_Fall+type@video+block@Welcome",

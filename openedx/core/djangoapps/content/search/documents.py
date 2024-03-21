@@ -2,7 +2,7 @@
 Utilities related to indexing content for search
 """
 from __future__ import annotations
-import hashlib
+from hashlib import blake2b
 import logging
 
 from django.utils.text import slugify
@@ -37,9 +37,10 @@ class Fields:
     # See https://blog.meilisearch.com/nested-hierarchical-facets-guide/
     # and https://www.algolia.com/doc/api-reference/widgets/hierarchical-menu/js/
     # For details on the format of the hierarchical tag data.
+    # We currently have a hard-coded limit of 4 levels of tags in the search index (level0..level3).
     tags = "tags"
-    tags_taxonomy = "taxonomy"
-    tags_level0 = "level0"
+    tags_taxonomy = "taxonomy"  # subfield of tags, i.e. tags.taxonomy
+    tags_level0 = "level0"  # subfield of tags, i.e. tags.level0
     tags_level1 = "level1"
     tags_level2 = "level2"
     tags_level3 = "level3"
@@ -47,6 +48,10 @@ class Fields:
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
     # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
     content = "content"
+
+    # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
+    # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
+    # command (changing those settings on an large active index is not recommended).
 
 
 class DocType:
@@ -63,10 +68,13 @@ def _meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     integer or a string composed of alphanumeric characters (a-z A-Z 0-9),
     hyphens (-) and underscores (_). Since our opaque keys don't meet this
     requirement, we transform them to a similar slug ID string that does.
+
+    In the future, with Learning Core's data models in place for courseware,
+    we could use PublishableEntity's primary key / UUID instead.
     """
     # The slugified key _may_ not be unique so we append a hashed string to make it unique:
     key_bin = str(usage_key).encode()
-    suffix = hashlib.sha1(key_bin).hexdigest()[:7]  # When we use Python 3.9+, should add usedforsecurity=False here.
+    suffix = blake2b(key_bin, digest_size=4).hexdigest()  # When we use Python 3.9+, should add usedforsecurity=False
     return slugify(str(usage_key)) + "-" + suffix
 
 
@@ -141,6 +149,13 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
                 "level2": ["Location > North America > Canada > Vancouver"],
             }
         }
+
+    Note: despite what you might expect, because this is only used for the
+    filtering/refinement UI, it's fine if this is a one-way transformation.
+    It's not necessary to be able to re-construct the exact tag IDs nor taxonomy
+    IDs from this data that's stored in the search index. It's just a bunch of
+    strings in a particular format that the frontend knows how to render to
+    support hierarchical refinement by tag.
     """
     # Note that we could improve performance for indexing many components from the same library/course,
     # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
@@ -159,15 +174,24 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
             result[Fields.tags_taxonomy].append(obj_tag.name)
         # Taxonomy name plus each level of tags, in a list:
         parts = [obj_tag.name] + obj_tag.get_lineage()  # e.g. ["Location", "North America", "Canada", "Vancouver"]
-        parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator
+        parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator.
+        # Now we build each level (tags.level0, tags.level1, etc.) as applicable.
+        # We have a hard-coded limit of 4 levels of tags for now (see Fields.tags above).
+        # A tag like "Difficulty: Hard" will only result in one level (tags.level0)
+        # But a tag like "Location: North America > Canada > Vancouver" would result in three levels (tags.level0:
+        #   "North America", tags.level1: "North America > Canada", tags.level2: "North America > Canada > Vancouver")
+        # See the comments above on "Field.tags" for an explanation of why we use this format (basically it's the format
+        # required by the Instantsearch frontend).
         for level in range(4):
+            # We use '>' as a separator because it's the default for the Instantsearch frontend library, and our
+            # preferred separator (\t) used in the database is ignored by Meilisearch since it's whitespace.
             new_value = " > ".join(parts[0:level + 2])
             if f"level{level}" not in result:
                 result[f"level{level}"] = [new_value]
             elif new_value not in result[f"level{level}"]:
                 result[f"level{level}"].append(new_value)
             if len(parts) == level + 2:
-                break
+                break  # We have all the levels for this tag now (e.g. parts=["Difficulty", "Hard"] -> need level0 only)
 
     return {Fields.tags: result}
 
@@ -184,18 +208,7 @@ def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) ->
         block = xblock_api.load_block(metadata.usage_key, user=None)
     except Exception as err:  # pylint: disable=broad-except
         log.exception(f"Failed to load XBlock {metadata.usage_key}: {err}")
-        # Even though we couldn't load the block, we can still include basic data about it in the index, from 'metadata'
-        doc.update({
-            Fields.id: _meili_id_from_opaque_key(metadata.usage_key),
-            Fields.usage_key: str(metadata.usage_key),
-            Fields.block_id: str(metadata.usage_key.block_id),
-            Fields.display_name: metadata.display_name,
-            Fields.type: metadata.usage_key.block_type,
-            Fields.context_key: str(metadata.usage_key.context_key),
-            Fields.org: str(metadata.usage_key.context_key.org),
-        })
-    else:
-        doc.update(_fields_from_block(block))
+    doc.update(_fields_from_block(block))
     doc.update(_tags_for_content_object(metadata.usage_key))
     doc[Fields.type] = DocType.library_block
     # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:

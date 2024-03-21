@@ -9,7 +9,7 @@ import logging
 import time
 
 from django.conf import settings
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
 
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content.search.documents import (
@@ -28,13 +28,24 @@ log = logging.getLogger(__name__)
 
 class Command(MeiliCommandMixin, BaseCommand):
     """
-    Build or re-build the search index for courses (in Studio, i.e. Draft mode)
+    Build or re-build the search index for courses and libraries (in Studio, i.e. Draft mode)
+
+    This is experimental and not recommended for production use.
     """
+
+    def add_arguments(self, parser):
+        parser.add_argument('--experimental', action='store_true')
+        parser.set_defaults(experimental=False)
 
     def handle(self, *args, **options):
         """
         Build a new search index for Studio, containing content from courses and libraries
         """
+        if not options["experimental"]:
+            raise CommandError(
+                "This command is experimental and not recommended for production. "
+                "Use the --experimental argument to acknowledge and run it."
+            )
         start_time = time.perf_counter()
         client = self.get_meilisearch_client()
         store = modulestore()
@@ -59,6 +70,11 @@ class Command(MeiliCommandMixin, BaseCommand):
         index_name = settings.MEILISEARCH_INDEX_PREFIX + STUDIO_INDEX_NAME
         with self.using_temp_index(index_name) as temp_index_name:
             ############## Configure the index ##############
+
+            # The following index settings are best changed on an empty index.
+            # Changing them on a populated index will "re-index all documents in the index, which can take some time"
+            # and use more RAM. Instead, we configure an empty index then populate it one course/library at a time.
+
             # Mark usage_key as unique (it's not the primary key for the index, but nevertheless must be unique):
             client.index(temp_index_name).update_distinct_attribute(Fields.usage_key)
             # Mark which attributes can be used for filtering/faceted search:
