@@ -151,3 +151,6 @@ pii_report
 
 # Pyenv Python version file
 .python-version
+
+# Auto generated rst files toc tree
+/docs/custom_toctree.rst

@@ -310,11 +310,11 @@ def find_rst_files(directory):
 
 
 def generate_toctree(custom_toctree_dir):
-    rst_files = find_rst_files(".")
+    rst_files = find_rst_files(root)
     toctree = "\n".join(["   " + file for file in rst_files])
     with open(custom_toctree_dir, 'w') as custom_docs:
         custom_docs.write("\n..\n\tAutomatically Generated Toctree. See `generate_toctree` \
-method in docs/conf.py.\nDo not change the contents of this file manually\n\n")
+method in docs/conf.py.\n\tDo not change the contents of this file manually\n\n")
         custom_docs.write(".. toctree::\n")
         custom_docs.write("   :glob:\n")
         custom_docs.write(toctree)
