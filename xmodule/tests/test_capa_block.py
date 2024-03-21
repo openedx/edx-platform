@@ -730,6 +730,41 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # and that this was considered attempt number 2 for grading purposes
         assert block.lcp.context['attempt'] == 2
 
+    @patch('xmodule.capa_block.ProblemBlock._set_score')
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_with_grading_method_disable(
+        self, mock_html: Mock, mock_is_correct: Mock, mock_set_score: Mock
+    ):
+        block = CapaFactory.create(attempts=0)
+        mock_html.return_value = "Test HTML"
+        mock_is_correct.return_value = True
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+        mock_set_score.assert_not_called()
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_with_grading_method_enable(self, mock_html: Mock, mock_is_correct: Mock):
+        block = CapaFactory.create(attempts=0)
+        mock_html.return_value = "Test HTML"
+        mock_is_correct.return_value = True
+
+        with patch.object(ProblemBlock, '_set_score', wraps=block._set_score) as mock_set_score:  # pylint: disable=protected-access
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 1
+            assert block.lcp.context['attempt'] == 1
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+            mock_set_score.assert_called()
+
     @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
     @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
     @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
@@ -1332,7 +1367,29 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # and that this is treated as the first attempt for grading purposes
         assert block.lcp.context['attempt'] == 1
 
-    @override_settings(FEATURES={"ENABLE_GRADING_METHOD_IN_PROBLEMS": True})
+    @patch('xmodule.capa_block.ProblemBlock.get_rescore')
+    def test_rescore_problem_with_grading_method_disable(self, mock_get_rescore: Mock):
+        block = CapaFactory.create(attempts=0, done=True)
+
+        block.rescore(only_if_higher=False)
+
+        assert block.attempts == 0
+        assert block.lcp.context['attempt'] == 1
+        mock_get_rescore.assert_not_called()
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    def test_rescore_problem_with_grading_method_enable(self):
+        block = CapaFactory.create(attempts=0, done=True)
+
+        with patch.object(ProblemBlock, 'get_rescore', wraps=block.get_rescore) as mock_get_rescore:
+
+            block.rescore(only_if_higher=False)
+
+            assert block.attempts == 0
+            assert block.lcp.context['attempt'] == 1
+            mock_get_rescore.assert_called()
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
     def test_rescore_problem_update_grading_method(self):
         block = CapaFactory.create(attempts=0, max_attempts=3)
 
