@@ -118,6 +118,9 @@ class Command(MeiliCommandMixin, BaseCommand):
                 )
                 docs = []
 
+                # Pre-fetch the course with all of its children:
+                course = store.get_course(course.id, depth=None)
+
                 def add_with_children(block):
                     """ Recursively index the given XBlock/component """
                     doc = searchable_doc_for_course_block(block)
