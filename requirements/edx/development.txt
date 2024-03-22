@@ -51,6 +51,7 @@ aniso8601==9.0.1
     #   edx-tincan-py35
 annotated-types==0.6.0
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pydantic
 anyio==4.3.0
@@ -168,6 +169,11 @@ cachetools==5.3.2
     # via
     #   -r requirements/edx/testing.txt
     #   tox
+camel-converter[pydantic]==3.1.1
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   meilisearch
 celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1189,6 +1195,10 @@ mccabe==0.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
+meilisearch==0.30.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 mistune==2.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -1461,12 +1471,15 @@ pycryptodomex==3.20.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.6.1
+pydantic==2.6.3
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   camel-converter
     #   fastapi
-pydantic-core==2.16.2
+pydantic-core==2.16.3
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pydantic
 pydata-sphinx-theme==0.14.4
@@ -1738,6 +1751,7 @@ requests==2.31.0
     #   edx-rest-api-client
     #   geoip2
     #   mailsnake
+    #   meilisearch
     #   openai
     #   optimizely-sdk
     #   pact-python

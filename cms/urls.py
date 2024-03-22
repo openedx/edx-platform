@@ -307,6 +307,10 @@ urlpatterns.append(
     ),
 )
 
+urlpatterns.append(
+    path('', include(('openedx.core.djangoapps.content.search.urls', 'content_search'), namespace='content_search')),
+)
+
 # display error page templates, for testing purposes
 urlpatterns += [
     path('404', handler404),
