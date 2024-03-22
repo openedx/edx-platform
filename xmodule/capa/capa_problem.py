@@ -516,7 +516,9 @@ class LoncapaProblem(object):
         This method is based on `get_grade_from_current_answers` but it is used when
         `ENABLE_GRADING_METHOD_IN_PROBLEMS` feature flag is enabled.
 
-        This method optionally recieve a `correct_map` to be used instead of the current one.
+        This method optionally receives a `correct_map` to be used instead
+        of the current one. This allows to make a rescore using each of the
+        correct maps stored in the `correct_map_history`.
 
         Args:
             student_answers (Optional[dict]): A dictionary with the student answers.
