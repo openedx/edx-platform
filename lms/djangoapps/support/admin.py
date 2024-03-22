@@ -22,14 +22,33 @@ class CourseResetAuditAdmin(admin.ModelAdmin):
     """ Django admin for CourseResetAudit model """
 
     list_display = ['course', 'user', 'status', 'created', 'completed_at', 'reset_by']
-    fields = ['created', 'modified', 'status', 'completed_at', 'course', 'user', 'course_enrollment', 'reset_by']
+    fields = [
+        'created',
+        'modified',
+        'status',
+        'completed_at',
+        'course',
+        'user',
+        'course_enrollment',
+        'reset_by',
+        'comment'
+    ]
 
     def get_readonly_fields(self, request, obj=None):
         """
         If we are editing an existing model, we should only be able to change the status, for potential debugging
         """
         if obj:
-            return ['created', 'modified', 'completed_at', 'course', 'user', 'course_enrollment', 'reset_by']
+            return [
+                'created',
+                'modified',
+                'completed_at',
+                'course',
+                'user',
+                'course_enrollment',
+                'reset_by',
+                'comment'
+            ]
         else:
             return ['created', 'modified', 'user']
 
