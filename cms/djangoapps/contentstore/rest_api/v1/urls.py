@@ -7,6 +7,7 @@ from openedx.core.constants import COURSE_ID_PATTERN
 
 from .views import (
     ContainerHandlerView,
+    CourseCertificatesView,
     CourseDetailsView,
     CourseTeamView,
     CourseTextbooksView,
@@ -108,6 +109,11 @@ urlpatterns = [
         fr'^textbooks/{COURSE_ID_PATTERN}$',
         CourseTextbooksView.as_view(),
         name="textbooks"
+    ),
+    re_path(
+        fr'^certificates/{COURSE_ID_PATTERN}$',
+        CourseCertificatesView.as_view(),
+        name="certificates"
     ),
     re_path(
         fr'^container_handler/{settings.USAGE_KEY_PATTERN}$',
