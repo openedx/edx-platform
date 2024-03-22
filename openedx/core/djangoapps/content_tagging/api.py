@@ -11,9 +11,17 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
+from urllib.parse import quote, unquote
 
 from .models import TaxonomyOrg
-from .types import ContentKey, ObjectTagByObjectIdDict, TagValuesByTaxonomyExportIdDict, TaxonomyDict
+from .types import (
+    ContentKey,
+    ObjectTagByObjectIdDict,
+    TagValuesByTaxonomyExportIdDict,
+    TaxonomyExportDict,
+    TaxonomyDict,
+)
+
 from .utils import check_taxonomy_context_key_org, get_context_key_from_key
 
 
@@ -189,7 +197,7 @@ def get_all_object_tags(
 def set_object_tags(
     content_key: ContentKey,
     object_tags: TagValuesByTaxonomyExportIdDict,
-    taxonomy_cache: dict = None,
+    taxonomy_cache: TaxonomyExportDict | None = None,
 ) -> None:
     """
     Sets the tags for the given content object.
@@ -234,22 +242,71 @@ def copy_object_tags(
         prefetch_orgs=True,
     )
 
-    # Convert data to use it with set_object_tags
-    src_object_tags = all_object_tags.get(str(source_content_key), {})
-    object_tags: TagValuesByTaxonomyExportIdDict = {}
-    taxonomy_cache = {
+    # Convert returned data into the format expected by set_object_tags
+    source_object_tags = all_object_tags.get(str(source_content_key), {})
+    taxonomy_cache: TaxonomyExportDict = {
         taxonomy.export_id: taxonomy
         for taxonomy in taxonomies.values()
     }
-    for taxonomy_id, tags in src_object_tags.items():
+    tags_by_taxonomy: TagValuesByTaxonomyExportIdDict = {}
+    for taxonomy_id, tags in source_object_tags.items():
         taxonomy = taxonomies[taxonomy_id]
-        object_tags[taxonomy.export_id] = [tag.value for tag in tags]
+        tags_by_taxonomy[taxonomy.export_id] = [tag.value for tag in tags]
 
     set_object_tags(
         content_key=dest_content_key,
-        object_tags=object_tags,
-        taxonomy_cache=taxonomy_cache
+        object_tags=tags_by_taxonomy,
+        taxonomy_cache=taxonomy_cache,
     )
+
+
+def serialize_object_tags(usage_id: str) -> str:
+    """
+    Serialize the given object tags to a string, escaping special characters
+
+    Note that we are serializing the tag data only, not the object_id.
+
+    Example tags:
+        LightCast Skills Taxonomy: ["Typing", "Microsoft Office"]
+        Open Canada Skills Taxonomy: ["MS Office", "<some:;,skill/|=>"]
+
+    Example serialized tags:
+        lightcast-skills:Typing,Microsoft Office;open-canada-skills:MS Office,%3Csome%3A%3B%2Cskill%2F%7C%3D%3E
+    """
+    content_tags = get_object_tags(usage_id)
+    serialized_tags = []
+    taxonomies_and_tags: dict[str, list[str]] = {}
+    for tag in content_tags:
+        taxonomy_export_id = tag.taxonomy.export_id
+
+        if not taxonomies_and_tags.get(taxonomy_export_id):
+            taxonomies_and_tags[taxonomy_export_id] = []
+
+        # Escape special characters in tag values, except spaces (%20) for better readability
+        escaped_tag = quote(tag.value).replace("%20", " ")
+        taxonomies_and_tags[taxonomy_export_id].append(escaped_tag)
+
+    for taxonomy in taxonomies_and_tags:
+        merged_tags = ','.join(taxonomies_and_tags.get(taxonomy, []))
+        serialized_tags.append(f"{taxonomy}:{merged_tags}")
+
+    return ";".join(serialized_tags)
+
+
+def deserialize_object_tags(
+    tag_data: str,
+) -> TagValuesByTaxonomyExportIdDict:
+    """
+    Deserializes a string of formatted tag data. See serialize_object_tags for details.
+    """
+    serialized_tags = tag_data.split(';')
+    taxonomy_and_tags_dict: TagValuesByTaxonomyExportIdDict = {}
+    for serialized_tag in serialized_tags:
+        taxonomy_export_id, tags = serialized_tag.split(':')
+        tag_values = [unquote(tag) for tag in tags.split(',')]
+        taxonomy_and_tags_dict[taxonomy_export_id] = tag_values
+
+    return taxonomy_and_tags_dict
 
 
 # Expose the oel_tagging APIs

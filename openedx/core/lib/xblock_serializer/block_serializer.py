@@ -7,8 +7,6 @@ import os
 
 from lxml import etree
 
-from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
-
 from .data import StaticFile
 from . import utils
 
@@ -20,6 +18,7 @@ class XBlockSerializer:
     A class that can serialize an XBlock to OLX.
     """
     static_files: list[StaticFile]
+    tags: dict[str, str]
 
     def __init__(self, block):
         """
@@ -28,6 +27,7 @@ class XBlockSerializer:
         """
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
+        self.tags = {}
         olx_node = self._serialize_block(block)
         self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
 
@@ -52,9 +52,17 @@ class XBlockSerializer:
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
         if block.scope_ids.usage_id.block_type == 'html':
-            return self._serialize_html_block(block)
+            olx = self._serialize_html_block(block)
         else:
-            return self._serialize_normal_block(block)
+            olx = self._serialize_normal_block(block)
+
+        # Serialize the block's tags too
+        # Import the tagging api here to avoid circular imports.
+        import openedx.core.djangoapps.content_tagging.api as content_tagging_api
+        block_id = str(block.scope_ids.usage_id)
+        self.tags[block_id] = content_tagging_api.serialize_object_tags(block_id)
+
+        return olx
 
     def _serialize_normal_block(self, block) -> etree.Element:
         """
@@ -90,12 +98,13 @@ class XBlockSerializer:
                         data = fh.read()
                     self.static_files.append(StaticFile(name=unit_file.name, data=data, url=None))
 
-        # Serialize and add tag data if any
-        if isinstance(block, TaggedBlockMixin):
-            block.add_tags_to_node(olx_node)
-
         if block.has_children:
             self._serialize_children(block, olx_node)
+
+        # Ensure there's a url_name attribute, so we can resurrect child usage keys.
+        if "url_name" not in olx_node.attrib:
+            olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
+
         return olx_node
 
     def _serialize_children(self, block, parent_olx_node):
@@ -119,10 +128,6 @@ class XBlockSerializer:
             olx_node.attrib["editor"] = block.editor
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
-
-        # Serialize and add tag data if any
-        if isinstance(block, TaggedBlockMixin):
-            block.add_tags_to_node(olx_node)
 
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")
