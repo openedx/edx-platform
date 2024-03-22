@@ -19,6 +19,13 @@ from ..tasks import reset_student_course
 User = get_user_model()
 
 
+def get_latest_audit(course_enrollment):
+    try:
+        return course_enrollment.courseresetaudit_set.latest('modified')
+    except CourseResetAudit.DoesNotExist:
+        return None
+
+
 def can_enrollment_be_reset(course_enrollment):
     """
     Args: enrollment (CourseEnrollment)
@@ -35,9 +42,8 @@ def can_enrollment_be_reset(course_enrollment):
     if user_has_passing_grade_in_course(course_enrollment):
         return False, "Learner Has Passing Grade"
 
-    try:
-        audit = course_enrollment.courseresetaudit_set.latest('modified')
-    except CourseResetAudit.DoesNotExist:
+    audit = get_latest_audit(course_enrollment)
+    if audit is None:
         return True, None
 
     audit_status_message = audit.status_message()
@@ -69,6 +75,7 @@ class CourseResetAPIView(APIView):
                 'course_id': <course id>
                 'display_name': <course display name>
                 'status': <status of the enrollment wrt/reset, to be displayed to user>
+                'comment': <comment left by user performing reset. may be blank>
                 'can_reset': (boolean) <can the course be reset for this learner>
             }
         ]
@@ -88,10 +95,12 @@ class CourseResetAPIView(APIView):
         for course_enrollment in course_enrollments:
             course_overview = course_enrollment.course_overview
             can_reset, status_message = can_enrollment_be_reset(course_enrollment)
+            course_reset_audit = get_latest_audit(course_enrollment)
             result.append({
                 'course_id': str(course_overview.id),
                 'display_name': course_overview.display_name,
                 'can_reset': can_reset,
+                'comment': course_reset_audit.comment if course_reset_audit else '',
                 'status': status_message if status_message else "Available"
             })
         return Response(result)
@@ -99,7 +108,11 @@ class CourseResetAPIView(APIView):
     @method_decorator(require_support_permission)
     def post(self, request, username_or_email):
         """
-        Resets a course for the given learner
+        Resets a course for the given learner.
+
+        POST params:
+            course_id (CourseKey): the course to reset
+            comment [optional] (str): 255 characters or fewer comment on why the course is being reset
 
         returns a dicts with the format {
             'course_id': <course id>
@@ -108,6 +121,7 @@ class CourseResetAPIView(APIView):
             'can_reset': (boolean) <can the course be reset for this learner>
         }
         """
+        comment = request.data.get('comment', '')
         course_id = request.data['course_id']
         try:
             user = get_user_by_username_or_email(username_or_email)
@@ -131,6 +145,7 @@ class CourseResetAPIView(APIView):
             and not user_passed
         ):
             course_reset_audit.status = CourseResetAudit.CourseResetStatus.ENQUEUED
+            course_reset_audit.comment = comment
             course_reset_audit.save()
             reset_student_course.delay(course_id, user.email, request.user.email)
 
@@ -153,11 +168,13 @@ class CourseResetAPIView(APIView):
                 course=opt_in_course,
                 course_enrollment=enrollment,
                 reset_by=request.user,
+                comment=comment,
             )
             resp = {
                 'course_id': course_id,
                 'status': course_reset_audit.status_message(),
                 'can_reset': False,
+                'comment': comment,
                 'display_name': course_overview.display_name
             }
 
