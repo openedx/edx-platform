@@ -491,9 +491,10 @@ class ProblemBlock(
 
         return self.display_name
 
-    def should_show_grading_method(self) -> str | bool:
+    def grading_method_display_name(self) -> str | None:
         """
-        If the feature flag is enabled, return the grading method, else return False.
+        If the `ENABLE_GRADING_METHOD_IN_PROBLEMS` feature flag is enabled,
+        return the grading method, else return None.
         """
         _ = self.runtime.service(self, "i18n").gettext
         display_name = {
@@ -504,10 +505,15 @@ class ProblemBlock(
         }
         if self.enable_grading_method:
             return display_name[self.grading_method]
-        return False
+        return None
 
     @property
-    def enable_grading_method(self):
+    def enable_grading_method(self) -> bool:
+        """
+        Returns whether the grading method feature is enabled. If the
+        feature is not enabled, the grading method field will not be shown in
+        Studio settings and the default grading method will be used.
+        """
         return settings.FEATURES.get('ENABLE_GRADING_METHOD_IN_PROBLEMS', False)
 
     @property
@@ -1299,7 +1305,7 @@ class ProblemBlock(
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
-            'grading_method': self.should_show_grading_method(),
+            'grading_method': self.grading_method_display_name(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
             'demand_hint_possible': demand_hint_possible,
@@ -1813,10 +1819,13 @@ class ProblemBlock(
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
+
+            current_score = self.score_from_lcp(self.lcp)
+            self.score_history.append(current_score)
             if self.enable_grading_method:
-                self._set_score()
+                self.set_score_with_grading_method(current_score)
             else:
-                self.set_score(self.score_from_lcp(self.lcp))
+                self.set_score(current_score)
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -1890,9 +1899,12 @@ class ProblemBlock(
         }
     # pylint: enable=too-many-statements
 
-    def _set_score(self) -> None:
+    def set_score_with_grading_method(self, current_score: Score) -> None:
         """
         Calculate and set the current score based on the grading method.
+
+        Args:
+            current_score (Score): The current score of the LON-CAPA problem.
 
         In this method:
             - The current score is obtained from the LON-CAPA problem.
@@ -1900,8 +1912,6 @@ class ProblemBlock(
             - The calculated score is obtained based on the grading method.
             - The calculated score is set as the current score.
         """
-        current_score = self.score_from_lcp(self.lcp)
-        self.score_history.append(current_score)
         grading_method_handler = GradingMethodHandler(
             current_score,
             self.grading_method,
@@ -2229,7 +2239,7 @@ class ProblemBlock(
         event_info['orig_total'] = orig_score.raw_possible
         try:
             if self.enable_grading_method:
-                calculated_score = self.get_rescore()
+                calculated_score = self.get_rescore_with_grading_method()
             else:
                 self.update_correctness()
                 calculated_score = self.calculate_score()
@@ -2266,7 +2276,7 @@ class ProblemBlock(
         event_info['attempts'] = self.attempts
         self.publish_unmasked('problem_rescore', event_info)
 
-    def get_rescore(self) -> Score:
+    def get_rescore_with_grading_method(self) -> Score:
         """
         Calculate and return the rescored score based on the grading method.
 

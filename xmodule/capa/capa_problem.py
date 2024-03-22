@@ -510,22 +510,21 @@ class LoncapaProblem(object):
         return newcmap
 
     def get_grade_from_answers(
-        self, student_answers: dict, correct_map: Optional[CorrectMap] = None
+        self, student_answers: Optional[dict], correct_map: Optional[CorrectMap] = None
     ) -> CorrectMap:
         """
-        Gets the grade for the currently-saved problem state, but does not save it
-        to the block.
+        This method is based on `get_grade_from_current_answers` but it is used when
+        `ENABLE_GRADING_METHOD_IN_PROBLEMS` feature flag is enabled.
 
-        For new student_answers being graded, `student_answers` is a dict of all the
-        entries from request.POST, but with the first part of each key removed
-        (the string before the first "_").  Thus, for example,
-        input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123.
+        This method optionally recieve a `correct_map` to be used instead of the current one.
 
-        For rescoring, `student_answers` is None.
+        Args:
+            student_answers (Optional[dict]): A dictionary with the student answers.
+            correct_map (CorrectMap, optional): A CorrectMap object with the correct answers.
+                Defaults to None.
 
-        If `correct_map` is provided, it is used as the correct_map for grading.
-
-        Calls the Response for each question in this problem, to do the actual grading.
+        Returns:
+            CorrectMap: A CorrectMap object with the results of the grading.
         """
         if not correct_map:
             correct_map = self.correct_map

@@ -735,8 +735,14 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         assert isinstance(problem.get_question_answers()['1_solution_1'], str)
 
     def test_get_grade_from_answers_with_student_answers(self):
+        """
+        Verify that `responder.evaluate_answers` is called with `student_answers`
+        and `correct_map` sent to `get_grade_from_answers`.
+
+        When both arguments are provided, means that the problem is being rescored.
+        """
         student_answers = {'1_2_1': 'over-suspicious'}
-        correct_map = CorrectMap()
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
         problem = new_loncapa_problem(
             """
             <problem>
@@ -758,12 +764,17 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             responder_mock.evaluate_answers.return_value = correct_map
 
             result = problem.get_grade_from_answers(student_answers, correct_map)
-
-            self.assertEqual(result.get_dict(), correct_map.get_dict())
+            self.assertDictEqual(result.get_dict(), correct_map.get_dict())
             responder_mock.evaluate_answers.assert_called_once_with(student_answers, correct_map)
 
     def test_get_grade_from_answers_without_student_answers(self):
-        correct_map = CorrectMap()
+        """
+        Verify that `responder.evaluate_answers` with appropriate arguments.
+
+        When `student_answers` is None, `responder.evaluate_answers` should be called with
+        the `self.student_answers` instead.
+        """
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
         problem = new_loncapa_problem(
             """
             <problem>
@@ -786,11 +797,17 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
             result = problem.get_grade_from_answers(None, correct_map)
 
-            self.assertEqual(result.get_dict(), correct_map.get_dict())
+            self.assertDictEqual(result.get_dict(), correct_map.get_dict())
             responder_mock.evaluate_answers.assert_called_once_with({}, correct_map)
 
     def test_get_grade_from_answers_with_filesubmission(self):
-        correct_map = CorrectMap()
+        """
+        Verify that an exception is raised when `responder.evaluate_answers` is called
+        with `student_answers` as None and `correct_map` sent to `get_grade_from_answers`
+
+        This ensures that rescore is not allowed if the problem has a filesubmission.
+        """
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
         problem = new_loncapa_problem(
             """
             <problem>
