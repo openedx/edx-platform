@@ -2396,12 +2396,20 @@ class TestResetCourseViewPost(SupportViewTestCase):
 
     @patch('lms.djangoapps.support.views.course_reset.reset_student_course')
     def test_learner_course_reset(self, mock_reset_student_course):
-        response = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
+        comment = str(uuid4())
+        response = self.client.post(
+            self._url(username=self.user.username),
+            data={
+                'course_id': self.course_id,
+                'comment': comment,
+            }
+        )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, {
             'course_id': self.course_id,
             'status': response.data['status'],
             'can_reset': False,
+            'comment': comment,
             'display_name': self.course.display_name
         })
         self.assertEqual(

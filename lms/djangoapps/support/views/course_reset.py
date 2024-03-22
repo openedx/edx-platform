@@ -117,6 +117,7 @@ class CourseResetAPIView(APIView):
             'can_reset': (boolean) <can the course be reset for this learner>
         }
         """
+        comment = request.data.get('comment', '')
         course_id = request.data['course_id']
         try:
             user = get_user_by_username_or_email(username_or_email)
@@ -140,6 +141,7 @@ class CourseResetAPIView(APIView):
             and not user_passed
         ):
             course_reset_audit.status = CourseResetAudit.CourseResetStatus.ENQUEUED
+            course_reset_audit.comment = comment
             course_reset_audit.save()
             reset_student_course.delay(course_id, user.email, request.user.email)
 
@@ -162,11 +164,13 @@ class CourseResetAPIView(APIView):
                 course=opt_in_course,
                 course_enrollment=enrollment,
                 reset_by=request.user,
+                comment=comment,
             )
             resp = {
                 'course_id': course_id,
                 'status': course_reset_audit.status_message(),
                 'can_reset': False,
+                'comment': comment,
                 'display_name': course_overview.display_name
             }
 
