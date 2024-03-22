@@ -19,6 +19,13 @@ from ..tasks import reset_student_course
 User = get_user_model()
 
 
+def get_latest_audit(course_enrollment):
+    try:
+        return course_enrollment.courseresetaudit_set.latest('modified')
+    except CourseResetAudit.DoesNotExist:
+        return None
+
+
 def can_enrollment_be_reset(course_enrollment):
     """
     Args: enrollment (CourseEnrollment)
@@ -35,9 +42,8 @@ def can_enrollment_be_reset(course_enrollment):
     if user_has_passing_grade_in_course(course_enrollment):
         return False, "Learner Has Passing Grade"
 
-    try:
-        audit = course_enrollment.courseresetaudit_set.latest('modified')
-    except CourseResetAudit.DoesNotExist:
+    audit = get_latest_audit(course_enrollment)
+    if audit is None:
         return True, None
 
     audit_status_message = audit.status_message()
@@ -69,6 +75,7 @@ class CourseResetAPIView(APIView):
                 'course_id': <course id>
                 'display_name': <course display name>
                 'status': <status of the enrollment wrt/reset, to be displayed to user>
+                'comment': <comment left by user performing reset. may be blank>
                 'can_reset': (boolean) <can the course be reset for this learner>
             }
         ]
@@ -88,10 +95,12 @@ class CourseResetAPIView(APIView):
         for course_enrollment in course_enrollments:
             course_overview = course_enrollment.course_overview
             can_reset, status_message = can_enrollment_be_reset(course_enrollment)
+            course_reset_audit = get_latest_audit(course_enrollment)
             result.append({
                 'course_id': str(course_overview.id),
                 'display_name': course_overview.display_name,
                 'can_reset': can_reset,
+                'comment': course_reset_audit.comment if course_reset_audit else '',
                 'status': status_message if status_message else "Available"
             })
         return Response(result)

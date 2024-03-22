@@ -2165,6 +2165,7 @@ class TestResetCourseViewGET(SupportViewTestCase):
             'course_id': self.course_id,
             'display_name': self.course_overview.display_name,
             'can_reset': False,
+            'comment': '',
             'status': 'Course Not Started'
         }])
 
@@ -2178,6 +2179,7 @@ class TestResetCourseViewGET(SupportViewTestCase):
                 'course_id': self.course_id,
                 'display_name': self.course_overview.display_name,
                 'can_reset': False,
+                'comment': '',
                 'status': 'Course Ended'
             }
         ])
@@ -2189,6 +2191,7 @@ class TestResetCourseViewGET(SupportViewTestCase):
             'course_id': self.course_id,
             'display_name': self.course_overview.display_name,
             'can_reset': False,
+            'comment': '',
             'status': 'Learner Has Passing Grade'
         }])
 
@@ -2204,6 +2207,7 @@ class TestResetCourseViewGET(SupportViewTestCase):
             'course_id': self.course_id,
             'display_name': self.course_overview.display_name,
             'can_reset': False,
+            'comment': '',
             'status': 'Learner Has Passing Grade'
         }])
 
@@ -2213,6 +2217,7 @@ class TestResetCourseViewGET(SupportViewTestCase):
             'course_id': self.course_id,
             'display_name': self.course.display_name,
             'can_reset': True,
+            'comment': '',
             'status': 'Available'
         }])
 
@@ -2237,29 +2242,39 @@ class TestResetCourseViewGET(SupportViewTestCase):
             'course_id': self.course_id,
             'display_name': self.course.display_name,
             'can_reset': expected_can_reset,
+            'comment': audit.comment,
             'status': audit.status_message()
         }])
 
+    def _set_up_course(self, opt_in=True):
+        """
+        Make a course, enroll self.learner, and optionally opt into course reset
+        """
+        course = CourseFactory.create(start=self.course.start, end=self.course.end)
+        CourseEnrollmentFactory.create(course_id=course.id, user=self.learner)
+        if opt_in:
+            CourseResetCourseOptInFactory.create(course_id=course.id)
+        return course
+
     def test_multiple_courses(self):
         """ Test for the behavior of multiple courses """
-        courses = [CourseFactory.create(start=self.course.start, end=self.course.end) for _ in range(4)]
-        for course in courses:
-            CourseEnrollmentFactory.create(course_id=course.id, user=self.learner)
-            CourseResetCourseOptInFactory.create(course_id=course.id)
-        other_courses = [CourseFactory.create(start=self.course.start, end=self.course.end) for _ in range(4)]
-        for course in other_courses:
-            CourseEnrollmentFactory.create(course_id=course.id, user=self.learner)
+        # Create four opted in courses and four non-opted-in courses
+        opted_in_courses = [self._set_up_course(opt_in=True) for _ in range(4)]
+        for _ in range(4):
+            self._set_up_course(opt_in=False)
 
         expected_response = [{
             'course_id': self.course_id,
             'display_name': self.course.display_name,
             'can_reset': True,
+            'comment': '',
             'status': 'Available'
         }]
-        for course in courses:
+        for course in opted_in_courses:
             expected_response.append({
                 'course_id': str(course.id),
                 'display_name': course.display_name,
+                'comment': '',
                 'can_reset': True,
                 'status': 'Available'
             })
@@ -2292,10 +2307,11 @@ class TestResetCourseViewGET(SupportViewTestCase):
             status=CourseResetAudit.CourseResetStatus.IN_PROGRESS,
         )
 
-        response = self.assertResponse([{
+        self.assertResponse([{
             'course_id': self.course_id,
             'display_name': self.course.display_name,
             'can_reset': False,
+            'comment': most_recent_audit.comment,
             'status': most_recent_audit.status_message()
         }])
 
@@ -2325,10 +2341,11 @@ class TestResetCourseViewGET(SupportViewTestCase):
             status=CourseResetAudit.CourseResetStatus.FAILED,
         )
 
-        response = self.assertResponse([{
+        self.assertResponse([{
             'course_id': self.course_id,
             'display_name': self.course.display_name,
             'can_reset': True,
+            'comment': most_recent_audit.comment,
             'status': most_recent_audit.status_message()
         }])
 
