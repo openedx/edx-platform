@@ -534,6 +534,21 @@ class PersistentSubsectionGrade(TimeStampedModel):
     def _cache_key(cls, course_id):
         return f"subsection_grades_cache.{course_id}"
 
+    @classmethod
+    def clear_grade(cls, user_id, course_key):
+        """
+        Clears Subsection grade override for a learner in a course
+        Arguments:
+            user_id: The user associated with the desired grade
+            course_id: The id of the course associated with the desired grade
+        """
+        deleted_count, _ = cls.objects.filter(
+            user_id=user_id,
+            course_id=course_key,
+        ).delete()
+        cls.clear_prefetched_data(course_key)
+        return deleted_count
+
 
 class PersistentCourseGrade(TimeStampedModel):
     """
@@ -680,6 +695,18 @@ class PersistentCourseGrade(TimeStampedModel):
     @staticmethod
     def _emit_grade_calculated_event(grade):
         events.course_grade_calculated(grade)
+
+    @classmethod
+    def clear_grade(cls, course_id, user_id):
+        """
+        Clears course grade for a learner in a course
+        Arguments:
+            course_id: The id of the course associated with the desired grade
+            user_id: The user associated with the desired grade
+        """
+        deleted_count, _ = cls.objects.filter(user_id=user_id, course_id=course_id).delete()
+        cls.clear_prefetched_data(course_id)
+        return deleted_count
 
     @staticmethod
     def _emit_openedx_persistent_grade_summary_changed_event(course_id, user_id, grade):
@@ -828,3 +855,17 @@ class PersistentSubsectionGradeOverride(models.Model):
                 getattr(subsection_grade_model, field_name)
             )
         return cleaned_data
+
+    @classmethod
+    def clear_override(cls, user_id, course_key):
+        """
+        Clears Subsection grade override for a learner in a course
+        Arguments:
+            user_id: The user associated with the desired grade
+            course_id: The id of the course associated with the desired grade
+        """
+        total, _ = cls.objects.filter(
+            grade__user_id=user_id,
+            grade__course_id=course_key
+        ).delete()
+        return total

@@ -346,6 +346,23 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             }
         )
 
+    def test_clear_subsection_grade(self):
+        PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        deleted = PersistentSubsectionGrade.clear_grade(self.user.id, self.course_key)
+        self.assertEqual(deleted, 1)
+
+    def test_clear_subsection_grade_override(self):
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.user,
+            subsection_grade_model=grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=GradeOverrideFeatureEnum.gradebook,
+        )
+        deleted = PersistentSubsectionGradeOverride.clear_override(self.user.id, self.course_key)
+        self.assertEqual(deleted, 1)
+
 
 @ddt.ddt
 class PersistentCourseGradesTest(GradesModelTestCase):
@@ -490,3 +507,34 @@ class PersistentCourseGradesTest(GradesModelTestCase):
                 'grading_policy_hash': str(grade.grading_policy_hash),
             }
         )
+
+    def test_clear_grade(self):
+        another_params = {
+            "user_id": 123456,
+            "course_id": self.course_key,
+            "course_version": "JoeMcEwing",
+            "course_edited_timestamp": datetime(
+                year=2016,
+                month=8,
+                day=1,
+                hour=18,
+                minute=53,
+                second=24,
+                microsecond=354741,
+                tzinfo=pytz.UTC,
+            ),
+            "percent_grade": 77.8,
+            "letter_grade": "Great job",
+            "passed": True,
+        }
+
+        UserFactory(id=another_params['user_id'])
+
+        PersistentCourseGrade.update_or_create(**self.params)
+        PersistentCourseGrade.update_or_create(**another_params)
+
+        deleted_user_grades = PersistentCourseGrade.clear_grade(self.course_key, self.params['user_id'])
+        another_user_grade = PersistentCourseGrade.read(another_params['user_id'], self.course_key)
+
+        self.assertEqual(deleted_user_grades, 1)
+        self.assertIsNotNone(another_user_grade)
