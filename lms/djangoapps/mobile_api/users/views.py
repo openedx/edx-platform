@@ -4,6 +4,7 @@ Views for user API
 
 
 import logging
+from functools import cached_property
 from typing import List, Optional
 
 from completion.exceptions import UnavailableCompletionData
@@ -324,7 +325,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           certified).
         * url: URL to the downloadable version of the certificate, if exists.
     """
-    queryset = CourseEnrollment.objects.all()
+
     lookup_field = 'username'
 
     # In Django Rest Framework v3, there is a default pagination
@@ -352,6 +353,13 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             return CourseEnrollmentSerializerv05
         return CourseEnrollmentSerializer
 
+    @cached_property
+    def queryset(self):
+        return CourseEnrollment.objects.all().select_related('course', 'user').filter(
+            user__username=self.kwargs['username'],
+            is_active=True
+        ).order_by('created').reverse()
+
     def get_queryset(self):
         api_version = self.kwargs.get('api_version')
         mobile_available = self.get_mobile_available_enrollments()
@@ -377,14 +385,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         """
         Gets list with `CourseEnrollment` for mobile available courses.
         """
-        enrollments = self.queryset.filter(
-            user__username=self.kwargs['username'],
-            is_active=True
-        ).order_by('created').reverse()
         org = self.request.query_params.get('org', None)
 
         same_org = (
-            enrollment for enrollment in enrollments
+            enrollment for enrollment in self.queryset
             if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org)
         )
         mobile_available = (
