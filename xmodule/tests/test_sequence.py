@@ -443,6 +443,15 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert metadata['tag'] == 'sequential'
         assert metadata['display_name'] == self.sequence_3_1.display_name_with_default
 
+    def test_get_metadata_navigation_disabled(self):
+        """Test that the sequence metadata is returned correctly when navigation is disabled"""
+        self.sequence_3_1.hide_from_toc = True
+        metadata = self.sequence_3_1.get_metadata()
+        assert len(metadata['items']) == 3
+        assert metadata['tag'] == 'sequential'
+        assert metadata['display_name'] == self.sequence_3_1.display_name_with_default
+        assert metadata['navigation_disabled'] is True
+
     @override_settings(FIELD_OVERRIDE_PROVIDERS=(
         'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
     ))

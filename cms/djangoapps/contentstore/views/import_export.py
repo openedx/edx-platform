@@ -42,8 +42,13 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from ..storage import course_import_export_storage
 from ..tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
 from ..toggles import use_new_export_page, use_new_import_page
-from ..utils import reverse_course_url, reverse_library_url, get_export_url, get_import_url
-
+from ..utils import (
+    reverse_course_url,
+    reverse_library_url,
+    get_export_url,
+    get_import_url,
+    IMPORTABLE_FILE_TYPES,
+)
 __all__ = [
     'import_handler', 'import_status_handler',
     'export_handler', 'export_output_handler', 'export_status_handler',
@@ -70,7 +75,7 @@ def import_handler(request, course_key_string):
         html: return html page for import page
         json: not supported
     POST or PUT
-        json: import a course via the .tar.gz file specified in request.FILES
+        json: import a course via the .tar.gz or .zip file specified in request.FILES
     """
     courselike_key = CourseKey.from_string(course_key_string)
     library = isinstance(courselike_key, LibraryLocator)
@@ -123,7 +128,7 @@ def _write_chunk(request, courselike_key):  # lint-amnesty, pylint: disable=too-
     """
     Write the OLX file data chunk from the given request to the local filesystem.
     """
-    # Upload .tar.gz to local filesystem for one-server installations not using S3 or Swift
+    # Upload .tar.gz or .zip to local filesystem for one-server installations not using S3 or Swift
     data_root = path(settings.GITHUB_REPO_ROOT)
     subdir = base64.urlsafe_b64encode(repr(courselike_key).encode('utf-8')).decode('utf-8')
     course_dir = data_root / subdir
@@ -141,8 +146,8 @@ def _write_chunk(request, courselike_key):  # lint-amnesty, pylint: disable=too-
         # Use sessions to keep info about import progress
         _save_request_status(request, courselike_string, 0)
 
-        if not filename.endswith('.tar.gz'):
-            error_message = _('We only support uploading a .tar.gz file.')
+        if not filename.endswith(IMPORTABLE_FILE_TYPES):
+            error_message = _('We support uploading files in one of the following formats: {IMPORTABLE_FILE_TYPES}')
             _save_request_status(request, courselike_string, -1)
             monitor_import_failure(courselike_key, current_step, message=error_message)
             return error_response(error_message, 415, 0)

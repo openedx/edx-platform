@@ -73,6 +73,7 @@ from common.djangoapps.xblock_django.models import (
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 
 from ..component import component_handler, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
@@ -1105,6 +1106,59 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         assert dupe_html_1.data == "HTML 1 Content (Lib Update)"
         assert dupe_html_2.display_name == "HTML 2 Title (Lib Update)"
         assert dupe_html_2.data == "HTML 2 Content (Lib Update)"
+
+    def test_duplicate_tags(self):
+        """
+        Test that duplicating a tagged XBlock also duplicates its content tags.
+        """
+        source_course = CourseFactory()
+        user = UserFactory.create()
+        source_chapter = BlockFactory(
+            parent=source_course, category="chapter", display_name="Source Chapter"
+        )
+        source_block = BlockFactory(parent=source_chapter, category="html", display_name="Child")
+
+        # Create a couple of taxonomies with tags
+        taxonomyA = tagging_api.create_taxonomy(name="A", export_id="A")
+        taxonomyB = tagging_api.create_taxonomy(name="B", export_id="B")
+        tagging_api.set_taxonomy_orgs(taxonomyA, all_orgs=True)
+        tagging_api.set_taxonomy_orgs(taxonomyB, all_orgs=True)
+        tagging_api.add_tag_to_taxonomy(taxonomyA, "one")
+        tagging_api.add_tag_to_taxonomy(taxonomyA, "two")
+        tagging_api.add_tag_to_taxonomy(taxonomyB, "three")
+        tagging_api.add_tag_to_taxonomy(taxonomyB, "four")
+
+        # Tag the chapter
+        tagging_api.tag_object(str(source_chapter.location), taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(source_chapter.location), taxonomyB, ["three", "four"])
+
+        # Tag the child block
+        tagging_api.tag_object(str(source_block.location), taxonomyA, ["two"],)
+
+        # Duplicate the chapter (and its children)
+        dupe_location = duplicate_block(
+            parent_usage_key=source_course.location,
+            duplicate_source_usage_key=source_chapter.location,
+            user=user,
+        )
+        dupe_chapter = self.store.get_item(dupe_location)
+        self.assertEqual(len(dupe_chapter.get_children()), 1)
+        dupe_block = dupe_chapter.get_children()[0]
+
+        # Check that the duplicated blocks also duplicated tags
+        expected_chapter_tags = [
+            f'<ObjectTag> {str(dupe_chapter.location)}: A=one',
+            f'<ObjectTag> {str(dupe_chapter.location)}: A=two',
+            f'<ObjectTag> {str(dupe_chapter.location)}: B=four',
+            f'<ObjectTag> {str(dupe_chapter.location)}: B=three',
+        ]
+        dupe_chapter_tags = [str(object_tag) for object_tag in tagging_api.get_object_tags(str(dupe_chapter.location))]
+        assert dupe_chapter_tags == expected_chapter_tags
+        expected_block_tags = [
+            f'<ObjectTag> {str(dupe_block.location)}: A=two',
+        ]
+        dupe_block_tags = [str(object_tag) for object_tag in tagging_api.get_object_tags(str(dupe_block.location))]
+        assert dupe_block_tags == expected_block_tags
 
 
 @ddt.ddt

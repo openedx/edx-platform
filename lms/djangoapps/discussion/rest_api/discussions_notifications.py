@@ -306,10 +306,9 @@ class DiscussionNotificationSender:
             'content_type': content_type,
             'content': thread_body
         }
-        audience_filters = self._create_cohort_course_audience()
-        audience_filters['discussion_roles'] = [
+        audience_filters = {'discussion_roles': [
             FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-        ]
+        ]}
         self._send_course_wide_notification("content_reported", audience_filters, context)
 
 

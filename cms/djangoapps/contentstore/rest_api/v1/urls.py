@@ -9,6 +9,7 @@ from .views import (
     ContainerHandlerView,
     CourseDetailsView,
     CourseTeamView,
+    CourseTextbooksView,
     CourseIndexView,
     CourseGradingView,
     CourseRerunView,
@@ -21,7 +22,8 @@ from .views import (
     ProctoringErrorsView,
     HelpUrlsView,
     VideoUsageView,
-    VideoDownloadView
+    VideoDownloadView,
+    VerticalContainerView,
 )
 
 app_name = 'v1'
@@ -103,9 +105,19 @@ urlpatterns = [
         name="course_rerun"
     ),
     re_path(
+        fr'^textbooks/{COURSE_ID_PATTERN}$',
+        CourseTextbooksView.as_view(),
+        name="textbooks"
+    ),
+    re_path(
         fr'^container_handler/{settings.USAGE_KEY_PATTERN}$',
         ContainerHandlerView.as_view(),
         name="container_handler"
+    ),
+    re_path(
+        fr'^container/vertical/{settings.USAGE_KEY_PATTERN}/children$',
+        VerticalContainerView.as_view(),
+        name="container_vertical"
     ),
 
     # Authoring API

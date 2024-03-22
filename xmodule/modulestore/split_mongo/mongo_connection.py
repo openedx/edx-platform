@@ -701,7 +701,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
         new_index.save()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().insert_course_index(course_index, course_context)
 
     def update_course_index(self, course_index, from_index=None, course_context=None):  # pylint: disable=arguments-differ
@@ -755,7 +757,10 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
 
         # Save the course index entry and create a historical record:
         index_obj.save()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().update_course_index(course_index, from_index, course_context)
 
     def delete_course_index(self, course_key):
@@ -764,7 +769,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         RequestCache(namespace="course_index_cache").clear()
         SplitModulestoreCourseIndex.objects.filter(course_id=course_key).delete()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().delete_course_index(course_key)
 
     def _drop_database(self, database=True, collections=True, connections=True):
@@ -782,5 +789,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
                 "post-test cleanup failed with TransactionManagementError. "
                 "Use 'with self.allow_transaction_exception():' from ModuleStoreTestCase/...IsolationMixin to fix it."
             ) from err
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super()._drop_database(database, collections, connections)

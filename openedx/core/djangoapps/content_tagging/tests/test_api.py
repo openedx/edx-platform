@@ -1,7 +1,11 @@
 """Tests for the Tagging models"""
+import time
+
 import ddt
 from django.test.testcases import TestCase
+
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Tag
 from organizations.models import Organization
 
@@ -323,7 +327,7 @@ class TestGetAllObjectTagsMixin:
                 _name="deleted taxonomy",
             )
 
-        self.expected_objecttags = {
+        self.expected_course_objecttags = {
             "course-v1:orgA+test_course+test_run": {
                 self.taxonomy_1.id: list(self.course_tags),
             },
@@ -339,22 +343,103 @@ class TestGetAllObjectTagsMixin:
             },
         }
 
+        # Library tags and library contents need a unique block_id that is persisted along test runs
+        self.block_suffix = str(round(time.time() * 1000))
+
+        api.tag_object(
+            object_id=f"lib:orgA:lib_{self.block_suffix}",
+            taxonomy=self.taxonomy_2,
+            tags=['Tag 2.1'],
+        )
+        self.library_tags = api.get_object_tags(f"lib:orgA:lib_{self.block_suffix}")
+
+        api.tag_object(
+            object_id=f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}",
+            taxonomy=self.taxonomy_1,
+            tags=['Tag 1.1'],
+        )
+        self.problem1_tags = api.get_object_tags(
+            f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}"
+        )
+
+        api.tag_object(
+            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
+            taxonomy=self.taxonomy_1,
+            tags=['Tag 1.2'],
+        )
+        self.library_html_tags1 = api.get_object_tags(
+            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
+            taxonomy_id=self.taxonomy_1.id,
+        )
+
+        api.tag_object(
+            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
+            taxonomy=self.taxonomy_2,
+            tags=['Tag 2.2'],
+        )
+        self.library_html_tags2 = api.get_object_tags(
+            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
+            taxonomy_id=self.taxonomy_2.id,
+        )
+
+        # Create "deleted" object tags, which will be omitted from the results.
+        for object_id in (
+            f"lib:orgA:lib_{self.block_suffix}",
+            f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}",
+            f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
+        ):
+            ObjectTag.objects.create(
+                object_id=object_id,
+                taxonomy=None,
+                tag=None,
+                _value="deleted tag",
+                _name="deleted taxonomy",
+            )
+
+        self.expected_library_objecttags = {
+            f"lib:orgA:lib_{self.block_suffix}": {
+                self.taxonomy_2.id: list(self.library_tags),
+            },
+            f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}": {
+                self.taxonomy_1.id: list(self.problem1_tags),
+            },
+            f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}": {
+                self.taxonomy_1.id: list(self.library_html_tags1),
+                self.taxonomy_2.id: list(self.library_html_tags2),
+            },
+        }
+
 
 class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
     """
     Test get_all_object_tags api function
     """
 
-    def test_get_all_object_tags(self):
+    def test_get_course_object_tags(self):
         """
-        Test the get_all_object_tags function
+        Test the get_all_object_tags function using a course
         """
         with self.assertNumQueries(1):
             object_tags, taxonomies = api.get_all_object_tags(
                 CourseKey.from_string("course-v1:orgA+test_course+test_run")
             )
 
-        assert object_tags == self.expected_objecttags
+        assert object_tags == self.expected_course_objecttags
+        assert taxonomies == {
+            self.taxonomy_1.id: self.taxonomy_1,
+            self.taxonomy_2.id: self.taxonomy_2,
+        }
+
+    def test_get_library_object_tags(self):
+        """
+        Test the get_all_object_tags function using a library
+        """
+        with self.assertNumQueries(1):
+            object_tags, taxonomies = api.get_all_object_tags(
+                LibraryLocatorV2.from_string(f"lib:orgA:lib_{self.block_suffix}")
+            )
+
+        assert object_tags == self.expected_library_objecttags
         assert taxonomies == {
             self.taxonomy_1.id: self.taxonomy_1,
             self.taxonomy_2.id: self.taxonomy_2,

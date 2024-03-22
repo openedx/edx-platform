@@ -25,6 +25,7 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from openedx.core.djangoapps.user_api.accounts import (
     AUTHN_EMAIL_CONFLICT_MSG,
     AUTHN_EMAIL_INVALID_MSG,
+    AUTHN_PASSWORD_COMPROMISED_MSG,
     AUTHN_USERNAME_CONFLICT_MSG,
     EMAIL_BAD_LENGTH_MSG,
     EMAIL_MAX_LENGTH,
@@ -2320,6 +2321,40 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
 
             assert response.status_code == 200
 
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
+    )
+    @mock.patch('eventtracking.tracker.emit')
+    @mock.patch(
+        'openedx.core.djangoapps.user_authn.views.registration_form.check_pwned_password',
+        mock.Mock(return_value={
+            'vulnerability': 'yes',
+            'frequency': 3,
+            'user_request_page': 'registration',
+        })
+    )
+    def test_register_error_with_pwned_password(self, emit):
+        post_params = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        }
+        response = self.client.post(
+            self.url,
+            post_params,
+            HTTP_ACCEPT='*/*',
+        )
+        emit.assert_called_with(
+            'edx.bi.user.pwned.password.status',
+            {
+                'frequency': 3,
+                'vulnerability': 'yes',
+                'user_request_page': 'registration',
+            })
+        assert response.status_code == 400
+
 
 @httpretty.activate
 @ddt.ddt
@@ -2812,3 +2847,28 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {'username': 'user', 'email': 'user@email.com', 'is_authn_mfe': True, 'form_field_key': 'email'},
             {'email': AUTHN_EMAIL_CONFLICT_MSG}
         )
+
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
+    )
+    @mock.patch('eventtracking.tracker.emit')
+    @mock.patch(
+        'openedx.core.djangoapps.user_api.accounts.api.check_pwned_password',
+        mock.Mock(return_value={
+            'vulnerability': 'yes',
+            'frequency': 3,
+            'user_request_page': 'registration',
+        })
+    )
+    def test_pwned_password_and_emit_track_event(self, emit):
+        self.assertValidationDecision(
+            {'password': 'testtest12'},
+            {'password': AUTHN_PASSWORD_COMPROMISED_MSG}
+        )
+        emit.assert_called_with(
+            'edx.bi.user.pwned.password.status',
+            {
+                'frequency': 3,
+                'vulnerability': 'yes',
+                'user_request_page': 'registration',
+            })

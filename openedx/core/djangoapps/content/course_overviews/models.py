@@ -701,6 +701,41 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
+    def get_courses_matching_query(cls, query, course_overviews):
+        """
+        Return a queryset of CourseOverview objects filtered bythe given query.
+
+        Args:
+            query: required parameter that allows filtering based on the CourseOverview.
+            course_overviews: queryset of CourseOverview objects to filter on.
+        """
+        return course_overviews.filter(
+            Q(display_name__icontains=query) |
+            Q(org__icontains=query) |
+            Q(id__icontains=query)
+        )
+
+    @classmethod
+    def get_courses_by_status(cls, active_only, archived_only, course_overviews):
+        """
+        Return a queryset of CourseOverview objects based on the given status.
+
+        Args:
+            active_only: when True, only active courses will be returned.
+            archived_only: when True, only archived courses will be returned.
+            course_overviews: queryset of CourseOverview objects to filter on.
+        """
+        if active_only:
+            return course_overviews.filter(
+                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=pytz.UTC))
+            )
+        if archived_only:
+            return course_overviews.filter(
+                end__lt=datetime.now().replace(tzinfo=pytz.UTC)
+            )
+        return course_overviews
+
+    @classmethod
     def get_all_course_keys(cls):
         """
         Returns all course keys from course overviews.

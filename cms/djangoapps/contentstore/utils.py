@@ -74,26 +74,29 @@ from cms.djangoapps.contentstore.toggles import (
     split_library_view_on_dashboard,
     use_new_advanced_settings_page,
     use_new_course_outline_page,
+    use_new_certificates_page,
     use_new_export_page,
     use_new_files_uploads_page,
     use_new_grading_page,
+    use_new_group_configurations_page,
     use_new_course_team_page,
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
     use_new_text_editor,
+    use_new_textbooks_page,
     use_new_unit_page,
     use_new_updates_page,
     use_new_video_editor,
     use_new_video_uploads_page,
     use_new_custom_pages,
     use_tagging_taxonomy_list_page,
-    # use_xpert_translations_component,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from xmodule.library_tools import LibraryToolsService
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -101,6 +104,7 @@ from xmodule.partitions.partitions_service import get_all_partitions_for_course 
 from xmodule.services import SettingsService, ConfigurationService, TeamsConfigurationService
 
 
+IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
 
 
@@ -432,6 +436,45 @@ def get_unit_url(course_locator, unit_locator) -> str:
     return unit_url
 
 
+def get_certificates_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for certificates page view.
+    """
+    certificates_url = None
+    if use_new_certificates_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/certificates'
+        if mfe_base_url:
+            certificates_url = course_mfe_url
+    return certificates_url
+
+
+def get_textbooks_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for textbooks page view.
+    """
+    textbooks_url = None
+    if use_new_textbooks_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/pages-and-resources/textbooks'
+        if mfe_base_url:
+            textbooks_url = course_mfe_url
+    return textbooks_url
+
+
+def get_group_configurations_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for group configurations page view.
+    """
+    group_configurations_url = None
+    if use_new_group_configurations_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/group_configurations'
+        if mfe_base_url:
+            group_configurations_url = course_mfe_url
+    return group_configurations_url
+
+
 def get_custom_pages_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for custom pages view.
@@ -593,6 +636,15 @@ def ancestor_has_staff_lock(xblock, parent_xblock=None):
             return False
         parent_xblock = modulestore().get_item(parent_location)
     return parent_xblock.visible_to_staff_only
+
+
+def get_sequence_usage_keys(course):
+    """
+    Extracts a list of 'subsections' usage_keys
+    """
+    return [str(subsection.location)
+            for section in course.get_children()
+            for subsection in section.get_children()]
 
 
 def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
@@ -1208,8 +1260,16 @@ def load_services_for_studio(runtime, user):
 
 def update_course_details(request, course_key, payload, course_block):
     """
-    Utils is used to update course details.
-    It is used for both DRF and django views.
+    Utility function used to update course details. It is used for both DRF and legacy Django views.
+
+    Args:
+        request (WSGIRequest): Django HTTP request object
+        course_key (CourseLocator): The course run key
+        payload (dict): Dictionary of course run settings
+        course_block (CourseBlockWithMixins): A course run instance
+
+    Returns:
+        None
     """
 
     from .views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
@@ -1235,10 +1295,9 @@ def update_course_details(request, course_key, payload, course_block):
                 if milestone["namespace"] != entrance_exam_namespace:
                     remove_prerequisite_course(course_key, milestone)
 
-    # If the entrance exams feature has been enabled, we'll need to check for some
-    # feature-specific settings and handle them accordingly
-    # We have to be careful that we're only executing the following logic if we actually
-    # need to create or delete an entrance exam from the specified course
+    # If the entrance exams feature has been enabled, we'll need to check for some feature-specific settings and handle
+    # them accordingly. We have to be careful that we're only executing the following logic if we actually need to
+    # create or delete an entrance exam from the specified course
     if core_toggles.ENTRANCE_EXAMS.is_enabled():
         course_entrance_exam_present = course_block.entrance_exam_enabled
         entrance_exam_enabled = payload.get('entrance_exam_enabled', '') == 'true'
@@ -1260,11 +1319,21 @@ def update_course_details(request, course_key, payload, course_block):
             # If there's no entrance exam defined, we'll create a new one
             else:
                 create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
-
-        # If the entrance exam box on the settings screen has been unchecked,
-        # and the course has an entrance exam attached...
+        # If the entrance exam box on the settings screen has been unchecked, and the course has an entrance exam
+        # attached...
         elif not entrance_exam_enabled and course_entrance_exam_present:
             delete_entrance_exam(request, course_key)
+
+    # Fix any potential issues with the display behavior and availability date of certificates before saving the update.
+    # A self-paced course run should *never* have a display behavior of anything other than "Immediately Upon Passing"
+    # ("early_no_info") and does not support having a certificate available date. We are aware of an issue with the
+    # legacy Django template-based frontend where bad data is allowed to creep into the system, which can cause
+    # downstream services (e.g. the Credentials IDA) to go haywire. This bad data is most often seen when a course run
+    # is updated from instructor-paced to self-paced (self_paced == True in our JSON payload), so we check and fix
+    # during these updates. Otherwise, the legacy UI seems to do the right thing.
+    if "self_paced" in payload and payload["self_paced"]:
+        payload["certificate_available_date"] = None
+        payload["certificates_display_behavior"] = CertificatesDisplayBehaviors.EARLY_NO_INFO
 
     # Perform the normal update workflow for the CourseDetails model
     return CourseDetails.update_from_json(course_key, payload, request.user)
@@ -1526,6 +1595,49 @@ def get_course_context(request):
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
     return active_courses, archived_courses, in_process_course_actions
+
+
+def get_course_context_v2(request):
+    """Get context of the homepage course tab from the Studio Home."""
+
+    # Importing here to avoid circular imports:
+    # ImportError: cannot import name 'reverse_course_url' from partially initialized module
+    # 'cms.djangoapps.contentstore.utils' (most likely due to a circular import)
+    from cms.djangoapps.contentstore.views.course import (
+        get_courses_accessible_to_user,
+        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
+    )
+
+    def format_in_process_course_view(uca):
+        """
+        Return a dict of the data which the view requires for each unsucceeded course.
+
+        Args:
+            uca: CourseRerunUIStateManager object.
+        """
+        return {
+            'display_name': uca.display_name,
+            'course_key': str(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
+            'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
+                uca.course_key,
+                kwargs={
+                    'action_state_id': uca.id,
+                },
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+        }
+
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    org = request.GET.get('org', '') if optimization_enabled else None
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+    return courses_iter, in_process_course_actions
 
 
 def get_home_context(request, no_course=False):
@@ -1815,6 +1927,7 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
     )
     from openedx.core.djangoapps.content_staging import api as content_staging_api
 
+    course_sequence_ids = get_sequence_usage_keys(course)
     component_templates = get_component_templates(course)
     ancestor_xblocks = []
     parent = get_parent_xblock(xblock)
@@ -1915,8 +2028,25 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
         # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
         'user_clipboard': user_clipboard,
         'is_fullwidth_content': is_library_xblock,
+        'course_sequence_ids': course_sequence_ids,
     }
     return context
+
+
+def get_textbooks_context(course):
+    """
+    Utils is used to get context for textbooks for course.
+    It is used for both DRF and django views.
+    """
+
+    upload_asset_url = reverse_course_url('assets_handler', course.id)
+    textbook_url = reverse_course_url('textbooks_list_handler', course.id)
+    return {
+        'context_course': course,
+        'textbooks': course.pdf_textbooks,
+        'upload_asset_url': upload_asset_url,
+        'textbook_url': textbook_url,
+    }
 
 
 class StudioPermissionsService:
@@ -1975,7 +2105,7 @@ def send_course_update_notification(course_key, content, user):
             **extra_context,
         },
         notification_type="course_update",
-        content_url=f"{settings.LMS_BASE}/courses/{str(course_key)}/course/updates",
+        content_url=f"{settings.LMS_ROOT_URL}/courses/{str(course_key)}/course/updates",
         app_name="updates",
         audience_filters={},
     )
