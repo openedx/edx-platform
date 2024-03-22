@@ -2,7 +2,10 @@
 Serializer for user API
 """
 
+from typing import Dict, List, Optional, Tuple
 
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -11,7 +14,11 @@ from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+from lms.djangoapps.courseware.courses import get_current_child
+from lms.djangoapps.courseware.model_data import FieldDataCache
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from xmodule.modulestore.django import modulestore
 
 
 class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: disable=abstract-method
@@ -138,6 +145,86 @@ class CourseEnrollmentSerializerv05(CourseEnrollmentSerializer):
     class Meta:
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course', 'certificate')
+        lookup_field = 'username'
+
+
+class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
+    """
+    Serializes CourseEnrollment models for API v4.
+
+    Adds `course_status` field into serializer data.
+    """
+    course_status = serializers.SerializerMethodField()
+
+    def get_course_status(self, model: CourseEnrollment) -> Optional[Dict[str, List[str]]]:
+        """
+        Gets course status for the given user's enrollments.
+        """
+        try:
+            block_id = str(get_key_to_last_completed_block(model.user, model.course.id))
+        except UnavailableCompletionData:
+            block_id = ""
+
+        if not block_id:
+            return None
+
+        request = self.context.get('request')
+        path, unit_name = self._get_last_visited_block_path_and_unit_name(request, model)
+        path_ids = [str(block.location) for block in path]
+
+        return {
+            'last_visited_module_id': path_ids[0],
+            'last_visited_module_path': path_ids,
+            'last_visited_block_id': block_id,
+            'last_visited_unit_display_name': unit_name,
+        }
+
+    @staticmethod
+    def _get_last_visited_block_path_and_unit_name(
+        request: 'Request',  # noqa: F821
+        model: CourseEnrollment,
+    ) -> Tuple[List[Optional['XBlock']], Optional[str]]:  # noqa: F821
+        """
+        Returns the path to the latest block and unit name visited by the current user.
+
+        If there is no such visit, the first item deep enough down the course
+        tree is used.
+        """
+        course = modulestore().get_course(model.course.id)
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
+            course.id, model.user, course, depth=3)
+
+        course_block = get_block_for_descriptor(
+            model.user, request, course, field_data_cache, course.id, course=course
+        )
+
+        unit_name = ''
+        path = [course_block] if course_block else []
+        chapter = get_current_child(course_block, min_depth=3)
+        if chapter is not None:
+            path.append(chapter)
+            section = get_current_child(chapter, min_depth=2)
+            if section is not None:
+                path.append(section)
+                unit = get_current_child(section, min_depth=1)
+                if unit is not None:
+                    unit_name = unit.display_name
+
+        path.reverse()
+        return path, unit_name
+
+    class Meta:
+        model = CourseEnrollment
+        fields = (
+            'audit_access_expires',
+            'created',
+            'mode',
+            'is_active',
+            'course',
+            'certificate',
+            'course_modes',
+            'course_status',
+        )
         lookup_field = 'username'
 
 

@@ -40,7 +40,12 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
-from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05, UserSerializer
+from .serializers import (
+    CourseEnrollmentSerializer,
+    CourseEnrollmentSerializerModifiedForPrimary,
+    CourseEnrollmentSerializerv05,
+    UserSerializer,
+)
 
 log = logging.getLogger(__name__)
 
@@ -400,7 +405,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             if api_version == API_V4:
                 primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
                 if primary_enrollment_obj:
-                    serializer = self.get_serializer(primary_enrollment_obj)
+                    serializer = CourseEnrollmentSerializerModifiedForPrimary(
+                        primary_enrollment_obj,
+                        context=self.get_serializer_context(),
+                    )
                     enrollment_data.update({'primary': serializer.data})
 
             return Response(enrollment_data)
@@ -456,8 +464,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         super().paginator  # pylint: disable=expression-not-assigned
         api_version = self.kwargs.get('api_version')
 
-        if self._paginator is None and api_version in (API_V3, API_V4):
+        if self._paginator is None and api_version == API_V3:
             self._paginator = DefaultPagination()
+        if self._paginator is None and api_version == API_V4:
+            self._paginator = UserCourseEnrollmentsV4Pagination()
 
         return self._paginator
 
@@ -472,3 +482,11 @@ def my_user_info(request, api_version):
     # updating it from the oauth2 related code is too complex
     user_logged_in.send(sender=User, user=request.user, request=request)
     return redirect("user-detail", api_version=api_version, username=request.user.username)
+
+
+class UserCourseEnrollmentsV4Pagination(DefaultPagination):
+    """
+    Pagination for `UserCourseEnrollments` API v4.
+    """
+    page_size = 5
+    max_page_size = 50

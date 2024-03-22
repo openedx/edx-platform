@@ -4,7 +4,7 @@ Tests for users API
 
 
 import datetime
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs
 
 import ddt
@@ -492,8 +492,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['enrollments']['count'], 15)
-        self.assertEqual(response.data['enrollments']['num_pages'], 2)
-        self.assertEqual(len(response.data['enrollments']['results']), 10)
+        self.assertEqual(response.data['enrollments']['num_pages'], 3)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(latest_enrolment.id))
 
@@ -514,7 +514,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['enrollments']['count'], 6)
-        self.assertEqual(len(response.data['enrollments']['results']), 6)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
         # check that we have the new_course in primary section
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(new_course.id))
@@ -529,7 +529,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['enrollments']['count'], 6)
-        self.assertEqual(len(response.data['enrollments']['results']), 6)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
         # check that now we have the old_course in primary section
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(old_course.id))
@@ -542,7 +542,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['enrollments']['count'], 7)
-        self.assertEqual(len(response.data['enrollments']['results']), 7)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
         # check that now we have the newest_course in primary section
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(newest_course.id))
@@ -612,6 +612,88 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         # check that we have the new_course in primary section in the same way
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(new_course.id))
+
+    def test_pagination_for_user_enrollments_api_v4(self):
+        """
+        Tests `UserCourseEnrollmentsV4Pagination`, api_version == v4.
+        """
+        self.login()
+        courses = [CourseFactory.create(org="my_org", mobile_available=True) for _ in range(15)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 14)
+        self.assertEqual(response.data['enrollments']['num_pages'], 3)
+        self.assertEqual(response.data['enrollments']['current_page'], 1)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        self.assertIn('next', response.data['enrollments'])
+        self.assertIn('previous', response.data['enrollments'])
+        self.assertIn('primary', response.data)
+
+    def test_course_status_in_primary_obj_when_student_doesnt_have_progress(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['primary']['course_status'], None)
+
+    @patch('lms.djangoapps.mobile_api.users.serializers.get_key_to_last_completed_block')
+    def test_course_status_in_primary_obj_when_student_have_progress(
+        self,
+        get_last_completed_block_mock: MagicMock,
+    ):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        # create test course structure
+        course = CourseFactory.create(org="edx", mobile_available=True)
+        section = BlockFactory.create(
+            parent=course,
+            category="chapter",
+            display_name="section",
+        )
+        subsection = BlockFactory.create(
+            parent=section,
+            category="sequential",
+            display_name="subsection",
+        )
+        vertical = BlockFactory.create(
+            parent=subsection,
+            category="vertical",
+            display_name="test unit",
+        )
+        problem = BlockFactory.create(
+            parent=vertical,
+            category="problem",
+            display_name="problem",
+        )
+        self.enroll(course.id)
+        get_last_completed_block_mock.return_value = problem.location
+        expected_course_status = {
+            'last_visited_module_id': str(subsection.location),
+            'last_visited_module_path': [
+                str(subsection.location),
+                str(section.location),
+                str(course.location)
+            ],
+            'last_visited_block_id': str(problem.location),
+            'last_visited_unit_display_name': vertical.display_name,
+        }
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['primary']['course_status'], expected_course_status)
+        get_last_completed_block_mock.assert_called_once_with(self.user, course.id)
 
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
