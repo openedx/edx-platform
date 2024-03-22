@@ -180,7 +180,7 @@ def get_block_display_name(block: XBlock) -> str:
     if display_name is not None:
         return display_name
     else:
-        return xblock_type_display_name(block.block_type)
+        return xblock_type_display_name(block.scope_ids.block_type)
 
 
 def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
