@@ -121,7 +121,7 @@ class ContainerHandlerViewTest(BaseXBlockContainer):
         )
         url = self.get_reverse_url(usage_key_string)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class ContainerVerticalViewTest(BaseXBlockContainer):
