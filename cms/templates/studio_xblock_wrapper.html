@@ -20,6 +20,8 @@ show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block_type)
 messages = xblock.validate().to_json()
+has_not_configured_message = messages.get('summary',{}).get('type', None) == 'not-configured'
+print(messages, has_not_configured_message)
 block_is_unit = is_unit(xblock)
 %>
 
@@ -190,7 +192,7 @@ block_is_unit = is_unit(xblock)
     </div>
     % if not is_root:
         <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location}"/>
-        % if xblock_url:
+        % if xblock_url and not has_not_configured_message:
         <div class="xblock-header-secondary">
             <div class="meta-info">${_('This block contains multiple components.')}</div>
             <ul class="actions-list">
