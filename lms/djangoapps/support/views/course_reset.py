@@ -108,7 +108,11 @@ class CourseResetAPIView(APIView):
     @method_decorator(require_support_permission)
     def post(self, request, username_or_email):
         """
-        Resets a course for the given learner
+        Resets a course for the given learner.
+
+        POST params:
+            course_id (CourseKey): the course to reset
+            comment [optional] (str): 255 characters or fewer comment on why the course is being reset
 
         returns a dicts with the format {
             'course_id': <course id>
