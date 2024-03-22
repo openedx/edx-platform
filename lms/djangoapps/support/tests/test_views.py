@@ -54,7 +54,7 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from common.test.utils import disable_signal
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from lms.djangoapps.support.models import CourseResetAudit, CourseResetCourseOptIn
+from lms.djangoapps.support.models import CourseResetAudit
 from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.support.tests.factories import CourseResetCourseOptInFactory, CourseResetAuditFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -2071,10 +2071,10 @@ class TestOnboardingView(SupportViewTestCase, ProctoredExamTestCase):
         self.assertEqual(response_data['current_status']['course_id'], self.course_id)
 
 
-@ddt.ddt
-class TestResetCourseViewGET(SupportViewTestCase):
-    """ Tests for the list endpoint for course reset """
-
+class ResetCourseViewTestBase(SupportViewTestCase):
+    """
+    Shared base class for course reset view tests
+    """
     def _url(self, username):
         """ Helper to generate URL """
         return reverse("support:course_reset", kwargs={'username_or_email': username})
@@ -2086,7 +2086,6 @@ class TestResetCourseViewGET(SupportViewTestCase):
         super().setUp()
         SupportStaffRole().add_users(self.user)
         self.now = datetime.now().replace(tzinfo=UTC)
-
         self.course = CourseFactory.create(
             start=self.now - timedelta(days=90),
             end=self.now + timedelta(days=90),
@@ -2096,6 +2095,11 @@ class TestResetCourseViewGET(SupportViewTestCase):
         self.learner = UserFactory.create()
         self.enrollment = CourseEnrollmentFactory.create(user=self.learner, course_id=self.course.id)
         self.opt_in = CourseResetCourseOptInFactory.create(course_id=self.course.id)
+
+
+@ddt.ddt
+class TestResetCourseListView(ResetCourseViewTestBase):
+    """ Tests for the list endpoint for course reset """
 
     def assert_course_ids(self, expected_course_ids, learner=None):
         """ Helper that asserts the course ids that will be returned from the listing endpoint """
@@ -2117,7 +2121,7 @@ class TestResetCourseViewGET(SupportViewTestCase):
         it will not be returned by the endpoint
         """
         non_opted_in_course = CourseFactory.create()
-        enrollment = CourseEnrollmentFactory.create(user=self.learner, course_id=non_opted_in_course.id)
+        CourseEnrollmentFactory.create(user=self.learner, course_id=non_opted_in_course.id)
         self.assert_course_ids([self.course_id])
 
     def test_deactivated_opt_in(self):
@@ -2125,7 +2129,6 @@ class TestResetCourseViewGET(SupportViewTestCase):
         If a learner is enrolled in a course that has opted in, but that opt-in is
         deactivated, it will not be returned from the endpoint
         """
-        response = self.client.get(self._url(self.learner))
         self.assert_course_ids([self.course_id])
 
         self.opt_in.active = False
@@ -2138,7 +2141,6 @@ class TestResetCourseViewGET(SupportViewTestCase):
         If a learner's enrollment in an opted in course is deactivated,
         the course will not be returned by the endpoint
         """
-        response = self.client.get(self._url(self.learner))
         self.assert_course_ids([self.course_id])
 
         self.enrollment.is_active = False
@@ -2146,10 +2148,9 @@ class TestResetCourseViewGET(SupportViewTestCase):
 
         self.assert_course_ids([])
 
-    def assertResponse(self, expected_response, learner=None):
+    def assertResponse(self, expected_response):
         """ Helper to assert the contents of the response from the listing endpoint """
-        learner = learner or self.learner
-        response = self.client.get(self._url(learner))
+        response = self.client.get(self._url(self.learner))
         self.assertEqual(response.status_code, 200)
 
         actual_response = response.json()
@@ -2350,60 +2351,74 @@ class TestResetCourseViewGET(SupportViewTestCase):
         }])
 
 
-class TestResetCourseViewPost(SupportViewTestCase):
+class TestResetCourseCreateView(ResetCourseViewTestBase):
     """
-    Tests for creating course request
+    Tests for POST endpoint for performing course reset
     """
 
-    def setUp(self):
-        super().setUp()
-        SupportStaffRole().add_users(self.user)
-
-        self.course_id = 'course-v1:a+b+c'
-
-        self.other_user = User.objects.create(username='otheruser', password='test')
-
-        self.course = CourseFactory.create(
-            org='a',
-            course='b',
-            run='c',
-            enable_proctored_exams=True,
-            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
-        )
-        self.enrollment = CourseEnrollmentFactory(
-            is_active=True,
-            mode='verified',
-            course_id=self.course.id,
-            user=self.user
-        )
-        self.opt_in = CourseResetCourseOptInFactory.create(course_id=self.course.id)
-
-        self.other_course = CourseFactory.create(
-            org='x',
-            course='y',
-            run='z',
+    def request(self, username=None, course_id=None, comment=None):
+        """ Helper to perform request """
+        username = username or self.learner.username
+        return self.client.post(
+            self._url(username),
+            data={
+                "course_id": course_id if course_id else self.course_id,
+                "comment": comment if comment else ""
+            }
         )
 
-    def _url(self, username):
-        return reverse("support:course_reset", kwargs={'username_or_email': username})
+    def assert_error_response(self, response, expected_status_code, expected_error_message):
+        """ Helper to assert status code and error message """
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response.data['error'], expected_error_message)
 
     def test_wrong_username(self):
-        """
-        Test that a request with a username which does not exits returns 404
-        """
-        response = self.client.post(self._url(username='does_not_exist'), data={'course_id': 'course-v1:aa+bb+c'})
-        self.assertEqual(response.status_code, 404)
+        """ A request with a username which does not exits returns 404 """
+        response = self.request(username='does_not_exist')
+        self.assert_error_response(response, 404, "User does not exist")
+
+    def test_invalid_course_id(self):
+        """ A request for an invalid course id returns 400 """
+        response = self.request(course_id='thisisnotacourseid')
+        self.assert_error_response(response, 400, "invalid course id")
+
+    def test_missing_course_id(self):
+        """ A request without a course id returns 400 """
+        response = self.client.post(self._url(self.learner.username))
+        self.assert_error_response(response, 400, "Must specify course id")
+
+    def test_course_not_opt_in(self):
+        """ A request for a course which isn't opted into the feature returns 404 """
+        self.opt_in.active = False
+        self.opt_in.save()
+
+        response = self.request()
+        self.assert_error_response(response, 404, "Course is not eligible")
+
+    def test_unenrolled(self):
+        """ A request for a learner who isn't enrolled in the given course returns a 404 """
+        self.enrollment.is_active = False
+        self.enrollment.save()
+
+        response = self.request()
+        self.assert_error_response(response, 404, "Learner is not enrolled in course")
+
+    @patch('lms.djangoapps.support.views.course_reset.can_enrollment_be_reset')
+    def test_cannot_reset(self, mock_can_reset):
+        """ A request for a course which isn't able to be reset returns a 404 """
+        mock_status = str(uuid4())
+        mock_can_reset.return_value = (False, mock_status)
+
+        response = self.request()
+        self.assert_error_response(response, 400, f"Cannot reset course: {mock_status}")
 
     @patch('lms.djangoapps.support.views.course_reset.reset_student_course')
     def test_learner_course_reset(self, mock_reset_student_course):
+        """ Happy path test """
         comment = str(uuid4())
-        response = self.client.post(
-            self._url(username=self.user.username),
-            data={
-                'course_id': self.course_id,
-                'comment': comment,
-            }
-        )
+
+        # A request for a given learner and course with a comment should return a 201
+        response = self.request(comment=comment)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, {
             'course_id': self.course_id,
@@ -2412,49 +2427,40 @@ class TestResetCourseViewPost(SupportViewTestCase):
             'comment': comment,
             'display_name': self.course.display_name
         })
+        # The reset task should be queued
+        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.id, self.user.id)
+        # And an audit should be created as ENQUEUED
         self.assertEqual(
-            mock_reset_student_course.delay.call_count, 1
+            self.enrollment.courseresetaudit_set.first().status,
+            CourseResetAudit.CourseResetStatus.ENQUEUED
         )
-
-    def test_course_not_opt_in(self):
-        response = self.client.post(self._url(username=self.user.username), data={'course_id': 'course-v1:aa+bb+c'})
-        self.assertEqual(response.status_code, 404)
 
     @patch('lms.djangoapps.support.views.course_reset.reset_student_course')
     def test_course_reset_failed(self, mock_reset_student_course):
-        course = CourseFactory.create(
-            org='xx',
-            course='yy',
-            run='zz',
-        )
-        enrollment = CourseEnrollmentFactory(
-            is_active=True,
-            mode='verified',
-            course_id=course.id,
-            user=self.user
-        )
-
-        opt_in_course = CourseResetCourseOptIn.objects.create(
-            course_id=course.id,
-            active=True
-        )
-
+        """ An audit that has failed previously should be able to be run successfully """
         CourseResetAudit.objects.create(
-            course=opt_in_course,
-            course_enrollment=enrollment,
-            reset_by=self.other_user,
-            status=CourseResetAudit.CourseResetStatus.FAILED
-        )
-        response = self.client.post(self._url(username=self.user.username), data={'course_id': course.id})
-        self.assertEqual(
-            mock_reset_student_course.delay.call_count, 1
-        )
-        self.assertEqual(response.status_code, 200)
-
-    def test_course_reset_dupe(self):
-        CourseResetAuditFactory.create(
             course=self.opt_in,
             course_enrollment=self.enrollment,
+            reset_by=self.user,
+            status=CourseResetAudit.CourseResetStatus.FAILED
         )
-        response2 = self.client.post(self._url(username=self.user.username), data={'course_id': self.course_id})
-        self.assertEqual(response2.status_code, 204)
+        response = self.request()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, {
+            'course_id': self.course_id,
+            'status': response.data['status'],
+            'can_reset': False,
+            'comment': '',
+            'display_name': self.course.display_name
+        })
+        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.id, self.user.id)
+
+    def test_course_reset_already_reset(self):
+        """ A course that has an audit that hasn't failed should not be allowed to be run again """
+        additional_audit = CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.ENQUEUED
+        )
+        response = self.request()
+        self.assert_error_response(response, 400, f"Cannot reset course: {additional_audit.status_message()}")
