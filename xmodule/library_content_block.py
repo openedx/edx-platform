@@ -221,7 +221,7 @@ class LibraryContentBlock(
         overlimit_block_keys = set()
         if len(selected_keys) > max_count:
             num_to_remove = len(selected_keys) - max_count
-            overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
+            overlimit_block_keys = set(rand.sample(list(selected_keys), num_to_remove))
             selected_keys -= overlimit_block_keys
 
         # Do we have enough blocks now?
@@ -233,7 +233,7 @@ class LibraryContentBlock(
             pool = valid_block_keys - selected_keys
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(rand.sample(pool, num_to_add))
+                added_block_keys = set(rand.sample(list(pool), num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
