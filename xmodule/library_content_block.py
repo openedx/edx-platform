@@ -451,7 +451,12 @@ class LibraryContentBlock(
         context['is_loading'] = is_updating
 
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
+        if 'library' in root_xblock.category:
+            if root_xblock.source_library_id and len(root_xblock.children) > 0:
+                fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
+        else:
+            fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
+
         fragment.initialize_js('LibraryContentAuthorView')
         return fragment
 
