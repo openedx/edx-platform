@@ -2257,7 +2257,6 @@ class ProblemBlock(
         # rescoring should have no effect on attempts, so don't
         # need to increment here, or mark done.  Just save.
         self.set_state_from_lcp()
-        self.set_score(calculated_score)
         self.publish_grade(score=calculated_score, only_if_higher=only_if_higher)
 
         event_info['new_score'] = calculated_score.raw_earned

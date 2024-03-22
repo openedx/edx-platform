@@ -1614,7 +1614,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert block.lcp.context['attempt'] == 1
             mock_get_rescore.assert_called()
 
-    def test_rescore_problem_grading_method_disable_to_enable(self):
+    @patch('xmodule.capa_block.ProblemBlock.publish_grade')
+    def test_rescore_problem_grading_method_disable_to_enable(self, mock_publish_grade: Mock):
         """
         Test the rescore method the grading method is disabled and then enabled.
 
@@ -1644,7 +1645,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             block.rescore(only_if_higher=False)
 
             # Still Score is the last score
-            assert block.score == Score(raw_earned=1, raw_possible=1)
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+            )
 
         # Enabled grading method
         with patch(
@@ -1656,21 +1659,28 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             block.grading_method = 'first_score'
             block.rescore(only_if_higher=False)
 
-            assert block.score == Score(raw_earned=0, raw_possible=1)
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=0, raw_possible=1), only_if_higher=False
+            )
 
             # Change grading method to 'highest_score'
             block.grading_method = 'highest_score'
             block.rescore(only_if_higher=False)
 
-            assert block.score == Score(raw_earned=1, raw_possible=1)
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+            )
 
             # Change grading method to 'average_score'
             block.grading_method = 'average_score'
             block.rescore(only_if_higher=False)
 
-            assert block.score == Score(raw_earned=0.33, raw_possible=1)
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=0.33, raw_possible=1), only_if_higher=False
+            )
 
-    def test_rescore_problem_grading_method_enable_to_disable(self):
+    @patch('xmodule.capa_block.ProblemBlock.publish_grade')
+    def test_rescore_problem_grading_method_enable_to_disable(self, mock_publish_grade: Mock):
         """
         Test the rescore method the grading method is enabled and then disabled.
 
@@ -1702,19 +1712,25 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             block.grading_method = 'first_score'
             block.rescore(only_if_higher=False)
 
-            assert block.score == Score(raw_earned=0, raw_possible=1)
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=0, raw_possible=1), only_if_higher=False
+            )
 
             # Change grading method to 'highest_score'
             block.grading_method = 'highest_score'
             block.rescore(only_if_higher=False)
 
-            assert block.score == Score(raw_earned=1, raw_possible=1)
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+            )
 
             # Change grading method to 'average_score'
             block.grading_method = 'average_score'
             block.rescore(only_if_higher=False)
 
-            assert block.score == Score(raw_earned=0.33, raw_possible=1)
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=0.33, raw_possible=1), only_if_higher=False
+            )
 
         # Disabled grading method
         with patch(
@@ -1727,7 +1743,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert block.score == Score(raw_earned=1, raw_possible=1)
 
     @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
-    def test_rescore_problem_update_grading_method(self):
+    @patch('xmodule.capa_block.ProblemBlock.publish_grade')
+    def test_rescore_problem_update_grading_method(self, mock_publish_grade: Mock):
         """
         Test the rescore method when the grading method is updated.
 
@@ -1753,19 +1770,25 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block.grading_method = 'first_score'
         block.rescore(only_if_higher=False)
 
-        assert block.score == Score(raw_earned=0, raw_possible=1)
+        mock_publish_grade.assert_called_with(
+            score=Score(raw_earned=0, raw_possible=1), only_if_higher=False
+        )
 
         # Change grading method to 'highest_score'
         block.grading_method = 'highest_score'
         block.rescore(only_if_higher=False)
 
-        assert block.score == Score(raw_earned=1, raw_possible=1)
+        mock_publish_grade.assert_called_with(
+            score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+        )
 
         # Change grading method to 'average_score'
         block.grading_method = 'average_score'
         block.rescore(only_if_higher=False)
 
-        assert block.score == Score(raw_earned=0.33, raw_possible=1)
+        mock_publish_grade.assert_called_with(
+            score=Score(raw_earned=0.33, raw_possible=1), only_if_higher=False
+        )
 
     def test_rescore_problem_not_done(self):
         # Simulate that the problem is NOT done
