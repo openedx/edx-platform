@@ -79,7 +79,12 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
       }
     </script>
   % endif
-  <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+  % if LANGUAGE_CODE != 'en':
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+  % elif settings.DEBUG or LANGUAGE_CODE == 'en':
+    ## Provides a fallback for gettext functions for English and in debug mode
+    <script type="text/javascript" src="${static.url('js/src/gettext_fallback.js')}"></script>
+  % endif
   <script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
   <% favicon_url = branding_api.get_favicon_url() %>
   <link rel="icon" type="image/x-icon" href="${favicon_url}"/>
