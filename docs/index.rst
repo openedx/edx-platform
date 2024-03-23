@@ -21,6 +21,8 @@ locations.
 .. _Open edX Development space: https://openedx.atlassian.net/wiki/spaces/COMM/overview
 .. _Open edX ReadTheDocs: http://docs.edx.org/
 
+.. include:: custom_toctree.rst
+
 .. toctree::
     :maxdepth: 1
 
