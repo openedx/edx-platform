@@ -172,7 +172,7 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     # tags for each component separately.
     all_tags = tagging_api.get_object_tags(str(object_id)).all()
     if not all_tags:
-        return {}
+        return {Fields.tags: {}}
     result = {
         Fields.tags_taxonomy: [],
         Fields.tags_level0: [],

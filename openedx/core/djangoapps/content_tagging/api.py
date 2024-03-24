@@ -11,12 +11,15 @@ from opaque_keys.edx.keys import UsageKey
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Exists, OuterRef, Q, QuerySet
+from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from openedx_tagging.core.tagging.models.utils import TAGS_CSV_SEPARATOR
 from organizations.models import Organization
 from .helpers.objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
+from openedx_events.content_authoring.data import ContentObjectData
+from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
 
 from .models import TaxonomyOrg
 from .types import ContentKey, TagValuesByObjectIdDict, TagValuesByTaxonomyIdDict, TaxonomyDict
@@ -388,6 +391,10 @@ def tag_object(
             object_id=object_id,
             taxonomy=taxonomy,
             tags=tags,
+        )
+        CONTENT_OBJECT_TAGS_CHANGED.send_event(
+            time=now(),
+            content_object=ContentObjectData(object_id=object_id)
         )
 
 

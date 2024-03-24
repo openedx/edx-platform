@@ -782,7 +782,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.5.2
+openedx-events @ git+https://github.com/open-craft/openedx-events.git@yusuf-musleh/content-object-tagged-signal
     # via
     #   -r requirements/edx/kernel.in
     #   edx-event-bus-kafka

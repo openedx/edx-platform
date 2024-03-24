@@ -6,7 +6,7 @@ import logging
 
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData, XBlockData
+from openedx_events.content_authoring.data import ContentLibraryData, ContentObjectData, LibraryBlockData, XBlockData
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
@@ -14,7 +14,8 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
-    XBLOCK_UPDATED
+    XBLOCK_UPDATED,
+    CONTENT_OBJECT_TAGS_CHANGED,
 )
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -133,3 +134,22 @@ def content_library_updated_handler(**kwargs) -> None:
         return
 
     update_content_library_index_docs.delay(str(content_library_data.library_key))
+
+
+@receiver(CONTENT_OBJECT_TAGS_CHANGED)
+@only_if_meilisearch_enabled
+def content_object_tags_changed_handler(**kwargs) -> None:
+    """
+    Update the tags data in the index for the Content Object
+    """
+    content_object_tags = kwargs.get("content_object", None)
+    if not content_object_tags or not isinstance(content_object_tags, ContentObjectData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    upsert_xblock_index_doc.delay(
+        content_object_tags.object_id,
+        recursive=False,
+        update_metadata=True,
+        update_tags=True,
+    )
