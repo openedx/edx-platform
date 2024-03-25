@@ -262,9 +262,9 @@
       a {
         display: block;
         padding: 2px 4px 2px 10px;
-        border-radius: 3px;
         font-size: 0.9em;
         line-height: 25px;
+        border-left: 1px solid $m-blue;
 
         &:hover,
         &:focus {
