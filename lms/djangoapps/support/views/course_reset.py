@@ -123,7 +123,6 @@ class CourseResetAPIView(APIView):
             'can_reset': (boolean) <can the course be reset for this learner>
         }
         """
-        comment = request.data.get('comment', '')
         try:
             course_id = request.data['course_id']
             course_key = CourseKey.from_string(course_id)
@@ -152,7 +151,7 @@ class CourseResetAPIView(APIView):
             course=opt_in_course,
             course_enrollment=course_enrollment,
             reset_by=request.user,
-            comment=comment,
+            comment=request.data.get('comment', ''),
         )
 
         resp = {
