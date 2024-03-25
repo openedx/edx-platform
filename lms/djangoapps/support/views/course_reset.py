@@ -142,8 +142,6 @@ class CourseResetAPIView(APIView):
         course_enrollment = CourseEnrollment.get_enrollment(user, course_key)
 
         can_reset, status_message = can_enrollment_be_reset(course_enrollment)
-        course_reset_audit = get_latest_audit(course_enrollment)
-
         if not can_reset:
             return Response({'error': f'Cannot reset course: {status_message}'}, status=400)
 
