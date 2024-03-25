@@ -348,7 +348,9 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
 
     def test_clear_subsection_grade(self):
         PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        deleted = PersistentSubsectionGrade.clear_grade(self.user.id, self.course_key)
+        deleted = PersistentSubsectionGrade.delete_subsection_grades_for_learner(
+            self.user.id, self.course_key
+        )
         self.assertEqual(deleted, 1)
 
     def test_clear_subsection_grade_override(self):
@@ -360,8 +362,8 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             earned_graded_override=0.0,
             feature=GradeOverrideFeatureEnum.gradebook,
         )
-        deleted = PersistentSubsectionGradeOverride.clear_override(self.user.id, self.course_key)
-        self.assertEqual(deleted, 1)
+        deleted = PersistentSubsectionGrade.delete_subsection_grades_for_learner(self.user.id, self.course_key)
+        self.assertEqual(deleted, 2)
 
 
 @ddt.ddt
@@ -533,8 +535,11 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         PersistentCourseGrade.update_or_create(**self.params)
         PersistentCourseGrade.update_or_create(**another_params)
 
-        deleted_user_grades = PersistentCourseGrade.clear_grade(self.course_key, self.params['user_id'])
-        another_user_grade = PersistentCourseGrade.read(another_params['user_id'], self.course_key)
+        PersistentCourseGrade.delete_course_grade_for_learner(
+            self.course_key, self.params['user_id']
+        )
+        with self.assertRaises(PersistentCourseGrade.DoesNotExist):
+            PersistentCourseGrade.read(self.params['user_id'], self.course_key)
 
-        self.assertEqual(deleted_user_grades, 1)
+        another_user_grade = PersistentCourseGrade.read(another_params['user_id'], self.course_key)
         self.assertIsNotNone(another_user_grade)

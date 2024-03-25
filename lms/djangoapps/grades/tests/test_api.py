@@ -176,6 +176,7 @@ class ClearGradeTests(ModuleStoreTestCase):
         self.assertIsNotNone(override_obj)
 
         api.clear_user_course_grades(self.user.id, self.course.id)
+
         with self.assertRaises(PersistentCourseGrade.DoesNotExist):
             PersistentCourseGrade.read(self.user.id, self.course.id)
 
@@ -218,12 +219,10 @@ class ClearGradeTests(ModuleStoreTestCase):
 
     @patch('lms.djangoapps.grades.models_api._PersistentSubsectionGrade')
     @patch('lms.djangoapps.grades.models_api._PersistentCourseGrade')
-    @patch('lms.djangoapps.grades.models_api._PersistentSubsectionGradeOverride')
-    def test_assert_clear_grade_methods_called(self, mock_override, mock_course_grade, mock_subsection_grade):
+    def test_assert_clear_grade_methods_called(self, mock_course_grade, mock_subsection_grade):
         api.clear_user_course_grades(self.user.id, self.course.id)
-        mock_override.clear_override.assert_called_with(self.user.id, self.course.id)
-        mock_course_grade.clear_grade.assert_called_with(self.course.id, self.user.id)
-        mock_subsection_grade.clear_grade.assert_called_with(self.user.id, self.course.id)
+        mock_course_grade.delete_course_grade_for_learner.assert_called_with(self.course.id, self.user.id)
+        mock_subsection_grade.delete_subsection_grades_for_learner.assert_called_with(self.user.id, self.course.id)
 
     @patch('lms.djangoapps.grades.models_api._PersistentSubsectionGrade')
     @patch('lms.djangoapps.grades.models_api._PersistentCourseGrade')

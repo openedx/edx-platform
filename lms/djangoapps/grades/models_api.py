@@ -108,9 +108,8 @@ def clear_user_course_grades(user_id, course_key):
     """
     with transaction.atomic():
         try:
-            _PersistentSubsectionGradeOverride.clear_override(user_id, course_key)
-            _PersistentSubsectionGrade.clear_grade(user_id, course_key)
-            _PersistentCourseGrade.clear_grade(course_key, user_id)
+            _PersistentSubsectionGrade.delete_subsection_grades_for_learner(user_id, course_key)
+            _PersistentCourseGrade.delete_course_grade_for_learner(course_key, user_id)
             return 'Grades deleted Successfully'
         except Exception as e:  # pylint: disable=broad-except
             return f'Error deleting grades: {str(e)}'
