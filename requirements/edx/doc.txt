@@ -128,7 +128,6 @@ certifi==2024.2.2
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
-    #   py2neo
     #   requests
     #   snowflake-connector-python
 cffi==1.16.0
@@ -720,7 +719,6 @@ inflection==0.5.1
 interchange==2021.0.4
     # via
     #   -r requirements/edx/base.txt
-    #   py2neo
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
 isodate==0.6.1
@@ -852,7 +850,6 @@ monotonic==1.6
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-    #   py2neo
 mpmath==1.3.0
     # via
     #   -r requirements/edx/base.txt
@@ -939,14 +936,12 @@ packaging==23.2
     #   -r requirements/edx/base.txt
     #   drf-yasg
     #   gunicorn
-    #   py2neo
     #   pydata-sphinx-theme
     #   snowflake-connector-python
     #   sphinx
 pansi==2020.7.3
     # via
     #   -r requirements/edx/base.txt
-    #   py2neo
 path==16.10.0
     # via
     #   -r requirements/edx/base.txt
@@ -998,10 +993,6 @@ psutil==5.9.8
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
-py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
 pyasn1==0.5.1
     # via
     #   -r requirements/edx/base.txt
@@ -1024,7 +1015,6 @@ pygments==2.17.2
     # via
     #   -r requirements/edx/base.txt
     #   accessible-pygments
-    #   py2neo
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
@@ -1267,7 +1257,6 @@ six==1.16.0
     #   optimizely-sdk
     #   pansi
     #   paver
-    #   py2neo
     #   pyjwkest
     #   python-dateutil
     #   sphinxcontrib-httpdomain
@@ -1421,7 +1410,6 @@ urllib3==1.26.18
     #   -r requirements/edx/base.txt
     #   botocore
     #   elasticsearch
-    #   py2neo
     #   requests
     #   snowflake-connector-python
 user-util==1.0.0
