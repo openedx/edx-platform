@@ -304,7 +304,8 @@ def _section_special_exams(course, access):
     mfe_view_url = None
     if proctoring_provider == 'lti_external':
         mfe_view_url = f'{settings.EXAMS_DASHBOARD_MICROFRONTEND_URL}/course/{course_key}/exams/embed'
-        show_onboarding = True
+        # NOTE: LTI proctoring doesn't support onboarding. If that changes, this value should change to True.
+        show_onboarding = False
     else:
         # Only call does_backend_support_onboarding if  not using an LTI proctoring provider
         show_onboarding = does_backend_support_onboarding(course.proctoring_provider)
