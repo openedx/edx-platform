@@ -2096,6 +2096,80 @@ def get_certificates_context(course, user):
         'certificate_activation_handler_url': activation_handler_url,
         'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
     }
+
+    return context
+
+
+def get_group_configurations_context(course, store):
+    """
+    Utils is used to get context for course's group configurations.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.course_group_config import (
+        COHORT_SCHEME, ENROLLMENT_SCHEME, GroupConfiguration, RANDOM_SCHEME
+    )
+    from cms.djangoapps.contentstore.views.course import (
+        are_content_experiments_enabled
+    )
+    from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+
+    course_key = course.id
+    group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+    course_outline_url = reverse_course_url('course_handler', course_key)
+    should_show_experiment_groups = are_content_experiments_enabled(course)
+    if should_show_experiment_groups:
+        experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(store, course)
+    else:
+        experiment_group_configurations = None
+
+    all_partitions = GroupConfiguration.get_all_user_partition_details(store, course)
+    should_show_enrollment_track = False
+    has_content_groups = False
+    displayable_partitions = []
+    for partition in all_partitions:
+        partition['read_only'] = getattr(UserPartition.get_scheme(partition['scheme']), 'read_only', False)
+
+        if partition['scheme'] == COHORT_SCHEME:
+            has_content_groups = True
+            displayable_partitions.append(partition)
+        elif partition['scheme'] == CONTENT_TYPE_GATING_SCHEME:
+            # Add it to the front of the list if it should be shown.
+            if ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
+                displayable_partitions.append(partition)
+        elif partition['scheme'] == ENROLLMENT_SCHEME:
+            should_show_enrollment_track = len(partition['groups']) > 1
+
+            # Add it to the front of the list if it should be shown.
+            if should_show_enrollment_track:
+                displayable_partitions.insert(0, partition)
+        elif partition['scheme'] != RANDOM_SCHEME:
+            # Experiment group configurations are handled explicitly above. We don't
+            # want to display their groups twice.
+            displayable_partitions.append(partition)
+
+    # Set the sort-order. Higher numbers sort earlier
+    scheme_priority = defaultdict(lambda: -1, {
+        ENROLLMENT_SCHEME: 1,
+        CONTENT_TYPE_GATING_SCHEME: 0
+    })
+    displayable_partitions.sort(key=lambda p: scheme_priority[p['scheme']], reverse=True)
+    # Add empty content group if there is no COHORT User Partition in the list.
+    # This will add ability to add new groups in the view.
+    if not has_content_groups:
+        displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
+
+    context = {
+        'context_course': course,
+        'group_configuration_url': group_configuration_url,
+        'course_outline_url': course_outline_url,
+        'experiment_group_configurations': experiment_group_configurations,
+        'should_show_experiment_groups': should_show_experiment_groups,
+        'all_group_configurations': displayable_partitions,
+        'should_show_enrollment_track': should_show_enrollment_track,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
+    }
+
     return context
 
 
