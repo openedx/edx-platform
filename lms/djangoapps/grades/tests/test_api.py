@@ -1,7 +1,7 @@
 """ Tests calling the grades api directly """
 
 
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 import ddt
 
@@ -44,7 +44,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
+        self.course = CourseFactory.create()
         self.subsection = BlockFactory.create(parent=self.course, category="sequential", display_name="Subsection")
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
             user_id=self.user.id,
@@ -130,8 +130,8 @@ class ClearGradeTests(ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
-        self.subsection = BlockFactory.create(parent=self.course, category="sequential", display_name="Subsection")
+        self.course = CourseFactory.create()
+        self.subsection = BlockFactory.create(parent=self.course)
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
             user_id=self.user.id,
             course_id=self.course.id,
@@ -187,35 +187,52 @@ class ClearGradeTests(ModuleStoreTestCase):
                 self.subsection.location
             )
 
-    def test_clear_wrong_user_course_grades(self):
-        wrong_user = UserFactory()
+    def _create_and_get_user_grades(self, user_id):
+        """ Creates grades for a user and override object """
         api.override_subsection_grade(
-            self.user.id,
+            user_id,
             self.course.id,
             self.subsection.location,
             overrider=self.overriding_user,
             earned_graded=0.0,
             comment='Test Override Comment',
         )
-        override_obj = api.get_subsection_grade_override(
-            self.user.id,
+        return api.get_subsection_grade_override(
+            user_id,
             self.course.id,
             self.subsection.location
         )
-        course_grade = PersistentCourseGrade.read(self.user.id, self.course.id)
-        self.assertIsNotNone(course_grade)
-        self.assertIsNotNone(override_obj)
 
-        api.clear_user_course_grades(wrong_user.id, self.course.id)
+    def test_clear_other_user_course_grades(self):
+        """
+        Make sure it deletes grades for other_user and not self.user
+        """
+        # Create grades for 2 users
+        other_user = UserFactory()
+        user_override_obj = self._create_and_get_user_grades(self.user.id)
+        other_user_override_obj = self._create_and_get_user_grades(other_user.id)
 
+        # fetch and assert grades are available for both users
+        user_course_grade = PersistentCourseGrade.read(self.user.id, self.course.id)
+        other_user_course_grade = PersistentCourseGrade.read(self.user.id, self.course.id)
+        self.assertIsNotNone(user_course_grade)
+        self.assertIsNotNone(user_override_obj)
+        self.assertIsNotNone(other_user_override_obj)
+        self.assertIsNotNone(other_user_course_grade)
+
+        api.clear_user_course_grades(other_user.id, self.course.id)
+
+        # assert grades after deletion for other_user
         after_clear_override_obj = api.get_subsection_grade_override(
             self.user.id,
             self.course.id,
             self.subsection.location
         )
-        after_clear_course_grade = PersistentCourseGrade.read(self.user.id, self.course.id)
+        after_clear_user_course_grade = PersistentCourseGrade.read(self.user.id, self.course.id)
+        with self.assertRaises(PersistentCourseGrade.DoesNotExist):
+            PersistentCourseGrade.read(other_user.id, self.course.id)
         self.assertIsNotNone(after_clear_override_obj)
-        self.assertIsNotNone(after_clear_course_grade)
+        self.assertIsNotNone(after_clear_user_course_grade)
 
     @patch('lms.djangoapps.grades.models_api._PersistentSubsectionGrade')
     @patch('lms.djangoapps.grades.models_api._PersistentCourseGrade')
@@ -223,15 +240,3 @@ class ClearGradeTests(ModuleStoreTestCase):
         api.clear_user_course_grades(self.user.id, self.course.id)
         mock_course_grade.delete_course_grade_for_learner.assert_called_with(self.course.id, self.user.id)
         mock_subsection_grade.delete_subsection_grades_for_learner.assert_called_with(self.user.id, self.course.id)
-
-    @patch('lms.djangoapps.grades.models_api._PersistentSubsectionGrade')
-    @patch('lms.djangoapps.grades.models_api._PersistentCourseGrade')
-    def test_assert_clear_grade_exception(self, mock_course_grade, mock_subsection_grade):
-        with patch(
-            'lms.djangoapps.grades.models_api._PersistentSubsectionGradeOverride',
-            Mock(side_effect=Exception)
-        ) as mock_override:
-            api.clear_user_course_grades(self.user.id, self.course.id)
-            self.assertRaises(Exception, mock_override)
-            self.assertFalse(mock_course_grade.called)
-            self.assertFalse(mock_subsection_grade.called)

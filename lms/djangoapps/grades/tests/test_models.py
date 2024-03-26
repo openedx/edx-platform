@@ -352,6 +352,9 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             self.user.id, self.course_key
         )
         self.assertEqual(deleted, 1)
+        self.assertFalse(PersistentSubsectionGrade.objects.filter(
+            user_id=self.user.id, course_id=self.course_key).exists()
+        )
 
     def test_clear_subsection_grade_override(self):
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
@@ -510,36 +513,40 @@ class PersistentCourseGradesTest(GradesModelTestCase):
             }
         )
 
-    def test_clear_grade(self):
-        another_params = {
-            "user_id": 123456,
-            "course_id": self.course_key,
-            "course_version": "JoeMcEwing",
-            "course_edited_timestamp": datetime(
-                year=2016,
-                month=8,
-                day=1,
-                hour=18,
-                minute=53,
-                second=24,
-                microsecond=354741,
-                tzinfo=pytz.UTC,
-            ),
-            "percent_grade": 77.8,
-            "letter_grade": "Great job",
-            "passed": True,
+    def test_clear_course_grade(self):
+        # create params for another user and another course
+        other_user = UserFactory.create()
+        other_user_params = {
+            **self.params,
+            'user_id': other_user.id
         }
 
-        UserFactory(id=another_params['user_id'])
+        other_course_key = CourseLocator(
+            org='some_org',
+            course='some_other_course',
+            run='some_run'
+        )
+        user_other_course_params = {
+            **self.params,
+            'course_id': other_course_key
+        }
 
+        # create course grades based on different params
         PersistentCourseGrade.update_or_create(**self.params)
-        PersistentCourseGrade.update_or_create(**another_params)
+        PersistentCourseGrade.update_or_create(**other_user_params)
+        PersistentCourseGrade.update_or_create(**user_other_course_params)
 
         PersistentCourseGrade.delete_course_grade_for_learner(
             self.course_key, self.params['user_id']
         )
+
+        # assert after deleteing grade for a single user and course
         with self.assertRaises(PersistentCourseGrade.DoesNotExist):
             PersistentCourseGrade.read(self.params['user_id'], self.course_key)
 
-        another_user_grade = PersistentCourseGrade.read(another_params['user_id'], self.course_key)
+        another_user_grade = PersistentCourseGrade.read(other_user_params['user_id'], self.course_key)
         self.assertIsNotNone(another_user_grade)
+
+        self.assertTrue(PersistentCourseGrade.objects.filter(
+            user_id=self.params['user_id'], course_id=other_course_key).exists()
+        )

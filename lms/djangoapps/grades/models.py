@@ -537,7 +537,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     @classmethod
     def delete_subsection_grades_for_learner(cls, user_id, course_key):
         """
-        Clears Subsection grade override for a learner in a course
+        Clears Subsection grades and overrides for a learner in a course
         Arguments:
             user_id: The user associated with the desired grade
             course_id: The id of the course associated with the desired grade
