@@ -219,7 +219,6 @@ def main(
     click.echo()
 
     # Warnings
-    click.secho("WARNING: `npm run compile-sass` is experimental. Use at your own risk.", fg="yellow", bold=True)
     if show_help:
         click.echo(context.get_help())
         return
