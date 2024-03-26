@@ -497,6 +497,66 @@ def use_new_course_team_page(course_key):
     return ENABLE_NEW_STUDIO_COURSE_TEAM_PAGE.is_enabled(course_key)
 
 
+# .. toggle_name: contentstore.new_studio_mfe.use_new_certificates_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course certificates page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-1-18
+# .. toggle_target_removal_date: 2023-4-31
+# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/317
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_CERTIFICATES_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_certificates_page', __name__)
+
+
+def use_new_certificates_page(course_key):
+    """
+    Returns a boolean if new studio certificates mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_CERTIFICATES_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: contentstore.new_studio_mfe.use_new_textbooks_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course textbooks page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-1-18
+# .. toggle_target_removal_date: 2023-4-31
+# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/319
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_TEXTBOOKS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_textbooks_page', __name__)
+
+
+def use_new_textbooks_page(course_key):
+    """
+    Returns a boolean if new studio textbooks mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_TEXTBOOKS_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: contentstore.new_studio_mfe.use_new_group_configurations_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course group configurations page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-1-18
+# .. toggle_target_removal_date: 2023-4-31
+# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/318
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_GROUP_CONFIGURATIONS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_group_configurations_page', __name__)
+
+
+def use_new_group_configurations_page(course_key):
+    """
+    Returns a boolean if new studio group configurations mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_GROUP_CONFIGURATIONS_PAGE.is_enabled(course_key)
+
+
 # .. toggle_name: contentstore.mock_video_uploads
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False

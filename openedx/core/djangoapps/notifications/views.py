@@ -330,18 +330,15 @@ class NotificationListAPIView(generics.ListAPIView):
         if self.request.query_params.get('tray_opened'):
             unseen_count = Notification.objects.filter(user_id=self.request.user, last_seen__isnull=True).count()
             notification_tray_opened_event(self.request.user, unseen_count)
+        params = {
+            'user': self.request.user,
+            'created__gte': expiry_date,
+            'web': True
+        }
 
         if app_name:
-            return Notification.objects.filter(
-                user=self.request.user,
-                app_name=app_name,
-                created__gte=expiry_date,
-            ).order_by('-id')
-        else:
-            return Notification.objects.filter(
-                user=self.request.user,
-                created__gte=expiry_date,
-            ).order_by('-id')
+            params['app_name'] = app_name
+        return Notification.objects.filter(**params).order_by('-id')
 
 
 @allow_any_authenticated_user()

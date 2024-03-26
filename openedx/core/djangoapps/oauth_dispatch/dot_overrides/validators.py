@@ -5,6 +5,7 @@ Classes that override default django-oauth-toolkit behavior
 
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -90,6 +91,32 @@ class EdxOAuth2Validator(OAuth2Validator):
         # Restore the original request attributes
         request.grant_type = grant_type
         request.user = user
+
+    def get_default_scopes(self, client_id, request, *args, **kwargs):
+        """
+        Returns the default scopes.
+
+        If the request payload does not have `scopes` attribute for a grant_type of
+        client credentials, add `user_id` as a default scope if it is an allowed scope.
+        """
+        default_scopes = super().get_default_scopes(client_id, request, *args, **kwargs)
+        # .. toggle_name: ENABLE_USER_ID_SCOPE
+        # .. toggle_implementation:DjangoSetting
+        # .. toggle_description: If enabled, the user_id scope will be added to the default scopes for client_credentials grant type.
+        # .. toggle_default: False
+        # .. toggle_use_cases: temporary
+        # .. toggle_creation_date: 2024-03-16
+        # .. toggle_target_removal_date: 2024-04-16
+        # .. toggle_warnings: This feature flag is temporary and will be removed once the feature is fully tested.
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/issues/34381 (toggle removal ticket)
+        if settings.FEATURES.get('ENABLE_USER_ID_SCOPE', False):
+            if request.grant_type == 'client_credentials' and not request.scopes:
+                if get_scopes_backend().has_user_id_in_application_scopes(application=request.client):
+                    # copy the default scopes and add user_id to it to avoid modifying the original list
+                    extended_default_scopes = default_scopes.copy()
+                    extended_default_scopes.append('user_id')
+                    return extended_default_scopes
+        return default_scopes
 
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
         """

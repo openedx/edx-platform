@@ -30,4 +30,13 @@ class ApplicationModelScopesTestCase(TestCase):
         application_access = ApplicationAccessFactory(scopes=application_scopes)
         scopes = ApplicationModelScopes()
         assert set(scopes.get_available_scopes(application_access.application)) == \
-               set(list(settings.OAUTH2_DEFAULT_SCOPES.keys()) + expected_additional_scopes)
+            set(list(settings.OAUTH2_DEFAULT_SCOPES.keys()) + expected_additional_scopes)
+
+    def test_has_user_id_in_application_scopes(self):
+        """ Verify the settings backend correctly identifies whether the user_id scope is available. """
+        application_access = ApplicationAccessFactory(scopes=['user_id'])
+        scopes = ApplicationModelScopes()
+        assert scopes.has_user_id_in_application_scopes(application_access.application)
+        application_access.scopes = []
+        application_access.save()
+        assert not scopes.has_user_id_in_application_scopes(application_access.application)

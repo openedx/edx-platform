@@ -71,6 +71,7 @@ from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.api import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
+from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -633,6 +634,7 @@ def prepare_runtime_for_user(
         'teams_configuration': TeamsConfigurationService(),
         'call_to_action': CallToActionService(),
         'publish': EventPublishingService(user, course_id, track_function),
+        'enrollments': EnrollmentsService(),
     }
 
     runtime.get_block_for_descriptor = inner_get_block

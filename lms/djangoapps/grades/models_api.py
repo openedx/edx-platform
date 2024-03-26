@@ -2,6 +2,7 @@
 Provides Python APIs exposed from Grades models.
 """
 
+from django.db import transaction
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -99,3 +100,12 @@ def get_subsection_grade_override(user_id, course_key_or_id, usage_key_or_id):
     _ = get_subsection_grade(user_id, course_key_or_id, usage_key_or_id)
 
     return _PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
+
+
+def clear_user_course_grades(user_id, course_key):
+    """
+    Given a user_id and course_key, clears persistent grades for a learner in a course
+    """
+    with transaction.atomic():
+        _PersistentSubsectionGrade.delete_subsection_grades_for_learner(user_id, course_key)
+        _PersistentCourseGrade.delete_course_grade_for_learner(course_key, user_id)

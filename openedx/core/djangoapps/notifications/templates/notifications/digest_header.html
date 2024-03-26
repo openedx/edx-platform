@@ -1,0 +1,75 @@
+<table
+    border="0"
+    cellpadding="0"
+    cellspacing="0"
+    style="background: #00262b; color: white; width: 100%; padding: 1.5rem"
+>
+    <tbody>
+        <tr align="center">
+            <td>
+                <img src="{{ logo_url }}" style="width: 64px" height="auto" alt="logo_url" />
+            </td>
+        </tr>
+        <tr style="height: 20px"></tr>
+        <tr align="center">
+            <td style="font-family: Inter; font-size: 32px; font-style: normal; font-weight: 700; line-height: 36px">
+                {{ digest_frequency }} email digest
+            </td>
+        </tr>
+        <tr style="height: 10px"></tr>
+        <tr align="center">
+            <td
+                style="
+                    color: #bfc9ca;
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 28px;
+                "
+            >
+                {{ start_date }} {% if digest_frequency == "Weekly" %} - {{ end_date }} {% endif %}
+            </td>
+        </tr>
+        <tr style="height: 24px"></tr>
+        <tr align="center">
+            <td>
+                <table width="100%" border="0" cellpadding="0">
+                    <tbody>
+                        <tr>
+                            {% for update in updates %}
+                                <td width="50%">
+                                    <p style="
+                                        {% if not forloop.last %}padding-right: 0.5rem{% endif %}
+                                        {% if not forloop.first %}padding-left: 0.5rem{% endif %}"
+                                    >
+                                        <table
+                                            width="100%"
+                                            cellpadding="0"
+                                            cellspacing="0"
+                                            style="background: #1b3b40; color: white; border-radius: 8px;
+                                            padding: 1.25rem 1rem;"
+                                        >
+                                            <tbody>
+                                                <tr align="center">
+                                                    <td style="font-weight: 700; font-size: 32px; line-height: 44px; padding: 0">
+                                                        {{update.count}}
+                                                    </td>
+                                                </tr>
+                                                <tr align="center">
+                                                    <td style="font-weight: 600; font-size: 0.875rem; line-height: 20px; padding: 0">
+                                                        {{update.type}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </p>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>

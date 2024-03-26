@@ -1,5 +1,5 @@
-15. Add scope user_id for JWT token
-###################################
+15. Add scope user_id for JWT token for grant_type password
+###########################################################
 
 Status
 ------

@@ -563,7 +563,7 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
 
     def test_response_endorsed_notifications(self):
         """
-        Tests nresponse endorsed notifications
+        Tests response endorsed notifications
         """
 
         thread = ThreadMock(thread_id=1, creator=self.user_1, title='test thread')

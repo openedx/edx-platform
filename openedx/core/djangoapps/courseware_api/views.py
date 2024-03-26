@@ -135,6 +135,10 @@ class CoursewareMeta:
         return self.course.license
 
     @property
+    def language(self):
+        return self.course.language
+
+    @property
     def notes(self):
         """
         Return whether edxnotes is enabled and visible.
@@ -418,6 +422,7 @@ class CoursewareInformation(RetrieveAPIView):
             * entrance_exam_passed: (bool) Indicates if the entrance exam has been passed
         * id: A unique identifier of the course; a serialized representation
             of the opaque key identifying the course.
+        * language: The language code for the course
         * media: An object that contains named media items.  Included here:
             * course_image: An image to show for the course.  Represented
               as an object with the following fields:
