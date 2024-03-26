@@ -31,7 +31,7 @@ def upsert_xblock_index_doc(usage_key_str: str, recursive: bool, update_metadata
         api.upsert_xblock_index_doc(usage_key, recursive, update_metadata, update_tags)
 
         return True
-    except Exception as e:  # pylint: disable=broad-except pragma: no cover
+    except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
         log.error("Error updating content index document for XBlock with id: %s. %s", usage_key_str, e)
         return False
 
@@ -50,7 +50,7 @@ def delete_xblock_index_doc(usage_key_str: str) -> bool:
         api.delete_index_doc(usage_key)
 
         return True
-    except Exception as e:  # pylint: disable=broad-except pragma: no cover
+    except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
         log.error("Error deleting content index document for XBlock with id: %s. %s", usage_key_str, e)
         return False
 
@@ -69,7 +69,7 @@ def upsert_library_block_index_doc(usage_key_str: str, update_metadata: bool, up
         api.upsert_library_block_index_doc(usage_key, update_metadata, update_tags)
 
         return True
-    except Exception as e:  # pylint: disable=broad-except pragma: no cover
+    except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
         log.error("Error updating content index document for libray block with id: %s. %s", usage_key_str, e)
         return False
 
@@ -88,6 +88,6 @@ def delete_library_block_index_doc(usage_key_str: str) -> bool:
         api.delete_index_doc(usage_key)
 
         return True
-    except Exception as e:  # pylint: disable=broad-except pragma: no cover
+    except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
         log.error("Error deleting content index document for library block with id: %s. %s", usage_key_str, e)
         return False

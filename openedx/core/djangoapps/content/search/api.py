@@ -429,6 +429,7 @@ def upsert_library_block_index_doc(
 
     _wait_for_meili_tasks(tasks)
 
+
 def generate_user_token(user):
     """
     Returns a Meilisearch API key that only allows the user to search content that they have permission to view

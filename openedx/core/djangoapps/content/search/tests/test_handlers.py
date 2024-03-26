@@ -39,7 +39,6 @@ class TestUpdateIndexHandlers(
 
         api.clear_meilisearch_client()  # Clear the Meilisearch client to avoid leaking state from other tests
 
-
     def test_create_delete_xblock(self, meilisearch_client):
         # Create course
         course = self.store.create_course(
@@ -118,7 +117,6 @@ class TestUpdateIndexHandlers(
         meilisearch_client.return_value.index.return_value.delete_document.assert_called_with(
             'block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b'
         )
-
 
     def test_create_delete_library_block(self, meilisearch_client):
         # Create library

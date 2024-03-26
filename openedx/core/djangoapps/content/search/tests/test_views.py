@@ -41,7 +41,6 @@ class StudioSearchViewTest(APITestCase):
         # Clear the Meilisearch client to avoid side effects from other tests
         api.clear_meilisearch_client()
 
-
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_studio_search_unathenticated_disabled(self, _meilisearch_client):
         """
