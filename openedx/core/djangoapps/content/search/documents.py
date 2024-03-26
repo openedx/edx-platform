@@ -169,10 +169,10 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
         # ... other levels added as needed
     }
     for obj_tag in all_tags:
-        # Add the taxonomy export_id:
+        # Add the taxonomy name:
         if obj_tag.taxonomy.name not in result[Fields.tags_taxonomy]:
             result[Fields.tags_taxonomy].append(obj_tag.taxonomy.name)
-        # Taxonomy export_id plus each level of tags, in a list:
+        # Taxonomy name plus each level of tags, in a list:
         parts = [obj_tag.taxonomy.name] + obj_tag.get_lineage()  # e.g. ["Location", "North America", "Canada", "Vancouver"]
         parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator.
         # Now we build each level (tags.level0, tags.level1, etc.) as applicable.
