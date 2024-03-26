@@ -104,6 +104,8 @@ Decision
    new ``content/search`` Django app, so it's relatively easy to swap out later
    if this experiment doesn't pan out.
 4. We will not use ``edx-search`` for the new search functionality.
+5. For the experiment, we won't use Meilisearch during tests, but we expect to
+   add that in the future if we move forward with replacing Elasticsearch completely.
 
 
 Consequences
