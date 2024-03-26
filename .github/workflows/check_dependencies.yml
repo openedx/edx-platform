@@ -2,9 +2,11 @@ name: Check Python Dependencies
 
 on:
   pull_request:
-    branches:
-      - main
-
+    
+defaults:
+  run:
+    shell: bash # strict bash
+    
 jobs:
   check_dependencies:
     name: Check Python Dependencies
