@@ -276,12 +276,11 @@ def set_exported_object_tags(
     # Clear all tags related with the content.
     oel_tagging.delete_object_tags(content_key_str)
 
-    for taxonomy_export_id, tags_values in exported_tags.items():
+    for taxonomy_export_id, tags_values in exported_tags.items():        
         if not tags_values:
             continue
 
         taxonomy = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
-        tags_values = tags_values.split(',')
         oel_tagging.tag_object(
             object_id=content_key_str,
             taxonomy=taxonomy,
@@ -296,12 +295,9 @@ def import_course_tags_from_csv(csv_path, course_id) -> None:
     Import tags from a csv file generated on export.
     """
     # Open csv file and extract the tags
-    try:
-        with open(csv_path, 'r') as csv_file:
-            csv_reader = csv.DictReader(csv_file)
-            tags_in_blocks = list(csv_reader)
-    except FileNotFoundError:
-        return
+    with open(csv_path, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        tags_in_blocks = list(csv_reader)
 
     def get_exported_tags(block) -> TagValuesByTaxonomyExportIdDict:
         """
@@ -309,17 +305,20 @@ def import_course_tags_from_csv(csv_path, course_id) -> None:
         """
         result = {}
         for key, value in block.items():
-            if key in ['Type', 'Name', 'ID']:
+            if key in ['Type', 'Name', 'ID'] or not value:
                 continue
-            result[key] = value
+            result[key] = value.split(',')
         return result
 
-    course_key = get_content_key_from_string(str(course_id))
+    course_key = CourseKey.from_string(str(course_id))
 
     for block in tags_in_blocks:
         exported_tags = get_exported_tags(block)
-        block_type = block.get('Type')
-        block_id = block.get('ID')
+        block_type = block.get('Type', '')
+        block_id = block.get('ID', '')
+
+        if not block_type or not block_id:
+            raise ValueError(f"Invalid format of csv in: '{block}'.")
 
         if block_type == 'course':
             set_exported_object_tags(course_key, exported_tags)

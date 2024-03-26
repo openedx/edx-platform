@@ -583,8 +583,12 @@ class ImportManager:
                 courselike = self.import_drafts(courselike, courselike_key, data_path, dest_id)
 
             with self.store.bulk_operations(dest_id):
-                self.import_tags(data_path, dest_id)
-
+                try:
+                    self.import_tags(data_path, dest_id)
+                except FileNotFoundError:
+                    logging.info(f'Course import {dest_id}: No tags.csv file present.')
+                except ValueError as e:
+                    logging.info(f'Course import {dest_id}: {str(e)}')
             yield courselike
 
 

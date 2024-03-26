@@ -1755,6 +1755,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         # Fetch this object's tags for a single taxonomy
         expected_tags = [{
             'name': 'Multiple Taxonomy',
+            'export_id': '13-multiple-taxonomy',
             'taxonomy_id': taxonomy.pk,
             'can_tag_object': True,
             'tags': [

@@ -25,11 +25,11 @@ class TestGetAllObjectTagsMixin:
         self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
         self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
         api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
-        Tag.objects.create(
+        self.tag_1_1 = Tag.objects.create(
             taxonomy=self.taxonomy_1,
             value="Tag 1.1",
         )
-        Tag.objects.create(
+        self.tag_1_2 = Tag.objects.create(
             taxonomy=self.taxonomy_1,
             value="Tag 1.2",
         )
@@ -37,11 +37,11 @@ class TestGetAllObjectTagsMixin:
         self.taxonomy_2 = api.create_taxonomy(name="Taxonomy 2")
         api.set_taxonomy_orgs(self.taxonomy_2, all_orgs=True)
 
-        Tag.objects.create(
+        self.tag_2_1 = Tag.objects.create(
             taxonomy=self.taxonomy_2,
             value="Tag 2.1",
         )
-        Tag.objects.create(
+        self.tag_2_2 = Tag.objects.create(
             taxonomy=self.taxonomy_2,
             value="Tag 2.2",
         )
@@ -100,7 +100,7 @@ class TestGetAllObjectTagsMixin:
                 taxonomy=None,
                 tag=None,
                 _value="deleted tag",
-                _name="deleted taxonomy",
+                _export_id="deleted_taxonomy",
             )
 
         self.expected_course_objecttags = {
@@ -169,7 +169,7 @@ class TestGetAllObjectTagsMixin:
                 taxonomy=None,
                 tag=None,
                 _value="deleted tag",
-                _name="deleted taxonomy",
+                _export_id="deleted_taxonomy",
             )
 
         self.expected_library_objecttags = {

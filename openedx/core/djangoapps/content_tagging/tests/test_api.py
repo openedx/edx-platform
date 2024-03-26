@@ -277,10 +277,19 @@ class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
         }
 
 
-class TestExportTags(TaggedCourseMixin):
+class TestExportImportTags(TaggedCourseMixin):
     """
-    Tests for export functions
+    Tests for export/import functions
     """
+    def _create_csv_file(self, content):
+        """
+        Create a csv file and returns the path and name
+        """
+        file_dir_name = tempfile.mkdtemp()
+        file_name = f'{file_dir_name}/tags.csv'
+        with open(file_name, 'w') as csv_file:
+            csv_file.write(content)
+        return file_name
 
     def test_generate_csv_rows(self) -> None:
         buffer = io.StringIO()
@@ -307,3 +316,63 @@ class TestExportTags(TaggedCourseMixin):
         cleaned_content = content.replace('\r\n', '\n')
         cleaned_expected_csv = self.expected_csv.replace('\r\n', '\n')
         self.assertEqual(cleaned_content, cleaned_expected_csv)
+
+    def test_import_tags_invalid_format(self) -> None:
+        csv_path = self._create_csv_file('invalid format, Invalid\r\ntest1, test2')
+        with self.assertRaises(ValueError) as exc:
+            api.import_course_tags_from_csv(csv_path, self.course.id)
+            assert "Invalid format of csv in" in str(exc.exception)
+
+    def test_import_tags_valid_taxonomy_and_tags(self) -> None:
+        csv_path = self._create_csv_file(
+            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
+        )
+        api.import_course_tags_from_csv(csv_path, self.course.id)
+        object_tags = list(api.get_object_tags(self.course.id))
+        assert len(object_tags) == 1
+
+        object_tag = object_tags[0]
+        assert object_tag.tag == self.tag_1_1
+        assert object_tag.taxonomy == self.taxonomy_1
+
+    def test_import_tags_invalid_tag(self) -> None:
+        csv_path = self._create_csv_file(
+            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.11",""\r\n'
+        )
+        api.import_course_tags_from_csv(csv_path, self.course.id)
+        object_tags = list(api.get_object_tags(self.course.id))
+        assert len(object_tags) == 0
+
+        object_tags = list(api.get_object_tags(
+            self.course.id,
+            include_deleted=True,
+        ))
+        assert len(object_tags) == 1
+
+        object_tag = object_tags[0]
+        assert object_tag.tag is None
+        assert object_tag.value == 'Tag 1.11'
+        assert object_tag.taxonomy == self.taxonomy_1
+
+    def test_import_tags_invalid_taxonomy(self) -> None:
+        csv_path = self._create_csv_file(
+            '"Name","Type","ID","1-taxonomy-1-1"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.11"\r\n'
+        )
+        api.import_course_tags_from_csv(csv_path, self.course.id)
+        object_tags = list(api.get_object_tags(self.course.id))
+        assert len(object_tags) == 0
+
+        object_tags = list(api.get_object_tags(
+            self.course.id,
+            include_deleted=True,
+        ))
+        assert len(object_tags) == 1
+
+        object_tag = object_tags[0]
+        assert object_tag.tag is None
+        assert object_tag.value == 'Tag 1.11'
+        assert object_tag.taxonomy is None
+        assert object_tag.export_id == '1-taxonomy-1-1'
