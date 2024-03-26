@@ -1,24 +1,32 @@
 name: Webhook Update staging
 
 on:
-  workflow_run:
-    workflows: ["Testing Image CI"]
-    types:
-      - completed
-    branches:
-      - 'eol/**'
-      - 'openuchile/**'
-      - 'vlabx/**'
+  workflow_call:
+    inputs:
+      code:
+        required: true
+        type: string
+      release-name:
+        required: true
+        type: string
+    secrets:
+      WEBHOOK_SECRET:
+        required: true
+  repository_dispatch:
+    types: [debug-webhook]
 
 jobs:
-  variables:
-    uses: ./.github/workflows/variables.yml
-
   triggering-staging:
-    needs: [ variables ]
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: inputs.code || github.event.client_payload.debug
     steps:
       - name: Trigger edx-staging repository
         run: |
-          curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ needs.variables.outputs.release-name }}\", \"project\": \"${{ needs.variables.outputs.project }}\", \"code\": \"${{ needs.variables.outputs.code }}\"}}"
+          RELEASE_NAME = "${{ inputs.release-name }}" || "${{ github.event.client_payload.release-name }}" || "koa";
+          if [[ "${{ inputs.code }}" = "eol" || "${{ github.event.client_payload.debug }}" = "eol" ]]
+          then
+            curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${RELEASE_NAME}\", \"project\": \"eol\", \"code\": \"eol\"}}"
+          elif [[ "${{ inputs.code }}" = "ou" || "${{ github.event.client_payload.debug }}" = "ou" ]]
+          then
+            curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${RELEASE_NAME}\", \"project\": \"openuchile\", \"code\": \"ou\"}}"
+          fi

@@ -86,3 +86,11 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  webhook:
+    needs: [ variables, build ]
+    uses: ./.github/workflows/webhook.yml
+    with:
+      code: ${{ needs.variables.outputs.code }}
+      release-name: ${{ needs.variables.outputs.release-name }}
+    secrets: inherit
