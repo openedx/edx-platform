@@ -72,5 +72,5 @@ class Command(BaseCommand):
         if error_keys:
             msg = 'The following courses encountered errors and were not updated:\n'
             for error_key in error_keys:
-                msg += f' - {error_key}\n'
+                msg += f' - {error_key}\n'  # pylint: disable=consider-using-join
             logger.info(msg)
