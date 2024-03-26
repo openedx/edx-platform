@@ -276,7 +276,7 @@ def set_exported_object_tags(
     # Clear all tags related with the content.
     oel_tagging.delete_object_tags(content_key_str)
 
-    for taxonomy_export_id, tags_values in exported_tags.items():        
+    for taxonomy_export_id, tags_values in exported_tags.items():
         if not tags_values:
             continue
 
