@@ -290,9 +290,9 @@ class CourseExportManager(ExportManager):
         block_id_pattern = f"{courselike_key_str.replace('course-v1:', 'block-v1:', 1)}*"
 
         tags_count = get_object_tag_counts(block_id_pattern)
+        course_tags_count = get_object_tag_counts(courselike_key_str)
 
-        # TODO Verify with course, sections and subsections
-        if tags_count:
+        if tags_count or course_tags_count:
             export_tags_in_csv_file(courselike_key_str, export_fs, 'tags.csv')
 
 

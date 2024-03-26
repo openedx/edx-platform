@@ -108,7 +108,7 @@ libsass==0.10.0
 click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.6.3
+openedx-learning==0.8.0
 
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
 openai<=0.28.1

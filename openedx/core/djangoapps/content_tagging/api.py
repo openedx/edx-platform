@@ -263,6 +263,71 @@ def export_tags_in_csv_file(object_id, file_dir, file_name) -> None:
         buffer.seek(0)
         csv_file.write(buffer.read())
 
+
+def set_exported_object_tags(
+    content_key: ContentKey,
+    exported_tags: TagValuesByTaxonomyExportIdDict,
+) -> None:
+    """
+    Sets the tags for the given exported content object.
+    """
+    content_key_str = str(content_key)
+
+    # Clear all tags related with the content.
+    oel_tagging.delete_object_tags(content_key_str)
+
+    for taxonomy_export_id, tags_values in exported_tags.items():
+        if not tags_values:
+            continue
+
+        taxonomy = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
+        tags_values = tags_values.split(',')
+        oel_tagging.tag_object(
+            object_id=content_key_str,
+            taxonomy=taxonomy,
+            tags=tags_values,
+            create_invalid=True,
+            taxonomy_export_id=taxonomy_export_id,
+        )
+
+
+def import_course_tags_from_csv(csv_path, course_id) -> None:
+    """
+    Import tags from a csv file generated on export.
+    """
+    # Open csv file and extract the tags
+    try:
+        with open(csv_path, 'r') as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            tags_in_blocks = list(csv_reader)
+    except FileNotFoundError:
+        return
+
+    def get_exported_tags(block) -> TagValuesByTaxonomyExportIdDict:
+        """
+        Returns a map with taxonomy export_id and tags for this block.
+        """
+        result = {}
+        for key, value in block.items():
+            if key in ['Type', 'Name', 'ID']:
+                continue
+            result[key] = value
+        return result
+
+    course_key = get_content_key_from_string(str(course_id))
+
+    for block in tags_in_blocks:
+        exported_tags = get_exported_tags(block)
+        block_type = block.get('Type')
+        block_id = block.get('ID')
+
+        if block_type == 'course':
+            set_exported_object_tags(course_key, exported_tags)
+        else:
+            block_key = course_key.make_usage_key(block_type, block_id)
+            set_exported_object_tags(block_key, exported_tags)
+
+
 # Expose the oel_tagging APIs
 
 get_taxonomy = oel_tagging.get_taxonomy
