@@ -177,8 +177,7 @@ TOY_BLOCK_INFO_TREE = [
                 ]),
                 BlockInfo("unicode", "html", {
                     "data": "…", "xml_attributes": {"filename": ["", None]}
-                }, []),
-                BlockInfo("Toy_forum", "discussion", {}, []),
+                }, [])
             ]),
         ]
     ),

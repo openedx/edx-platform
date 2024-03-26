@@ -11,18 +11,10 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from organizations.models import Organization
-from urllib.parse import quote, unquote
 
 from .models import TaxonomyOrg
-from .types import (
-    ContentKey,
-    ObjectTagByObjectIdDict,
-    TagValuesByTaxonomyExportIdDict,
-    TaxonomyExportDict,
-    TaxonomyDict,
-)
-
-from .utils import check_taxonomy_context_key_org, get_context_key_from_key
+from .types import ContentKey, TagValuesByObjectIdDict, TagValuesByTaxonomyIdDict, TaxonomyDict
+from .utils import check_taxonomy_context_key_org, get_content_key_from_string, get_context_key_from_key
 
 
 def create_taxonomy(
@@ -140,14 +132,14 @@ def get_unassigned_taxonomies(enabled=True) -> QuerySet:
 
 
 def get_all_object_tags(
-    content_key: LibraryLocatorV2 | CourseKey | ContentKey,
+    content_key: ContentKey,
     prefetch_orgs: bool = False,
-) -> tuple[ObjectTagByObjectIdDict, TaxonomyDict]:
+) -> tuple[TagValuesByObjectIdDict, TaxonomyDict]:
     """
     Get all the object tags applied to components in the given course/library.
 
     Includes any tags applied to the course/library as a whole.
-    Returns a tuple with a dictionary of grouped object tags for all blocks and a dictionary of taxonomies.
+    Returns a tuple with a dictionary of grouped object tag values for all blocks and a dictionary of taxonomies.
 
     If `prefetch_orgs` is set, then the returned ObjectTag taxonomies will have their TaxonomyOrgs prefetched,
     which makes checking permissions faster.
@@ -177,14 +169,16 @@ def get_all_object_tags(
     if prefetch_orgs:
         all_object_tags = all_object_tags.prefetch_related("tag__taxonomy__taxonomyorg_set")
 
-    grouped_object_tags: ObjectTagByObjectIdDict = {}
+    grouped_object_tags: TagValuesByObjectIdDict = {}
     taxonomies: TaxonomyDict = {}
 
     for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
         grouped_object_tags[object_id] = {}
         for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id if x.tag else 0):
             object_tags_list = list(taxonomy_tags)
-            grouped_object_tags[object_id][taxonomy_id] = object_tags_list
+            grouped_object_tags[object_id][taxonomy_id] = [
+                tag.value for tag in object_tags_list
+            ]
 
             if taxonomy_id not in taxonomies:
                 assert object_tags_list[0].tag
@@ -194,34 +188,23 @@ def get_all_object_tags(
     return grouped_object_tags, taxonomies
 
 
-def set_object_tags(
+def set_all_object_tags(
     content_key: ContentKey,
-    object_tags: TagValuesByTaxonomyExportIdDict,
-    taxonomy_cache: TaxonomyExportDict | None = None,
+    object_tags: TagValuesByTaxonomyIdDict,
 ) -> None:
     """
     Sets the tags for the given content object.
-
-    (Optional) provide a cache of taxonomies keyed by export_id to save refetching from the database.
     """
     context_key = get_context_key_from_key(content_key)
 
-    if taxonomy_cache is None:
-        taxonomy_cache = {}
+    for taxonomy_id, tags_values in object_tags.items():
 
-    for taxonomy_export_id, tags_values in object_tags.items():
-
-        if taxonomy_export_id not in taxonomy_cache:
-            taxonomy_cache[taxonomy_export_id] = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
-        taxonomy = taxonomy_cache.get(taxonomy_export_id)
+        taxonomy = oel_tagging.get_taxonomy(taxonomy_id)
 
         if not taxonomy:
             continue
 
-        if not check_taxonomy_context_key_org(taxonomy, context_key):
-            continue
-
-        oel_tagging.tag_object(
+        tag_object(
             object_id=str(content_key),
             taxonomy=taxonomy,
             tags=tags_values,
@@ -241,72 +224,45 @@ def copy_object_tags(
         content_key=source_content_key,
         prefetch_orgs=True,
     )
-
-    # Convert returned data into the format expected by set_object_tags
     source_object_tags = all_object_tags.get(str(source_content_key), {})
-    taxonomy_cache: TaxonomyExportDict = {
-        taxonomy.export_id: taxonomy
-        for taxonomy in taxonomies.values()
-    }
-    tags_by_taxonomy: TagValuesByTaxonomyExportIdDict = {}
-    for taxonomy_id, tags in source_object_tags.items():
-        taxonomy = taxonomies[taxonomy_id]
-        tags_by_taxonomy[taxonomy.export_id] = [tag.value for tag in tags]
 
-    set_object_tags(
-        content_key=dest_content_key,
-        object_tags=tags_by_taxonomy,
-        taxonomy_cache=taxonomy_cache,
-    )
+    for taxonomy_id, taxonomy in taxonomies.items():
+        tags = source_object_tags.get(taxonomy_id, [])
+        tag_object(
+            object_id=str(dest_content_key),
+            taxonomy=taxonomy,
+            tags=tags,
+        )
 
 
-def serialize_object_tags(usage_id: str) -> str:
+def tag_object(
+    object_id: str,
+    taxonomy: Taxonomy,
+    tags: list[str],
+    object_tag_class: type[ObjectTag] = ObjectTag,
+) -> None:
     """
-    Serialize the given object tags to a string, escaping special characters
+    Replaces the existing ObjectTag entries for the given taxonomy + object_id
+    with the given list of tags, if the taxonomy can be used by the given object_id.
 
-    Note that we are serializing the tag data only, not the object_id.
+    tags: A list of the values of the tags from this taxonomy to apply.
 
-    Example tags:
-        LightCast Skills Taxonomy: ["Typing", "Microsoft Office"]
-        Open Canada Skills Taxonomy: ["MS Office", "<some:;,skill/|=>"]
+    object_tag_class: Optional. Use a proxy subclass of ObjectTag for additional
+        validation. (e.g. only allow tagging certain types of objects.)
 
-    Example serialized tags:
-        lightcast-skills:Typing,Microsoft Office;open-canada-skills:MS Office,%3Csome%3A%3B%2Cskill%2F%7C%3D%3E
+    Raised Tag.DoesNotExist if the proposed tags are invalid for this taxonomy.
+    Preserves existing (valid) tags, adds new (valid) tags, and removes omitted
+    (or invalid) tags.
     """
-    content_tags = get_object_tags(usage_id)
-    serialized_tags = []
-    taxonomies_and_tags: dict[str, list[str]] = {}
-    for tag in content_tags:
-        taxonomy_export_id = tag.taxonomy.export_id
+    content_key = get_content_key_from_string(object_id)
+    context_key = get_context_key_from_key(content_key)
 
-        if not taxonomies_and_tags.get(taxonomy_export_id):
-            taxonomies_and_tags[taxonomy_export_id] = []
-
-        # Escape special characters in tag values, except spaces (%20) for better readability
-        escaped_tag = quote(tag.value).replace("%20", " ")
-        taxonomies_and_tags[taxonomy_export_id].append(escaped_tag)
-
-    for taxonomy in taxonomies_and_tags:
-        merged_tags = ','.join(taxonomies_and_tags.get(taxonomy, []))
-        serialized_tags.append(f"{taxonomy}:{merged_tags}")
-
-    return ";".join(serialized_tags)
-
-
-def deserialize_object_tags(
-    tag_data: str,
-) -> TagValuesByTaxonomyExportIdDict:
-    """
-    Deserializes a string of formatted tag data. See serialize_object_tags for details.
-    """
-    serialized_tags = tag_data.split(';')
-    taxonomy_and_tags_dict: TagValuesByTaxonomyExportIdDict = {}
-    for serialized_tag in serialized_tags:
-        taxonomy_export_id, tags = serialized_tag.split(':')
-        tag_values = [unquote(tag) for tag in tags.split(',')]
-        taxonomy_and_tags_dict[taxonomy_export_id] = tag_values
-
-    return taxonomy_and_tags_dict
+    if check_taxonomy_context_key_org(taxonomy, context_key):
+        oel_tagging.tag_object(
+            object_id=object_id,
+            taxonomy=taxonomy,
+            tags=tags,
+        )
 
 
 # Expose the oel_tagging APIs
@@ -318,5 +274,4 @@ get_object_tag_counts = oel_tagging.get_object_tag_counts
 delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
 get_object_tags = oel_tagging.get_object_tags
-tag_object = oel_tagging.tag_object
 add_tag_to_taxonomy = oel_tagging.add_tag_to_taxonomy

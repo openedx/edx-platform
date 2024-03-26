@@ -79,7 +79,9 @@ class TestTaxonomyMixin:
         self.all_orgs_block_tag = api.get_object_tags(
             object_id="block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde",
         )[0]
-        api.tag_object(
+
+        # Force apply these tags: Ax and OeX are not an allowed org for these taxonomies
+        api.oel_tagging.tag_object(
             object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
@@ -87,7 +89,7 @@ class TestTaxonomyMixin:
         self.both_orgs_course_tag = api.get_object_tags(
             object_id="course-v1:Ax+DemoX+Demo_Course",
         )[0]
-        api.tag_object(
+        api.oel_tagging.tag_object(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
@@ -95,7 +97,7 @@ class TestTaxonomyMixin:
         self.both_orgs_block_tag = api.get_object_tags(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
         )[0]
-        api.tag_object(
+        api.oel_tagging.tag_object(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
             taxonomy=self.taxonomy_one_org,
             tags=[self.tag_one_org.value],
@@ -103,7 +105,7 @@ class TestTaxonomyMixin:
         self.one_org_block_tag = api.get_object_tags(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
         )[0]
-        api.tag_object(
+        api.oel_tagging.tag_object(
             object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_disabled,
             tags=[self.tag_disabled.value],
@@ -339,17 +341,17 @@ class TestGetAllObjectTagsMixin:
 
         self.expected_course_objecttags = {
             "course-v1:orgA+test_course+test_run": {
-                self.taxonomy_1.id: list(self.course_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.course_tags],
             },
             "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential": {
-                self.taxonomy_1.id: list(self.sequential_tags1),
-                self.taxonomy_2.id: list(self.sequential_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.sequential_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.sequential_tags2],
             },
             "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1": {
-                self.taxonomy_2.id: list(self.vertical1_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.vertical1_tags],
             },
             "block-v1:orgA+test_course+test_run+type@html+block@test_html": {
-                self.taxonomy_2.id: list(self.html_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.html_tags],
             },
         }
 
@@ -408,14 +410,14 @@ class TestGetAllObjectTagsMixin:
 
         self.expected_library_objecttags = {
             f"lib:orgA:lib_{self.block_suffix}": {
-                self.taxonomy_2.id: list(self.library_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.library_tags],
             },
             f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}": {
-                self.taxonomy_1.id: list(self.problem1_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.problem1_tags],
             },
             f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}": {
-                self.taxonomy_1.id: list(self.library_html_tags1),
-                self.taxonomy_2.id: list(self.library_html_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.library_html_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.library_html_tags2],
             },
         }
 
@@ -504,5 +506,5 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
 
         # Destination block should have all of the source block's tags, except for the orgA-specific one.
         expected_tags = list(self.sequential_tags1) + list(self.sequential_tags2)
-        with self.assertNumQueries(32):  # TODO why so high?
+        with self.assertNumQueries(31):  # TODO why so high?
             self._test_copy_object_tags(src_key, dst_key, expected_tags)

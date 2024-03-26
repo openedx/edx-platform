@@ -393,10 +393,9 @@ def _import_xml_node_to_parent(
 
     # Copy content tags to the new xblock
     if copied_from_block and tags:
-        serialized_object_tags = tags.get(str(copied_from_block))
-        if serialized_object_tags:
-            object_tags = content_tagging_api.deserialize_object_tags(serialized_object_tags)
-            content_tagging_api.set_object_tags(
+        object_tags = tags.get(str(copied_from_block))
+        if object_tags:
+            content_tagging_api.set_all_object_tags(
                 content_key=new_xblock.location,
                 object_tags=object_tags,
             )

@@ -192,10 +192,8 @@ class ObjectTagExportView(APIView):
                 # Add the tags for each taxonomy
                 for taxonomy_id in taxonomies:
                     if taxonomy_id in item.object_tags:
-                        block_data[f"taxonomy_{taxonomy_id}"] = ", ".join([
-                            object_tag.value
-                            for object_tag in item.object_tags[taxonomy_id]
-                        ])
+                        tag_values = item.object_tags[taxonomy_id]
+                        block_data[f"taxonomy_{taxonomy_id}"] = ", ".join(tag_values)
 
                 yield csv_writer.writerow(block_data)
 

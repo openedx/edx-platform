@@ -236,12 +236,12 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert dest_video_id, f"No tags pasted from {video_block_key}"
         video_tags = all_tags[dest_video_id]
         assert len(video_tags) == 1
-        assert str(video_tags[taxonomy_all_org.id]) == f'[<ObjectTag> {dest_video_id}: test_taxonomy=tag_3]'
+        assert video_tags[taxonomy_all_org.id] == ["tag_3"]
 
         assert dest_poll_id, f"No tags pasted from {poll_block_key}"
         poll_tags = all_tags[dest_poll_id]
         assert len(poll_tags) == 1
-        assert str(poll_tags[taxonomy_all_org.id]) == f'[<ObjectTag> {dest_poll_id}: test_taxonomy=tag_4]'
+        assert poll_tags[taxonomy_all_org.id] == ["tag_4"]
 
     def test_paste_with_assets(self):
         """

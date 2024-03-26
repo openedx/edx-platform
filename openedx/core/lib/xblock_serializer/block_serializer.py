@@ -7,7 +7,7 @@ import os
 
 from lxml import etree
 
-import openedx.core.djangoapps.content_tagging.api as content_tagging_api
+from openedx.core.djangoapps.content_tagging.api import get_all_object_tags, TagValuesByObjectIdDict
 
 from .data import StaticFile
 from . import utils
@@ -20,7 +20,7 @@ class XBlockSerializer:
     A class that can serialize an XBlock to OLX.
     """
     static_files: list[StaticFile]
-    tags: dict[str, str]
+    tags: TagValuesByObjectIdDict
 
     def __init__(self, block):
         """
@@ -58,9 +58,11 @@ class XBlockSerializer:
         else:
             olx = self._serialize_normal_block(block)
 
-        # Serialize the block's tags too
-        block_id = str(block.scope_ids.usage_id)
-        self.tags[block_id] = content_tagging_api.serialize_object_tags(block_id)
+        # Store the block's tags
+        block_key = block.scope_ids.usage_id
+        block_id = str(block_key)
+        object_tags, _ = get_all_object_tags(content_key=block_key)
+        self.tags[block_id] = object_tags.get(block_id, {})
 
         return olx
 
