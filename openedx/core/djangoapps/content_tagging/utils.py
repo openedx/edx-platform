@@ -10,8 +10,6 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
-from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
-
 from .models import TaxonomyOrg
 from .types import ContentKey, ContextKey
 
@@ -120,6 +118,9 @@ class TaggingRulesCache:
 
         These library orgs are cached for the duration of the request.
         """
+        # Import the content_libraries api here to avoid circular imports.
+        from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
+
         cache_key = f'library_orgs:{user.id}'
         library_orgs = self.request_cache.data.get(cache_key)
         if library_orgs is None:

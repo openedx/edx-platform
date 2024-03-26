@@ -7,6 +7,8 @@ import os
 
 from lxml import etree
 
+import openedx.core.djangoapps.content_tagging.api as content_tagging_api
+
 from .data import StaticFile
 from . import utils
 
@@ -57,8 +59,6 @@ class XBlockSerializer:
             olx = self._serialize_normal_block(block)
 
         # Serialize the block's tags too
-        # Import the tagging api here to avoid circular imports.
-        import openedx.core.djangoapps.content_tagging.api as content_tagging_api
         block_id = str(block.scope_ids.usage_id)
         self.tags[block_id] = content_tagging_api.serialize_object_tags(block_id)
 
