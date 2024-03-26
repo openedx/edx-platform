@@ -330,6 +330,9 @@ def import_course_tags_from_csv(csv_path, course_id) -> None:
 
 # Expose the oel_tagging APIs
 
+add_tag_to_taxonomy = oel_tagging.add_tag_to_taxonomy
+update_tag_in_taxonomy = oel_tagging.update_tag_in_taxonomy
+delete_tags_from_taxonomy = oel_tagging.delete_tags_from_taxonomy
 get_taxonomy = oel_tagging.get_taxonomy
 get_taxonomies = oel_tagging.get_taxonomies
 get_tags = oel_tagging.get_tags

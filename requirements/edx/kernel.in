@@ -107,6 +107,7 @@ lxml                                # XML parser
 lti-consumer-xblock>=7.3.0
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
+meilisearch                         # Library to access Meilisearch search engine (will replace ElasticSearch)
 mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing

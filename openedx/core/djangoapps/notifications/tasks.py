@@ -24,7 +24,7 @@ from openedx.core.djangoapps.notifications.filters import NotificationFilter
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
-    get_course_notification_preference_config_version
+    get_course_notification_preference_config_version,
 )
 from openedx.core.djangoapps.notifications.utils import get_list_in_batches
 
@@ -132,11 +132,13 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         for preference in preferences:
             user_id = preference.user_id
             preference = update_user_preference(preference, user_id, course_key)
+
             if (
                 preference and
-                preference.get_web_config(app_name, notification_type) and
+                preference.is_enabled_for_any_channel(app_name, notification_type) and
                 preference.get_app_config(app_name).get('enabled', False)
             ):
+                notification_preferences = preference.get_channels_for_notification_type(app_name, notification_type)
                 notifications.append(
                     Notification(
                         user_id=user_id,
@@ -145,6 +147,8 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                         content_context=context,
                         content_url=content_url,
                         course_id=course_key,
+                        web='web' in notification_preferences,
+                        email='email' in notification_preferences,
                     )
                 )
                 generated_notification_audience.append(user_id)
@@ -170,7 +174,7 @@ def is_notification_valid(notification_type, context):
     """
     try:
         get_notification_content(notification_type, context)
-    except Exception:        # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         return False
     return True
 

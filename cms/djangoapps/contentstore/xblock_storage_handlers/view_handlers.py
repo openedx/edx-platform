@@ -1145,9 +1145,15 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 rules_url = settings.PROCTORING_SETTINGS.get("LINK_URLS", {}).get(
                     "online_proctoring_rules", ""
                 )
-                supports_onboarding = does_backend_support_onboarding(
-                    course.proctoring_provider
-                )
+
+                # Only call does_backend_support_onboarding if  not using an LTI proctoring provider
+                if course.proctoring_provider != 'lti_external':
+                    supports_onboarding = does_backend_support_onboarding(
+                        course.proctoring_provider
+                    )
+                # NOTE: LTI proctoring doesn't support onboarding. If that changes, this value should change to True.
+                else:
+                    supports_onboarding = False
 
                 proctoring_exam_configuration_link = None
                 if xblock.is_proctored_exam:

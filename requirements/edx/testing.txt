@@ -30,7 +30,9 @@ aniso8601==9.0.1
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
 annotated-types==0.6.0
-    # via pydantic
+    # via
+    #   -r requirements/edx/base.txt
+    #   pydantic
 anyio==4.3.0
     # via starlette
 appdirs==1.4.4
@@ -118,6 +120,10 @@ bridgekeeper==0.9
     # via -r requirements/edx/base.txt
 cachetools==5.3.2
     # via tox
+camel-converter[pydantic]==3.1.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   meilisearch
 celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
@@ -539,7 +545,7 @@ edx-celeryutils==1.2.5
     #   super-csv
 edx-codejail==3.3.3
     # via -r requirements/edx/base.txt
-edx-completion==4.4.0
+edx-completion==4.5.0
     # via -r requirements/edx/base.txt
 edx-django-release-util==1.3.0
     # via
@@ -901,6 +907,8 @@ maxminddb==2.5.2
     #   geoip2
 mccabe==0.7.0
     # via pylint
+meilisearch==0.30.0
+    # via -r requirements/edx/base.txt
 mock==5.1.0
     # via -r requirements/edx/base.txt
 mongoengine==0.27.0
@@ -989,7 +997,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.4.0
+ora2==6.5.1
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1094,10 +1102,15 @@ pycryptodomex==3.20.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.6.1
-    # via fastapi
-pydantic-core==2.16.2
-    # via pydantic
+pydantic==2.6.3
+    # via
+    #   -r requirements/edx/base.txt
+    #   camel-converter
+    #   fastapi
+pydantic-core==2.16.3
+    # via
+    #   -r requirements/edx/base.txt
+    #   pydantic
 pygments==2.17.2
     # via
     #   -r requirements/edx/base.txt
@@ -1306,6 +1319,7 @@ requests==2.31.0
     #   edx-rest-api-client
     #   geoip2
     #   mailsnake
+    #   meilisearch
     #   openai
     #   optimizely-sdk
     #   pact-python
