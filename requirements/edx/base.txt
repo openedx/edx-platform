@@ -105,7 +105,6 @@ certifi==2024.2.2
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
-
     #   requests
     #   snowflake-connector-python
 cffi==1.16.0
@@ -728,8 +727,7 @@ mock==5.1.0
 mongoengine==0.27.0
     # via -r requirements/edx/kernel.in
 monotonic==1.6
-    # via
-    #   analytics-python
+    # via analytics-python
 mpmath==1.3.0
     # via sympy
 multidict==6.0.5
@@ -864,8 +862,7 @@ pydantic==2.6.3
 pydantic-core==2.16.3
     # via pydantic
 pygments==2.17.2
-    # via
-    #   -r requirements/edx/bundled.in
+    # via -r requirements/edx/bundled.in
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/kernel.in
@@ -958,7 +955,6 @@ pytz==2024.1
     #   event-tracking
     #   fs
     #   icalendar
-    #   interchange
     #   olxcleaner
     #   openedx-blockstore
     #   ora2
@@ -1071,11 +1067,9 @@ six==1.16.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   interchange
     #   isodate
     #   libsass
     #   optimizely-sdk
-    #   pansi
     #   paver
     #   pyjwkest
     #   python-dateutil

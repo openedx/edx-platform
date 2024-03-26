@@ -724,9 +724,6 @@ inflection==0.5.1
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   drf-yasg
-interchange==2021.0.4
-    # via
-    #   -r requirements/edx/base.txt
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
 isodate==0.6.1
@@ -949,9 +946,6 @@ packaging==23.2
     #   pydata-sphinx-theme
     #   snowflake-connector-python
     #   sphinx
-pansi==2020.7.3
-    # via
-    #   -r requirements/edx/base.txt
 path==16.10.0
     # via
     #   -r requirements/edx/base.txt
@@ -1141,7 +1135,6 @@ pytz==2024.1
     #   event-tracking
     #   fs
     #   icalendar
-    #   interchange
     #   olxcleaner
     #   openedx-blockstore
     #   ora2
@@ -1270,11 +1263,9 @@ six==1.16.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   interchange
     #   isodate
     #   libsass
     #   optimizely-sdk
-    #   pansi
     #   paver
     #   pyjwkest
     #   python-dateutil

@@ -1025,10 +1025,6 @@ iniconfig==2.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest
-interchange==2021.0.4
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 ipaddress==1.0.23
     # via
     #   -r requirements/edx/doc.txt
@@ -1350,10 +1346,6 @@ packaging==23.2
     #   tox
 pact-python==2.1.1
     # via -r requirements/edx/testing.txt
-pansi==2020.7.3
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 path==16.10.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1435,9 +1427,7 @@ psutil==5.9.8
     #   pact-python
     #   pytest-xdist
 py==1.11.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   tox
+    # via -r requirements/edx/testing.txt
 pyasn1==0.5.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1681,7 +1671,6 @@ pytz==2024.1
     #   event-tracking
     #   fs
     #   icalendar
-    #   interchange
     #   olxcleaner
     #   openedx-blockstore
     #   ora2
@@ -1842,12 +1831,10 @@ six==1.16.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   interchange
     #   isodate
     #   libsass
     #   optimizely-sdk
     #   pact-python
-    #   pansi
     #   paver
     #   pyjwkest
     #   python-dateutil
@@ -2101,7 +2088,6 @@ urllib3==1.26.18
     #   -r requirements/edx/testing.txt
     #   botocore
     #   elasticsearch
-    #   pact-python
     #   requests
     #   snowflake-connector-python
 user-util==1.0.0
