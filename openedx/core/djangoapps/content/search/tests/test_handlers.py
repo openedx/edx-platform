@@ -3,13 +3,14 @@ Tests for the search index update handlers
 """
 from unittest.mock import MagicMock, patch
 
+from django.test import LiveServerTestCase, override_settings
 from organizations.tests.factories import OrganizationFactory
-from django.test import override_settings, LiveServerTestCase
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 from .. import api
 
@@ -17,6 +18,7 @@ from .. import api
 @patch("openedx.core.djangoapps.content.search.api._wait_for_meili_task", new=MagicMock(return_value=None))
 @patch("openedx.core.djangoapps.content.search.api.MeilisearchClient")
 @override_settings(MEILISEARCH_ENABLED=True)
+@skip_unless_cms
 class TestUpdateIndexHandlers(
     ModuleStoreTestCase,
     BlockstoreAppTestMixin,
