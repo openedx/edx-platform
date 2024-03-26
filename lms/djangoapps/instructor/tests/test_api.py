@@ -2219,11 +2219,16 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         super().setUp()
 
         self.instructor = InstructorFactory(course_key=self.course.id)
+        CourseEnrollment.enroll(self.instructor, self.course.id)
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.other_instructor = InstructorFactory(course_key=self.course.id)
+        CourseEnrollment.enroll(self.other_instructor, self.course.id)
         self.other_staff = StaffFactory(course_key=self.course.id)
+        CourseEnrollment.enroll(self.other_staff, self.course.id)
         self.other_user = UserFactory()
+        CourseEnrollment.enroll(self.other_user, self.course.id)
+        self.unenrolled_user = UserFactory()
 
     def test_modify_access_noparams(self):
         """ Test missing all query parameters. """
@@ -2438,6 +2443,34 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             assert rolename in user_roles
         elif action == 'revoke':
             assert rolename not in user_roles
+
+    def test_update_forum_role_with_unenrolled_user(self):
+        """
+        Check response of update_forum_role_membership api with unenrolled user.
+        """
+
+        def _check_allow_access_with_unenrolled_user(url, role):
+            """
+            Helper function for testing api.
+            """
+            response = self.client.post(url, {
+                'unique_student_identifier': self.unenrolled_user.username,
+                'rolename': role,
+                'action': 'allow',
+            })
+            assert response.status_code == 200
+            expected = {
+                'unique_student_identifier': self.unenrolled_user.username,
+                'userNotEnrolled': True,
+            }
+            res_json = json.loads(response.content.decode('utf-8'))
+            assert res_json == expected
+            user_roles = self.unenrolled_user.roles.filter(course_id=self.course.id).values_list("name", flat=True)
+            assert role not in user_roles
+
+        forum_role_url = reverse('update_forum_role_membership', kwargs={'course_id': str(self.course.id)})
+        _check_allow_access_with_unenrolled_user(forum_role_url, 'Community TA')
+        _check_allow_access_with_unenrolled_user(forum_role_url, 'Administrator')
 
 
 @ddt.ddt
