@@ -22,7 +22,9 @@ jobs:
     steps:
       - name: Trigger edx-staging repository
         run: |
-          RELEASE_NAME = "${{ inputs.release-name }}" || "${{ github.event.client_payload.release-name }}" || "koa";
+          RELEASE_NAME=${{ inputs.release-name }};
+          RELEASE_NAME=${RELEASE_NAME:-${{ github.event.client_payload.release-name }}};
+          RELEASE_NAME=${RELEASE_NAME:-koa};
           if [[ "${{ inputs.code }}" = "eol" || "${{ github.event.client_payload.debug }}" = "eol" ]]
           then
             curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${RELEASE_NAME}\", \"project\": \"eol\", \"code\": \"eol\"}}"
