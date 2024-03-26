@@ -1,3 +1,6 @@
+"""
+Tests for the search index update handlers
+"""
 from unittest.mock import MagicMock, patch
 
 from organizations.tests.factories import OrganizationFactory
@@ -53,30 +56,30 @@ class TestUpdateIndexHandlers(
         sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
             {
-                'id': 'block-v1orgatest_coursetest_runtypesequentialblocktest_sequential-0cdb9395',
-                'type': 'course_block',
-                'usage_key': 'block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential',
-                'block_id': 'test_sequential',
-                'display_name': 'sequential',
-                'block_type': 'sequential',
-                'context_key': 'course-v1:orgA+test_course+test_run',
-                'org': 'orgA',
-                'breadcrumbs': [{'display_name': 'Test Course'}], 'content': {}
+                "id": "block-v1orgatest_coursetest_runtypesequentialblocktest_sequential-0cdb9395",
+                "type": "course_block",
+                "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+                "block_id": "test_sequential",
+                "display_name": "sequential",
+                "block_type": "sequential",
+                "context_key": "course-v1:orgA+test_course+test_run",
+                "org": "orgA",
+                "breadcrumbs": [{"display_name": "Test Course"}], "content": {}
             }
         ])
         vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
             {
-                'id': 'block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b',
-                'type': 'course_block',
-                'usage_key': 'block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical',
-                'block_id': 'test_vertical',
-                'display_name': 'vertical',
-                'block_type': 'vertical',
-                'context_key': 'course-v1:orgA+test_course+test_run',
-                'org': 'orgA',
-                'breadcrumbs': [{'display_name': 'Test Course'}, {'display_name': 'sequential'}],
-                'content': {}
+                "id": "block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b",
+                "type": "course_block",
+                "usage_key": "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical",
+                "block_id": "test_vertical",
+                "display_name": "vertical",
+                "block_type": "vertical",
+                "context_key": "course-v1:orgA+test_course+test_run",
+                "org": "orgA",
+                "breadcrumbs": [{"display_name": "Test Course"}, {"display_name": "sequential"}],
+                "content": {}
             }
         ])
 
@@ -87,27 +90,27 @@ class TestUpdateIndexHandlers(
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
             {
-                'id': 'block-v1orgatest_coursetest_runtypesequentialblocktest_sequential-0cdb9395',
-                'type': 'course_block',
-                'usage_key': 'block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential',
-                'block_id': 'test_sequential',
-                'display_name': 'Updated Sequential',
-                'block_type': 'sequential',
-                'context_key': 'course-v1:orgA+test_course+test_run',
-                'org': 'orgA',
-                'breadcrumbs': [{'display_name': 'Test Course'}], 'content': {}
+                "id": "block-v1orgatest_coursetest_runtypesequentialblocktest_sequential-0cdb9395",
+                "type": "course_block",
+                "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+                "block_id": "test_sequential",
+                "display_name": "Updated Sequential",
+                "block_type": "sequential",
+                "context_key": "course-v1:orgA+test_course+test_run",
+                "org": "orgA",
+                "breadcrumbs": [{"display_name": "Test Course"}], "content": {}
             },
             {
-                'id': 'block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b',
-                'type': 'course_block',
-                'usage_key': 'block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical',
-                'block_id': 'test_vertical',
-                'display_name': 'vertical',
-                'block_type': 'vertical',
-                'context_key': 'course-v1:orgA+test_course+test_run',
-                'org': 'orgA',
-                'breadcrumbs': [{'display_name': 'Test Course'}, {'display_name': 'Updated Sequential'}],
-                'content': {}
+                "id": "block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b",
+                "type": "course_block",
+                "usage_key": "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical",
+                "block_id": "test_vertical",
+                "display_name": "vertical",
+                "block_type": "vertical",
+                "context_key": "course-v1:orgA+test_course+test_run",
+                "org": "orgA",
+                "breadcrumbs": [{"display_name": "Test Course"}, {"display_name": "Updated Sequential"}],
+                "content": {}
             }
         ])
 
@@ -115,7 +118,7 @@ class TestUpdateIndexHandlers(
         self.store.delete_item(vertical.location, self.user_id)
 
         meilisearch_client.return_value.index.return_value.delete_document.assert_called_with(
-            'block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b'
+            "block-v1orgatest_coursetest_runtypeverticalblocktest_vertical-011f143b"
         )
 
     def test_create_delete_library_block(self, meilisearch_client):
@@ -131,16 +134,35 @@ class TestUpdateIndexHandlers(
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
             {
-                'id': 'lborgalib_aproblemproblem1-ca3186e9',
-                'type': 'library_block',
-                'usage_key': 'lb:orgA:lib_a:problem:Problem1',
-                'block_id': 'Problem1',
-                'display_name': 'Blank Problem',
-                'block_type': 'problem',
-                'context_key': 'lib:orgA:lib_a',
-                'org': 'orgA',
-                'breadcrumbs': [{'display_name': 'Library Org A'}],
-                'content': {'problem_types': [], 'capa_content': ' '}
+                "id": "lborgalib_aproblemproblem1-ca3186e9",
+                "type": "library_block",
+                "usage_key": "lb:orgA:lib_a:problem:Problem1",
+                "block_id": "Problem1",
+                "display_name": "Blank Problem",
+                "block_type": "problem",
+                "context_key": "lib:orgA:lib_a",
+                "org": "orgA",
+                "breadcrumbs": [{"display_name": "Library Org A"}],
+                "content": {"problem_types": [], "capa_content": " "}
+            },
+        ])
+
+        # Rename the content library
+        library_api.update_library(library.key, title="Updated Library Org A")
+
+        # The breadcrumbs should be updated
+        meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([
+            {
+                "id": "lborgalib_aproblemproblem1-ca3186e9",
+                "type": "library_block",
+                "usage_key": "lb:orgA:lib_a:problem:Problem1",
+                "block_id": "Problem1",
+                "display_name": "Blank Problem",
+                "block_type": "problem",
+                "context_key": "lib:orgA:lib_a",
+                "org": "orgA",
+                "breadcrumbs": [{"display_name": "Updated Library Org A"}],
+                "content": {"problem_types": [], "capa_content": " "}
             },
         ])
 
@@ -148,5 +170,5 @@ class TestUpdateIndexHandlers(
         library_api.delete_library_block(problem.usage_key)
 
         meilisearch_client.return_value.index.return_value.delete_document.assert_called_with(
-            'lborgalib_aproblemproblem1-ca3186e9'
+            "lborgalib_aproblemproblem1-ca3186e9"
         )

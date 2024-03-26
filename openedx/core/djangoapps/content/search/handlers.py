@@ -5,8 +5,9 @@ Handlers for content indexing
 import logging
 
 from django.dispatch import receiver
-from openedx_events.content_authoring.data import LibraryBlockData, XBlockData
+from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData, XBlockData
 from openedx_events.content_authoring.signals import (
+    CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     XBLOCK_CREATED,
@@ -18,8 +19,9 @@ from .api import only_if_meilisearch_enabled
 from .tasks import (
     delete_library_block_index_doc,
     delete_xblock_index_doc,
+    update_content_library_index_docs,
     upsert_library_block_index_doc,
-    upsert_xblock_index_doc
+    upsert_xblock_index_doc,
 )
 
 log = logging.getLogger(__name__)
@@ -79,7 +81,7 @@ def xblock_deleted_handler(**kwargs) -> None:
 
 @receiver(LIBRARY_BLOCK_CREATED)
 @only_if_meilisearch_enabled
-def content_library_updated_handler(**kwargs) -> None:
+def library_block_updated_handler(**kwargs) -> None:
     """
     Create or update the index for the content library block
     """
@@ -93,7 +95,7 @@ def content_library_updated_handler(**kwargs) -> None:
 
 @receiver(LIBRARY_BLOCK_DELETED)
 @only_if_meilisearch_enabled
-def content_library_deleted_handler(**kwargs) -> None:
+def library_block_deleted(**kwargs) -> None:
     """
     Delete the index for the content library block
     """
@@ -103,3 +105,17 @@ def content_library_deleted_handler(**kwargs) -> None:
         return
 
     delete_library_block_index_doc.delay(str(library_block_data.usage_key))
+
+
+@receiver(CONTENT_LIBRARY_UPDATED)
+@only_if_meilisearch_enabled
+def content_library_updated_handler(**kwargs) -> None:
+    """
+    Update the index for the content library
+    """
+    content_library_data = kwargs.get("content_library", None)
+    if not content_library_data or not isinstance(content_library_data, ContentLibraryData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+
+    update_content_library_index_docs.delay(str(content_library_data.library_key))

@@ -17,6 +17,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.content.search.documents import (
     STUDIO_INDEX_NAME,
@@ -168,7 +169,7 @@ def _using_temp_index(status_cb: Callable[[str], None] | None = None) -> Generat
     Create a new temporary Meilisearch index, populate it, then swap it to
     become the active index.
     """
-    def nop(_):  # pragma: no cover
+    def nop(_):
         pass
 
     if status_cb is None:
@@ -368,6 +369,9 @@ def upsert_xblock_index_doc(
 
     add_with_children(xblock)
 
+    if not docs:
+        return
+
     tasks = []
     if current_rebuild_index_name:
         # If there is a rebuild in progress, the document will also be added to the new index.
@@ -422,6 +426,32 @@ def upsert_library_block_index_doc(
     ]
 
     tasks = []
+    if current_rebuild_index_name:
+        # If there is a rebuild in progress, the document will also be added to the new index.
+        tasks.append(client.index(current_rebuild_index_name).update_documents(docs))
+    tasks.append(client.index(INDEX_NAME).update_documents(docs))
+
+    _wait_for_meili_tasks(tasks)
+
+
+def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
+    """
+    Creates or updates the documents for the given Content Library in the search index
+    """
+    current_rebuild_index_name = _get_running_rebuild_index_name()
+    client = _get_meilisearch_client()
+
+    docs = []
+    for component in lib_api.get_library_components(library_key):
+        metadata = lib_api.LibraryXBlockMetadata.from_component(library_key, component)
+        doc = searchable_doc_for_library_block(metadata, include_metadata=True, include_tags=False)
+        docs.append(doc)
+
+    tasks = []
+
+    if not docs:
+        return
+
     if current_rebuild_index_name:
         # If there is a rebuild in progress, the document will also be added to the new index.
         tasks.append(client.index(current_rebuild_index_name).update_documents(docs))

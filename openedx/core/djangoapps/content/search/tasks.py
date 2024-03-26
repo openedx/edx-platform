@@ -10,7 +10,7 @@ from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 
 from . import api
 
@@ -90,4 +90,23 @@ def delete_library_block_index_doc(usage_key_str: str) -> bool:
         return True
     except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
         log.error("Error deleting content index document for library block with id: %s. %s", usage_key_str, e)
+        return False
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def update_content_library_index_docs(library_key_str: str) -> bool:
+    """
+    Celery task to update the content index documents for all library blocks in a library
+    """
+    try:
+        library_key = LibraryLocatorV2.from_string(library_key_str)
+
+        log.info("Updating content index documents for library with id: %s", library_key)
+
+        api.upsert_content_library_index_docs(library_key)
+
+        return True
+    except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
+        log.error("Error updating content index documents for library with id: %s. %s", library_key, e)
         return False

@@ -182,3 +182,12 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
             self.doc_problem['id']
         )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_content_library_metadata(self, mock_meilisearch):
+        """
+        Test indexing a whole content library.
+        """
+        api.upsert_content_library_index_docs(self.library.key)
+
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem])
