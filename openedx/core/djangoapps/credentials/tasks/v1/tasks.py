@@ -23,7 +23,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory, get_recently_modified_
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
-from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.api import is_credentials_enabled
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_base_url, get_credentials_api_client
 from openedx.core.djangoapps.programs.signals import (
     handle_course_cert_awarded,
@@ -329,71 +329,60 @@ def send_grade_if_interesting(
          LMS.
         verbose (bool): A value determining the logging level desired for this grade update
     """
-    if verbose:
-        msg = (
-            f"Starting send_grade_if_interesting with_params: user [{getattr(user, 'username', None)}], "
-            f"course_run_key [{course_run_key}], mode [{mode}], status [{status}], letter_grade [{letter_grade}], "
-            f"percent_grade [{percent_grade}], grade_last_updated [{grade_last_updated}], verbose [{verbose}]"
-        )
-        logger.info(msg)
+    warning_base = f"Skipping send grade for user {user} in course run {course_run_key}:"
 
-    # Avoid scheduling new tasks if certification is disabled. (Grades are a part of the records/cert story)
-    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+    if verbose:
+        logger.info(
+            f"Starting send_grade_if_interesting with params: user [{user}], course_run_key [{course_run_key}], mode "
+            f"[{mode}], status [{status}], letter_grade [{letter_grade}], percent_grade [{percent_grade}], "
+            f"grade_last_updated [{grade_last_updated}, verbose [{verbose}]"
+        )
+
+    if not is_credentials_enabled():
         if verbose:
-            logger.info("Skipping send grade: is_learner_issuance_enabled False")
+            logger.warning(f"{warning_base} use of the Credentials IDA is disabled by config")
         return
 
-    # Avoid scheduling new tasks if learner records are disabled for this site.
+    # avoid scheduling tasks if the learner records feature has been disabled for this org
     if not is_learner_records_enabled_for_org(course_run_key.org):
         if verbose:
-            logger.info(
-                "Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
-                    org=course_run_key.org
-                )
-            )
+            logger.warning(f"{warning_base} the learner records feature is disabled for the org {course_run_key.org}")
         return
 
-    # Grab mode/status if we don't have them in hand
+    # If we don't have mode and/or status, retrieve them from the learner's certificate record
     if mode is None or status is None:
         try:
             cert = GeneratedCertificate.objects.get(user=user, course_id=course_run_key)  # pylint: disable=no-member
             mode = cert.mode
             status = cert.status
         except GeneratedCertificate.DoesNotExist:
-            # We only care about grades for which there is a certificate.
+            # we only care about grades for which there is a certificate record
             if verbose:
-                logger.info(
-                    f"Skipping send grade: no cert for user [{getattr(user, 'username', None)}] & course_id "
-                    f"[{course_run_key}]"
-                )
+                logger.warning(f"{warning_base} no certificate record in the specified course run")
             return
 
-    # Don't worry about whether it's available as well as awarded. Just awarded is good enough to record a verified
-    # attempt at a course. We want even the grades that didn't pass the class because Credentials wants to know about
-    # those too.
+    # Don't worry about the certificate record being in a passing or awarded status. Having a certificate record in any
+    # status is good enough to record a verified attempt at a course. The Credentials IDA keeps track of how many times
+    # a learner has made an attempt at a course run of a course, so it wants to know about all the learner's efforts.
+    # This check is attempt to prevent updates being sent to Credentials that it does not care about (e.g. updates
+    # related to a legacy Audit course)
     if mode not in INTERESTING_MODES or status not in INTERESTING_STATUSES:
         if verbose:
-            logger.info(f"Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]")
+            logger.warning(f"{warning_base} mode ({mode}) or status ({status}) is not interesting to Credentials")
         return
 
-    # If the course isn't in any program, don't bother telling Credentials about it. When Credentials grows support
-    # for course records as well as program records, we'll need to open this up.
+    # don't bother sending an update if the course run is not associated with any programs
     if not is_course_run_in_a_program(course_run_key):
         if verbose:
-            logger.info(
-                f"Skipping send grade: course run not in a program. [{course_run_key}]"
-            )
+            logger.warning(f"{warning_base} course run is not associated with any programs")
         return
 
-    # Grab grade data if we don't have them in hand
+    # grab additional grade data if we don't have it in hand
     if letter_grade is None or percent_grade is None or grade_last_updated is None:
         grade = CourseGradeFactory().read(user, course_key=course_run_key, create_if_needed=False)
         if grade is None:
             if verbose:
-                logger.info(
-                    f"Skipping send grade: No grade found for user [{getattr(user, 'username', None)}] & course_id "
-                    f"[{course_run_key}]"
-                )
+                logger.warning(f"{warning_base} no grade found for user in the specified course run")
             return
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
