@@ -9,7 +9,6 @@ from openedx_events.content_authoring.data import LibraryBlockData, XBlockData
 from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
-    LIBRARY_BLOCK_UPDATED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED
