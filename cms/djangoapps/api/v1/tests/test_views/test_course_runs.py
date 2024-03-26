@@ -402,3 +402,54 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert response.data == {'non_field_errors': [
             'Invalid key supplied. Ensure there are no special characters in the Course Number.'
         ]}
+
+    def test_clone_course(self):
+        course = CourseFactory()
+        url = reverse('api:v1:course_run-clone')
+        data = {
+            'source_course_id': str(course.id),
+            'destination_course_id': 'course-v1:destination+course+id',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 201
+        self.assertEqual(response.data, {"message": "Course cloned successfully."})
+
+    def test_clone_course_with_missing_source_id(self):
+        url = reverse('api:v1:course_run-clone')
+        data = {
+            'destination_course_id': 'course-v1:destination+course+id',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 400
+        self.assertEqual(response.data, {'source_course_id': ['This field is required.']})
+
+    def test_clone_course_with_missing_dest_id(self):
+        url = reverse('api:v1:course_run-clone')
+        data = {
+            'source_course_id': 'course-v1:source+course+id',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 400
+        self.assertEqual(response.data, {'destination_course_id': ['This field is required.']})
+
+    def test_clone_course_with_nonexistent_source_course(self):
+        url = reverse('api:v1:course_run-clone')
+        data = {
+            'source_course_id': 'course-v1:nonexistent+source+course_id',
+            'destination_course_id': 'course-v1:destination+course+id',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 400
+        assert str(response.data.get('non_field_errors')[0]) == 'Source course does not exist.'
+
+    def test_clone_course_with_existing_dest_course(self):
+        url = reverse('api:v1:course_run-clone')
+        course = CourseFactory()
+        existing_dest_course = CourseFactory()
+        data = {
+            'source_course_id': str(course.id),
+            'destination_course_id': str(existing_dest_course.id),
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 400
+        assert str(response.data.get('non_field_errors')[0]) == 'Destination course already exists.'
