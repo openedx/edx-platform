@@ -6,7 +6,7 @@ on:
 defaults:
   run:
     shell: bash # strict bash
-    
+
 jobs:
   check_dependencies:
     name: Check Python Dependencies
@@ -23,7 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install 'https://github.com/openedx/repo-tools[find_dependencies]'
+          python -m pip install --upgrade pip
+          pip install 'https://github.com/openedx/repo-tools[find_dependencies]'
 
       - name: Run dependency check
         run: |
