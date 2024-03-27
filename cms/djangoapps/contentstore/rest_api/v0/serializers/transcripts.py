@@ -14,12 +14,13 @@ class TranscriptSerializer(StrictSerializer):
     language_code = serializers.CharField(required=False, allow_null=True)
     new_language_code = serializers.CharField(required=False, allow_null=True)
 
+
 class YoutubeTranscriptCheckSerializer(StrictSerializer):
     """
     Strict Serializer for YouTube transcripts check
     """
     html5_local = serializers.ListField(
-        child = serializers.CharField()
+        child=serializers.CharField()
     )
     html5_equal = serializers.BooleanField()
     is_youtube_mode = serializers.BooleanField()
@@ -29,6 +30,7 @@ class YoutubeTranscriptCheckSerializer(StrictSerializer):
     current_item_subs = serializers.ListField(required=False, allow_null=True)
     status = serializers.CharField()
     command = serializers.CharField()
+
 
 class YoutubeTranscriptUploadSerializer(StrictSerializer):
     """

@@ -205,8 +205,6 @@ def get_transcript_links_from_youtube(youtube_id, settings, i18n, youtube_transc
     Returns (status, transcripts): bool, dict.
     """
     _ = i18n.gettext
-
-
     transcript_links = get_transcript_link_from_youtube(youtube_id)
 
     if not transcript_links:
@@ -217,7 +215,8 @@ def get_transcript_links_from_youtube(youtube_id, settings, i18n, youtube_transc
 
     return transcript_links
 
-def get_transcript_from_youtube(link, youtube_id,):
+
+def get_transcript_from_youtube(link, youtube_id, i18n):
     """
     Gets transcripts from youtube for youtube_id.
 
@@ -226,9 +225,8 @@ def get_transcript_from_youtube(link, youtube_id,):
 
     Returns (status, transcripts): bool, dict.
     """
+    _ = i18n.gettext
     utf8_parser = etree.XMLParser(encoding='utf-8')
-
-
     data = requests.get(link)
 
     if data.status_code != 200 or not data.text:
@@ -277,7 +275,7 @@ def download_youtube_subs(youtube_id, video_block, settings):  # lint-amnesty, p
     transcript_links = get_transcript_links_from_youtube(youtube_id, settings, i18n)
     subs = []
     for (language_code, link) in transcript_links.items():
-        sub = get_transcript_from_youtube(link, youtube_id)
+        sub = get_transcript_from_youtube(link, youtube_id, i18n)
         subs.append([language_code, json.dumps(sub, indent=2)])
     return subs
 

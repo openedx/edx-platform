@@ -6,13 +6,13 @@ from django.urls import re_path, path
 from openedx.core.constants import COURSE_ID_PATTERN
 
 from .views import (
-  AdvancedCourseSettingsView,
-  CourseTabSettingsView,
-  CourseTabListView,
-  CourseTabReorderView,
-  TranscriptView,
-  YoutubeTranscriptCheckView,
-  YoutubeTranscriptUploadView,
+    AdvancedCourseSettingsView,
+    CourseTabSettingsView,
+    CourseTabListView,
+    CourseTabReorderView,
+    TranscriptView,
+    YoutubeTranscriptCheckView,
+    YoutubeTranscriptUploadView,
 )
 from .views import assets
 from .views import authoring_videos
@@ -86,11 +86,11 @@ urlpatterns = [
         xblock.XblockView.as_view(), name='cms_api_xblock'
     ),
     re_path(
-      fr'^youtube_transcripts/{settings.COURSE_ID_PATTERN}/check?$',
-      YoutubeTranscriptCheckView.as_view(), name='cms_api_youtube_transcripts_check'
+        fr'^youtube_transcripts/{settings.COURSE_ID_PATTERN}/check?$',
+        YoutubeTranscriptCheckView.as_view(), name='cms_api_youtube_transcripts_check'
     ),
     re_path(
-      fr'^youtube_transcripts/{settings.COURSE_ID_PATTERN}/upload?$',
-      YoutubeTranscriptUploadView.as_view(), name='cms_api_youtube_transcripts_upload'
+        fr'^youtube_transcripts/{settings.COURSE_ID_PATTERN}/upload?$',
+        YoutubeTranscriptUploadView.as_view(), name='cms_api_youtube_transcripts_upload'
     ),
 ]
