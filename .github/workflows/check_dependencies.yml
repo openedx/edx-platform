@@ -28,7 +28,7 @@ jobs:
 
       - name: Find script path
         run: |
-          find /opt/hostedtoolcache/Python/3.8.18/x64 -name "finding_dependency.py"    
+          find / -name "finding_dependency.py"
 
 
       - name: Check if any dependency belongs to openedx
