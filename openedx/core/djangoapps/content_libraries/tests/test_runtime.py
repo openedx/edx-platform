@@ -129,10 +129,12 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         assert metadata_view_result.data['display_name'] == 'New Multi Choice Question'
         assert 'children' not in metadata_view_result.data
         assert 'editable_children' not in metadata_view_result.data
-        self.assertDictContainsSubset({
+        index_dictionary = metadata_view_result.data["index_dictionary"]
+        index_dictionary_subset = {
             "content_type": "CAPA",
             "problem_types": ["multiplechoiceresponse"],
-        }, metadata_view_result.data["index_dictionary"])
+        }
+        self.assertLessEqual(index_dictionary_subset.items(), index_dictionary.items())
         assert metadata_view_result.data['student_view_data'] is None
         # Capa doesn't provide student_view_data
 
@@ -416,11 +418,12 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         submit_result = client.post(problem_check_url, data={problem_key: "choice_3"})
         assert submit_result.status_code == 200
         submit_data = json.loads(submit_result.content.decode('utf-8'))
-        self.assertDictContainsSubset({
+        submit_subset_data = {
             "current_score": 0,
             "total_possible": 1,
             "attempts_used": 1,
-        }, submit_data)
+        }
+        self.assertLessEqual(submit_subset_data.items(), submit_data.items())
 
         # Now test that the score is also persisted in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
@@ -432,11 +435,12 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         submit_result = client.post(problem_check_url, data={problem_key: "choice_1"})
         assert submit_result.status_code == 200
         submit_data = json.loads(submit_result.content.decode('utf-8'))
-        self.assertDictContainsSubset({
+        submit_subset_data = {
             "current_score": 1,
             "total_possible": 1,
             "attempts_used": 2,
-        }, submit_data)
+        }
+        self.assertLessEqual(submit_subset_data.items(), submit_data.items())
         # Now test that the score is also updated in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
         sm = get_score(self.student_a, block_id)
