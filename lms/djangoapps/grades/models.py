@@ -534,6 +534,27 @@ class PersistentSubsectionGrade(TimeStampedModel):
     def _cache_key(cls, course_id):
         return f"subsection_grades_cache.{course_id}"
 
+    @classmethod
+    def delete_subsection_grades_for_learner(cls, user_id, course_key):
+        """
+        Clears Subsection grades and overrides for a learner in a course
+        Arguments:
+            user_id: The user associated with the desired grade
+            course_id: The id of the course associated with the desired grade
+        """
+        try:
+            deleted_count, deleted_obj = cls.objects.filter(
+                user_id=user_id,
+                course_id=course_key,
+            ).delete()
+            get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_key)].pop(user_id)
+            if deleted_obj['grades.PersistentSubsectionGradeOverride'] is not None:
+                PersistentSubsectionGradeOverride.clear_prefetched_overrides_for_learner(user_id, course_key)
+        except KeyError:
+            pass
+
+        return deleted_count
+
 
 class PersistentCourseGrade(TimeStampedModel):
     """
@@ -680,6 +701,20 @@ class PersistentCourseGrade(TimeStampedModel):
     @staticmethod
     def _emit_grade_calculated_event(grade):
         events.course_grade_calculated(grade)
+
+    @classmethod
+    def delete_course_grade_for_learner(cls, course_id, user_id):
+        """
+        Clears course grade for a learner in a course
+        Arguments:
+            course_id: The id of the course associated with the desired grade
+            user_id: The user associated with the desired grade
+        """
+        try:
+            cls.objects.get(user_id=user_id, course_id=course_id).delete()
+            get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_id)].pop(user_id)
+        except (PersistentCourseGrade.DoesNotExist, KeyError):
+            pass
 
     @staticmethod
     def _emit_openedx_persistent_grade_summary_changed_event(course_id, user_id, grade):
@@ -828,3 +863,7 @@ class PersistentSubsectionGradeOverride(models.Model):
                 getattr(subsection_grade_model, field_name)
             )
         return cleaned_data
+
+    @classmethod
+    def clear_prefetched_overrides_for_learner(cls, user_id, course_key):
+        get_cache(cls._CACHE_NAMESPACE).pop((user_id, str(course_key)), None)

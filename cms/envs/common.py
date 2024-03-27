@@ -560,6 +560,16 @@ FEATURES = {
     # .. toggle_creation_date: 2024-02-29
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
     'ENABLE_HIDE_FROM_TOC_UI': False,
+
+    # .. toggle_name: FEATURES['ENABLE_HOME_PAGE_COURSE_API_V2']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Enables the new home page course v2 API, which is a new version of the home page course
+    #   API with pagination, filter and ordering capabilities.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-03-14
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34173
+    'ENABLE_HOME_PAGE_COURSE_API_V2': True,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -1784,6 +1794,9 @@ INSTALLED_APPS = [
     'openedx_tagging.core.tagging.apps.TaggingConfig',
     'openedx.core.djangoapps.content_tagging',
 
+    # Search
+    'openedx.core.djangoapps.content.search',
+
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
@@ -2679,7 +2692,7 @@ EDXAPP_PARSE_KEYS = {}
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
-NOTIFICATION_CREATION_BATCH_SIZE = 99
+NOTIFICATION_CREATION_BATCH_SIZE = 83
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
@@ -2882,3 +2895,18 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
 REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
 
 BEAMER_PRODUCT_ID = ""
+
+################### Studio Search (alpha, using Meilisearch) ###################
+
+# Enable Studio search features (powered by Meilisearch) (beta, off by default)
+MEILISEARCH_ENABLED = False
+# Meilisearch URL that the python backend can use. Often points to another docker container or k8s service.
+MEILISEARCH_URL = "http://meilisearch"
+# URL that browsers (end users) can user to reach Meilisearch. Should be HTTPS in production.
+MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
+# To support multi-tenancy, you can prefix all indexes with a common key like "sandbox7-"
+# and use a restricted tenant token in place of an API key, so that this Open edX instance
+# can only use the index(es) that start with this prefix.
+# See https://www.meilisearch.com/docs/learn/security/tenant_tokens
+MEILISEARCH_INDEX_PREFIX = ""
+MEILISEARCH_API_KEY = "devkey"
