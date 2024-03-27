@@ -39,6 +39,7 @@ from common.djangoapps.util.monitoring import monitor_import_failure
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.djangoapps.content_tagging.auth import has_view_object_tags_access
 from ..storage import course_import_export_storage
 from ..tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
 from ..toggles import use_new_export_page, use_new_import_page
@@ -343,6 +344,11 @@ def export_handler(request, course_key_string):
     requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
     if request.method == 'POST':
+        if not has_view_object_tags_access(request.user, str(course_key)):
+            raise PermissionDenied(
+                "You do not have permission to view object tags for this object_id."
+            )
+
         export_olx.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
         return JsonResponse({'ExportStatus': 1})
     elif 'text/html' in requested_format:

@@ -170,10 +170,10 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     }
     for obj_tag in all_tags:
         # Add the taxonomy name:
-        if obj_tag.name not in result[Fields.tags_taxonomy]:
-            result[Fields.tags_taxonomy].append(obj_tag.name)
-        # Taxonomy name plus each level of tags, in a list:
-        parts = [obj_tag.name] + obj_tag.get_lineage()  # e.g. ["Location", "North America", "Canada", "Vancouver"]
+        if obj_tag.taxonomy.name not in result[Fields.tags_taxonomy]:
+            result[Fields.tags_taxonomy].append(obj_tag.taxonomy.name)
+        # Taxonomy name plus each level of tags, in a list: # e.g. ["Location", "North America", "Canada", "Vancouver"]
+        parts = [obj_tag.taxonomy.name] + obj_tag.get_lineage()
         parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator.
         # Now we build each level (tags.level0, tags.level1, etc.) as applicable.
         # We have a hard-coded limit of 4 levels of tags for now (see Fields.tags above).
