@@ -8,6 +8,7 @@ from enum import Enum
 
 from django.utils.functional import cached_property
 
+
 # "Arbitrarily large" but still limited
 MANAGED_TEAM_MAX_TEAM_SIZE = 200
 # Arbitrarily arbitrary
@@ -190,7 +191,7 @@ class TeamsetConfig:
         """
         Return developer-helpful string.
         """
-        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type']
+        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type', 'dynamic_user_partition_id']
         return "<{} {}>".format(
             self.__class__.__name__,
             " ".join(
@@ -286,6 +287,14 @@ class TeamsetConfig:
         Returns true if teamsettype is private_managed
         """
         return self.teamset_type == TeamsetType.private_managed
+
+    @cached_property
+    def dynamic_user_partition_id(self):
+        """
+        The ID of the dynamic user partition for this team-set,
+        falling back to None.
+        """
+        return self._data.get('dynamic_user_partition_id')
 
 
 class TeamsetType(Enum):
