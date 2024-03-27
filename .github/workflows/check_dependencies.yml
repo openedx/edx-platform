@@ -26,6 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install edx-repo-tools[find_dependencies]
 
+      - name: Find repo-tools package location
+        run: pip show edx-repo-tools
+          
       - name: Run dependency check
         run: |
           which finding_dependency.py
