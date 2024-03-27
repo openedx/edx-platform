@@ -408,7 +408,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
         self.expected_csv = (
             '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
             '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
-            '"  test sequential","sequential","test_sequential","Tag 1.1, Tag 1.2","Tag 2.1"\r\n'
+            '"  test sequential","sequential","test_sequential","Tag 1.1; Tag 1.2","Tag 2.1"\r\n'
             '"    test vertical1","vertical","test_vertical1","","Tag 2.2"\r\n'
             '"    test vertical2","vertical","test_vertical2","",""\r\n'
             '"      test html","html","test_html","","Tag 2.1"\r\n'

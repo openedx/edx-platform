@@ -14,6 +14,7 @@ from django.db.models import Exists, OuterRef, Q, QuerySet
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
+from openedx_tagging.core.tagging.models.utils import TAGS_CSV_SEPARATOR
 from organizations.models import Organization
 from .helpers.objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
 
@@ -241,7 +242,7 @@ def generate_csv_rows(object_id, buffer) -> Iterator[str]:
         # Add the tags for each taxonomy
         for taxonomy_id in taxonomies:
             if taxonomy_id in item.object_tags:
-                block_data[f"taxonomy_{taxonomy_id}"] = ", ".join([
+                block_data[f"taxonomy_{taxonomy_id}"] = f"{TAGS_CSV_SEPARATOR} ".join([
                     object_tag.value
                     for object_tag in item.object_tags[taxonomy_id]
                 ])
@@ -307,7 +308,7 @@ def import_course_tags_from_csv(csv_path, course_id) -> None:
         for key, value in block.items():
             if key in ['Type', 'Name', 'ID'] or not value:
                 continue
-            result[key] = value.split(',')
+            result[key] = value.split(TAGS_CSV_SEPARATOR)
         return result
 
     course_key = CourseKey.from_string(str(course_id))
