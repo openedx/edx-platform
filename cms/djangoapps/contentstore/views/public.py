@@ -46,7 +46,7 @@ def redirect_to_lms_login_for_admin(request):
     """
     This view redirect the admin/login url to the site's login page.
     """
-    return redirect('/login/?next=/admin')
+    return redirect('/login?next=/admin')
 
 
 def _build_next_param(request):

@@ -27,7 +27,7 @@ class AutoAuthTestCase(UrlResetMixin, TestCase):
     """
     Base class for AutoAuth Tests that properly resets the urls.py
     """
-    URLCONF_MODULES = ['openedx.core.djangoapps.user_authn.urls']
+    URLCONF_MODULES = ['openedx.core.djangoapps.user_authn.urls_common', 'openedx.core.djangoapps.user_authn.urls']
 
 
 @ddt.ddt
