@@ -14,7 +14,7 @@ from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.commerce.waffle import should_redirect_to_commerce_coordinator_checkout
+from common.djangoapps.student.models import CourseEnrollmentAttribute
 from openedx.core.djangoapps.commerce.utils import (
     get_ecommerce_api_base_url,
     get_ecommerce_api_client,
@@ -24,6 +24,10 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from .models import CommerceConfiguration
+from .waffle import (
+    should_redirect_to_commerce_coordinator_checkout,
+    should_redirect_to_commerce_coordinator_refunds,
+)
 
 log = logging.getLogger(__name__)
 
@@ -252,6 +256,10 @@ def refund_seat(course_enrollment, change_mode=False):
     course_key_str = str(course_enrollment.course_id)
     enrollee = course_enrollment.user
 
+    if should_redirect_to_commerce_coordinator_refunds():
+        if _refund_in_commerce_coordinator(course_enrollment, change_mode):
+            return
+
     service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
     api_client = get_ecommerce_api_client(service_user)
 
@@ -274,14 +282,89 @@ def refund_seat(course_enrollment, change_mode=False):
             mode=course_enrollment.mode,
             user=enrollee,
         )
-        if change_mode and CourseMode.can_auto_enroll(course_id=CourseKey.from_string(course_key_str)):
-            course_enrollment.update_enrollment(mode=CourseMode.auto_enroll_mode(course_id=course_key_str),
-                                                is_active=False, skip_refund=True)
-            course_enrollment.save()
+        if change_mode:
+            _auto_enroll(course_enrollment)
     else:
         log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
     return refund_ids
+
+
+def _refund_in_commerce_coordinator(course_enrollment, change_mode):
+    """
+    Helper function to perform refund in Commerce Coordinator.
+
+    Parameters:
+        course_enrollment (CourseEnrollment): the enrollment to refund.
+        change_mode (bool): whether the enrollment should be auto-enrolled into
+            the default course mode after refund.
+
+    Returns:
+        bool: True if refund was performed. False if refund is not applicable
+            to Commerce Coordinator.
+    """
+    enrollment_source_system = course_enrollment.get_order_attribute_value("source_system")
+    course_key_str = str(course_enrollment.course_id)
+    # Commerce Coordinator enrollments will have an orders.source_system enrollment attribute.
+    # Redirect to Coordinator only if the source_system is whitelisted as Coordinator's in settings.
+    if enrollment_source_system and enrollment_source_system in settings.COMMERCE_COORDINATOR_REFUND_SOURCE_SYSTEMS:
+        log.info('Redirecting refund to Commerce Coordinator for user [%s], course [%s]...',
+                 course_enrollment.user_id, course_key_str)
+        # Re-use Ecommerce API client factory to build an API client for Commerce Coordinator..
+        service_user = get_user_model().objects.get(
+            username=settings.COMMERCE_COORDINATOR_SERVICE_WORKER_USERNAME
+        )
+        api_client = get_ecommerce_api_client(service_user)
+        refunds_url = urljoin(
+            settings.COMMERCE_COORDINATOR_URL_ROOT,
+            settings.COMMERCE_COORDINATOR_REFUND_PATH
+        )
+        # Build request, raising exception if Coordinator returns non-200.
+        enrollment_attributes = CourseEnrollmentAttribute.get_enrollment_attributes(course_enrollment)
+        api_client.post(
+            refunds_url,
+            json={
+                'course_id': course_key_str,
+                'username': course_enrollment.username,
+                'enrollment_attributes': enrollment_attributes
+            }
+        ).raise_for_status()
+        log.info('Refund successfully sent to Commerce Coordinator for user [%s], course [%s].',
+                 course_enrollment.user_id, course_key_str)
+        if change_mode:
+            _auto_enroll(course_enrollment)
+        return True
+    else:
+        log.info('Continuing refund without Commerce Coordinator redirect for user [%s], course [%s]...',
+                 course_enrollment.user_id, course_key_str)
+        return False
+
+
+def _auto_enroll(course_enrollment):
+    """
+    Helper method to update an enrollment to a default course mode.
+
+    Arguments:
+        course_enrollment (CourseEnrollment): The course_enrollment to update.
+
+    Returns:
+        bool: True if auto-enroll is succesful. False if auto-enroll is not applicable.
+    """
+    enrollment_course_id = course_enrollment.course_id
+
+    if CourseMode.can_auto_enroll(course_id=enrollment_course_id):
+        auto_enroll_mode = CourseMode.auto_enroll_mode(course_id=enrollment_course_id)
+        course_enrollment.update_enrollment(mode=auto_enroll_mode, is_active=False, skip_refund=True)
+        course_enrollment.save()
+        log.info(
+            'Auto-enrolled user [%s], course [%s] in mode [%s].',
+            course_enrollment.user_id,
+            enrollment_course_id,
+            auto_enroll_mode
+        )
+        return True
+    else:
+        return False
 
 
 def _process_refund(refund_ids, api_client, mode, user, always_notify=False):
