@@ -26,8 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install edx-repo-tools[find_dependencies]
 
-      - name: Find repo-tools package location
-        run: pip show edx-repo-tools
+      - name: Locate finding_dependency.py
+        run: |
+          find /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages -name "finding_dependency.py"
           
       - name: Run dependency check
         run: |
