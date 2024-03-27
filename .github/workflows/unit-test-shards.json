@@ -239,7 +239,6 @@
     "paths": [
       "cms/djangoapps/api/",
       "cms/djangoapps/cms_user_tasks/",
-      "cms/djangoapps/coursegraph/",
       "cms/djangoapps/course_creators/",
       "cms/djangoapps/export_course_metadata/",
       "cms/djangoapps/maintenance/",

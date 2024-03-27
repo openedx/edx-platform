@@ -190,7 +190,6 @@ certifi==2024.2.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   elasticsearch
-    #   py2neo
     #   requests
     #   snowflake-connector-python
 cffi==1.16.0
@@ -1026,11 +1025,6 @@ iniconfig==2.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest
-interchange==2021.0.4
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   py2neo
 ipaddress==1.0.23
     # via
     #   -r requirements/edx/doc.txt
@@ -1216,7 +1210,6 @@ monotonic==1.6
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
-    #   py2neo
 mpmath==1.3.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1345,7 +1338,6 @@ packaging==23.2
     #   build
     #   drf-yasg
     #   gunicorn
-    #   py2neo
     #   pydata-sphinx-theme
     #   pyproject-api
     #   pytest
@@ -1354,11 +1346,6 @@ packaging==23.2
     #   tox
 pact-python==2.1.1
     # via -r requirements/edx/testing.txt
-pansi==2020.7.3
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   py2neo
 path==16.10.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1441,11 +1428,6 @@ psutil==5.9.8
     #   pytest-xdist
 py==1.11.0
     # via -r requirements/edx/testing.txt
-py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 pyasn1==0.5.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1492,7 +1474,6 @@ pygments==2.17.2
     #   -r requirements/edx/testing.txt
     #   accessible-pygments
     #   diff-cover
-    #   py2neo
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
@@ -1690,7 +1671,6 @@ pytz==2024.1
     #   event-tracking
     #   fs
     #   icalendar
-    #   interchange
     #   olxcleaner
     #   openedx-blockstore
     #   ora2
@@ -1851,14 +1831,11 @@ six==1.16.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   interchange
     #   isodate
     #   libsass
     #   optimizely-sdk
     #   pact-python
-    #   pansi
     #   paver
-    #   py2neo
     #   pyjwkest
     #   python-dateutil
     #   sphinxcontrib-httpdomain
@@ -2111,7 +2088,6 @@ urllib3==1.26.18
     #   -r requirements/edx/testing.txt
     #   botocore
     #   elasticsearch
-    #   py2neo
     #   requests
     #   snowflake-connector-python
 user-util==1.0.0
