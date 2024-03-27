@@ -367,6 +367,7 @@ class VideosHandlerTestCase(
                     'created',
                     'duration',
                     'status',
+                    'status_nontranslated',
                     'course_video_image_url',
                     'file_size',
                     'download_link',
@@ -388,8 +389,8 @@ class VideosHandlerTestCase(
         (
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
-                'status', 'course_video_image_url', 'file_size', 'download_link',
-                'transcripts', 'transcription_status', 'transcript_urls',
+                'status', 'status_nontranslated', 'course_video_image_url', 'file_size',
+                'download_link', 'transcripts', 'transcription_status', 'transcript_urls',
                 'error_description'
             ],
             [
@@ -406,8 +407,8 @@ class VideosHandlerTestCase(
         (
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
-                'status', 'course_video_image_url', 'file_size', 'download_link',
-                'transcripts', 'transcription_status', 'transcript_urls',
+                'status', 'status_nontranslated', 'course_video_image_url', 'file_size',
+                'download_link', 'transcripts', 'transcription_status', 'transcript_urls',
                 'error_description'
             ],
             [
