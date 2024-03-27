@@ -28,7 +28,7 @@ jobs:
 
       - name: Run dependency check
         run: |
-          python finding_dependency.py
+          which finding_dependency.py
 
       - name: Check if any dependency belongs to openedx
         run: |
