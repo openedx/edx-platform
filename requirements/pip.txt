@@ -4,11 +4,11 @@
 #
 #    make upgrade
 #
-wheel==0.42.0
+wheel==0.43.0
     # via -r requirements/pip.in
 
 # The following packages are considered to be unsafe in a requirements file:
 pip==24.0
     # via -r requirements/pip.in
-setuptools==69.1.0
+setuptools==69.2.0
     # via -r requirements/pip.in
