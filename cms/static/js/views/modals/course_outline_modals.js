@@ -17,7 +17,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,ThumbnailUploadEditor, LessonTypeEditor, CompletionTrackingEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,ThumbnailUploadEditor, LessonTypeEditor, LedTypeEditor, CompletionTrackingEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -1026,6 +1026,33 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
   });
 
 
+  LedTypeEditor = AbstractEditor.extend({
+    templateName: 'led-type-selector',
+    className: 'led_type_select',
+
+    afterRender: function() {
+      AbstractEditor.prototype.afterRender.call(this);
+      this.setValue(this.model.get('led_type'));
+    },
+
+    setValue: function(value) {
+      this.$('#led_type_select option[value="' + value + '"]').prop('selected', true);
+    },
+
+    hasChanges: function() {
+      return this.model.get('led_type') !== this.$('#led_type_select option:selected').val();
+    },
+
+    getRequestData: function() {
+      return {
+        metadata: {
+          led_type: this.$('#led_type_select option:selected').val()
+        }
+      };
+    }
+  });
+
+
 
     ShowCorrectnessEditor = AbstractEditor.extend({
         templateName: 'show-correctness-editor',
@@ -1190,7 +1217,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     }
                 ];
                 if (xblockInfo.isChapter()) {
-                    tabs[0].editors = [ReleaseDateEditor, ThumbnailUploadEditor];
+                    tabs[0].editors = [ReleaseDateEditor, ThumbnailUploadEditor, LedTypeEditor];
                     tabs[1].editors = [StaffLockEditor];
                 } else if (xblockInfo.isSequential()) {
                     tabs[0].editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];

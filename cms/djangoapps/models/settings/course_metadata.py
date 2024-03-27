@@ -71,6 +71,7 @@ class CourseMetadata:
         'is_completion_tracked',
         'thumbnail',
         'lesson_type',
+        'led_type',
         'chrome',
         'default_tab',
         'highlights_enabled_for_messaging',

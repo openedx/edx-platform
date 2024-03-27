@@ -1,0 +1,11 @@
+<form>
+  <h3 class="modal-section-title" id="led_type"><%- gettext('Select Led Type') %></h3>
+  <div class="modal-section-content lesson_type_select">
+    <div role="group" class="list-fields" aria-labelledby="led_type">
+      <select class="form-control" id="led_type_select">
+        <option value="">None</option>
+        <option value="teacher_led_only">Teacher led only</option>
+        <option value="teacher_and_student">Teacher and student</option>
+    </div>
+  </div>
+</form>
