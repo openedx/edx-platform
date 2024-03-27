@@ -9,7 +9,7 @@ RUN apt update \
     # Global requirements
     && apt install --no-install-recommends -yq language-pack-en git build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev libmysqlclient-dev libxmlsec1-dev libfreetype6-dev libssl-dev swig gcc g++ \
     # openedx requirements
-    gettext gfortran graphviz libgraphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev ntp pkg-config python3 python3-dev python3-pip lynx sudo python3-venv \
+    gettext gfortran graphviz libgraphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev ntp pkg-config python3 python3-dev python3-pip lynx python3-venv \
     # Our requirements
     mysql-client locales unzip \
     && rm -rf /var/lib/apt/lists/* \
