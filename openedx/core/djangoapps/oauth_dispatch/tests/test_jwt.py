@@ -14,6 +14,7 @@ from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 from openedx.core.djangoapps.oauth_dispatch.tests.mixins import AccessTokenMixin
 from common.djangoapps.student.tests.factories import UserFactory
 
+
 @ddt.ddt
 class TestCreateJWTs(AccessTokenMixin, TestCase):
     """ Tests for oauth_dispatch's jwt creation functionality. """
@@ -103,7 +104,7 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=True)
         header = jwt.get_unverified_header(jwt_token)
         assert 'kid' in header
-        assert header['kid'] == 'devstack_key'
+        assert header['kid'] == 'BTZ9HA6K'
         self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=True)
 
     def test_create_jwt_for_token_default_expire_seconds(self):
