@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install edx-repo-tools[find_dependencies]
+          python -m pip install git+https://github.com/openedx/repo-tools.git[@0.8.6]#egg=edx-repo-tools[find_dependencies]
 
       - name: Run dependency check
         run: |
