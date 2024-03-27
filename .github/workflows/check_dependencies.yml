@@ -26,10 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install edx-repo-tools[find_dependencies]
 
-      - name: Find script path
+      - name: Run dependency check
         run: |
-          find / -name "finding_dependency.py"
-
+          python finding_dependency.py
 
       - name: Check if any dependency belongs to openedx
         run: |
