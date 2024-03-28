@@ -18,7 +18,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
 User = get_user_model()
 log = logging.getLogger(__name__)
 
-NOTIFICATION_CHANNELS = ['web', 'push', 'email']
+NOTIFICATION_CHANNELS = ['web', 'push', 'email', 'email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
 COURSE_NOTIFICATION_CONFIG_VERSION = 7
@@ -212,9 +212,9 @@ class CourseNotificationPreference(TimeStampedModel):
         Returns True if the notification type is enabled for any channel.
         """
         if self.is_core(app_name, notification_type):
-            return any(self.get_core_config(app_name).get(channel, False) for channel in NOTIFICATION_CHANNELS)
+            return any(self.get_core_config(app_name).get(channel, False) for channel in NOTIFICATION_CHANNELS[:-1])
         return any(self.get_notification_type_config(app_name, notification_type).get(channel, False) for channel in
-                   NOTIFICATION_CHANNELS)
+                   NOTIFICATION_CHANNELS[:-1])
 
     def get_channels_for_notification_type(self, app_name, notification_type) -> list:
         """
@@ -224,8 +224,9 @@ class CourseNotificationPreference(TimeStampedModel):
         ['web', 'push']
         """
         if self.is_core(app_name, notification_type):
-            return [channel for channel in NOTIFICATION_CHANNELS if self.get_core_config(app_name).get(channel, False)]
-        return [channel for channel in NOTIFICATION_CHANNELS if
+            return [channel for channel in NOTIFICATION_CHANNELS[:-1] if
+                    self.get_core_config(app_name).get(channel, False)]
+        return [channel for channel in NOTIFICATION_CHANNELS[:-1] if
                 self.get_notification_type_config(app_name, notification_type).get(channel, False)]
 
     def is_core(self, app_name, notification_type) -> bool:
