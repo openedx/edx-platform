@@ -5,9 +5,8 @@ from __future__ import annotations
 
 from django.db.models import Count
 from django.http import StreamingHttpResponse
-from django.utils.timezone import now
-from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
+from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -156,7 +155,6 @@ class ObjectTagOrgView(ObjectTagView):
         if response.status_code == 200:
             object_id = kwargs.get('object_id')
             CONTENT_OBJECT_TAGS_CHANGED.send_event(
-                time=now(),
                 content_object=ContentObjectData(object_id=object_id)
             )
         return response
