@@ -130,7 +130,7 @@ class TranslateCustomTagBlock(  # pylint: disable=abstract-method
     resources_dir = None
 
     @classmethod
-    def parse_xml(cls, node, runtime, _keys, _id_generator):
+    def parse_xml(cls, node, runtime, _keys):
         """
         Transforms the xml_data from <$custom_tag attr="" attr=""/> to
         <customtag attr="" attr="" impl="$custom_tag"/>

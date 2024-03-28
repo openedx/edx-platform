@@ -8,7 +8,7 @@
     # via -r requirements/edx/base.txt
 accessible-pygments==0.0.4
     # via pydata-sphinx-theme
-acid-xblock==0.2.1
+acid-xblock==0.3.0
     # via -r requirements/edx/base.txt
 aiohttp==3.9.3
     # via
@@ -1488,7 +1488,7 @@ webob==1.8.7
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/base.txt
-xblock[django]==1.10.0
+xblock[django]==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock

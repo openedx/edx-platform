@@ -78,7 +78,7 @@ class RawMixin:
         try:
             block = super().parse_xml_new_runtime(node, runtime, keys)
         except AttributeError:
-            block = super().parse_xml(node, runtime, keys, id_generator=None)
+            block = super().parse_xml(node, runtime, keys)
         block.data = data_field_value
         return block
 

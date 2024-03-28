@@ -344,7 +344,7 @@ def _import_xml_node_to_parent(
 
     if not xblock_class.has_children:
         # No children to worry about. The XML may contain child nodes, but they're not XBlocks.
-        temp_xblock = xblock_class.parse_xml(node, runtime, keys, id_generator)
+        temp_xblock = xblock_class.parse_xml(node, runtime, keys)
     else:
         # We have to handle the children ourselves, because there are lots of complex interactions between
         #    * the vanilla XBlock parse_xml() method, and its lack of API for "create and save a new XBlock"
@@ -354,7 +354,7 @@ def _import_xml_node_to_parent(
         # serialization of a child block, in order. For blocks that don't support children, their XML content/nodes
         # could be anything (e.g. HTML, capa)
         node_without_children = etree.Element(node.tag, **node.attrib)
-        temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys, id_generator)
+        temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys)
         child_nodes = list(node)
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")

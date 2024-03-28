@@ -40,6 +40,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             render_template=lambda template, context: pprint.pformat((template, context)),
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
+        self.id_generator = Mock()
 
     def process_xml(self, xml):  # pylint: disable=method-hidden
         """Parse `xml` as an XBlock, and add it to `self._blocks`"""

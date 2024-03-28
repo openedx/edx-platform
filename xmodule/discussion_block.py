@@ -233,7 +233,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
         return {'topic_id': self.discussion_id}
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
+    def parse_xml(cls, node, runtime, keys):
         """
         Parses OLX into XBlock.
 
@@ -246,7 +246,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
         XBlock.parse_xml. Otherwise this method parses file in "discussion" folder (known as definition_xml), applies
         policy.json and updates fields accordingly.
         """
-        block = super().parse_xml(node, runtime, keys, id_generator)
+        block = super().parse_xml(node, runtime, keys)
 
         cls._apply_metadata_and_policy(block, node, runtime)
 

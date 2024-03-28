@@ -178,13 +178,13 @@ class ErrorBlock(
         return cls._construct(system, xml_data, error_msg, location=id_generator.create_definition('error'))
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):  # lint-amnesty, pylint: disable=unused-argument
+    def parse_xml(cls, node, runtime, keys):  # lint-amnesty, pylint: disable=unused-argument
         """
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         # It'd be great to not reserialize and deserialize the xml
         xml = etree.tostring(node).decode('utf-8')
-        block = cls.from_xml(xml, runtime, id_generator)
+        block = cls.from_xml(xml, runtime, runtime.id_generator)
         return block
 
     def export_to_xml(self, resource_fs):

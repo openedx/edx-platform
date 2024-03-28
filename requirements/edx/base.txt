@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/github.in
-acid-xblock==0.2.1
+acid-xblock==0.3.0
     # via -r requirements/edx/kernel.in
 aiohttp==3.9.3
     # via
@@ -1222,7 +1222,7 @@ webob==1.8.7
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/paver.txt
-xblock[django]==1.10.0
+xblock[django]==2.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock

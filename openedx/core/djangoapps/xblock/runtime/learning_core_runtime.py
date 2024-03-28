@@ -205,7 +205,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             # plus some minor additional lines of code as needed.
             block = block_class.parse_xml_new_runtime(xml_node, runtime=self, keys=keys)
         else:
-            block = block_class.parse_xml(xml_node, runtime=self, keys=keys, id_generator=None)
+            block = block_class.parse_xml(xml_node, runtime=self, keys=keys)
 
         # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
         block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access

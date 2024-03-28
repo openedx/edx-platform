@@ -586,8 +586,7 @@ class SplitTestBlockExportImportTest(MixedSplitTestCase):
 
         # Now import it.
         olx_element = lxml.etree.fromstring(exported_olx)
-        id_generator = Mock()
-        imported_split_test_block = SplitTestBlock.parse_xml(olx_element, runtime, None, id_generator)
+        imported_split_test_block = SplitTestBlock.parse_xml(olx_element, runtime, None)
 
         # Check the new XBlock has the same properties as the old one.
         assert imported_split_test_block.display_name == split_test_block.display_name

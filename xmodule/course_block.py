@@ -1166,8 +1166,8 @@ class CourseBlock(
         return policy_str
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
-        instance = super().parse_xml(node, runtime, keys, id_generator)
+    def parse_xml(cls, node, runtime, keys):
+        instance = super().parse_xml(node, runtime, keys)
 
         policy_dir = None
         url_name = node.get('url_name')

@@ -2027,7 +2027,8 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         xml_object = etree.fromstring(xml_data)
         id_generator = Mock()
         id_generator.target_course_id = "test_course_id"
-        video = self.block.parse_xml(xml_object, module_system, None, id_generator)
+        module_system.id_generator = id_generator
+        video = self.block.parse_xml(xml_object, module_system, None)
 
         assert video.edx_video_id == 'test_edx_video_id'
         video_data = get_video_info(video.edx_video_id)
@@ -2075,12 +2076,11 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         xml_data = """<video><video_asset></video_asset></video>"""
         xml_object = etree.fromstring(xml_data)
         module_system = DummySystem(load_error_blocks=True)
-        id_generator = Mock()
 
         # Verify edx_video_id is empty before.
         assert self.block.edx_video_id == ''
 
-        video = self.block.parse_xml(xml_object, module_system, None, id_generator)
+        video = self.block.parse_xml(xml_object, module_system, None)
 
         # Verify edx_video_id is populated after the import.
         assert video.edx_video_id != ''
@@ -2112,7 +2112,6 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         )
         xml_object = etree.fromstring(xml_data)
         module_system = DummySystem(load_error_blocks=True)
-        id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
         module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
@@ -2128,7 +2127,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         # Verify edx_video_id is empty before.
         assert self.block.edx_video_id == ''
 
-        video = self.block.parse_xml(xml_object, module_system, None, id_generator)
+        video = self.block.parse_xml(xml_object, module_system, None)
 
         # Verify edx_video_id is populated after the import.
         assert video.edx_video_id != ''
@@ -2218,7 +2217,6 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         language_code = 'en'
 
         module_system = DummySystem(load_error_blocks=True)
-        id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
         module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
@@ -2270,7 +2268,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         # Verify edx_video_id is empty before import.
         assert self.block.edx_video_id == ''
 
-        video = self.block.parse_xml(xml_object, module_system, None, id_generator)
+        video = self.block.parse_xml(xml_object, module_system, None)
 
         # Verify edx_video_id is not empty after import.
         assert video.edx_video_id != ''
@@ -2298,7 +2296,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         """
         xml_object = etree.fromstring(xml_data)
         with pytest.raises(ValCannotCreateError):
-            VideoBlock.parse_xml(xml_object, module_system, None, id_generator=Mock())
+            VideoBlock.parse_xml(xml_object, module_system, None)
         with pytest.raises(ValVideoNotFoundError):
             get_video_info("test_edx_video_id")
 
