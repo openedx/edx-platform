@@ -10,7 +10,6 @@ from mimetypes import guess_type
 from attrs import frozen, Factory
 from django.conf import settings
 from django.utils.translation import gettext as _
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
 from xblock.core import XBlock
@@ -501,15 +500,8 @@ def _get_usage_key_from_node(node, parent_id: str) -> UsageKey | None:
 
     If the parent_id is not a valid UsageKey, or there's no "url_name" attribute in the node, then will return None.
     """
-    try:
-        parent_key = UsageKey.from_string(parent_id)
-        # We're constructing a CourseKey here because they support make_usage_key,
-        # but this will work even if the parent context_key is a library,
-        # cf opaque_keys test_lib_key_make_usage_key
-        parent_context = CourseKey.from_string(str(parent_key.context_key))
-    except InvalidKeyError:
-        log.warning("Invalid usage key provided: %s", parent_id)
-
+    parent_key = UsageKey.from_string(parent_id)
+    parent_context = parent_key.context_key
     usage_key = None
     block_id = node.attrib.get("url_name")
     block_type = node.tag
