@@ -12,6 +12,7 @@ from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.support.models import CourseResetAudit
+from lms.djangoapps.grades.api import clear_user_course_grades
 
 log = logging.getLogger(__name__)
 
@@ -74,6 +75,8 @@ def reset_student_course(course_id, learner_email, reset_by_user_email):
 
         # Clear block completion data
         BlockCompletion.objects.clear_learning_context_completion(user, course.id)
+        # Clear a student grades for a course
+        clear_user_course_grades(user.id, course.id)
 
         update_audit_status(course_reset_audit, CourseResetAudit.CourseResetStatus.COMPLETE)
     except Exception as e:  # pylint: disable=broad-except
