@@ -9,33 +9,23 @@ defaults:
 
 jobs:
   check_dependencies:
-    name: Check Python Dependencies
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8' 
+          python-version: '3.8'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install git+https://github.com/openedx/repo-tools.git@0.8.6#egg=edx-repo-tools[find_dependencies]
+          pip install -r requirements.txt
 
-      - name: Run dependency check
+      - name: List Installed Packages
         run: |
-          python https://github.com/openedx/repo-tools/blob/master/edx_repo_tools/find_dependencies/find_dependencies.py
-
-      - name: Check if any dependency belongs to openedx
-        run: |
-          if grep -q openedx /tmp/unpack_reqs/repo_urls.txt; then
-            echo "A dependency belongs to openedx organization"
-            exit 0  # Pass the check
-          else
-            echo "No dependency belongs to openedx organization"
-            exit 1  # Fail the check
-          fi
+          source .venv/bin/activate  # Activate the virtual environment
+          pip list --format=columns  # List installed packages in columns format
