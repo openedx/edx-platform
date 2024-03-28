@@ -28,7 +28,7 @@ jobs:
 
       - name: Run dependency check
         run: |
-          python finding_dependency.py
+          python https://github.com/openedx/repo-tools/blob/master/edx_repo_tools/find_dependencies/find_dependencies.py
 
       - name: Check if any dependency belongs to openedx
         run: |
