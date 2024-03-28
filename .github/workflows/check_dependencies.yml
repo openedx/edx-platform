@@ -29,7 +29,8 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: List Installed Packages
+      - name: Activate Virtual Environment and List Installed Packages with Source URLs
         run: |
           source .venv/bin/activate  # Activate the virtual environment
+          pip install --upgrade pip
           pip list --format=columns --verbose | grep -E 'Package:|Location:|Source:'
