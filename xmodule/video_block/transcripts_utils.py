@@ -185,11 +185,11 @@ def get_transcript_link_from_youtube(youtube_id):
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
             caption_links = {}
             for caption in caption_tracks:
-                if "languageCode" in caption.keys():
-                    language_code = caption['languageCode']
+                language_code = caption.get('languageCode', None)
+                if language_code and not language_code == 'None':
                     link = caption.get("baseUrl")
                     caption_links[language_code] = link
-            return caption_links
+            return None if not caption_links else caption_links
         return None
     except ConnectionError:
         return None

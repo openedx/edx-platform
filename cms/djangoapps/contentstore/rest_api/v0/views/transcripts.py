@@ -69,6 +69,7 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
 
         return delete_video_transcript_or_404(request)
 
+
 @view_auth_classes()
 class YoutubeTranscriptCheckView(DeveloperErrorViewMixin, RetrieveAPIView):
     """
@@ -91,6 +92,7 @@ class YoutubeTranscriptCheckView(DeveloperErrorViewMixin, RetrieveAPIView):
         Get the status of youtube transcripts for a given youtube video
         """
         return check_transcripts(request)
+
 
 @view_auth_classes()
 class YoutubeTranscriptUploadView(DeveloperErrorViewMixin, RetrieveAPIView):
