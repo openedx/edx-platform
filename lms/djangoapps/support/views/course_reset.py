@@ -160,5 +160,5 @@ class CourseResetAPIView(APIView):
             'display_name': course_enrollment.course_overview.display_name
         }
 
-        reset_student_course.delay(course_id, user.id, request.user.id)
+        reset_student_course.delay(course_id, user.email, request.user.email)
         return Response(resp, status=201)
