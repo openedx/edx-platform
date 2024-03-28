@@ -44,6 +44,16 @@ class ResetStudentCourse(TestSubmittingProblems):
         self.p3 = ''
         self.video = ''
 
+        # Patch BlockCompletion for the whole test
+        completion_patcher = patch('lms.djangoapps.support.tasks.BlockCompletion')
+        self.mock_block_completion = completion_patcher.start()
+        self.addCleanup(completion_patcher.stop)
+
+    @property
+    def mock_clear_block_completion(self):
+        """ Helper property to access the two-mock-layers-deep clear_learning_context_completion """
+        return self.mock_block_completion.objects.clear_learning_context_completion
+
     def basic_setup(self):
         """
         Set up a simple course for testing basic grading functionality.
@@ -133,6 +143,7 @@ class ResetStudentCourse(TestSubmittingProblems):
                 )
             ])
 
+            self.mock_clear_block_completion.assert_called_once_with(self.student_user, self.course.id)
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNotNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.COMPLETE)
@@ -169,6 +180,7 @@ class ResetStudentCourse(TestSubmittingProblems):
                 )
             ])
 
+            self.mock_clear_block_completion.assert_called_once_with(self.student_user, self.course.id)
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertRaises(StudentModule.DoesNotExist, mock_reset_student_attempts)
             self.assertIsNotNone(course_reset_audit.completed_at)
@@ -182,6 +194,7 @@ class ResetStudentCourse(TestSubmittingProblems):
         ):
             reset_student_course(self.course_id, self.student_user.email, self.user.email)
             mock_reset_student_attempts.assert_not_called()
+            self.mock_clear_block_completion.assert_not_called()
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.FAILED)
@@ -194,6 +207,7 @@ class ResetStudentCourse(TestSubmittingProblems):
             self.basic_setup()
             reset_student_course(self.course_id, self.student_user.email, self.user.email)
             mock_reset_student_attempts.assert_called_once()
+            self.mock_clear_block_completion.assert_not_called()
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.FAILED)

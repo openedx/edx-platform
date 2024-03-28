@@ -3,6 +3,7 @@
 from datetime import datetime
 import logging
 from celery import shared_task
+from completion.models import BlockCompletion
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.student.models.course_enrollment import CourseEnrollment
@@ -56,11 +57,17 @@ def reset_student_course(course_id, learner_email, reset_by_user_email):
     try:
         course = get_course(course_overview.id, depth=4)
         blocks = get_blocks(course)
+
+        # Clear student state and score
         for data in blocks:
             try:
                 reset_student_attempts(course.id, user, data.scope_ids.usage_id, reset_by_user, True)
             except StudentModule.DoesNotExist:
                 pass
+
+        # Clear block completion data
+        BlockCompletion.objects.clear_learning_context_completion(user, course.id)
+
         update_audit_status(course_reset_audit, CourseResetAudit.CourseResetStatus.COMPLETE)
     except Exception as e:  # pylint: disable=broad-except
         logging.exception(f'Error occurred for Course Audit with ID {course_reset_audit.id}: {e}.')

@@ -53,10 +53,13 @@ pull_xblock_translations:  ## pull xblock translations via atlas
 	python manage.py lms compile_xblock_translations
 	python manage.py cms compile_xblock_translations
 
-pull_translations: ## pull translations via atlas
-	# Clean up the existing translations
-	git clean -fdX conf/locale
+clean_translations: ## Remove existing translations to prepare for a fresh pull
+	# Removes core edx-platform translations but keeps config files and Esperanto (eo) test translations
+	find conf/locale -mindepth 1 -maxdepth 1 -type d -a ! -name eo -exec rm -rf {} +
+	# Removes the xblocks/plugins and js-compiled translations
 	rm -rf conf/plugins-locale cms/static/js/i18n/ lms/static/js/i18n/ cms/static/js/xblock.v1-i18n/ lms/static/js/xblock.v1-i18n/
+
+pull_translations: clean_translations  ## pull translations via atlas
 	make pull_xblock_translations
 	make pull_plugin_translations
 	atlas pull $(ATLAS_OPTIONS) \
