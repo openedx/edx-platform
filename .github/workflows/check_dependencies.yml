@@ -32,4 +32,4 @@ jobs:
       - name: List Installed Packages
         run: |
           source .venv/bin/activate  # Activate the virtual environment
-          pip list --format=columns --verbose  # List installed packages with verbose output
+          pip list --format=columns --verbose | grep -E 'Package:|Location:|Source:'
