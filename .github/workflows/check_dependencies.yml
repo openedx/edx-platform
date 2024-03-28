@@ -1,0 +1,35 @@
+name: Check Python Dependencies
+
+on:
+  pull_request:
+    
+defaults:
+  run:
+    shell: bash # strict bash
+
+jobs:
+  check_dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Create Virtual Environment
+        run: python -m venv .venv
+
+      - name: Install Dependencies
+        run: |
+          source .venv/bin/activate  # Activate the virtual environment
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: List Installed Packages
+        run: |
+          source .venv/bin/activate  # Activate the virtual environment
+          pip list --format=columns --verbose | grep -E 'Package:|Location:|Source:'
