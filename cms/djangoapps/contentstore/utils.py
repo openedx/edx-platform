@@ -91,12 +91,12 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_uploads_page,
     use_new_custom_pages,
     use_tagging_taxonomy_list_page,
-    # use_xpert_translations_component,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from xmodule.library_tools import LibraryToolsService
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1260,8 +1260,16 @@ def load_services_for_studio(runtime, user):
 
 def update_course_details(request, course_key, payload, course_block):
     """
-    Utils is used to update course details.
-    It is used for both DRF and django views.
+    Utility function used to update course details. It is used for both DRF and legacy Django views.
+
+    Args:
+        request (WSGIRequest): Django HTTP request object
+        course_key (CourseLocator): The course run key
+        payload (dict): Dictionary of course run settings
+        course_block (CourseBlockWithMixins): A course run instance
+
+    Returns:
+        None
     """
 
     from .views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
@@ -1287,10 +1295,9 @@ def update_course_details(request, course_key, payload, course_block):
                 if milestone["namespace"] != entrance_exam_namespace:
                     remove_prerequisite_course(course_key, milestone)
 
-    # If the entrance exams feature has been enabled, we'll need to check for some
-    # feature-specific settings and handle them accordingly
-    # We have to be careful that we're only executing the following logic if we actually
-    # need to create or delete an entrance exam from the specified course
+    # If the entrance exams feature has been enabled, we'll need to check for some feature-specific settings and handle
+    # them accordingly. We have to be careful that we're only executing the following logic if we actually need to
+    # create or delete an entrance exam from the specified course
     if core_toggles.ENTRANCE_EXAMS.is_enabled():
         course_entrance_exam_present = course_block.entrance_exam_enabled
         entrance_exam_enabled = payload.get('entrance_exam_enabled', '') == 'true'
@@ -1312,11 +1319,21 @@ def update_course_details(request, course_key, payload, course_block):
             # If there's no entrance exam defined, we'll create a new one
             else:
                 create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
-
-        # If the entrance exam box on the settings screen has been unchecked,
-        # and the course has an entrance exam attached...
+        # If the entrance exam box on the settings screen has been unchecked, and the course has an entrance exam
+        # attached...
         elif not entrance_exam_enabled and course_entrance_exam_present:
             delete_entrance_exam(request, course_key)
+
+    # Fix any potential issues with the display behavior and availability date of certificates before saving the update.
+    # A self-paced course run should *never* have a display behavior of anything other than "Immediately Upon Passing"
+    # ("early_no_info") and does not support having a certificate available date. We are aware of an issue with the
+    # legacy Django template-based frontend where bad data is allowed to creep into the system, which can cause
+    # downstream services (e.g. the Credentials IDA) to go haywire. This bad data is most often seen when a course run
+    # is updated from instructor-paced to self-paced (self_paced == True in our JSON payload), so we check and fix
+    # during these updates. Otherwise, the legacy UI seems to do the right thing.
+    if "self_paced" in payload and payload["self_paced"]:
+        payload["certificate_available_date"] = None
+        payload["certificates_display_behavior"] = CertificatesDisplayBehaviors.EARLY_NO_INFO
 
     # Perform the normal update workflow for the CourseDetails model
     return CourseDetails.update_from_json(course_key, payload, request.user)
@@ -1578,6 +1595,49 @@ def get_course_context(request):
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
     return active_courses, archived_courses, in_process_course_actions
+
+
+def get_course_context_v2(request):
+    """Get context of the homepage course tab from the Studio Home."""
+
+    # Importing here to avoid circular imports:
+    # ImportError: cannot import name 'reverse_course_url' from partially initialized module
+    # 'cms.djangoapps.contentstore.utils' (most likely due to a circular import)
+    from cms.djangoapps.contentstore.views.course import (
+        get_courses_accessible_to_user,
+        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
+    )
+
+    def format_in_process_course_view(uca):
+        """
+        Return a dict of the data which the view requires for each unsucceeded course.
+
+        Args:
+            uca: CourseRerunUIStateManager object.
+        """
+        return {
+            'display_name': uca.display_name,
+            'course_key': str(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
+            'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
+                uca.course_key,
+                kwargs={
+                    'action_state_id': uca.id,
+                },
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+        }
+
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    org = request.GET.get('org', '') if optimization_enabled else None
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+    return courses_iter, in_process_course_actions
 
 
 def get_home_context(request, no_course=False):
@@ -1970,6 +2030,146 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
         'is_fullwidth_content': is_library_xblock,
         'course_sequence_ids': course_sequence_ids,
     }
+    return context
+
+
+def get_textbooks_context(course):
+    """
+    Utils is used to get context for textbooks for course.
+    It is used for both DRF and django views.
+    """
+
+    upload_asset_url = reverse_course_url('assets_handler', course.id)
+    textbook_url = reverse_course_url('textbooks_list_handler', course.id)
+    return {
+        'context_course': course,
+        'textbooks': course.pdf_textbooks,
+        'upload_asset_url': upload_asset_url,
+        'textbook_url': textbook_url,
+    }
+
+
+def get_certificates_context(course, user):
+    """
+    Utils is used to get context for container xblock requests.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.certificates import CertificateManager
+
+    course_key = course.id
+    certificate_url = reverse_course_url('certificates_list_handler', course_key)
+    course_outline_url = reverse_course_url('course_handler', course_key)
+    upload_asset_url = reverse_course_url('assets_handler', course_key)
+    activation_handler_url = reverse_course_url(
+        handler_name='certificate_activation_handler',
+        course_key=course_key
+    )
+    course_modes = [
+        mode.slug for mode in CourseMode.modes_for_course(
+            course_id=course_key, include_expired=True
+        ) if mode.slug != 'audit'
+    ]
+
+    has_certificate_modes = len(course_modes) > 0
+
+    if has_certificate_modes:
+        certificate_web_view_url = get_lms_link_for_certificate_web_view(
+            course_key=course_key,
+            mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
+        )
+    else:
+        certificate_web_view_url = None
+
+    is_active, certificates = CertificateManager.is_activated(course)
+    context = {
+        'context_course': course,
+        'certificate_url': certificate_url,
+        'course_outline_url': course_outline_url,
+        'upload_asset_url': upload_asset_url,
+        'certificates': certificates,
+        'has_certificate_modes': has_certificate_modes,
+        'course_modes': course_modes,
+        'certificate_web_view_url': certificate_web_view_url,
+        'is_active': is_active,
+        'is_global_staff': GlobalStaff().has_user(user),
+        'certificate_activation_handler_url': activation_handler_url,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
+    }
+
+    return context
+
+
+def get_group_configurations_context(course, store):
+    """
+    Utils is used to get context for course's group configurations.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.course_group_config import (
+        COHORT_SCHEME, ENROLLMENT_SCHEME, GroupConfiguration, RANDOM_SCHEME
+    )
+    from cms.djangoapps.contentstore.views.course import (
+        are_content_experiments_enabled
+    )
+    from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+
+    course_key = course.id
+    group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+    course_outline_url = reverse_course_url('course_handler', course_key)
+    should_show_experiment_groups = are_content_experiments_enabled(course)
+    if should_show_experiment_groups:
+        experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(store, course)
+    else:
+        experiment_group_configurations = None
+
+    all_partitions = GroupConfiguration.get_all_user_partition_details(store, course)
+    should_show_enrollment_track = False
+    has_content_groups = False
+    displayable_partitions = []
+    for partition in all_partitions:
+        partition['read_only'] = getattr(UserPartition.get_scheme(partition['scheme']), 'read_only', False)
+
+        if partition['scheme'] == COHORT_SCHEME:
+            has_content_groups = True
+            displayable_partitions.append(partition)
+        elif partition['scheme'] == CONTENT_TYPE_GATING_SCHEME:
+            # Add it to the front of the list if it should be shown.
+            if ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
+                displayable_partitions.append(partition)
+        elif partition['scheme'] == ENROLLMENT_SCHEME:
+            should_show_enrollment_track = len(partition['groups']) > 1
+
+            # Add it to the front of the list if it should be shown.
+            if should_show_enrollment_track:
+                displayable_partitions.insert(0, partition)
+        elif partition['scheme'] != RANDOM_SCHEME:
+            # Experiment group configurations are handled explicitly above. We don't
+            # want to display their groups twice.
+            displayable_partitions.append(partition)
+
+    # Set the sort-order. Higher numbers sort earlier
+    scheme_priority = defaultdict(lambda: -1, {
+        ENROLLMENT_SCHEME: 1,
+        CONTENT_TYPE_GATING_SCHEME: 0
+    })
+    displayable_partitions.sort(key=lambda p: scheme_priority[p['scheme']], reverse=True)
+    # Add empty content group if there is no COHORT User Partition in the list.
+    # This will add ability to add new groups in the view.
+    if not has_content_groups:
+        displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
+
+    context = {
+        'context_course': course,
+        'group_configuration_url': group_configuration_url,
+        'course_outline_url': course_outline_url,
+        'experiment_group_configurations': experiment_group_configurations,
+        'should_show_experiment_groups': should_show_experiment_groups,
+        'all_group_configurations': displayable_partitions,
+        'should_show_enrollment_track': should_show_enrollment_track,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
+    }
+
     return context
 
 

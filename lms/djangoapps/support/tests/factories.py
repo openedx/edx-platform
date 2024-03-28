@@ -26,4 +26,5 @@ class CourseResetAuditFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
     course_enrollment = factory.SubFactory(CourseEnrollmentFactory)
     reset_by = factory.SubFactory(UserFactory)
     status = CourseResetAudit.CourseResetStatus.ENQUEUED
+    comment = factory.Sequence(lambda i: f'comment {i}')
     completed_at = None

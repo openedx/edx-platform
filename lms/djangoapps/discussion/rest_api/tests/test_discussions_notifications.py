@@ -54,6 +54,8 @@ class TestDiscussionNotificationSender(unittest.TestCase):
         self.assertEqual(audience_filters, {
             'discussion_roles': ['Administrator', 'Moderator', 'Community TA']
         })
+        self.assertEqual(len(audience_filters), 1)
+        self.assertEqual(list(audience_filters.keys()), ['discussion_roles'])
 
     def test_send_reported_content_notification_for_response(self, mock_send_notification, mock_create_audience):
         """
