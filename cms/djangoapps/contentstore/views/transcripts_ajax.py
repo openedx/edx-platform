@@ -352,7 +352,9 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
                         item.runtime.service(item, "i18n")
                     )
                     for (_, link) in transcript_links.items():
-                        youtube_server_subs = get_transcript_from_youtube(link, youtube_id, item.runtime.service(item, "i18n"))
+                        youtube_server_subs = get_transcript_from_youtube(
+                            link, youtube_id, item.runtime.service(item, "i18n")
+                        )
                         if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
                             transcripts_presence['youtube_diff'] = False
                 except GetTranscriptsFromYouTubeException:
