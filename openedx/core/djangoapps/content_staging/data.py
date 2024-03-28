@@ -42,6 +42,7 @@ class StagedContentData:
     status: StagedContentStatus = field(validator=validators.in_(StagedContentStatus), converter=StagedContentStatus)
     block_type: str = field(validator=validators.instance_of(str))
     display_name: str = field(validator=validators.instance_of(str))
+    tags: dict = field(validator=validators.optional(validators.instance_of(dict)))
 
 
 @frozen

@@ -41,7 +41,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="course",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.course_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.course_tags],
             },
         )
 
@@ -58,8 +58,8 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="sequential",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.sequential_tags1),
-                self.taxonomy_2.id: list(self.sequential_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.sequential_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.sequential_tags2],
             },
         )
 
@@ -108,7 +108,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="vertical",
             children=[],
             object_tags={
-                self.taxonomy_2.id: list(self.vertical1_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.vertical1_tags],
             },
         )
         assert tagged_sequential.children is not None  # type guard
@@ -140,7 +140,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="html",
             children=[],
             object_tags={
-                self.taxonomy_2.id: list(self.html_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.html_tags],
             },
         )
         assert untagged_vertical2.children is not None  # type guard
@@ -169,7 +169,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="library",
             children=[],
             object_tags={
-                self.taxonomy_2.id: list(self.library_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.library_tags],
             },
         )
 
@@ -184,7 +184,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="problem",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.problem1_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.problem1_tags],
             },
         )
 
@@ -212,8 +212,8 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="html",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.library_html_tags1),
-                self.taxonomy_2.id: list(self.library_html_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.library_html_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.library_html_tags2],
             },
         )
 

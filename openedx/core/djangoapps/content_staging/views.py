@@ -145,6 +145,7 @@ class ClipboardEndpoint(APIView):
                 olx=block_data.olx_str,
                 display_name=block_metadata_utils.display_name_with_default(block),
                 suggested_url_name=usage_key.block_id,
+                tags=block_data.tags,
             )
             (clipboard, _created) = UserClipboard.objects.update_or_create(user=request.user, defaults={
                 "content": staged_content,

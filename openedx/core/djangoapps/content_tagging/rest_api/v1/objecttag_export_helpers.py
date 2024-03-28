@@ -15,7 +15,7 @@ import openedx.core.djangoapps.content_libraries.api as library_api
 from openedx.core.djangoapps.content_libraries.api import LibraryXBlockMetadata
 from xmodule.modulestore.django import modulestore
 
-from ...types import ObjectTagByObjectIdDict, ObjectTagByTaxonomyIdDict
+from ...types import TagValuesByObjectIdDict, TagValuesByTaxonomyIdDict
 
 
 @define
@@ -26,7 +26,7 @@ class TaggedContent:
     display_name: str
     block_id: str
     category: str
-    object_tags: ObjectTagByTaxonomyIdDict
+    object_tags: TagValuesByTaxonomyIdDict
     children: list[TaggedContent] | None
 
 
@@ -43,7 +43,7 @@ def iterate_with_level(
 
 
 def _get_course_tagged_object_and_children(
-    course_key: CourseKey, object_tag_cache: ObjectTagByObjectIdDict
+    course_key: CourseKey, object_tag_cache: TagValuesByObjectIdDict
 ) -> tuple[TaggedContent, list[XBlock]]:
     """
     Returns a TaggedContent with course metadata with its tags, and its children.
@@ -68,7 +68,7 @@ def _get_course_tagged_object_and_children(
 
 
 def _get_library_tagged_object_and_children(
-    library_key: LibraryLocatorV2, object_tag_cache: ObjectTagByObjectIdDict
+    library_key: LibraryLocatorV2, object_tag_cache: TagValuesByObjectIdDict
 ) -> tuple[TaggedContent, list[LibraryXBlockMetadata]]:
     """
     Returns a TaggedContent with library metadata with its tags, and its children.
@@ -97,7 +97,7 @@ def _get_library_tagged_object_and_children(
 
 
 def _get_xblock_tagged_object_and_children(
-    usage_key: UsageKey, object_tag_cache: ObjectTagByObjectIdDict
+    usage_key: UsageKey, object_tag_cache: TagValuesByObjectIdDict
 ) -> tuple[TaggedContent, list[XBlock]]:
     """
     Returns a TaggedContent with xblock metadata with its tags, and its children.
@@ -117,7 +117,7 @@ def _get_xblock_tagged_object_and_children(
 
 
 def _get_library_block_tagged_object(
-    library_block: LibraryXBlockMetadata, object_tag_cache: ObjectTagByObjectIdDict
+    library_block: LibraryXBlockMetadata, object_tag_cache: TagValuesByObjectIdDict
 ) -> tuple[TaggedContent, None]:
     """
     Returns a TaggedContent with library content block metadata and its tags,
@@ -137,7 +137,7 @@ def _get_library_block_tagged_object(
 
 def build_object_tree_with_objecttags(
     content_key: LibraryLocatorV2 | CourseKey,
-    object_tag_cache: ObjectTagByObjectIdDict,
+    object_tag_cache: TagValuesByObjectIdDict,
 ) -> TaggedContent:
     """
     Returns the object with the tags associated with it.

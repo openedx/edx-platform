@@ -34,6 +34,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
+from openedx.core.djangoapps.content_tagging.utils import rules_cache
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 
@@ -284,6 +285,9 @@ class TestTaxonomyObjectsMixin:
         self._setUp_library()
         self._setUp_users()
         self._setUp_taxonomies()
+
+        # Clear the rules cache in between test runs to keep query counts consistent.
+        rules_cache.clear()
 
 
 @skip_unless_cms

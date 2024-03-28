@@ -89,7 +89,6 @@ from openedx_learning.core.publishing import api as publishing_api
 from openedx_learning.core.contents import api as contents_api
 from openedx_learning.core.components import api as components_api
 from openedx_learning.core.components.models import Component
-from openedx_tagging.core.tagging import api as tagging_api
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -597,9 +596,12 @@ def _get_library_component_tags_count(library_key) -> dict:
     """
     Get the count of tags that are applied to each component in this library, as a dict.
     """
+    # Import content_tagging.api here to avoid circular imports
+    from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
+
     # Create a pattern to match the IDs of the library components, e.g. "lb:org:id*"
     library_key_pattern = str(library_key).replace("lib:", "lb:", 1) + "*"
-    return tagging_api.get_object_tag_counts(library_key_pattern, count_implicit=True)
+    return get_object_tag_counts(library_key_pattern, count_implicit=True)
 
 
 def get_library_components(library_key, text_search=None, block_types=None) -> QuerySet[Component]:

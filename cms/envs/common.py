@@ -129,7 +129,6 @@ from django.urls import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
-from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
@@ -996,7 +995,6 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,
-    TaggedBlockMixin,
 )
 XBLOCK_EXTRA_MIXINS = ()
 

@@ -39,6 +39,7 @@ def get_user_clipboard(user_id: int, only_ready: bool = True) -> UserClipboardDa
             status=content.status,
             block_type=content.block_type,
             display_name=content.display_name,
+            tags=content.tags,
         ),
         source_usage_key=clipboard.source_usage_key,
     )
