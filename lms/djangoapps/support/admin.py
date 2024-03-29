@@ -44,6 +44,7 @@ class CourseResetAuditAdmin(admin.ModelAdmin):
         'reset_by',
         'comment'
     ]
+    actions = ['mark_failed']
 
     def get_readonly_fields(self, request, obj=None):
         """
@@ -66,6 +67,10 @@ class CourseResetAuditAdmin(admin.ModelAdmin):
     @admin.display(description="user")
     def user(self, obj):
         return obj.course_enrollment.user
+
+    @admin.action(description="Fail selected reset attempts")
+    def mark_failed(self, request, queryset):
+        queryset.update(status=CourseResetAudit.CourseResetStatus.FAILED)
 
 
 admin.site.register(CourseResetCourseOptIn, CourseResetCourseOptInAdmin)
