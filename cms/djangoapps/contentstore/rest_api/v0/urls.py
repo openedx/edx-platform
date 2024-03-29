@@ -47,7 +47,7 @@ urlpatterns = [
 
     # Authoring API
     re_path(
-        fr'^heartbeat$', heartbeat, name='heartbeat'
+        r'^heartbeat$', heartbeat, name='heartbeat'
     ),
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
