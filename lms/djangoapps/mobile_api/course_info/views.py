@@ -11,14 +11,16 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
+from common.djangoapps.student.models import CourseEnrollment, User as StudentUser
 from common.djangoapps.static_replace import make_static_urls_absolute
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
-from lms.djangoapps.mobile_api.course_info.serializers import CourseInfoOverviewSerializer, CourseAccessSerializer
+from lms.djangoapps.mobile_api.course_info.serializers import CourseInfoOverviewSerializer, CourseAccessSerializer, MobileCourseEnrollmentSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
@@ -28,7 +30,7 @@ from ..decorators import mobile_course_access, mobile_view
 User = get_user_model()
 log = logging.getLogger(__name__)
 
-UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
+UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser, StudentUser]
 
 
 @mobile_view()
@@ -320,7 +322,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
     def list(self, request, **kwargs):  # pylint: disable=W0221
         """
         REST API endpoint for listing all the blocks information in the course and
-        information about the course while regarding user access and roles.
+        information about the course considering user access and roles.
 
         Arguments:
             request - Django request object
@@ -329,23 +331,48 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         response = super().list(request, kwargs)
 
         if request.GET.get('return_type', 'dict') == 'dict':
+            api_version = self.kwargs.get('api_version')
             course_id = request.query_params.get('course_id', None)
             course_key = CourseKey.from_string(course_id)
             course_overview = CourseOverview.get_from_id(course_key)
             requested_username = request.query_params.get('username', None)
 
             course_data = {
-                "id": course_id
+                'id': course_id,
+                'course_updates': reverse(
+                    'course-updates-list',
+                    kwargs={'api_version': api_version, 'course_id': course_id},
+                    request=request,
+                ),
+                'course_handouts': reverse(
+                    'course-handouts-list',
+                    kwargs={'api_version': api_version, 'course_id': course_id},
+                    request=request,
+                ),
             }
-            course_data.update(CourseInfoOverviewSerializer(course_overview).data)
+
+            course_info_context = {}
             if requested_user := self.get_requested_user(request.user, requested_username):
+                course_info_context = {
+                    'user': requested_user
+                }
+                user_enrollment = CourseEnrollment.get_enrollment(user=requested_user, course_key=course_key)
                 course_data.update({
-                    'certificate': self.get_certificate(request, requested_user, course_key),
-                    'coursewareAccess': CourseAccessSerializer({
-                        "user": requested_user,
-                        "course": course_overview,
-                        "course_id": course_key
+                    'discussion_url': reverse(
+                        'discussion_course',
+                        kwargs={'course_id': course_id},
+                        request=request,
+                    ) if course_overview.is_discussion_tab_enabled(requested_user) else None,
+                    'course_access_details': CourseAccessSerializer({
+                        'user': requested_user,
+                        'course': course_overview,
+                        'course_id': course_key
                     }).data,
+                    'certificate': self.get_certificate(request, requested_user, course_key),
+                    'enrollment_details': MobileCourseEnrollmentSerializer(user_enrollment).data,
                 })
+
+            course_data.update(CourseInfoOverviewSerializer(course_overview, context=course_info_context).data)
+
             response.data.update(course_data)
         return response

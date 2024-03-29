@@ -2,13 +2,20 @@
 Course Info serializers
 """
 from rest_framework import serializers
+from typing import Union
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.mobile_api.users.serializers import ModeSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 
 
 class CourseInfoOverviewSerializer(serializers.ModelSerializer):
@@ -21,6 +28,9 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
     org = serializers.CharField(source='display_org_with_default')
     is_self_paced = serializers.BooleanField(source='self_paced')
     media = serializers.SerializerMethodField()
+    course_sharing_utm_parameters = serializers.SerializerMethodField()
+    course_about = serializers.SerializerMethodField('get_course_about_url')
+    course_modes = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseOverview
@@ -34,11 +44,48 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             'end',
             'is_self_paced',
             'media',
+            'course_sharing_utm_parameters',
+            'course_about',
+            'course_modes',
         )
 
     @staticmethod
     def get_media(obj):
+        """
+        Return course images in the correct forrmat.
+        """
         return {'image': obj.image_urls}
+
+    def get_course_sharing_utm_parameters(self, obj):
+         return get_encoded_course_sharing_utm_params()
+
+    def get_course_about_url(self, course_overview):
+        return get_link_for_about_page(course_overview)
+
+    def get_course_modes(self, course_overview):
+        """
+        Retrieve course modes associated with the course.
+        """
+        course_modes = CourseMode.modes_for_course(
+            course_overview.id,
+            only_selectable=False
+        )
+        return [
+            ModeSerializer(mode).data
+            for mode in course_modes
+        ]
+
+
+class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the CourseEnrollment object used in the BlocksInfoInCourseView.
+    """
+
+    class Meta:
+        fields = ('created', 'mode', 'is_active')
+        model = CourseEnrollment
+        lookup_field = 'username'
+
 
 
 class CourseAccessSerializer(serializers.Serializer):
@@ -46,9 +93,11 @@ class CourseAccessSerializer(serializers.Serializer):
     Get info whether a user should be able to view course material.
     """
 
-    hasUnmetPrerequisites = serializers.SerializerMethodField(method_name="get_has_unmet_prerequisites")
-    isTooEarly = serializers.SerializerMethodField(method_name="get_is_too_early")
-    isStaff = serializers.SerializerMethodField(method_name="get_is_staff")
+    has_unmet_prerequisites = serializers.SerializerMethodField(method_name="get_has_unmet_prerequisites")
+    is_too_early = serializers.SerializerMethodField(method_name="get_is_too_early")
+    is_staff = serializers.SerializerMethodField(method_name="get_is_staff")
+    audit_access_expires = serializers.SerializerMethodField()
+    courseware_access = serializers.SerializerMethodField()
 
     def get_has_unmet_prerequisites(self, data: dict) -> bool:
         """
@@ -67,3 +116,20 @@ class CourseAccessSerializer(serializers.Serializer):
         Determine whether a user has staff access to this course.
         """
         return any(administrative_accesses_to_course_for_user(data.get("user"), data.get("course_id")))
+    def get_audit_access_expires(self, data: dict) -> Union[str, None]:
+        """
+        Returns expiration date for a course audit expiration, if any or null
+        """
+        return get_user_course_expiration_date(data.get('user'), data.get('course'))
+
+    def get_courseware_access(self, data: dict) -> dict:
+        """
+        Determine if the learner has access to the course, otherwise show error message.
+        """
+        return has_access(
+                data.get('user'),
+                'load_mobile',
+                data.get('course')
+            ).to_json()
+
+
