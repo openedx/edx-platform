@@ -123,15 +123,15 @@ class CapaFactory:
             # since everything else is a string.
             field_data['attempts'] = int(attempts)
 
-        system = get_test_system(
+        runtime = get_test_system(
             course_id=location.course_key,
             user_is_staff=kwargs.get('user_is_staff', False),
             render_template=render_template or Mock(return_value="<div>Test Template HTML</div>"),
         )
-        block = ProblemBlock(
-            system,
-            DictFieldData(field_data),
+        block = runtime.construct_xblock_from_class(
+            ProblemBlock,
             ScopeIds(None, 'problem', location, location),
+            DictFieldData(field_data),
         )
         assert block.lcp
 
