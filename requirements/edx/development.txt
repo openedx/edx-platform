@@ -343,7 +343,7 @@ distlib==0.3.7
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==4.2.10
+django==4.2.11
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

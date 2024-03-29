@@ -263,7 +263,7 @@ dill==0.3.7
     # via pylint
 distlib==0.3.7
     # via virtualenv
-django==4.2.10
+django==4.2.11
     # via
     #   -r requirements/edx/base.txt
     #   django-appconf
