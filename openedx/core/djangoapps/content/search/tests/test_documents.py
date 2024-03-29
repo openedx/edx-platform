@@ -2,6 +2,7 @@
 Tests for the Studio content search documents (what gets stored in the index)
 """
 from organizations.models import Organization
+
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.django import modulestore

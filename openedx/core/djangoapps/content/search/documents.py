@@ -2,11 +2,12 @@
 Utilities related to indexing content for search
 """
 from __future__ import annotations
-from hashlib import blake2b
+
 import logging
+from hashlib import blake2b
 
 from django.utils.text import slugify
-from opaque_keys.edx.keys import UsageKey, LearningContextKey
+from opaque_keys.edx.keys import LearningContextKey, UsageKey
 
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
@@ -62,7 +63,7 @@ class DocType:
     library_block = "library_block"
 
 
-def _meili_id_from_opaque_key(usage_key: UsageKey) -> str:
+def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     """
     Meilisearch requires each document to have a primary key that's either an
     integer or a string composed of alphanumeric characters (a-z A-Z 0-9),
@@ -88,7 +89,6 @@ def _fields_from_block(block) -> dict:
         {"content": {"display_name": "..."}, "content_type": "..."}
     """
     block_data = {
-        Fields.id: _meili_id_from_opaque_key(block.usage_key),
         Fields.usage_key: str(block.usage_key),
         Fields.block_id: str(block.usage_key.block_id),
         Fields.display_name: xblock_api.get_block_display_name(block),
@@ -196,33 +196,58 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     return {Fields.tags: result}
 
 
-def searchable_doc_for_library_block(metadata: lib_api.LibraryXBlockMetadata) -> dict:
+def searchable_doc_for_library_block(
+    xblock_metadata: lib_api.LibraryXBlockMetadata, include_metadata: bool = True, include_tags: bool = True
+) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, so that the given library block can be
     found using faceted search.
+
+    Args:
+        xblock_metadata: The XBlock component metadata to index
+        include_metadata: If True, include the block's metadata in the doc
+        include_tags: If True, include the block's tags in the doc
     """
-    library_name = lib_api.get_library(metadata.usage_key.context_key).title
-    doc = {}
-    try:
-        block = xblock_api.load_block(metadata.usage_key, user=None)
-    except Exception as err:  # pylint: disable=broad-except
-        log.exception(f"Failed to load XBlock {metadata.usage_key}: {err}")
-    doc.update(_fields_from_block(block))
-    doc.update(_tags_for_content_object(metadata.usage_key))
-    doc[Fields.type] = DocType.library_block
-    # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
-    doc[Fields.breadcrumbs] = [{"display_name": library_name}]
+    library_name = lib_api.get_library(xblock_metadata.usage_key.context_key).title
+    block = xblock_api.load_block(xblock_metadata.usage_key, user=None)
+
+    doc = {
+        Fields.id: meili_id_from_opaque_key(xblock_metadata.usage_key),
+        Fields.type: DocType.library_block,
+    }
+
+    if include_metadata:
+        doc.update(_fields_from_block(block))
+        # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
+        doc[Fields.breadcrumbs] = [{"display_name": library_name}]
+
+    if include_tags:
+        doc.update(_tags_for_content_object(xblock_metadata.usage_key))
+
     return doc
 
 
-def searchable_doc_for_course_block(block) -> dict:
+def searchable_doc_for_course_block(block, include_metadata: bool = True, include_tags: bool = True) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, so that the given course block can be
     found using faceted search.
+
+    Args:
+        block: The XBlock instance to index
+        include_metadata: If True, include the block's metadata in the doc
+        include_tags: If True, include the block's tags in the doc
     """
-    doc = _fields_from_block(block)
-    doc.update(_tags_for_content_object(block.usage_key))
-    doc[Fields.type] = DocType.course_block
+    doc = {
+        Fields.id: meili_id_from_opaque_key(block.usage_key),
+        Fields.type: DocType.course_block,
+    }
+
+    if include_metadata:
+        doc.update(_fields_from_block(block))
+
+    if include_tags:
+        doc.update(_tags_for_content_object(block.usage_key))
+
     return doc
