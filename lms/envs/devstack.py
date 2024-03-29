@@ -561,6 +561,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:1991',  # frontend-app-admin-portal
     'http://localhost:1999',  # frontend-app-authn
     'http://localhost:18450',  # frontend-app-support-tools
+    'http://localhost:1994',  # frontend-app-gradebook
 ]
 
 
