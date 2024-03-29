@@ -110,6 +110,7 @@ from xmodule.partitions.partitions_service import PartitionService
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -1907,6 +1908,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 versions_dict=source_index['versions'],
                 search_targets=source_index['search_targets'],
                 skip_auto_publish=True,
+                source_course_id=source_course_id,
                 **kwargs
             )
             # don't copy assets until we create the course in case something's awry
@@ -2037,8 +2039,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_id = versions_dict[master_branch]
             draft_version = CourseLocator(version_guid=new_id)
             draft_structure = self._lookup_course(draft_version).structure
-
+        
         locator = locator.replace(version_guid=new_id)
+
+        source_course_id = kwargs.get('source_course_id')
+
+        if source_course_id and str(source_course_id) == settings.DEFAULT_SITE_CREATION_COURSE_ID: 
+            course_block = draft_structure['blocks'].get(BlockKey(type='course', id='course'))
+            display_name = course_block.fields.get('display_name')
+            course_block.fields['display_name'] = f'{display_name} - {locator.org}'
+        
         with self.bulk_operations(locator):
             self.update_structure(locator, draft_structure)
             index_entry = {
