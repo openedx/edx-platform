@@ -180,19 +180,22 @@ def get_transcript_link_from_youtube(youtube_id):
     try:
         youtube_html = requests.get(f"{youtube_url_base}{youtube_id}")
         caption_re = settings.YOUTUBE['TRANSCRIPTS']['CAPTION_TRACKS_REGEX']
-        allowed_language_codes = settings.YOUTUBE['TRANSCRIPTS']['ALLOWED_LANGUAGE_CODES']
         caption_matched = re.search(caption_re, youtube_html.content.decode("utf-8"))
         if caption_matched:
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
+            caption_links = {}
             for caption in caption_tracks:
-                if "languageCode" in caption.keys() and caption["languageCode"] in allowed_language_codes:
-                    return caption.get("baseUrl")
+                language_code = caption.get('languageCode', None)
+                if language_code and not language_code == 'None':
+                    link = caption.get("baseUrl")
+                    caption_links[language_code] = link
+            return None if not caption_links else caption_links
         return None
     except ConnectionError:
         return None
 
 
-def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
+def get_transcript_links_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Gets transcripts from youtube for youtube_id.
 
@@ -202,18 +205,29 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     Returns (status, transcripts): bool, dict.
     """
     _ = i18n.gettext
+    transcript_links = get_transcript_link_from_youtube(youtube_id)
 
-    utf8_parser = etree.XMLParser(encoding='utf-8')
-
-    transcript_link = get_transcript_link_from_youtube(youtube_id)
-
-    if not transcript_link:
+    if not transcript_links:
         msg = _("Can't get transcript link from Youtube for {youtube_id}.").format(
             youtube_id=youtube_id,
         )
         raise GetTranscriptsFromYouTubeException(msg)
 
-    data = requests.get(transcript_link)
+    return transcript_links
+
+
+def get_transcript_from_youtube(link, youtube_id, i18n):
+    """
+    Gets transcripts from youtube for youtube_id.
+
+    Parses only utf-8 encoded transcripts.
+    Other encodings are not supported at the moment.
+
+    Returns (status, transcripts): bool, dict.
+    """
+    _ = i18n.gettext
+    utf8_parser = etree.XMLParser(encoding='utf-8')
+    data = requests.get(link)
 
     if data.status_code != 200 or not data.text:
         msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {status_code}.").format(
@@ -258,9 +272,12 @@ def download_youtube_subs(youtube_id, video_block, settings):  # lint-amnesty, p
     """
     i18n = video_block.runtime.service(video_block, "i18n")
     _ = i18n.gettext
-
-    subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
-    return json.dumps(subs, indent=2)
+    transcript_links = get_transcript_links_from_youtube(youtube_id, settings, i18n)
+    subs = []
+    for (language_code, link) in transcript_links.items():
+        sub = get_transcript_from_youtube(link, youtube_id, i18n)
+        subs.append([language_code, json.dumps(sub, indent=2)])
+    return subs
 
 
 def remove_subs_from_store(subs_id, item, lang='en'):
