@@ -4,6 +4,7 @@ from django.conf import settings
 from django.urls import re_path, path
 
 from openedx.core.constants import COURSE_ID_PATTERN
+from openedx.core.djangoapps.heartbeat.views import heartbeat
 
 from .views import (
     AdvancedCourseSettingsView,
@@ -45,6 +46,9 @@ urlpatterns = [
     ),
 
     # Authoring API
+    re_path(
+        fr'^heartbeat$', heartbeat, name='heartbeat'
+    ),
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
         assets.AssetsCreateRetrieveView.as_view(), name='cms_api_create_retrieve_assets'
