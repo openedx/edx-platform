@@ -72,7 +72,8 @@ class PollBlockTest(unittest.TestCase):
         '''
         node = etree.fromstring(sample_poll_xml)
 
-        output = PollBlock.parse_xml(node, module_system, self.scope_ids, id_generator)
+        module_system.id_generator = id_generator
+        output = PollBlock.parse_xml(node, module_system, self.scope_ids)
         # Update the answer with invalid character.
         invalid_characters_poll_answer = output.answers[0]
         # Invalid less-than character.
