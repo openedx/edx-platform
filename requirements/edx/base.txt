@@ -794,7 +794,7 @@ openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
-openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@chris/FAL-3604-import-export-courses
+openedx-learning==0.8.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
