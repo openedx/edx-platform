@@ -316,9 +316,9 @@ def _import_xml_node_to_parent(
     block_type = node.tag
 
     # Generate the new ID:
-    id_generator = ImportIdGenerator(parent_key.context_key)
-    def_id = id_generator.create_definition(block_type, slug_hint)
-    usage_id = id_generator.create_usage(def_id)
+    runtime.id_generator = ImportIdGenerator(parent_key.context_key)
+    def_id = runtime.id_generator.create_definition(block_type, slug_hint)
+    usage_id = runtime.id_generator.create_usage(def_id)
     keys = ScopeIds(None, block_type, def_id, usage_id)
     # parse_xml is a really messy API. We pass both 'keys' and 'id_generator' and, depending on the XBlock, either
     # one may be used to determine the new XBlock's usage key, and the other will be ignored. e.g. video ignores
