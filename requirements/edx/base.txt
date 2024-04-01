@@ -987,7 +987,7 @@ pyyaml==6.0.1
     #   xblock
 random2==1.0.2
     # via -r requirements/edx/kernel.in
-recommender-xblock==2.1.1
+recommender-xblock==2.2.0
     # via -r requirements/edx/bundled.in
 redis==5.0.1
     # via
