@@ -172,7 +172,7 @@ def get_all_object_tags(
 
     for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
         grouped_object_tags[object_id] = {}
-        block_tags_sorted = sorted(block_tags, key=lambda x: x.tag.taxonomy_id if x.tag else 0)
+        block_tags_sorted = sorted(block_tags, key=lambda x: x.tag.taxonomy_id if x.tag else 0)  # type: ignore
         for taxonomy_id, taxonomy_tags in groupby(block_tags_sorted, lambda x: x.tag.taxonomy_id if x.tag else 0):
             object_tags_list = list(taxonomy_tags)
             grouped_object_tags[object_id][taxonomy_id] = object_tags_list
