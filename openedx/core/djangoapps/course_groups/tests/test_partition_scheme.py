@@ -1,8 +1,5 @@
 """
-Test the partitions and partitions services. The partitions tested
-in this file are the following:
-- CohortPartitionScheme
-- TeamPartitionScheme
+Test the partitions and partitions service
 
 """
 
