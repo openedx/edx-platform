@@ -12,7 +12,8 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.teams.api import get_teams_in_teamset
 from lms.djangoapps.teams.models import CourseTeamMembership
-from openedx.core.djangoapps.course_groups.flags import CONTENT_GROUPS_FOR_TEAMS
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS
+
 from xmodule.partitions.partitions import (  # lint-amnesty, pylint: disable=wrong-import-order
     Group,
     UserPartition
@@ -24,7 +25,7 @@ log = logging.getLogger(__name__)
 
 
 class TeamUserPartition(UserPartition):
-    """Extends UserPartition to support dynamic gcreate_team_set_partition_with_course_idroups pulled from the current
+    """Extends UserPartition to support dynamic groups pulled from the current
     course teams.
 
     Class attributes:
@@ -134,7 +135,7 @@ class TeamPartitionScheme:
         # introduced.  In that case, we need to create a new partition with a
         # new team-set id.
         if not id:
-            return
+            return None
 
         team_set_partition = TeamUserPartition(
             id,

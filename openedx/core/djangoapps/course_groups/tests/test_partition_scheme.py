@@ -11,9 +11,9 @@ from unittest.mock import MagicMock, patch
 import django.test
 
 from lms.djangoapps.courseware.tests.test_masquerade import StaffMasqueradeTestCase
+from lms.djangoapps.teams.team_partition_scheme import TeamPartitionScheme
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
-from openedx.core.djangoapps.course_groups.partition_generator import create_team_set_partition_with_course_id
-from openedx.core.djangoapps.course_groups.team_partition_scheme import TeamPartitionScheme
+from openedx.core.lib.teams_config import create_team_set_partition_with_course_id
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory

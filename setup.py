@@ -107,7 +107,7 @@ setup(
             "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
             "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",  # lint-amnesty, pylint: disable=line-too-long
             "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
-            "team = openedx.core.djangoapps.course_groups.team_partition_scheme:TeamPartitionScheme",
+            "team = lms.djangoapps.teams.team_partition_scheme:TeamPartitionScheme",
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
@@ -183,7 +183,7 @@ setup(
         'openedx.dynamic_partition_generator': [
             'enrollment_track = xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition',
-            'team = openedx.core.djangoapps.course_groups.partition_generator:create_team_set_partition',
+            'team = openedx.core.lib.teams_config:create_team_set_partition',
         ],
         'xblock.v1': XBLOCKS,
         'xblock_asides.v1': XBLOCKS_ASIDES,
