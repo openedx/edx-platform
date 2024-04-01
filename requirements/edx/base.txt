@@ -420,7 +420,7 @@ edx-api-doc-tools==1.7.0
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
     #   openedx-blockstore
-edx-auth-backends==4.2.0
+edx-auth-backends==4.3.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
