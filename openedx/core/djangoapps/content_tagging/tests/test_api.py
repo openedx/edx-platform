@@ -8,7 +8,7 @@ from fs.osfs import OSFS
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocatorV2
-from openedx_tagging.core.tagging.models import Tag
+from openedx_tagging.core.tagging.models import Tag, ObjectTag
 from organizations.models import Organization
 from ..helpers.test_objecttag_export_helpers import TestGetAllObjectTagsMixin, TaggedCourseMixin
 
@@ -254,6 +254,50 @@ class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
             object_tags, taxonomies = api.get_all_object_tags(
                 CourseKey.from_string("course-v1:orgA+test_course+test_run")
             )
+
+        assert object_tags == self.expected_course_objecttags
+        assert taxonomies == {
+            self.taxonomy_1.id: self.taxonomy_1,
+            self.taxonomy_2.id: self.taxonomy_2,
+        }
+
+    def test_get_course_object_tags_with_add_tags(self):
+        """
+        This test checks for an issue in get_all_object_tags:
+        If new tags are added to those already added previously,
+        the previous tags are lost.
+        This happens because the new tags will overwrite the old ones
+        in the result.
+        """
+        # Tag in a new taxonomy
+        ObjectTag.objects.create(
+            object_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy=self.taxonomy_1,
+            tag=self.tag_1_1,
+        )
+        # Tag in a already tagged taxonomy
+        ObjectTag.objects.create(
+            object_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy=self.taxonomy_2,
+            tag=self.tag_2_1,
+        )
+
+        with self.assertNumQueries(1):
+            object_tags, taxonomies = api.get_all_object_tags(
+                CourseKey.from_string("course-v1:orgA+test_course+test_run")
+            )
+
+        # Add new object tags to the expected result
+        self.expected_course_objecttags["block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"] = {
+            self.taxonomy_1.id: list(api.get_object_tags(
+                "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+                taxonomy_id=self.taxonomy_1.id,
+            )),
+            self.taxonomy_2.id: list(api.get_object_tags(
+                "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+                taxonomy_id=self.taxonomy_2.id,
+            )),
+        }
 
         assert object_tags == self.expected_course_objecttags
         assert taxonomies == {

@@ -165,14 +165,15 @@ def get_all_object_tags(
     all_object_tags = list(ObjectTag.objects.filter(
         Q(object_id__startswith=block_id_prefix) | Q(object_id=content_key),
         Q(tag__isnull=False, tag__taxonomy__isnull=False),
-    ).select_related("tag__taxonomy"))
+    ).select_related("tag__taxonomy").order_by("object_id"))
 
     grouped_object_tags: ObjectTagByObjectIdDict = {}
     taxonomies: TaxonomyDict = {}
 
     for object_id, block_tags in groupby(all_object_tags, lambda x: x.object_id):
         grouped_object_tags[object_id] = {}
-        for taxonomy_id, taxonomy_tags in groupby(block_tags, lambda x: x.tag.taxonomy_id if x.tag else 0):
+        block_tags_sorted = sorted(block_tags, key=lambda x: x.tag.taxonomy_id if x.tag else 0)
+        for taxonomy_id, taxonomy_tags in groupby(block_tags_sorted, lambda x: x.tag.taxonomy_id if x.tag else 0):
             object_tags_list = list(taxonomy_tags)
             grouped_object_tags[object_id][taxonomy_id] = object_tags_list
 
@@ -181,7 +182,7 @@ def get_all_object_tags(
                 assert object_tags_list[0].tag.taxonomy
                 taxonomies[taxonomy_id] = object_tags_list[0].tag.taxonomy
 
-    return grouped_object_tags, taxonomies
+    return grouped_object_tags, dict(sorted(taxonomies.items()))
 
 
 def set_object_tags(
