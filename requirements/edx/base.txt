@@ -530,7 +530,7 @@ edx-search==3.9.1
     # via -r requirements/edx/kernel.in
 edx-sga==0.23.1
     # via -r requirements/edx/bundled.in
-edx-submissions==3.6.0
+edx-submissions==3.7.0
     # via
     #   -r requirements/edx/kernel.in
     #   ora2
