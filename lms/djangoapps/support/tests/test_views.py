@@ -2428,7 +2428,7 @@ class TestResetCourseCreateView(ResetCourseViewTestBase):
             'display_name': self.course.display_name
         })
         # The reset task should be queued
-        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.id, self.user.id)
+        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.email, self.user.email)
         # And an audit should be created as ENQUEUED
         self.assertEqual(
             self.enrollment.courseresetaudit_set.first().status,
@@ -2453,7 +2453,7 @@ class TestResetCourseCreateView(ResetCourseViewTestBase):
             'comment': '',
             'display_name': self.course.display_name
         })
-        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.id, self.user.id)
+        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.email, self.user.email)
 
     def test_course_reset_already_reset(self):
         """ A course that has an audit that hasn't failed should not be allowed to be run again """

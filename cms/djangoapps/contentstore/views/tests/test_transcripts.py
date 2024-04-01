@@ -628,7 +628,7 @@ class TestRenameTranscripts(BaseTranscripts):
 @ddt.ddt
 @patch(
     'cms.djangoapps.contentstore.views.transcripts_ajax.download_youtube_subs',
-    Mock(return_value=SJSON_TRANSCRIPT_CONTENT)
+    Mock(return_value=[['en', SJSON_TRANSCRIPT_CONTENT]])
 )
 class TestReplaceTranscripts(BaseTranscripts):
     """
