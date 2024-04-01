@@ -426,7 +426,7 @@ django-storages==1.14.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-django-user-tasks==3.1.0
+django-user-tasks==3.2.0
     # via -r requirements/edx/base.txt
 django-waffle==4.1.0
     # via
