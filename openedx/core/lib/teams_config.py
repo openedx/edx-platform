@@ -387,7 +387,7 @@ def create_team_set_partition_with_course_id(course_id, team_sets=None):
     for team_set in team_sets:
         partition = team_scheme.create_user_partition(
             id=team_set.dynamic_user_partition_id,
-            name=_("Team set {team_set_name} groups".format(team_set_name=team_set.name)),
+            name=_(f"Team set {team_set.name} groups"),  # lint-amnesty, pylint: disable=translation-of-non-string
             description=_("Partition for segmenting users by team-set"),
             parameters={
                 "course_id": str(course_id),
