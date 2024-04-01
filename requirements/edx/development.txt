@@ -345,6 +345,7 @@ distlib==0.3.7
     #   virtualenv
 django==4.2.11
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
@@ -1011,6 +1012,7 @@ import-linter==1.12.0
     # via -r requirements/edx/testing.txt
 importlib-metadata==6.8.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/../pip-tools.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

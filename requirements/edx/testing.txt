@@ -265,6 +265,7 @@ distlib==0.3.7
     # via virtualenv
 django==4.2.11
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
     #   django-celery-results
@@ -767,6 +768,7 @@ import-linter==1.12.0
     # via -r requirements/edx/testing.in
 importlib-metadata==6.8.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   markdown
     #   pytest-randomly

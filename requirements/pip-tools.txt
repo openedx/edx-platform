@@ -11,7 +11,9 @@ click==8.1.6
     #   -c requirements/constraints.txt
     #   pip-tools
 importlib-metadata==6.8.0
-    # via build
+    # via
+    #   -c requirements/common_constraints.txt
+    #   build
 packaging==23.2
     # via build
 pip-tools==7.3.0
