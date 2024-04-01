@@ -1973,7 +1973,7 @@ sqlparse==0.4.4
     #   django
     #   django-debug-toolbar
     #   openedx-blockstore
-staff-graded-xblock==2.2.0
+staff-graded-xblock==2.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

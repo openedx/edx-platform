@@ -1125,7 +1125,7 @@ sqlparse==0.4.4
     #   -r requirements/edx/kernel.in
     #   django
     #   openedx-blockstore
-staff-graded-xblock==2.2.0
+staff-graded-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 stevedore==5.1.0
     # via

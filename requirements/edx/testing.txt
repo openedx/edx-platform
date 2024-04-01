@@ -1454,7 +1454,7 @@ sqlparse==0.4.4
     #   -r requirements/edx/base.txt
     #   django
     #   openedx-blockstore
-staff-graded-xblock==2.2.0
+staff-graded-xblock==2.3.0
     # via -r requirements/edx/base.txt
 starlette==0.36.3
     # via fastapi
