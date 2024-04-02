@@ -47,11 +47,11 @@ six==1.16.0
     # via
     #   libsass
     #   paver
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via edx-opaque-keys
 urllib3==1.26.18
     # via
