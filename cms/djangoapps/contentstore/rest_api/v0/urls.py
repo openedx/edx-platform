@@ -4,7 +4,6 @@ from django.conf import settings
 from django.urls import re_path, path
 
 from openedx.core.constants import COURSE_ID_PATTERN
-from openedx.core.djangoapps.heartbeat.views import heartbeat
 
 from .views import (
     AdvancedCourseSettingsView,
@@ -14,6 +13,7 @@ from .views import (
     TranscriptView,
     YoutubeTranscriptCheckView,
     YoutubeTranscriptUploadView,
+    APIHeartBeatView
 )
 from .views import assets
 from .views import authoring_videos
@@ -47,7 +47,7 @@ urlpatterns = [
 
     # Authoring API
     re_path(
-        r'^heartbeat$', heartbeat, name='heartbeat'
+        r'^heartbeat$', APIHeartBeatView, name='heartbeat'
     ),
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
