@@ -1203,7 +1203,7 @@ watchdog==4.0.0
     # via -r requirements/edx/paver.txt
 wcwidth==0.2.13
     # via prompt-toolkit
-web-fragments==2.1.0
+web-fragments==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   crowdsourcehinter-xblock

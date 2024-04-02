@@ -1468,7 +1468,7 @@ wcwidth==0.2.13
     # via
     #   -r requirements/edx/base.txt
     #   prompt-toolkit
-web-fragments==2.1.0
+web-fragments==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   crowdsourcehinter-xblock

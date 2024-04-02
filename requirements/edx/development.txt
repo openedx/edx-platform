@@ -2155,7 +2155,7 @@ wcwidth==0.2.13
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   prompt-toolkit
-web-fragments==2.1.0
+web-fragments==2.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
