@@ -147,7 +147,10 @@ class process_cached:  # pylint: disable=invalid-name
         """
         Support instance methods.
         """
-        return functools.partial(self.__call__, obj)
+        partial = functools.partial(self.__call__, obj)
+        # Make the cache accessible on the wrapped object so it can be cleared if needed.
+        partial.cache = self.cache
+        return partial
 
 
 class CacheInvalidationManager:
