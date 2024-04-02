@@ -16,11 +16,6 @@ log = logging.getLogger(__name__)
 MANAGED_TEAM_MAX_TEAM_SIZE = 200
 # Arbitrarily arbitrary
 DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
-# The minimum partition ID that can be used for dynamic team partitions.
-# This is to avoid conflicts with other partition IDs. We use a range
-# from 51 to 99 because 50 is the default partition ID for enrollment tracks,
-# and cohorts/random partitions are assigned IDs starting from 100.
-MINIMUM_DYNAMIC_TEAM_PARTITION_ID = 51
 TEAM_SCHEME = "team"
 TEAMS_NAMESPACE = "course_teams"
 

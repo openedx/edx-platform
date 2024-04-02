@@ -13,10 +13,11 @@ from django.utils.translation import gettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
+from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
-from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, MINIMUM_DYNAMIC_TEAM_PARTITION_ID, TeamsetType
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -267,7 +268,7 @@ class CourseMetadata:
                 did_validate = False
                 errors.append({'key': key, 'message': err_message, 'model': model})
 
-        cls.fill_teams_user_partitions_ids(block.id, filtered_dict)
+        cls.fill_teams_user_partitions_ids(block, filtered_dict)
         team_setting_errors = cls.validate_team_settings(filtered_dict)
         if team_setting_errors:
             errors = errors + team_setting_errors
@@ -284,21 +285,40 @@ class CourseMetadata:
 
         return did_validate, errors, updated_data
 
+    @staticmethod
+    def get_dynamic_user_partition_id(block, min_partition_id, max_partition_id):
+        """
+        Get a dynamic partition id that is not already in use.
+        """
+        # Importing here to avoid ImportError:
+        # ImportError: cannot import name 'GroupConfiguration' from partially initialized module
+        # 'cms.djangoapps.contentstore.course_group_config' (most likely due to a circular import)
+        from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
+        return generate_int_id(
+            min_partition_id,
+            max_partition_id,
+            GroupConfiguration.get_used_ids(block),
+        )
+
     @classmethod
-    def fill_teams_user_partitions_ids(cls, course_key, settings_dict):
+    def fill_teams_user_partitions_ids(cls, block, settings_dict):
         """
         Fill the `dynamic_user_partition_id` in the team settings if it is not set.
 
         This is used by the Dynamic Team Partition Generator to create the dynamic user partitions
         based on the team-sets defined in the course.
         """
-        if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
+        if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(block.id):
             return
 
         proposed_topics = cls.get_team_sets_from_settings(settings_dict)
-        for index, proposed_topic in enumerate(proposed_topics):
+        for proposed_topic in proposed_topics:
             if not proposed_topic.get('dynamic_user_partition_id'):
-                proposed_topic['dynamic_user_partition_id'] = MINIMUM_DYNAMIC_TEAM_PARTITION_ID + index
+                proposed_topic['dynamic_user_partition_id'] = cls.get_dynamic_user_partition_id(
+                    block,
+                    MINIMUM_STATIC_PARTITION_ID,
+                    MYSQL_MAX_INT,
+                )
 
     @classmethod
     def get_team_sets_from_settings(cls, settings_dict):
@@ -377,17 +397,6 @@ class CourseMetadata:
             if topic_validation_errors:
                 topic_validation_errors['model'] = teams_configuration_model
                 errors.append(topic_validation_errors)
-
-        for proposed_topic in proposed_topics:
-            user_partition_id = proposed_topic.get('dynamic_user_partition_id')
-            if user_partition_id is None:
-                continue
-            if user_partition_id > MINIMUM_STATIC_PARTITION_ID or user_partition_id < MINIMUM_DYNAMIC_TEAM_PARTITION_ID:
-                message = (
-                    f"dynamic_user_partition_id must be greater or equal than {str(MINIMUM_DYNAMIC_TEAM_PARTITION_ID)}"
-                    f" and less than {str(MINIMUM_STATIC_PARTITION_ID)}."
-                )
-                errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
 
         return errors
 

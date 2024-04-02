@@ -29,7 +29,15 @@ class TeamUserPartition(UserPartition):
     course teams.
 
     Class attributes:
-        team_sets_mapping (dict): A mapping of partition IDs to team-set IDs.
+        team_sets_mapping (dict): A mapping of partition IDs to team-set IDs. This is used to
+            determine which team-set to use for a partition. Then, the team-set ID is
+            used to get the teams to create the groups for the partition.
+
+            Example:
+                {
+                    partition_id: team_set_id,
+                    ...
+                }
     """
 
     team_sets_mapping = {}
@@ -60,9 +68,12 @@ class TeamPartitionScheme:
     """Uses course team memberships to map learners into partition groups.
 
     The scheme is only available if the CONTENT_GROUPS_FOR_TEAMS feature flag is enabled.
+
     This is how it works:
-    - A user partition is created for each team-set in the course.
-    - A (Content) group is created for each team in the team-set.
+    - A user partition is created for each team-set in the course with a unused partition ID generated in runtime
+    by using generate_int_id() with min=MINIMUM_STATIC_PARTITION_ID and max=MYSQL_MAX_INT.
+    - A (Content) group is created for each team in the team-set with the database team ID as the group ID, and the team name as
+        the group name.
     - A user is assigned to a group if they are a member of the team.
     """
 
@@ -92,7 +103,7 @@ class TeamPartitionScheme:
         if get_course_masquerade(user, course_key) and not is_masquerading_as_specific_student(user, course_key):
             return get_masquerading_user_group(course_key, user, user_partition)
 
-        # A user cannot belong to more than one team in a team-set, so we can just get the first team.
+        # A user cannot belong to more than one team in a team-set by definition, so we can just get the first team.
         teams = get_teams_in_teamset(str(course_key), user_partition.parameters["team_set_id"])
         team_ids = [team.team_id for team in teams]
         user_team = CourseTeamMembership.get_memberships(user.username, [str(course_key)], team_ids).first()
