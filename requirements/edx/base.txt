@@ -415,7 +415,7 @@ drf-yasg==1.21.5
     #   edx-api-doc-tools
 edx-ace==1.7.0
     # via -r requirements/edx/kernel.in
-edx-api-doc-tools==1.7.0
+edx-api-doc-tools==1.8.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
