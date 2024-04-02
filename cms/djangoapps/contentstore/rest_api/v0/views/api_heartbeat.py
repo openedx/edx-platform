@@ -15,7 +15,7 @@ class APIHeartBeatView(DeveloperErrorViewMixin, APIView):
     @apidocs.schema(
         parameters=[],
         responses={
-            200: ,
+            200: "The API is online",
             401: "The requester is not authenticated.",
             403: "The API is not availible",
         },
