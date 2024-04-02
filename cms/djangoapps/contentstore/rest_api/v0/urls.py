@@ -47,7 +47,7 @@ urlpatterns = [
 
     # Authoring API
     re_path(
-        r'^heartbeat$', APIHeartBeatView, name='heartbeat'
+        r'^heartbeat$', APIHeartBeatView.as_view(), name='heartbeat'
     ),
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
