@@ -51,9 +51,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.add_tag_to_taxonomy(cls.subject_tags, tag="Jump Links", parent_tag_value="Hypertext")
 
         # Tag stuff:
-        tagging_api.tag_object(cls.problem_block.usage_key, cls.difficulty_tags, tags=["Easy"])
-        tagging_api.tag_object(cls.html_block_key, cls.subject_tags, tags=["Chinese", "Jump Links"])
-        tagging_api.tag_object(cls.html_block_key, cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.problem_block.usage_key), cls.difficulty_tags, tags=["Easy"])
+        tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
+        tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
 
     def test_problem_block(self):
         """
