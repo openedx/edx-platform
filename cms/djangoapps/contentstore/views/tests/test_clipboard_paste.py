@@ -143,54 +143,143 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         # The new block should store a reference to where it was copied from
         assert dest_block.copied_from_block == str(source_block.location)
 
-    def test_copy_and_paste_unit_with_tags(self):
+    def _setup_tagged_content(self, course_key) -> dict:
         """
-        Test copying a unit (vertical) with tags from one course into another
+        Create and tag content to use in copy/paste tests.
         """
-        course_key, client = self._setup_course()
-        dest_course = CourseFactory.create(display_name='Destination Course')
-        with self.store.bulk_operations(dest_course.id):
-            dest_chapter = BlockFactory.create(parent=dest_course, category='chapter', display_name='Section')
-            dest_sequential = BlockFactory.create(parent=dest_chapter, category='sequential', display_name='Subsection')
-
+        # Add a couple more blocks to test tagging different types of blocks.
+        # We add these here instead of in sample_courses.py to avoid breaking modulestore tests.
         unit_key = course_key.make_usage_key("vertical", "vertical_test")
+        with self.store.bulk_operations(course_key):
+            discussion_block_key = BlockFactory.create(
+                parent=self.store.get_item(unit_key),
+                category='discussion',
+                display_name='Toy_forum',
+                publish_item=True,
+            ).location
+        with self.store.bulk_operations(course_key):
+            html_block_key = BlockFactory.create(
+                parent=self.store.get_item(unit_key),
+                category="html",
+                display_name="Toy_text",
+                publish_item=True,
+            ).location
+
+        library = ClipboardLibraryContentPasteTestCase.setup_library()
+        with self.store.bulk_operations(course_key):
+            library_content_block_key = BlockFactory.create(
+                parent=self.store.get_item(unit_key),
+                category="library_content",
+                source_library_id=str(library.key),
+                display_name="LC Block",
+                publish_item=True,
+            ).location
+
         # Add tags to the unit
-        taxonomy_all_org = tagging_api.create_taxonomy("test_taxonomy", "Test Taxonomy")
+        taxonomy_all_org = tagging_api.create_taxonomy(
+            "test_taxonomy",
+            "Test Taxonomy",
+            export_id="ALL_ORGS",
+        )
 
         tagging_api.set_taxonomy_orgs(taxonomy_all_org, all_orgs=True)
-        Tag.objects.create(taxonomy=taxonomy_all_org, value="tag_1")
-        Tag.objects.create(taxonomy=taxonomy_all_org, value="tag_2")
+        for tag_value in ('tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5', 'tag_6', 'tag_7'):
+            Tag.objects.create(taxonomy=taxonomy_all_org, value=tag_value)
         tagging_api.tag_object(
             object_id=str(unit_key),
             taxonomy=taxonomy_all_org,
             tags=["tag_1", "tag_2"],
         )
 
-        taxonomy_all_org_removed = tagging_api.create_taxonomy("test_taxonomy_removed", "Test Taxonomy Removed")
+        # Tag some sub-blocks with different tags
+        video_block_key = course_key.make_usage_key("video", "sample_video")
+        tagging_api.tag_object(
+            object_id=str(video_block_key),
+            taxonomy=taxonomy_all_org,
+            tags=["tag_3"],
+        )
+        poll_block_key = course_key.make_usage_key("poll_question", "T1_changemind_poll_foo_2")
+        tagging_api.tag_object(
+            object_id=str(poll_block_key),
+            taxonomy=taxonomy_all_org,
+            tags=["tag_4"],
+        )
+        tagging_api.tag_object(
+            object_id=str(discussion_block_key),
+            taxonomy=taxonomy_all_org,
+            tags=["tag_5"],
+        )
+        tagging_api.tag_object(
+            object_id=str(html_block_key),
+            taxonomy=taxonomy_all_org,
+            tags=["tag_6"],
+        )
+        tagging_api.tag_object(
+            object_id=str(library_content_block_key),
+            taxonomy=taxonomy_all_org,
+            tags=["tag_7"],
+        )
+
+        # Tag our blocks using a taxonomy we'll remove before pasting -- so these tags won't be pasted
+        all_block_keys = {
+            key.block_type: key
+            for key in (
+                unit_key,
+                video_block_key,
+                poll_block_key,
+                discussion_block_key,
+                html_block_key,
+                library_content_block_key,
+            )
+        }
+
+        taxonomy_all_org_removed = tagging_api.create_taxonomy(
+            "test_taxonomy_removed",
+            "Test Taxonomy Removed",
+            export_id="REMOVE_ME",
+        )
         tagging_api.set_taxonomy_orgs(taxonomy_all_org_removed, all_orgs=True)
         Tag.objects.create(taxonomy=taxonomy_all_org_removed, value="tag_1")
         Tag.objects.create(taxonomy=taxonomy_all_org_removed, value="tag_2")
-        tagging_api.tag_object(
-            object_id=str(unit_key),
-            taxonomy=taxonomy_all_org_removed,
-            tags=["tag_1", "tag_2"],
-        )
-        tagging_api.get_object_tags(str(unit_key))
+        for object_key in all_block_keys.values():
+            tagging_api.tag_object(
+                object_id=str(object_key),
+                taxonomy=taxonomy_all_org_removed,
+                tags=["tag_1", "tag_2"],
+            )
 
+        # Tag our blocks using a taxonomy that isn't enabled for any orgs -- these tags won't be pasted
         taxonomy_no_org = tagging_api.create_taxonomy("test_taxonomy_no_org", "Test Taxonomy No Org")
         Tag.objects.create(taxonomy=taxonomy_no_org, value="tag_1")
         Tag.objects.create(taxonomy=taxonomy_no_org, value="tag_2")
-        tagging_api.tag_object(
-            object_id=str(unit_key),
-            taxonomy=taxonomy_no_org,
-            tags=["tag_1", "tag_2"],
-        )
+        for object_key in all_block_keys.values():
+            tagging_api.tag_object(
+                object_id=str(object_key),
+                taxonomy=taxonomy_no_org,
+                tags=["tag_1", "tag_2"],
+            )
+
+        return all_block_keys
+
+    def test_copy_and_paste_unit_with_tags(self):
+        """
+        Test copying a unit (vertical) with tags from one course into another
+        """
+        course_key, client = self._setup_course()
+        source_block_keys = self._setup_tagged_content(course_key)
+
+        dest_course = CourseFactory.create(display_name='Destination Course')
+        with self.store.bulk_operations(dest_course.id):
+            dest_chapter = BlockFactory.create(parent=dest_course, category='chapter', display_name='Section')
+            dest_sequential = BlockFactory.create(parent=dest_chapter, category='sequential', display_name='Subsection')
 
         # Copy the unit
+        unit_key = source_block_keys['vertical']
         copy_response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(unit_key)}, format="json")
         assert copy_response.status_code == 200
 
-        taxonomy_all_org_removed.delete()
+        # Delete one of the taxonomies used, to test that their tags aren't pasted.
+        tagging_api.get_taxonomy_by_export_id('REMOVE_ME').delete()
 
         # Paste the unit
         paste_response = client.post(XBLOCK_ENDPOINT, {
@@ -205,6 +294,34 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert len(tags) == 2
         assert str(tags[0]) == f'<ObjectTag> {dest_unit_key}: test_taxonomy=tag_1'
         assert str(tags[1]) == f'<ObjectTag> {dest_unit_key}: test_taxonomy=tag_2'
+
+        # Ensure that the pasted child blocks were tagged too.
+        dest_tags, _ = tagging_api.get_all_object_tags(dest_course.id)
+        dest_block_ids = {
+            UsageKey.from_string(block_id).block_type: block_id
+            for block_id in dest_tags
+        }
+        taxonomy_all_org = tagging_api.get_taxonomy_by_export_id('ALL_ORGS')
+
+        dest_video_id = dest_block_ids.get('video')
+        assert dest_video_id, f"No tags pasted from {source_block_keys['video']}?"
+        assert dest_tags.get(dest_video_id, {}).get(taxonomy_all_org.id) == ["tag_3"]
+
+        dest_poll_id = dest_block_ids.get('poll_question')
+        assert dest_poll_id, f"No tags pasted from {source_block_keys['poll_question']}?"
+        assert dest_tags.get(dest_poll_id, {}).get(taxonomy_all_org.id) == ["tag_4"]
+
+        dest_discussion_id = dest_block_ids.get('discussion')
+        assert dest_discussion_id, f"No tags pasted from {source_block_keys['discussion']}?"
+        assert dest_tags.get(dest_discussion_id, {}).get(taxonomy_all_org.id) == ["tag_5"]
+
+        dest_html_id = dest_block_ids.get('html')
+        assert dest_html_id, f"No tags pasted from {source_block_keys['html']}?"
+        assert dest_tags.get(dest_html_id, {}).get(taxonomy_all_org.id) == ["tag_6"]
+
+        dest_library_id = dest_block_ids.get('library_content')
+        assert dest_library_id, f"No tags pasted from {source_block_keys['library_content']}?"
+        assert dest_tags.get(dest_library_id, {}).get(taxonomy_all_org.id) == ["tag_7"]
 
     def test_paste_with_assets(self):
         """
@@ -289,7 +406,28 @@ class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
         self.client = APIClient()
         self.client.login(username=self.user.username, password=self.user_password)
         self.store = modulestore()
-        # Create a content library:
+        library = self.setup_library()
+
+        # Create a library content block (lc), point it out our library, and sync it.
+        self.course = CourseFactory.create(display_name='Course')
+        self.orig_lc_block = BlockFactory.create(
+            parent=self.course,
+            category="library_content",
+            source_library_id=str(library.key),
+            display_name="LC Block",
+            publish_item=False,
+        )
+        self.dest_lc_block = None
+
+        self._sync_lc_block_from_library('orig_lc_block')
+        orig_child = self.store.get_item(self.orig_lc_block.children[0])
+        assert orig_child.display_name == "MCQ"
+
+    @classmethod
+    def setup_library(cls):
+        """
+        Creates and returns a content library.
+        """
         library = library_api.create_library(
             library_type=library_api.COMPLEX,
             org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
@@ -310,21 +448,7 @@ class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
         </problem>
         """)
         library_api.publish_changes(library.key)
-
-        # Create a library content block (lc), point it out our library, and sync it.
-        self.course = CourseFactory.create(display_name='Course')
-        self.orig_lc_block = BlockFactory.create(
-            parent=self.course,
-            category="library_content",
-            source_library_id=str(library.key),
-            display_name="LC Block",
-            publish_item=False,
-        )
-        self.dest_lc_block = None
-
-        self._sync_lc_block_from_library('orig_lc_block')
-        orig_child = self.store.get_item(self.orig_lc_block.children[0])
-        assert orig_child.display_name == "MCQ"
+        return library
 
     def test_paste_library_content_block(self):
         """
