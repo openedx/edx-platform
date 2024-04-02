@@ -4,6 +4,8 @@ Unit tests for reset_student_course task
 
 from unittest.mock import patch, Mock, call
 
+from django.conf import settings
+from django.core import mail
 from xmodule.modulestore.tests.factories import BlockFactory
 
 from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
@@ -15,6 +17,7 @@ from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import SupportStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.video_block import VideoBlock
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class ResetStudentCourse(TestSubmittingProblems):
