@@ -290,13 +290,13 @@ def set_exported_object_tags(
         if not tags_values:
             continue
 
-        taxonomy = oel_tagging.get_taxonomy_by_export_id(taxonomy_export_id)
+        taxonomy = oel_tagging.get_taxonomy_by_export_id(str(taxonomy_export_id))
         oel_tagging.tag_object(
             object_id=content_key_str,
             taxonomy=taxonomy,
             tags=tags_values,
             create_invalid=True,
-            taxonomy_export_id=taxonomy_export_id,
+            taxonomy_export_id=str(taxonomy_export_id),
         )
 
 
