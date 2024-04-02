@@ -69,7 +69,6 @@ class DiscussionXBlockImportExportTests(TestCase):
         self.runtime_mock = mock.Mock(spec=Runtime)
         self.runtime_mock.construct_xblock_from_class = mock.Mock(side_effect=self._construct_xblock_mock)
         self.runtime_mock.get_policy = mock.Mock(return_value={})
-        self.id_generator = mock.Mock()
 
     def _construct_xblock_mock(self, cls, keys):  # pylint: disable=unused-argument
         """
