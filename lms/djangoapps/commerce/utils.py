@@ -23,7 +23,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from .models import CommerceConfiguration
-from .waffle import (
+from .waffle import (  # lint-amnesty, pylint: disable=invalid-django-waffle-import
     should_redirect_to_commerce_coordinator_checkout,
     should_redirect_to_commerce_coordinator_refunds,
 )
