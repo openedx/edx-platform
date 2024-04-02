@@ -109,6 +109,20 @@ class ResetStudentCourse(TestSubmittingProblems):
 
         self.refresh_course()
 
+    def assert_email_sent_successfully(self, expected):
+        """
+        Verify that the course reset email has been sent to the user.
+        """
+        from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        sent_message = mail.outbox[0]
+        body = sent_message.body
+
+        assert expected['subject'] in sent_message.subject
+        assert expected['body'] in body
+        assert sent_message.from_email == from_email
+        assert len(sent_message.to) == 1
+        assert self.user.email in sent_message.to
+
     def test_reset_student_course(self):
         """ Test that it resets student attempts  """
         with patch(
@@ -153,6 +167,10 @@ class ResetStudentCourse(TestSubmittingProblems):
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNotNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.COMPLETE)
+            self.assert_email_sent_successfully({
+                'subject': 'Password reset completed',
+                'body': 'This is to confirm that you have successfully changed your password'
+            })
 
     def test_reset_student_course_student_module_not_found(self):
 
