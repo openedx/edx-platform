@@ -4,12 +4,14 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 import cms.djangoapps.contentstore.toggles as toggles
 
-class APIHeartBeatView(APIView):
+class APIHeartBeatView(DeveloperErrorViewMixin, APIView):
     """
     View for getting the Authoring API's status
     """
+
     @apidocs.schema(
         parameters=[],
         responses={
@@ -18,6 +20,7 @@ class APIHeartBeatView(APIView):
             403: "The API is not availible",
         },
     )
+    @view_auth_classes(is_authenticated=True)
     def get(self, request: Request):
         """
         Get an object containing the Authoring API's status
