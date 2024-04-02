@@ -417,6 +417,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             'configs': {
                 'iap_configs': {}
             },
+            'user_timezone': 'UTC',
             'enrollments': {
                 'next': None,
                 'previous': None,
@@ -434,7 +435,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertDictEqual(expected_result, response.data)
         self.assertNotIn('primary', response.data)
 
-    def test_student_have_one_enrollment(self):
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_student_have_one_enrollment(self, cache_mock: MagicMock):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -458,7 +460,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(str(course.id), response.data['primary']['course']['id'])
 
-    def test_student_have_two_enrollments(self):
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_student_have_two_enrollments(self, cache_mock: MagicMock):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -477,7 +480,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(course_second.id))
 
-    def test_student_have_more_then_ten_enrollments(self):
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_student_have_more_then_ten_enrollments(self, cache_mock: MagicMock):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -497,7 +501,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(latest_enrolment.id))
 
-    def test_student_have_progress_in_old_course_and_enroll_newest_course(self):
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_student_have_progress_in_old_course_and_enroll_newest_course(self, cache_mock: MagicMock):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -559,6 +564,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             "configs": {
                 "iap_configs": {}
             },
+            "user_timezone": "UTC",
             "enrollments": {
                 "next": None,
                 "previous": None,
@@ -576,7 +582,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertDictEqual(expected_result, response.data)
         self.assertNotIn('primary', response.data)
 
-    def test_do_progress_in_not_mobile_available_course(self):
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_do_progress_in_not_mobile_available_course(self, cache_mock: MagicMock):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -613,7 +620,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(new_course.id))
 
-    def test_pagination_for_user_enrollments_api_v4(self):
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_pagination_for_user_enrollments_api_v4(self, cache_mock: MagicMock):
         """
         Tests `UserCourseEnrollmentsV4Pagination`, api_version == v4.
         """
@@ -632,7 +640,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('previous', response.data['enrollments'])
         self.assertIn('primary', response.data)
 
-    def test_course_status_in_primary_obj_when_student_doesnt_have_progress(self):
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_course_status_in_primary_obj_when_student_doesnt_have_progress(self, cache_mock: MagicMock):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -645,10 +654,12 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['primary']['course_status'], None)
 
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
     @patch('lms.djangoapps.mobile_api.users.serializers.get_key_to_last_completed_block')
     def test_course_status_in_primary_obj_when_student_have_progress(
         self,
         get_last_completed_block_mock: MagicMock,
+        cache_mock: MagicMock
     ):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.

@@ -2,6 +2,7 @@
 Serializer for user API
 """
 
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 from django.core.cache import cache
@@ -16,8 +17,10 @@ from common.djangoapps.util.course import get_encoded_course_sharing_utm_params,
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
-from lms.djangoapps.courseware.courses import get_current_child
+from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
+from lms.djangoapps.courseware.courses import get_course_assignment_date_blocks, get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
@@ -160,8 +163,13 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
 
     course_status = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
+    course_assignments = serializers.SerializerMethodField()
 
     BLOCK_STRUCTURE_CACHE_TIMEOUT = 60 * 60  # 1 hour
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.course = modulestore().get_course(self.instance.course.id)
 
     def get_course_status(self, model: CourseEnrollment) -> Optional[Dict[str, List[str]]]:
         """
@@ -186,8 +194,8 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
             'last_visited_unit_display_name': unit_name,
         }
 
-    @staticmethod
     def _get_last_visited_block_path_and_unit_name(
+        self,
         request: 'Request',  # noqa: F821
         model: CourseEnrollment,
     ) -> Tuple[List[Optional['XBlock']], Optional[str]]:  # noqa: F821
@@ -197,12 +205,10 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
         If there is no such visit, the first item deep enough down the course
         tree is used.
         """
-        course = modulestore().get_course(model.course.id)
-        field_data_cache = FieldDataCache.cache_for_block_descendents(
-            course.id, model.user, course, depth=3)
+        field_data_cache = FieldDataCache.cache_for_block_descendents(self.course.id, model.user, self.course, depth=3)
 
         course_block = get_block_for_descriptor(
-            model.user, request, course, field_data_cache, course.id, course=course
+            model.user, request, self.course, field_data_cache, self.course.id, course=self.course
         )
 
         unit_name = ''
@@ -243,6 +249,32 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
             'num_points_possible': sum(map(lambda x: x.graded_total.possible if x.graded else 0, subsection_grades)),
         }
 
+    def get_course_assignments(self, model: CourseEnrollment) -> Optional[Dict[str, List[Dict[str, str]]]]:
+        """
+        Returns the future assignment data and past assignments data for the user in the course.
+        """
+        assignments = get_course_assignment_date_blocks(
+            self.course,
+            model.user,
+            self.context.get('request'),
+            include_past_dates=True
+        )
+        next_assignment = None
+        past_assignment = []
+
+        timezone = get_user_timezone_or_last_seen_timezone_or_utc(model.user)
+        for assignment in sorted(assignments, key=lambda x: x.date):
+            if assignment.date < datetime.now(timezone):
+                past_assignment.append(assignment)
+            else:
+                next_assignment = DateSummarySerializer(assignment).data
+                break
+
+        return {
+            'future_assignment': next_assignment,
+            'past_assignments': DateSummarySerializer(past_assignment, many=True).data,
+        }
+
     class Meta:
         model = CourseEnrollment
         fields = (
@@ -255,6 +287,7 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
             'course_modes',
             'course_status',
             'progress',
+            'course_assignments',
         )
         lookup_field = 'username'
 

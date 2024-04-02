@@ -12,7 +12,7 @@ from completion.utilities import get_key_to_last_completed_block
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in
 from django.db import transaction
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import dateparse
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
@@ -28,6 +28,7 @@ from edx_rest_framework_extensions.paginators import DefaultPagination
 from common.djangoapps.student.models import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
 from lms.djangoapps.courseware.access import is_mobile_available_for_user
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
+from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
 from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
@@ -358,7 +359,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         return CourseEnrollment.objects.all().select_related('course', 'user').filter(
             user__username=self.kwargs['username'],
             is_active=True
-        ).order_by('created').reverse()
+        ).order_by('-created')
 
     def get_queryset(self):
         api_version = self.kwargs.get('api_version')
@@ -404,6 +405,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         if api_version in (API_V2, API_V3, API_V4):
             enrollment_data = {
                 'configs': MobileConfig.get_structured_configs(),
+                'user_timezone': str(get_user_timezone_or_last_seen_timezone_or_utc(self.get_user())),
                 'enrollments': response.data
             }
             if api_version == API_V4:
@@ -418,6 +420,12 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             return Response(enrollment_data)
 
         return response
+
+    def get_user(self) -> User:
+        """
+        Get user object by username.
+        """
+        return get_object_or_404(User, username=self.kwargs['username'])
 
     def get_primary_enrollment_by_latest_enrollment_or_progress(self) -> Optional[CourseEnrollment]:
         """
