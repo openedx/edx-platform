@@ -66,3 +66,17 @@ class CourseHomeTabSerializerV2(serializers.Serializer):
         required=False,
         allow_null=True
     )
+
+
+class LibraryViewSerializerV2(serializers.Serializer):
+    """Serializer for library view"""
+    display_name = serializers.CharField()
+    library_key = serializers.CharField()
+    url = serializers.CharField()
+    org = serializers.CharField()
+    number = serializers.CharField()
+    can_edit = serializers.BooleanField()
+
+
+class LibraryTabSerializerV2(serializers.Serializer):
+    libraries = LibraryViewSerializerV2(many=True, required=False, allow_null=True)

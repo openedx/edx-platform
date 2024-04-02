@@ -10,8 +10,8 @@ from rest_framework.pagination import PageNumberPagination
 
 from openedx.core.lib.api.view_utils import view_auth_classes
 
-from cms.djangoapps.contentstore.utils import get_course_context_v2
-from cms.djangoapps.contentstore.rest_api.v2.serializers import CourseHomeTabSerializerV2
+from cms.djangoapps.contentstore.utils import get_course_context_v2, get_library_context
+from cms.djangoapps.contentstore.rest_api.v2.serializers import CourseHomeTabSerializerV2, LibraryTabSerializerV2
 
 
 class HomePageCoursesPaginator(PageNumberPagination):
@@ -38,6 +38,34 @@ class HomePageCoursesPaginator(PageNumberPagination):
         """
         if isinstance(queryset, filter):
             queryset = list(queryset)
+
+        return super().paginate_queryset(queryset, request, view)
+    
+
+class HomePageLibrariesPaginator(PageNumberPagination):
+    """Custom paginator for the home page libraries view version 2."""
+
+    def get_paginated_response(self, data):
+        """Return a paginated style `Response` object for the given output data."""
+        return Response(OrderedDict([
+            ('count', self.page.paginator.count),
+            ('num_pages', self.page.paginator.num_pages),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data),
+        ]))
+
+    def paginate_queryset(self, queryset, request, view=None):
+        """
+        Paginate a queryset if required, either returning a page object,
+        or `None` if pagination is not configured for this view.
+
+        This method is a modified version of the original `paginate_queryset` method
+        from the `PageNumberPagination` class. The original method was modified to
+        handle the case where the `queryset` is a `filter` object.
+        """
+        if isinstance(queryset, dict):
+            queryset = queryset.get('libraries', [])
 
         return super().paginate_queryset(queryset, request, view)
 
@@ -145,3 +173,73 @@ class HomePageCoursesViewV2(APIView):
             'in_process_course_actions': in_process_course_actions,
         })
         return paginator.get_paginated_response(serializer.data)
+
+@view_auth_classes(is_authenticated=True)
+class HomePageLibrariesViewV2(APIView):
+    """
+    View for getting all courses and libraries available to the logged in user.
+    """
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                "org",
+                apidocs.ParameterLocation.QUERY,
+                description="Query param to filter by course org",
+            ),
+            apidocs.string_parameter(
+                "page",
+                apidocs.ParameterLocation.QUERY,
+                description="Query param to paginate the courses",
+            )],
+        responses={
+            200: LibraryTabSerializerV2,
+            401: "The requester is not authenticated.",
+        },
+    )
+    def get(self, request: Request):
+        """
+        Get an object containing all libraries on home page.
+
+        **Example Request**
+
+            GET /api/contentstore/v1/home/libraries
+
+        **Response Values**
+
+        If the request is successful, an HTTP 200 "OK" response is returned.
+
+        The HTTP 200 response contains a single dict that contains keys that
+        are the course's home.
+
+        **Example Response**
+
+        ```json
+        {
+            "libraries": [
+                {
+                "display_name": "My First Library",
+                "library_key": "library-v1:new+CPSPR",
+                "url": "/library/library-v1:new+CPSPR",
+                "org": "new",
+                "number": "CPSPR",
+                "can_edit": true
+                }
+            ],        }
+        ```
+        """
+        # if not settings.FEATURES.get('ENABLE_HOME_PAGE_LIBRARY_API_V2', False):
+        #     return HttpResponseNotFound()
+        library_context = get_library_context(request)
+        paginator = HomePageLibrariesPaginator()
+
+        libraries_page = paginator.paginate_queryset(
+            library_context,
+            self.request,
+            view=self
+        )
+        serializer = LibraryTabSerializerV2({
+            'libraries': libraries_page,
+        })
+        return paginator.get_paginated_response(serializer.data)
+        # serializer = LibraryTabSerializerV2(library_context)
+        # return Response(serializer.data)
