@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import api
 from .objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
-from openedx_tagging.core.tagging.models import ObjectTag, Tag
+from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
 
 
@@ -22,28 +22,27 @@ class TestGetAllObjectTagsMixin:
     def setUp(self):
         super().setUp()
 
-        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
         self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
         api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
-        self.tag_1_1 = Tag.objects.create(
+        self.tag_1_1 = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_1,
-            value="Tag 1.1",
+            tag="Tag 1.1",
         )
-        self.tag_1_2 = Tag.objects.create(
+        self.tag_1_2 = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_1,
-            value="Tag 1.2",
+            tag="Tag 1.2",
         )
 
         self.taxonomy_2 = api.create_taxonomy(name="Taxonomy 2")
         api.set_taxonomy_orgs(self.taxonomy_2, all_orgs=True)
 
-        self.tag_2_1 = Tag.objects.create(
+        self.tag_2_1 = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_2,
-            value="Tag 2.1",
+            tag="Tag 2.1",
         )
-        self.tag_2_2 = Tag.objects.create(
+        self.tag_2_2 = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_2,
-            value="Tag 2.2",
+            tag="Tag 2.2",
         )
 
         api.tag_object(
@@ -52,6 +51,14 @@ class TestGetAllObjectTagsMixin:
             tags=['Tag 1.1'],
         )
         self.course_tags = api.get_object_tags("course-v1:orgA+test_course+test_run")
+
+        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
+        self.orgB = Organization.objects.create(name="Organization B", short_name="orgB")
+        self.taxonomy_3 = api.create_taxonomy(name="Taxonomy 3", orgs=[self.orgA])
+        api.add_tag_to_taxonomy(
+            taxonomy=self.taxonomy_3,
+            tag="Tag 3.1",
+        )
 
         # Tag blocks
         api.tag_object(
@@ -105,17 +112,17 @@ class TestGetAllObjectTagsMixin:
 
         self.expected_course_objecttags = {
             "course-v1:orgA+test_course+test_run": {
-                self.taxonomy_1.id: list(self.course_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.course_tags],
             },
             "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential": {
-                self.taxonomy_1.id: list(self.sequential_tags1),
-                self.taxonomy_2.id: list(self.sequential_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.sequential_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.sequential_tags2],
             },
             "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1": {
-                self.taxonomy_2.id: list(self.vertical1_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.vertical1_tags],
             },
             "block-v1:orgA+test_course+test_run+type@html+block@test_html": {
-                self.taxonomy_2.id: list(self.html_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.html_tags],
             },
         }
 
@@ -174,14 +181,14 @@ class TestGetAllObjectTagsMixin:
 
         self.expected_library_objecttags = {
             f"lib:orgA:lib_{self.block_suffix}": {
-                self.taxonomy_2.id: list(self.library_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.library_tags],
             },
             f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}": {
-                self.taxonomy_1.id: list(self.problem1_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.problem1_tags],
             },
             f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}": {
-                self.taxonomy_1.id: list(self.library_html_tags1),
-                self.taxonomy_2.id: list(self.library_html_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.library_html_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.library_html_tags2],
             },
         }
 
@@ -215,7 +222,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="course",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.course_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.course_tags],
             },
         )
 
@@ -232,8 +239,8 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="sequential",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.sequential_tags1),
-                self.taxonomy_2.id: list(self.sequential_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.sequential_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.sequential_tags2],
             },
         )
 
@@ -282,7 +289,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="vertical",
             children=[],
             object_tags={
-                self.taxonomy_2.id: list(self.vertical1_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.vertical1_tags],
             },
         )
         assert tagged_sequential.children is not None  # type guard
@@ -314,7 +321,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="html",
             children=[],
             object_tags={
-                self.taxonomy_2.id: list(self.html_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.html_tags],
             },
         )
         assert untagged_vertical2.children is not None  # type guard
@@ -343,7 +350,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="library",
             children=[],
             object_tags={
-                self.taxonomy_2.id: list(self.library_tags),
+                self.taxonomy_2.id: [tag.value for tag in self.library_tags],
             },
         )
 
@@ -358,7 +365,7 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="problem",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.problem1_tags),
+                self.taxonomy_1.id: [tag.value for tag in self.problem1_tags],
             },
         )
 
@@ -386,8 +393,8 @@ class TaggedCourseMixin(TestGetAllObjectTagsMixin, ModuleStoreTestCase):  # type
             category="html",
             children=[],
             object_tags={
-                self.taxonomy_1.id: list(self.library_html_tags1),
-                self.taxonomy_2.id: list(self.library_html_tags2),
+                self.taxonomy_1.id: [tag.value for tag in self.library_html_tags1],
+                self.taxonomy_2.id: [tag.value for tag in self.library_html_tags2],
             },
         )
 

@@ -5,14 +5,14 @@ import tempfile
 import ddt
 from django.test.testcases import TestCase
 from fs.osfs import OSFS
-
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
-from openedx_tagging.core.tagging.models import Tag, ObjectTag
+from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
 from ..helpers.test_objecttag_export_helpers import TestGetAllObjectTagsMixin, TaggedCourseMixin
 
 from .. import api
+from ..utils import rules_cache
 
 
 class TestTaxonomyMixin:
@@ -45,25 +45,25 @@ class TestTaxonomyMixin:
         self.taxonomy_no_orgs = api.create_taxonomy(name="No orgs")
 
         # Tags
-        self.tag_disabled = Tag.objects.create(
+        self.tag_disabled = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_disabled,
-            value="learning",
+            tag="learning",
         )
-        self.tag_all_orgs = Tag.objects.create(
+        self.tag_all_orgs = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_all_orgs,
-            value="learning",
+            tag="learning",
         )
-        self.tag_both_orgs = Tag.objects.create(
+        self.tag_both_orgs = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_both_orgs,
-            value="learning",
+            tag="learning",
         )
-        self.tag_one_org = Tag.objects.create(
+        self.tag_one_org = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_one_org,
-            value="learning",
+            tag="learning",
         )
-        self.tag_no_orgs = Tag.objects.create(
+        self.tag_no_orgs = api.add_tag_to_taxonomy(
             taxonomy=self.taxonomy_no_orgs,
-            value="learning",
+            tag="learning",
         )
         # ObjectTags
         api.tag_object(
@@ -82,7 +82,9 @@ class TestTaxonomyMixin:
         self.all_orgs_block_tag = api.get_object_tags(
             object_id="block-v1:Ax+DemoX+Demo_Course+type@vertical+block@abcde",
         )[0]
-        api.tag_object(
+
+        # Force apply these tags: Ax and OeX are not an allowed org for these taxonomies
+        api.oel_tagging.tag_object(
             object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
@@ -90,7 +92,7 @@ class TestTaxonomyMixin:
         self.both_orgs_course_tag = api.get_object_tags(
             object_id="course-v1:Ax+DemoX+Demo_Course",
         )[0]
-        api.tag_object(
+        api.oel_tagging.tag_object(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
             taxonomy=self.taxonomy_both_orgs,
             tags=[self.tag_both_orgs.value],
@@ -98,7 +100,7 @@ class TestTaxonomyMixin:
         self.both_orgs_block_tag = api.get_object_tags(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@video+block@abcde",
         )[0]
-        api.tag_object(
+        api.oel_tagging.tag_object(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
             taxonomy=self.taxonomy_one_org,
             tags=[self.tag_one_org.value],
@@ -106,7 +108,7 @@ class TestTaxonomyMixin:
         self.one_org_block_tag = api.get_object_tags(
             object_id="block-v1:OeX+DemoX+Demo_Course+type@html+block@abcde",
         )[0]
-        api.tag_object(
+        api.oel_tagging.tag_object(
             object_id="course-v1:Ax+DemoX+Demo_Course",
             taxonomy=self.taxonomy_disabled,
             tags=[self.tag_disabled.value],
@@ -117,6 +119,9 @@ class TestTaxonomyMixin:
         self.taxonomy_disabled.enabled = False
         self.taxonomy_disabled.save()
         self.disabled_course_tag.refresh_from_db()  # Update its cached .taxonomy
+
+        # Clear the rules cache in between test runs
+        rules_cache.clear()
 
 
 @ddt.ddt
@@ -241,9 +246,9 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         assert result[0]["depth"] == 0
 
 
-class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
+class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
     """
-    Test get_all_object_tags api function
+    Tests object tag API functions.
     """
 
     def test_get_course_object_tags(self):
@@ -287,16 +292,19 @@ class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
                 CourseKey.from_string("course-v1:orgA+test_course+test_run")
             )
 
+        vertical1_tags = api.get_object_tags(
+            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy_id=self.taxonomy_1.id,
+        )
+        vertical2_tags = api.get_object_tags(
+            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy_id=self.taxonomy_2.id,
+        )
+
         # Add new object tags to the expected result
         self.expected_course_objecttags["block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"] = {
-            self.taxonomy_1.id: list(api.get_object_tags(
-                "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
-                taxonomy_id=self.taxonomy_1.id,
-            )),
-            self.taxonomy_2.id: list(api.get_object_tags(
-                "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
-                taxonomy_id=self.taxonomy_2.id,
-            )),
+            self.taxonomy_1.id: [tag.value for tag in vertical1_tags],
+            self.taxonomy_2.id: [tag.value for tag in vertical2_tags],
         }
 
         assert object_tags == self.expected_course_objecttags
@@ -319,6 +327,58 @@ class TestGetAllObjectTags(TestGetAllObjectTagsMixin, TestCase):
             self.taxonomy_1.id: self.taxonomy_1,
             self.taxonomy_2.id: self.taxonomy_2,
         }
+
+    def _test_copy_object_tags(self, src_key, dst_key, expected_tags):
+        """
+        Test copying object tags to a new object.
+        """
+        # Destination block doesn't have any tags yet
+        with self.assertNumQueries(1):
+            assert not list(api.get_object_tags(object_id=str(dst_key)))
+
+        # Copy tags from the source block
+        api.copy_object_tags(src_key, dst_key)
+
+        with self.assertNumQueries(1):
+            dst_tags = list(api.get_object_tags(object_id=str(dst_key)))
+
+        # Check that the destination tags match the expected list (name + value only; object_id will differ)
+        with self.assertNumQueries(0):
+            assert len(dst_tags) == len(expected_tags)
+            for idx, src_tag in enumerate(expected_tags):
+                dst_tag = dst_tags[idx]
+                assert src_tag.export_id == dst_tag.export_id
+                assert src_tag.value == dst_tag.value
+
+    def test_copy_object_tags(self):
+        """
+        Test copying object tags to a new object.
+        """
+        src_key = UsageKey.from_string("block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential")
+        dst_key = UsageKey.from_string("block-v1:orgB+test_course+test_run+type@sequential+block@test_sequential")
+        expected_tags = list(self.sequential_tags1) + list(self.sequential_tags2)
+        with self.assertNumQueries(30):  # TODO why so high?
+            self._test_copy_object_tags(src_key, dst_key, expected_tags)
+
+    def test_copy_cross_org_tags(self):
+        """
+        Test copying object tags to a new object in a different org.
+        Ensure only the permitted tags are copied.
+        """
+        src_key = UsageKey.from_string("block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential")
+        dst_key = UsageKey.from_string("block-v1:orgB+test_course+test_run+type@sequential+block@test_sequential")
+
+        # Add another tag from an orgA-specific taxonomy
+        api.tag_object(
+            object_id=str(src_key),
+            taxonomy=self.taxonomy_3,
+            tags=["Tag 3.1"],
+        )
+
+        # Destination block should have all of the source block's tags, except for the orgA-specific one.
+        expected_tags = list(self.sequential_tags1) + list(self.sequential_tags2)
+        with self.assertNumQueries(31):  # TODO why so high?
+            self._test_copy_object_tags(src_key, dst_key, expected_tags)
 
 
 class TestExportImportTags(TaggedCourseMixin):
