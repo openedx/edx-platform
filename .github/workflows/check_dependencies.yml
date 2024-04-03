@@ -20,23 +20,15 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Create Virtual Environment
-        run: python3 -m venv .venv
-      # Optionally, you can log the output to a file
-      # continue-on-error: true
-      # env:
-      #   log_file: make_venv.log
+      - name: Create repo_work directory
+        run: mkdir -p WORK_DIR/repo_work
 
-      - name: Upgrade pip
-        run: .venv/bin/python3 -m pip install -U pip
-      # Optionally, you can log the output to a file
-      # continue-on-error: true
-      # env:
-      #   log_file: pip_upgrade.log
-
-      - name: Download dependencies
-        run: .venv/bin/python3 -m pip download --dest files -r base.txt
-      # Optionally, you can log the output to a file
-      # continue-on-error: true
-      # env:
-      #   log_file: pip_download.log
+      - name: Copy Python requirements file
+        run: |
+          py_reqs=$(find . -maxdepth 1 -name "requirements*.txt" | head -n 1)
+          if [ -f "$py_reqs" ]; then
+            cp "$py_reqs" WORK_DIR/repo_work/base.txt
+            echo "Python requirements file: $py_reqs"
+          else
+            echo "No Python requirements file found."
+          fi
