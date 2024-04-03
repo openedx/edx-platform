@@ -59,8 +59,8 @@ def send_reset_course_completion_email(course, user):
 
     try:
         log.info(
-            f"Sending whole course reset email to {user.profile.name} (Email: {user.email})"
-            "from course {course.display_name} (CourseId: {course.id})"
+            f"Sending whole course reset email to {user.profile.name} (Email: {user.email}) "
+            f"from course {course.display_name} (CourseId: {course.id})"
         )
         with emulate_http_request(site=site, user=user):
             msg = WholeCourseReset(context=message_context).personalize(
@@ -69,17 +69,17 @@ def send_reset_course_completion_email(course, user):
                 user_context={'full_name': user.profile.name}
             )
             ace.send(msg)
-    except Exception:  # pylint: disable=broad-except
+    except Exception as exc:  # pylint: disable=broad-except
         log.exception(
-            f"Whole course reset email to {user.profile.name} (Email: {user.email})"
-            "from course {course.display_name} (CourseId: {course.id}) failed."
-            "Error: {exc.response['Error']['Code']}"
+            f"Whole course reset email to {user.profile.name} (Email: {user.email}) "
+            f"from course {course.display_name} (CourseId: {course.id}) failed."
+            f"Error: {exc.response['Error']['Code']}"
         )
         return False
     else:
         log.info(
-            f"Whole course reset email sent successfully to {user.profile.name} (Email: {user.email})"
-            "from course {course.display_name} (CourseId: {course.id})"
+            f"Whole course reset email sent successfully to {user.profile.name} (Email: {user.email}) "
+            f"from course {course.display_name} (CourseId: {course.id})"
         )
         return True
 
