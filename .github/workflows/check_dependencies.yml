@@ -48,6 +48,8 @@ jobs:
         run: |
           echo "Downloading packages"
           .venv/bin/python3 -m pip download --dest files -r base.txt
+          base_txt_path="${GITHUB_WORKSPACE}/files/base.txt"
+          echo "Path of base.txt: ${base_txt_path}"
         working-directory: WORK_DIR/repo_work
 
       - name: Extract GitHub URLs from base.txt
