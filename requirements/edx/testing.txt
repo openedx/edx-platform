@@ -342,7 +342,7 @@ django-classy-tags==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   django-sekizai
-django-config-models==2.5.1
+django-config-models==2.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise

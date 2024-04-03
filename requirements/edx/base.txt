@@ -257,7 +257,7 @@ django-celery-results==2.5.1
     # via -r requirements/edx/kernel.in
 django-classy-tags==4.1.0
     # via django-sekizai
-django-config-models==2.5.1
+django-config-models==2.7.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
