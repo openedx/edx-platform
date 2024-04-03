@@ -25,12 +25,11 @@ jobs:
 
       - name: Copy Python requirements file
         run: |
-          py_reqs=$(find . -maxdepth 1 -name "requirements*.txt" | head -n 1)
-          if [ -f "$py_reqs" ]; then
-            cp "$py_reqs" WORK_DIR/repo_work/base.txt
-            echo "Python requirements file: $py_reqs"
+          for req_file in "requirements/edx/base.txt" "requirements/base.txt" "requirements.txt"; do
+          if [ -f "$req_file" ]; then
+            cp "$req_file" WORK_DIR/repo_work/base.txt
+            echo "Python requirements file found: $req_file"
             echo "Content of base.txt:"
-            cat "$py_reqs"
-          else
-            echo "No Python requirements file found."
+            cat "$req_file"
+            break
           fi
