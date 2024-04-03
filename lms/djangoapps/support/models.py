@@ -22,7 +22,7 @@ class CourseResetCourseOptIn(TimeStampedModel):
     """
     Model that represents a course which has opted in to the course reset feature.
     """
-    course_id = CourseKeyField(max_length=255)
+    course_id = CourseKeyField(max_length=255, unique=True)
     active = BooleanField()
 
     def __str__(self):
