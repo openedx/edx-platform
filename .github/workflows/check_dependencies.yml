@@ -55,7 +55,7 @@ jobs:
       - name: Extract GitHub URLs from base.txt
         run: |
           urls=()
-          base_txt_path="${GITHUB_WORKSPACE}/files/base.txt"
+          base_txt_path="./files/base.txt"
           while IFS= read -r line; do
             if [[ $line =~ (https://github.com[^@ #]*(\.git)?) ]]; then
               urls+=("${BASH_REMATCH[0]}")
