@@ -34,3 +34,18 @@ jobs:
               break
             fi
           done
+
+      - name: Create virtual environment
+        run: python3 -m venv .venv
+        working-directory: WORK_DIR/repo_work
+
+      - name: Upgrade pip
+        run: |
+          .venv/bin/python3 -m pip install -U pip
+        working-directory: WORK_DIR/repo_work
+
+      - name: Download packages
+        run: |
+          echo "Downloading packages"
+          .venv/bin/python3 -m pip download --dest files -r base.txt
+        working-directory: WORK_DIR/repo_work    
