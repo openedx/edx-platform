@@ -4,6 +4,7 @@ Tests for notifications tasks.
 
 from unittest.mock import patch
 
+import datetime
 import ddt
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -14,9 +15,15 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from .utils import create_notification
 from ..config.waffle import ENABLE_NOTIFICATIONS
 from ..models import CourseNotificationPreference, Notification
-from ..tasks import create_notification_pref_if_not_exists, send_notifications, update_user_preference
+from ..tasks import (
+    create_notification_pref_if_not_exists,
+    delete_notifications,
+    send_notifications,
+    update_user_preference
+)
 
 
 @patch('openedx.core.djangoapps.notifications.models.COURSE_NOTIFICATION_CONFIG_VERSION', 1)
@@ -362,3 +369,67 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         content_url = 'https://example.com/'
         send_notifications(user_ids, str(self.course.id), app_name, notification_type, context, content_url)
         self.assertEqual(len(Notification.objects.all()), generated_count)
+
+
+class TestDeleteNotificationTask(ModuleStoreTestCase):
+    """
+    Tests delete_notification_function
+    """
+    def setUp(self):
+        """
+        Setup
+        """
+        super().setUp()
+        self.user = UserFactory()
+        self.course_1 = CourseFactory.create(org='org', number='num', run='run_01')
+        self.course_2 = CourseFactory.create(org='org', number='num', run='run_02')
+        Notification.objects.all().delete()
+
+    def test_app_name_param(self):
+        """
+        Tests if app_name parameter works as expected
+        """
+        assert not Notification.objects.all()
+        create_notification(self.user, self.course_1.id, app_name='discussion', notification_type='new_comment')
+        create_notification(self.user, self.course_1.id, app_name='updates', notification_type='course_update')
+        delete_notifications({'app_name': 'discussion'})
+        assert not Notification.objects.filter(app_name='discussion')
+        assert Notification.objects.filter(app_name='updates')
+
+    def test_notification_type_param(self):
+        """
+        Tests if notification_type parameter works as expected
+        """
+        assert not Notification.objects.all()
+        create_notification(self.user, self.course_1.id, app_name='discussion', notification_type='new_comment')
+        create_notification(self.user, self.course_1.id, app_name='discussion', notification_type='new_response')
+        delete_notifications({'notification_type': 'new_comment'})
+        assert not Notification.objects.filter(notification_type='new_comment')
+        assert Notification.objects.filter(notification_type='new_response')
+
+    def test_created_param(self):
+        """
+        Tests if created parameter works as expected
+        """
+        assert not Notification.objects.all()
+        create_notification(self.user, self.course_1.id, created=datetime.datetime(2024, 2, 10))
+        create_notification(self.user, self.course_2.id, created=datetime.datetime(2024, 3, 12, 5))
+        kwargs = {
+            'created': {
+                'created__gte': datetime.datetime(2024, 3, 12, 0, 0, 0),
+                'created__lte': datetime.datetime(2024, 3, 12, 23, 59, 59),
+            }
+        }
+        delete_notifications(kwargs)
+        self.assertEqual(Notification.objects.all().count(), 1)
+
+    def test_course_id_param(self):
+        """
+        Tests if course_id parameter works as expected
+        """
+        assert not Notification.objects.all()
+        create_notification(self.user, self.course_1.id)
+        create_notification(self.user, self.course_2.id)
+        delete_notifications({'course_id': self.course_1.id})
+        assert not Notification.objects.filter(course_id=self.course_1.id)
+        assert Notification.objects.filter(course_id=self.course_2.id)

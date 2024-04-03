@@ -8,7 +8,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_APPS,
     COURSE_NOTIFICATION_TYPES
 )
-from openedx.core.djangoapps.notifications.tasks import soft_delete_notifications
+from openedx.core.djangoapps.notifications.tasks import delete_notifications
 
 
 class Command(BaseCommand):
@@ -18,8 +18,7 @@ class Command(BaseCommand):
         python manage.py lms delete_notifications
     """
     help = (
-        "Delete/Undelete notifications that meets a criteria. Requires app_name, notification_type and created"
-        "(duration). Add --delete switch to soft delete and to undelete use it without --delete switch"
+        "Delete notifications that meets a criteria. Requires app_name, notification_type and created (duration)"
     )
 
     def add_arguments(self, parser):
@@ -32,14 +31,13 @@ class Command(BaseCommand):
         parser.add_argument('--created', type=argparse_date, required=True,
                             help="Allowed date formats YYYY-MM-DD. YYYY Year. MM Month. DD Date."
                                  "Duration can be specified with ~. Maximum 15 days duration is allowed")
-        parser.add_argument('--delete', action='store_true')
         parser.add_argument('--course_id', required=False)
 
     def handle(self, *args, **kwargs):
         """
-        Calls soft delete notifications task
+        Calls delete notifications task
         """
-        soft_delete_notifications.delay(kwargs)
+        delete_notifications.delay(kwargs)
 
 
 def argparse_date(string: str):

@@ -333,8 +333,7 @@ class NotificationListAPIView(generics.ListAPIView):
         params = {
             'user': self.request.user,
             'created__gte': expiry_date,
-            'web': True,
-            'is_deleted': False,
+            'web': True
         }
 
         if app_name:
@@ -371,7 +370,7 @@ class NotificationCountView(APIView):
         # Get the unseen notifications count for each app name.
         count_by_app_name = (
             Notification.objects
-            .filter(user_id=request.user, last_seen__isnull=True, is_deleted=False)
+            .filter(user_id=request.user, last_seen__isnull=True)
             .values('app_name')
             .annotate(count=Count('*'))
         )

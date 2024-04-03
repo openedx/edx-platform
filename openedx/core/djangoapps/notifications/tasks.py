@@ -60,33 +60,29 @@ def create_course_notification_preferences_for_courses(self, course_ids):
 
 @shared_task(ignore_result=True)
 @set_code_owner_attribute
-def soft_delete_notifications(kwargs):
+def delete_notifications(kwargs):
     """
-    Soft delete/undelete notifications
-    kwargs: dict {notification_type, app_name, created, course_id, delete}
+    Delete notifications
+    kwargs: dict {notification_type, app_name, created, course_id}
     """
     batch_size = settings.EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE
     total_deleted = 0
-    delete_value = kwargs.pop('delete', False)
-    deleted_text = 'deleted' if delete_value else 'undeleted'
     kwargs = clean_arguments(kwargs)
-    logger.info(f'Running soft delete with kwargs {kwargs}')
+    logger.info(f'Running delete with kwargs {kwargs}')
     while True:
         ids_to_delete = Notification.objects.filter(
-            is_deleted=not delete_value,
             **kwargs
         ).values_list('id', flat=True)[:batch_size]
         ids_to_delete = list(ids_to_delete)
         if not ids_to_delete:
             break
-        deleted_in_batch = len(ids_to_delete)
-        total_deleted += deleted_in_batch
-        queryset = Notification.objects.filter(
+        delete_queryset = Notification.objects.filter(
             id__in=ids_to_delete
         )
-        queryset.update(is_deleted=delete_value)
-        logger.info(f'Soft {deleted_text} in batch {deleted_in_batch}')
-    logger.info(f'Total soft {deleted_text}: {total_deleted}')
+        delete_count, _ = delete_queryset.delete()
+        total_deleted += delete_count
+        logger.info(f'Deleted in batch {delete_count}')
+    logger.info(f'Total deleted: {total_deleted}')
 
 
 @shared_task(ignore_result=True)
