@@ -117,14 +117,14 @@ class ResetStudentCourse(TestSubmittingProblems):
         Verify that the course reset email has been sent to the user.
         """
         from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-        sent_message = mail.outbox[0]
+        sent_message = mail.outbox[-1]
         body = sent_message.body
 
         assert expected['subject'] in sent_message.subject
         assert expected['body'] in body
         assert sent_message.from_email == from_email
         assert len(sent_message.to) == 1
-        assert self.user.email in sent_message.to
+        assert self.student_user.email in sent_message.to
 
     def test_reset_student_course(self):
         """ Test that it resets student attempts  """
