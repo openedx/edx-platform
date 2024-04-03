@@ -27,6 +27,7 @@ jobs:
 
       - name: Copy Python requirements file
         run: |
+          WORK_DIR="/tmp/unpack_reqs"
           for req_file in "requirements/edx/base.txt" "requirements/base.txt" "requirements.txt"; do
             if [ -f "$req_file" ]; then
               cp "$req_file" "$WORK_DIR"/repo_work/base.txt
