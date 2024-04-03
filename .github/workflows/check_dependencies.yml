@@ -39,7 +39,7 @@ jobs:
           done
 
       - name: Create virtual environment
-        run: python3 -m venv .venv
+        run: python3 -m venv $WORK_DIR/repo_work/.venv
         working-directory: |
                         WORK_DIR="/tmp/unpack_reqs"
                         $WORK_DIR/repo_work
