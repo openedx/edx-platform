@@ -48,4 +48,19 @@ jobs:
         run: |
           echo "Downloading packages"
           .venv/bin/python3 -m pip download --dest files -r base.txt
-        working-directory: WORK_DIR/repo_work    
+        working-directory: WORK_DIR/repo_work
+
+      - name: Extract GitHub URLs from base.txt
+        run: |
+          urls=()
+          while IFS= read -r line; do
+            if [[ $line =~ (https://github.com[^@ #]*(\.git)?) ]]; then
+              urls+=("${BASH_REMATCH[0]}")
+            fi
+          done < base.txt
+          echo "::set-output name=github_urls::${urls[*]}"
+
+      - name: Display GitHub URLs
+        run: |
+          echo "GitHub URLs:"
+          echo "${{ steps.extract.urls }}"  
