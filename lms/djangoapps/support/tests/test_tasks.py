@@ -171,8 +171,8 @@ class ResetStudentCourse(TestSubmittingProblems):
             self.assertIsNotNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.COMPLETE)
             self.assert_email_sent_successfully({
-                'subject': 'Password reset completed',
-                'body': 'This is to confirm that you have successfully changed your password'
+                'subject': f'The course { self.course.display_name } has been reset !',
+                'body': f'Your progress in course { self.course.display_name } has been reset on your behalf.'
             })
 
     def test_reset_student_course_student_module_not_found(self):
