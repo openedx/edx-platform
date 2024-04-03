@@ -21,16 +21,22 @@ jobs:
           python-version: '3.8'
 
       - name: Create Virtual Environment
-        run: python -m venv .venv
+        run: python3 -m venv .venv
+      # Optionally, you can log the output to a file
+      # continue-on-error: true
+      # env:
+      #   log_file: make_venv.log
 
-      - name: Install Dependencies
-        run: |
-          source .venv/bin/activate  # Activate the virtual environment
-          pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Upgrade pip
+        run: .venv/bin/python3 -m pip install -U pip
+      # Optionally, you can log the output to a file
+      # continue-on-error: true
+      # env:
+      #   log_file: pip_upgrade.log
 
-      - name: Activate Virtual Environment and List Installed Packages with Source URLs
-        run: |
-          source .venv/bin/activate  # Activate the virtual environment
-          pip install --upgrade pip
-          pip list --format=columns --verbose | grep -E 'Package:|Location:|Source:'
+      - name: Download dependencies
+        run: .venv/bin/python3 -m pip download --dest files -r base.txt
+      # Optionally, you can log the output to a file
+      # continue-on-error: true
+      # env:
+      #   log_file: pip_download.log
