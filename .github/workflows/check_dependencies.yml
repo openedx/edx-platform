@@ -40,12 +40,16 @@ jobs:
 
       - name: Create virtual environment
         run: python3 -m venv .venv
-        working-directory: $WORK_DIR/repo_work
+        working-directory: |
+                        WORK_DIR="/tmp/unpack_reqs"
+                        $WORK_DIR/repo_work
 
       - name: Upgrade pip
         run: |
           .venv/bin/python3 -m pip install -U pip
-        working-directory: $WORK_DIR/repo_work
+        working-directory: |
+                      WORK_DIR="/tmp/unpack_reqs"
+                      $WORK_DIR/repo_work
 
       - name: Download packages
         run: |
@@ -53,7 +57,9 @@ jobs:
           .venv/bin/python3 -m pip download --dest files -r base.txt
           base_txt_path="${GITHUB_WORKSPACE}/files/base.txt"
           echo "Path of base.txt: ${base_txt_path}"
-        working-directory: $WORK_DIR/repo_work
+        working-directory: |
+                      WORK_DIR="/tmp/unpack_reqs"
+                      $WORK_DIR/repo_work
 
       - name: Extract GitHub URLs from base.txt
         id: extract
