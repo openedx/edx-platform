@@ -59,7 +59,7 @@ jobs:
             if [[ $line =~ (https://github.com[^@ #]*(\.git)?) ]]; then
               urls+=("${BASH_REMATCH[0]}")
             fi
-          done < base.txt
+          done < "${base_txt_path}"
           echo "::set-output name=github_urls::${urls[*]}"
 
       - name: Display GitHub URLs
