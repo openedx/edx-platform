@@ -62,8 +62,7 @@ class PollBlockTest(unittest.TestCase):
         unescaped characters.
         """
         module_system = DummySystem(load_error_blocks=True)
-        id_generator = Mock()
-        id_generator.target_course_id = self.xblock.course_id
+        module_system.id_generator.target_course_id = self.xblock.course_id
         sample_poll_xml = '''
         <poll_question display_name="Poll Question">
             <p>How old are you?</p>
@@ -72,7 +71,6 @@ class PollBlockTest(unittest.TestCase):
         '''
         node = etree.fromstring(sample_poll_xml)
 
-        module_system.id_generator = id_generator
         output = PollBlock.parse_xml(node, module_system, self.scope_ids)
         # Update the answer with invalid character.
         invalid_characters_poll_answer = output.answers[0]

@@ -344,10 +344,8 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         '''
         xml_object = etree.fromstring(xml_data)
-        id_generator = Mock()
-        id_generator.target_course_id = course_id
+        module_system.id_generator.target_course_id = course_id
 
-        module_system.id_generator = id_generator
         output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
@@ -644,9 +642,7 @@ class VideoBlockImportTestCase(TestCase):
             edx_video_id=edx_video_id
         )
         xml_object = etree.fromstring(xml_data)
-        id_generator = Mock()
-        id_generator.target_course_id = 'test_course_id'
-        module_system.id_generator = id_generator
+        module_system.id_generator.target_course_id = 'test_course_id'
         video = VideoBlock.parse_xml(xml_object, module_system, None)
 
         self.assert_attributes_equal(video, {'edx_video_id': edx_video_id})

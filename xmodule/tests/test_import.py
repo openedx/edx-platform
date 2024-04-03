@@ -50,6 +50,7 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             mixins=(InheritanceMixin, XModuleMixin),
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
+        self.id_generator = Mock()
 
 
 class BaseCourseTestCase(TestCase):

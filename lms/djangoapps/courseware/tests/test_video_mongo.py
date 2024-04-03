@@ -2025,9 +2025,8 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_provider=val_transcript_provider
         )
         xml_object = etree.fromstring(xml_data)
-        id_generator = Mock()
-        id_generator.target_course_id = "test_course_id"
-        module_system.id_generator = id_generator
+        module_system.id_generator.target_course_id = "test_course_id"
+
         video = self.block.parse_xml(xml_object, module_system, None)
 
         assert video.edx_video_id == 'test_edx_video_id'
@@ -2035,7 +2034,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert video_data['client_video_id'] == 'test_client_video_id'
         assert video_data['duration'] == 111.0
         assert video_data['status'] == 'imported'
-        assert video_data['courses'] == [{id_generator.target_course_id: None}]
+        assert video_data['courses'] == [{module_system.id_generator.target_course_id: None}]
         assert video_data['encoded_videos'][0]['profile'] == 'mobile'
         assert video_data['encoded_videos'][0]['url'] == 'http://example.com/video'
         assert video_data['encoded_videos'][0]['file_size'] == 222
