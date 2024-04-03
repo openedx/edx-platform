@@ -8,6 +8,7 @@ import logging
 from django.dispatch import receiver
 from openedx_events.content_authoring.data import (
     CourseData,
+    DuplicatedXBlockData,
     XBlockData,
     LibraryBlockData,
 )
@@ -16,13 +17,15 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
+    XBLOCK_DUPLICATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_DELETED,
 )
 
-from .tasks import delete_course_tags
+from .api import copy_object_tags
 from .tasks import (
+    delete_course_tags,
     delete_xblock_tags,
     update_course_tags,
     update_xblock_tags,
@@ -125,3 +128,19 @@ def delete_tag_library_block(**kwargs):
         delete_library_block_tags(str(library_block_data.usage_key))
     except Exception as err:  # pylint: disable=broad-except
         log.error(f"Failed to delete library block tags: {err}")
+
+
+@receiver(XBLOCK_DUPLICATED)
+def duplicate_tags(**kwargs):
+    """
+    Duplicates tags associated with an XBlock whenever the block is duplicated to a new location.
+    """
+    xblock_data = kwargs.get("xblock_info", None)
+    if not xblock_data or not isinstance(xblock_data, DuplicatedXBlockData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    copy_object_tags(
+        xblock_data.source_usage_key,
+        xblock_data.usage_key,
+    )
