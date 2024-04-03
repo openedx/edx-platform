@@ -400,7 +400,7 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
-done-xblock==2.2.0
+done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
     # via edx-drf-extensions

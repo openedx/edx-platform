@@ -497,7 +497,7 @@ djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-done-xblock==2.2.0
+done-xblock==2.3.0
     # via -r requirements/edx/base.txt
 drf-jwt==1.19.2
     # via
