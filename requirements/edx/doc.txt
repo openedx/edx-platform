@@ -523,7 +523,7 @@ edx-codejail==3.3.3
     # via -r requirements/edx/base.txt
 edx-completion==4.5.0
     # via -r requirements/edx/base.txt
-edx-django-release-util==1.3.0
+edx-django-release-util==1.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edxval
