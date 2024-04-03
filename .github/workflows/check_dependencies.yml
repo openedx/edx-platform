@@ -29,7 +29,8 @@ jobs:
           if [ -f "$py_reqs" ]; then
             cp "$py_reqs" WORK_DIR/repo_work/base.txt
             echo "Python requirements file: $py_reqs"
-            echo "repo_work directory: $repo_work"
+            echo "Content of base.txt:"
+            cat "$py_reqs"
           else
             echo "No Python requirements file found."
           fi
