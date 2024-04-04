@@ -32,7 +32,7 @@ jobs:
         run: |
           for req_file in "requirements/edx/base.txt" "requirements/base.txt" "requirements.txt"; do
             if [ -f "$req_file" ]; then
-              cp "$req_file" "$repo_work/base.txt
+              cp "$req_file" "$repo_work"/base.txt
               echo "Python requirements file found: $req_file"
               echo "Content of base.txt:"
               cat "$req_file"
