@@ -2,7 +2,6 @@
 
 import json
 import unittest
-from unittest.mock import Mock
 
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData

@@ -50,7 +50,6 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             mixins=(InheritanceMixin, XModuleMixin),
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
-        self.id_generator = Mock()
 
 
 class BaseCourseTestCase(TestCase):
@@ -360,7 +359,9 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
             </chapter>
         </course>'''.format(due=course_due, org=ORG, course=COURSE, url_name=url_name)
         block = system.process_xml(start_xml)
+        print("\n\n\n\n\n", block.runtime.id_generator, "\n\n\n\n")
         child = block.get_children()[0]
+        print("\n\n\n\n\n", child, "\n\n\n\n\n")
         # pylint: disable=protected-access
         child._field_data.set(child, 'due', child_due)
         compute_inherited_metadata(block)
