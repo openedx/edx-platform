@@ -2,6 +2,8 @@
 Management command for deleting notifications with parameters
 """
 import datetime
+import logging
+
 from django.core.management.base import BaseCommand
 
 from openedx.core.djangoapps.notifications.base_notification import (
@@ -9,6 +11,9 @@ from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_TYPES
 )
 from openedx.core.djangoapps.notifications.tasks import delete_notifications
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -38,6 +43,7 @@ class Command(BaseCommand):
         Calls delete notifications task
         """
         delete_notifications.delay(kwargs)
+        logger.info('Deletion task is in progress please check logs to verify')
 
 
 def argparse_date(string: str):
