@@ -2,7 +2,7 @@
     <div class="subsection-share-link-container">
         <div>
             <p>
-                <%- gettext('Embed your subsection content directly on a page using an iframe, and view it withput the LMS header and footer.') %>
+                <%- gettext('Embed your subsection content directly on a page using an iframe, and view it without the LMS header and footer.') %>
             </p>
             <button
                 type="button"
