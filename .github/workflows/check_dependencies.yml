@@ -70,7 +70,16 @@ jobs:
       - name: Display GitHub URLs
         run: |
           echo "GitHub URLs:"
-          echo "${{ steps.extract.outputs.urls }}"  
+          echo "${{ steps.extract.outputs.urls }}"
+
+      - name: Check if files directory exists
+      run: |
+        if [ -d "/home/runner/work/edx-platform/edx-platform/files" ]; then
+          echo "Directory exists: /home/runner/work/edx-platform/edx-platform/files"
+        else
+          echo "Directory does not exist: /home/runner/work/edx-platform/edx-platform/files"
+          exit 1
+        fi      
 
       - name: Print WHL Files
         run: |
