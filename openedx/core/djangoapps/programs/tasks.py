@@ -426,7 +426,10 @@ def update_credentials_course_certificate_configuration_available_date(
     course_key = str(course_key)
     course_modes = CourseMode.objects.filter(course_id=course_key)
     # There should only ever be one certificate relevant mode per course run
-    modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+    modes = [
+        mode.slug for mode in course_modes
+        if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES or CourseMode.is_eligible_for_certificate(mode.slug)
+    ]
     if len(modes) != 1:
         LOGGER.exception(f"Either course {course_key} has no certificate mode or multiple modes. Task failed.")
         return
@@ -509,7 +512,10 @@ def award_course_certificate(self, username, course_run_key):
             )
             return
 
-        if certificate.mode in CourseMode.CERTIFICATE_RELEVANT_MODES:
+        if (
+            certificate.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
+            or CourseMode.is_eligible_for_certificate(certificate.mode)
+        ):
             course_overview = get_course_overview_or_none(course_key)
             if not course_overview:
                 LOGGER.warning(

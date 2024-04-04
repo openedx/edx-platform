@@ -154,3 +154,16 @@ def remove_preferences_with_no_access(preferences: dict, user) -> dict:
         user_forum_roles
     )
     return preferences
+
+
+def clean_arguments(kwargs):
+    """
+    Returns query arguments from command line arguments
+    """
+    clean_kwargs = {}
+    for key in ['app_name', 'notification_type', 'course_id']:
+        if kwargs.get(key):
+            clean_kwargs[key] = kwargs[key]
+    if kwargs.get('created', {}):
+        clean_kwargs.update(kwargs.get('created'))
+    return clean_kwargs

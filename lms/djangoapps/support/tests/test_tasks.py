@@ -123,28 +123,32 @@ class ResetStudentCourse(TestSubmittingProblems):
                     self.student_user,
                     self.p1.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p2.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p3.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.video.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 )
             ])
 
@@ -168,21 +172,24 @@ class ResetStudentCourse(TestSubmittingProblems):
                     self.student_user,
                     self.p1.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p2.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p3.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 )
             ])
 

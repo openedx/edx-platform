@@ -71,7 +71,7 @@ django-waffle==4.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-edx-django-utils==5.10.1
+edx-django-utils==5.12.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client

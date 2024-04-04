@@ -148,11 +148,7 @@ def node_prereqs_installation():
 
     # NPM installs hang sporadically. Log the installation process so that we
     # determine if any packages are chronic offenders.
-    shard_str = os.getenv('SHARD', None)
-    if shard_str:
-        npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.{shard_str}.log'
-    else:
-        npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.log'
+    npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.log'
     npm_log_file = open(npm_log_file_path, 'wb')  # lint-amnesty, pylint: disable=consider-using-with
     npm_command = 'npm ci --verbose'.split()
 
