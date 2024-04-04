@@ -62,7 +62,14 @@ def reset_student_course(course_id, learner_email, reset_by_user_email):
         # Clear student state and score
         for data in blocks:
             try:
-                reset_student_attempts(course.id, user, data.scope_ids.usage_id, reset_by_user, True)
+                reset_student_attempts(
+                    course.id,
+                    user,
+                    data.scope_ids.usage_id,
+                    reset_by_user,
+                    delete_module=True,
+                    emit_signals_and_events=False
+                )
             except StudentModule.DoesNotExist:
                 pass
 
