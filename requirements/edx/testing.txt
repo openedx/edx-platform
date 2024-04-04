@@ -342,7 +342,7 @@ django-classy-tags==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   django-sekizai
-django-config-models==2.5.1
+django-config-models==2.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -497,7 +497,7 @@ djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-done-xblock==2.2.0
+done-xblock==2.3.0
     # via -r requirements/edx/base.txt
 drf-jwt==1.19.2
     # via
@@ -547,7 +547,7 @@ edx-codejail==3.3.3
     # via -r requirements/edx/base.txt
 edx-completion==4.5.0
     # via -r requirements/edx/base.txt
-edx-django-release-util==1.3.0
+edx-django-release-util==1.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edxval
