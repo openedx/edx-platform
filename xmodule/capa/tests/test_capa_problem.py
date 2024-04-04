@@ -4,15 +4,22 @@ Test capa problem.
 import textwrap
 import unittest
 
+from django.conf import settings
+from django.test import override_settings
 import pytest
 import ddt
 from lxml import etree
 from markupsafe import Markup
-from mock import patch
+from mock import patch, MagicMock
 
+from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError
 from xmodule.capa.tests.helpers import new_loncapa_problem
 from openedx.core.djangolib.markup import HTML
+
+
+FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS = settings.FEATURES.copy()
+FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS['ENABLE_GRADING_METHOD_IN_PROBLEMS'] = True
 
 
 @ddt.ddt
@@ -732,3 +739,104 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         # Ensure that the answer is a string so that the dict returned from this
         # function can eventualy be serialized to json without issues.
         assert isinstance(problem.get_question_answers()['1_solution_1'], str)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    def test_get_grade_from_current_answers(self):
+        """
+        Verify that `responder.evaluate_answers` is called with `student_answers`
+        and `correct_map` sent to `get_grade_from_current_answers`.
+
+        When both arguments are provided, means that the problem is being rescored.
+        """
+        student_answers = {'1_2_1': 'over-suspicious'}
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <multiplechoiceresponse>
+                    <choicegroup>
+                        <choice correct="true">Answer1</choice>
+                        <choice correct="false">Answer2</choice>
+                        <choice correct="false">Answer3</choice>
+                        <choice correct="false">Answer4</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+            </problem>
+            """
+        )
+        responder_mock = MagicMock()
+
+        with patch.object(problem, 'responders', {'responder1': responder_mock}):
+            responder_mock.allowed_inputfields = ['choicegroup']
+            responder_mock.evaluate_answers.return_value = correct_map
+
+            result = problem.get_grade_from_current_answers(student_answers, correct_map)
+            self.assertDictEqual(result.get_dict(), correct_map.get_dict())
+            responder_mock.evaluate_answers.assert_called_once_with(student_answers, correct_map)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    def test_get_grade_from_current_answers_without_student_answers(self):
+        """
+        Verify that `responder.evaluate_answers` is called with appropriate arguments.
+
+        When `student_answers` is None, `responder.evaluate_answers` should be called with
+        the `self.student_answers` instead.
+        """
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <multiplechoiceresponse>
+                    <choicegroup>
+                        <choice correct="true">Answer1</choice>
+                        <choice correct="false">Answer2</choice>
+                        <choice correct="false">Answer3</choice>
+                        <choice correct="false">Answer4</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+            </problem>
+            """
+        )
+        responder_mock = MagicMock()
+
+        with patch.object(problem, 'responders', {'responder1': responder_mock}):
+            problem.responders['responder1'].allowed_inputfields = ['choicegroup']
+            problem.responders['responder1'].evaluate_answers.return_value = correct_map
+
+            result = problem.get_grade_from_current_answers(None, correct_map)
+
+            self.assertDictEqual(result.get_dict(), correct_map.get_dict())
+            responder_mock.evaluate_answers.assert_called_once_with(None, correct_map)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    def test_get_grade_from_current_answers_with_filesubmission(self):
+        """
+        Verify that an exception is raised when `responder.evaluate_answers` is called
+        with `student_answers` as None and `correct_map` sent to `get_grade_from_current_answers`
+
+        This ensures that rescore is not allowed if the problem has a filesubmission.
+        """
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <multiplechoiceresponse>
+                    <choicegroup>
+                        <choice correct="true">Answer1</choice>
+                        <choice correct="false">Answer2</choice>
+                        <choice correct="false">Answer3</choice>
+                        <choice correct="false">Answer4</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+            </problem>
+            """
+        )
+        responder_mock = MagicMock()
+
+        with patch.object(problem, 'responders', {'responder1': responder_mock}):
+            responder_mock.allowed_inputfields = ['filesubmission']
+            responder_mock.evaluate_answers.return_value = correct_map
+
+            with self.assertRaises(Exception):
+                problem.get_grade_from_current_answers(None, correct_map)
+            responder_mock.evaluate_answers.assert_not_called()
