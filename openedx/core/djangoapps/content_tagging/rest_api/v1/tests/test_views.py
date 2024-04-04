@@ -37,8 +37,7 @@ from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
 from openedx.core.djangoapps.content_tagging.utils import rules_cache
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
-
-from ....helpers.test_objecttag_export_helpers import TaggedCourseMixin
+from ....tests.test_objecttag_export_helpers import TaggedCourseMixin
 
 User = get_user_model()
 

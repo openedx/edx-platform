@@ -9,7 +9,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import api
-from .objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
+from ..helpers.objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
 

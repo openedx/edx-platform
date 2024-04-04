@@ -9,7 +9,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
-from ..helpers.test_objecttag_export_helpers import TestGetAllObjectTagsMixin, TaggedCourseMixin
+from .test_objecttag_export_helpers import TestGetAllObjectTagsMixin, TaggedCourseMixin
 
 from .. import api
 from ..utils import rules_cache
