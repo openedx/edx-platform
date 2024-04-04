@@ -1,21 +1,32 @@
 """ Django admins for support models """
+from django import forms
 from django.contrib import admin
 from lms.djangoapps.support.models import CourseResetCourseOptIn, CourseResetAudit
+from openedx.core.lib.courses import clean_course_id
+
+
+class CourseResetCourseOptInAdminForm(forms.ModelForm):
+    """ Form for the CourseResetCourseOptIn Django admin page """
+    class Meta:
+        model = CourseResetCourseOptIn
+        fields = ['course_id', 'active']
+
+    def clean_course_id(self):
+        return clean_course_id(self)
 
 
 class CourseResetCourseOptInAdmin(admin.ModelAdmin):
     """ Django admin for CourseResetCourseOptIn model """
-    list_display = ['course_id', 'active']
-    fields = ['course_id', 'active', 'created', 'modified']
+    form = CourseResetCourseOptInAdminForm
+    list_display = ['course_id', 'active', 'created', 'modified']
 
     def get_readonly_fields(self, request, obj=None):
         """
         Ensure that 'course_id' cannot be edited after creation.
         """
         if obj:
-            return ['course_id', 'created', 'modified']
-        else:
-            return ['created', 'modified']
+            return ['course_id']
+        return []
 
 
 class CourseResetAuditAdmin(admin.ModelAdmin):
@@ -33,6 +44,7 @@ class CourseResetAuditAdmin(admin.ModelAdmin):
         'reset_by',
         'comment'
     ]
+    actions = ['mark_failed']
 
     def get_readonly_fields(self, request, obj=None):
         """
@@ -55,6 +67,10 @@ class CourseResetAuditAdmin(admin.ModelAdmin):
     @admin.display(description="user")
     def user(self, obj):
         return obj.course_enrollment.user
+
+    @admin.action(description="Fail selected reset attempts")
+    def mark_failed(self, request, queryset):
+        queryset.update(status=CourseResetAudit.CourseResetStatus.FAILED)
 
 
 admin.site.register(CourseResetCourseOptIn, CourseResetCourseOptInAdmin)
