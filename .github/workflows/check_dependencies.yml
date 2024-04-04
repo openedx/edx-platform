@@ -57,6 +57,17 @@ jobs:
           cat ${{ github.workspace }}/files"
         working-directory: /tmp/unpack_reqs/openedx/edx-platform
 
+      - name: Print WHL Files
+        run: |
+          echo "Path of files: /home/runner/work/edx-platform/edx-platform/files"
+          echo "WHL files found:"
+          for file in /home/runner/work/edx-platform/edx-platform/files/*.whl; do
+            echo "File: $file"
+            echo "Contents:"
+            cat "$file"
+            echo "-----------------"
+          done   
+
       - name: Extract GitHub URLs from base.txt
         id: extract
         run: |
