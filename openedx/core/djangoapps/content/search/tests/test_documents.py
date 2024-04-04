@@ -9,6 +9,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
 from ..documents import searchable_doc_for_course_block
+from ..models import SearchAccess
+
 
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 
@@ -26,6 +28,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         cls.store = modulestore()
         cls.toy_course = ToyCourseFactory.create()  # See xmodule/modulestore/tests/sample_courses.py
         cls.toy_course_key = cls.toy_course.id
+        cls.toy_course_access_id = SearchAccess.objects.get(context_key=cls.toy_course_key).id
+
         # Get references to some blocks in the toy course
         cls.html_block_key = cls.toy_course_key.make_usage_key("html", "toyjumpto")
         # Create a problem in library
@@ -71,6 +75,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "block_id": "Test_Problem",
             "context_key": "course-v1:edX+toy+2012_Fall",
             "org": "edX",
+            "access_id": self.toy_course_access_id,
             "display_name": "Test Problem",
             "breadcrumbs": [
                 {"display_name": "Toy Course"},
@@ -105,6 +110,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "block_id": "toyjumpto",
             "context_key": "course-v1:edX+toy+2012_Fall",
             "org": "edX",
+            "access_id": self.toy_course_access_id,
             "display_name": "Text",
             "breadcrumbs": [
                 {"display_name": "Toy Course"},
@@ -139,6 +145,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "block_id": "Welcome",
             "context_key": "course-v1:edX+toy+2012_Fall",
             "org": "edX",
+            "access_id": self.toy_course_access_id,
             "display_name": "Welcome",
             "breadcrumbs": [
                 {"display_name": "Toy Course"},

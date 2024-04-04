@@ -7,16 +7,20 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 import meilisearch
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.roles import GlobalStaff
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.content.search.documents import STUDIO_INDEX_NAME
+from openedx.core.djangoapps.content.search.models import get_access_ids_for_request
+
 
 User = get_user_model()
 log = logging.getLogger(__name__)
+MAX_ACCESS_IDS_IN_FILTER = 1_000
 
 
 def _get_meili_api_key_uid():
@@ -27,6 +31,21 @@ def _get_meili_api_key_uid():
         client = meilisearch.Client(settings.MEILISEARCH_URL, settings.MEILISEARCH_API_KEY)
         _get_meili_api_key_uid.uid = client.get_key(settings.MEILISEARCH_API_KEY).uid
     return _get_meili_api_key_uid.uid
+
+
+def _get_meili_access_filter(request: Request) -> dict:
+    """
+    Return meilisearch filter based on the requesting user's permissions.
+    """
+    # Global staff can see anything, so no filters required.
+    if GlobalStaff().has_user(request.user):
+        return {}
+
+    # Everyone else is limited to the N most recent courses and libraries they can access.
+    access_ids = get_access_ids_for_request(request)[:MAX_ACCESS_IDS_IN_FILTER]
+    return {
+        "filter": f"access_id IN {access_ids}",
+    }
 
 
 @view_auth_classes(is_authenticated=True)
@@ -41,21 +60,13 @@ class StudioSearchView(APIView):
         """
         if not settings.MEILISEARCH_ENABLED:
             raise NotFound("Meilisearch features are not enabled.")
-        if not GlobalStaff().has_user(request.user):
-            # Until we enforce permissions properly (see below), this endpoint is restricted to global staff,
-            # because it lets you search data from any course/library.
-            raise PermissionDenied("For the moment, use of this search preview is restricted to global staff.")
         client = meilisearch.Client(settings.MEILISEARCH_URL, settings.MEILISEARCH_API_KEY)
         index_name = settings.MEILISEARCH_INDEX_PREFIX + STUDIO_INDEX_NAME
 
         # Create an API key that only allows the user to search content that they have permission to view:
         expires_at = datetime.now(tz=timezone.utc) + timedelta(days=7)
         search_rules = {
-            index_name: {
-                # TODO: Apply filters here based on the user's permissions, so they can only search for content
-                # that they have permission to view. Example:
-                # 'filter': 'org = BradenX'
-            }
+            index_name: _get_meili_access_filter(request),
         }
         # Note: the following is just generating a JWT. It doesn't actually make an API call to Meilisearch.
         restricted_api_key = client.generate_tenant_token(
