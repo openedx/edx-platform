@@ -1721,7 +1721,7 @@ xblock-google-drive==0.3.0
     # via -r requirements/edx/testing.txt
 xblock-poll==1.13.0
     # via -r requirements/edx/testing.txt
-xblock-utils==3.0.0
+xblock-utils==3.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-sga
