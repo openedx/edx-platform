@@ -17,13 +17,14 @@ def file_upload_view(request):
             file_name = default_storage.save(file_obj.name, file_obj)
 
             # Determine the file URL based on the storage backend
+            default_file_url = default_storage.url(file_name)
             storage_backend = default_storage.__class__.__name__
             if 'S3Boto3Storage' in storage_backend:
                 # File URL for S3
-                file_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{file_name}"
+                file_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}{default_file_url}"
             else:
                 # File URL for local storage
-                file_url = request.build_absolute_uri(settings.MEDIA_URL + file_name)
+                file_url = request.build_absolute_uri(default_file_url)
 
             return JsonResponse({'status': 'File uploaded', 'file_url': file_url})
 
