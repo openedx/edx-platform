@@ -3,8 +3,8 @@ Django module for Course Metadata class -- manages advanced settings and related
 """
 
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 import pytz
 from django.conf import settings
@@ -78,6 +78,7 @@ class CourseMetadata:
         'highlights_enabled_for_messaging',
         'is_onboarding_exam',
         'discussions_settings',
+        'copied_from_block',
     ]
 
     @classmethod
