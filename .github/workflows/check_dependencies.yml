@@ -74,10 +74,10 @@ jobs:
 
       - name: Check if files directory exists
         run: |
-          if [ -d "/home/runner/work/edx-platform/edx-platform/files" ]; then
-            echo "Directory exists: /home/runner/work/edx-platform/edx-platform/files"
+          if [ -d "/tmp/unpack_reqs/openedx/edx-platform/files" ]; then
+            echo "Directory exists: /tmp/unpack_reqs/openedx/edx-platform/files"
           else
-            echo "Directory does not exist: /home/runner/work/edx-platform/edx-platform/files"
+            echo "Directory does not exist: /tmp/unpack_reqs/openedx/edx-platform/files"
             exit 1
           fi      
 
