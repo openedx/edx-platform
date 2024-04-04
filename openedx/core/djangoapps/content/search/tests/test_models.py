@@ -6,11 +6,17 @@ from organizations.models import Organization
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.content.search.models import SearchAccess, get_access_ids_for_request
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+try:
+    # This import errors in the lms because content.search is not an installed app there.
+    from openedx.core.djangoapps.content.search.models import SearchAccess, get_access_ids_for_request
+except RuntimeError:
+    SearchAccess = {}
+    get_access_ids_for_request = lambda x: x
 
 
 @skip_unless_cms
@@ -18,6 +24,7 @@ class StudioSearchAccessTest(SharedModuleStoreTestCase):
     """
     Tests the SearchAccess model, handlers, and helper functions.
     """
+
     def setUp(self):
         """
         Add users, orgs, courses, and libraries.
