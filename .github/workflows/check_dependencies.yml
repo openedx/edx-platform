@@ -23,7 +23,10 @@ jobs:
       - name: Create repo_work directory        
         run: |
           WORK_DIR="/tmp/unpack_reqs"
-          mkdir -p "$WORK_DIR"/repo_work
+          repo_name="${{ github.repository }}"
+          repo_work="$WORK_DIR/$repo_name"
+          mkdir -p "$repo_work"
+          echo "$repo_work"
 
       - name: Copy Python requirements file
         run: |
@@ -39,10 +42,8 @@ jobs:
           done
 
       - name: Create virtual environment
-        run: python3 -m venv $WORK_DIR/repo_work/.venv
-        working-directory: |
-                        WORK_DIR="/tmp/unpack_reqs"
-                        $WORK_DIR/repo_work
+        run: python3 -m venv .venv
+        working-directory: /tmp/unpack_reqs/repo_work
 
       - name: Upgrade pip
         run: |
