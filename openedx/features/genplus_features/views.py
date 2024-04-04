@@ -20,7 +20,7 @@ def file_upload_view(request):
             storage_backend = default_storage.__class__.__name__
             if 'S3Boto3Storage' in storage_backend:
                 # File URL for S3
-                file_url = os.path.join(settings.AWS_S3_CUSTOM_DOMAIN, file_name)
+                file_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{file_name}"
             else:
                 # File URL for local storage
                 file_url = request.build_absolute_uri(settings.MEDIA_URL + file_name)
