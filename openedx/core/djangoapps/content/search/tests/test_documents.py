@@ -8,8 +8,13 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
-from ..documents import searchable_doc_for_course_block
-from ..models import SearchAccess
+try:
+    # This import errors in the lms because content.search is not an installed app there.
+    from ..documents import searchable_doc_for_course_block
+    from ..models import SearchAccess
+except RuntimeError:
+    searchable_doc_for_course_block = lambda x: x
+    SearchAccess = {}
 
 
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
