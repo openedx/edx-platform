@@ -83,9 +83,9 @@ jobs:
 
       - name: Print WHL Files
         run: |
-          echo "Path of files: /home/runner/work/edx-platform/edx-platform/files"
+          echo "Path of files: /tmp/unpack_reqs/openedx/edx-platform/files"
           echo "WHL files found:"
-          for file in /home/runner/work/edx-platform/edx-platform/files/*.whl; do
+          for file in /tmp/unpack_reqs/openedx/edx-platform/files/*.whl; do
             echo "File: $file"
             echo "Contents:"
             cat "$file"
