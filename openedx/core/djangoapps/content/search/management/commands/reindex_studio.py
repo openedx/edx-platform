@@ -84,6 +84,7 @@ class Command(MeiliCommandMixin, BaseCommand):
                 Fields.org,
                 Fields.tags,
                 Fields.type,
+                Fields.access_id,
             ])
             # Mark which attributes are used for keyword search, in order of importance:
             client.index(temp_index_name).update_searchable_attributes([
