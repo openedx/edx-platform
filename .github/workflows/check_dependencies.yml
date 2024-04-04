@@ -53,8 +53,6 @@ jobs:
         run: |
           echo "Downloading packages"
           .venv/bin/python3 -m pip download --dest files -r base.txt
-          echo "Path of files: ${{ github.workspace }}/files"
-          cat ${{ github.workspace }}/files"
         working-directory: /tmp/unpack_reqs/openedx/edx-platform
 
       - name: Extract GitHub URLs from base.txt
