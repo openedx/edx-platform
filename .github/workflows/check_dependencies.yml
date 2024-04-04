@@ -61,7 +61,7 @@ jobs:
         id: extract
         run: |
           urls=()
-          base_txt_path="./files/base.txt"
+          base_txt_path="/tmp/unpack_reqs/openedx/edx-platform/base.txt"
           while IFS= read -r line; do
             if [[ $line =~ (https://github.com[^@ #]*(\.git)?) ]]; then
               urls+=("${BASH_REMATCH[0]}")
