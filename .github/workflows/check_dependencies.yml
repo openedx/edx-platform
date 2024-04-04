@@ -67,7 +67,7 @@ jobs:
               urls+=("${BASH_REMATCH[0]}")
             fi
           done < "${base_txt_path}"
-          echo "::set-output name=urls::${urls[*]}"
+          echo "{name}={urls}" >> $GITHUB_OUTPUT
 
       - name: Display GitHub URLs
         run: |
