@@ -643,7 +643,7 @@ edx-tincan-py35==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-toggles==5.1.1
+edx-toggles==5.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
