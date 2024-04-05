@@ -34,6 +34,6 @@ class StudioSearchView(APIView):
             # because it lets you search data from any course/library.
             raise PermissionDenied("For the moment, use of this search preview is restricted to global staff.")
 
-        response_data = api.generate_user_token(request.user)
+        response_data = api.generate_user_token_for_studio_search(request.user)
 
         return Response(response_data)
