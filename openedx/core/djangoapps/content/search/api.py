@@ -169,11 +169,8 @@ def _using_temp_index(status_cb: Callable[[str], None] | None = None) -> Generat
     Create a new temporary Meilisearch index, populate it, then swap it to
     become the active index.
     """
-    def nop(_):
-        pass
-
     if status_cb is None:
-        status_cb = nop
+        status_cb = log.info
 
     client = _get_meilisearch_client()
     status_cb("Checking index...")
@@ -253,11 +250,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     """
     Rebuild the Meilisearch index from scratch
     """
-    def nop(_message):
-        pass
-
     if status_cb is None:
-        status_cb = nop
+        status_cb = log.info
 
     client = _get_meilisearch_client()
     store = modulestore()
