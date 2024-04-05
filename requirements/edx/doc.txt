@@ -198,7 +198,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-crowdsourcehinter-xblock==0.6
+crowdsourcehinter-xblock==0.7
     # via -r requirements/edx/base.txt
 cryptography==38.0.4
     # via

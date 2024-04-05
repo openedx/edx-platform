@@ -152,7 +152,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-crowdsourcehinter-xblock==0.6
+crowdsourcehinter-xblock==0.7
     # via -r requirements/edx/bundled.in
 cryptography==38.0.4
     # via
