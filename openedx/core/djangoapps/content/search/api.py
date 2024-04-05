@@ -224,7 +224,7 @@ def _recurse_children(block, fn, status_cb: Callable[[str], None] | None = None)
                 fn(child)
 
 
-def _update_index_docs(docs)-> None:
+def _update_index_docs(docs) -> None:
     """
     Helper function that updates the documents in the search index
 
