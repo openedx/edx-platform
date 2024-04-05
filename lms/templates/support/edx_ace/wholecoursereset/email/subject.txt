@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans trimmed %}The course {{ course_title }} has been reset !{% endblocktrans %}
+{% endautoescape %}

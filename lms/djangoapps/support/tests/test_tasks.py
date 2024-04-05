@@ -4,6 +4,8 @@ Unit tests for reset_student_course task
 
 from unittest.mock import patch, Mock, call
 
+from django.conf import settings
+from django.core import mail
 from xmodule.modulestore.tests.factories import BlockFactory
 
 from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
@@ -15,6 +17,7 @@ from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import SupportStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.video_block import VideoBlock
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class ResetStudentCourse(TestSubmittingProblems):
@@ -109,6 +112,20 @@ class ResetStudentCourse(TestSubmittingProblems):
 
         self.refresh_course()
 
+    def assert_email_sent_successfully(self, expected):
+        """
+        Verify that the course reset email has been sent to the user.
+        """
+        from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        sent_message = mail.outbox[-1]
+        body = sent_message.body
+
+        assert expected['subject'] in sent_message.subject
+        assert expected['body'] in body
+        assert sent_message.from_email == from_email
+        assert len(sent_message.to) == 1
+        assert self.student_user.email in sent_message.to
+
     def test_reset_student_course(self):
         """ Test that it resets student attempts  """
         with patch(
@@ -157,6 +174,10 @@ class ResetStudentCourse(TestSubmittingProblems):
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNotNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.COMPLETE)
+            self.assert_email_sent_successfully({
+                'subject': f'The course { self.course.display_name } has been reset !',
+                'body': f'Your progress in course { self.course.display_name } has been reset on your behalf.'
+            })
 
     def test_reset_student_course_student_module_not_found(self):
 
