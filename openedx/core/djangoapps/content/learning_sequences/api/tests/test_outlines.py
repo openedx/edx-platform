@@ -2089,7 +2089,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
             ]
         )
 
-    @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
     @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_load_data_in_partition_processor(self, team_sets_mock, team_configuration_service_mock):
         """
@@ -2121,7 +2121,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
             self.team_sets[0].dynamic_user_partition_id
         ).name == self.team_1.name
 
-    @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
     @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_user_not_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
         """
@@ -2149,7 +2149,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         )
         assert not team_partition_groups_processor._is_user_excluded_by_partition_group([])
 
-    @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
     @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_user_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
         """
@@ -2173,7 +2173,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         # pylint: disable=protected-access
         assert team_partition_groups_processor._is_user_excluded_by_partition_group(sequence_partition_groups)
 
-    @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
     @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_usage_keys_removed(self, team_sets_mock, team_configuration_service_mock):
         """Test that the team partition groups processor correctly determines the usage keys to remove from the outline.
