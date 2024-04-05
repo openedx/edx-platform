@@ -389,7 +389,7 @@ def delete_index_doc(usage_key: UsageKey) -> None:
 
     tasks = []
     if current_rebuild_index_name:
-        # If there is a rebuild in progress, the document will also be added to the new index.
+        # If there is a rebuild in progress, the document will also be deleted from the new index.
         tasks.append(client.index(current_rebuild_index_name).delete_document(meili_id_from_opaque_key(usage_key)))
     tasks.append(client.index(INDEX_NAME).delete_document(meili_id_from_opaque_key(usage_key)))
 
