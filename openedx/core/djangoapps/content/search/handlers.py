@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content.search.models import SearchAccess
 @receiver(COURSE_CREATED)
 def create_course_search_access(course: CourseData, **kwargs):
     """Creates a SearchAccess instance for new courses."""
-    SearchAccess.objects.create(context_key=course.course_key)
+    SearchAccess.objects.get_or_create(context_key=course.course_key)
 
 
 # Using post_delete here because there is no COURSE_DELETED event defined.
@@ -26,7 +26,7 @@ def delete_course_search_access(sender, instance, **kwargs):  # pylint: disable=
 @receiver(CONTENT_LIBRARY_CREATED)
 def create_library_search_access(content_library: ContentLibraryData, **kwargs):
     """Creates a SearchAccess instance for new content libraries"""
-    SearchAccess.objects.create(context_key=content_library.library_key)
+    SearchAccess.objects.get_or_create(context_key=content_library.library_key)
 
 
 @receiver(CONTENT_LIBRARY_DELETED)
