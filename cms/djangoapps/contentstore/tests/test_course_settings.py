@@ -1791,7 +1791,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             }
         }
 
-        CourseMetadata.fill_teams_user_partitions_ids(self.course.id, settings_dict)
+        CourseMetadata.fill_teams_user_partitions_ids(self.course, settings_dict)
 
         for team_set in settings_dict["teams_configuration"]["value"]["team_sets"]:
             self.assertNotIn("dynamic_user_partition_id", team_set)
@@ -1813,7 +1813,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             }
         }
 
-        CourseMetadata.fill_teams_user_partitions_ids(self.course.id, settings_dict)
+        CourseMetadata.fill_teams_user_partitions_ids(self.course, settings_dict)
 
         for team_set in settings_dict["teams_configuration"]["value"]["team_sets"]:
             self.assertIn("dynamic_user_partition_id", team_set)
