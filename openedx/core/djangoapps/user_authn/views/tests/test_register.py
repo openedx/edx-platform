@@ -2625,10 +2625,10 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         return self.client.post(self.path, data)
 
     def get_validation_decision(self, response):
-        return response.data.get('validation_decisions', {})
+        return response.data.get('validationDecisions', {})
 
     def get_username_suggestions(self, response):
-        return response.data.get('username_suggestions', [])
+        return response.data.get('usernameSuggestions', [])
 
     def assertValidationDecision(self, data, decision, validate_suggestions=False):
         response = self.get_validation_response(data)

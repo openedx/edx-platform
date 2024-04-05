@@ -7,10 +7,14 @@ from django.test import TestCase
 from openedx.core.djangoapps.user_authn.api.tests.data_mock import (
     MFE_CONTEXT_WITH_TPA_DATA,
     MFE_CONTEXT_WITHOUT_TPA_DATA,
+    VALIDATION_REGISTRATION_DATA,
+    NAME_VALIDATION_REGISTRATION_DATA,
     SERIALIZED_MFE_CONTEXT_WITH_TPA_DATA,
     SERIALIZED_MFE_CONTEXT_WITHOUT_TPA_DATA,
+    SERIALIZED_VALIDATION_REGISTRATION_DATA,
+    SERIALIZED_NAME_VALIDATION_REGISTRATION_DATA,
 )
-from openedx.core.djangoapps.user_authn.serializers import MFEContextSerializer
+from openedx.core.djangoapps.user_authn.serializers import MFEContextSerializer, RegistrationValidationSerializer
 
 
 class TestMFEContextSerializer(TestCase):
@@ -43,4 +47,36 @@ class TestMFEContextSerializer(TestCase):
         self.assertDictEqual(
             serialized_data,
             SERIALIZED_MFE_CONTEXT_WITHOUT_TPA_DATA
+        )
+
+
+class RegistrationValidationSerializerTest(TestCase):
+    """
+    Unit tests for RegistrationValidationSerializer
+    """
+
+    def test_validation_registration_serializer(self):
+        """
+        Test validation_registration field
+        """
+        serialized_data = RegistrationValidationSerializer(
+            VALIDATION_REGISTRATION_DATA
+        ).data
+
+        self.assertDictEqual(
+            serialized_data,
+            SERIALIZED_VALIDATION_REGISTRATION_DATA
+        )
+
+    def test_validation_registration_with_username_suggestions_serializer(self):
+        """
+        Test validation_registration and username_suggestions fields
+        """
+        serialized_data = RegistrationValidationSerializer(
+            NAME_VALIDATION_REGISTRATION_DATA
+        ).data
+
+        self.assertDictEqual(
+            serialized_data,
+            SERIALIZED_NAME_VALIDATION_REGISTRATION_DATA
         )

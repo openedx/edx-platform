@@ -81,3 +81,22 @@ class MFEContextSerializer(serializers.Serializer):
             'extended_profile': []
         }
     )
+
+
+class RegistrationValidationSerializer(serializers.Serializer):
+    """
+    Serilize the registration validation API response for MFEs
+    """
+
+    def to_representation(self, instance):
+        """
+        Based on dict preparing the serialized response
+        """
+        data = {
+            'validationDecisions': instance.get('validation_decisions')
+        }
+        if instance.get('username_suggestions'):
+            data.update({
+                'usernameSuggestions': instance.get('username_suggestions')
+            })
+        return data

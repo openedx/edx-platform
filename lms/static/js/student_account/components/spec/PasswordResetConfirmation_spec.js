@@ -44,7 +44,7 @@ describe('PasswordResetConfirmation', () => {
         window.fetch.callsFake(() => {
             done();
             return Promise.resolve({
-                json: () => ({ validation_decisions: { password: validationError } }),
+                json: () => ({ validationDecisions: { password: validationError } }),
             });
         });
     }

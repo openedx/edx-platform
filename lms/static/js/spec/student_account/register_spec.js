@@ -62,7 +62,7 @@
                     ]
                 },
                 VALIDATION_DECISIONS_POSITIVE = {
-                    validation_decisions: {
+                    validationDecisions: {
                         email: '',
                         username: '',
                         password: '',
@@ -70,7 +70,7 @@
                     }
                 },
                 VALIDATION_DECISIONS_NEGATIVE = {
-                    validation_decisions: {
+                    validationDecisions: {
                         email: 'Error.',
                         username: 'Error.',
                         password: 'Error.',

@@ -65,6 +65,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
 )
 from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
+from openedx.core.djangoapps.user_authn.serializers import RegistrationValidationSerializer
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
@@ -725,7 +726,7 @@ class RegistrationValidationView(APIView):
             >>> }
             RESPONSE
             >>> {
-            >>>     "validation_decisions": {
+            >>>     "validationDecisions": {
             >>>         "username": "",
             >>>         "email": ""
             >>>     }
@@ -743,7 +744,7 @@ class RegistrationValidationView(APIView):
             >>> }
             RESPONSE
             >>> {
-            >>>     "validation_decisions": {
+            >>>     "validationDecisions": {
             >>>         "username": "",
             >>>         "password": "Password cannot be the same as the username."
             >>>     }
@@ -761,7 +762,7 @@ class RegistrationValidationView(APIView):
             >>> }
             RESPONSE
             >>> {
-            >>>     "validation_decisions": {
+            >>>     "validationDecisions": {
             >>>         "username": "",
             >>>         "email": "It looks like cto@edx.org belongs to an existing account. Try again with a different email address.",
             >>>         "password": "Password must be at least 2 characters long",
@@ -898,5 +899,5 @@ class RegistrationValidationView(APIView):
         response_dict = {'validation_decisions': validation_decisions}
         if self.username_suggestions:
             response_dict['username_suggestions'] = self.username_suggestions
-
-        return Response(response_dict)
+        serialized_response = RegistrationValidationSerializer(response_dict).data
+        return Response(serialized_response)

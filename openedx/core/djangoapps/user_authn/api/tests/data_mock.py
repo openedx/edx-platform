@@ -112,3 +112,29 @@ SERIALIZED_MFE_CONTEXT_WITHOUT_TPA_DATA = {
         'extended_profile': []
     }
 }
+
+VALIDATION_REGISTRATION_DATA = {
+    'validation_decisions': {
+        'email': 'error message'
+    }
+}
+
+SERIALIZED_VALIDATION_REGISTRATION_DATA = {
+    'validationDecisions': {
+        'email': 'error message'
+    }
+}
+
+NAME_VALIDATION_REGISTRATION_DATA = {
+    'validation_decisions': {
+        'email': 'error message'
+    },
+    'username_suggestions': ['test_1', 'test_2', 'test_3']
+}
+
+SERIALIZED_NAME_VALIDATION_REGISTRATION_DATA = {
+    'validationDecisions': {
+        'email': 'error message'
+    },
+    'usernameSuggestions': ['test_1', 'test_2', 'test_3']
+}

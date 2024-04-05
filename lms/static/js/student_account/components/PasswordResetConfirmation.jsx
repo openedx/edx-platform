@@ -61,8 +61,8 @@ class PasswordResetConfirmation extends React.Component {
                 let validationMessage = '';
                 // Be careful about grabbing this message, since we could have received an HTTP error or the
                 // endpoint didn't give us what we expect. We only care if we get a clear error message.
-                if (response.validation_decisions && response.validation_decisions.password) {
-                    validationMessage = response.validation_decisions.password;
+                if (response.validationDecisions && response.validationDecisions.password) {
+                    validationMessage = response.validationDecisions.password;
                 }
                 this.setState({
                     isValid: !validationMessage,

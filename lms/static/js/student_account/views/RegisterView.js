@@ -352,8 +352,8 @@
                     name = $el.attr('name'),
                     type = $el.attr('type'),
                     isCheckbox = type === 'checkbox',
-                    hasError = decisions.validation_decisions[name] !== '',
-                    error = isCheckbox ? '' : decisions.validation_decisions[name];
+                    hasError = decisions.validationDecisions[name] !== '',
+                    error = isCheckbox ? '' : decisions.validationDecisions[name];
 
                 if (hasError && this.negativeValidationEnabled) {
                     this.addValidationErrorMsgForScreenReader($el);
@@ -597,8 +597,8 @@
             },
 
             liveValidateCheckbox: function($checkbox) {
-                var validationDecisions = {validation_decisions: {}},
-                    decisions = validationDecisions.validation_decisions,
+                var validationDecisions = {validationDecisions: {}},
+                    decisions = validationDecisions.validationDecisions,
                     name = $checkbox.attr('name'),
                     checked = $checkbox.is(':checked'),
                     error = $checkbox.data('errormsg-required');
@@ -617,8 +617,8 @@
             },
 
             genericLiveValidate: function($el) {
-                var validationDecisions = {validation_decisions: {}},
-                    decisions = validationDecisions.validation_decisions,
+                var validationDecisions = {validationDecisions: {}},
+                    decisions = validationDecisions.validationDecisions,
                     name = $el.attr('name'),
                     error = $el.data('errormsg-required');
                 decisions[name] = $el.val() ? '' : error;
