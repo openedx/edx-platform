@@ -16,11 +16,13 @@ from common.djangoapps.student.roles import GlobalStaff
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.content.search.documents import STUDIO_INDEX_NAME
 from openedx.core.djangoapps.content.search.models import get_access_ids_for_request
+from openedx.core.djangoapps.content_tagging.rules import get_user_orgs
 
 
 User = get_user_model()
 log = logging.getLogger(__name__)
 MAX_ACCESS_IDS_IN_FILTER = 1_000
+MAX_ORGS_IN_FILTER = 1_000
 
 
 def _get_meili_api_key_uid():
@@ -41,10 +43,15 @@ def _get_meili_access_filter(request: Request) -> dict:
     if GlobalStaff().has_user(request.user):
         return {}
 
-    # Everyone else is limited to the N most recent courses and libraries they can access.
+    # Everyone else is limited to their org roles...
+    user_orgs = [
+        org.short_name for org in get_user_orgs(request.user)[:MAX_ORGS_IN_FILTER]
+    ]
+
+    # ...or the N most recent courses and libraries they can access.
     access_ids = get_access_ids_for_request(request)[:MAX_ACCESS_IDS_IN_FILTER]
     return {
-        "filter": f"access_id IN {access_ids}",
+        "filter": f"org IN {user_orgs} OR access_id IN {access_ids}",
     }
 
 

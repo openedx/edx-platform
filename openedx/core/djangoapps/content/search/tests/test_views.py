@@ -6,6 +6,7 @@ from django.test import override_settings
 from rest_framework.test import APITestCase, APIClient
 from unittest import mock
 
+from organizations.models import Organization
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
@@ -118,7 +119,7 @@ class StudioSearchViewTest(APITestCase):
             api_key_uid=MOCK_API_KEY_UID,
             search_rules={
                 "studio_content": {
-                    "filter": "access_id IN []",
+                    "filter": "org IN [] OR access_id IN []",
                 }
             },
             expires_at=mock.ANY,
@@ -162,7 +163,40 @@ class StudioSearchViewTest(APITestCase):
             api_key_uid=MOCK_API_KEY_UID,
             search_rules={
                 "studio_content": {
-                    "filter": f"access_id IN {expected_access_ids}",
+                    "filter": f"org IN [] OR access_id IN {expected_access_ids}",
+                }
+            },
+            expires_at=mock.ANY,
+        )
+
+    @mock_meilisearch(enabled=True)
+    @mock.patch('openedx.core.djangoapps.content.search.views.get_user_orgs')
+    @mock.patch('openedx.core.djangoapps.content.search.views.meilisearch.Client')
+    def test_studio_search_limit_orgs(self, mock_search_client, mock_get_user_orgs):
+        """
+        Users with access to many courses or libraries will only be able to search content
+        from the most recent 1_000 courses/libraries.
+        """
+        self.client.login(username='student', password='student_pass')
+        mock_generate_tenant_token = self._mock_generate_tenant_token(mock_search_client)
+        mock_get_user_orgs.return_value = [
+            Organization.objects.create(
+                short_name=f"org{x}",
+                description=f"Org {x}",
+            ) for x in range(2000)
+        ]
+        expected_user_orgs = [
+            f"org{x}" for x in range(1000)
+        ]
+
+        result = self.client.get(STUDIO_SEARCH_ENDPOINT_URL)
+        assert result.status_code == 200
+        mock_get_user_orgs.assert_called_once()
+        mock_generate_tenant_token.assert_called_once_with(
+            api_key_uid=MOCK_API_KEY_UID,
+            search_rules={
+                "studio_content": {
+                    "filter": f"org IN {expected_user_orgs} OR access_id IN []",
                 }
             },
             expires_at=mock.ANY,
