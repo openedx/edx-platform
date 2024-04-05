@@ -59,6 +59,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.edly.constants import ACTIVATION_EMAIL
+from openedx.features.edly.models import EdlyMultiSiteAccess
 from openedx.features.edly.validators import get_subscription_limit, handle_subscription_limit
 from openedx.features.edly.utils import (
     create_edly_access_role,
@@ -720,9 +721,16 @@ class RegistrationValidationView(APIView):
         edly_sub_org = get_edly_sub_org_from_request(request)
         invalid_username_error = get_username_validation_error(username)
         username_exists_error = get_username_existence_validation_error(username, edly_sub_org)
+        check_username_all_sites = request.data.get('check_username_all_sites', '')
+        username_exists_sites_error = ''
+        if check_username_all_sites:
+            queryset = EdlyMultiSiteAccess.objects.filter(user__username=username)
+            if queryset.exists():
+                username_exists_sites_error = 'User account with this username already exist'
+                
         # We prefer seeing for invalidity first.
         # Some invalid usernames (like for superusers) may exist.
-        return invalid_username_error or username_exists_error
+        return invalid_username_error or username_exists_error or username_exists_sites_error
 
     def email_handler(self, request):
         """ Validates whether the email address is valid. """
@@ -732,7 +740,14 @@ class RegistrationValidationView(APIView):
         email_exists_error = get_email_existence_validation_error(email, edly_sub_org)
         # We prefer seeing for invalidity first.
         # Some invalid emails (like a blank one for superusers) may exist.
-        return invalid_email_error or email_exists_error
+        check_email_all_sites = request.data.get('check_email_all_sites', '')
+        email_exists_error_sites = ''
+        if check_email_all_sites:
+            queryset = EdlyMultiSiteAccess.objects.filter(user__email=email)
+            if queryset.exists():
+                email_exists_error_sites = 'User account with this email already exists'
+                
+        return invalid_email_error or email_exists_error or email_exists_error_sites
 
     def confirm_email_handler(self, request):
         email = request.data.get('email')
