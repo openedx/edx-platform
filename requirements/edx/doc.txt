@@ -600,7 +600,7 @@ edx-rbac==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-rest-api-client==5.6.1
+edx-rest-api-client==5.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise

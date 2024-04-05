@@ -521,7 +521,7 @@ edx-proctoring==4.16.1
     #   edx-proctoring-proctortrack
 edx-rbac==1.8.0
     # via edx-enterprise
-edx-rest-api-client==5.6.1
+edx-rest-api-client==5.7.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
