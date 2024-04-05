@@ -225,6 +225,27 @@ def _recurse_children(block, fn, status_cb: Callable[[str], None] | None = None)
                 fn(child)
 
 
+def _update_index_docs(docs)-> None:
+    """
+    Helper function that updates the documents in the search index
+
+    If there is a rebuild in progress, the document will also be added to the new index.
+    """
+    if not docs:
+        return
+
+    client = _get_meilisearch_client()
+    current_rebuild_index_name = _get_running_rebuild_index_name()
+
+    tasks = []
+    if current_rebuild_index_name:
+        # If there is a rebuild in progress, the document will also be added to the new index.
+        tasks.append(client.index(current_rebuild_index_name).update_documents(docs))
+    tasks.append(client.index(STUDIO_INDEX_NAME).update_documents(docs))
+
+    _wait_for_meili_tasks(tasks)
+
+
 def only_if_meilisearch_enabled(f):
     """
     Only call `f` if meilisearch is enabled
@@ -347,10 +368,7 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
         usage_key (UsageKey): The usage key of the XBlock to index
         recursive (bool): If True, also index all children of the XBlock
     """
-    current_rebuild_index_name = _get_running_rebuild_index_name()
-
     xblock = modulestore().get_item(usage_key)
-    client = _get_meilisearch_client()
 
     docs = []
 
@@ -363,16 +381,7 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
 
     add_with_children(xblock)
 
-    if not docs:
-        return
-
-    tasks = []
-    if current_rebuild_index_name:
-        # If there is a rebuild in progress, the document will also be added to the new index.
-        tasks.append(client.index(current_rebuild_index_name).update_documents(docs))
-    tasks.append(client.index(STUDIO_INDEX_NAME).update_documents(docs))
-
-    _wait_for_meili_tasks(tasks)
+    _update_index_docs(docs)
 
 
 def delete_index_doc(usage_key: UsageKey) -> None:
@@ -399,49 +408,28 @@ def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     """
     Creates or updates the document for the given Library Block in the search index
     """
-    current_rebuild_index_name = _get_running_rebuild_index_name()
 
     library_block = lib_api.get_component_from_usage_key(usage_key)
     library_block_metadata = lib_api.LibraryXBlockMetadata.from_component(usage_key.context_key, library_block)
-    client = _get_meilisearch_client()
 
     docs = [
         searchable_doc_for_library_block(library_block_metadata)
     ]
 
-    tasks = []
-    if current_rebuild_index_name:
-        # If there is a rebuild in progress, the document will also be added to the new index.
-        tasks.append(client.index(current_rebuild_index_name).update_documents(docs))
-    tasks.append(client.index(STUDIO_INDEX_NAME).update_documents(docs))
-
-    _wait_for_meili_tasks(tasks)
+    _update_index_docs(docs)
 
 
 def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     """
     Creates or updates the documents for the given Content Library in the search index
     """
-    current_rebuild_index_name = _get_running_rebuild_index_name()
-    client = _get_meilisearch_client()
-
     docs = []
     for component in lib_api.get_library_components(library_key):
         metadata = lib_api.LibraryXBlockMetadata.from_component(library_key, component)
         doc = searchable_doc_for_library_block(metadata)
         docs.append(doc)
 
-    tasks = []
-
-    if not docs:
-        return
-
-    if current_rebuild_index_name:
-        # If there is a rebuild in progress, the document will also be added to the new index.
-        tasks.append(client.index(current_rebuild_index_name).update_documents(docs))
-    tasks.append(client.index(STUDIO_INDEX_NAME).update_documents(docs))
-
-    _wait_for_meili_tasks(tasks)
+    _update_index_docs(docs)
 
 
 def generate_user_token_for_studio_search(user):
