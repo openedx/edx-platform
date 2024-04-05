@@ -2090,7 +2090,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         )
 
     @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
-    @patch("openedx.core.djangoapps.course_groups.partition_generator.get_team_sets")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_load_data_in_partition_processor(self, team_sets_mock, team_configuration_service_mock):
         """
         Test that the team partition groups processor loads the data correctly for the given user.
@@ -2122,7 +2122,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         ).name == self.team_1.name
 
     @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
-    @patch("openedx.core.djangoapps.course_groups.partition_generator.get_team_sets")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_user_not_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
         """
         Test that the team partition groups processor correctly determines if a user is excluded by the partition
@@ -2150,7 +2150,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         assert not team_partition_groups_processor._is_user_excluded_by_partition_group([])
 
     @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
-    @patch("openedx.core.djangoapps.course_groups.partition_generator.get_team_sets")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_user_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
         """
         Test that the team partition groups processor correctly determines if a user is excluded by the partition
@@ -2174,7 +2174,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         assert team_partition_groups_processor._is_user_excluded_by_partition_group(sequence_partition_groups)
 
     @patch("openedx.core.djangoapps.course_groups.team_partition_scheme.TeamsConfigurationService")
-    @patch("openedx.core.djangoapps.course_groups.partition_generator.get_team_sets")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
     def test_usage_keys_removed(self, team_sets_mock, team_configuration_service_mock):
         """Test that the team partition groups processor correctly determines the usage keys to remove from the outline.
 
