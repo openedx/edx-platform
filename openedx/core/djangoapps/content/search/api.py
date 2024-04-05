@@ -165,6 +165,9 @@ def _using_temp_index(status_cb: Callable[[str], None] | None = None) -> Generat
     """
     Create a new temporary Meilisearch index, populate it, then swap it to
     become the active index.
+
+    Args:
+        status_cb (Callable): A callback function to report status messages
     """
     if status_cb is None:
         status_cb = log.info
