@@ -125,11 +125,13 @@ def _get_meili_api_key_uid():
 def _wait_for_meili_task(info: TaskInfo) -> None:
     """
     Simple helper method to wait for a Meilisearch task to complete
+    This method will block until the task is completed, so it should only be used in celery tasks
+    or management commands.
     """
     client = _get_meilisearch_client()
     current_status = client.get_task(info.task_uid)
     while current_status.status in ("enqueued", "processing"):
-        time.sleep(1)
+        time.sleep(0.5)
         current_status = client.get_task(info.task_uid)
     if current_status.status != "succeeded":
         try:
