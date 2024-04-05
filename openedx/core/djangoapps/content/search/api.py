@@ -46,7 +46,7 @@ else:
 _MEILI_CLIENT = None
 _MEILI_API_KEY_UID = None
 
-LOCK_EXPIRE = 5 * 60  # Lock expires in 5 minutes
+LOCK_EXPIRE = 24 * 60 * 60  # Lock expires in 24 hours
 
 
 @contextmanager
@@ -54,25 +54,21 @@ def _index_rebuild_lock() -> Generator[str, None, None]:
     """
     Lock to prevent that more than one rebuild is running at the same time
     """
-    timeout_at = time.monotonic() + LOCK_EXPIRE
     lock_id = f"lock-meilisearch-index-{STUDIO_INDEX_NAME}"
     new_index_name = STUDIO_INDEX_NAME + "_new"
 
-    while True:
-        status = cache.add(lock_id, new_index_name, LOCK_EXPIRE)
-        if status:
-            # Lock acquired
-            try:
-                yield new_index_name
-                break
-            finally:
-                # Release the lock
-                cache.delete(lock_id)
+    status = cache.add(lock_id, new_index_name, LOCK_EXPIRE)
 
-        if time.monotonic() > timeout_at:
-            raise TimeoutError("Timeout acquiring lock")
+    if not status:
+        # Lock already acquired
+        raise RuntimeError("Rebuild already in progress")
 
-        time.sleep(1)
+    # Lock acquired
+    try:
+        yield new_index_name
+    finally:
+        # Release the lock
+        cache.delete(lock_id)
 
 
 def _get_running_rebuild_index_name() -> str | None:
