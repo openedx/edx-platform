@@ -160,7 +160,7 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     # Note that we could improve performance for indexing many components from the same library/course,
     # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
     # tags for each component separately.
-    all_tags = tagging_api.get_object_tags(object_id).all()
+    all_tags = tagging_api.get_object_tags(str(object_id)).all()
     if not all_tags:
         return {}
     result = {
@@ -170,10 +170,10 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     }
     for obj_tag in all_tags:
         # Add the taxonomy name:
-        if obj_tag.name not in result[Fields.tags_taxonomy]:
-            result[Fields.tags_taxonomy].append(obj_tag.name)
+        if obj_tag.taxonomy.name not in result[Fields.tags_taxonomy]:
+            result[Fields.tags_taxonomy].append(obj_tag.taxonomy.name)
         # Taxonomy name plus each level of tags, in a list:
-        parts = [obj_tag.name] + obj_tag.get_lineage()  # e.g. ["Location", "North America", "Canada", "Vancouver"]
+        parts = [obj_tag.taxonomy.name] + obj_tag.get_lineage()  # e.g. ["Location", "North America", "Canada", "Vancouver"]
         parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator.
         # Now we build each level (tags.level0, tags.level1, etc.) as applicable.
         # We have a hard-coded limit of 4 levels of tags for now (see Fields.tags above).
@@ -196,18 +196,11 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     return {Fields.tags: result}
 
 
-def searchable_doc_for_library_block(
-    xblock_metadata: lib_api.LibraryXBlockMetadata, include_metadata: bool = True, include_tags: bool = True
-) -> dict:
+def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetadata) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, so that the given library block can be
     found using faceted search.
-
-    Args:
-        xblock_metadata: The XBlock component metadata to index
-        include_metadata: If True, include the block's metadata in the doc
-        include_tags: If True, include the block's tags in the doc
     """
     library_name = lib_api.get_library(xblock_metadata.usage_key.context_key).title
     block = xblock_api.load_block(xblock_metadata.usage_key, user=None)
@@ -217,37 +210,38 @@ def searchable_doc_for_library_block(
         Fields.type: DocType.library_block,
     }
 
-    if include_metadata:
-        doc.update(_fields_from_block(block))
-        # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
-        doc[Fields.breadcrumbs] = [{"display_name": library_name}]
+    doc.update(_fields_from_block(block))
 
-    if include_tags:
-        doc.update(_tags_for_content_object(xblock_metadata.usage_key))
+    # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
+    doc[Fields.breadcrumbs] = [{"display_name": library_name}]
 
     return doc
 
 
-def searchable_doc_for_course_block(block, include_metadata: bool = True, include_tags: bool = True) -> dict:
+def searchable_doc_tags(usage_key: UsageKey) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the tags data for the given content object.
+    """
+    doc = {
+        Fields.id: meili_id_from_opaque_key(usage_key),
+    }
+    doc.update(_tags_for_content_object(usage_key))
+
+    return doc
+
+
+def searchable_doc_for_course_block(block) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, so that the given course block can be
     found using faceted search.
-
-    Args:
-        block: The XBlock instance to index
-        include_metadata: If True, include the block's metadata in the doc
-        include_tags: If True, include the block's tags in the doc
     """
     doc = {
         Fields.id: meili_id_from_opaque_key(block.usage_key),
         Fields.type: DocType.course_block,
     }
 
-    if include_metadata:
-        doc.update(_fields_from_block(block))
-
-    if include_tags:
-        doc.update(_tags_for_content_object(block.usage_key))
+    doc.update(_fields_from_block(block))
 
     return doc

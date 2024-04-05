@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
 @set_code_owner_attribute
-def upsert_xblock_index_doc(usage_key_str: str, recursive: bool, update_metadata: bool, update_tags: bool) -> None:
+def upsert_xblock_index_doc(usage_key_str: str, recursive: bool) -> None:
     """
     Celery task to update the content index document for an XBlock
     """
@@ -28,7 +28,7 @@ def upsert_xblock_index_doc(usage_key_str: str, recursive: bool, update_metadata
 
     log.info("Updating content index document for XBlock with id: %s", usage_key)
 
-    api.upsert_xblock_index_doc(usage_key, recursive, update_metadata, update_tags)
+    api.upsert_xblock_index_doc(usage_key, recursive)
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
@@ -46,7 +46,7 @@ def delete_xblock_index_doc(usage_key_str: str) -> None:
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
 @set_code_owner_attribute
-def upsert_library_block_index_doc(usage_key_str: str, update_metadata: bool, update_tags: bool) -> None:
+def upsert_library_block_index_doc(usage_key_str: str) -> None:
     """
     Celery task to update the content index document for a library block
     """
@@ -54,7 +54,7 @@ def upsert_library_block_index_doc(usage_key_str: str, update_metadata: bool, up
 
     log.info("Updating content index document for library block with id: %s", usage_key)
 
-    api.upsert_library_block_index_doc(usage_key, update_metadata, update_tags)
+    api.upsert_library_block_index_doc(usage_key)
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))

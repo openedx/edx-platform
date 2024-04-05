@@ -19,18 +19,18 @@ from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 
-from openedx.core.djangoapps.content.search.documents import (
-    STUDIO_INDEX_NAME,
-    Fields,
-    meili_id_from_opaque_key,
-    searchable_doc_for_course_block,
-    searchable_doc_for_library_block
-)
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
-from .documents import Fields, searchable_doc_for_course_block, searchable_doc_for_library_block
+from .documents import (
+    STUDIO_INDEX_NAME,
+    Fields,
+    meili_id_from_opaque_key,
+    searchable_doc_for_course_block,
+    searchable_doc_for_library_block,
+    searchable_doc_tags
+)
 
 log = logging.getLogger(__name__)
 
@@ -300,8 +300,11 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             docs = []
             for component in lib_api.get_library_components(lib_key):
                 metadata = lib_api.LibraryXBlockMetadata.from_component(lib_key, component)
-                doc = searchable_doc_for_library_block(metadata)
+                doc = {}
+                doc.update(searchable_doc_for_library_block(metadata))
+                doc.update(searchable_doc_tags(metadata.usage_key))
                 docs.append(doc)
+
                 num_blocks_done += 1
             if docs:
                 # Add all the docs in this library at once (usually faster than adding one at a time):
@@ -336,9 +339,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses and libraries.")
 
 
-def upsert_xblock_index_doc(
-    usage_key: UsageKey, recursive: bool = True, update_metadata: bool = True, update_tags: bool = True
-) -> None:
+def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None:
     """
     Creates or updates the document for the given XBlock in the search index
 
@@ -346,8 +347,6 @@ def upsert_xblock_index_doc(
     Args:
         usage_key (UsageKey): The usage key of the XBlock to index
         recursive (bool): If True, also index all children of the XBlock
-        update_metadata (bool): If True, update the metadata of the XBlock
-        update_tags (bool): If True, update the tags of the XBlock
     """
     current_rebuild_index_name = _get_running_rebuild_index_name()
 
@@ -358,7 +357,7 @@ def upsert_xblock_index_doc(
 
     def add_with_children(block):
         """ Recursively index the given XBlock/component """
-        doc = searchable_doc_for_course_block(block, include_metadata=update_metadata, include_tags=update_tags)
+        doc = searchable_doc_for_course_block(block)
         docs.append(doc)
         if recursive:
             _recurse_children(block, add_with_children)
@@ -397,17 +396,9 @@ def delete_index_doc(usage_key: UsageKey) -> None:
     _wait_for_meili_tasks(tasks)
 
 
-def upsert_library_block_index_doc(
-    usage_key: UsageKey, update_metadata: bool = True, update_tags: bool = True
-) -> None:
+def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     """
     Creates or updates the document for the given Library Block in the search index
-
-
-    Args:
-        usage_key (UsageKey): The usage key of the Library Block to index
-        update_metadata (bool): If True, update the metadata of the Library Block
-        update_tags (bool): If True, update the tags of the Library Block
     """
     current_rebuild_index_name = _get_running_rebuild_index_name()
 
@@ -416,9 +407,7 @@ def upsert_library_block_index_doc(
     client = _get_meilisearch_client()
 
     docs = [
-        searchable_doc_for_library_block(
-            library_block_metadata, include_metadata=update_metadata, include_tags=update_tags
-        )
+        searchable_doc_for_library_block(library_block_metadata)
     ]
 
     tasks = []
@@ -440,7 +429,7 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     docs = []
     for component in lib_api.get_library_components(library_key):
         metadata = lib_api.LibraryXBlockMetadata.from_component(library_key, component)
-        doc = searchable_doc_for_library_block(metadata, include_metadata=True, include_tags=False)
+        doc = searchable_doc_for_library_block(metadata)
         docs.append(doc)
 
     tasks = []

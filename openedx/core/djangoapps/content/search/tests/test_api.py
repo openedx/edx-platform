@@ -134,12 +134,7 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         Test indexing an XBlock.
         """
-        api.upsert_xblock_index_doc(
-            self.sequential.usage_key,
-            recursive=recursive,
-            update_metadata=True,
-            update_tags=False,
-        )
+        api.upsert_xblock_index_doc(self.sequential.usage_key, recursive=recursive)
 
         if recursive:
             expected_docs = [self.doc_sequential, self.doc_vertical]
@@ -164,11 +159,7 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         Test indexing a Library Block.
         """
-        api.upsert_library_block_index_doc(
-            self.problem.usage_key,
-            update_metadata=True,
-            update_tags=False,
-        )
+        api.upsert_library_block_index_doc(self.problem.usage_key)
 
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem])
 

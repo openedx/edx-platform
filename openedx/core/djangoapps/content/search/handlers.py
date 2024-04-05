@@ -41,8 +41,6 @@ def xblock_created_handler(**kwargs) -> None:
     upsert_xblock_index_doc.delay(
         str(xblock_info.usage_key),
         recursive=False,
-        update_metadata=True,
-        update_tags=False,
     )
 
 
@@ -60,8 +58,6 @@ def xblock_updated_handler(**kwargs) -> None:
     upsert_xblock_index_doc.delay(
         str(xblock_info.usage_key),
         recursive=True,  # Update all children because the breadcrumb may have changed
-        update_metadata=True,
-        update_tags=False,
     )
 
 
@@ -90,7 +86,7 @@ def library_block_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    upsert_library_block_index_doc.delay(str(library_block_data.usage_key), update_metadata=True, update_tags=False)
+    upsert_library_block_index_doc.delay(str(library_block_data.usage_key))
 
 
 @receiver(LIBRARY_BLOCK_DELETED)
