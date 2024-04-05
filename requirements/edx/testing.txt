@@ -193,7 +193,7 @@ click-repl==0.3.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
-code-annotations==1.6.0
+code-annotations==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
