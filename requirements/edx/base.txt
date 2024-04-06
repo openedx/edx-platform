@@ -181,8 +181,9 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.14
     # via jwcrypto
-django==4.2.10
+django==4.2.11
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-appconf
     #   django-celery-results
@@ -610,7 +611,9 @@ idna==3.4
     #   snowflake-connector-python
     #   yarl
 importlib-metadata==6.8.0
-    # via markdown
+    # via
+    #   -c requirements/edx/../common_constraints.txt
+    #   markdown
 importlib-resources==6.1.0
     # via
     #   jsonschema
