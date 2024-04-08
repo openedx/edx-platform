@@ -318,10 +318,10 @@ class ProblemFeedbackService(Service):
     """
     An XBlock Service that allows XModules to define:
 
-    - if the answers are visible
-    - whether correctness is currently hidden. When correctness is hidden, this
-    limits the user's access to the correct/incorrect flags, messages, problem
-    scores, and aggregate subsection and course grades.
+    * If the answers are visible.
+    * Whether correctness is currently hidden. When correctness is hidden, this
+      limits the user's access to the correct/incorrect flags, messages, problem
+      scores, and aggregate subsection and course grades.
     """
     def __init__(self, block=None, user_is_staff=False, **kwargs):
         super().__init__(**kwargs)
@@ -333,6 +333,16 @@ class ProblemFeedbackService(Service):
     def is_past_due(self):
         """
         Returns if the problem is past its due date.
+
+        This method returns True when an XBlock doesn't have a due date. That
+        is because if an XBlock doesn't have a due date, and we are trying to
+        assess whether we can display a correct answer to a learner, we want to
+        treat an answered problem without a due date as past due. Otherwise, we
+        can never show the answer to a learner, since there is no due date.
+
+        There are scenarios where you would want is_past_due to return False
+        when an XBlock doesn't have a due date, for example, when determining
+        whether a learner should still be able to submit their answer.
         """
         if not self._xblock:
             return False
@@ -366,7 +376,9 @@ class ProblemFeedbackService(Service):
 
         if self.used_all_attempts():
             return True
-        elif (self.xblock is None or self._xblock.close_date is not None) and self.is_past_due():
+        # Using XBlock's is_past_due method, as it's suited for checking the
+        # submission deadline, unlike the is_past_due method of this service.
+        elif self._xblock.is_past_due():
             return True
         return False
 
@@ -382,7 +394,7 @@ class ProblemFeedbackService(Service):
         attempts = self._xblock.attempts
         is_correct = self._xblock.is_correct()
         required_attempts = self._xblock.attempts_before_showanswer_button
-        has_due_date = getattr(self._xblock, 'due', None) is not None
+        has_due_date = getattr(self._xblock, 'close_date', None) is not None
         past_due = self.is_past_due()
         is_attempted = self.is_attempted()
         used_all_attempts = self.used_all_attempts()
