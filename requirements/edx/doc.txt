@@ -8,7 +8,7 @@
     # via -r requirements/edx/base.txt
 accessible-pygments==0.0.4
     # via pydata-sphinx-theme
-acid-xblock==0.2.1
+acid-xblock==0.3.0
     # via -r requirements/edx/base.txt
 aiohttp==3.9.3
     # via
@@ -607,7 +607,7 @@ edx-rest-api-client==5.6.1
     #   edx-proctoring
 edx-search==3.9.1
     # via -r requirements/edx/base.txt
-edx-sga==0.23.1
+edx-sga==0.24.1
     # via -r requirements/edx/base.txt
 edx-submissions==3.7.0
     # via
@@ -942,7 +942,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.5.1
+ora2==6.6.1
     # via -r requirements/edx/base.txt
 packaging==23.2
     # via
@@ -1488,7 +1488,7 @@ webob==1.8.7
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/base.txt
-xblock[django]==1.10.0
+xblock[django]==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
