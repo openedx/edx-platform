@@ -1,12 +1,15 @@
 """Tests for the Tagging models"""
-import time
-
+import io
+import os
+import tempfile
 import ddt
 from django.test.testcases import TestCase
+from fs.osfs import OSFS
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
+from .test_objecttag_export_helpers import TestGetAllObjectTagsMixin, TaggedCourseMixin
 
 from .. import api
 from ..utils import rules_cache
@@ -243,185 +246,6 @@ class TestAPITaxonomy(TestTaxonomyMixin, TestCase):
         assert result[0]["depth"] == 0
 
 
-class TestGetAllObjectTagsMixin:
-    """
-    Set up data to test get_all_object_tags functions
-    """
-
-    def setUp(self):
-        super().setUp()
-
-        self.taxonomy_1 = api.create_taxonomy(name="Taxonomy 1")
-        api.set_taxonomy_orgs(self.taxonomy_1, all_orgs=True)
-        api.add_tag_to_taxonomy(
-            taxonomy=self.taxonomy_1,
-            tag="Tag 1.1",
-        )
-        api.add_tag_to_taxonomy(
-            taxonomy=self.taxonomy_1,
-            tag="Tag 1.2",
-        )
-
-        self.taxonomy_2 = api.create_taxonomy(name="Taxonomy 2")
-        api.set_taxonomy_orgs(self.taxonomy_2, all_orgs=True)
-
-        api.add_tag_to_taxonomy(
-            taxonomy=self.taxonomy_2,
-            tag="Tag 2.1",
-        )
-        api.add_tag_to_taxonomy(
-            taxonomy=self.taxonomy_2,
-            tag="Tag 2.2",
-        )
-
-        api.tag_object(
-            object_id="course-v1:orgA+test_course+test_run",
-            taxonomy=self.taxonomy_1,
-            tags=['Tag 1.1'],
-        )
-        self.course_tags = api.get_object_tags("course-v1:orgA+test_course+test_run")
-
-        self.orgA = Organization.objects.create(name="Organization A", short_name="orgA")
-        self.orgB = Organization.objects.create(name="Organization B", short_name="orgB")
-        self.taxonomy_3 = api.create_taxonomy(name="Taxonomy 3", orgs=[self.orgA])
-        api.add_tag_to_taxonomy(
-            taxonomy=self.taxonomy_3,
-            tag="Tag 3.1",
-        )
-
-        # Tag blocks
-        api.tag_object(
-            object_id="block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
-            taxonomy=self.taxonomy_1,
-            tags=['Tag 1.1', 'Tag 1.2'],
-        )
-        self.sequential_tags1 = api.get_object_tags(
-            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
-            taxonomy_id=self.taxonomy_1.id,
-
-        )
-        api.tag_object(
-            object_id="block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
-            taxonomy=self.taxonomy_2,
-            tags=['Tag 2.1'],
-        )
-        self.sequential_tags2 = api.get_object_tags(
-            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
-            taxonomy_id=self.taxonomy_2.id,
-        )
-        api.tag_object(
-            object_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
-            taxonomy=self.taxonomy_2,
-            tags=['Tag 2.2'],
-        )
-        self.vertical1_tags = api.get_object_tags(
-            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"
-        )
-        api.tag_object(
-            object_id="block-v1:orgA+test_course+test_run+type@html+block@test_html",
-            taxonomy=self.taxonomy_2,
-            tags=['Tag 2.1'],
-        )
-        self.html_tags = api.get_object_tags("block-v1:orgA+test_course+test_run+type@html+block@test_html")
-
-        # Create "deleted" object tags, which will be omitted from the results.
-        for object_id in (
-            "course-v1:orgA+test_course+test_run",
-            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
-            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
-            "block-v1:orgA+test_course+test_run+type@html+block@test_html",
-        ):
-            ObjectTag.objects.create(
-                object_id=str(object_id),
-                taxonomy=None,
-                tag=None,
-                _value="deleted tag",
-                _name="deleted taxonomy",
-            )
-
-        self.expected_course_objecttags = {
-            "course-v1:orgA+test_course+test_run": {
-                self.taxonomy_1.id: [tag.value for tag in self.course_tags],
-            },
-            "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential": {
-                self.taxonomy_1.id: [tag.value for tag in self.sequential_tags1],
-                self.taxonomy_2.id: [tag.value for tag in self.sequential_tags2],
-            },
-            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1": {
-                self.taxonomy_2.id: [tag.value for tag in self.vertical1_tags],
-            },
-            "block-v1:orgA+test_course+test_run+type@html+block@test_html": {
-                self.taxonomy_2.id: [tag.value for tag in self.html_tags],
-            },
-        }
-
-        # Library tags and library contents need a unique block_id that is persisted along test runs
-        self.block_suffix = str(round(time.time() * 1000))
-
-        api.tag_object(
-            object_id=f"lib:orgA:lib_{self.block_suffix}",
-            taxonomy=self.taxonomy_2,
-            tags=['Tag 2.1'],
-        )
-        self.library_tags = api.get_object_tags(f"lib:orgA:lib_{self.block_suffix}")
-
-        api.tag_object(
-            object_id=f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}",
-            taxonomy=self.taxonomy_1,
-            tags=['Tag 1.1'],
-        )
-        self.problem1_tags = api.get_object_tags(
-            f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}"
-        )
-
-        api.tag_object(
-            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
-            taxonomy=self.taxonomy_1,
-            tags=['Tag 1.2'],
-        )
-        self.library_html_tags1 = api.get_object_tags(
-            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
-            taxonomy_id=self.taxonomy_1.id,
-        )
-
-        api.tag_object(
-            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
-            taxonomy=self.taxonomy_2,
-            tags=['Tag 2.2'],
-        )
-        self.library_html_tags2 = api.get_object_tags(
-            object_id=f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
-            taxonomy_id=self.taxonomy_2.id,
-        )
-
-        # Create "deleted" object tags, which will be omitted from the results.
-        for object_id in (
-            f"lib:orgA:lib_{self.block_suffix}",
-            f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}",
-            f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}",
-        ):
-            ObjectTag.objects.create(
-                object_id=object_id,
-                taxonomy=None,
-                tag=None,
-                _value="deleted tag",
-                _name="deleted taxonomy",
-            )
-
-        self.expected_library_objecttags = {
-            f"lib:orgA:lib_{self.block_suffix}": {
-                self.taxonomy_2.id: [tag.value for tag in self.library_tags],
-            },
-            f"lb:orgA:lib_{self.block_suffix}:problem:problem1_{self.block_suffix}": {
-                self.taxonomy_1.id: [tag.value for tag in self.problem1_tags],
-            },
-            f"lb:orgA:lib_{self.block_suffix}:html:html_{self.block_suffix}": {
-                self.taxonomy_1.id: [tag.value for tag in self.library_html_tags1],
-                self.taxonomy_2.id: [tag.value for tag in self.library_html_tags2],
-            },
-        }
-
-
 class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
     """
     Tests object tag API functions.
@@ -435,6 +259,53 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
             object_tags, taxonomies = api.get_all_object_tags(
                 CourseKey.from_string("course-v1:orgA+test_course+test_run")
             )
+
+        assert object_tags == self.expected_course_objecttags
+        assert taxonomies == {
+            self.taxonomy_1.id: self.taxonomy_1,
+            self.taxonomy_2.id: self.taxonomy_2,
+        }
+
+    def test_get_course_object_tags_with_add_tags(self):
+        """
+        This test checks for an issue in get_all_object_tags:
+        If new tags are added to those already added previously,
+        the previous tags are lost.
+        This happens because the new tags will overwrite the old ones
+        in the result.
+        """
+        # Tag in a new taxonomy
+        ObjectTag.objects.create(
+            object_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy=self.taxonomy_1,
+            tag=self.tag_1_1,
+        )
+        # Tag in a already tagged taxonomy
+        ObjectTag.objects.create(
+            object_id="block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy=self.taxonomy_2,
+            tag=self.tag_2_1,
+        )
+
+        with self.assertNumQueries(1):
+            object_tags, taxonomies = api.get_all_object_tags(
+                CourseKey.from_string("course-v1:orgA+test_course+test_run")
+            )
+
+        vertical1_tags = api.get_object_tags(
+            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy_id=self.taxonomy_1.id,
+        )
+        vertical2_tags = api.get_object_tags(
+            "block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1",
+            taxonomy_id=self.taxonomy_2.id,
+        )
+
+        # Add new object tags to the expected result
+        self.expected_course_objecttags["block-v1:orgA+test_course+test_run+type@vertical+block@test_vertical1"] = {
+            self.taxonomy_1.id: [tag.value for tag in vertical1_tags],
+            self.taxonomy_2.id: [tag.value for tag in vertical2_tags],
+        }
 
         assert object_tags == self.expected_course_objecttags
         assert taxonomies == {
@@ -476,7 +347,7 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
             assert len(dst_tags) == len(expected_tags)
             for idx, src_tag in enumerate(expected_tags):
                 dst_tag = dst_tags[idx]
-                assert src_tag.name == dst_tag.name
+                assert src_tag.export_id == dst_tag.export_id
                 assert src_tag.value == dst_tag.value
 
     def test_copy_object_tags(self):
@@ -508,3 +379,104 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
         expected_tags = list(self.sequential_tags1) + list(self.sequential_tags2)
         with self.assertNumQueries(31):  # TODO why so high?
             self._test_copy_object_tags(src_key, dst_key, expected_tags)
+
+
+class TestExportImportTags(TaggedCourseMixin):
+    """
+    Tests for export/import functions
+    """
+    def _create_csv_file(self, content):
+        """
+        Create a csv file and returns the path and name
+        """
+        file_dir_name = tempfile.mkdtemp()
+        file_name = f'{file_dir_name}/tags.csv'
+        with open(file_name, 'w') as csv_file:
+            csv_file.write(content)
+        return file_name
+
+    def test_generate_csv_rows(self) -> None:
+        buffer = io.StringIO()
+        list(api.generate_csv_rows(str(self.course.id), buffer))
+        buffer.seek(0)
+        csv_content = buffer.getvalue()
+
+        assert csv_content == self.expected_csv
+
+    def test_export_tags_in_csv_file(self) -> None:
+        file_dir_name = tempfile.mkdtemp()
+        file_dir = OSFS(file_dir_name)
+        file_name = 'tags.csv'
+
+        api.export_tags_in_csv_file(str(self.course.id), file_dir, file_name)
+
+        file_path = os.path.join(file_dir_name, file_name)
+
+        self.assertTrue(os.path.exists(file_path))
+
+        with open(file_path, 'r') as f:
+            content = f.read()
+
+        cleaned_content = content.replace('\r\n', '\n')
+        cleaned_expected_csv = self.expected_csv.replace('\r\n', '\n')
+        self.assertEqual(cleaned_content, cleaned_expected_csv)
+
+    def test_import_tags_invalid_format(self) -> None:
+        csv_path = self._create_csv_file('invalid format, Invalid\r\ntest1, test2')
+        with self.assertRaises(ValueError) as exc:
+            api.import_course_tags_from_csv(csv_path, self.course.id)
+            assert "Invalid format of csv in" in str(exc.exception)
+
+    def test_import_tags_valid_taxonomy_and_tags(self) -> None:
+        csv_path = self._create_csv_file(
+            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.1",""\r\n'
+        )
+        api.import_course_tags_from_csv(csv_path, self.course.id)
+        object_tags = list(api.get_object_tags(self.course.id))
+        assert len(object_tags) == 1
+
+        object_tag = object_tags[0]
+        assert object_tag.tag == self.tag_1_1
+        assert object_tag.taxonomy == self.taxonomy_1
+
+    def test_import_tags_invalid_tag(self) -> None:
+        csv_path = self._create_csv_file(
+            '"Name","Type","ID","1-taxonomy-1","2-taxonomy-2"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.11",""\r\n'
+        )
+        api.import_course_tags_from_csv(csv_path, self.course.id)
+        object_tags = list(api.get_object_tags(self.course.id))
+        assert len(object_tags) == 0
+
+        object_tags = list(api.get_object_tags(
+            self.course.id,
+            include_deleted=True,
+        ))
+        assert len(object_tags) == 1
+
+        object_tag = object_tags[0]
+        assert object_tag.tag is None
+        assert object_tag.value == 'Tag 1.11'
+        assert object_tag.taxonomy == self.taxonomy_1
+
+    def test_import_tags_invalid_taxonomy(self) -> None:
+        csv_path = self._create_csv_file(
+            '"Name","Type","ID","1-taxonomy-1-1"\r\n'
+            '"Test Course","course","course-v1:orgA+test_course+test_run","Tag 1.11"\r\n'
+        )
+        api.import_course_tags_from_csv(csv_path, self.course.id)
+        object_tags = list(api.get_object_tags(self.course.id))
+        assert len(object_tags) == 0
+
+        object_tags = list(api.get_object_tags(
+            self.course.id,
+            include_deleted=True,
+        ))
+        assert len(object_tags) == 1
+
+        object_tag = object_tags[0]
+        assert object_tag.tag is None
+        assert object_tag.value == 'Tag 1.11'
+        assert object_tag.taxonomy is None
+        assert object_tag.export_id == '1-taxonomy-1-1'

@@ -17,6 +17,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from openedx.core.djangoapps.content_tagging.tests.test_objecttag_export_helpers import TaggedCourseMixin
+
 
 class TestArgParsingCourseExportOlx(unittest.TestCase):
     """
@@ -31,7 +33,7 @@ class TestArgParsingCourseExportOlx(unittest.TestCase):
             call_command('export_olx')
 
 
-class TestCourseExportOlx(ModuleStoreTestCase):
+class TestCourseExportOlx(TaggedCourseMixin, ModuleStoreTestCase):
     """
     Test exporting OLX content from a course or library.
     """
@@ -61,7 +63,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         )
         return course.id
 
-    def check_export_file(self, tar_file, course_key):
+    def check_export_file(self, tar_file, course_key, with_tags=False):
         """Check content of export file."""
         names = tar_file.getnames()
         dirname = "{0.org}-{0.course}-{0.run}".format(course_key)
@@ -71,6 +73,10 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         self.assertIn(f"{dirname}/about/overview.html", names)
         self.assertIn(f"{dirname}/assets/assets.xml", names)
         self.assertIn(f"{dirname}/policies", names)
+        if with_tags:
+            self.assertIn(f"{dirname}/tags.csv", names)
+        else:
+            self.assertNotIn(f"{dirname}/tags.csv", names)
 
     def test_export_course(self):
         test_course_key = self.create_dummy_course(ModuleStoreEnum.Type.split)
@@ -98,3 +104,11 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         output = output_wrapper.bytes_io.read()
         with tarfile.open(fileobj=BytesIO(output), mode="r:gz") as tar_file:
             self.check_export_file(tar_file, test_course_key)
+
+    def test_export_course_with_tags(self):
+        tmp_dir = path(mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        filename = tmp_dir / 'test.tar.gz'
+        call_command('export_olx', '--output', filename, str(self.course.id))
+        with tarfile.open(filename) as tar_file:
+            self.check_export_file(tar_file, self.course.id, with_tags=True)
