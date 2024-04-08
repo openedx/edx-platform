@@ -93,7 +93,45 @@ class CourseRunViewSet(viewsets.GenericViewSet):  # lint-amnesty, pylint: disabl
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
-    def clone(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+    def clone(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        **Use Case**
+
+            This endpoint can be used for course cloning.
+
+            Unlike reruns, cloning a course allows creating a copy of an existing
+            course under a different organization name and with a different course
+            name.
+
+        **Example Request**
+
+            POST /api/v1/course_runs/clone/ {
+                "source_course_id": "course-v1:edX+DemoX+Demo_Course",
+                "destination_course_id": "course-v1:newOrg+newDemoX+Demo_Course_Clone"
+            }
+
+            **POST Parameters**
+
+                * source_course_id: a full course id of the course that will be
+                  cloned. Has to be an id of an existing course.
+                * destination_course_id: a full course id of the destination
+                  course. The organization, course name and course run of the
+                  new course will be determined from the provided id. Has to be
+                  an id of a course that doesn't exist yet.
+
+        **Response Values**
+
+            If the request parameters are valid and a course has been cloned
+            succesfully, an HTTP 201 "Created" response is returned.
+
+            If source course id and/or destination course id are invalid, or
+            source course doesn't exist, or destination course already exist,
+            an HTTP 400 "Bad Request" response is returned.
+
+            If the user that is making the request doesn't have the access to
+            either of the courses, an HTTP 401 "Unauthorized" response is
+            returned.
+        """
         serializer = CourseCloneSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         new_course_run = serializer.save()
