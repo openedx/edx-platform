@@ -7,7 +7,9 @@
   <tr>
     <td>
       <h1>
-        {% trans "The course {{ course_title }} has been reset !" as tmsg %}{{ tmsg | force_escape }}
+        {% filter force_escape %}
+          {% blocktrans %}The course {{ course_title }} has been reset !{% endblocktrans %}
+          {% endfilter %}
       </h1>
       <p style="color: rgba(0,0,0,.75);">
         {% filter force_escape %}
