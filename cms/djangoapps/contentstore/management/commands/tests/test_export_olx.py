@@ -63,7 +63,7 @@ class TestCourseExportOlx(TaggedCourseMixin, ModuleStoreTestCase):
         )
         return course.id
 
-    def check_export_file(self, tar_file, course_key, withTags=False):
+    def check_export_file(self, tar_file, course_key, with_tags=False):
         """Check content of export file."""
         names = tar_file.getnames()
         dirname = "{0.org}-{0.course}-{0.run}".format(course_key)
@@ -73,7 +73,7 @@ class TestCourseExportOlx(TaggedCourseMixin, ModuleStoreTestCase):
         self.assertIn(f"{dirname}/about/overview.html", names)
         self.assertIn(f"{dirname}/assets/assets.xml", names)
         self.assertIn(f"{dirname}/policies", names)
-        if withTags:
+        if with_tags:
             self.assertIn(f"{dirname}/tags.csv", names)
         else:
             self.assertNotIn(f"{dirname}/tags.csv", names)
@@ -111,4 +111,4 @@ class TestCourseExportOlx(TaggedCourseMixin, ModuleStoreTestCase):
         filename = tmp_dir / 'test.tar.gz'
         call_command('export_olx', '--output', filename, str(self.course.id))
         with tarfile.open(filename) as tar_file:
-            self.check_export_file(tar_file, self.course.id, withTags=True)
+            self.check_export_file(tar_file, self.course.id, with_tags=True)

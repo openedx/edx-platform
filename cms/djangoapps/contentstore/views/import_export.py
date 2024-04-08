@@ -344,11 +344,6 @@ def export_handler(request, course_key_string):
     requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
     if request.method == 'POST':
-        if not has_view_object_tags_access(request.user, str(course_key)):
-            raise PermissionDenied(
-                "You do not have permission to view object tags for this object_id."
-            )
-
         export_olx.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
         return JsonResponse({'ExportStatus': 1})
     elif 'text/html' in requested_format:

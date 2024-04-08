@@ -792,7 +792,8 @@ class LibraryImportManager(ImportManager):
         """
         Imports tags into library blocks
         """
-        # TODO Implement function
+        # We don't support tags in v1 libraries, and v2 libraries don't have
+        # an import/export format defined yet. No action needed here for now.
 
 
 def import_course_from_xml(*args, **kwargs):
