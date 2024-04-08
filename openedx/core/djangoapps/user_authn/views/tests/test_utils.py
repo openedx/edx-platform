@@ -64,7 +64,7 @@ class TestGenerateUsername(TestCase):
         """
         Test get_auto_generated_username function when no name data is provided.
         """
-        mock_datetime.now.return_value.strftime.return_value = '24 03'
+        mock_datetime.now.return_value.strftime.return_value = f"{datetime.now().year % 100} {datetime.now().month:02d}"
         mock_choices.return_value = ['X', 'Y', 'Z', 'A']  # Fixed random string for testing
 
         mock_get_username_prefix.return_value = None
