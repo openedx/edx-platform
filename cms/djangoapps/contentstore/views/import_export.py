@@ -39,7 +39,6 @@ from common.djangoapps.util.monitoring import monitor_import_failure
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
-from openedx.core.djangoapps.content_tagging.auth import has_view_object_tags_access
 from ..storage import course_import_export_storage
 from ..tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
 from ..toggles import use_new_export_page, use_new_import_page
