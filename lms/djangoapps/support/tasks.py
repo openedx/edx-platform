@@ -13,6 +13,15 @@ from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.support.models import CourseResetAudit
 from lms.djangoapps.grades.api import clear_user_course_grades
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+
+from edx_ace import ace
+from django.contrib.sites.models import Site
+from edx_ace.recipient import Recipient
+from openedx.core.lib.celery.task_utils import emulate_http_request
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from lms.djangoapps.support.message_types import WholeCourseReset
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +42,46 @@ def get_blocks(course):
                 for block in vertical.get_children():
                     blocks.append(block)
     return blocks
+
+
+@shared_task
+@set_code_owner_attribute
+def send_reset_course_completion_email(course, user):
+    """
+    Sends email to a learner when whole course reset is complete.
+    """
+    site = Site.objects.get_current()
+
+    message_context = get_base_template_context(site)
+    message_context.update({
+        'course_title': course.display_name,
+    })
+
+    try:
+        log.info(
+            f"Sending whole course reset email to {user.profile.name} (Email: {user.email}) "
+            f"from course {course.display_name} (CourseId: {course.id})"
+        )
+        with emulate_http_request(site=site, user=user):
+            msg = WholeCourseReset(context=message_context).personalize(
+                recipient=Recipient(user.id, user.email),
+                language=get_user_preference(user, LANGUAGE_KEY),
+                user_context={'full_name': user.profile.name}
+            )
+            ace.send(msg)
+    except Exception as exc:  # pylint: disable=broad-except
+        log.exception(
+            f"Whole course reset email to {user.profile.name} (Email: {user.email}) "
+            f"from course {course.display_name} (CourseId: {course.id}) failed."
+            f"Error: {exc.response['Error']['Code']}"
+        )
+        return False
+    else:
+        log.info(
+            f"Whole course reset email sent successfully to {user.profile.name} (Email: {user.email}) "
+            f"from course {course.display_name} (CourseId: {course.id})"
+        )
+        return True
 
 
 @shared_task
@@ -79,6 +128,10 @@ def reset_student_course(course_id, learner_email, reset_by_user_email):
         clear_user_course_grades(user.id, course.id)
 
         update_audit_status(course_reset_audit, CourseResetAudit.CourseResetStatus.COMPLETE)
+
+        # Send email upon completion
+        send_reset_course_completion_email(course, user)
+
     except Exception as e:  # pylint: disable=broad-except
         logging.exception(f'Error occurred for Course Audit with ID {course_reset_audit.id}: {e}.')
         update_audit_status(course_reset_audit, CourseResetAudit.CourseResetStatus.FAILED)
