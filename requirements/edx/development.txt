@@ -1990,7 +1990,7 @@ stevedore==5.1.0
     #   edx-django-utils
     #   edx-enterprise
     #   edx-opaque-keys
-super-csv==3.1.0
+super-csv==3.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
