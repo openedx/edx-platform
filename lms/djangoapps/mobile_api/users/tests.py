@@ -36,6 +36,7 @@ from lms.djangoapps.mobile_api.testutils import (
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
+from lms.djangoapps.mobile_api.users.enums import EnrollmentStatuses
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3, API_V4
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -705,6 +706,201 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['primary']['course_status'], expected_course_status)
         get_last_completed_block_mock.assert_called_once_with(self.user, course.id)
+
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_user_enrollment_api_v4_in_progress_status(self, cache_mock: MagicMock):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.IN_PROGRESS.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 2)
+        self.assertEqual(enrollments['results'][1]['course']['id'], str(actual_course.id))
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(infinite_course.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_completed_status(self):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=infinite_course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+        )
+
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.COMPLETED.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 1)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(infinite_course.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_expired_status(self):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.EXPIRED.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 1)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(old_course.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_expired_course_with_certificate(self):
+        """
+        Testing that the API returns a course with
+        an expiration date in the past if the user has a certificate for this course.
+        """
+        self.login()
+        expired_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        expired_course_with_cert = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=expired_course_with_cert.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+        )
+
+        self.enroll(expired_course_with_cert.id)
+        self.enroll(expired_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.COMPLETED.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 1)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(expired_course_with_cert.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_status_all(self):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=infinite_course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+        )
+
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.ALL.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 3)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(infinite_course.id))
+        self.assertEqual(enrollments['results'][1]['course']['id'], str(actual_course.id))
+        self.assertEqual(enrollments['results'][2]['course']['id'], str(old_course.id))
+        self.assertNotIn('primary', response.data)
 
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})

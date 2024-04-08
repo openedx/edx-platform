@@ -110,7 +110,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """
         Returns expiration date for a course audit expiration, if any or null
         """
-        return get_user_course_expiration_date(model.user, model.course)
+        return get_user_course_expiration_date(model.user, model.course, model)
 
     def get_certificate(self, model):
         """Returns the information about the user's certificate in the course."""

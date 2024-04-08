@@ -42,6 +42,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
+from .enums import EnrollmentStatuses
 from .serializers import (
     CourseEnrollmentSerializer,
     CourseEnrollmentSerializerModifiedForPrimary,
@@ -356,13 +357,33 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
     @cached_property
     def queryset(self):
-        return CourseEnrollment.objects.all().select_related('course', 'user').filter(
-            user__username=self.kwargs['username'],
+        """
+        Find and return the list of course enrollments for the user.
+
+        In v4 added filtering by statuses.
+        """
+        api_version = self.kwargs.get('api_version')
+        status = self.request.GET.get('status')
+        username = self.kwargs['username']
+
+        queryset = CourseEnrollment.objects.all().select_related('course', 'user').filter(
+            user__username=username,
             is_active=True
         ).order_by('-created')
 
+        if api_version == API_V4 and status in EnrollmentStatuses.values():
+            if status == EnrollmentStatuses.IN_PROGRESS.value:
+                queryset = queryset.in_progress(user_username=username, time_zone=self.user_timezone)
+            elif status == EnrollmentStatuses.COMPLETED.value:
+                queryset = queryset.completed(user_username=username)
+            elif status == EnrollmentStatuses.EXPIRED.value:
+                queryset = queryset.expired(user_username=username, time_zone=self.user_timezone)
+
+        return queryset
+
     def get_queryset(self):
         api_version = self.kwargs.get('api_version')
+        status = self.request.GET.get('status')
         mobile_available = self.get_mobile_available_enrollments()
 
         not_duration_limited = (
@@ -370,7 +391,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
         )
 
-        if api_version == API_V4:
+        if api_version == API_V4 and status not in EnrollmentStatuses.values():
             primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
             if primary_enrollment_obj:
                 mobile_available.remove(primary_enrollment_obj)
@@ -401,25 +422,36 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         api_version = self.kwargs.get('api_version')
+        status = self.request.GET.get('status')
 
         if api_version in (API_V2, API_V3, API_V4):
             enrollment_data = {
                 'configs': MobileConfig.get_structured_configs(),
-                'user_timezone': str(get_user_timezone_or_last_seen_timezone_or_utc(self.get_user())),
+                'user_timezone': str(self.user_timezone),
                 'enrollments': response.data
             }
-            if api_version == API_V4:
-                primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
-                if primary_enrollment_obj:
-                    serializer = CourseEnrollmentSerializerModifiedForPrimary(
-                        primary_enrollment_obj,
-                        context=self.get_serializer_context(),
-                    )
-                    enrollment_data.update({'primary': serializer.data})
+            if api_version == API_V4 and status not in EnrollmentStatuses.values():
+                if status in EnrollmentStatuses.values():
+                    enrollment_data.update({'primary': None})
+                else:
+                    primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
+                    if primary_enrollment_obj:
+                        serializer = CourseEnrollmentSerializerModifiedForPrimary(
+                            primary_enrollment_obj,
+                            context=self.get_serializer_context(),
+                        )
+                        enrollment_data.update({'primary': serializer.data})
 
             return Response(enrollment_data)
 
         return response
+
+    @cached_property
+    def user_timezone(self):
+        """
+        Get the user's timezone.
+        """
+        return get_user_timezone_or_last_seen_timezone_or_utc(self.get_user())
 
     def get_user(self) -> User:
         """
