@@ -304,12 +304,15 @@ def _refund_in_commerce_coordinator(course_enrollment, change_mode):
     """
     enrollment_source_system = course_enrollment.get_order_attribute_value("source_system")
     course_key_str = str(course_enrollment.course_id)
+
     # Commerce Coordinator enrollments will have an orders.source_system enrollment attribute.
-    # Redirect to Coordinator only if the source_system is whitelisted as Coordinator's in settings.
+    # Redirect to Coordinator only if the source_system is safelisted as Coordinator's in settings.
+
     if enrollment_source_system and enrollment_source_system in settings.COMMERCE_COORDINATOR_REFUND_SOURCE_SYSTEMS:
         log.info('Redirecting refund to Commerce Coordinator for user [%s], course [%s]...',
                  course_enrollment.user_id, course_key_str)
-        # Re-use Ecommerce API client factory to build an API client for Commerce Coordinator..
+
+        # Re-use Ecommerce API client factory to build an API client for Commerce Coordinator...
         service_user = get_user_model().objects.get(
             username=settings.COMMERCE_COORDINATOR_SERVICE_WORKER_USERNAME
         )
@@ -318,22 +321,39 @@ def _refund_in_commerce_coordinator(course_enrollment, change_mode):
             settings.COMMERCE_COORDINATOR_URL_ROOT,
             settings.COMMERCE_COORDINATOR_REFUND_PATH
         )
+
         # Build request, raising exception if Coordinator returns non-200.
         enrollment_attributes = CourseEnrollmentAttribute.get_enrollment_attributes(course_enrollment)
-        api_client.post(
-            refunds_url,
-            json={
-                'course_id': course_key_str,
-                'username': course_enrollment.username,
-                'enrollment_attributes': enrollment_attributes
-            }
-        ).raise_for_status()
+
+        try:
+            api_client.post(
+                refunds_url,
+                json={
+                    'course_id': course_key_str,
+                    'username': course_enrollment.username,
+                    'enrollment_attributes': enrollment_attributes
+                }
+            ).raise_for_status()
+
+        except Exception as exc:  # pylint: disable=broad-except
+            # Catch any possible exceptions from the Commerce Coordinator service to ensure we fail gracefully
+            log.exception(
+                "Unexpected exception while attempting to refund user in Coordinator [%s], "
+                "course key [%s] message: [%s]",
+                course_enrollment.username,
+                course_key_str,
+                str(exc)
+            )
+            return False
+
+        # Refund was successfully sent to Commerce Coordinator
         log.info('Refund successfully sent to Commerce Coordinator for user [%s], course [%s].',
                  course_enrollment.user_id, course_key_str)
         if change_mode:
             _auto_enroll(course_enrollment)
         return True
     else:
+        # Refund was not meant to be sent to Commerce Coordinator
         log.info('Continuing refund without Commerce Coordinator redirect for user [%s], course [%s]...',
                  course_enrollment.user_id, course_key_str)
         return False
