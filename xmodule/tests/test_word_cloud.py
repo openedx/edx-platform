@@ -41,8 +41,8 @@ class WordCloudBlockTest(TestCase):
         )
 
         olx_element = etree.fromstring(original_xml)
-        id_generator = Mock()
-        block = WordCloudBlock.parse_xml(olx_element, runtime, None, id_generator)
+        runtime.id_generator = Mock()
+        block = WordCloudBlock.parse_xml(olx_element, runtime, None)
         block.location = BlockUsageLocator(
             CourseLocator('org', 'course', 'run', branch='revision'), 'word_cloud', 'block_id'
         )

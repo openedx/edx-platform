@@ -129,7 +129,6 @@ from django.urls import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
-from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
@@ -571,6 +570,15 @@ FEATURES = {
     # .. toggle_creation_date: 2024-03-14
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34173
     'ENABLE_HOME_PAGE_COURSE_API_V2': True,
+
+    # .. toggle_name: FEATURES['ENABLE_GRADING_METHOD_IN_PROBLEMS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the grading method feature in capa problems.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-03-22
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
+    'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -996,7 +1004,6 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,
-    TaggedBlockMixin,
 )
 XBLOCK_EXTRA_MIXINS = ()
 

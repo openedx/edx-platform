@@ -2,7 +2,7 @@
 Tests for django admin commands in the verify_student module
 
 """
-
+import ddt
 import logging
 import os
 import tempfile
@@ -18,6 +18,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.approve_id_verifications'
 
 
+@ddt.ddt
 class TestApproveIDVerificationsCommand(TestCase):
     """
     Tests for django admin commands in the verify_student module
@@ -50,7 +51,8 @@ class TestApproveIDVerificationsCommand(TestCase):
         with open(file_path, 'w') as temp_file:
             temp_file.write(str("\n".join(user_ids)))
 
-    def test_approve_id_verifications(self):
+    @ddt.data('submitted', 'must_retry')
+    def test_approve_id_verifications(self, status):
         """
         Tests that the approve_id_verifications management command executes successfully.
         """
@@ -59,7 +61,7 @@ class TestApproveIDVerificationsCommand(TestCase):
             SoftwareSecurePhotoVerification.objects.create(
                 user=user.user,
                 name=user.name,
-                status='submitted',
+                status=status,
             )
 
         assert SoftwareSecurePhotoVerification.objects.filter(status='approved').count() == 0

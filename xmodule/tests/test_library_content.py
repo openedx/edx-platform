@@ -195,7 +195,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
 
         # Now import it.
         olx_element = etree.fromstring(exported_olx)
-        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None, self.id_generator)
+        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None)
 
         self._verify_xblock_properties(imported_lc_block)
 
@@ -219,7 +219,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
 
         # Import the olx.
         olx_element = etree.fromstring(olx_with_comments)
-        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None, self.id_generator)
+        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None)
 
         self._verify_xblock_properties(imported_lc_block)
 

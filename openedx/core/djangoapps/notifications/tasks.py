@@ -26,7 +26,7 @@ from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_course_notification_preference_config_version,
 )
-from openedx.core.djangoapps.notifications.utils import get_list_in_batches
+from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
 
 logger = get_task_logger(__name__)
 
@@ -56,6 +56,33 @@ def create_course_notification_preferences_for_courses(self, course_ids):
             f'Newly created course preferences: {newly_created}.\n'
         )
     logger.info('Completed task create_course_notification_preferences')
+
+
+@shared_task(ignore_result=True)
+@set_code_owner_attribute
+def delete_notifications(kwargs):
+    """
+    Delete notifications
+    kwargs: dict {notification_type, app_name, created, course_id}
+    """
+    batch_size = settings.EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE
+    total_deleted = 0
+    kwargs = clean_arguments(kwargs)
+    logger.info(f'Running delete with kwargs {kwargs}')
+    while True:
+        ids_to_delete = Notification.objects.filter(
+            **kwargs
+        ).values_list('id', flat=True)[:batch_size]
+        ids_to_delete = list(ids_to_delete)
+        if not ids_to_delete:
+            break
+        delete_queryset = Notification.objects.filter(
+            id__in=ids_to_delete
+        )
+        delete_count, _ = delete_queryset.delete()
+        total_deleted += delete_count
+        logger.info(f'Deleted in batch {delete_count}')
+    logger.info(f'Total deleted: {total_deleted}')
 
 
 @shared_task(ignore_result=True)

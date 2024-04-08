@@ -366,7 +366,11 @@ def send_grade_if_interesting(
     # a learner has made an attempt at a course run of a course, so it wants to know about all the learner's efforts.
     # This check is attempt to prevent updates being sent to Credentials that it does not care about (e.g. updates
     # related to a legacy Audit course)
-    if mode not in INTERESTING_MODES or status not in INTERESTING_STATUSES:
+    if (
+        mode not in INTERESTING_MODES
+        and not CourseMode.is_eligible_for_certificate(mode)
+        or status not in INTERESTING_STATUSES
+    ):
         if verbose:
             logger.warning(f"{warning_base} mode ({mode}) or status ({status}) is not interesting to Credentials")
         return
@@ -439,7 +443,10 @@ def backfill_date_for_all_course_runs():
         course_key = str(course_run.id)
         course_modes = CourseMode.objects.filter(course_id=course_key)
         # There should only ever be one certificate relevant mode per course run
-        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+        modes = [
+            mode.slug for mode in course_modes
+            if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES or CourseMode.is_eligible_for_certificate(mode.slug)
+        ]
         if len(modes) != 1:
             logger.exception(
                 f'Either course {course_key} has no certificate mode or multiple modes. Task failed.'
@@ -490,7 +497,10 @@ def clean_certificate_available_date():
         course_key = str(course_run.id)
         course_modes = CourseMode.objects.filter(course_id=course_key)
         # There should only ever be one certificate relevant mode per course run
-        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+        modes = [
+            mode.slug for mode in course_modes
+            if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES or CourseMode.is_eligible_for_certificate(mode.slug)
+        ]
         if len(modes) != 1:
             logger.exception(f'Either course {course_key} has no certificate mode or multiple modes. Task failed.')
         # if there is only one relevant mode, post to credentials

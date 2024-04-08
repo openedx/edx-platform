@@ -65,7 +65,6 @@ jobs:
       env:
         TEST_SUITE: quality
         SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
-        SHARD: 4
         PIP_SRC: ${{ runner.temp }}
         TARGET_BRANCH: ${{ github.base_ref }}
       run: |
