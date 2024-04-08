@@ -16,12 +16,10 @@
 			gettext("The following information is already a part of your {platform} profile and is required for your application. To edit this information go to "),
 			{platform: platform_name}
 		) %><a href="<%- account_settings_url %>"><%- gettext("Account Settings") %></a>.</p>
-		<% if (!auto_generated_username_enabled) { %>
-			<div class="info-column">
-				<div class="title"><%- gettext('Username') %></div>
-				<div class="data"><%- username %></div>
-			</div>
-		<% } %>
+		<div class="info-column">
+			<div class="title"><%- gettext('Username') %></div>
+			<div class="data"><%- username %></div>
+		</div>
 		<div class="info-column">
 			<div class="title"><%- gettext('Email address') %></div>
 			<div class="data"><%- email %></div>
