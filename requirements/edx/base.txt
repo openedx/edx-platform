@@ -550,7 +550,7 @@ edx-toggles==5.2.0
     #   ora2
 edx-token-utils==0.2.1
     # via -r requirements/edx/kernel.in
-edx-when==2.4.0
+edx-when==2.5.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
