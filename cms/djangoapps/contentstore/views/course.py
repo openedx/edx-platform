@@ -990,8 +990,9 @@ def create_new_course_in_store(store, user, org, number, run, fields):
 
     # Set default language from settings and enable web certs
     fields.update({
-        'language': getattr(settings, 'DEFAULT_COURSE_LANGUAGE', 'en'),
         'cert_html_view_enabled': True,
+        'invitation_only': getattr(settings, 'DEFAULT_COURSE_INVITATION_ONLY', False),
+        'language': getattr(settings, 'DEFAULT_COURSE_LANGUAGE', 'en'),
     })
 
     with modulestore().default_store(store):
