@@ -2,13 +2,23 @@
 Tests for the Studio content search REST API.
 """
 import functools
-from django.test import override_settings
-from rest_framework.test import APITestCase, APIClient
 from unittest import mock
 
-from organizations.models import Organization
-from common.djangoapps.student.tests.factories import UserFactory
+import ddt
+from django.test import override_settings
+from rest_framework.test import APIClient
+
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+
+from .test_models import StudioSearchTestMixin
+
+try:
+    # This import errors in the lms because content.search is not an installed app there.
+    from openedx.core.djangoapps.content.search.models import SearchAccess
+except RuntimeError:
+    SearchAccess = {}
+
 
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 MOCK_API_KEY_UID = "3203d764-370f-4e99-a917-d47ab7f29739"
@@ -37,22 +47,12 @@ def mock_meilisearch(enabled=True):
     return decorator
 
 
+@ddt.ddt
 @skip_unless_cms
-class StudioSearchViewTest(APITestCase):
+class StudioSearchViewTest(StudioSearchTestMixin, SharedModuleStoreTestCase):
     """
     General tests for the Studio search REST API.
     """
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.staff = UserFactory.create(
-            username='staff', email='staff@example.com', is_staff=True, password='staff_pass'
-        )
-        cls.student = UserFactory.create(
-            username='student', email='student@example.com', is_staff=False, password='student_pass'
-        )
-
     def setUp(self):
         super().setUp()
         self.client = APIClient()
@@ -144,21 +144,21 @@ class StudioSearchViewTest(APITestCase):
         )
 
     @mock_meilisearch(enabled=True)
-    @mock.patch('openedx.core.djangoapps.content.search.views.get_access_ids_for_request')
     @mock.patch('openedx.core.djangoapps.content.search.views.meilisearch.Client')
-    def test_studio_search_limit_access_ids(self, mock_search_client, mock_get_access_ids):
+    def test_studio_search_course_staff_access(self, mock_search_client):
         """
-        Users with access to many courses or libraries will only be able to search content
-        from the most recent 1_000 courses/libraries.
+        Users with staff or instructor access to a course or library will be limited to these courses/libraries.
         """
-        self.client.login(username='student', password='student_pass')
+        self.client.login(username='course_staff', password='course_staff_pass')
         mock_generate_tenant_token = self._mock_generate_tenant_token(mock_search_client)
-        mock_get_access_ids.return_value = list(range(2000))
-        expected_access_ids = list(range(1000))
-
         result = self.client.get(STUDIO_SEARCH_ENDPOINT_URL)
         assert result.status_code == 200
-        mock_get_access_ids.assert_called_once()
+
+        expected_access_ids = list(SearchAccess.objects.filter(
+            context_key__in=self.course_user_keys,
+        ).only('id').values_list('id', flat=True))
+        expected_access_ids.sort(reverse=True)
+
         mock_generate_tenant_token.assert_called_once_with(
             api_key_uid=MOCK_API_KEY_UID,
             search_rules={
@@ -169,34 +169,60 @@ class StudioSearchViewTest(APITestCase):
             expires_at=mock.ANY,
         )
 
+    @ddt.data(
+        'org_staff',
+        'org_instr',
+    )
     @mock_meilisearch(enabled=True)
-    @mock.patch('openedx.core.djangoapps.content.search.views.get_user_orgs')
     @mock.patch('openedx.core.djangoapps.content.search.views.meilisearch.Client')
-    def test_studio_search_limit_orgs(self, mock_search_client, mock_get_user_orgs):
+    def test_studio_search_org_access(self, username, mock_search_client):
         """
-        Users with access to many courses or libraries will only be able to search content
-        from the most recent 1_000 courses/libraries.
+        Users with org access to any courses or libraries will use the org filter.
         """
-        self.client.login(username='student', password='student_pass')
+        self.client.login(username=username, password=f'{username}_pass')
         mock_generate_tenant_token = self._mock_generate_tenant_token(mock_search_client)
-        mock_get_user_orgs.return_value = [
-            Organization.objects.create(
-                short_name=f"org{x}",
-                description=f"Org {x}",
-            ) for x in range(2000)
-        ]
-        expected_user_orgs = [
-            f"org{x}" for x in range(1000)
-        ]
-
         result = self.client.get(STUDIO_SEARCH_ENDPOINT_URL)
         assert result.status_code == 200
-        mock_get_user_orgs.assert_called_once()
         mock_generate_tenant_token.assert_called_once_with(
             api_key_uid=MOCK_API_KEY_UID,
             search_rules={
                 "studio_content": {
-                    "filter": f"org IN {expected_user_orgs} OR access_id IN []",
+                    "filter": "org IN ['org1'] OR access_id IN []",
+                }
+            },
+            expires_at=mock.ANY,
+        )
+
+    @mock_meilisearch(enabled=True)
+    @mock.patch('openedx.core.djangoapps.content.search.views._get_user_orgs')
+    @mock.patch('openedx.core.djangoapps.content.search.views.get_access_ids_for_request')
+    @mock.patch('openedx.core.djangoapps.content.search.views.meilisearch.Client')
+    def test_studio_search_limits(self, mock_search_client, mock_get_access_ids, mock_get_user_orgs):
+        """
+        Users with access to many courses/libraries or orgs will only be able to search content
+        from the most recent 1_000 courses/libraries and orgs.
+        """
+        self.client.login(username='student', password='student_pass')
+        mock_generate_tenant_token = self._mock_generate_tenant_token(mock_search_client)
+
+        mock_get_access_ids.return_value = list(range(2000))
+        expected_access_ids = list(range(1000))
+
+        mock_get_user_orgs.return_value = [
+            f"studio-search-org{x}" for x in range(2000)
+        ]
+        expected_user_orgs = [
+            f"studio-search-org{x}" for x in range(1000)
+        ]
+
+        result = self.client.get(STUDIO_SEARCH_ENDPOINT_URL)
+        assert result.status_code == 200
+        mock_get_access_ids.assert_called_once()
+        mock_generate_tenant_token.assert_called_once_with(
+            api_key_uid=MOCK_API_KEY_UID,
+            search_rules={
+                "studio_content": {
+                    "filter": f"org IN {expected_user_orgs} OR access_id IN {expected_access_ids}",
                 }
             },
             expires_at=mock.ANY,

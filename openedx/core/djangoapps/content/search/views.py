@@ -1,6 +1,8 @@
 """
 REST API for content search
 """
+from __future__ import annotations
+
 from datetime import datetime, timedelta, timezone
 import logging
 
@@ -12,12 +14,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.djangoapps.student.role_helpers import get_course_roles
 from common.djangoapps.student.roles import GlobalStaff
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.content.search.documents import STUDIO_INDEX_NAME
 from openedx.core.djangoapps.content.search.models import get_access_ids_for_request
-from openedx.core.djangoapps.content_tagging.rules import get_user_orgs
-
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -43,16 +44,28 @@ def _get_meili_access_filter(request: Request) -> dict:
     if GlobalStaff().has_user(request.user):
         return {}
 
-    # Everyone else is limited to their org roles...
-    user_orgs = [
-        org.short_name for org in get_user_orgs(request.user)[:MAX_ORGS_IN_FILTER]
-    ]
+    # Everyone else is limited to their org staff roles...
+    user_orgs = _get_user_orgs(request)[:MAX_ORGS_IN_FILTER]
 
     # ...or the N most recent courses and libraries they can access.
     access_ids = get_access_ids_for_request(request)[:MAX_ACCESS_IDS_IN_FILTER]
     return {
         "filter": f"org IN {user_orgs} OR access_id IN {access_ids}",
     }
+
+
+def _get_user_orgs(request: Request) -> list[str]:
+    """
+    Get the org.short_names for the organizations that the requesting user has OrgStaffRole or OrgInstructorRole.
+
+    Note: org-level roles have course_id=None to distinguish them from course-level roles.
+    """
+    course_roles = get_course_roles(request.user)
+    return list(set(
+        role.org
+        for role in course_roles
+        if role.course_id is None and role.role in ['staff', 'instructor']
+    ))
 
 
 @view_auth_classes(is_authenticated=True)
