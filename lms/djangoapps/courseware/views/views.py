@@ -66,6 +66,7 @@ from lms.djangoapps.certificates.generation_handler import CertificateGeneration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
+from lms.djangoapps.course_home_api.progress.serializers import CertificateDataSerializer
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_public_access
 from lms.djangoapps.courseware.courses import (
@@ -1422,6 +1423,9 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     log.info(f'Attempt will be made to generate a course certificate for {student.id} : {course_key}.')
+    # We get the certificate status before request to create it, this needed
+    # because it could the case that certificate is being quickly generated
+    certificate_status_before = certs_api.certificate_downloadable_status(student, course.id)
 
     try:
         certs_api.generate_certificate_task(student, course_key, 'self')
@@ -1446,13 +1450,27 @@ def generate_user_cert(request, course_id):
         certificate_status["is_downloadable"],
         certificate_status["is_generating"],
     )
+    
+    # By default we assume certficate is generated quickly
+    status_message = _("Your cretficate has been just generated!.")
+    status_code = 200
 
-    if certificate_status["is_downloadable"]:
-        return HttpResponseBadRequest(_("Certificate has already been created."))
+    if certificate_status["is_downloadable"] and certificate_status_before["is_downloadable"]:
+        status_message = _("Certificate has already been created.")
+        status_code = 400
     elif certificate_status["is_generating"]:
-        return HttpResponseBadRequest(_("Certificate is being created."))
+        status_message = _("Certificate is being created.")
+        # Todo:
+        # Shall we keep responding with 400? even if request is taken into account...
+        status_code = 400
 
-    return HttpResponse()
+    if status_code == 400:
+        return JsonResponse({'status_message': status_message },status = status_code)
+    # Now that we are sure we get the cert data in same data structual as if it's progress
+    # page or course outline, hence `CertificateDataSerializer` is used for both
+    # course home view (which which the  data strucucal that the learning MFE expecsts).
+    course_mode = certs_api.certificate_status_for_student(student,course.id).get('mode')
+    return JsonResponse({'certificate_data': CertificateDataSerializer(get_cert_data(student,course,course_mode)).data}, status = status_code)
 
 
 def enclosing_sequence_for_gating_checks(block):
