@@ -5,26 +5,6 @@ from opaque_keys.edx.django.models import LearningContextKeyField
 from opaque_keys.edx.locator import LibraryLocatorV2
 
 
-def populate_search_access(apps, schema_editor):
-    """
-    Adds SearchAccess rows for all existing CourseOverview and ContentLibrary instances.
-    """
-    if schema_editor.connection.alias != "default":
-        return
-
-    SearchAccess = apps.get_model("search", "SearchAccess")
-
-    CourseOverview = apps.get_model("course_overviews", "CourseOverview")
-    for course in CourseOverview.objects.only('id'):
-        SearchAccess.objects.create(context_key=course.id)
-
-    ContentLibrary = apps.get_model("content_libraries", "ContentLibrary")
-    for lib in ContentLibrary.objects.select_related("org").only("org", "slug"):
-        # ContentLibrary.library_key property is not available here, so we have to assemble it.
-        lib_key = LibraryLocatorV2(org=lib.org.short_name, slug=lib.slug)
-        SearchAccess.objects.create(context_key=lib_key)
-
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -41,9 +21,5 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(help_text='Numeric ID for each Course / Library context. This ID will generally require fewer bits than the full LearningContextKey, allowing more courses and libraries to be represented in content search filters.', primary_key=True, serialize=False)),
                 ('context_key', LearningContextKeyField(max_length=255, unique=True)),
             ],
-        ),
-        migrations.RunPython(
-            populate_search_access,
-            reverse_code=migrations.RunPython.noop,
         ),
     ]
