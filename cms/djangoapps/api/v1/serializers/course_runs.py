@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 from rest_framework.fields import empty
 
@@ -198,8 +199,50 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
             'display_name': instance.display_name
         }
         fields.update(validated_data)
-        new_course_run_key = rerun_course(user, course_run_key, course_run_key.org, number, run, fields, False)
+        new_course_run_key = rerun_course(
+            user, course_run_key, course_run_key.org, number, run, fields, background=False,
+        )
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)
         return course_run
+
+
+class CourseCloneSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
+    source_course_id = serializers.CharField()
+    destination_course_id = serializers.CharField()
+
+    def validate(self, attrs):
+        source_course_id = attrs.get('source_course_id')
+        destination_course_id = attrs.get('destination_course_id')
+        store = modulestore()
+        source_key = CourseKey.from_string(source_course_id)
+        dest_key = CourseKey.from_string(destination_course_id)
+
+        # Check if the source course exists
+        if not store.has_course(source_key):
+            raise serializers.ValidationError('Source course does not exist.')
+
+        # Check if the destination course already exists
+        if store.has_course(dest_key):
+            raise serializers.ValidationError('Destination course already exists.')
+        return attrs
+
+    def create(self, validated_data):
+        source_course_id = validated_data.get('source_course_id')
+        destination_course_id = validated_data.get('destination_course_id')
+        user = self.context['request'].user
+        source_course_key = CourseKey.from_string(source_course_id)
+        destination_course_key = CourseKey.from_string(destination_course_id)
+        source_course_run = get_course_and_check_access(source_course_key, user)
+        fields = {
+            'display_name': source_course_run.display_name,
+        }
+
+        destination_course_run_key = rerun_course(
+            user, source_course_key, destination_course_key.org, destination_course_key.course,
+            destination_course_key.run, fields, background=False,
+        )
+
+        destination_course_run = get_course_and_check_access(destination_course_run_key, user)
+        return destination_course_run

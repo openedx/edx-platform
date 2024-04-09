@@ -1029,6 +1029,12 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     if store.has_course(destination_course_key, ignore_case=True):
         raise DuplicateCourseError(source_course_key, destination_course_key)
 
+    # if org or name of source course don't match the destination course,
+    # verify user has access to the destination course
+    if source_course_key.org != destination_course_key.org or source_course_key.course != destination_course_key.course:
+        if not has_studio_write_access(user, destination_course_key):
+            raise PermissionDenied()
+
     # Make sure user has instructor and staff access to the destination course
     # so the user can see the updated status for that course
     add_instructor(destination_course_key, user, user)

@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
-        node-version: [ 16 ]
+        node-version: [ 18 ]
         python-version: [ 3.8 ]
 
     steps:
@@ -28,13 +28,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Setup npm
-      run: npm i -g npm@8.5.x
+      run: npm i -g npm@10.5.x
 
-    - name: Install Firefox 61.0
+    - name: Install Firefox 123.0
       run: |
         sudo apt-get purge firefox
-        wget "https://ftp.mozilla.org/pub/firefox/releases/61.0/linux-x86_64/en-US/firefox-61.0.tar.bz2"
-        tar -xjf firefox-61.0.tar.bz2
+        wget "https://ftp.mozilla.org/pub/firefox/releases/123.0/linux-x86_64/en-US/firefox-123.0.tar.bz2"
+        tar -xjf firefox-123.0.tar.bz2
         sudo mv firefox /opt/firefox
         sudo ln -s /opt/firefox/firefox /usr/bin/firefox
 
