@@ -115,7 +115,7 @@ RUN pip install -r requirements/edx/base.txt
 
 # Install node and npm
 RUN nodeenv /edx/app/edxapp/nodeenv --node=18.19.0 --prebuilt
-RUN npm install -g npm@10.2.x
+RUN npm install -g npm@10.5.x
 
 # This script is used by an npm post-install hook.
 # We copy it into the image now so that it will be available when we run `npm install` in the next step.

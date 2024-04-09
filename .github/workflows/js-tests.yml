@@ -28,7 +28,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Setup npm
-      run: npm i -g npm@10.2.x
+      run: npm i -g npm@10.5.x
 
     - name: Install Firefox 123.0
       run: |
