@@ -344,7 +344,6 @@ def _refund_in_commerce_coordinator(course_enrollment, change_mode):
                 course_key_str,
                 str(exc)
             )
-            return False
 
         # Refund was successfully sent to Commerce Coordinator
         log.info('Refund successfully sent to Commerce Coordinator for user [%s], course [%s].',
@@ -367,7 +366,7 @@ def _auto_enroll(course_enrollment):
         course_enrollment (CourseEnrollment): The course_enrollment to update.
 
     Returns:
-        bool: True if auto-enroll is succesful. False if auto-enroll is not applicable.
+        bool: True if auto-enroll is successful. False if auto-enroll is not applicable.
     """
     enrollment_course_id = course_enrollment.course_id
 
