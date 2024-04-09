@@ -69,7 +69,6 @@ class DiscussionXBlockImportExportTests(TestCase):
         self.runtime_mock = mock.Mock(spec=Runtime)
         self.runtime_mock.construct_xblock_from_class = mock.Mock(side_effect=self._construct_xblock_mock)
         self.runtime_mock.get_policy = mock.Mock(return_value={})
-        self.id_gen_mock = mock.Mock()
 
     def _construct_xblock_mock(self, cls, keys):  # pylint: disable=unused-argument
         """
@@ -102,7 +101,7 @@ class DiscussionXBlockImportExportTests(TestCase):
 
         patched_load_definition_xml.side_effect = Exception("Irrelevant")
 
-        block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys, self.id_gen_mock)
+        block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys)
         try:
             assert block.discussion_id == id_pair.value
             assert block.discussion_category == category_pair.value
@@ -134,7 +133,7 @@ class DiscussionXBlockImportExportTests(TestCase):
 
         patched_load_definition_xml.return_value = (definition_node, "irrelevant")
 
-        block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys, self.id_gen_mock)
+        block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys)
         try:
             assert block.discussion_id == id_pair.value
             assert block.discussion_category == category_pair.value

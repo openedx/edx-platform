@@ -3,24 +3,21 @@ Tagging Org API Views
 """
 from __future__ import annotations
 
-import csv
-from typing import Iterator
-
 from django.db.models import Count
 from django.http import StreamingHttpResponse
-from opaque_keys.edx.keys import UsageKey
-from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
+from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from ...auth import has_view_object_tags_access
 
 from ...api import (
     create_taxonomy,
-    get_all_object_tags,
+    generate_csv_rows,
     get_taxonomies,
     get_taxonomies_for_org,
     get_taxonomy,
@@ -28,9 +25,7 @@ from ...api import (
     set_taxonomy_orgs
 )
 from ...rules import get_admin_orgs
-from ...utils import get_content_key_from_string
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
-from .objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
 from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 
 
@@ -167,64 +162,22 @@ class ObjectTagExportView(APIView):
             def write(self, value):
                 return value
 
-        def _generate_csv_rows() -> Iterator[str]:
-            """
-            Receives the blocks, tags and taxonomies and returns a CSV string
-            """
-
-            header = {"name": "Name", "type": "Type", "id": "ID"}
-
-            # Prepare the header for the taxonomies
-            for taxonomy_id, taxonomy in taxonomies.items():
-                header[f"taxonomy_{taxonomy_id}"] = taxonomy.export_id
-
-            csv_writer = csv.DictWriter(pseudo_buffer, fieldnames=header.keys(), quoting=csv.QUOTE_NONNUMERIC)
-            yield csv_writer.writerow(header)
-
-            # Iterate over the blocks and yield the rows
-            for item, level in iterate_with_level(tagged_content):
-                block_data = {
-                    "name": level * "  " + item.display_name,
-                    "type": item.category,
-                    "id": item.block_id,
-                }
-
-                # Add the tags for each taxonomy
-                for taxonomy_id in taxonomies:
-                    if taxonomy_id in item.object_tags:
-                        tag_values = item.object_tags[taxonomy_id]
-                        block_data[f"taxonomy_{taxonomy_id}"] = ", ".join(tag_values)
-
-                yield csv_writer.writerow(block_data)
-
         object_id: str = kwargs.get('context_id', None)
-
-        try:
-            content_key = get_content_key_from_string(object_id)
-
-            if isinstance(content_key, UsageKey):
-                raise ValidationError("The object_id must be a CourseKey or a LibraryLocatorV2.")
-
-            # Check if the user has permission to view object tags for this object_id
-            if not self.request.user.has_perm(
-                "oel_tagging.view_objecttag",
-                # The obj arg expects a model, but we are passing an object
-                oel_tagging_rules.ObjectTagPermissionItem(taxonomy=None, object_id=object_id),  # type: ignore[arg-type]
-            ):
-                raise PermissionDenied(
-                    "You do not have permission to view object tags for this object_id."
-                )
-
-            all_object_tags, taxonomies = get_all_object_tags(content_key)
-            tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
-
-        except ValueError as e:
-            raise ValidationError from e
-
         pseudo_buffer = Echo()
 
-        return StreamingHttpResponse(
-            streaming_content=_generate_csv_rows(),
-            content_type="text/csv",
-            headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
-        )
+        if not has_view_object_tags_access(self.request.user, object_id):
+            raise PermissionDenied(
+                "You do not have permission to view object tags for this object_id."
+            )
+
+        try:
+            return StreamingHttpResponse(
+                streaming_content=generate_csv_rows(
+                    object_id,
+                    pseudo_buffer,
+                ),
+                content_type="text/csv",
+                headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
+            )
+        except ValueError as e:
+            raise ValidationError from e

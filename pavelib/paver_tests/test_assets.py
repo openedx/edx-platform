@@ -8,7 +8,6 @@ from unittest.mock import patch
 import ddt
 import paver.tasks
 from paver.easy import call_task, path
-from watchdog.observers import Observer
 
 from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets
 
@@ -195,86 +194,6 @@ class TestPaverThemeAssetTasks(PaverTestCase):
             )
 
         assert len(self.task_messages) == len(expected_messages)
-
-
-class TestPaverWatchAssetTasks(TestCase):
-    """
-    Test the Paver watch asset tasks.
-    """
-
-    def setUp(self):
-        self.expected_sass_directories = [
-            path('common/static/sass'),
-            path('common/static'),
-            path('node_modules/@edx'),
-            path('node_modules'),
-            path('lms/static/sass/partials'),
-            path('lms/static/sass'),
-            path('lms/static/certificates/sass'),
-            path('cms/static/sass'),
-            path('cms/static/sass/partials'),
-        ]
-
-        # Reset the options that paver stores in a global variable (thus polluting tests)
-        if 'pavelib.assets.watch_assets' in paver.tasks.environment.options:
-            del paver.tasks.environment.options['pavelib.assets.watch_assets']
-
-        super().setUp()
-
-    def tearDown(self):
-        self.expected_sass_directories = []
-        super().tearDown()
-
-    def test_watch_assets(self):
-        """
-        Test the "compile_sass" task.
-        """
-        with patch('pavelib.assets.SassWatcher.register') as mock_register:
-            with patch('pavelib.assets.Observer.start'):
-                with patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
-                    call_task(
-                        'pavelib.assets.watch_assets',
-                        options={"background": True},
-                    )
-                    assert mock_register.call_count == 2
-                    assert mock_webpack.call_count == 1
-
-                    sass_watcher_args = mock_register.call_args_list[0][0]
-
-                    assert isinstance(sass_watcher_args[0], Observer)
-                    assert isinstance(sass_watcher_args[1], list)
-                    assert len(sass_watcher_args[1]) == len(self.expected_sass_directories)
-
-    def test_watch_theme_assets(self):
-        """
-        Test the Paver watch asset tasks with theming enabled.
-        """
-        self.expected_sass_directories.extend([
-            path(TEST_THEME_DIR) / 'lms/static/sass',
-            path(TEST_THEME_DIR) / 'lms/static/sass/partials',
-            path(TEST_THEME_DIR) / 'lms/static/certificates/sass',
-            path(TEST_THEME_DIR) / 'cms/static/sass',
-            path(TEST_THEME_DIR) / 'cms/static/sass/partials',
-        ])
-
-        with patch('pavelib.assets.SassWatcher.register') as mock_register:
-            with patch('pavelib.assets.Observer.start'):
-                with patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
-                    call_task(
-                        'pavelib.assets.watch_assets',
-                        options={
-                            "background": True,
-                            "theme_dirs": [TEST_THEME_DIR.dirname()],
-                            "themes": [TEST_THEME_DIR.basename()]
-                        },
-                    )
-                    assert mock_register.call_count == 2
-                    assert mock_webpack.call_count == 1
-
-                    sass_watcher_args = mock_register.call_args_list[0][0]
-                    assert isinstance(sass_watcher_args[0], Observer)
-                    assert isinstance(sass_watcher_args[1], list)
-                    assert len(sass_watcher_args[1]) == len(self.expected_sass_directories)
 
 
 @ddt.ddt

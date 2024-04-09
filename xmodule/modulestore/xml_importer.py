@@ -52,6 +52,7 @@ from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModu
 from xmodule.tabs import CourseTabList
 from xmodule.util.misc import escape_invalid_characters
 from xmodule.x_module import XModuleMixin
+from openedx.core.djangoapps.content_tagging.api import import_course_tags_from_csv
 
 from .inheritance import own_metadata
 from .store_utilities import rewrite_nonportable_content_links
@@ -476,6 +477,13 @@ class ImportManager:
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def import_tags(self, data_path, dest_id):
+        """
+        To be overloaded with a method that adds tags to already imported blocks
+        """
+        raise NotImplementedError
+
     def recursive_build(self, source_courselike, courselike, courselike_key, dest_id):
         """
         Recursively imports all child blocks from the temporary modulestore into the
@@ -574,6 +582,13 @@ class ImportManager:
                 # Import all draft items into the courselike.
                 courselike = self.import_drafts(courselike, courselike_key, data_path, dest_id)
 
+            with self.store.bulk_operations(dest_id):
+                try:
+                    self.import_tags(data_path, dest_id)
+                except FileNotFoundError:
+                    logging.info(f'Course import {dest_id}: No tags.csv file present.')
+                except ValueError as e:
+                    logging.info(f'Course import {dest_id}: {str(e)}')
             yield courselike
 
 
@@ -695,6 +710,13 @@ class CourseImportManager(ImportManager):
         # Fetch the course to return the most recent course version.
         return self.store.get_course(courselike.id.replace(branch=None, version_guid=None))
 
+    def import_tags(self, data_path, dest_id):
+        """
+        Imports tags into course blocks.
+        """
+        csv_path = path(data_path) / 'tags.csv'
+        import_course_tags_from_csv(csv_path, dest_id)
+
 
 class LibraryImportManager(ImportManager):
     """
@@ -765,6 +787,13 @@ class LibraryImportManager(ImportManager):
         Imports all drafts into the desired store.
         """
         return courselike
+
+    def import_tags(self, data_path, dest_id):
+        """
+        Imports tags into library blocks
+        """
+        # We don't support tags in v1 libraries, and v2 libraries don't have
+        # an import/export format defined yet. No action needed here for now.
 
 
 def import_course_from_xml(*args, **kwargs):

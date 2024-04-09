@@ -319,10 +319,15 @@ def _import_xml_node_to_parent(
     parent_key = parent_xblock.scope_ids.usage_id
     block_type = node.tag
 
+    # Modulestore's IdGenerator here is SplitMongoIdManager which is assigned
+    # by CachingDescriptorSystem Runtime and since we need our custom ImportIdGenerator
+    # here we are temporaraliy swtiching it.
+    original_id_generator = runtime.id_generator
+
     # Generate the new ID:
-    id_generator = ImportIdGenerator(parent_key.context_key)
-    def_id = id_generator.create_definition(block_type, slug_hint)
-    usage_id = id_generator.create_usage(def_id)
+    runtime.id_generator = ImportIdGenerator(parent_key.context_key)
+    def_id = runtime.id_generator.create_definition(block_type, slug_hint)
+    usage_id = runtime.id_generator.create_usage(def_id)
     keys = ScopeIds(None, block_type, def_id, usage_id)
     # parse_xml is a really messy API. We pass both 'keys' and 'id_generator' and, depending on the XBlock, either
     # one may be used to determine the new XBlock's usage key, and the other will be ignored. e.g. video ignores
@@ -348,7 +353,7 @@ def _import_xml_node_to_parent(
 
     if not xblock_class.has_children:
         # No children to worry about. The XML may contain child nodes, but they're not XBlocks.
-        temp_xblock = xblock_class.parse_xml(node, runtime, keys, id_generator)
+        temp_xblock = xblock_class.parse_xml(node, runtime, keys)
     else:
         # We have to handle the children ourselves, because there are lots of complex interactions between
         #    * the vanilla XBlock parse_xml() method, and its lack of API for "create and save a new XBlock"
@@ -358,8 +363,12 @@ def _import_xml_node_to_parent(
         # serialization of a child block, in order. For blocks that don't support children, their XML content/nodes
         # could be anything (e.g. HTML, capa)
         node_without_children = etree.Element(node.tag, **node.attrib)
-        temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys, id_generator)
+        temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys)
         child_nodes = list(node)
+
+    # Restore the original id_generator
+    runtime.id_generator = original_id_generator
+
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
     temp_xblock.parent = parent_key
