@@ -136,6 +136,26 @@ class StudioSearchAccessTest(StudioSearchTestMixin, SharedModuleStoreTestCase):
     Tests the SearchAccess model, handlers, and helper functions.
     """
 
+    def _create_course(self, course_location):
+        """
+        Creates a SearchAccess object for each new course.
+
+        Usually these are created when documents are indexed, but in these model tests, we need to create them manually.
+        """
+        course = super()._create_course(course_location)
+        SearchAccess.objects.create(context_key=course.id)
+        return course
+
+    def _create_library(self, org, num):
+        """
+        Creates a SearchAccess object for each new library.
+
+        Usually these are created when documents are indexed, but in these model tests, we need to create them manually.
+        """
+        library = super()._create_library(org, num)
+        SearchAccess.objects.create(context_key=library.key)
+        return library
+
     def _check_access_ids(self, access_ids, expected_keys):
         """
         Checks the returned list of access_ids to ensure:
