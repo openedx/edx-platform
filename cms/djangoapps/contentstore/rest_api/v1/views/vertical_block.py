@@ -10,6 +10,8 @@ from cms.djangoapps.contentstore.utils import (
     get_container_handler_context,
     get_user_partition_info,
     get_visibility_partition_info,
+    get_xblock_validation_messages,
+    get_xblock_render_error,
 )
 from cms.djangoapps.contentstore.views.component import _get_item_in_course
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
@@ -194,7 +196,9 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "user_partitions": {}
                     "actions": {
                         "can_manage_tags": true,
-                    }
+                    },
+                    "has_validation_error": false,
+                    "validation_errors": [],
                 },
                 {
                     "name": "Video",
@@ -205,6 +209,8 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "actions": {
                         "can_manage_tags": true,
                     }
+                    "validation_messages": [],
+                    "render_error": "",
                 },
                 {
                     "name": "Text",
@@ -214,7 +220,14 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "user_partitions": {},
                     "actions": {
                         "can_manage_tags": true,
-                    }
+                    },
+                    "validation_messages": [
+                        {
+                            "text": "This component's access settings contradict its parent's access settings.",
+                            "type": "error"
+                        }
+                    ],
+                    "render_error": "Unterminated control keyword: 'if' in file '../problem.html'",
                 },
             ],
             "is_published": false
@@ -232,12 +245,17 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                 child_info = modulestore().get_item(child)
                 user_partition_info = get_visibility_partition_info(child_info, course=course)
                 user_partitions = get_user_partition_info(child_info, course=course)
+                validation_messages = get_xblock_validation_messages(child_info)
+                render_error = get_xblock_render_error(request, child_info)
+
                 children.append({
                     "name": child_info.display_name_with_default,
                     "block_id": child_info.location,
                     "block_type": child_info.location.block_type,
                     "user_partition_info": user_partition_info,
                     "user_partitions": user_partitions,
+                    "validation_messages": validation_messages,
+                    "render_error": render_error,
                 })
 
             is_published = not modulestore().has_changes(current_xblock)
