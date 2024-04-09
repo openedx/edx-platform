@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from typing import List
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import LearningContextKeyField
 from rest_framework.request import Request
 
-from cms.djangoapps.contentstore.views.course import get_courses_accessible_to_user
+from common.djangoapps.student.role_helpers import get_course_roles
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.content_libraries.api import get_libraries_for_user
 
 
@@ -35,14 +34,18 @@ class SearchAccess(models.Model):
     )
 
 
-def get_access_ids_for_request(request: Request) -> List[int]:
+def get_access_ids_for_request(request: Request) -> list[int]:
     """
-    Returns the SearchAccess.id values that the user has read access to.
+    Returns a list of SearchAccess.id values for courses and content libraries that the requesting user has been
+    individually grated access to.
     """
-    courses, _ = get_courses_accessible_to_user(request)
+    course_roles = get_course_roles(request.user)
     course_clause = models.Q(context_key__in=[
-        course.id for course in courses
+        role.course_id
+        for role in course_roles
+        if role.role in [CourseInstructorRole.ROLE, CourseStaffRole.ROLE]
     ])
+
     libraries = get_libraries_for_user(user=request.user)
     library_clause = models.Q(context_key__in=[
         lib.library_key for lib in libraries

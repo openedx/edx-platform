@@ -16,7 +16,7 @@ try:
     from openedx.core.djangoapps.content.search.models import SearchAccess, get_access_ids_for_request
 except RuntimeError:
     SearchAccess = {}
-    get_access_ids_for_request = lambda x: x
+    get_access_ids_for_request = lambda request: []
 
 
 @skip_unless_cms
@@ -32,7 +32,6 @@ class StudioSearchAccessTest(SharedModuleStoreTestCase):
         super().setUp()
         self.global_staff = UserFactory(password=self.TEST_PASSWORD)
         GlobalStaff().add_users(self.global_staff)
-        self.staff_user_keys = []
 
         self.course_staff = UserFactory(password=self.TEST_PASSWORD)
         self.course_instructor = UserFactory(password=self.TEST_PASSWORD)
@@ -47,13 +46,11 @@ class StudioSearchAccessTest(SharedModuleStoreTestCase):
             CourseStaffRole(course_location).add_users(self.course_staff)
             CourseInstructorRole(course_location).add_users(self.course_instructor)
             self.course_user_keys.append(course_location)
-            self.staff_user_keys.append(course_location)
 
         # Create a few courses that only global_staff can access
         for num in range(3):
             course_location = self.store.make_course_key('Org', 'StaffCourse' + str(num), 'Run')
             self._create_course(course_location)
-            self.staff_user_keys.append(course_location)
 
         # Create orgs to test library access
         self.org1, _ = Organization.objects.get_or_create(
@@ -146,7 +143,9 @@ class StudioSearchAccessTest(SharedModuleStoreTestCase):
         self._check_access_ids(access_ids, self.course_user_keys)
 
     def test_staff_get_access_ids_for_request(self):
-        """Global staff can see all courses and libraries"""
+        """
+        Global staff can see all courses and libraries, but they only have individual access granted for libraries.
+        """
         request = RequestFactory().get('/course')
         request.user = self.global_staff
 
@@ -156,7 +155,6 @@ class StudioSearchAccessTest(SharedModuleStoreTestCase):
     def test_delete_removes_access_ids_for_request(self):
         """Removing courses and library should remove their associated access_ids."""
         remaining_keys = self.staff_user_keys
-        remaining_keys.remove(self.last_course.id)
         remaining_keys.remove(self.last_library.key)
         self.last_course.delete()
         library_api.delete_library(self.last_library.key)
