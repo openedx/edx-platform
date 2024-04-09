@@ -127,14 +127,13 @@ module.exports = Merge.smart({
 
         output: {
             path: path.resolve(__dirname, 'common/static/bundles'),
-            library: {
-                type: 'window'
-            }
+            libraryTarget: 'window'
         },
 
         plugins: [
             new webpack.ProgressPlugin(), // report progress during compilation
             new webpack.NoEmitOnErrorsPlugin(),
+            new webpack.NamedModulesPlugin(),
             new BundleTracker({
                 path: staticRootCms,
                 filename: 'webpack-stats.json'
@@ -156,6 +155,21 @@ module.exports = Merge.smart({
                 // any other way to declare that dependency.
                 $script: 'scriptjs'
             }),
+
+            // Note: Until karma-webpack releases v3, it doesn't play well with
+            // the CommonsChunkPlugin. We have a kludge in karma.common.conf.js
+            // that dynamically removes this plugin from webpack config when
+            // running those tests (the details are in that file). This is a
+            // recommended workaround, as this plugin is just an optimization. But
+            // because of this, we really don't want to get too fancy with how we
+            // invoke this plugin until we can upgrade karma-webpack.
+            new webpack.optimize.CommonsChunkPlugin({
+                // If the value below changes, update the render_bundle call in
+                // common/djangoapps/pipeline_mako/templates/static_content.html
+                name: 'commons',
+                filename: 'commons.js',
+                minChunks: 10
+            })
         ],
 
         module: {
@@ -167,6 +181,42 @@ module.exports = Merge.smart({
                 /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce.js/
             ],
             rules: [
+                {
+                    test: files.namespacedRequire.concat(files.textBangUnderscore, filesWithRequireJSBlocks),
+                    loader: StringReplace.replace(
+                        ['babel-loader'],
+                        {
+                            replacements: [
+                                {
+                                    pattern: defineHeader,
+                                    replacement: function() { return ''; }
+                                },
+                                {
+                                    pattern: defineFooter,
+                                    replacement: function() { return ''; }
+                                },
+                                {
+                                    pattern: /(\/\* RequireJS) \*\//g,
+                                    replacement: function(match, p1) { return p1; }
+                                },
+                                {
+                                    pattern: /\/\* Webpack/g,
+                                    replacement: function(match) { return match + ' */'; }
+                                },
+                                {
+                                    pattern: /text!(.*?\.underscore)/g,
+                                    replacement: function(match, p1) { return p1; }
+                                },
+                                {
+                                    pattern: /RequireJS.require/g,
+                                    replacement: function() {
+                                        return 'require';
+                                    }
+                                }
+                            ]
+                        }
+                    )
+                },
                 {
                     test: /\.(js|jsx)$/,
                     exclude: [
@@ -201,6 +251,47 @@ module.exports = Merge.smart({
                     use: 'raw-loader'
                 },
                 {
+                    // This file is used by both RequireJS and Webpack and depends on window globals
+                    // This is a dirty hack and shouldn't be replicated for other files.
+                    test: path.resolve(__dirname, 'cms/static/cms/js/main.js'),
+                    loader: StringReplace.replace(
+                        ['babel-loader'],
+                        {
+                            replacements: [
+                                {
+                                    pattern: /\(function\(AjaxPrefix\) {/,
+                                    replacement: function() { return ''; }
+                                },
+                                {
+                                    pattern: /], function\(domReady, \$, str, Backbone, gettext, NotificationView\) {/,
+                                    replacement: function() {
+                                        // eslint-disable-next-line
+                                        return '], function(domReady, $, str, Backbone, gettext, NotificationView, AjaxPrefix) {';
+                                    }
+                                },
+                                {
+                                    pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
+                                    replacement: function() {
+                                        return "'../../common/js/components/views/feedback_notification',"
+                                               + "'AjaxPrefix',";
+                                    }
+                                },
+                                {
+                                    pattern: /}\).call\(this, AjaxPrefix\);/,
+                                    replacement: function() { return ''; }
+                                },
+                                {
+                                    pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
+                                    replacement: function() {
+                                        return "'../../common/js/components/views/feedback_notification',"
+                                               + "'AjaxPrefix',";
+                                    }
+                                }
+                            ]
+                        }
+                    )
+                },
+                {
                     test: /\.(woff2?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
                     loader: 'file-loader'
                 },
@@ -210,38 +301,12 @@ module.exports = Merge.smart({
                 },
                 {
                     test: /xblock\/core/,
-                    use: [
-                        {
-                            loader: 'exports-loader',
-                            options: { exports: 'window.XBlock' }
-                        },
-                        {
-                            loader: 'imports-loader',
-                            options: {
-                                imports: [
-                                    "jquery",
-                                    "default jquery immediateDescendents",
-                                ],
-                                wrapper: 'window'
-                            }
-                        }
-                    ]
+                    loader: 'exports-loader?window.XBlock!'
+                            + 'imports-loader?jquery,jquery.immediateDescendents,this=>window'
                 },
                 {
                     test: /xblock\/runtime.v1/,
-                    use: [
-                        {
-                            loader: 'exports-loader',
-                            options: { exports: 'window.XBlock' }
-                        },
-                        {
-                            loader: 'imports-loader',
-                            options: {
-                                imports: "default xblock/core XBlock", 
-                                wrapper: 'window'
-                            }
-                        }
-                    ]
+                    loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window'
                 },
                 /** *****************************************************************************************************
                 /* BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS:
@@ -268,253 +333,114 @@ module.exports = Merge.smart({
                  */
                 {
                     test: /xmodule\/assets\/word_cloud\/src\/js\/word_cloud.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/common_static\/js\/vendor\/draggabilly.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/annotatable\/display.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/capa\/display.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/capa\/imageinput.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/capa\/schematic.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/collapsible.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/conditional\/display.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/html\/display.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/html\/edit.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/html\/imageModal.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/javascript_loader.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/lti\/lti.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/poll\/poll.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/poll\/poll_main.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/problem\/edit.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/raw\/edit\/metadata-only.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/raw\/edit\/xml.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/sequence\/display.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/sequence\/edit.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/tabs\/tabs-aggregator.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/vertical\/edit.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/video\/10_main.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 /*
                  * END BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS
                  ***************************************************************************************************** */
                 {
                     test: /codemirror/,
-                    use: [
-                        {
-                            loader: 'exports-loader',
-                            options: { exports: 'window.CodeMirror' }
-                        }
-                    ]
+                    loader: 'exports-loader?window.CodeMirror'
                 },
                 {
                     test: /tinymce/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
+                    loader: 'imports-loader?this=>window'
                 },
                 {
                     test: /xmodule\/js\/src\/xmodule/,
-                    use: [
-                        {
-                            loader: 'exports-loader',
-                            options: { exports: 'window.XModule' }
-                        },
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ],
+                    loader: 'exports-loader?window.XModule!imports-loader?this=>window'
                 },
                 {
                     test: /mock-ajax/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { exports: 'false' }
-                        }
-                    ]
+                    loader: 'imports-loader?exports=>false'
                 },
                 {
                     test: /d3.min/,
@@ -530,36 +456,8 @@ module.exports = Merge.smart({
                 },
                 {
                     test: /logger/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
-                },
-                // spec files that use import
-                {
-                    test: /lms\/static\/completion\/js\/spec\/ViewedEvent_spec.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
-                },
-                {
-                    test: /\.js$/,
-                    include: [
-                        "/lms/static/js/learner_dashboard/spec/"
-                    ],
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: { wrapper: 'window' }
-                        }
-                    ]
-                },
-                // end spec files that use import
+                    loader: 'imports-loader?this=>window'
+                }
             ]
         },
 
@@ -612,21 +510,7 @@ module.exports = Merge.smart({
                 'common/static/js/vendor/tinymce/js/tinymce',
                 'node_modules',
                 'common/static/xmodule'
-            ],
-
-            // We used to have node: { fs: 'empty' } in this file,
-            // that is no longer supported. Adding this based on the recommendation in
-            // https://stackoverflow.com/questions/64361940/webpack-error-configuration-node-has-an-unknown-property-fs
-            // 
-            // With this uncommented tests fail
-            // Tests failed in the following suites:
-            // * lms javascript
-            // * xmodule-webpack javascript
-            // Error: define cannot be used indirect
-            // 
-            // fallback: {
-            //     fs: false
-            // }
+            ]
         },
 
         resolveLoader: {
@@ -651,6 +535,10 @@ module.exports = Merge.smart({
         watchOptions: {
             poll: true
         },
+
+        node: {
+            fs: 'empty'
+        }
 
     }
 }, {web: builtinBlocksJS}, workerConfig());
