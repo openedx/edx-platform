@@ -564,7 +564,7 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.2.0
     # via -r requirements/edx/kernel.in
-event-tracking==2.3.0
+event-tracking==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-completion
