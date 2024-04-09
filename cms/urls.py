@@ -18,6 +18,7 @@ import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
+from cms.djangoapps.contentstore.views.block import edit_view_xblock
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -145,6 +146,8 @@ urlpatterns = oauth2_urlpatterns + [
             name='xblock_outline_handler'),
     re_path(fr'^xblock/container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.xblock_container_handler,
             name='xblock_container_handler'),
+    re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}/editor$', edit_view_xblock,
+            name='xblock_editor_handler'),
     re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}/(?P<view_name>[^/]+)$', contentstore_views.xblock_view_handler,
             name='xblock_view_handler'),
     re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}?$', contentstore_views.xblock_handler,
