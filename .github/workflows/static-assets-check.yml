@@ -17,6 +17,7 @@ jobs:
         node-version: [ 18 ]
         npm-version: [ 10.2.x ]
         mongo-version: ["4.4", "7.0"]
+        node-env: ['development', 'production']
 
     services:
       mongo:
@@ -80,6 +81,7 @@ jobs:
       env:
         LMS_CFG: lms/envs/minimal.yml
         CMS_CFG: lms/envs/minimal.yml
+        NODE_ENV: ${{ matrix.node-env }}
 
       run: |
         paver update_assets lms
