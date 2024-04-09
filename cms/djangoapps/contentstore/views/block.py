@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.student.auth import (
     has_studio_read_access,
     has_studio_write_access,
@@ -38,10 +38,11 @@ from xmodule.x_module import (
     STUDIO_VIEW,
 )  # lint-amnesty, pylint: disable=wrong-import-order
 
-
 from ..helpers import (
     is_unit,
 )
+from ..utils import get_container_handler_context
+from .component import _get_item_in_course
 from .preview import get_preview_fragment
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
@@ -298,6 +299,23 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
     else:
         return HttpResponse(status=406)
+
+
+@require_http_methods("GET")
+@login_required
+def edit_view_xblock(request, usage_key_string):
+    """
+    The handler for rendered edit xblock view.
+    """
+    usage_key = usage_key_with_run(usage_key_string)
+    if not has_studio_read_access(request.user, usage_key.course_key):
+        raise PermissionDenied()
+    store = modulestore()
+
+    with store.bulk_operations(usage_key.course_key):
+        course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+        container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
+        return render_to_response('container_editor.html', container_handler_context)
 
 
 @require_http_methods("GET")
