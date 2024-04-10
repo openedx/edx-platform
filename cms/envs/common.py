@@ -2755,3 +2755,7 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+############## Default value for invitation_only when creating courses ##############
+
+DEFAULT_COURSE_INVITATION_ONLY = False
