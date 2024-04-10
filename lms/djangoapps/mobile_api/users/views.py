@@ -346,7 +346,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
+        requested_fields = self.request.GET.get('requested_fields', '')
+
         context['api_version'] = self.kwargs.get('api_version')
+        context['requested_fields'] = requested_fields.split(',')
         return context
 
     def get_serializer_class(self):
