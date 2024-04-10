@@ -259,7 +259,7 @@ def main(
         click.secho(f"    Done.", fg="green")
         # For Sass files without explicit RTL versions, generate
         # an RTL version of the CSS using the rtlcss library.
-        for sass_path in glob.glob(str(source) + "/**/*.scss"):
+        for sass_path in glob.glob(str(source_root) + "/**/*.scss"):
             if Path(sass_path).name.startswith("_"):
                 # Don't generate RTL CSS for partials
                 continue
@@ -270,7 +270,7 @@ def main(
                 # Don't generate RTL CSS if there is an explicit Sass version for RTL
                 continue
             click.echo("    Generating missing right-to-left CSS:")
-            source_css_file = sass_path.replace(str(source), str(dest)).replace(
+            source_css_file = sass_path.replace(str(source_root), str(target_root)).replace(
                 ".scss", ".css"
             )
             target_css_file = source_css_file.replace(".css", "-rtl.css")
