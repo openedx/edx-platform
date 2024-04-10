@@ -13,6 +13,7 @@ from .views import (
     TranscriptView,
     YoutubeTranscriptCheckView,
     YoutubeTranscriptUploadView,
+    APIHeartBeatView
 )
 from .views import assets
 from .views import authoring_videos
@@ -45,6 +46,9 @@ urlpatterns = [
     ),
 
     # Authoring API
+    re_path(
+        r'^heartbeat$', APIHeartBeatView.as_view(), name='heartbeat'
+    ),
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}$',
         assets.AssetsCreateRetrieveView.as_view(), name='cms_api_create_retrieve_assets'
