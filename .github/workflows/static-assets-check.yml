@@ -14,8 +14,8 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
-        node-version: [ 16 ]
-        npm-version: [ 8.5.x ]
+        node-version: [ 18 ]
+        npm-version: [ 10.5.x ]
         mongo-version: ["4.4", "7.0"]
 
     services:
