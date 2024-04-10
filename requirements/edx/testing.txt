@@ -1604,7 +1604,7 @@ wrapt==1.16.0
     # via
     #   -r requirements/edx/base.txt
     #   astroid
-xblock[django]==2.0.0
+xblock[django]==3.1.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
