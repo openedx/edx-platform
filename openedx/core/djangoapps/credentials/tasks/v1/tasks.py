@@ -373,7 +373,11 @@ def send_grade_if_interesting(
     # Don't worry about whether it's available as well as awarded. Just awarded is good enough to record a verified
     # attempt at a course. We want even the grades that didn't pass the class because Credentials wants to know about
     # those too.
-    if mode not in INTERESTING_MODES or status not in INTERESTING_STATUSES:
+    if (
+        mode not in INTERESTING_MODES
+        and not CourseMode.is_eligible_for_certificate(mode)
+        or status not in INTERESTING_STATUSES
+    ):
         if verbose:
             logger.info(f"Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]")
         return
@@ -452,7 +456,10 @@ def backfill_date_for_all_course_runs():
         course_key = str(course_run.id)
         course_modes = CourseMode.objects.filter(course_id=course_key)
         # There should only ever be one certificate relevant mode per course run
-        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+        modes = [
+            mode.slug for mode in course_modes
+            if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES or CourseMode.is_eligible_for_certificate(mode.slug)
+        ]
         if len(modes) != 1:
             logger.exception(
                 f'Either course {course_key} has no certificate mode or multiple modes. Task failed.'
@@ -503,7 +510,10 @@ def clean_certificate_available_date():
         course_key = str(course_run.id)
         course_modes = CourseMode.objects.filter(course_id=course_key)
         # There should only ever be one certificate relevant mode per course run
-        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+        modes = [
+            mode.slug for mode in course_modes
+            if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES or CourseMode.is_eligible_for_certificate(mode.slug)
+        ]
         if len(modes) != 1:
             logger.exception(f'Either course {course_key} has no certificate mode or multiple modes. Task failed.')
         # if there is only one relevant mode, post to credentials
