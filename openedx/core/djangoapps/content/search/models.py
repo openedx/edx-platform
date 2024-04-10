@@ -34,21 +34,29 @@ class SearchAccess(models.Model):
     )
 
 
-def get_access_ids_for_request(request: Request) -> list[int]:
+def get_access_ids_for_request(request: Request, omit_orgs: list[str] = None) -> list[int]:
     """
     Returns a list of SearchAccess.id values for courses and content libraries that the requesting user has been
     individually grated access to.
+
+    Omits any courses/libraries with orgs in the `omit_orgs` list.
     """
+    omit_orgs = omit_orgs or []
+
     course_roles = get_course_roles(request.user)
     course_clause = models.Q(context_key__in=[
         role.course_id
         for role in course_roles
-        if role.role in [CourseInstructorRole.ROLE, CourseStaffRole.ROLE]
+        if (
+            role.role in [CourseInstructorRole.ROLE, CourseStaffRole.ROLE]
+            and role.org not in omit_orgs
+        )
     ])
 
     libraries = get_libraries_for_user(user=request.user)
     library_clause = models.Q(context_key__in=[
         lib.library_key for lib in libraries
+        if lib.library_key.org not in omit_orgs
     ])
 
     # Sort by descending access ID to simulate prioritizing the "most recently created context keys".

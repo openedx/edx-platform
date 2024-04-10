@@ -8,6 +8,8 @@ import ddt
 from django.test import override_settings
 from rest_framework.test import APIClient
 
+from common.djangoapps.student.auth import update_org_role
+from common.djangoapps.student.roles import OrgStaffRole
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -188,6 +190,33 @@ class StudioSearchViewTest(StudioSearchTestMixin, SharedModuleStoreTestCase):
             search_rules={
                 "studio_content": {
                     "filter": "org IN ['org1'] OR access_id IN []",
+                }
+            },
+            expires_at=mock.ANY,
+        )
+
+    @mock_meilisearch(enabled=True)
+    @mock.patch('openedx.core.djangoapps.content.search.views.meilisearch.Client')
+    def test_studio_search_omit_orgs(self, mock_search_client):
+        """
+        Grant org access to our staff user to ensure that org's access_ids are omitted from the search filter.
+        """
+        update_org_role(caller=self.global_staff, role=OrgStaffRole, user=self.course_staff, orgs=['org1'])
+        self.client.login(username='course_staff', password='course_staff_pass')
+        mock_generate_tenant_token = self._mock_generate_tenant_token(mock_search_client)
+        result = self.client.get(STUDIO_SEARCH_ENDPOINT_URL)
+        assert result.status_code == 200
+
+        expected_access_ids = list(SearchAccess.objects.filter(
+            context_key__in=[key for key in self.course_user_keys if key.org != 'org1'],
+        ).only('id').values_list('id', flat=True))
+        expected_access_ids.sort(reverse=True)
+
+        mock_generate_tenant_token.assert_called_once_with(
+            api_key_uid=MOCK_API_KEY_UID,
+            search_rules={
+                "studio_content": {
+                    "filter": f"org IN ['org1'] OR access_id IN {expected_access_ids}",
                 }
             },
             expires_at=mock.ANY,

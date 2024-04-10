@@ -216,6 +216,16 @@ class StudioSearchAccessTest(StudioSearchTestMixin, SharedModuleStoreTestCase):
         access_ids = get_access_ids_for_request(request)
         self._check_access_ids(access_ids, self.staff_user_keys)
 
+    def test_get_access_ids_for_request_omit_orgs(self):
+        """
+        Omit the org1 library keys from the returned list.
+        """
+        request = RequestFactory().get('/course')
+        request.user = self.global_staff
+
+        access_ids = get_access_ids_for_request(request, omit_orgs=['org1'])
+        self._check_access_ids(access_ids, self.staff_user_keys[-2:])
+
     def test_delete_removes_access_ids_for_request(self):
         """Removing courses and library should remove their associated access_ids."""
         remaining_keys = self.staff_user_keys

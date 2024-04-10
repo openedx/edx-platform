@@ -48,7 +48,7 @@ def _get_meili_access_filter(request: Request) -> dict:
     user_orgs = _get_user_orgs(request)[:MAX_ORGS_IN_FILTER]
 
     # ...or the N most recent courses and libraries they can access.
-    access_ids = get_access_ids_for_request(request)[:MAX_ACCESS_IDS_IN_FILTER]
+    access_ids = get_access_ids_for_request(request, omit_orgs=user_orgs)[:MAX_ACCESS_IDS_IN_FILTER]
     return {
         "filter": f"org IN {user_orgs} OR access_id IN {access_ids}",
     }
