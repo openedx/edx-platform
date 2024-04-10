@@ -1188,7 +1188,7 @@ urllib3==1.26.18
     #   py2neo
     #   requests
     #   snowflake-connector-python
-user-util==1.0.0
+user-util==1.1.0
     # via -r requirements/edx/kernel.in
 vine==5.1.0
     # via
