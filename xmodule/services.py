@@ -27,7 +27,7 @@ from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataC
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
-from lms.djangoapps.grades.signals import signals as grades_signals
+from lms.djangoapps.grades.api import signals as grades_signals
 
 log = logging.getLogger(__name__)
 
