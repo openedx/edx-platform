@@ -126,6 +126,7 @@ module.exports = Merge.smart({
         },
 
         output: {
+            publicPath: "", // https://stackoverflow.com/a/65272040
             path: path.resolve(__dirname, 'common/static/bundles'),
             library: {
                 type: 'window'
