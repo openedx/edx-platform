@@ -193,7 +193,7 @@ click-repl==0.3.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
-code-annotations==1.6.0
+code-annotations==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -217,7 +217,7 @@ coverage[toml]==7.4.1
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
-crowdsourcehinter-xblock==0.6
+crowdsourcehinter-xblock==0.7
     # via -r requirements/edx/base.txt
 cryptography==38.0.4
     # via
@@ -626,7 +626,7 @@ edx-rbac==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-rest-api-client==5.6.1
+edx-rest-api-client==5.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -643,7 +643,7 @@ edx-tincan-py35==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-toggles==5.1.1
+edx-toggles==5.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -657,7 +657,7 @@ edx-toggles==5.1.1
     #   ora2
 edx-token-utils==0.2.1
     # via -r requirements/edx/base.txt
-edx-when==2.4.0
+edx-when==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
@@ -674,7 +674,7 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.2.0
     # via -r requirements/edx/base.txt
-event-tracking==2.3.0
+event-tracking==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -966,7 +966,7 @@ openedx-atlas==0.6.0
     # via -r requirements/edx/base.txt
 openedx-blockstore==1.4.0
     # via -r requirements/edx/base.txt
-openedx-calc==3.0.1
+openedx-calc==3.1.0
     # via -r requirements/edx/base.txt
 openedx-django-pyfs==3.6.0
     # via
@@ -1466,7 +1466,7 @@ stevedore==5.1.0
     #   edx-django-utils
     #   edx-enterprise
     #   edx-opaque-keys
-super-csv==3.1.0
+super-csv==3.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
