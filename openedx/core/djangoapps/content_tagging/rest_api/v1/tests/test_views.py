@@ -44,7 +44,7 @@ User = get_user_model()
 TAXONOMY_ORG_LIST_URL = "/api/content_tagging/v1/taxonomies/"
 TAXONOMY_ORG_DETAIL_URL = "/api/content_tagging/v1/taxonomies/{pk}/"
 TAXONOMY_ORG_UPDATE_ORG_URL = "/api/content_tagging/v1/taxonomies/{pk}/orgs/"
-OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/?taxonomy={taxonomy_id}"
+OBJECT_TAG_UPDATE_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 OBJECT_TAGS_EXPORT_URL = "/api/content_tagging/v1/object_tags/{object_id}/export/"
 OBJECT_TAGS_URL = "/api/content_tagging/v1/object_tags/{object_id}/"
 TAXONOMY_TEMPLATE_URL = "/api/content_tagging/v1/taxonomies/import/{filename}"
@@ -1404,6 +1404,13 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
     Testing various cases for the ObjectTagView.
     """
 
+    def _call_put_request(self, object_id, taxonomy_id, tags):
+        url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id)
+        return self.client.put(url, {"tagsData": [{
+            "taxonomy": taxonomy_id,
+            "tags": tags,
+        }]}, format="json")
+
     @ddt.data(
         # staffA and staff are staff in courseA and can tag using enabled taxonomies
         ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
@@ -1429,9 +1436,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         taxonomy = getattr(self, taxonomy_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
-
-        response = self.client.put(url, {"tags": tag_values}, format="json")
+        response = self._call_put_request(self.courseA, taxonomy.pk, tag_values)
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
@@ -1445,6 +1450,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
                 assert tags_by_taxonomy == []  # No tags are set from any taxonomy
 
             # Check that re-fetching the tags returns what we set
+            url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA)
             new_response = self.client.get(url, format="json")
             assert status.is_success(new_response.status_code)
             assert new_response.data == response.data
@@ -1463,8 +1469,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         disabled_taxonomy = self.tA2
         assert disabled_taxonomy.enabled is False
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=disabled_taxonomy.pk)
-        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+        response = self._call_put_request(self.courseA, disabled_taxonomy.pk, ["Tag 1"])
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -1484,9 +1489,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         taxonomy = getattr(self, taxonomy_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
-
-        response = self.client.put(url, {"tags": ["invalid"]}, format="json")
+        response = self._call_put_request(self.courseA, taxonomy.pk, ["invalid"])
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
@@ -1513,9 +1516,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         taxonomy = getattr(self, taxonomy_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA, taxonomy_id=taxonomy.pk)
-
-        response = self.client.put(url, {"tags": tag_values}, format="json")
+        response = self._call_put_request(self.xblockA, taxonomy.pk, tag_values)
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
@@ -1529,6 +1530,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
                 assert tags_by_taxonomy == []  # No tags are set from any taxonomy
 
             # Check that re-fetching the tags returns what we set
+            url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA)
             new_response = self.client.get(url, format="json")
             assert status.is_success(new_response.status_code)
             assert new_response.data == response.data
@@ -1547,8 +1549,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         disabled_taxonomy = self.tA2
         assert disabled_taxonomy.enabled is False
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA, taxonomy_id=disabled_taxonomy.pk)
-        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+        response = self._call_put_request(self.xblockA, disabled_taxonomy.pk, ["Tag 1"])
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -1568,9 +1569,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         taxonomy = getattr(self, taxonomy_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.xblockA, taxonomy_id=taxonomy.pk)
-
-        response = self.client.put(url, {"tags": ["invalid"]}, format="json")
+        response = self._call_put_request(self.xblockA, taxonomy.pk, ["invalid"])
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
@@ -1598,9 +1597,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         taxonomy = getattr(self, taxonomy_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=taxonomy.pk)
-
-        response = self.client.put(url, {"tags": tag_values}, format="json")
+        response = self._call_put_request(self.libraryA, taxonomy.pk, tag_values)
 
         assert response.status_code == expected_status
         if status.is_success(expected_status):
@@ -1614,6 +1611,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
                 assert tags_by_taxonomy == []  # No tags are set from any taxonomy
 
             # Check that re-fetching the tags returns what we set
+            url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA)
             new_response = self.client.get(url, format="json")
             assert status.is_success(new_response.status_code)
             assert new_response.data == response.data
@@ -1632,8 +1630,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         disabled_taxonomy = self.tA2
         assert disabled_taxonomy.enabled is False
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=disabled_taxonomy.pk)
-        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+        response = self._call_put_request(self.libraryA, disabled_taxonomy.pk, ["Tag 1"])
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -1653,9 +1650,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
 
         taxonomy = getattr(self, taxonomy_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.libraryA, taxonomy_id=taxonomy.pk)
-
-        response = self.client.put(url, {"tags": ["invalid"]}, format="json")
+        response = self._call_put_request(self.libraryA, taxonomy.pk, ["invalid"])
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
@@ -1672,9 +1667,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseB, taxonomy_id=self.tA1.pk)
-
-        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+        response = self._call_put_request(self.courseB, self.tA1.pk, ["Tag 1"])
 
         assert response.status_code == expected_status
 
@@ -1692,9 +1685,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         user = getattr(self, user_attr)
         self.client.force_authenticate(user=user)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=self.ot1.pk)
-
-        response = self.client.put(url, {"tags": []}, format="json")
+        response = self._call_put_request(self.courseA, self.ot1.pk, [])
 
         assert response.status_code == expected_status
 
@@ -1709,9 +1700,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         self.client.force_authenticate(user=self.staffA)
         object_id = getattr(self, objectid_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id, taxonomy_id=self.tA1.pk)
-
-        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+        response = self._call_put_request(object_id, self.tA1.pk, ["Tag 1"])
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -1725,9 +1714,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         object_id = getattr(self, objectid_attr)
 
-        url = OBJECT_TAG_UPDATE_URL.format(object_id=object_id, taxonomy_id=self.tA1.pk)
-
-        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+        response = self._call_put_request(object_id, self.tA1.pk, ["Tag 1"])
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -1735,10 +1722,9 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         """
         Test that we cannot tag an object that is not a CouseKey, LibraryLocatorV2 or UsageKey
         """
-        url = OBJECT_TAG_UPDATE_URL.format(object_id='invalid_key', taxonomy_id=self.tA1.pk)
         self.client.force_authenticate(user=self.staff)
 
-        response = self.client.put(url, {"tags": ["Tag 1"]}, format="json")
+        response = self._call_put_request('invalid_key', self.tA1.pk, ["Tag 1"])
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -1749,10 +1735,9 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         self.client.force_authenticate(user=self.staffA)
         taxonomy = self.multiple_taxonomy
         tag_values = ["Tag 1", "Tag 2"]
-        put_url = OBJECT_TAG_UPDATE_URL.format(object_id=self.courseA, taxonomy_id=taxonomy.pk)
 
         # Tag an object
-        response1 = self.client.put(put_url, {"tags": tag_values}, format="json")
+        response1 = self._call_put_request(self.courseA, taxonomy.pk, tag_values)
         assert status.is_success(response1.status_code)
 
         # Fetch this object's tags for a single taxonomy
