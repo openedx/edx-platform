@@ -5,7 +5,6 @@
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
-var StringReplace = require('string-replace-webpack-plugin');
 var Merge = require('webpack-merge');
 
 var files = require('./webpack-config/file-lists.js');
@@ -168,6 +167,35 @@ module.exports = Merge.smart({
                 /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce.js/
             ],
             rules: [
+                {
+                    test: files.namespacedRequire.concat(files.textBangUnderscore, filesWithRequireJSBlocks),
+                    loader: 'string-replace-loader',
+                    options: {
+                        multiple: [
+                            { search: defineHeader, replace: '' },
+                            { search: defineFooter, replace: '' },
+                            { 
+                                search: /(\/\* RequireJS) \*\//g,
+                                replace(match, p1, offset, string) {
+                                    return p1;
+                                }
+                            },
+                            { 
+                                search: /\/\* Webpack/g,
+                                replace(match, p1, offset, string) {
+                                    return match + ' */';
+                                }
+                            },
+                            { 
+                                search: /text!(.*?\.underscore)/g,
+                                replace(match, p1, offset, string) {
+                                    return p1;
+                                }
+                            },
+                            { search: /RequireJS.require/g, replace: 'require' }
+                        ]
+                    }
+                },
                 {
                     test: /\.(js|jsx)$/,
                     exclude: [
