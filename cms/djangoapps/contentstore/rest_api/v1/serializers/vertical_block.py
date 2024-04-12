@@ -123,7 +123,22 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
         """
 
         can_manage_tags = use_tagging_taxonomy_list_page()
+        xblock = obj["xblock"]
+        is_course = xblock.scope_ids.usage_id.context_key.is_course
+        xblock_url = xblock_studio_url(xblock)
+        # Responsible for the ability to edit container xblock(copy, duplicate, move and manage access).
+        # It was used in the legacy and transferred here with simplification.
+        # After the investigation it was determined that the "show_other_action"
+        # condition below is sufficient to enable/disable actions on each xblock.
+        show_inline = xblock.has_children and not xblock_url
+        # All except delete and manage tags
+        show_other_action = not show_inline and is_course
         actions = {
+            "can_copy": show_other_action,
+            "can_duplicate": show_other_action,
+            "can_move": show_other_action,
+            "can_manage_access": show_other_action,
+            "can_delete": is_course,
             "can_manage_tags": can_manage_tags,
         }
 
