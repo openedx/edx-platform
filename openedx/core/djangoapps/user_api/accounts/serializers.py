@@ -12,7 +12,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from rest_framework import serializers
-from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
 
 
 from common.djangoapps.student.models import (
@@ -135,7 +134,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             activation_key = user.registration.activation_key
         except ObjectDoesNotExist:
             activation_key = None
-        additional_white_listed_fields = []
+
         data = {
             "username": user.username,
             "url": self.context.get('request').build_absolute_uri(
@@ -220,13 +219,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
                     "secondary_email_enabled": True,
                 }
             )
-        if is_auto_generated_username_enabled():
-            data.update(
-                {
-                    "auto_generated_username_enabled": True,
-                }
-            )
-            additional_white_listed_fields = ["auto_generated_username_enabled", "name"]
 
         if self.custom_fields:
             fields = self.custom_fields
@@ -234,9 +226,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             fields = _visible_fields(user_profile, user, self.configuration)
         else:
             fields = self.configuration.get('public_fields')
-
-        if additional_white_listed_fields:
-            fields.extend(additional_white_listed_fields)
 
         return self._filter_fields(
             fields,
