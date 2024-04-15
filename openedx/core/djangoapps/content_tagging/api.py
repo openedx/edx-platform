@@ -294,12 +294,16 @@ def set_exported_object_tags(
             continue
 
         taxonomy = oel_tagging.get_taxonomy_by_export_id(str(taxonomy_export_id))
-        tag_object(
+        oel_tagging.tag_object(
             object_id=content_key_str,
             taxonomy=taxonomy,
             tags=tags_values,
             create_invalid=True,
             taxonomy_export_id=str(taxonomy_export_id),
+        )
+        CONTENT_OBJECT_TAGS_CHANGED.send_event(
+            time=now(),
+            content_object=ContentObjectData(object_id=content_key_str)
         )
 
 
@@ -374,6 +378,9 @@ def tag_object(
     Replaces the existing ObjectTag entries for the given taxonomy + object_id
     with the given list of tags, if the taxonomy can be used by the given object_id.
 
+    This is a wrapper around oel_tagging.tag_object that adds emitting the `CONTENT_OBJECT_TAGS_CHANGED` event
+    when tagging an object.
+
     tags: A list of the values of the tags from this taxonomy to apply.
 
     object_tag_class: Optional. Use a proxy subclass of ObjectTag for additional
@@ -396,7 +403,6 @@ def tag_object(
             time=now(),
             content_object=ContentObjectData(object_id=object_id)
         )
-
 
 # Expose the oel_tagging APIs
 

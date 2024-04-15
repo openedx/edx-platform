@@ -172,4 +172,5 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 {"display_name": "Overview"},
             ],
             "content": {},
+            # This video has no tags.
         }
