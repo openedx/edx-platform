@@ -17,13 +17,12 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_UPDATED,
     CONTENT_OBJECT_TAGS_CHANGED,
 )
-from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from openedx.core.djangoapps.content_tagging.utils import get_content_key_from_string
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
 
-from .api import only_if_meilisearch_enabled
+from .api import only_if_meilisearch_enabled, upsert_block_tags_index_docs
 from .tasks import (
     delete_library_block_index_doc,
     delete_xblock_index_doc,
@@ -150,22 +149,10 @@ def content_object_tags_changed_handler(**kwargs) -> None:
         return
 
     try:
-        # Determine if course or library block
-        content_object = get_content_key_from_string(content_object_tags.object_id)
+        # Check if valid if course or library block
+        get_content_key_from_string(content_object_tags.object_id)
     except ValueError:
         log.error("Received invalid content object id")
         return
 
-    if isinstance(content_object, LibraryUsageLocatorV2):
-        upsert_library_block_index_doc.delay(
-            content_object_tags.object_id,
-            update_metadata=False,
-            update_tags=True,
-        )
-    else:
-        upsert_xblock_index_doc.delay(
-            content_object_tags.object_id,
-            recursive=False,
-            update_metadata=False,
-            update_tags=True,
-        )
+    upsert_block_tags_index_docs(content_object_tags.object_id)

@@ -456,6 +456,15 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     _update_index_docs(docs)
 
 
+def upsert_block_tags_index_docs(usage_key: UsageKey):
+    """
+    Updates the tags data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
+    doc.update(searchable_doc_tags(usage_key))
+    _update_index_docs([doc])
+
+
 def _get_user_orgs(request: Request) -> list[str]:
     """
     Get the org.short_names for the organizations that the requesting user has OrgStaffRole or OrgInstructorRole.
