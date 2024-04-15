@@ -172,5 +172,4 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 {"display_name": "Overview"},
             ],
             "content": {},
-            "tags": {},
         }

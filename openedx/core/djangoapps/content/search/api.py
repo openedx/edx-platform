@@ -369,6 +369,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             def add_with_children(block):
                 """ Recursively index the given XBlock/component """
                 doc = searchable_doc_for_course_block(block)
+                doc.update(searchable_doc_tags(block.usage_key))
                 docs.append(doc)  # pylint: disable=cell-var-from-loop
                 _recurse_children(block, add_with_children)  # pylint: disable=cell-var-from-loop
 

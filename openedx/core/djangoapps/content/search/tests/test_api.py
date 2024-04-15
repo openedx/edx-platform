@@ -181,14 +181,13 @@ class TestSearchApi(ModuleStoreTestCase):
         Test indexing an XBlock with tags.
         """
 
-        # Tag XBlock (these internally call `upsert_xblock_index_doc`)
+        # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
         tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyA, ["one", "two"])
         tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyB, ["three", "four"])
 
         # Build expected docs with tags at each stage
         doc_sequential_with_tags1 = {
             "id": self.doc_sequential["id"],
-            "type": self.doc_sequential["type"],
             "tags": {
                 'taxonomy': ['A'],
                 'level0': ['A > one', 'A > two']
@@ -196,7 +195,6 @@ class TestSearchApi(ModuleStoreTestCase):
         }
         doc_sequential_with_tags2 = {
             "id": self.doc_sequential["id"],
-            "type": self.doc_sequential["type"],
             "tags": {
                 'taxonomy': ['A', 'B'],
                 'level0': ['A > one', 'A > two', 'B > four', 'B > three']
@@ -237,14 +235,13 @@ class TestSearchApi(ModuleStoreTestCase):
         Test indexing an Library Block with tags.
         """
 
-        # Tag XBlock (these internally call `upsert_library_block_index_doc`)
+        # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
         tagging_api.tag_object(str(self.problem.usage_key), self.taxonomyA, ["one", "two"])
         tagging_api.tag_object(str(self.problem.usage_key), self.taxonomyB, ["three", "four"])
 
         # Build expected docs with tags at each stage
         doc_problem_with_tags1 = {
             "id": self.doc_problem["id"],
-            "type": self.doc_problem["type"],
             "tags": {
                 'taxonomy': ['A'],
                 'level0': ['A > one', 'A > two']
@@ -252,7 +249,6 @@ class TestSearchApi(ModuleStoreTestCase):
         }
         doc_problem_with_tags2 = {
             "id": self.doc_problem["id"],
-            "type": self.doc_problem["type"],
             "tags": {
                 'taxonomy': ['A', 'B'],
                 'level0': ['A > one', 'A > two', 'B > four', 'B > three']
