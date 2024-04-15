@@ -583,6 +583,14 @@ FEATURES = {
 
     # See annotations in lms/envs/common.py for details.
     'ENABLE_BLAKE2B_HASHING': False,
+
+    # .. toggle_name: FEATURES['BADGES_ENABLED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable the Badges feature.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-04-10
+    'BADGES_ENABLED': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -2880,6 +2888,8 @@ SIMPLE_HISTORY_DATE_INDEX = False
 def _should_send_xblock_events(settings):
     return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
 
+def _should_send_learning_badge_events(settings):
+    return settings.FEATURES['BADGES_ENABLED']
 
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
 # .. setting_default: all events disabled
@@ -2930,6 +2940,18 @@ EVENT_BUS_PRODUCER_CONFIG = {
         'learning-certificate-lifecycle':
             {'event_key_field': 'certificate.course.course_key', 'enabled': False},
     },
+    "org.openedx.learning.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
+    "org.openedx.learning.ccx.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
 }
 
 
@@ -2940,6 +2962,18 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.deleted.v1',
                          'course-authoring-xblock-lifecycle', 'enabled')
 
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.ccx.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)
 
 ################### Authoring API ######################
 
