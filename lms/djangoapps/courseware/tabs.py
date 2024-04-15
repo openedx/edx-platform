@@ -315,6 +315,12 @@ class DatesTab(EnrolledTab):
         tab_dict['link_func'] = link_func
         super().__init__(tab_dict)
 
+    @classmethod
+    def is_enabled(cls, course, user=None):
+        if settings.FEATURES.get('DISABLE_DATES_TAB'):
+            return False
+        return super().is_enabled(course, user)
+
 
 def get_course_tab_list(user, course):
     """
