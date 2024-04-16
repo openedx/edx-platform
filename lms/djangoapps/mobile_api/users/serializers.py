@@ -3,11 +3,13 @@ Serializer for user API
 """
 
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from django.core.cache import cache
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -16,15 +18,14 @@ from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
-from lms.djangoapps.courseware.courses import get_course_assignment_date_blocks, get_current_child
-from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.courses import get_course_assignment_date_blocks
 from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: disable=abstract-method
@@ -217,8 +218,10 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
         if not block_id:
             return None
 
-        request = self.context.get('request')
-        path, unit_name = self._get_last_visited_block_path_and_unit_name(request, model)
+        path, unit_name = self._get_last_visited_block_path_and_unit_name(block_id)
+        if not path and unit_name:
+            return None
+
         path_ids = [str(block.location) for block in path]
 
         return {
@@ -228,37 +231,25 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
             'last_visited_unit_display_name': unit_name,
         }
 
+    @staticmethod
     def _get_last_visited_block_path_and_unit_name(
-        self,
-        request: 'Request',  # noqa: F821
-        model: CourseEnrollment,
-    ) -> Tuple[List[Optional['XBlock']], Optional[str]]:  # noqa: F821
+        block_id: str
+    ) -> Union[Tuple[None, None], Tuple[List['XBlock'], str]]:  # noqa: F821
         """
         Returns the path to the latest block and unit name visited by the current user.
-
-        If there is no such visit, the first item deep enough down the course
-        tree is used.
         """
-        field_data_cache = FieldDataCache.cache_for_block_descendents(self.course.id, model.user, self.course, depth=3)
+        try:
+            last_visited_block = modulestore().get_item(UsageKey.from_string(block_id))
+            vertical = last_visited_block.get_parent()
+            sequential = vertical.get_parent()
+            chapter = sequential.get_parent()
+            course = chapter.get_parent()
+        except (ItemNotFoundError, InvalidKeyError, AttributeError):
+            return None, None
 
-        course_block = get_block_for_descriptor(
-            model.user, request, self.course, field_data_cache, self.course.id, course=self.course
-        )
+        path = [sequential, chapter, course]
 
-        unit_name = ''
-        path = [course_block] if course_block else []
-        chapter = get_current_child(course_block, min_depth=3)
-        if chapter is not None:
-            path.append(chapter)
-            section = get_current_child(chapter, min_depth=2)
-            if section is not None:
-                path.append(section)
-                unit = get_current_child(section, min_depth=1)
-                if unit is not None:
-                    unit_name = unit.display_name
-
-        path.reverse()
-        return path, unit_name
+        return path, vertical.display_name
 
     def get_progress(self, model: CourseEnrollment) -> Dict[str, int]:
         """
