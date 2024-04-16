@@ -153,6 +153,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["children"]), 2)
         self.assertFalse(response.data["is_published"])
+        self.assertTrue(response.data["can_paste_component"])
 
     def test_xblock_is_published(self):
         """
