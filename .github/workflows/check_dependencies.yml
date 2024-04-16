@@ -22,7 +22,10 @@ jobs:
           python-version: '3.8'
 
       - name: Install requests module
-        run: pip install requests    
+        run: pip install requests
+
+      - name: Install requests module
+        run: pip install rich      
 
       - name: Make the script files executable
         run: chmod +x find_dependencies.py
