@@ -367,6 +367,8 @@ def main(dirs=None, org=None):
     print("== DONE ==============")
     print("Second-party:")
     print("\n".join(seconds))
+    if seconds:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
