@@ -503,6 +503,24 @@ class TestUploadedFileSerializer(TestCase):
         }
         assert data == expected_value
 
+    def test_no_download_url(self):
+        """Test UploadedFileSerializer in the case where a URL was not found"""
+        input_data = {
+            "download_url": "",
+            "description": "Test description",
+            "name": "Test name",
+            "size": 78222,
+        }
+
+        data = UploadedFileSerializer(input_data).data
+        expected_value = {
+            "downloadUrl": "",
+            "description": input_data["description"],
+            "name": input_data["name"],
+            "size": input_data["size"],
+        }
+        assert data == expected_value
+
 
 @ddt.ddt
 class TestResponseSerializer(TestCase):
