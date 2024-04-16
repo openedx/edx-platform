@@ -217,11 +217,11 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """ Disable XBlock asides in this runtime """
         return []
 
-    def parse_xml_file(self, fileobj, id_generator=None):
+    def parse_xml_file(self, fileobj):
         # Deny access to the inherited method
         raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
 
-    def add_node_as_child(self, block, node, id_generator=None):
+    def add_node_as_child(self, block, node):
         """
         Called by XBlock.parse_xml to treat a child node as a child block.
         """

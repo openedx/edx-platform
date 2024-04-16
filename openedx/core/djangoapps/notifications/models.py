@@ -20,6 +20,8 @@ log = logging.getLogger(__name__)
 
 NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 
+ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
+
 # Update this version when there is a change to any course specific notification type or app.
 COURSE_NOTIFICATION_CONFIG_VERSION = 7
 
@@ -82,6 +84,13 @@ def get_notification_channels():
     Returns the notification channels.
     """
     return NOTIFICATION_CHANNELS
+
+
+def get_additional_notification_channel_settings():
+    """
+    Returns the additional notification channel settings.
+    """
+    return ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS
 
 
 class Notification(TimeStampedModel):
@@ -224,9 +233,18 @@ class CourseNotificationPreference(TimeStampedModel):
         ['web', 'push']
         """
         if self.is_core(app_name, notification_type):
-            return [channel for channel in NOTIFICATION_CHANNELS if self.get_core_config(app_name).get(channel, False)]
-        return [channel for channel in NOTIFICATION_CHANNELS if
-                self.get_notification_type_config(app_name, notification_type).get(channel, False)]
+            notification_channels = [channel for channel in NOTIFICATION_CHANNELS if
+                                     self.get_core_config(app_name).get(channel, False)]
+            additional_channel_settings = [channel for channel in ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS if
+                                           self.get_core_config(app_name).get(channel, False)]
+        else:
+            notification_channels = [channel for channel in NOTIFICATION_CHANNELS if
+                                     self.get_notification_type_config(app_name, notification_type).get(channel, False)]
+            additional_channel_settings = [channel for channel in ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS if
+                                           self.get_notification_type_config(app_name, notification_type).get(channel,
+                                                                                                              False)]
+
+        return notification_channels + additional_channel_settings
 
     def is_core(self, app_name, notification_type) -> bool:
         """

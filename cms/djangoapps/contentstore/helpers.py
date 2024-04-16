@@ -24,6 +24,7 @@ from xmodule.xml_block import XmlMixin
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
+import openedx.core.djangoapps.content_tagging.api as content_tagging_api
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
 
@@ -284,6 +285,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             user_id=request.user.id,
             slug_hint=user_clipboard.source_usage_key.block_id,
             copied_from_block=str(user_clipboard.source_usage_key),
+            tags=user_clipboard.content.tags,
         )
     # Now handle static files that need to go into Files & Uploads:
     notices = _import_files_into_course(
@@ -306,6 +308,8 @@ def _import_xml_node_to_parent(
     slug_hint: str | None = None,
     # UsageKey of the XBlock that this one is a copy of
     copied_from_block: str | None = None,
+    # Content tags applied to the source XBlock(s)
+    tags: dict[str, str] | None = None,
 ) -> XBlock:
     """
     Given an XML node representing a serialized XBlock (OLX), import it into modulestore 'store' as a child of the
@@ -315,10 +319,15 @@ def _import_xml_node_to_parent(
     parent_key = parent_xblock.scope_ids.usage_id
     block_type = node.tag
 
+    # Modulestore's IdGenerator here is SplitMongoIdManager which is assigned
+    # by CachingDescriptorSystem Runtime and since we need our custom ImportIdGenerator
+    # here we are temporaraliy swtiching it.
+    original_id_generator = runtime.id_generator
+
     # Generate the new ID:
-    id_generator = ImportIdGenerator(parent_key.context_key)
-    def_id = id_generator.create_definition(block_type, slug_hint)
-    usage_id = id_generator.create_usage(def_id)
+    runtime.id_generator = ImportIdGenerator(parent_key.context_key)
+    def_id = runtime.id_generator.create_definition(block_type, slug_hint)
+    usage_id = runtime.id_generator.create_usage(def_id)
     keys = ScopeIds(None, block_type, def_id, usage_id)
     # parse_xml is a really messy API. We pass both 'keys' and 'id_generator' and, depending on the XBlock, either
     # one may be used to determine the new XBlock's usage key, and the other will be ignored. e.g. video ignores
@@ -344,7 +353,7 @@ def _import_xml_node_to_parent(
 
     if not xblock_class.has_children:
         # No children to worry about. The XML may contain child nodes, but they're not XBlocks.
-        temp_xblock = xblock_class.parse_xml(node, runtime, keys, id_generator)
+        temp_xblock = xblock_class.parse_xml(node, runtime, keys)
     else:
         # We have to handle the children ourselves, because there are lots of complex interactions between
         #    * the vanilla XBlock parse_xml() method, and its lack of API for "create and save a new XBlock"
@@ -354,8 +363,12 @@ def _import_xml_node_to_parent(
         # serialization of a child block, in order. For blocks that don't support children, their XML content/nodes
         # could be anything (e.g. HTML, capa)
         node_without_children = etree.Element(node.tag, **node.attrib)
-        temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys, id_generator)
+        temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys)
         child_nodes = list(node)
+
+    # Restore the original id_generator
+    runtime.id_generator = original_id_generator
+
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
     temp_xblock.parent = parent_key
@@ -376,7 +389,24 @@ def _import_xml_node_to_parent(
 
     if not children_handled:
         for child_node in child_nodes:
-            _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
+            child_copied_from = _get_usage_key_from_node(child_node, copied_from_block) if copied_from_block else None
+            _import_xml_node_to_parent(
+                child_node,
+                new_xblock,
+                store,
+                user_id=user_id,
+                copied_from_block=str(child_copied_from),
+                tags=tags,
+            )
+
+    # Copy content tags to the new xblock
+    if copied_from_block and tags:
+        object_tags = tags.get(str(copied_from_block))
+        if object_tags:
+            content_tagging_api.set_all_object_tags(
+                content_key=new_xblock.location,
+                object_tags=object_tags,
+            )
 
     return new_xblock
 
@@ -471,3 +501,24 @@ def is_item_in_course_tree(item):
         ancestor = ancestor.get_parent()
 
     return ancestor is not None
+
+
+def _get_usage_key_from_node(node, parent_id: str) -> UsageKey | None:
+    """
+    Returns the UsageKey for the given node and parent ID.
+
+    If the parent_id is not a valid UsageKey, or there's no "url_name" attribute in the node, then will return None.
+    """
+    parent_key = UsageKey.from_string(parent_id)
+    parent_context = parent_key.context_key
+    usage_key = None
+    block_id = node.attrib.get("url_name")
+    block_type = node.tag
+
+    if parent_context and block_id and block_type:
+        usage_key = parent_context.make_usage_key(
+            block_type=block_type,
+            block_id=block_id,
+        )
+
+    return usage_key

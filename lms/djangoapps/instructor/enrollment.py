@@ -7,6 +7,7 @@ Does not include any access control, be sure to check access before calling.
 
 import json
 import logging
+from contextlib import ExitStack, contextmanager
 from datetime import datetime
 
 import pytz
@@ -19,7 +20,7 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from submissions import api as sub_api  # installed from the edx-submissions repository
-from submissions.models import score_set
+from submissions.models import score_set, score_reset
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=line-too-long
@@ -238,7 +239,28 @@ def send_beta_role_email(action, user, email_params):
         send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
 
 
-def reset_student_attempts(course_id, student, module_state_key, requesting_user, delete_module=False):
+@contextmanager
+def _conditionally_disconnect_submissions_signal_recievers(emit_score_reset):
+    """
+    Context manager helper.
+    - Disconnects the score_set signal on enter, reconnects on exit
+    - If emit_score_reset, disconnects score_reset signal on enter, reconnects on exit
+    """
+    with ExitStack() as context_stack:
+        context_stack.enter_context(disconnect_submissions_signal_receiver(score_set))
+        if not emit_score_reset:
+            context_stack.enter_context(disconnect_submissions_signal_receiver(score_reset))
+        yield
+
+
+def reset_student_attempts(
+    course_id,
+    student,
+    module_state_key,
+    requesting_user,
+    delete_module=False,
+    emit_signals_and_events=True,
+):
     """
     Reset student attempts for a problem. Optionally deletes all student state for the specified problem.
 
@@ -248,6 +270,10 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
     `student` is a User
     `problem_to_reset` is the name of a problem e.g. 'L2Node1'.
     To build the module_state_key 'problem/' and course information will be appended to `problem_to_reset`.
+    `delete_module`: Instead of resetting attempts, delete the learner's StudentModule
+    `emit_signals_and_events`: If this is False, don't fire django signals or emit events. This is intended for
+                               the case where we are calling this function many times, and want to handle the signalling
+                               and eventing at a bulk level rather than firing every individual call to this function
 
     Raises:
         ValueError: `problem_state` is invalid JSON.
@@ -275,7 +301,7 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
             # Inform these blocks of the reset and allow them to handle their data.
             clear_student_state = getattr(block, "clear_student_state", None)
             if callable(clear_student_state):
-                with disconnect_submissions_signal_receiver(score_set):
+                with _conditionally_disconnect_submissions_signal_recievers(emit_signals_and_events):
                     clear_student_state(
                         user_id=user_id,
                         course_id=str(course_id),
@@ -300,11 +326,15 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
             user_id,
             str(course_id),
             str(module_state_key),
+            emit_signal=emit_signals_and_events,
         )
 
     def _reset_or_delete_module(studentmodule):
         if delete_module:
             studentmodule.delete()
+            if not emit_signals_and_events:
+                return
+
             create_new_event_transaction_id()
             set_event_transaction_type(grades_events.STATE_DELETED_EVENT_TYPE)
             tracker.emit(
@@ -361,6 +391,9 @@ def _reset_module_attempts(studentmodule):
     problem_state = json.loads(studentmodule.state)
     # old_number_of_attempts = problem_state["attempts"]
     problem_state["attempts"] = 0
+    problem_state["score_history"] = []
+    problem_state["correct_map_history"] = []
+    problem_state["student_answers_history"] = []
 
     # save
     studentmodule.state = json.dumps(problem_state)

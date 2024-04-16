@@ -7,12 +7,11 @@ from typing import Dict, List, Union
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
-from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
+from openedx_tagging.core.tagging.models import Taxonomy
 
 ContentKey = Union[LibraryLocatorV2, CourseKey, UsageKey]
 ContextKey = Union[LibraryLocatorV2, CourseKey]
 
-ObjectTagByTaxonomyIdDict = Dict[int, List[ObjectTag]]
-ObjectTagByObjectIdDict = Dict[str, ObjectTagByTaxonomyIdDict]
+TagValuesByTaxonomyIdDict = Dict[int, List[str]]
+TagValuesByObjectIdDict = Dict[str, TagValuesByTaxonomyIdDict]
 TaxonomyDict = Dict[int, Taxonomy]
-TagValuesByTaxonomyExportIdDict = Dict[str, List[str]]

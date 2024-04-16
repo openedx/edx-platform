@@ -1049,7 +1049,16 @@ FEATURES = {
     # .. toggle_use_cases: opt_in
     # .. toggle_creation_date: 2023-10-10
     # .. toggle_tickets: https://github.com/openedx/openedx-events/issues/210
-    'SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS': False
+    'SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS': False,
+
+    # .. toggle_name: FEATURES['ENABLE_GRADING_METHOD_IN_PROBLEMS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables the grading method feature in capa problems.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-03-22
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
+    'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -4254,8 +4263,11 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 # E-Commerce Commerce Coordinator Configuration
-COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8000'
-COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/redirect/'
+COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8140'
+COMMERCE_COORDINATOR_REFUND_PATH = '/lms/refund/'
+COMMERCE_COORDINATOR_REFUND_SOURCE_SYSTEMS = ('SET-ME-PLEASE',)
+COMMERCE_COORDINATOR_SERVICE_WORKER_USERNAME = 'commerce_coordinator_worker'
+COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/payment_page_redirect/'
 
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'

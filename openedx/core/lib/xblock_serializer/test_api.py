@@ -80,7 +80,7 @@ EXPECTED_OPENASSESSMENT_OLX = """
     teams_enabled="False"
     selected_teamset_id=""
     show_rubric_during_response="False"
-    tags-v1="t1-export-id:%3Cspecial %22%27-%3D%2C. %7C%3D chars %3E tag,anotherTag,normal tag"
+    url_name="Tagged_OpenAssessment_Block"
 >
   <title>Open Response Assessment</title>
   <assessments>
@@ -207,7 +207,7 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         Tag.objects.create(taxonomy=cls.taxonomy2, value="tag", parent=root2)
         Tag.objects.create(taxonomy=cls.taxonomy2, value="other tag", parent=root2)
 
-    def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> bool:
+    def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> None:
         """ Assert that the given XML strings are equal, ignoring attribute order and some whitespace variations. """
         self.assertEqual(
             ElementTree.canonicalize(xml_str_a, strip_text=True),
@@ -429,31 +429,34 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         # Add a bunch of tags
         tagging_api.tag_object(
-            object_id=unit.location,
+            object_id=str(unit.location),
             taxonomy=self.taxonomy1,
             tags=["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"]
         )
         tagging_api.tag_object(
-            object_id=unit.location,
+            object_id=str(unit.location),
             taxonomy=self.taxonomy2,
             tags=["tag", "other tag"]
         )
 
-        # Check that the tags data in included in the OLX and properly escaped
+        # Check that the tags data is serialized and omitted from the OLX
         serialized = api.serialize_xblock_to_olx(unit)
-        expected_serialized_tags = (
-            "t1-export-id:%3Cspecial %22%27-%3D%2C. %7C%3D chars %3E tag,anotherTag,normal tag;"
-            "t2-export-id:other tag,tag"
-        )
         self.assertXmlEqual(
             serialized.olx_str,
-            f"""
+            """
             <vertical
                 display_name="Tagged Unit"
                 url_name="Tagged_Unit"
-                tags-v1="{expected_serialized_tags}"
             />
             """
+        )
+        self.assertEqual(
+            serialized.tags, {
+                str(unit.location): {
+                    self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
+                    self.taxonomy2.id: ["tag", "other tag"],
+                }
+            }
         )
 
     def test_tagged_html_block(self):
@@ -474,35 +477,38 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         # Add a bunch of tags
         tagging_api.tag_object(
-            object_id=html_block.location,
+            object_id=str(html_block.location),
             taxonomy=self.taxonomy1,
             tags=["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"]
         )
         tagging_api.tag_object(
-            object_id=html_block.location,
+            object_id=str(html_block.location),
             taxonomy=self.taxonomy2,
             tags=["tag", "other tag"]
         )
 
-        # Check that the tags data in included in the OLX and properly escaped
+        # Check that the tags data is serialized and omitted from the OLX
         serialized = api.serialize_xblock_to_olx(html_block)
-        expected_serialized_tags = (
-            "t1-export-id:%3Cspecial %22%27-%3D%2C. %7C%3D chars %3E tag,anotherTag,normal tag;"
-            "t2-export-id:other tag,tag"
-        )
         self.assertXmlEqual(
             serialized.olx_str,
-            f"""
+            """
             <html
                 url_name="Tagged_Non-default_HTML_Block"
                 display_name="Tagged Non-default HTML Block"
                 editor="raw"
                 use_latex_compiler="true"
-                tags-v1="{expected_serialized_tags}"
             ><![CDATA[
                 🍔
             ]]></html>
             """
+        )
+        self.assertEqual(
+            serialized.tags, {
+                str(html_block.location): {
+                    self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
+                    self.taxonomy2.id: ["tag", "other tag"],
+                }
+            }
         )
 
     def test_tagged_problem_blocks(self):
@@ -535,62 +541,68 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         # Add a bunch of tags to the problem blocks
         tagging_api.tag_object(
-            object_id=regular_problem.location,
+            object_id=str(regular_problem.location),
             taxonomy=self.taxonomy1,
             tags=["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"]
         )
         tagging_api.tag_object(
-            object_id=regular_problem.location,
+            object_id=str(regular_problem.location),
             taxonomy=self.taxonomy2,
             tags=["tag", "other tag"]
         )
         tagging_api.tag_object(
-            object_id=python_problem.location,
+            object_id=str(python_problem.location),
             taxonomy=self.taxonomy1,
             tags=["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"]
         )
         tagging_api.tag_object(
-            object_id=python_problem.location,
+            object_id=str(python_problem.location),
             taxonomy=self.taxonomy2,
             tags=["tag", "other tag"]
         )
 
-        # Check that the tags data in included in the OLX and properly escaped
+        # Check that the tags data is serialized and omitted from the OLX.
         serialized = api.serialize_xblock_to_olx(regular_problem)
-        expected_serialized_tags = (
-            "t1-export-id:%3Cspecial %22%27-%3D%2C. %7C%3D chars %3E tag,anotherTag,normal tag;"
-            "t2-export-id:other tag,tag"
-        )
         self.assertXmlEqual(
             serialized.olx_str,
-            f"""
+            """
             <problem
                 display_name="Tagged Problem No Python"
                 url_name="Tagged_Problem_No_Python"
                 max_attempts="3"
-                tags-v1="{expected_serialized_tags}"
             >
                 <optionresponse></optionresponse>
             </problem>
             """
         )
+        self.assertEqual(
+            serialized.tags, {
+                str(regular_problem.location): {
+                    self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
+                    self.taxonomy2.id: ["tag", "other tag"],
+                }
+            }
+        )
 
         serialized = api.serialize_xblock_to_olx(python_problem)
-        expected_serialized_tags = (
-            "t1-export-id:%3Cspecial %22%27-%3D%2C. %7C%3D chars %3E tag,anotherTag,normal tag;"
-            "t2-export-id:other tag,tag"
-        )
         self.assertXmlEqual(
             serialized.olx_str,
-            f"""
+            """
             <problem
                 display_name="Tagged Python Problem"
                 url_name="Tagged_Python_Problem"
-                tags-v1="{expected_serialized_tags}"
             >
                 This uses python: <script type="text/python">...</script>...
             </problem>
             """
+        )
+        self.assertEqual(
+            serialized.tags, {
+                str(python_problem.location): {
+                    self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
+                    self.taxonomy2.id: ["tag", "other tag"],
+                }
+            }
         )
 
     def test_tagged_library_content_blocks(self):
@@ -609,12 +621,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         # Add a bunch of tags to the library content block
         tagging_api.tag_object(
-            object_id=lc_block.location,
+            object_id=str(lc_block.location),
             taxonomy=self.taxonomy1,
             tags=["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"]
         )
 
-        # Check that the tags data in included in the OLX and properly escaped
+        # Check that the tags data is serialized, omitted from the OLX, and properly escaped
         serialized = api.serialize_xblock_to_olx(lc_block)
         self.assertXmlEqual(
             serialized.olx_str,
@@ -624,10 +636,14 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
                 max_count="1"
                 source_library_id="{str(lib.location.library_key)}"
                 url_name="Tagged_LC_Block"
-                tags-v1="t1-export-id:%3Cspecial %22%27-%3D%2C. %7C%3D chars %3E tag,anotherTag,normal tag"
             />
             """
         )
+        self.assertEqual(serialized.tags, {
+            str(lc_block.location): {
+                self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
+            }
+        })
 
     def test_tagged_video_block(self):
         """
@@ -642,12 +658,12 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         # Add tags to video block
         tagging_api.tag_object(
-            object_id=video_block.location,
+            object_id=str(video_block.location),
             taxonomy=self.taxonomy1,
             tags=["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"]
         )
 
-        # Check that the tags data in included in the OLX and properly escaped
+        # Check that the tags data is serialized and omitted from the OLX.
         serialized = api.serialize_xblock_to_olx(video_block)
         self.assertXmlEqual(
             serialized.olx_str,
@@ -656,10 +672,14 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
                 youtube="1.00:3_yD_cEKoCk"
                 url_name="Tagged_Video_Block"
                 display_name="Tagged Video Block"
-                tags-v1="t1-export-id:%3Cspecial %22%27-%3D%2C. %7C%3D chars %3E tag,anotherTag,normal tag"
             />
             """
         )
+        self.assertEqual(serialized.tags, {
+            str(video_block.location): {
+                self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
+            }
+        })
 
     def test_tagged_openassessment_block(self):
         """
@@ -674,14 +694,19 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         # Add a tags to openassessment block
         tagging_api.tag_object(
-            object_id=openassessment_block.location,
+            object_id=str(openassessment_block.location),
             taxonomy=self.taxonomy1,
             tags=["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"]
         )
 
-        # Check that the tags data in included in the OLX and properly escaped
+        # Check that the tags data is serialized and omitted from the OLX
         serialized = api.serialize_xblock_to_olx(openassessment_block)
         self.assertXmlEqual(
             serialized.olx_str,
             EXPECTED_OPENASSESSMENT_OLX
         )
+        self.assertEqual(serialized.tags, {
+            str(openassessment_block.location): {
+                self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],
+            }
+        })
