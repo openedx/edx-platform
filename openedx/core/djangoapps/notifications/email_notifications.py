@@ -10,12 +10,12 @@ class EmailCadence:
     """
     DAILY = 'Daily'
     WEEKLY = 'Weekly'
-    INSTANTLY = 'Instantly'
+    IMMEDIATELY = 'Immediately'
     NEVER = 'Never'
     EMAIL_CADENCE_CHOICES = [
         (DAILY, _('Daily')),
         (WEEKLY, _('Weekly')),
-        (INSTANTLY, _('Instantly')),
+        (IMMEDIATELY, _('Immediately')),
         (NEVER, _('Never')),
     ]
     EMAIL_CADENCE_CHOICES_DICT = dict(EMAIL_CADENCE_CHOICES)
