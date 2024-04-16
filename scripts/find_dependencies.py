@@ -361,7 +361,7 @@ def main(dirs=None, org=None):
 
     #firsts = urls_in_orgs(repo_urls, FIRST_PARTY_ORGS)
     #write_list(WORK_DIR / "first_party_urls.txt", firsts)
-    seconds = urls_in_orgs(repo_urls, "edx")
+    seconds = urls_in_orgs(repo_urls, org)
     #write_list(WORK_DIR / "second_party_urls.txt", seconds)
 
     print("== DONE ==============")
