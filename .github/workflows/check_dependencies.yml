@@ -1,0 +1,24 @@
+name: Check Python Dependencies
+
+on:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash # strict bash
+
+jobs:
+  check_dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Run Python script
+        run: python find_dependencies.py
