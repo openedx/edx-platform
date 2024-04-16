@@ -22,7 +22,7 @@ jobs:
           python-version: '3.8'
 
       - name: Make the script files executable
-        run: chmod +x my-script.sh my-other-script.sh    
+        run: chmod +x find_dependencies.py
 
       - name: Run Python script
         run: python find_dependencies.py
