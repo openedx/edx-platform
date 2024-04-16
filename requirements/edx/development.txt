@@ -1319,7 +1319,7 @@ openedx-filters==1.6.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@chris/FAL-3645-refined-drawer
+openedx-learning==0.9.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
