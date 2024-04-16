@@ -712,7 +712,7 @@ edx-codejail==3.3.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-completion==4.5.0
+edx-completion==4.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
