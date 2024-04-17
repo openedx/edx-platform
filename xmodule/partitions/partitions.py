@@ -17,7 +17,7 @@ from stevedore.extension import ExtensionManager
 # ID is stored in the xblock group_access dict).
 ENROLLMENT_TRACK_PARTITION_ID = 50
 
-MINIMUM_STATIC_PARTITION_ID = 100
+MINIMUM_UNUSED_PARTITION_ID = 100
 
 
 class UserPartitionError(Exception):
