@@ -21,7 +21,6 @@ except RuntimeError:
     SearchAccess = {}
 
 
-
 @patch("openedx.core.djangoapps.content.search.api._wait_for_meili_task", new=MagicMock(return_value=None))
 @patch("openedx.core.djangoapps.content.search.api.MeilisearchClient")
 @override_settings(MEILISEARCH_ENABLED=True)
