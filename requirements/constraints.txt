@@ -23,7 +23,7 @@ click>=8.0,<9.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.15.2
+edx-enterprise==4.15.3
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
