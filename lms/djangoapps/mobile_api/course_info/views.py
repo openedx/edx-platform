@@ -20,7 +20,11 @@ from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
-from lms.djangoapps.mobile_api.course_info.serializers import CourseInfoOverviewSerializer, CourseAccessSerializer, MobileCourseEnrollmentSerializer
+from lms.djangoapps.mobile_api.course_info.serializers import (
+    CourseInfoOverviewSerializer,
+    CourseAccessSerializer,
+    MobileCourseEnrollmentSerializer
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
