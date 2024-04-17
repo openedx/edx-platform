@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from lms.djangoapps.teams.team_partition_scheme import TeamPartitionScheme
-from openedx.core.lib.teams_config import create_team_set_partition_with_course_id
+from openedx.core.lib.teams_config import create_team_set_partitions_with_course_id
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 from xmodule.modulestore.django import modulestore
@@ -68,7 +68,7 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
         Expected result:
         - The user partitions are created based on the team sets.
         """
-        partitions = create_team_set_partition_with_course_id(self.course_key, self.team_sets)
+        partitions = create_team_set_partitions_with_course_id(self.course_key, self.team_sets)
 
         assert partitions == [
             TeamPartitionScheme.create_user_partition(

@@ -362,10 +362,10 @@ def _clean_max_team_size(value):
     return value
 
 
-def create_team_set_partition_with_course_id(course_id, team_sets=None):
+def create_team_set_partitions_with_course_id(course_id, team_sets=None):
     """
-    Create and return the dynamic enrollment track user partition based only on course_id.
-    If it cannot be created, None is returned.
+    Create and return the team-set user partitions based only on course_id.
+    If they cannot be created, None is returned.
     """
     if not team_sets:
         team_sets = _get_team_sets(course_id) or {}
@@ -382,7 +382,7 @@ def create_team_set_partition_with_course_id(course_id, team_sets=None):
     for team_set in team_sets:
         partition = team_scheme.create_user_partition(
             id=team_set.dynamic_user_partition_id,
-            name=_(f"Team Group: {team_set.name}"),  # lint-amnesty, pylint: disable=translation-of-non-string
+            name=_("Team Group: {team_set_name}").format(team_set_name=team_set.name),
             description=_("Partition for segmenting users by team-set"),
             parameters={
                 "course_id": str(course_id),
@@ -401,7 +401,7 @@ def create_team_set_partition(course):
     """
     if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course.id):
         return []
-    return create_team_set_partition_with_course_id(
+    return create_team_set_partitions_with_course_id(
         course.id,
         _get_team_sets(course.id),
     )
