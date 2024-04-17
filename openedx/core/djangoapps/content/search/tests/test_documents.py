@@ -8,7 +8,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
-from ..documents import searchable_doc_for_course_block
+try:
+    # This import errors in the lms because content.search is not an installed app there.
+    from ..documents import searchable_doc_for_course_block
+    from ..models import SearchAccess
+except RuntimeError:
+    searchable_doc_for_course_block = lambda x: x
+    SearchAccess = {}
+
 
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 
@@ -26,6 +33,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         cls.store = modulestore()
         cls.toy_course = ToyCourseFactory.create()  # See xmodule/modulestore/tests/sample_courses.py
         cls.toy_course_key = cls.toy_course.id
+
         # Get references to some blocks in the toy course
         cls.html_block_key = cls.toy_course_key.make_usage_key("html", "toyjumpto")
         # Create a problem in library
@@ -55,6 +63,16 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
         tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
 
+    @property
+    def toy_course_access_id(self):
+        """
+        Returns the SearchAccess.id created for the toy course.
+
+        This SearchAccess object is created when documents are added to the search index, so this method must be called
+        after this step, or risk a DoesNotExist error.
+        """
+        return SearchAccess.objects.get(context_key=self.toy_course_key).id
+
     def test_problem_block(self):
         """
         Test how a problem block gets represented in the search index
@@ -71,6 +89,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "block_id": "Test_Problem",
             "context_key": "course-v1:edX+toy+2012_Fall",
             "org": "edX",
+            "access_id": self.toy_course_access_id,
             "display_name": "Test Problem",
             "breadcrumbs": [
                 {"display_name": "Toy Course"},
@@ -105,6 +124,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "block_id": "toyjumpto",
             "context_key": "course-v1:edX+toy+2012_Fall",
             "org": "edX",
+            "access_id": self.toy_course_access_id,
             "display_name": "Text",
             "breadcrumbs": [
                 {"display_name": "Toy Course"},
@@ -139,6 +159,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "block_id": "Welcome",
             "context_key": "course-v1:edX+toy+2012_Fall",
             "org": "edX",
+            "access_id": self.toy_course_access_id,
             "display_name": "Welcome",
             "breadcrumbs": [
                 {"display_name": "Toy Course"},

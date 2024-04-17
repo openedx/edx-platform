@@ -8,6 +8,7 @@ import logging
 from django.utils.text import slugify
 from opaque_keys.edx.keys import UsageKey, LearningContextKey
 
+from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
@@ -29,6 +30,7 @@ class Fields:
     block_type = "block_type"
     context_key = "context_key"
     org = "org"
+    access_id = "access_id"  # .models.SearchAccess.id
     # breadcrumbs: an array of {"display_name": "..."} entries. First one is the name of the course/library itself.
     # After that is the name of any parent Section/Subsection/Unit/etc.
     # It's a list of dictionaries because for now we just include the name of each but in future we may add their IDs.
@@ -78,6 +80,14 @@ def _meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     return slugify(str(usage_key)) + "-" + suffix
 
 
+def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
+    """
+    Retrieve the numeric access id for the given course/library context.
+    """
+    access, _ = SearchAccess.objects.get_or_create(context_key=context_key)
+    return access.id
+
+
 def _fields_from_block(block) -> dict:
     """
     Given an XBlock instance, call its index_dictionary() method to load any
@@ -96,6 +106,7 @@ def _fields_from_block(block) -> dict:
         # This is called context_key so it's the same for courses and libraries
         Fields.context_key: str(block.usage_key.context_key),  # same as lib_key
         Fields.org: str(block.usage_key.context_key.org),
+        Fields.access_id: _meili_access_id_from_context_key(block.usage_key.context_key),
         Fields.breadcrumbs: []
     }
     # Get the breadcrumbs (course, section, subsection, etc.):
