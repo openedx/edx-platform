@@ -52,12 +52,12 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_media(obj):
         """
-        Return course images in the correct forrmat.
+        Return course images in the correct format.
         """
         return {'image': obj.image_urls}
 
     def get_course_sharing_utm_parameters(self, obj):
-         return get_encoded_course_sharing_utm_params()
+        return get_encoded_course_sharing_utm_params()
 
     def get_course_about_url(self, course_overview):
         return get_link_for_about_page(course_overview)
@@ -87,15 +87,14 @@ class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):
         lookup_field = 'username'
 
 
-
 class CourseAccessSerializer(serializers.Serializer):
     """
     Get info whether a user should be able to view course material.
     """
 
-    has_unmet_prerequisites = serializers.SerializerMethodField(method_name="get_has_unmet_prerequisites")
-    is_too_early = serializers.SerializerMethodField(method_name="get_is_too_early")
-    is_staff = serializers.SerializerMethodField(method_name="get_is_staff")
+    has_unmet_prerequisites = serializers.SerializerMethodField(method_name='get_has_unmet_prerequisites')
+    is_too_early = serializers.SerializerMethodField(method_name='get_is_too_early')
+    is_staff = serializers.SerializerMethodField(method_name='get_is_staff')
     audit_access_expires = serializers.SerializerMethodField()
     courseware_access = serializers.SerializerMethodField()
 
@@ -103,19 +102,20 @@ class CourseAccessSerializer(serializers.Serializer):
         """
         Check whether or not a course has unmet prerequisites.
         """
-        return any(get_pre_requisite_courses_not_completed(data.get("user"), [data.get("course_id")]))
+        return any(get_pre_requisite_courses_not_completed(data.get('user'), [data.get('course_id')]))
 
     def get_is_too_early(self, data: dict) -> bool:
         """
         Determine if the course is open to a learner (course has started or user has early beta access).
         """
-        return not check_course_open_for_learner(data.get("user"), data.get("course"))
+        return not check_course_open_for_learner(data.get('user'), data.get('course'))
 
     def get_is_staff(self, data: dict) -> bool:
         """
         Determine whether a user has staff access to this course.
         """
-        return any(administrative_accesses_to_course_for_user(data.get("user"), data.get("course_id")))
+        return any(administrative_accesses_to_course_for_user(data.get('user'), data.get('course_id')))
+
     def get_audit_access_expires(self, data: dict) -> Union[str, None]:
         """
         Returns expiration date for a course audit expiration, if any or null
@@ -126,10 +126,4 @@ class CourseAccessSerializer(serializers.Serializer):
         """
         Determine if the learner has access to the course, otherwise show error message.
         """
-        return has_access(
-                data.get('user'),
-                'load_mobile',
-                data.get('course')
-            ).to_json()
-
-
+        return has_access(data.get('user'), 'load_mobile', data.get('course')).to_json()

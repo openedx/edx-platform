@@ -12,12 +12,15 @@ from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
+from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
+from common.djangoapps.util.course import get_link_for_about_page
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from lms.djangoapps.mobile_api.course_info.views import BlocksInfoInCourseView
 from lms.djangoapps.course_api.blocks.tests.test_views import TestBlocksInCourseView
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -263,7 +266,7 @@ class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCas
 
 
 @ddt.ddt
-class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylint: disable=test-inherits-tests
+class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test class for BlocksInfoInCourseView
     """
@@ -277,14 +280,14 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
         self.student_user = UserFactory.create(username="student_user")
 
     @ddt.data(
-        ("anonymous", None, None),
-        ("staff", "student_user", "student_user"),
-        ("student", "student_user", "student_user"),
-        ("student", None, "student_user"),
-        ("student", "other_student", None),
+        ('anonymous', None, None),
+        ('staff', 'student_user', 'student_user'),
+        ('student', 'student_user', 'student_user'),
+        ('student', None, 'student_user'),
+        ('student', 'other_student', None),
     )
     @ddt.unpack
-    @patch("lms.djangoapps.mobile_api.course_info.views.User.objects.get")
+    @patch('lms.djangoapps.mobile_api.course_info.views.User.objects.get')
     def test_get_requested_user(self, user_role, username, expected_username, mock_get):
         """
         Test get_requested_user utility from the BlocksInfoInCourseView.
@@ -294,16 +297,16 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
         username: username query parameter from the request.
         expected_username: username of the returned user.
         """
-        if user_role == "anonymous":
+        if user_role == 'anonymous':
             request_user = AnonymousUser()
-        elif user_role == "staff":
+        elif user_role == 'staff':
             request_user = self.admin_user
-        elif user_role == "student":
+        elif user_role == 'student':
             request_user = self.student_user
 
         self.request.user = request_user
 
-        if expected_username == "student_user":
+        if expected_username == 'student_user':
             mock_user = self.student_user
             mock_get.return_value = mock_user
 
@@ -370,3 +373,52 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView):  # lint-amnesty, pylin
         assert response.data['certificate'] == {'url': certificate_url}
         assert response.data['is_self_paced'] is False
         mock_certificate_downloadable_status.assert_called_once()
+
+    def test_course_access_details(self):
+        response = self.verify_response(url=self.url)
+
+        expected_course_access_details = {
+            'has_unmet_prerequisites': False,
+            'is_too_early': False,
+            'is_staff': False,
+            'audit_access_expires': None,
+            'courseware_access': {
+                'has_access': True,
+                'error_code': None,
+                'developer_message': None,
+                'user_message': None,
+                'additional_context_user_message': None,
+                'user_fragment': None
+            }
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data['course_access_details'], expected_course_access_details)
+
+    def test_course_sharing_utm_parameters(self):
+        response = self.verify_response(url=self.url)
+
+        expected_course_sharing_utm_parameters = {
+            'facebook': 'utm_medium=social&utm_campaign=social-sharing-db&utm_source=facebook',
+            'twitter': 'utm_medium=social&utm_campaign=social-sharing-db&utm_source=twitter'
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data['course_sharing_utm_parameters'], expected_course_sharing_utm_parameters)
+
+    def test_course_about_url(self):
+        response = self.verify_response(url=self.url)
+
+        course_overview = CourseOverview.objects.get(id=self.course.course_id)
+        expected_course_about_link = get_link_for_about_page(course_overview)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['course_about'], expected_course_about_link)
+
+    def test_course_modes(self):
+        response = self.verify_response(url=self.url)
+
+        expected_course_modes = [{'slug': 'audit', 'sku': None, 'android_sku': None, 'ios_sku': None, 'min_price': 0}]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data['course_modes'], expected_course_modes)
