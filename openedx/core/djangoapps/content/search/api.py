@@ -316,6 +316,11 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.context_key,
             Fields.org,
             Fields.tags,
+            Fields.tags + "." + Fields.tags_taxonomy,
+            Fields.tags + "." + Fields.tags_level0,
+            Fields.tags + "." + Fields.tags_level1,
+            Fields.tags + "." + Fields.tags_level2,
+            Fields.tags + "." + Fields.tags_level3,
             Fields.type,
             Fields.access_id,
         ])
