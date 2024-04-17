@@ -2045,8 +2045,8 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         )
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outlines+TeamPartitions")
         cls.team_sets = [
-            MagicMock(name="1st TeamSet", teamset_id=1, dynamic_user_partition_id=51),
-            MagicMock(name="2nd TeamSet", teamset_id=2, dynamic_user_partition_id=52),
+            MagicMock(name="1st TeamSet", teamset_id=1, user_partition_id=51),
+            MagicMock(name="2nd TeamSet", teamset_id=2, user_partition_id=52),
         ]
         cls.student = cls._create_and_enroll_learner("student")
         cls.team_1 = CourseTeamFactory.create(
@@ -2061,10 +2061,10 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
         )
         cls.team_1.add_user(cls.student)
         team_1_sequence_partition_groups = {
-            cls.team_sets[0].dynamic_user_partition_id: frozenset([cls.team_sets[0].teamset_id]),
+            cls.team_sets[0].user_partition_id: frozenset([cls.team_sets[0].teamset_id]),
         }
         team_2_sequence_partition_groups = {
-            cls.team_sets[1].dynamic_user_partition_id: frozenset([cls.team_sets[1].teamset_id]),
+            cls.team_sets[1].user_partition_id: frozenset([cls.team_sets[1].teamset_id]),
         }
         cls.outline = cls._setup_course_outline_with_sections(
             [
@@ -2097,10 +2097,10 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
 
         Expected result:
         - The number of user groups should be equal to the number of teams the user is a part of.
-        - The current user groups should contain dynamic_user_partition_id as the key and an instance of the Group model
+        - The current user groups should contain user_partition_id as the key and an instance of the Group model
           as the value with the teams data.
         - The current user groups should contain the name of the team as the value for the key equal to the
-        dynamic_user_partition_id.
+        user_partition_id.
         """
         team_sets_mock.return_value = self.team_sets
         team_configuration_service_mock.return_value.get_teams_configuration.teamsets = self.team_sets
@@ -2112,13 +2112,13 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
 
         assert len(team_partition_groups_processor.current_user_groups) == 1
         assert team_partition_groups_processor.current_user_groups.get(
-            self.team_sets[0].dynamic_user_partition_id
+            self.team_sets[0].user_partition_id
         ) is not None
         assert team_partition_groups_processor.current_user_groups.get(
-            self.team_sets[1].dynamic_user_partition_id
+            self.team_sets[1].user_partition_id
         ) is None
         assert team_partition_groups_processor.current_user_groups.get(
-            self.team_sets[0].dynamic_user_partition_id
+            self.team_sets[0].user_partition_id
         ).name == self.team_1.name
 
     @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
@@ -2137,8 +2137,8 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
             self.course_key, self.student, datetime.now()
         )
         sequence_partition_groups = {
-            self.team_sets[0].dynamic_user_partition_id: frozenset([self.team_sets[0].teamset_id]),
-            self.team_sets[1].dynamic_user_partition_id: frozenset([self.team_sets[1].teamset_id]),
+            self.team_sets[0].user_partition_id: frozenset([self.team_sets[0].teamset_id]),
+            self.team_sets[1].user_partition_id: frozenset([self.team_sets[1].teamset_id]),
             53: frozenset([100]),
         }
         team_partition_groups_processor.load_data(self.outline)
@@ -2165,7 +2165,7 @@ class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
             self.course_key, self.student, datetime.now()
         )
         sequence_partition_groups = {
-            self.team_sets[1].dynamic_user_partition_id: frozenset([self.team_sets[1].teamset_id]),
+            self.team_sets[1].user_partition_id: frozenset([self.team_sets[1].teamset_id]),
             53: frozenset([100]),
         }
         team_partition_groups_processor.load_data(self.outline)

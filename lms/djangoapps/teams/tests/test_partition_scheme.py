@@ -35,8 +35,8 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
         self.student = UserFactory.create()
         self.student.courseenrollment_set.create(course_id=self.course_key, is_active=True)
         self.team_sets = [
-            MagicMock(name="1st TeamSet", teamset_id=1, dynamic_user_partition_id=51),
-            MagicMock(name="2nd TeamSet", teamset_id=2, dynamic_user_partition_id=52),
+            MagicMock(name="1st TeamSet", teamset_id=1, user_partition_id=51),
+            MagicMock(name="2nd TeamSet", teamset_id=2, user_partition_id=52),
         ]
 
     @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
@@ -50,7 +50,7 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
         mock_teams_configuration_service().get_teams_configuration.return_value.teamsets = self.team_sets
 
         partition = TeamPartitionScheme.create_user_partition(
-            id=self.team_sets[0].dynamic_user_partition_id,
+            id=self.team_sets[0].user_partition_id,
             name=f"Team Group: {self.team_sets[0].name}",
             description="Partition for segmenting users by team-set",
             parameters={
@@ -59,7 +59,7 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
             }
         )
 
-        assert partition.id == self.team_sets[0].dynamic_user_partition_id
+        assert partition.id == self.team_sets[0].user_partition_id
 
     def test_team_partition_generator(self):
         """
@@ -72,7 +72,7 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
 
         assert partitions == [
             TeamPartitionScheme.create_user_partition(
-                id=self.team_sets[0].dynamic_user_partition_id,
+                id=self.team_sets[0].user_partition_id,
                 name=f"Team Group: {self.team_sets[0].name}",
                 description="Partition for segmenting users by team-set",
                 parameters={
@@ -81,7 +81,7 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
                 }
             ),
             TeamPartitionScheme.create_user_partition(
-                id=self.team_sets[1].dynamic_user_partition_id,
+                id=self.team_sets[1].user_partition_id,
                 name=f"Team Group: {self.team_sets[1].name}",
                 description="Partition for segmenting users by team-set",
                 parameters={
@@ -111,7 +111,7 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
             topic_id=self.team_sets[0].teamset_id,
         )
         team_partition_scheme = TeamPartitionScheme.create_user_partition(
-            id=self.team_sets[0].dynamic_user_partition_id,
+            id=self.team_sets[0].user_partition_id,
             name=f"Team Group: {self.team_sets[0].name}",
             description="Partition for segmenting users by team-set",
             parameters={
@@ -142,7 +142,7 @@ class TestTeamPartitionScheme(ModuleStoreTestCase):
         )
         team.add_user(self.student)
         team_partition_scheme = TeamPartitionScheme.create_user_partition(
-            id=self.team_sets[0].dynamic_user_partition_id,
+            id=self.team_sets[0].user_partition_id,
             name=f"Team Group: {self.team_sets[0].name}",
             description="Partition for segmenting users by team-set",
             parameters={

@@ -23,6 +23,7 @@ from xmodule.course_block import get_available_providers  # lint-amnesty, pylint
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 LOGGER = logging.getLogger(__name__)
 
@@ -286,24 +287,21 @@ class CourseMetadata:
         return did_validate, errors, updated_data
 
     @staticmethod
-    def get_dynamic_user_partition_id(block, min_partition_id, max_partition_id):
+    def get_user_partition_id(block, min_partition_id, max_partition_id):
         """
         Get a dynamic partition id that is not already in use.
         """
-        # Importing here to avoid ImportError:
-        # ImportError: cannot import name 'GroupConfiguration' from partially initialized module
-        # 'cms.djangoapps.contentstore.course_group_config' (most likely due to a circular import)
-        from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
+        used_partition_ids = {p.id for p in get_all_partitions_for_course(block)}
         return generate_int_id(
             min_partition_id,
             max_partition_id,
-            GroupConfiguration.get_used_ids(block),
+            used_partition_ids,
         )
 
     @classmethod
     def fill_teams_user_partitions_ids(cls, block, settings_dict):
         """
-        Fill the `dynamic_user_partition_id` in the team settings if it is not set.
+        Fill the `user_partition_id` in the team settings if it is not set.
 
         This is used by the Dynamic Team Partition Generator to create the dynamic user partitions
         based on the team-sets defined in the course.
@@ -313,8 +311,8 @@ class CourseMetadata:
 
         proposed_topics = cls.get_team_sets_from_settings(settings_dict)
         for proposed_topic in proposed_topics:
-            if not proposed_topic.get('dynamic_user_partition_id'):
-                proposed_topic['dynamic_user_partition_id'] = cls.get_dynamic_user_partition_id(
+            if not proposed_topic.get('user_partition_id'):
+                proposed_topic['user_partition_id'] = cls.get_user_partition_id(
                     block,
                     MINIMUM_STATIC_PARTITION_ID,
                     MYSQL_MAX_INT,
@@ -421,7 +419,7 @@ class CourseMetadata:
             'description',
             'max_team_size',
             'type',
-            'dynamic_user_partition_id',
+            'user_partition_id',
         }
         teamset_type = topic_settings.get('type', {})
         if teamset_type:

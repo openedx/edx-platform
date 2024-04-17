@@ -1777,7 +1777,7 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     def test_team_content_groups_off(self):
         """
-        Tests that dynamic_user_partition_id is not added to the model when content groups for teams are off.
+        Tests that user_partition_id is not added to the model when content groups for teams are off.
         """
         settings_dict = {
             "teams_configuration": {
@@ -1794,12 +1794,12 @@ class CourseMetadataEditingTest(CourseTestCase):
         CourseMetadata.fill_teams_user_partitions_ids(self.course, settings_dict)
 
         for team_set in settings_dict["teams_configuration"]["value"]["team_sets"]:
-            self.assertNotIn("dynamic_user_partition_id", team_set)
+            self.assertNotIn("user_partition_id", team_set)
 
     @patch("cms.djangoapps.models.settings.course_metadata.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
     def test_team_content_groups_on(self):
         """
-        Tests that dynamic_user_partition_id is added to the model when content groups for teams are on.
+        Tests that user_partition_id is added to the model when content groups for teams are on.
         """
         settings_dict = {
             "teams_configuration": {
@@ -1816,7 +1816,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         CourseMetadata.fill_teams_user_partitions_ids(self.course, settings_dict)
 
         for team_set in settings_dict["teams_configuration"]["value"]["team_sets"]:
-            self.assertIn("dynamic_user_partition_id", team_set)
+            self.assertIn("user_partition_id", team_set)
 
 
 class CourseGraderUpdatesTest(CourseTestCase):

@@ -210,7 +210,7 @@ class TeamsetConfig:
         """
         Return developer-helpful string.
         """
-        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type', 'dynamic_user_partition_id']
+        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type', 'user_partition_id']
         return "<{} {}>".format(
             self.__class__.__name__,
             " ".join(
@@ -308,12 +308,12 @@ class TeamsetConfig:
         return self.teamset_type == TeamsetType.private_managed
 
     @cached_property
-    def dynamic_user_partition_id(self):
+    def user_partition_id(self):
         """
         The ID of the dynamic user partition for this team-set,
         falling back to None.
         """
-        return self._data.get('dynamic_user_partition_id')
+        return self._data.get('user_partition_id')
 
 
 class TeamsetType(Enum):
@@ -381,7 +381,7 @@ def create_team_set_partitions_with_course_id(course_id, team_sets=None):
     partitions = []
     for team_set in team_sets:
         partition = team_scheme.create_user_partition(
-            id=team_set.dynamic_user_partition_id,
+            id=team_set.user_partition_id,
             name=_("Team Group: {team_set_name}").format(team_set_name=team_set.name),
             description=_("Partition for segmenting users by team-set"),
             parameters={
