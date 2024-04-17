@@ -2,6 +2,7 @@
 REST API for content search
 """
 from __future__ import annotations
+
 import logging
 
 from django.contrib.auth import get_user_model

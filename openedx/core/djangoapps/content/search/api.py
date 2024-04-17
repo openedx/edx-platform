@@ -18,6 +18,10 @@ from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
+from common.djangoapps.student.roles import GlobalStaff
+from rest_framework.request import Request
+from common.djangoapps.student.role_helpers import get_course_roles
+from openedx.core.djangoapps.content.search.models import get_access_ids_for_request
 
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore import ModuleStoreEnum
@@ -47,6 +51,9 @@ _MEILI_CLIENT = None
 _MEILI_API_KEY_UID = None
 
 LOCK_EXPIRE = 24 * 60 * 60  # Lock expires in 24 hours
+
+MAX_ACCESS_IDS_IN_FILTER = 1_000
+MAX_ORGS_IN_FILTER = 1_000
 
 
 @contextmanager
@@ -310,6 +317,15 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.org,
             Fields.tags,
             Fields.type,
+            Fields.access_id,
+        ])
+        # Mark which attributes are used for keyword search, in order of importance:
+        client.index(temp_index_name).update_searchable_attributes([
+            Fields.display_name,
+            Fields.block_id,
+            Fields.content,
+            Fields.tags,
+            # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
         ])
 
         ############## Libraries ##############
@@ -435,17 +451,46 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     _update_index_docs(docs)
 
 
-def generate_user_token_for_studio_search(user):
+def _get_user_orgs(request: Request) -> list[str]:
+    """
+    Get the org.short_names for the organizations that the requesting user has OrgStaffRole or OrgInstructorRole.
+
+    Note: org-level roles have course_id=None to distinguish them from course-level roles.
+    """
+    course_roles = get_course_roles(request.user)
+    return list(set(
+        role.org
+        for role in course_roles
+        if role.course_id is None and role.role in ['staff', 'instructor']
+    ))
+
+
+def _get_meili_access_filter(request: Request) -> dict:
+    """
+    Return meilisearch filter based on the requesting user's permissions.
+    """
+    # Global staff can see anything, so no filters required.
+    if GlobalStaff().has_user(request.user):
+        return {}
+
+    # Everyone else is limited to their org staff roles...
+    user_orgs = _get_user_orgs(request)[:MAX_ORGS_IN_FILTER]
+
+    # ...or the N most recent courses and libraries they can access.
+    access_ids = get_access_ids_for_request(request, omit_orgs=user_orgs)[:MAX_ACCESS_IDS_IN_FILTER]
+    return {
+        "filter": f"org IN {user_orgs} OR access_id IN {access_ids}",
+    }
+
+
+def generate_user_token_for_studio_search(request):
     """
     Returns a Meilisearch API key that only allows the user to search content that they have permission to view
     """
     expires_at = datetime.now(tz=timezone.utc) + timedelta(days=7)
+
     search_rules = {
-        STUDIO_INDEX_NAME: {
-            # TODO: Apply filters here based on the user's permissions, so they can only search for content
-            # that they have permission to view. Example:
-            # 'filter': 'org = BradenX'
-        }
+        STUDIO_INDEX_NAME: _get_meili_access_filter(request),
     }
     # Note: the following is just generating a JWT. It doesn't actually make an API call to Meilisearch.
     restricted_api_key = _get_meilisearch_client().generate_tenant_token(

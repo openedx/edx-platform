@@ -16,6 +16,12 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 
 from .. import api
 
+try:
+    # This import errors in the lms because content.search is not an installed app there.
+    from openedx.core.djangoapps.content.search.models import SearchAccess
+except RuntimeError:
+    SearchAccess = {}
+
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 
 
@@ -52,6 +58,7 @@ class TestSearchApi(ModuleStoreTestCase):
             self.user_id,
             fields={"display_name": "Test Course"},
         )
+        course_access, _ = SearchAccess.objects.get_or_create(context_key=self.course.id)
 
         # Create XBlocks
         self.sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
@@ -65,7 +72,8 @@ class TestSearchApi(ModuleStoreTestCase):
             'context_key': 'course-v1:org1+test_course+test_run',
             'org': 'org1',
             'breadcrumbs': [{'display_name': 'Test Course'}],
-            'content': {}
+            'content': {},
+            'access_id': course_access.id,
         }
         self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical")
         self.doc_vertical = {
@@ -81,7 +89,8 @@ class TestSearchApi(ModuleStoreTestCase):
                 {'display_name': 'Test Course'},
                 {'display_name': 'sequential'}
             ],
-            'content': {}
+            'content': {},
+            'access_id': course_access.id,
         }
 
         # Create a content library:
@@ -91,6 +100,7 @@ class TestSearchApi(ModuleStoreTestCase):
             slug="lib",
             title="Library",
         )
+        lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
         # Populate it with a problem:
         self.problem = library_api.create_library_block(self.library.key, "problem", "p1")
         self.doc_problem = {
@@ -104,6 +114,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
             "content": {"problem_types": [], "capa_content": " "},
             "type": "library_block",
+            "access_id": lib_access.id,
         }
 
     @override_settings(MEILISEARCH_ENABLED=False)

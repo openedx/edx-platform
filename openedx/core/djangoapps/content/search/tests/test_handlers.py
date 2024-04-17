@@ -14,6 +14,13 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 
 from .. import api
 
+try:
+    # This import errors in the lms because content.search is not an installed app there.
+    from openedx.core.djangoapps.content.search.models import SearchAccess
+except RuntimeError:
+    SearchAccess = {}
+
+
 
 @patch("openedx.core.djangoapps.content.search.api._wait_for_meili_task", new=MagicMock(return_value=None))
 @patch("openedx.core.djangoapps.content.search.api.MeilisearchClient")
@@ -53,6 +60,7 @@ class TestUpdateIndexHandlers(
             self.user_id,
             fields={"display_name": "Test Course"},
         )
+        course_access, _ = SearchAccess.objects.get_or_create(context_key=course.id)
 
         # Create XBlocks
         sequential = self.store.create_child(self.user_id, course.location, "sequential", "test_sequential")
@@ -65,7 +73,9 @@ class TestUpdateIndexHandlers(
             "block_type": "sequential",
             "context_key": "course-v1:orgA+test_course+test_run",
             "org": "orgA",
-            "breadcrumbs": [{"display_name": "Test Course"}], "content": {}
+            "breadcrumbs": [{"display_name": "Test Course"}], "content": {},
+            "access_id": course_access.id,
+
         }
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_sequential])
         vertical = self.store.create_child(self.user_id, sequential.location, "vertical", "test_vertical")
@@ -79,7 +89,8 @@ class TestUpdateIndexHandlers(
             "context_key": "course-v1:orgA+test_course+test_run",
             "org": "orgA",
             "breadcrumbs": [{"display_name": "Test Course"}, {"display_name": "sequential"}],
-            "content": {}
+            "content": {},
+            "access_id": course_access.id,
         }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_vertical])
@@ -112,6 +123,7 @@ class TestUpdateIndexHandlers(
             title="Library Org A",
             description="This is a library from Org A",
         )
+        lib_access, _ = SearchAccess.objects.get_or_create(context_key=library.key)
 
         problem = library_api.create_library_block(library.key, "problem", "Problem1")
         doc_problem = {
@@ -124,7 +136,8 @@ class TestUpdateIndexHandlers(
             "context_key": "lib:orgA:lib_a",
             "org": "orgA",
             "breadcrumbs": [{"display_name": "Library Org A"}],
-            "content": {"problem_types": [], "capa_content": " "}
+            "content": {"problem_types": [], "capa_content": " "},
+            "access_id": lib_access.id,
         }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
