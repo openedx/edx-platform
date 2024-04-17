@@ -697,7 +697,7 @@ edx-bulk-grades==1.0.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   staff-graded-xblock
-edx-ccx-keys==1.2.1
+edx-ccx-keys==1.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
