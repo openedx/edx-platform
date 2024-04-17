@@ -14,11 +14,11 @@ from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
-from .. import api
 
 try:
     # This import errors in the lms because content.search is not an installed app there.
-    from openedx.core.djangoapps.content.search.models import SearchAccess
+    from .. import api
+    from ..models import SearchAccess
 except RuntimeError:
     SearchAccess = {}
 

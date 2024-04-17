@@ -19,12 +19,12 @@ from .test_models import StudioSearchTestMixin
 
 try:
     # This import errors in the lms because content.search is not an installed app there.
-    from openedx.core.djangoapps.content.search.models import SearchAccess
+    from .. import api
+    from ..models import SearchAccess
 except RuntimeError:
     SearchAccess = {}
 
 
-from .. import api
 
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 MOCK_API_KEY_UID = "3203d764-370f-4e99-a917-d47ab7f29739"
