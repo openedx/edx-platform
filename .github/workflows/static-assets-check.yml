@@ -14,8 +14,8 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
-        node-version: [ 18 ]
-        npm-version: [ 10.2.x ]
+        node-version: [ 16 ]
+        npm-version: [ 8.5.x ]
         mongo-version: ["4.4", "7.0"]
 
     services:
@@ -82,5 +82,5 @@ jobs:
         CMS_CFG: lms/envs/minimal.yml
 
       run: |
-        paver update_assets lms
-        paver update_assets cms
+        paver update_assets lms --theme-dirs ./themes
+        paver update_assets cms --theme-dirs ./themes

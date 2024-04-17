@@ -268,6 +268,9 @@ class UploadedFileSerializer(serializers.Serializer):
         """
         Get the representation for SerializerMethodField `downloadUrl`
         """
+        if not obj.get("download_url"):
+            return ""
+
         return urljoin(settings.LMS_ROOT_URL, obj.get("download_url"))
 
 

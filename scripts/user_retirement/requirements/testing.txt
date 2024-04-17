@@ -75,7 +75,7 @@ edx-django-utils==5.12.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
-edx-rest-api-client==5.6.1
+edx-rest-api-client==5.7.0
     # via -r scripts/user_retirement/requirements/base.txt
 exceptiongroup==1.2.0
     # via pytest

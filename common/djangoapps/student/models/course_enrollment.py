@@ -683,9 +683,10 @@ class CourseEnrollment(models.Model):
         if check_access:
             if cls.is_enrollment_closed(user, course) and not can_upgrade:
                 log.warning(
-                    "User %s failed to enroll in course %s because enrollment is closed",
+                    "User %s failed to enroll in course %s because enrollment is closed (can_upgrade=%s).",
                     user.username,
-                    str(course_key)
+                    str(course_key),
+                    can_upgrade,
                 )
                 raise EnrollmentClosedError
 

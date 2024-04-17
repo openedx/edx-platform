@@ -196,6 +196,11 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                 "user_partition_info": expected_user_partition_info,
                 "user_partitions": expected_user_partitions,
                 "actions": {
+                    "can_copy": True,
+                    "can_duplicate": True,
+                    "can_move": True,
+                    "can_manage_access": True,
+                    "can_delete": True,
                     "can_manage_tags": True,
                 },
                 "validation_messages": [],
@@ -206,6 +211,11 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                 "block_id": str(self.html_unit_second.location),
                 "block_type": self.html_unit_second.location.block_type,
                 "actions": {
+                    "can_copy": True,
+                    "can_duplicate": True,
+                    "can_move": True,
+                    "can_manage_access": True,
+                    "can_delete": True,
                     "can_manage_tags": True,
                 },
                 "user_partition_info": expected_user_partition_info,
