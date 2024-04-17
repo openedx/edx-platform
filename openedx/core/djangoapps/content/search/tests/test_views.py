@@ -25,7 +25,6 @@ except RuntimeError:
     SearchAccess = {}
 
 
-
 STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 MOCK_API_KEY_UID = "3203d764-370f-4e99-a917-d47ab7f29739"
 
