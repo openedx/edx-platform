@@ -17,7 +17,7 @@ MANAGED_TEAM_MAX_TEAM_SIZE = 200
 # Arbitrarily arbitrary
 DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
 TEAM_SCHEME = "team"
-TEAMS_NAMESPACE = "course_teams"
+TEAMS_NAMESPACE = "teams"
 
 # .. toggle_name: course_teams.content_groups_for_teams
 # .. toggle_implementation: CourseWaffleFlag
