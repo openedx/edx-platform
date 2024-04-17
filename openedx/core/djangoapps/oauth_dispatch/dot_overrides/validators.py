@@ -5,7 +5,6 @@ Classes that override default django-oauth-toolkit behavior
 
 from datetime import datetime, timedelta
 
-from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
