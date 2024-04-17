@@ -344,7 +344,8 @@ def process_directory():
                 if home_page is not None:
                     if match := urls_in_orgs([home_page], SECOND_PARTY_ORGS):
                         openedx_packages.append(home_page)
-                
+
+    print(openedx_packages)            
     return openedx_packages
 
 FIRST_PARTY_ORGS = ["openedx"]
