@@ -34,7 +34,7 @@ jobs:
               echo "RELEVANT=true" >> "$GITHUB_ENV"
           fi
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ env.RELEVANT == 'true' }}
 
       - uses: actions/setup-python@v4
