@@ -29,8 +29,8 @@ jobs:
       RELEASE-NAME: ${{ steps.release.outputs.result }}
       PROJECT: ${{ steps.project.outputs.result }}
       CODE: ${{ steps.code.outputs.result }}
-      IS-RELEASE: ${{ steps.code.outputs.is_release }}
-      IS-PR: ${{ steps.code.outputs.is_pr }}
+      IS-RELEASE: ${{ steps.is_release.outputs.result }}
+      IS-PR: ${{ steps.is_pr.outputs.result }}
     steps:
       - name: Take current date
         id: ts

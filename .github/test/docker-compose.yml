@@ -5,18 +5,18 @@ services:
     restart: unless-stopped
 
   mongodb:
-    image: mongo:3.6.16
+    image: mongo:4.0.26
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     restart: unless-stopped
 
   lms:
-    image: ghcr.io/eol-uchile/edx-platform:testing-koa
+    image: ghcr.io/eol-uchile/edx-platform:testing-current
     depends_on:
       - memcached
       - mongodb
   
   cms:
-    image: ghcr.io/eol-uchile/edx-platform:testing-koa
+    image: ghcr.io/eol-uchile/edx-platform:testing-current
     depends_on:
       - memcached
       - mongodb
