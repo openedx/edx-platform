@@ -6,7 +6,6 @@ on:
 defaults:
   run:
     shell: bash # strict bash
-    working-directory: ./scripts
 
 jobs:
   check_dependencies:
@@ -20,6 +19,26 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
+
+      - name: Create repo_work directory        
+        run: |
+          WORK_DIR="/tmp/unpack_reqs"
+          repo_name="${{ github.repository }}"
+          repo_work="$WORK_DIR/$repo_name"
+          mkdir -p "$repo_work"
+          echo "$repo_work"
+      
+      - name: Copy Python requirements file
+        run: |
+          for req_file in "requirements/edx/base.txt" "requirements/base.txt" "requirements.txt"; do
+            if [ -f "$req_file" ]; then
+              cp "$req_file" /tmp/unpack_reqs/openedx/edx-platform/base.txt
+              echo "Python requirements file found: $req_file"
+              echo "Content of base.txt:"
+              cat "$req_file"
+              break
+            fi
+          done
 
       - name: Install requests module
         run: pip install requests

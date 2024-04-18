@@ -305,6 +305,32 @@ def request_package_info_url(package):
         else:
             print(f"Failed to retrieve data for package {package}. Status code:", response.status_code)    
 
+def find_file_in_project(filename):
+    """
+    Recursively searches for a file within the project directory.
+
+    Args:
+    - filename: The name of the file to search for.
+
+    Returns:
+    - A list of file paths where the file was found.
+    """
+    # Get the current working directory
+    project_root = os.getcwd()
+
+    # List to store paths of found files
+    found_paths = []
+
+    # Recursively search for the file in the project directory
+    for root, dirs, files in os.walk(project_root):
+        if filename in files:
+            # Construct the full path of the found file
+            file_path = os.path.join(root, filename)
+            found_paths.append(file_path)
+
+    return found_paths
+
+
 
 def process_directory():
     """
@@ -313,37 +339,37 @@ def process_directory():
     Also copies the considered dependencies file into the temp work directory,
     for later analysis.
     """    
-    repo_name = Path.cwd().name
-    repo_work = WORK_DIR / repo_name
-    repo_work.mkdir(parents=True, exist_ok=True)
+    # repo_name = Path.cwd().name
+    # repo_work = WORK_DIR / repo_name
+    # repo_work.mkdir(parents=True, exist_ok=True)
     repo_urls = set()
     package_names = []
     openedx_packages = [] 
-    if (js_reqs := Path("package-lock.json")).exists():
-        shutil.copyfile(js_reqs, repo_work / "package-lock.json")
+    # if (js_reqs := Path("package-lock.json")).exists():
+    #     shutil.copyfile(js_reqs, repo_work / "package-lock.json")
         # with change_dir(repo_work):
             # repo_urls.update(check_js_dependencies())
-    if (py_reqs := find_py_reqs()):
-        shutil.copyfile(py_reqs, repo_work / "base.txt")
+    # if (py_reqs := find_py_reqs()):
+    #     shutil.copyfile(py_reqs, repo_work / "base.txt")
 
-        with open(repo_work / "base.txt") as fbase:
-            # Read each line (package name) in the file
-            file_data = fbase.read()
+    with open(repo_work / "base.txt") as fbase:
+        # Read each line (package name) in the file
+        file_data = fbase.read()
 
-            # Splitting the data by lines
-            lines = file_data.strip().split('\n')
-            for line in lines:
-                # Print the package name
-                parts = line.split('#', 1)
-                package_name = parts[0].strip()
-                package_names.append(package_name)
+        # Splitting the data by lines
+        lines = file_data.strip().split('\n')
+        for line in lines:
+            # Print the package name
+            parts = line.split('#', 1)
+            package_name = parts[0].strip()
+            package_names.append(package_name)
 
-        for package in package_names:
-            if package != " ":
-                home_page = request_package_info_url(package)
-                if home_page is not None:
-                    if match := urls_in_orgs([home_page], SECOND_PARTY_ORGS):
-                        openedx_packages.append(home_page)
+    for package in package_names:
+        if package != " ":
+            home_page = request_package_info_url(package)
+            if home_page is not None:
+                if match := urls_in_orgs([home_page], SECOND_PARTY_ORGS):
+                    openedx_packages.append(home_page)
                 
     return openedx_packages
 
@@ -380,16 +406,20 @@ def main(dirs=None, org=None):
     Analyze the requirements in all of the directories mentioned on the command line.
     If arguments have newlines, treat each line as a separate directory.
     """
+    import pdb; pdb.set_trace()
     if dirs is None:
         repo_dir = sys.argv[1]
         org_flag_index = sys.argv.index("--org")
         org = sys.argv[org_flag_index + 1]
-    print(f"Creating new work directory: {WORK_DIR}")
-    shutil.rmtree(WORK_DIR, ignore_errors=True)
+    #print(f"Creating new work directory: {WORK_DIR}")
+    #shutil.rmtree(WORK_DIR, ignore_errors=True)
     repo_urls = set()
 
-    with change_dir(repo_dir):
-        repo_urls.update(process_directory())
+    #with change_dir(repo_dir):
+    repo_urls.update(process_directory())
+
+
+
 
     print("== DONE ==============")
     print("Second-party:")
