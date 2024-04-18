@@ -48,6 +48,7 @@ jobs:
 
       - name: Make the script files executable
         run: chmod +x find_dependencies.py
+        working-directory: ./scripts
 
       - name: Run Python script
         run: python find_dependencies.py edx-platform --org edx
