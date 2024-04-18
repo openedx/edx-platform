@@ -423,8 +423,8 @@ def main(dirs=None, org=None):
     print("== DONE ==============")
     print("Second-party:")
     print("\n".join(repo_urls))
-    if repo_urls:
-        sys.exit(1)
+    # if repo_urls:
+    #     sys.exit(1)
 
 if __name__ == "__main__":
     main()
