@@ -571,7 +571,7 @@ edx-django-utils==5.12.0
     #   openedx-events
     #   ora2
     #   super-csv
-edx-drf-extensions==10.2.0
+edx-drf-extensions==10.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
