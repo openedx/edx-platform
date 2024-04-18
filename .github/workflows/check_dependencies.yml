@@ -32,3 +32,4 @@ jobs:
 
       - name: Run Python script
         run: python find_dependencies.py edx-platform --org edx
+        working-directory: ./requirements
