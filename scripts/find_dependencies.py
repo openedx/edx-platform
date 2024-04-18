@@ -351,7 +351,7 @@ def process_directory():
             # repo_urls.update(check_js_dependencies())
     # if (py_reqs := find_py_reqs()):
     #     shutil.copyfile(py_reqs, repo_work / "base.txt")
-
+    repo_work = "/tmp/unpack_reqs/openedx/edx-platform"
     with open(repo_work / "base.txt") as fbase:
         # Read each line (package name) in the file
         file_data = fbase.read()
