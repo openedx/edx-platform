@@ -6,6 +6,7 @@ on:
 defaults:
   run:
     shell: bash # strict bash
+    working-directory: ./scripts
 
 jobs:
   check_dependencies:
@@ -30,4 +31,5 @@ jobs:
         run: chmod +x find_dependencies.py
 
       - name: Run Python script
-        run: python find_dependencies.py edx-platform --org edx        
+        run: python find_dependencies.py edx-platform --org edx
+  
