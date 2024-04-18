@@ -530,7 +530,7 @@ edx-braze-client==0.2.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-bulk-grades==1.0.2
+edx-bulk-grades==1.1.0
     # via
     #   -r requirements/edx/base.txt
     #   staff-graded-xblock
