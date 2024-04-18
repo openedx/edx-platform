@@ -1,28 +1,36 @@
-name: Define Tag Variables
+name: Define Workflow Variables
 on:
   workflow_call:
     outputs:
       timestamp:
         description: "The current timestamp"
-        value: ${{ jobs.variables.outputs.TIMESTAMP }}
+        value: ${{ jobs.obtain.outputs.TIMESTAMP }}
       release-name:
         description: "Name of the edX release taken from the branch name"
-        value: ${{ jobs.variables.outputs.RELEASE-NAME }}
+        value: ${{ jobs.obtain.outputs.RELEASE-NAME }}
       project:
         description: "Name of the EOL project taken from the branch name"
-        value: ${{ jobs.variables.outputs.PROJECT }}
+        value: ${{ jobs.obtain.outputs.PROJECT }}
       code:
         description: "Code of the EOL project taken from the project name"
-        value: ${{ jobs.variables.outputs.CODE }}
+        value: ${{ jobs.obtain.outputs.CODE }}
+      is-release:
+        description: "Flag to indicate if the branch is a production branch"
+        value: ${{ jobs.obtain.outputs.IS-RELEASE }}
+      is-pr:
+        description: "Flag to indicate if the workflow is part of a pull request"
+        value: ${{ jobs.obtain.outputs.IS-PR }}
 
 jobs:
-  variables:
+  obtain:
     runs-on: ubuntu-latest
     outputs:
       TIMESTAMP: ${{ steps.ts.outputs.TS }}
       RELEASE-NAME: ${{ steps.release.outputs.result }}
       PROJECT: ${{ steps.project.outputs.result }}
       CODE: ${{ steps.code.outputs.result }}
+      IS-RELEASE: ${{ steps.code.outputs.is_release }}
+      IS-PR: ${{ steps.code.outputs.is_pr }}
     steps:
       - name: Take current date
         id: ts
@@ -74,13 +82,39 @@ jobs:
               return "vl"
             } else throw 'No code'
 
+      - name: Define production release flag
+        id: is_release
+        uses: actions/script@v7
+        with:
+          result-encoding: string
+          script: |
+            if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/) ) { // push to production branch case
+              return true
+            } else return false
+
+      - name: Define pull request flag
+        id: is_pr
+        uses: actions/script@v7
+        with:
+          result-encoding: string
+          script: |
+            if ( "${{ github.event.pull_request.base.ref }}".match(/^(eol|openuchile|vlabx)(-release)?\/(\w+)(\.master)?$/) ) { // pr to image generation branch case
+              return true
+            } else return false
+
+  validate:
+    needs: [ obtain ]
+    runs-on: ubuntu-latest
+    steps:
       - name: Print variables
         run: |
-          echo TS=${{ steps.ts.outputs.TS }}
-          echo RELEASE-NAME=${{ steps.release.outputs.result }}
-          echo PROJECT=${{ steps.project.outputs.result }}
-          echo CODE=${{ steps.code.outputs.result }}
+          echo TS=${{ needs.obtain.outputs.TIMESTAMP }}
+          echo RELEASE-NAME=${{ needs.obtain.outputs.RELEASE-NAME }}
+          echo PROJECT=${{ needs.obtain.outputs.PROJECT }}
+          echo CODE=${{ needs.obtain.outputs.CODE }}
+          echo IS-RELEASE=${{ needs.obtain.outputs.IS-RELEASE }}
+          echo IS-PR=${{ needs.obtain.outputs.IS-PR }}
 
       - name: Fail on empty values
-        if: steps.ts.outputs.TS == '' || steps.release.outputs.result == '' || steps.project.outputs.result == '' || steps.code.outputs.result == ''
+        if: ${{ needs.obtain.outputs.TIMESTAMP == '' || needs.obtain.outputs.RELEASE-NAME == '' || needs.obtain.outputs.PROJECT == '' || needs.obtain.outputs.CODE == '' || needs.obtain.outputs.IS-RELEASE == '' || needs.obtain.outputs.IS-PR == '' }}
         run: exit 1

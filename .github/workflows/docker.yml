@@ -3,6 +3,9 @@ name: Docker Image CI
 on:
   push:
     branches:
+      - 'eol/**'
+      - 'openuchile/**'
+      - 'vlabx/**'
       - 'eol-release/**'
       - 'openuchile-release/**'
       - 'vlabx-release/**'
@@ -14,11 +17,15 @@ on:
       - reopened
       - synchronize
     branches:
+      - 'eol/**'
+      - 'openuchile/**'
+      - 'vlabx/**'
       - 'eol-release/**'
       - 'openuchile-release/**'
       - 'vlabx-release/**'
     paths-ignore:
       - '.github/workflows/**'
+
 jobs:
   variables:
     uses: ./.github/workflows/variables.yml
@@ -34,6 +41,16 @@ jobs:
       packages: write
 
     steps:
+      - name: Define testing prefix
+        id: prefix
+        run: |
+          if [[ "${{ needs.variables.outputs.is-prod }}" = "false" ]]
+          then
+            echo "PREFIX=testing-" >> $GITHUB_OUTPUT
+          else
+            echo "PREFIX=" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
@@ -53,7 +70,7 @@ jobs:
           docker buildx build . \
             --file .github/build/Dockerfile \
             --target base \
-            --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} \
+            --build-arg EDX_PLATFORM_VERSION=${{ env.RELEASE-NAME }}.${{ env.CODE }}-${{ env.TS }} \
             --tag ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA} \
             --tag ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }} \
             --tag ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }} \
@@ -66,7 +83,10 @@ jobs:
           docker buildx build . \
             --file .github/build/Dockerfile \
             --target testing \
-            --build-arg EDX_PLATFORM_VERSION=${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }} \
+            --build-arg EDX_PLATFORM_VERSION=${{ env.RELEASE-NAME }}.testing-${{ env.CODE }}-${{ env.TS }} \
+            --tag ghcr.io/eol-uchile/edx-platform:testing-${GITHUB_SHA} \
+            --tag ghcr.io/eol-uchile/edx-platform:testing-${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }} \
+            --tag ghcr.io/eol-uchile/edx-platform:testing-${{ env.CODE }}-${{ env.RELEASE-NAME }} \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache-new" \
             --output "type=docker,push=false"
@@ -76,13 +96,13 @@ jobs:
           cd .github/test
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh
 
-      - name: Push production image to the registry
-        if: startsWith(github.ref, 'refs/heads/eol-release/') || startsWith(github.ref, 'refs/heads/openuchile-release/') || startsWith(github.ref, 'refs/heads/vlabx-release/')
+      - name: Push image to the registry
+        if: ${{ needs.variables.outputs.is-pr == 'false' }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username ${{ github.actor }} --password-stdin
-          docker push ghcr.io/eol-uchile/edx-platform:${GITHUB_SHA}
-          docker push ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }}
-          docker push ghcr.io/eol-uchile/edx-platform:${{ env.CODE }}-${{ env.RELEASE-NAME }}
+          docker push ghcr.io/eol-uchile/edx-platform:${{ steps.prefix.outputs.PREFIX }}${GITHUB_SHA}
+          docker push ghcr.io/eol-uchile/edx-platform:${{ steps.prefix.outputs.PREFIX }}${{ env.CODE }}-${{ env.RELEASE-NAME }}-${{ env.TS }}
+          docker push ghcr.io/eol-uchile/edx-platform:${{ steps.prefix.outputs.PREFIX }}${{ env.CODE }}-${{ env.RELEASE-NAME }}
 
       - name: Move cache
         run: |
@@ -91,8 +111,10 @@ jobs:
 
   webhook:
     needs: [ variables, build ]
+    if: ${{ needs.variables.outputs.is-pr == 'false' }}
     uses: ./.github/workflows/webhook.yml
     with:
       code: ${{ needs.variables.outputs.code }}
       release-name: ${{ needs.variables.outputs.release-name }}
+      is-release: ${{ needs.variables.outputs.is-release }}
     secrets: inherit
