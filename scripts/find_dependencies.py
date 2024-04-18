@@ -154,7 +154,6 @@ def request_package_info_url(package):
         url = f"{base_url}{package}/json"
         response = requests.get(url)
         if response.status_code == 200:
-            #print(f"Package: {package}")
             data_dict = response.json()
             info = data_dict["info"]
             home_page = info["home_page"]
