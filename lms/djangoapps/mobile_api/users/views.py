@@ -357,7 +357,6 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             enrollment for enrollment in same_org
             if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
         )
-        # NOTE: Active / inactive for calendar?
         not_duration_limited = (
             enrollment for enrollment in mobile_available
             if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
