@@ -3,6 +3,7 @@ Management command for sending email digest
 """
 from django.core.management.base import BaseCommand
 
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.email.tasks import send_digest_email_to_all_users
 
 
@@ -21,7 +22,8 @@ class Command(BaseCommand):
         """
         Adds management commands parser arguments
         """
-        parser.add_argument('cadence_type', choices=['Daily', 'Weekly'])
+        cadence_type_choices = [EmailCadence.DAILY, EmailCadence.WEEKLY]
+        parser.add_argument('cadence_type', choices=cadence_type_choices, required=True)
 
     def handle(self, *args, **kwargs):
         """

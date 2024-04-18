@@ -23,6 +23,8 @@ def create_notification(user, course_key, **kwargs):
             "content_type": 'post',
             "content": "post_title"
         },
+        'email': True,
+        'web': True
     }
     notification_params.update(kwargs)
     notification = Notification.objects.create(**notification_params)

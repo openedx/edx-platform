@@ -4,10 +4,12 @@ Email Notifications Utils
 import datetime
 
 from django.conf import settings
+from pytz import utc
 from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
 
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
@@ -17,14 +19,17 @@ def is_email_notification_flag_enabled(user=None):
     """
     Returns if waffle flag is enabled for user or not
     """
-    waffle_model = get_waffle_flag_model()
-    flag = waffle_model.get(ENABLE_EMAIL_NOTIFICATIONS.name)
+    flag_model = get_waffle_flag_model()
+    try:
+        flag = flag_model.objects.get(name=ENABLE_EMAIL_NOTIFICATIONS.name)
+    except flag_model.DoesNotExist:
+        return False
     if flag.everyone is not None:
         return flag.everyone
-    role_value = flag.is_active_for_user(user)
-    if role_value is not None:
-        return role_value
     if user:
+        role_value = flag.is_active_for_user(user)
+        if role_value is not None:
+            return role_value
         try:
             return flag.users.contains(user)
         except ValueError:
@@ -76,7 +81,7 @@ def create_email_digest_context(app_notifications_dict, start_date, end_date=Non
     app_notifications_dict: Mapping of notification app and its count, title and notifications
     start_date: datetime instance
     end_date: datetime instance
-    digest_frequency: "Daily" or "Weekly"
+    digest_frequency: EmailCadence.DAILY or EmailCadence.WEEKLY
     courses_data: Dictionary to cache course info (avoid additional db calls)
     """
     context = create_email_template_context()
@@ -118,16 +123,16 @@ def get_start_end_date(cadence_type):
     """
     Returns start_date and end_date for email digest
     """
-    if cadence_type not in ["Daily", "Weekly"]:
+    if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
     date_today = datetime.datetime.now()
     yesterday = date_today - datetime.timedelta(days=1)
     end_date = datetime.datetime.combine(yesterday, datetime.time.max)
     start_date = end_date
-    if cadence_type == "Weekly":
+    if cadence_type == EmailCadence.WEEKLY:
         start_date = end_date - datetime.timedelta(days=6)
     start_date = datetime.datetime.combine(start_date, datetime.time.min)
-    return start_date, end_date
+    return utc.localize(start_date), utc.localize(end_date)
 
 
 def get_course_info(course_key):
@@ -193,3 +198,48 @@ def create_app_notifications_dict(notifications):
         app_data['count'] += 1
         app_data['notifications'].append(notification)
     return app_notifications
+
+
+def get_unique_course_ids(notifications):
+    """
+    Returns unique course_ids from notifications
+    """
+    course_ids = []
+    for notification in notifications:
+        if notification.course_id not in course_ids:
+            course_ids.append(notification.course_id)
+    return course_ids
+
+
+def get_enabled_notification_types_for_cadence(preferences, cadence_type=EmailCadence.DAILY):
+    """
+    Returns a dictionary that returns notification_types with cadence_types for course_ids
+    """
+    if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
+        raise ValueError('Invalid cadence_type')
+    course_types = {}
+    for preference in preferences:
+        key = preference.course_id
+        value = []
+        config = preference.notification_preference_config
+        for app_data in config.values():
+            for notification_type, type_dict in app_data['notification_types'].items():
+                if type_dict['email_cadence'] == cadence_type:
+                    value.append(notification_type)
+            if 'core' in value:
+                value.remove('core')
+                value.extend(app_data['core_notification_types'])
+        course_types[key] = value
+    return course_types
+
+
+def filter_notification_with_email_enabled_preferences(notifications, preferences, cadence_type=EmailCadence.DAILY):
+    """
+    Filter notifications for types with email cadence preference enabled
+    """
+    enabled_course_prefs = get_enabled_notification_types_for_cadence(preferences, cadence_type)
+    filtered_notifications = []
+    for notification in notifications:
+        if notification.notification_type in enabled_course_prefs[notification.course_id]:
+            filtered_notifications.append(notification)
+    return filtered_notifications

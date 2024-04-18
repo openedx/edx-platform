@@ -4,8 +4,10 @@ Test utils.py
 import datetime
 import ddt
 
+from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.models import Notification
 from openedx.core.djangoapps.notifications.email.utils import (
     add_additional_attributes_to_notifications,
@@ -15,6 +17,7 @@ from openedx.core.djangoapps.notifications.email.utils import (
     create_email_template_context,
     get_course_info,
     get_time_ago,
+    is_email_notification_flag_enabled,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -138,3 +141,55 @@ class TestContextFunctions(ModuleStoreTestCase):
         assert context['digest_frequency'] == digest_frequency
         assert_list_equal(context['email_digest_updates'], expected_digest_updates)
         assert_list_equal(context['email_content'], expected_email_content)
+
+
+class TestWaffleFlag(ModuleStoreTestCase):
+    """
+    Test user level email notifications waffle flag
+    """
+    def setUp(self):
+        """
+        Setup
+        """
+        super().setUp()
+        self.user_1 = UserFactory()
+        self.user_2 = UserFactory()
+        self.course_1 = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
+        self.course_1 = CourseFactory.create(display_name='test course 2', run="Testing_course_2")
+
+    def test_waffle_flag_for_everyone(self):
+        """
+        Tests if waffle flag is enabled for everyone
+        """
+        assert is_email_notification_flag_enabled() is False
+        waffle_model = get_waffle_flag_model()
+        flag, _ = waffle_model.objects.get_or_create(name=ENABLE_EMAIL_NOTIFICATIONS.name)
+        flag.everyone = True
+        flag.save()
+        assert is_email_notification_flag_enabled() is True
+
+    def test_waffle_flag_for_user(self):
+        """
+        Tests user level waffle flag
+        """
+        assert is_email_notification_flag_enabled() is False
+        waffle_model = get_waffle_flag_model()
+        flag, _ = waffle_model.objects.get_or_create(name=ENABLE_EMAIL_NOTIFICATIONS.name)
+        flag.users.add(self.user_1)
+        flag.save()
+        assert is_email_notification_flag_enabled(self.user_1) is True
+        assert is_email_notification_flag_enabled(self.user_2) is False
+
+    def test_waffle_flag_everyone_priority(self):
+        """
+        Tests if everyone field has more priority over user field
+        """
+        assert is_email_notification_flag_enabled() is False
+        waffle_model = get_waffle_flag_model()
+        flag, _ = waffle_model.objects.get_or_create(name=ENABLE_EMAIL_NOTIFICATIONS.name)
+        flag.everyone = False
+        flag.users.add(self.user_1)
+        flag.save()
+        assert is_email_notification_flag_enabled() is False
+        assert is_email_notification_flag_enabled(self.user_1) is False
+        assert is_email_notification_flag_enabled(self.user_2) is False
