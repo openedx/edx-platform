@@ -57,7 +57,7 @@ from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.edly.models import EdlySubOrganization
-from openedx.features.edly.utils import filter_courses_based_on_org
+from openedx.features.edly.utils import filter_courses_based_on_org, toggle_lti_user_parameters
 from openedx.features.edly.validators import is_courses_limit_reached_for_plan
 from common.djangoapps.student import auth
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
@@ -1490,6 +1490,8 @@ def advanced_settings_handler(request, course_key_string):
                                 }
                             ]
                             return JsonResponseBadRequest(response_message)
+
+                        toggle_lti_user_parameters(course_key, request.json['enable_lti_parameters'], request.user)
 
                         # now update mongo
                         modulestore().update_item(course_module, request.user.id)
