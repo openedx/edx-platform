@@ -83,6 +83,7 @@ backports-zoneinfo[tzdata]==0.2.1
     #   -r requirements/edx/base.txt
     #   celery
     #   django
+    #   edx-milestones
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.3
@@ -597,7 +598,7 @@ edx-i18n-tools==1.5.0
     #   ora2
 edx-lint==5.3.6
     # via -r requirements/edx/testing.in
-edx-milestones==0.5.0
+edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.7
     # via -r requirements/edx/base.txt
