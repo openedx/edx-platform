@@ -242,17 +242,11 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'exports-loader',
-                            options: { exports: 'window.XBlock' }
+                            options: 'window.XBlock'
                         },
                         {
                             loader: 'imports-loader',
-                            options: {
-                                imports: [
-                                    "jquery",
-                                    "default jquery immediateDescendents",
-                                ],
-                                wrapper: 'window'
-                            }
+                            options: 'jquery,jquery.immediateDescendents,this=>window'
                         }
                     ]
                 },
@@ -261,14 +255,11 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'exports-loader',
-                            options: { exports: 'window.XBlock' }
+                            options: 'window.XBlock'
                         },
                         {
                             loader: 'imports-loader',
-                            options: {
-                                imports: "default xblock/core XBlock", 
-                                wrapper: 'window'
-                            }
+                            options: 'XBlock=xblock/core,this=>window'
                         }
                     ]
                 },
@@ -300,7 +291,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -309,7 +300,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -318,7 +309,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -327,7 +318,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -336,7 +327,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -345,7 +336,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -354,7 +345,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -363,7 +354,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -372,7 +363,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -381,7 +372,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -390,7 +381,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -399,7 +390,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -408,7 +399,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -417,7 +408,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -426,7 +417,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -435,7 +426,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -444,7 +435,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -453,7 +444,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -462,7 +453,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -471,7 +462,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -480,7 +471,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -489,7 +480,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -498,7 +489,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -510,7 +501,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'exports-loader',
-                            options: { exports: 'window.CodeMirror' }
+                            options: 'window.CodeMirror'
                         }
                     ]
                 },
@@ -519,7 +510,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -528,11 +519,11 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'exports-loader',
-                            options: { exports: 'window.XModule' }
+                            options: 'window.XModule'
                         },
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ],
                 },
@@ -541,7 +532,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { exports: 'false' }
+                            options: 'exports=>false'
                         }
                     ]
                 },
@@ -562,7 +553,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -572,7 +563,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
@@ -584,7 +575,7 @@ module.exports = Merge.smart({
                     use: [
                         {
                             loader: 'imports-loader',
-                            options: { wrapper: 'window' }
+                            options: 'this=>window'
                         }
                     ]
                 },
