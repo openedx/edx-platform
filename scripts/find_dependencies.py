@@ -406,11 +406,10 @@ def main(dirs=None, org=None):
     Analyze the requirements in all of the directories mentioned on the command line.
     If arguments have newlines, treat each line as a separate directory.
     """
-    import pdb; pdb.set_trace()
-    if dirs is None:
-        repo_dir = sys.argv[1]
-        org_flag_index = sys.argv.index("--org")
-        org = sys.argv[org_flag_index + 1]
+    # if dirs is None:
+    #     repo_dir = sys.argv[1]
+    #     org_flag_index = sys.argv.index("--org")
+    #     org = sys.argv[org_flag_index + 1]
     #print(f"Creating new work directory: {WORK_DIR}")
     #shutil.rmtree(WORK_DIR, ignore_errors=True)
     repo_urls = set()
