@@ -450,7 +450,7 @@ edx-django-release-util==1.4.0
     #   -r requirements/edx/kernel.in
     #   edxval
     #   openedx-blockstore
-edx-django-sites-extensions==4.0.2
+edx-django-sites-extensions==4.2.0
     # via -r requirements/edx/kernel.in
 edx-django-utils==5.12.0
     # via
