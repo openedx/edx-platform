@@ -2,6 +2,7 @@
 Tests for the Studio content search documents (what gets stored in the index)
 """
 from organizations.models import Organization
+
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.django import modulestore
@@ -10,7 +11,7 @@ from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
 try:
     # This import errors in the lms because content.search is not an installed app there.
-    from ..documents import searchable_doc_for_course_block
+    from ..documents import searchable_doc_for_course_block, searchable_doc_tags
     from ..models import SearchAccess
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
@@ -78,7 +79,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         Test how a problem block gets represented in the search index
         """
         block = self.store.get_item(self.problem_block.usage_key)
-        doc = searchable_doc_for_course_block(block)
+        doc = {}
+        doc.update(searchable_doc_for_course_block(block))
+        doc.update(searchable_doc_tags(block.usage_key))
+
         assert doc == {
             # Note the 'id' has been stripped of special characters to meet Meilisearch requirements.
             # The '-8516ed8' suffix is deterministic based on the original usage key.
@@ -115,7 +119,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         Test how an HTML block gets represented in the search index
         """
         block = self.store.get_item(self.html_block_key)
-        doc = searchable_doc_for_course_block(block)
+        doc = {}
+        doc.update(searchable_doc_for_course_block(block))
+        doc.update(searchable_doc_tags(block.usage_key))
         assert doc == {
             "id": "block-v1edxtoy2012_falltypehtmlblocktoyjumpto-efb9c601",
             "type": "course_block",
