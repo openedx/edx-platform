@@ -732,3 +732,22 @@ def create_user_access_role(request ,user ,groups_names):
         groups = Group.objects.filter(name__in=groups_names)
         for new_group in groups:
             edly_access_user.groups.add(new_group)
+
+
+def toggle_lti_user_parameters(course_id, enable_lti_parameters, user):
+    """Toggles the LTI user parameters for a specific course."""
+    from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
+
+    try:
+        obj = CourseEditLTIFieldsEnabledFlag.objects.get(course_id=course_id)
+        if obj.enabled != enable_lti_parameters["value"]:
+            obj.delete()
+            CourseEditLTIFieldsEnabledFlag.objects.create(
+                course_id=course_id,
+                enabled=enable_lti_parameters["value"],
+                changed_by=user,
+            )
+    except CourseEditLTIFieldsEnabledFlag.DoesNotExist:
+        CourseEditLTIFieldsEnabledFlag.objects.create(
+            course_id=course_id, enabled=enable_lti_parameters["value"], changed_by=user
+        )

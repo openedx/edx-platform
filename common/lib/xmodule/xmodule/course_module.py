@@ -1028,6 +1028,14 @@ class CourseFields(object):
         ),
         scope=Scope.settings
     )
+    enable_lti_parameters = Boolean(
+        display_name=_("Enable LTI User Parameters"),
+        help=_(
+            "Allow LTI to send the username and email to the LTI provider service."
+        ),
+        scope=Scope.settings,
+        default=False
+    )
 
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
