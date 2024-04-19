@@ -2062,19 +2062,27 @@ class TestCreateImportView(ImportTaxonomyMixin, APITestCase):
     )
     def test_import_no_export_id(self, file_format) -> None:
         url = TAXONOMY_CREATE_IMPORT_URL
-        file = SimpleUploadedFile(f"taxonomy.{file_format}", b"invalid file content")
+        new_tags = [
+            {"id": "tag_1", "value": "Tag 1"},
+        ]
+        file = self._get_file(new_tags, file_format)
         self.client.force_authenticate(user=self.staff)
         response = self.client.post(
             url,
             {
-                "taxonomt_name": "Imported Taxonomy name",
+                "taxonomy_name": "Imported Taxonomy",
                 "taxonomy_description": "Imported Taxonomy description",
                 "file": file,
             },
             format="multipart"
         )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["taxonomy_export_id"][0] == "This field is required."
+        assert response.status_code == status.HTTP_201_CREATED
+
+        taxonomy = response.data
+        taxonomy_id = taxonomy["id"]
+        assert taxonomy["name"] == "Imported Taxonomy"
+        assert taxonomy["description"] == "Imported Taxonomy description"
+        assert taxonomy["export_id"] == f"{taxonomy_id}-imported-taxonomy"
 
         # Check if the taxonomy was not created
         assert not Taxonomy.objects.filter(name="Imported Taxonomy name").exists()
