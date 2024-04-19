@@ -117,11 +117,9 @@ def _get_meili_api_key_uid():
     Helper method to get the UID of the API key we're using for Meilisearch
     """
     global _MEILI_API_KEY_UID  # pylint: disable=global-statement
-
-    if _MEILI_API_KEY_UID is not None:
-        return _MEILI_API_KEY_UID
-
-    _MEILI_API_KEY_UID = _get_meilisearch_client().get_key(settings.MEILISEARCH_API_KEY).uid
+    if _MEILI_API_KEY_UID is None:
+        _MEILI_API_KEY_UID = _get_meilisearch_client().get_key(settings.MEILISEARCH_API_KEY).uid
+    return _MEILI_API_KEY_UID
 
 
 def _wait_for_meili_task(info: TaskInfo) -> None:
