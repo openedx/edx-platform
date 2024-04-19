@@ -1486,7 +1486,7 @@ webob==1.8.7
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/base.txt
-xblock[django]==3.1.0
+xblock[django]==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
