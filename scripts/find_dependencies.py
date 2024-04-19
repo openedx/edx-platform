@@ -13,6 +13,7 @@ import itertools
 import json
 import os
 import re
+import requirements
 import shlex
 import shutil
 import subprocess
@@ -195,30 +196,28 @@ def process_directory():
     Also copies the considered dependencies file into the temp work directory,
     for later analysis.
     """    
-    
+    repo_name = Path.cwd().name
+    repo_work = WORK_DIR / repo_name
+    repo_work.mkdir(parents=True, exist_ok=True)
     repo_urls = set()
     package_names = []
     openedx_packages = [] 
-    
-    with open("/tmp/unpack_reqs/openedx/edx-platform/base.txt") as fbase:
-        # Read each line (package name) in the file
-        file_data = fbase.read()
+    if (js_reqs := Path("package-lock.json")).exists():
+        shutil.copyfile(js_reqs, repo_work / "package-lock.json")
 
-        # Splitting the data by lines
-        lines = file_data.strip().split('\n')
-        for line in lines:
-            # Print the package name
-            parts = line.split('#', 1)
-            package_name = parts[0].strip()
-            package_names.append(package_name)
+    if (py_reqs := find_py_reqs()):
+        shutil.copyfile(py_reqs, repo_work / "base.txt")
 
-    for package in package_names:
-        if package != " ":
-            home_page = request_package_info_url(package)
-            if home_page is not None:
-                if match := urls_in_orgs([home_page], SECOND_PARTY_ORGS):
-                    openedx_packages.append(home_page)
-                
+        with open(repo_work / "base.txt") as fbase:
+            # Read each line (package name) in the file
+            # with open('requirements.txt', 'r') as fd:
+            for req in requirements.parse(fbase):
+                print(req.name)
+                home_page = request_package_info_url(req.name)
+                if home_page is not None:
+                    if match := urls_in_orgs([home_page], SECOND_PARTY_ORGS):
+                        openedx_packages.append(home_page)
+
     return openedx_packages
 
 FIRST_PARTY_ORGS = ["openedx"]
