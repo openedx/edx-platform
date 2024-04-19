@@ -117,7 +117,13 @@ def _fields_from_block(block) -> dict:
                 # this would be very inefficient. Better to recurse the tree top-down with the parent blocks loaded.
                 log.warning(f"Updating Studio search index for XBlock {block.usage_key} but ancestors weren't cached.")
             cur_block = cur_block.get_parent()
-            block_data[Fields.breadcrumbs].insert(0, {"display_name": xblock_api.get_block_display_name(cur_block)})
+            block_data[Fields.breadcrumbs].insert(
+                0,
+                {
+                    "display_name": xblock_api.get_block_display_name(cur_block),
+                    "usage_key": str(cur_block.usage_key),
+                },
+            )
     try:
         content_data = block.index_dictionary()
         # Will be something like:
@@ -218,12 +224,13 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     doc = {
         Fields.id: meili_id_from_opaque_key(xblock_metadata.usage_key),
         Fields.type: DocType.library_block,
+        Fields.breadcrumbs: []
     }
 
     doc.update(_fields_from_block(block))
 
     # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
-    doc[Fields.breadcrumbs] = [{"display_name": library_name}]
+    doc[Fields.breadcrumbs] = [{"display_name": library_name, "usage_key": str(xblock_metadata.usage_key.context_key)}]
 
     return doc
 

@@ -72,7 +72,13 @@ class TestUpdateIndexHandlers(
             "block_type": "sequential",
             "context_key": "course-v1:orgA+test_course+test_run",
             "org": "orgA",
-            "breadcrumbs": [{"display_name": "Test Course"}], "content": {},
+            "breadcrumbs": [
+                {
+                    "display_name": "Test Course",
+                    "usage_key": "block-v1:orgA+test_course+test_run+type@course+block@course",
+                },
+            ],
+            "content": {},
             "access_id": course_access.id,
 
         }
@@ -87,7 +93,16 @@ class TestUpdateIndexHandlers(
             "block_type": "vertical",
             "context_key": "course-v1:orgA+test_course+test_run",
             "org": "orgA",
-            "breadcrumbs": [{"display_name": "Test Course"}, {"display_name": "sequential"}],
+            "breadcrumbs": [
+                {
+                    "display_name": "Test Course",
+                    "usage_key": "block-v1:orgA+test_course+test_run+type@course+block@course",
+                },
+                {
+                    "display_name": "sequential",
+                    "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+                },
+            ],
             "content": {},
             "access_id": course_access.id,
         }
@@ -134,7 +149,7 @@ class TestUpdateIndexHandlers(
             "block_type": "problem",
             "context_key": "lib:orgA:lib_a",
             "org": "orgA",
-            "breadcrumbs": [{"display_name": "Library Org A"}],
+            "breadcrumbs": [{"display_name": "Library Org A", "usage_key": "lib:orgA:lib_a"}],
             "content": {"problem_types": [], "capa_content": " "},
             "access_id": lib_access.id,
         }
