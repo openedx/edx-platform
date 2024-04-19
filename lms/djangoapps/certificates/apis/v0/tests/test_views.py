@@ -309,7 +309,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
     def test_query_counts(self):
         # Test student with no certificates
         student_no_cert = UserFactory.create(password=self.user_password)
-        with self.assertNumQueries(21, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(20, table_ignorelist=WAFFLE_TABLES):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.global_staff,

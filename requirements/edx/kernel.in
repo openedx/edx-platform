@@ -51,7 +51,6 @@ django-pipeline
 django-ratelimit
 django-sekizai
 django-simple-history
-django-splash
 django-statici18n
 django-storages
 django-user-tasks

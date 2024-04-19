@@ -2286,8 +2286,6 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
 
-    'splash.middleware.SplashMiddleware',
-
     'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
     'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
 
@@ -3161,9 +3159,6 @@ INSTALLED_APPS = [
 
     # Notes
     'lms.djangoapps.edxnotes',
-
-    # Splash screen
-    'splash',
 
     # User API
     'rest_framework',
