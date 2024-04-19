@@ -806,7 +806,7 @@ edx-proctoring==4.17.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
-edx-rbac==1.8.0
+edx-rbac==1.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
