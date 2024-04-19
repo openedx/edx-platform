@@ -713,7 +713,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Try uploading some non-CSV file and verify that it is rejected
         """
-        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \xC3\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
@@ -920,15 +920,16 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 2
 
-    @patch('lms.djangoapps.instructor.views.api', 'generate_random_string',
-           Mock(side_effect=['first', 'first', 'second']))
     def test_generate_unique_password_no_reuse(self):
         """
         generate_unique_password should generate a unique password string that hasn't been generated before.
         """
-        generated_password = ['first']
-        password = generate_unique_password(generated_password, 12)
-        assert password != 'first'
+        with patch('lms.djangoapps.instructor.views.api.generate_random_string') as mock:
+            mock.side_effect = ['first', 'first', 'second']
+
+            generated_password = ['first']
+            password = generate_unique_password(generated_password, 12)
+            assert password != 'first'
 
     @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
     def test_allow_automated_signups_flag_not_set(self):
