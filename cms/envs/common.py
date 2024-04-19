@@ -579,6 +579,9 @@ FEATURES = {
     # .. toggle_creation_date: 2024-03-22
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
     'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
+
+    # See annotations in lms/envs/common.py for details.
+    'ENABLE_BLAKE2B_HASHiNG': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
