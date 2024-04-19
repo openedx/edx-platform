@@ -38,14 +38,16 @@ recommend that you use a service provider to run the software for you.  They
 have free trials that make it easy to get started:
 https://openedx.org/get-started/
 
-If you will be modifying edx-platform code, the `Open edX Developer Stack`_ (Devstack) is
-a Docker-based development environment.
+If you will be modifying edx-platform code, `Tutor`_ is
+the community-supported Docker-based Open edX distribution, both for production and
+local development. The goal of Tutor is to make it easy to deploy, customise,
+upgrade and scale your Open edX installation.
 
-If you want to run your own Open edX server and have the technical skills to do
-so, `Open edX Installation Options`_ explains your options.
+You can read more about getting up and running with a Tutor deployment
+at the `Site Ops home on docs.openedx.org`_.
 
-.. _Open edX Developer Stack: https://github.com/openedx/devstack
-.. _Open edX Installation Options:  https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/60227779/Open+edX+Installation+Options
+.. _Tutor: https://github.com/overhangio/tutor
+.. _Site Ops home on docs.openedx.org: https://docs.openedx.org/en/latest/site_ops/index.html
 
 Dependencies
 ============

@@ -200,12 +200,12 @@ class EcommerceServiceTests(TestCase):
             result = ecommerce_service.get_add_to_basket_url()
 
             if coordinator_flag_active:
-                expected_url = 'http://coordinator_url/lms/redirect/'
+                expected_url = 'http://coordinator_url/lms/payment_page_redirect/'
             else:
                 expected_url = 'http://ecommerce_url/test_basket/add/'
 
             self.assertIsNotNone(result)
-            self.assertEqual(result, expected_url)
+            self.assertEqual(expected_url, result)
 
 
 @ddt.ddt

@@ -82,5 +82,5 @@ jobs:
         CMS_CFG: lms/envs/minimal.yml
 
       run: |
-        paver update_assets lms
-        paver update_assets cms
+        paver update_assets lms --theme-dirs ./themes
+        paver update_assets cms --theme-dirs ./themes

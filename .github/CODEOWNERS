@@ -2,12 +2,12 @@
 
 # Ensure that the team responsible for upgrades sees any PRs that would
 # add GitHub-hosted dependencies to that platform.
-requirements/edx/github.in                                          @openedx/arbi-bom
+requirements/edx/github.in                                          @openedx/2u-arbi-bom
 
 # Core
 common/djangoapps/student/
-common/djangoapps/student/models/__init__.py                        @openedx/teaching-and-learning
-common/djangoapps/student/models/course_enrollment.py               @openedx/teaching-and-learning
+common/djangoapps/student/models/__init__.py                        @openedx/2u-tnl
+common/djangoapps/student/models/course_enrollment.py               @openedx/2u-tnl
 common/djangoapps/third_party_auth/
 lms/djangoapps/course_api/blocks
 lms/djangoapps/courseware/
@@ -47,8 +47,8 @@ openedx/features/discounts/
 
 # Ping Axim On-call if someone uses the QuickStart
 # https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html
-lms/templates/dashboard.html               @openedx/axim-oncall
+lms/templates/dashboard.html                                         @openedx/axim-oncall
 
 # Ensure minimal.yml stays minimal, this could be a team in the future
 # but it's just me for now, others can sign up if they care as well.
-lms/envs/minimal.yml                                            @feanil
+lms/envs/minimal.yml                                                 @feanil

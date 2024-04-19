@@ -126,7 +126,7 @@ class process_cached:  # pylint: disable=invalid-name
         self.cache = {}
 
     def __call__(self, *args):
-        if not isinstance(args, collections.Hashable):
+        if not isinstance(args, collections.abc.Hashable):
             # uncacheable. a list, for instance.
             # better to not cache than blow up.
             return self.func(*args)
@@ -147,7 +147,10 @@ class process_cached:  # pylint: disable=invalid-name
         """
         Support instance methods.
         """
-        return functools.partial(self.__call__, obj)
+        partial = functools.partial(self.__call__, obj)
+        # Make the cache accessible on the wrapped object so it can be cleared if needed.
+        partial.cache = self.cache
+        return partial
 
 
 class CacheInvalidationManager:

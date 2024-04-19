@@ -133,12 +133,13 @@ def lms_update_or_create_enrollment(
         except (CourseEnrollmentError, CourseEnrollmentNotUpdatableError) as error:
             log.exception(
                 "Raising error [%s] for user "
-                "[%s]: course run = [%s], enterprise_uuid = [%s], is_active = [%s], ",
+                "[%s]: course run = [%s], enterprise_uuid = [%s], is_active = [%s], force_enrollment = [%s], ",
                 error,
                 username,
                 course_id,
                 str(enterprise_uuid),
                 is_active,
+                force_enrollment,
             )
             raise error
         finally:
