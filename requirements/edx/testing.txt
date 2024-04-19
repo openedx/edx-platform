@@ -616,7 +616,7 @@ edx-opaque-keys[django]==2.5.1
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/base.txt
-edx-proctoring==4.16.1
+edx-proctoring==4.17.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack

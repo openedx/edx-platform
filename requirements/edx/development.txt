@@ -801,7 +801,7 @@ edx-organizations==6.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-proctoring==4.16.1
+edx-proctoring==4.17.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
