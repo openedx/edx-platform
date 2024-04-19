@@ -198,7 +198,6 @@ django==4.2.10
     #   django-oauth-toolkit
     #   django-sekizai
     #   django-ses
-    #   django-splash
     #   django-statici18n
     #   django-storages
     #   django-user-tasks
@@ -350,8 +349,6 @@ django-simple-history==3.4.0
     #   edx-organizations
     #   edx-proctoring
     #   ora2
-django-splash==1.3.0
-    # via -r requirements/edx/kernel.in
 django-statici18n==2.4.0
     # via
     #   -r requirements/edx/kernel.in
