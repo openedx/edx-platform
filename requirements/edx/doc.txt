@@ -689,7 +689,7 @@ glob2==0.7
     # via -r requirements/edx/base.txt
 gunicorn==21.2.0
     # via -r requirements/edx/base.txt
-help-tokens==2.3.0
+help-tokens==2.4.0
     # via -r requirements/edx/base.txt
 html5lib==1.1
     # via

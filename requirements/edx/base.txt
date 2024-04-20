@@ -594,7 +594,7 @@ glob2==0.7
     # via -r requirements/edx/kernel.in
 gunicorn==21.2.0
     # via -r requirements/edx/kernel.in
-help-tokens==2.3.0
+help-tokens==2.4.0
     # via -r requirements/edx/kernel.in
 html5lib==1.1
     # via
