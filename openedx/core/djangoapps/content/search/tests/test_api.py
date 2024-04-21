@@ -140,7 +140,7 @@ class TestSearchApi(ModuleStoreTestCase):
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_reindex_meilisearch(self, mock_meilisearch):
 
-        # Add tags field to doc, since reindex calls with `include_tags=True` internally
+        # Add tags field to doc, since reindex calls includes tags
         doc_sequential = copy.deepcopy(self.doc_sequential)
         doc_sequential["tags"] = {}
         doc_vertical = copy.deepcopy(self.doc_vertical)

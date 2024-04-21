@@ -272,6 +272,7 @@ def is_meilisearch_enabled() -> bool:
     return False
 
 
+# pylint: disable=too-many-statements
 def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     """
     Rebuild the Meilisearch index from scratch
