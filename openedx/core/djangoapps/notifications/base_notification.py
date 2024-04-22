@@ -145,11 +145,11 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'info': '',
         'non_editable': [],
-        'content_template': _('<{p}><{strong}>{username}</{strong}> response has been endorsed in your post '
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> response has been endorsed in your post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
-            'username': 'Response author name',
+            'replier_name': 'Endorsed by',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]

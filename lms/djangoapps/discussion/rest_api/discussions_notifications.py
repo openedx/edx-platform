@@ -240,10 +240,8 @@ class DiscussionNotificationSender:
         Sends a notification to the author of the thread
         response on his thread has been endorsed
         """
-        context = {
-            "username": self.creator.username,
-        }
-        self._send_notification([self.thread.user_id], "response_endorsed_on_thread", context)
+        if self.creator.id != int(self.thread.user_id):
+            self._send_notification([self.thread.user_id], "response_endorsed_on_thread")
 
     def send_response_endorsed_notification(self):
         """
