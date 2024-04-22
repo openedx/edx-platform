@@ -1791,19 +1791,19 @@ class CourseMetadataEditingTest(CourseTestCase):
             })
         )
         settings_dict = {
-                "teams_configuration": {
-                    "value": {
-                        "max_team_size": 2,
-                        "team_sets": [
-                            {
-                                "id": "topic_3_id",
-                                "name": "Topic 3 Name",
-                                "description": "Topic 3 desc"
-                            },
-                        ]
-                    }
+            "teams_configuration": {
+                "value": {
+                    "max_team_size": 2,
+                    "team_sets": [
+                        {
+                            "id": "topic_3_id",
+                            "name": "Topic 3 Name",
+                            "description": "Topic 3 desc"
+                        },
+                    ]
                 }
             }
+        }
 
         _, errors, updated_data = CourseMetadata.validate_and_update_from_json(
             course,
@@ -1831,19 +1831,19 @@ class CourseMetadataEditingTest(CourseTestCase):
             })
         )
         settings_dict = {
-                "teams_configuration": {
-                    "value": {
-                        "max_team_size": 2,
-                        "team_sets": [
-                            {
-                                "id": "topic_3_id",
-                                "name": "Topic 3 Name",
-                                "description": "Topic 3 desc"
-                            },
-                        ]
-                    }
+            "teams_configuration": {
+                "value": {
+                    "max_team_size": 2,
+                    "team_sets": [
+                        {
+                            "id": "topic_3_id",
+                            "name": "Topic 3 Name",
+                            "description": "Topic 3 desc"
+                        },
+                    ]
                 }
             }
+        }
 
         _, errors, updated_data = CourseMetadata.validate_and_update_from_json(
             course,
