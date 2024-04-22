@@ -306,12 +306,14 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'web': False,
                             'email': False,
                             'push': False,
+                            'email_cadence': 'Daily',
                             'info': ''
                         },
                         'core': {
                             'web': True,
                             'email': True,
                             'push': True,
+                            'email_cadence': 'Daily',
                             'info': 'Notifications for Open response submissions.'
                         }
                     },
@@ -607,12 +609,14 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                             'web': False,
                             'email': False,
                             'push': False,
+                            'email_cadence': 'Daily',
                             'info': ''
                         },
                         'core': {
                             'web': True,
                             'email': True,
                             'push': True,
+                            'email_cadence': 'Daily',
                             'info': 'Notifications for Open response submissions.'
                         }
                     },

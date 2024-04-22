@@ -194,6 +194,7 @@ COURSE_NOTIFICATION_TYPES = {
         'web': False,
         'email': False,
         'push': False,
+        'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
         'content_template': _('<{p}>You have a new open response submission awaiting for review for : '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
@@ -232,6 +233,7 @@ COURSE_NOTIFICATION_APPS = {
         'core_web': True,
         'core_email': True,
         'core_push': True,
+        'core_email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
 }
