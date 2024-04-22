@@ -117,11 +117,9 @@ def _get_meili_api_key_uid():
     Helper method to get the UID of the API key we're using for Meilisearch
     """
     global _MEILI_API_KEY_UID  # pylint: disable=global-statement
-
-    if _MEILI_API_KEY_UID is not None:
-        return _MEILI_API_KEY_UID
-
-    _MEILI_API_KEY_UID = _get_meilisearch_client().get_key(settings.MEILISEARCH_API_KEY).uid
+    if _MEILI_API_KEY_UID is None:
+        _MEILI_API_KEY_UID = _get_meilisearch_client().get_key(settings.MEILISEARCH_API_KEY).uid
+    return _MEILI_API_KEY_UID
 
 
 def _wait_for_meili_task(info: TaskInfo) -> None:
@@ -274,6 +272,7 @@ def is_meilisearch_enabled() -> bool:
     return False
 
 
+# pylint: disable=too-many-statements
 def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     """
     Rebuild the Meilisearch index from scratch
@@ -369,6 +368,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             def add_with_children(block):
                 """ Recursively index the given XBlock/component """
                 doc = searchable_doc_for_course_block(block)
+                doc.update(searchable_doc_tags(block.usage_key))
                 docs.append(doc)  # pylint: disable=cell-var-from-loop
                 _recurse_children(block, add_with_children)  # pylint: disable=cell-var-from-loop
 
@@ -454,6 +454,15 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
         docs.append(doc)
 
     _update_index_docs(docs)
+
+
+def upsert_block_tags_index_docs(usage_key: UsageKey):
+    """
+    Updates the tags data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
+    doc.update(searchable_doc_tags(usage_key))
+    _update_index_docs([doc])
 
 
 def _get_user_orgs(request: Request) -> list[str]:
