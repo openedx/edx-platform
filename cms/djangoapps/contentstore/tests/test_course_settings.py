@@ -39,6 +39,7 @@ from openedx.core.djangoapps.discussions.config.waffle import (
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 )
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1779,21 +1780,39 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         Tests that user_partition_id is not added to the model when content groups for teams are off.
         """
+        course = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'max_team_size': 2,
+                'team_sets': [{
+                    'id': 'arbitrary-topic-id',
+                    'name': 'arbitrary-topic-name',
+                    'description': 'arbitrary-topic-desc'
+                }]
+            })
+        )
         settings_dict = {
-            "teams_configuration": {
-                "value": {
-                    "team_sets": [
-                        {
-                            "team_id": "team1",
-                        }
-                    ]
+                "teams_configuration": {
+                    "value": {
+                        "max_team_size": 2,
+                        "team_sets": [
+                            {
+                                "id": "topic_3_id",
+                                "name": "Topic 3 Name",
+                                "description": "Topic 3 desc"
+                            },
+                        ]
+                    }
                 }
             }
-        }
 
-        CourseMetadata.fill_teams_user_partitions_ids(self.course, settings_dict)
+        _, errors, updated_data = CourseMetadata.validate_and_update_from_json(
+            course,
+            settings_dict,
+            user=self.user
+        )
 
-        for team_set in settings_dict["teams_configuration"]["value"]["team_sets"]:
+        self.assertEqual(len(errors), 0)
+        for team_set in updated_data["teams_configuration"]["value"]["team_sets"]:
             self.assertNotIn("user_partition_id", team_set)
 
     @patch("cms.djangoapps.models.settings.course_metadata.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
@@ -1801,21 +1820,39 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         Tests that user_partition_id is added to the model when content groups for teams are on.
         """
+        course = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'max_team_size': 2,
+                'team_sets': [{
+                    'id': 'arbitrary-topic-id',
+                    'name': 'arbitrary-topic-name',
+                    'description': 'arbitrary-topic-desc'
+                }]
+            })
+        )
         settings_dict = {
-            "teams_configuration": {
-                "value": {
-                    "team_sets": [
-                        {
-                            "team_id": "team1",
-                        }
-                    ]
+                "teams_configuration": {
+                    "value": {
+                        "max_team_size": 2,
+                        "team_sets": [
+                            {
+                                "id": "topic_3_id",
+                                "name": "Topic 3 Name",
+                                "description": "Topic 3 desc"
+                            },
+                        ]
+                    }
                 }
             }
-        }
 
-        CourseMetadata.fill_teams_user_partitions_ids(self.course, settings_dict)
+        _, errors, updated_data = CourseMetadata.validate_and_update_from_json(
+            course,
+            settings_dict,
+            user=self.user
+        )
 
-        for team_set in settings_dict["teams_configuration"]["value"]["team_sets"]:
+        self.assertEqual(len(errors), 0)
+        for team_set in updated_data["teams_configuration"]["value"]["team_sets"]:
             self.assertIn("user_partition_id", team_set)
 
 
