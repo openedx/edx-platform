@@ -965,7 +965,7 @@ h11==0.14.0
     # via
     #   -r requirements/edx/testing.txt
     #   uvicorn
-help-tokens==2.3.0
+help-tokens==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
