@@ -250,6 +250,7 @@ class TeamsetConfig:
             'description': self.description,
             'max_team_size': self.max_team_size,
             'type': self.teamset_type.value,
+            'user_partition_id': self.user_partition_id,
         }
 
     @cached_property
