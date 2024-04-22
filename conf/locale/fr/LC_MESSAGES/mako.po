@@ -10217,7 +10217,7 @@ msgstr "Dates à venir"
 #: themes/st-lutherx/lms/templates/courseware/accordion.html
 #: themes/st-normanx/lms/templates/courseware/accordion.html
 msgid "Overview"
-msgstr "Vérifier"
+msgstr "Sommaire"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
