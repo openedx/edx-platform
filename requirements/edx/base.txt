@@ -485,7 +485,7 @@ edx-enterprise==4.15.9
     #   -r requirements/edx/kernel.in
 edx-event-bus-kafka==5.6.0
     # via -r requirements/edx/kernel.in
-edx-event-bus-redis==0.3.3
+edx-event-bus-redis==0.5.0
     # via -r requirements/edx/kernel.in
 edx-i18n-tools==1.5.0
     # via

@@ -762,7 +762,7 @@ edx-event-bus-kafka==5.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-event-bus-redis==0.3.3
+edx-event-bus-redis==0.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
