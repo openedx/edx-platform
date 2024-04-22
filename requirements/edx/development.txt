@@ -215,7 +215,7 @@ charset-normalizer==2.0.12
     #   -r requirements/edx/testing.txt
     #   requests
     #   snowflake-connector-python
-chem==1.2.0
+chem==1.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1832,7 +1832,6 @@ six==1.16.0
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   bleach
-    #   chem
     #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
