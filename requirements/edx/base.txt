@@ -483,7 +483,7 @@ edx-enterprise==4.15.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-edx-event-bus-kafka==5.6.0
+edx-event-bus-kafka==5.7.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.5.0
     # via -r requirements/edx/kernel.in

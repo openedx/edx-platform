@@ -758,7 +758,7 @@ edx-enterprise==4.15.9
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-event-bus-kafka==5.6.0
+edx-event-bus-kafka==5.7.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
