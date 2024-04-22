@@ -19,7 +19,7 @@ over older code, and there is probably a better mechanism to be had.)
 
 from celery import Celery
 
-# TEMP: This code will be removed by ARCH-BOM on 4/22/24
+# TEMP: This code will be removed by ARCH-BOM on 4/23/24
 # ddtrace allows celery task logs to be traced by the dd agent.
 # TODO: remove this code.
 try:
