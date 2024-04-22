@@ -10,7 +10,7 @@ charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-edx-opaque-keys==2.5.1
+edx-opaque-keys==2.8.0
     # via -r requirements/edx/paver.in
 idna==3.6
     # via requests

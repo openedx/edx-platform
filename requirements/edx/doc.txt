@@ -573,7 +573,7 @@ edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.7
     # via -r requirements/edx/base.txt
-edx-opaque-keys[django]==2.5.1
+edx-opaque-keys[django]==2.8.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
