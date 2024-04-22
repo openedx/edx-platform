@@ -4,6 +4,7 @@ Base setup for Notification Apps and Types.
 from django.utils.translation import gettext_lazy as _
 
 from .email_notifications import EmailCadence
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 
@@ -185,6 +186,25 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
+    'ora_staff_notification': {
+        'notification_app': 'ora',
+        'name': 'ora_staff_notification',
+        'is_core': False,
+        'info': '',
+        'web': False,
+        'email': False,
+        'push': False,
+        'email_cadence': EmailCadence.DAILY,
+        'non_editable': [],
+        'content_template': _('<{p}>You have a new open response submission awaiting for review for : '
+                              '<{strong}>{ora_name}</{strong}></{p}>'),
+        'content_context': {
+            'ora_name': 'Name of ORA in course',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
+        'visible_to': [CourseStaffRole.ROLE, CourseInstructorRole.ROLE]
+    },
 }
 
 COURSE_NOTIFICATION_APPS = {
@@ -201,6 +221,15 @@ COURSE_NOTIFICATION_APPS = {
     'updates': {
         'enabled': True,
         'core_info': _('Notifications for new announcements and updates from the course team.'),
+        'core_web': True,
+        'core_email': True,
+        'core_push': True,
+        'core_email_cadence': EmailCadence.DAILY,
+        'non_editable': []
+    },
+    'ora': {
+        'enabled': True,
+        'core_info': _('Notifications for Open response submissions.'),
         'core_web': True,
         'core_email': True,
         'core_push': True,

@@ -47,3 +47,14 @@ ENABLE_NOTIFICATIONS_FILTERS = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_noti
 # .. toggle_target_removal_date: 2024-06-01
 # .. toggle_tickets: INF-1145
 ENABLE_COURSEWIDE_NOTIFICATIONS = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_coursewide_notifications", __name__)
+
+
+# .. toggle_name: notifications.enable_ora_staff_notifications
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable ORA staff notifications
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2024-04-04
+# .. toggle_target_removal_date: 2024-06-04
+# .. toggle_tickets: INF-1304
+ENABLE_ORA_STAFF_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora_staff_notifications", __name__)
