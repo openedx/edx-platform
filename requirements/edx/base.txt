@@ -789,7 +789,7 @@ openedx-events==9.9.2
     #   edx-event-bus-redis
     #   event-tracking
     #   ora2
-openedx-filters==1.6.0
+openedx-filters==1.8.1
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
