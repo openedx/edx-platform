@@ -27,20 +27,7 @@ log = logging.getLogger(__name__)
 class TeamUserPartition(UserPartition):
     """Extends UserPartition to support dynamic groups pulled from the current
     course teams.
-
-    Class attributes:
-        team_sets_mapping (dict): A mapping of partition IDs to team-set IDs. This is used to
-            determine which team-set to use for a partition. Then, the team-set ID is
-            used to get the teams to create the groups for the partition.
-
-            Example:
-                {
-                    partition_id: team_set_id,
-                    ...
-                }
     """
-
-    team_sets_mapping = {}
 
     @property
     def groups(self):
@@ -56,7 +43,7 @@ class TeamUserPartition(UserPartition):
         # Get the team-set for this partition via the team_sets_mapping and then get the teams in that team-set
         # to create the groups for this partition.
         team_sets = TeamsConfigurationService().get_teams_configuration(course_key).teamsets
-        team_set_id = self.team_sets_mapping[self.id]
+        team_set_id = self.parameters["team_set_id"]
         team_set = next((team_set for team_set in team_sets if team_set.teamset_id == team_set_id), None)
         teams = get_teams_in_teamset(str(course_key), team_set.teamset_id)
         return [
@@ -157,5 +144,4 @@ class TeamPartitionScheme:
             parameters,
             active=True,
         )
-        TeamUserPartition.team_sets_mapping[id] = parameters["team_set_id"]
         return team_set_partition
