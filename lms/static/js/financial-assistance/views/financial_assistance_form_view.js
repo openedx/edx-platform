@@ -28,7 +28,8 @@
         return FormView.extend({
             el: '.financial-assistance-wrapper',
             events: {
-                'click .js-submit-form': 'submitForm'
+                'click .js-submit-form': 'submitForm',
+                'ajaxError': 'handleAjaxError'
             },
             tpl: formViewTpl,
             fieldTpl: formFieldTpl,
@@ -101,6 +102,12 @@
 
                 if (error.status === 0) {
                     msg = gettext('An error has occurred. Check your Internet connection and try again.');
+                } else if (error.status === 403) {
+                    txt = [
+                        'You must confirm your email to complete registration before applying for financial assistance.',
+                        'If you continue to have issues please contact support.'
+                    ],
+                    msg = gettext(txt.join(' '));
                 }
 
                 this.errors = [HtmlUtils.joinHtml(
@@ -155,6 +162,12 @@
                         });
                     }
                 }
+            },
+
+            // this.model.save() makes an ajax call, which, when it errors,
+            // should have an error message displayed on the banner on the page
+            handleAjaxError: function (event, request, settings, thrownError) {
+                this.saveError(request);
             }
         });
     }

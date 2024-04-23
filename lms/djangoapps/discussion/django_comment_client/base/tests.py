@@ -399,6 +399,7 @@ class ViewsQueryCountTestCase(
         Decorates test methods to count mongo and SQL calls for a
         particular modulestore.
         """
+
         def inner(self, default_store, block_count, mongo_calls, sql_queries, *args, **kwargs):
             with modulestore().default_store(default_store):
                 self.set_up_course(block_count=block_count)
@@ -409,7 +410,7 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 8, 43),
+        (ModuleStoreEnum.Type.split, 3, 8, 42),
     )
     @ddt.unpack
     @count_queries
@@ -417,7 +418,7 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 6, 42),
+        (ModuleStoreEnum.Type.split, 3, 6, 41),
     )
     @ddt.unpack
     @count_queries
@@ -426,6 +427,8 @@ class ViewsQueryCountTestCase(
 
 
 @ddt.ddt
+@disable_signal(views, 'comment_flagged')
+@disable_signal(views, 'thread_flagged')
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
         ForumsEnableMixin,
@@ -792,7 +795,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -810,7 +814,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -869,7 +874,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -887,7 +893,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -1714,7 +1721,13 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread", "body": 'dummy body'},
+            {
+                "closed": False,
+                "commentable_id": commentable_id,
+                "thread_id": "dummy_thread",
+                "body": 'dummy body',
+                "course_id": str(self.course.id)
+            },
         )
         for action in ["upvote_comment", "downvote_comment", "un_flag_abuse_for_comment", "flag_abuse_for_comment"]:
             response = self.client.post(
@@ -1735,7 +1748,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "body": "dummy body"},
+            {"closed": False, "commentable_id": commentable_id, "body": "dummy body", "course_id": str(self.course.id)}
         )
         for action in ["upvote_thread", "downvote_thread", "un_flag_abuse_for_thread", "flag_abuse_for_thread",
                        "follow_thread", "unfollow_thread"]:

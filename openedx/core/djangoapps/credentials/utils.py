@@ -1,5 +1,6 @@
 """Helper functions for working with Credentials."""
 import logging
+from typing import Dict, List
 from urllib.parse import urljoin
 
 import requests
@@ -42,7 +43,7 @@ def get_credentials_api_client(user):
     Arguments:
         user (User): The user to authenticate as when requesting credentials.
     """
-    scopes = ['email', 'profile', 'user_id']
+    scopes = ["email", "profile", "user_id"]
     jwt = create_jwt_for_user(user, scopes=scopes)
 
     client = requests.Session()
@@ -65,7 +66,12 @@ def get_credentials_api_base_url(org=None):
     return url
 
 
-def get_credentials(user, program_uuid=None, credential_type=None):
+def get_credentials(
+    user: User,
+    program_uuid: str = None,
+    credential_type: str = None,
+    raise_on_error: bool = False,
+) -> List[Dict]:
     """
     Given a user, get credentials earned from the credentials service.
 
@@ -75,6 +81,7 @@ def get_credentials(user, program_uuid=None, credential_type=None):
     Keyword Arguments:
         program_uuid (str): UUID of the program whose credential to retrieve.
         credential_type (str): Which type of credentials to return (course-run or program)
+        raise_on_error (bool): Reraise errors back to the caller, instead if returning empty results.
 
     Returns:
         list of dict, representing credentials returned by the Credentials
@@ -82,31 +89,38 @@ def get_credentials(user, program_uuid=None, credential_type=None):
     """
     credential_configuration = CredentialsApiConfig.current()
 
-    querystring = {'username': user.username, 'status': 'awarded', 'only_visible': 'True'}
+    querystring = {
+        "username": user.username,
+        "status": "awarded",
+        "only_visible": "True",
+    }
 
     if program_uuid:
-        querystring['program_uuid'] = program_uuid
+        querystring["program_uuid"] = program_uuid
 
     if credential_type:
-        querystring['type'] = credential_type
+        querystring["type"] = credential_type
 
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
     use_cache = credential_configuration.is_cache_enabled and not user.is_staff
-    cache_key = f'{credential_configuration.CACHE_KEY}.{user.username}' if use_cache else None
+    cache_key = (
+        f"{credential_configuration.CACHE_KEY}.{user.username}" if use_cache else None
+    )
     if cache_key and program_uuid:
-        cache_key = f'{cache_key}.{program_uuid}'
+        cache_key = f"{cache_key}.{program_uuid}"
 
     api_client = get_credentials_api_client(user)
     base_api_url = get_credentials_api_base_url()
 
     return get_api_data(
         credential_configuration,
-        'credentials',
+        "credentials",
         api_client=api_client,
         base_api_url=base_api_url,
         querystring=querystring,
-        cache_key=cache_key
+        cache_key=cache_key,
+        raise_on_error=raise_on_error,
     )
 
 
@@ -122,11 +136,13 @@ def get_courses_completion_status(username, course_run_ids):
     """
     credential_configuration = CredentialsApiConfig.current()
     if not credential_configuration.enabled:
-        log.warning('%s configuration is disabled.', credential_configuration.API_NAME)
+        log.warning("%s configuration is disabled.", credential_configuration.API_NAME)
         return [], False
 
-    completion_status_url = (f'{settings.CREDENTIALS_INTERNAL_SERVICE_URL}/api'
-                             '/credentials/v1/learner_cert_status/')
+    completion_status_url = (
+        f"{settings.CREDENTIALS_INTERNAL_SERVICE_URL}/api"
+        "/credentials/v1/learner_cert_status/"
+    )
     try:
         api_client = get_credentials_api_client(
             User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
@@ -134,30 +150,36 @@ def get_courses_completion_status(username, course_run_ids):
         api_response = api_client.post(
             completion_status_url,
             json={
-                'username': username,
-                'course_runs': course_run_ids,
-            }
+                "username": username,
+                "course_runs": course_run_ids,
+            },
         )
         api_response.raise_for_status()
         course_completion_response = api_response.json()
     except Exception as exc:  # pylint: disable=broad-except
-        log.exception("An unexpected error occurred while reqeusting course completion statuses "
-                      "for user [%s] for course_run_ids [%s] with exc [%s]:",
-                      username,
-                      course_run_ids,
-                      exc
-                      )
+        log.exception(
+            "An unexpected error occurred while reqeusting course completion statuses "
+            "for user [%s] for course_run_ids [%s] with exc [%s]:",
+            username,
+            course_run_ids,
+            exc,
+        )
         return [], True
-    log.info("Course completion status response for user [%s] for course_run_ids [%s] is [%s]",
-             username,
-             course_run_ids,
-             course_completion_response)
+    log.info(
+        "Course completion status response for user [%s] for course_run_ids [%s] is [%s]",
+        username,
+        course_run_ids,
+        course_completion_response,
+    )
     # Yes, This is course_credentials_data. The key is named status but
     # it contains all the courses data from credentials.
-    course_credentials_data = course_completion_response.get('status', [])
+    course_credentials_data = course_completion_response.get("status", [])
     if course_credentials_data is not None:
-        filtered_records = [course_data['course_run']['key'] for course_data in course_credentials_data if
-                            course_data['course_run']['key'] in course_run_ids and
-                            course_data['status'] == settings.CREDENTIALS_COURSE_COMPLETION_STATE]
+        filtered_records = [
+            course_data["course_run"]["key"]
+            for course_data in course_credentials_data
+            if course_data["course_run"]["key"] in course_run_ids
+            and course_data["status"] == settings.CREDENTIALS_COURSE_COMPLETION_STATE
+        ]
         return filtered_records, False
     return [], False

@@ -5,9 +5,12 @@ from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 
+from edx_toggles.toggles.testutils import override_waffle_flag
+
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
 from cms.djangoapps.contentstore.rest_api.v1.mixins import PermissionAccessMixin
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import get_lms_link_for_item
+from cms.djangoapps.contentstore.utils import get_lms_link_for_item, get_pages_and_resources_url
 from cms.djangoapps.contentstore.views.course import _course_outline_json
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -46,6 +49,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             kwargs={"course_id": self.course.id},
         )
 
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_course_index_response(self):
         """Check successful response content"""
         response = self.client.get(self.url)
@@ -59,6 +63,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "discussions_incontext_feedback_url": "",
             "discussions_incontext_learnmore_url": "",
+            "is_custom_relative_dates_active": True,
             "initial_state": None,
             "initial_user_clipboard": {
                 "content": None,
@@ -72,12 +77,20 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
-            "rerun_notification_id": None
+            "rerun_notification_id": None,
+            "discussions_settings": {
+                "enable_in_context": True,
+                "enable_graded_units": False,
+                "unit_level_visibility": True,
+                'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
+            },
+            "advance_settings_url": f"/settings/advanced/{self.course.id}",
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
 
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=False)
     def test_course_index_response_with_show_locators(self):
         """Check successful response content with show query param"""
         response = self.client.get(self.url, {"show": str(self.unit.location)})
@@ -91,6 +104,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "discussions_incontext_feedback_url": "",
             "discussions_incontext_learnmore_url": "",
+            "is_custom_relative_dates_active": False,
             "initial_state": {
                 "expanded_locators": [
                     str(self.unit.location),
@@ -110,7 +124,14 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
-            "rerun_notification_id": None
+            "rerun_notification_id": None,
+            "discussions_settings": {
+                "enable_in_context": True,
+                "enable_graded_units": False,
+                "unit_level_visibility": True,
+                'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
+            },
+            "advance_settings_url": f"/settings/advanced/{self.course.id}",
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

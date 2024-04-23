@@ -21,7 +21,7 @@ from openedx.core.djangoapps.notifications.audience_filters import (
     CohortAudienceFilter,
     CourseRoleAudienceFilter,
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_ORA_STAFF_NOTIFICATION
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 
 log = logging.getLogger(__name__)
@@ -96,13 +96,10 @@ def calculate_course_wide_notification_audience(course_key, audience_filters):
             if filter_class:
                 filter_instance = filter_class(course_key)
                 filtered_users = filter_instance.filter(filter_values)
-                log.info(f'Temp: Course-wide notification filtered users are '
-                         f'{filtered_users} for filter type {filter_type}')
                 audience_user_ids.extend(filtered_users)
         else:
             raise ValueError(f"Invalid audience filter type: {filter_type}")
 
-    log.info(f'Temp: Course-wide notification after audience filter is applied, users: {list(set(audience_user_ids))}')
     return list(set(audience_user_ids))
 
 
@@ -111,6 +108,11 @@ def generate_course_notifications(signal, sender, course_notification_data, meta
     """
     Watches for COURSE_NOTIFICATION_REQUESTED signal and calls send_notifications task
     """
+    if (
+        course_notification_data.notification_type == 'ora_staff_notification'
+        and not ENABLE_ORA_STAFF_NOTIFICATION.is_enabled(course_notification_data['course_key'])
+    ):
+        return
 
     from openedx.core.djangoapps.notifications.tasks import send_notifications
     course_notification_data = course_notification_data.__dict__
@@ -131,5 +133,4 @@ def generate_course_notifications(signal, sender, course_notification_data, meta
         'content_url': course_notification_data.get('content_url'),
     }
 
-    log.info(f"Temp: Course-wide notification, user_ids to sent notifications to {notification_data.get('user_ids')}")
     send_notifications.delay(**notification_data)

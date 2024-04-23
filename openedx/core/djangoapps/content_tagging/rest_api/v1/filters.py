@@ -6,7 +6,6 @@ from django.db.models import Exists, OuterRef, Q
 from rest_framework.filters import BaseFilterBackend
 
 import openedx_tagging.core.tagging.rules as oel_tagging
-from organizations.models import Organization
 
 from ...rules import get_admin_orgs, get_user_orgs
 from ...models import TaxonomyOrg
@@ -25,9 +24,8 @@ class UserOrgFilterBackend(BaseFilterBackend):
         if oel_tagging.is_taxonomy_admin(request.user):
             return queryset
 
-        orgs = list(Organization.objects.all())
-        user_admin_orgs = get_admin_orgs(request.user, orgs)
-        user_orgs = get_user_orgs(request.user, orgs)  # Orgs that the user is a content creator or instructor
+        user_admin_orgs = get_admin_orgs(request.user)
+        user_orgs = get_user_orgs(request.user)  # Orgs that the user is a content creator or instructor
 
         if len(user_orgs) == 0 and len(user_admin_orgs) == 0:
             return queryset.none()
@@ -67,11 +65,10 @@ class ObjectTagTaxonomyOrgFilterBackend(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, _):
         if oel_tagging.is_taxonomy_admin(request.user):
-            return queryset
+            return queryset.prefetch_related('taxonomy__taxonomyorg_set')
 
-        orgs = list(Organization.objects.all())
-        user_admin_orgs = get_admin_orgs(request.user, orgs)
-        user_orgs = get_user_orgs(request.user, orgs)
+        user_admin_orgs = get_admin_orgs(request.user)
+        user_orgs = get_user_orgs(request.user)
         user_or_admin_orgs = list(set(user_orgs) | set(user_admin_orgs))
 
         return queryset.filter(taxonomy__enabled=True).filter(
@@ -90,4 +87,4 @@ class ObjectTagTaxonomyOrgFilterBackend(BaseFilterBackend):
                     )
                 )
             )
-        )
+        ).prefetch_related('taxonomy__taxonomyorg_set')

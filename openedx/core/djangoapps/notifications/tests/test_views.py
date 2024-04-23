@@ -16,8 +16,10 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -35,6 +37,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
+from ..utils import get_notification_types_with_visibility_settings
 
 
 @ddt.ddt
@@ -169,6 +172,7 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@override_waffle_flag(ENABLE_REPORTED_CONTENT_NOTIFICATIONS, active=True)
 @ddt.ddt
 class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
     """
@@ -234,22 +238,86 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'new_comment',
                         'new_response',
                         'response_on_followed_post',
-                        'comment_on_followed_post'
+                        'comment_on_followed_post',
+                        'response_endorsed_on_thread',
+                        'response_endorsed'
                     ],
                     'notification_types': {
+                        'new_discussion_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'new_question_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
                         'core': {
                             'web': True,
                             'email': True,
                             'push': True,
+                            'email_cadence': 'Daily',
                             'info': 'Notifications for responses and comments on your posts, and the ones you’re '
                                     'following, including endorsements to your responses and on your posts.'
                         },
-                        'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
-                        'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''},
+                        'content_reported': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'info': '',
+                            'email_cadence': 'Daily',
+                        },
                     },
                     'non_editable': {
                         'core': ['web']
                     }
+                },
+                'updates': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'course_update': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for new announcements and updates from the course team.'
+                        }
+                    },
+                    'non_editable': {}
+                },
+                'ora': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'ora_staff_notification': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for Open response submissions.'
+                        }
+                    },
+                    'non_editable': {}
                 }
             }
         }
@@ -276,7 +344,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, self._expected_api_response())
+        expected_response = self._expected_api_response()
+        expected_response = remove_notifications_with_visibility_settings(expected_response)
+        self.assertEqual(response.data, expected_response)
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
 
@@ -285,8 +355,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
     @mock.patch.dict(COURSE_NOTIFICATION_TYPES, {
         **COURSE_NOTIFICATION_TYPES,
         **{
-            'new_question_post': {
-                'name': 'new_question_post',
+            'content_reported': {
+                'name': 'content_reported',
                 'visible_to': [FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADMINISTRATOR]
             }
         }
@@ -301,6 +371,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         """
         Test get user notification preference.
         """
+        if role:
+            CourseStaffRole(self.course.id).add_users(self.user)
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         role_instance = None
@@ -310,11 +382,12 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         expected_response = self._expected_api_response()
+
         if not role:
-            expected_response['notification_preference_config']['discussion']['notification_types'].pop(
-                'new_question_post'
-            )
+            expected_response = remove_notifications_with_visibility_settings(expected_response)
+
         self.assertEqual(response.data, expected_response)
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
@@ -328,6 +401,14 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
         ('discussion', 'core', 'email', True, status.HTTP_200_OK, 'type_update'),
         ('discussion', 'core', 'email', False, status.HTTP_200_OK, 'type_update'),
+
+        # Test for email cadence update
+        ('discussion', 'core', 'email_cadence', 'Daily', status.HTTP_200_OK, 'type_update'),
+        ('discussion', 'core', 'email_cadence', 'Weekly', status.HTTP_200_OK, 'type_update'),
+
+        # Test for app-wide channel update
+        ('discussion', None, 'email', True, status.HTTP_200_OK, 'app-wide-channel-update'),
+        ('discussion', None, 'email', False, status.HTTP_200_OK, 'app-wide-channel-update'),
 
         ('discussion', 'invalid_notification_type', 'email', True, status.HTTP_400_BAD_REQUEST, None),
         ('discussion', 'new_comment', 'invalid_notification_channel', False, status.HTTP_400_BAD_REQUEST, None),
@@ -352,16 +433,28 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
         response = self.client.patch(self.path, json.dumps(payload), content_type='application/json')
         self.assertEqual(response.status_code, expected_status)
+        expected_data = self._expected_api_response()
 
         if update_type == 'app_update':
             expected_data = self._expected_api_response()
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             expected_data['notification_preference_config'][notification_app]['enabled'] = value
             self.assertEqual(response.data, expected_data)
 
         elif update_type == 'type_update':
             expected_data = self._expected_api_response()
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             expected_data['notification_preference_config'][notification_app][
                 'notification_types'][notification_type][notification_channel] = value
+            self.assertEqual(response.data, expected_data)
+
+        elif update_type == 'app-wide-channel-update':
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
+            app_prefs = expected_data['notification_preference_config'][notification_app]
+            for notification_type_name, notification_type_preferences in app_prefs['notification_types'].items():
+                non_editable_channels = app_prefs['non_editable'].get(notification_type_name, [])
+                if notification_channel not in non_editable_channels:
+                    app_prefs['notification_types'][notification_type_name][notification_channel] = value
             self.assertEqual(response.data, expected_data)
 
         if expected_status == status.HTTP_200_OK:
@@ -379,6 +472,208 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                 assert 'info' not in type_prefs.keys()
 
 
+@override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@override_waffle_flag(ENABLE_REPORTED_CONTENT_NOTIFICATIONS, active=True)
+@ddt.ddt
+class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
+    """
+    Test for user notification channel preference API.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(
+            org='testorg',
+            number='testcourse',
+            run='testrun'
+        )
+
+        course_overview = CourseOverviewFactory.create(id=self.course.id, org='AwesomeOrg')
+        self.course_enrollment = CourseEnrollment.objects.create(
+            user=self.user,
+            course=course_overview,
+            is_active=True,
+            mode='audit'
+        )
+        self.client = APIClient()
+        self.path = reverse('notification-channel-preferences', kwargs={'course_key_string': self.course.id})
+
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
+        )
+
+    def _expected_api_response(self, course=None):
+        """
+        Helper method to return expected API response.
+        """
+        if course is None:
+            course = self.course
+        response = {
+            'id': 1,
+            'course_name': 'course-v1:testorg+testcourse+testrun Course',
+            'course_id': 'course-v1:testorg+testcourse+testrun',
+            'notification_preference_config': {
+                'discussion': {
+                    'enabled': True,
+                    'core_notification_types': [
+                        'new_comment_on_response',
+                        'new_comment',
+                        'new_response',
+                        'response_on_followed_post',
+                        'comment_on_followed_post',
+                        'response_endorsed_on_thread',
+                        'response_endorsed'
+                    ],
+                    'notification_types': {
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for responses and comments on your posts, and the ones you’re '
+                                    'following, including endorsements to your responses and on your posts.'
+                        },
+                        'new_discussion_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'new_question_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'content_reported': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                    },
+                    'non_editable': {
+                        'core': ['web']
+                    }
+                },
+                'updates': {
+                    'enabled': True,
+                    'core_notification_types': [
+
+                    ],
+                    'notification_types': {
+                        'course_update': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for new announcements and updates from the course team.'
+                        }
+                    },
+                    'non_editable': {}
+                },
+                'ora': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'ora_staff_notification': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for Open response submissions.'
+                        }
+                    },
+                    'non_editable': {}
+                }
+            }
+        }
+        if not ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course.id):
+            app_prefs = response['notification_preference_config']['discussion']
+            notification_types = app_prefs['notification_types']
+            for notification_type in ['new_discussion_post', 'new_question_post']:
+                notification_types.pop(notification_type)
+        return response
+
+    @ddt.data(
+        ('discussion', 'web', True, status.HTTP_200_OK),
+        ('discussion', 'web', False, status.HTTP_200_OK),
+
+        ('invalid_notification_app', 'web', False, status.HTTP_400_BAD_REQUEST),
+        ('discussion', 'invalid_notification_channel', False, status.HTTP_400_BAD_REQUEST),
+    )
+    @ddt.unpack
+    @mock.patch("eventtracking.tracker.emit")
+    def test_patch_user_notification_preference(
+        self, notification_app, notification_channel, value, expected_status, mock_emit,
+    ):
+        """
+        Test update of user notification channel preference.
+        """
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+        payload = {
+            'notification_app': notification_app,
+            'value': value,
+        }
+        if notification_channel:
+            payload['notification_channel'] = notification_channel
+
+        response = self.client.patch(self.path, json.dumps(payload), content_type='application/json')
+        self.assertEqual(response.status_code, expected_status)
+
+        if expected_status == status.HTTP_200_OK:
+            expected_data = self._expected_api_response()
+            expected_app_prefs = expected_data['notification_preference_config'][notification_app]
+            for notification_type, __ in expected_app_prefs['notification_types'].items():
+                non_editable_channels = expected_app_prefs['non_editable'].get(notification_type, [])
+                if notification_channel not in non_editable_channels:
+                    expected_app_prefs['notification_types'][notification_type][notification_channel] = value
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
+            self.assertEqual(response.data, expected_data)
+            event_name, event_data = mock_emit.call_args[0]
+            self.assertEqual(event_name, 'edx.notifications.preferences.updated')
+            self.assertEqual(event_data['notification_app'], notification_app)
+            self.assertEqual(event_data['notification_channel'], notification_channel)
+            self.assertEqual(event_data['value'], value)
+
+
+@ddt.ddt
 class NotificationListAPIViewTest(APITestCase):
     """
     Tests suit for the NotificationListAPIView.
@@ -457,6 +752,43 @@ class NotificationListAPIViewTest(APITestCase):
             data[0]['content'],
             '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
         )
+
+    @ddt.data(
+        ([], 0),
+        (['web'], 1),
+        (['email'], 0),
+        (['web', 'email'], 1),
+        (['web', 'email', 'push'], 1),
+    )
+    @ddt.unpack
+    def test_list_notifications_with_channels(self, channels, expected_count):
+        """
+        Test that the view can filter notifications by app name and channels.
+        """
+
+        Notification.objects.create(
+            user=self.user,
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            },
+            web='web' in channels,
+            email='email' in channels
+        )
+
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+
+        # Make a request to the view with the app_name query parameter set to 'app1'.
+        response = self.client.get(self.url + "?app_name=discussion")
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains expected results i.e. channels contains web or is null.
+        data = response.data['results']
+        self.assertEqual(len(data), expected_count)
 
     @mock.patch("eventtracking.tracker.emit")
     def test_list_notifications_with_tray_opened_param(self, mock_emit):
@@ -594,7 +926,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['count'], 4)
             self.assertEqual(response.data['count_by_app_name'], {
-                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0})
+                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0, 'ora': 0})
             self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
@@ -615,7 +947,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
-        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0})
+        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0, 'ora': 0})
 
     def test_get_expiry_days_in_count_view(self):
         """
@@ -771,3 +1103,18 @@ class NotificationReadAPIViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
+
+
+def remove_notifications_with_visibility_settings(expected_response):
+    """
+    Remove notifications with visibility settings from the expected response.
+    """
+    not_visible = get_notification_types_with_visibility_settings()
+    for expected_response_app in expected_response['notification_preference_config']:
+        for notification_type, visibility_settings in not_visible.items():
+            types = expected_response['notification_preference_config'][expected_response_app]['notification_types']
+            if notification_type in types:
+                expected_response['notification_preference_config'][expected_response_app]['notification_types'].pop(
+                    notification_type
+                )
+    return expected_response

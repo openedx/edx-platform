@@ -1,7 +1,7 @@
 """
 Discussion notifications sender util.
 """
-import logging
+import re
 
 from django.conf import settings
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
@@ -20,9 +20,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
 )
-
-
-log = logging.getLogger(__name__)
 
 
 class DiscussionNotificationSender:
@@ -75,7 +72,7 @@ class DiscussionNotificationSender:
             course_key=self.course.id,
             content_context={
                 "replier_name": self.creator.username,
-                "post_title": self.thread.title,
+                "post_title": getattr(self.thread, 'title', ''),
                 "course_name": self.course.display_name,
                 "sender_id": self.creator.id,
                 **extra_context,
@@ -206,16 +203,20 @@ class DiscussionNotificationSender:
         discussion_cohorted = is_discussion_cohorted(course_key_str)
 
         # Retrieves cohort divided discussion
-        discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key_str)
+        try:
+            discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key_str)
+        except CourseDiscussionSettings.DoesNotExist:
+            return {}
         divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
             self.course,
             discussion_settings
         )
 
         # Checks if post has any cohort assigned
-        group_id = self.thread.attributes['group_id']
-        if group_id is not None:
-            group_id = int(group_id)
+        group_id = self.thread.attributes.get('group_id')
+        if group_id is None:
+            return {}
+        group_id = int(group_id)
 
         # Course wide topics
         all_topics = divided_inline_discussions + divided_course_wide_discussions
@@ -233,6 +234,20 @@ class DiscussionNotificationSender:
                 'cohorts': [group_id],
             }
         return {}
+
+    def send_response_endorsed_on_thread_notification(self):
+        """
+        Sends a notification to the author of the thread
+        response on his thread has been endorsed
+        """
+        if self.creator.id != int(self.thread.user_id):
+            self._send_notification([self.thread.user_id], "response_endorsed_on_thread")
+
+    def send_response_endorsed_notification(self):
+        """
+        Sends a notification to the author of the response
+        """
+        self._send_notification([self.creator.id], "response_endorsed")
 
     def send_new_thread_created_notification(self):
         """
@@ -262,15 +277,51 @@ class DiscussionNotificationSender:
             'username': self.creator.username,
             'post_title': self.thread.title
         }
-
-        log.info(f"Temp: Audience filter for course-wide notification is {audience_filters}")
         self._send_course_wide_notification(notification_type, audience_filters, context)
+
+    def send_reported_content_notification(self):
+        """
+        Send notification to users who are subscribed to the thread.
+        """
+        thread_body = self.thread.body if self.thread.body else ''
+
+        thread_body = remove_html_tags(thread_body)
+        thread_types = {
+            # numeric key is the depth of the thread in the discussion
+            'comment': {
+                1: 'comment',
+                0: 'response'
+            },
+            'thread': {
+                0: 'thread'
+            }
+        }
+
+        content_type = thread_types[self.thread.type][getattr(self.thread, 'depth', 0)]
+
+        context = {
+            'username': self.creator.username,
+            'content_type': content_type,
+            'content': thread_body
+        }
+        audience_filters = {'discussion_roles': [
+            FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+        ]}
+        self._send_course_wide_notification("content_reported", audience_filters, context)
 
 
 def is_discussion_cohorted(course_key_str):
     """
     Returns if the discussion is divided by cohorts
     """
-    cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key_str)
-    discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key_str)
+    try:
+        cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key_str)
+        discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key_str)
+    except (CourseCohortsSettings.DoesNotExist, CourseDiscussionSettings.DoesNotExist):
+        return False
     return cohort_settings.is_cohorted and discussion_settings.always_divide_inline_discussions
+
+
+def remove_html_tags(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)

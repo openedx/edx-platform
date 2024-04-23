@@ -2,11 +2,15 @@
 
 
 import logging
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
 from django.core.cache import cache
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
+
+if TYPE_CHECKING:
+    from requests import session
 
 log = logging.getLogger(__name__)
 
@@ -19,9 +23,20 @@ def get_fields(fields, response):
     return results
 
 
-def get_api_data(api_config, resource, api_client, base_api_url, resource_id=None,
-                 querystring=None, cache_key=None, many=True,
-                 traverse_pagination=True, fields=None, long_term_cache=False):
+def get_api_data(
+    api_config: Any,
+    resource: str,
+    api_client: "session",
+    base_api_url: str,
+    resource_id: Optional[Union[int, str]] = None,
+    querystring: Optional[Dict[Any, Any]] = None,
+    cache_key: Optional[str] = None,
+    many: bool = True,
+    traverse_pagination: bool = True,
+    fields: Optional[List[Any]] = None,
+    long_term_cache: bool = False,
+    raise_on_error: bool = False,
+) -> Union[List[Any], Dict[Any, Any]]:
     """
     GET data from an edX REST API endpoint using the API client.
 
@@ -43,21 +58,26 @@ def get_api_data(api_config, resource, api_client, base_api_url, resource_id=Non
         many (bool): Whether the resource requested is a collection of objects, or a single object.
             If false, an empty dict will be returned in cases of failure rather than the default empty list.
         traverse_pagination (bool): Whether to traverse pagination or return paginated response..
+        fields (list):  Return only specific fields from the response
         long_term_cache (bool): Whether to use the long term cache ttl or the standard cache ttl
+        raise_on_error (bool): Reraise errors back to the caller, instead if returning empty results.
 
     Returns:
         Data returned by the API. When hitting a list endpoint, extracts "results" (list of dict)
-        returned by DRF-powered APIs.
+        returned by DRF-powered APIs. By default, returns an empty result if the called API
+        returns an error.
     """
     no_data = [] if many else {}
 
     if not api_config.enabled:
-        log.warning('%s configuration is disabled.', api_config.API_NAME)
+        log.warning("%s configuration is disabled.", api_config.API_NAME)
         return no_data
 
     if cache_key:
-        cache_key = f'{cache_key}.{resource_id}' if resource_id is not None else cache_key
-        cache_key += '.zpickled'
+        cache_key = (
+            f"{cache_key}.{resource_id}" if resource_id is not None else cache_key
+        )
+        cache_key += ".zpickled"
 
         cached = cache.get(cache_key)
         if cached:
@@ -77,19 +97,23 @@ def get_api_data(api_config, resource, api_client, base_api_url, resource_id=Non
         querystring = querystring if querystring else {}
         api_url = urljoin(
             f"{base_api_url}/",
-            f"{resource}/{str(resource_id) + '/' if resource_id is not None else ''}"
+            f"{resource}/{str(resource_id) + '/' if resource_id is not None else ''}",
         )
         response = api_client.get(api_url, params=querystring)
         response.raise_for_status()
         response = response.json()
 
         if resource_id is None and traverse_pagination:
-            results = _traverse_pagination(response, api_client, api_url, querystring, no_data)
+            results = _traverse_pagination(
+                response, api_client, api_url, querystring, no_data
+            )
         else:
             results = response
 
     except:  # pylint: disable=bare-except
-        log.exception('Failed to retrieve data from the %s API.', api_config.API_NAME)
+        log.exception("Failed to retrieve data from the %s API.", api_config.API_NAME)
+        if raise_on_error:
+            raise
         return no_data
 
     if cache_key:
@@ -111,17 +135,17 @@ def _traverse_pagination(response, api_client, api_url, querystring, no_data):
 
     Extracts and concatenates "results" (list of dict) returned by DRF-powered APIs.
     """
-    results = response.get('results', no_data)
+    results = response.get("results", no_data)
 
     page = 1
-    next_page = response.get('next')
+    next_page = response.get("next")
     while next_page:
         page += 1
-        querystring['page'] = page
+        querystring["page"] = page
         response = api_client.get(api_url, params=querystring)
         response.raise_for_status()
         response = response.json()
-        results += response.get('results', no_data)
-        next_page = response.get('next')
+        results += response.get("results", no_data)
+        next_page = response.get("next")
 
     return results

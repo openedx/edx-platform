@@ -64,13 +64,6 @@ class Env:
     # Which Python version should be used in xdist workers?
     PYTHON_VERSION = os.environ.get("PYTHON_VERSION", "2.7")
 
-    # If set, put reports for run in "unique" directories.
-    # The main purpose of this is to ensure that the reports can be 'slurped'
-    # in the main jenkins flow job without overwriting the reports from other
-    # build steps. For local development/testing, this shouldn't be needed.
-    if os.environ.get("SHARD", None):
-        shard_str = "shard_{}".format(os.environ.get("SHARD"))
-
     # Directory that videos are served from
     VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
 

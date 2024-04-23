@@ -84,6 +84,7 @@ module.exports = Merge.smart({
             'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
             'js/factories/edit_tabs': './cms/static/js/factories/edit_tabs.js',
             'js/sock': './cms/static/js/sock.js',
+            'js/factories/tag_count': './cms/static/js/factories/tag_count.js',
 
             // LMS
             SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
@@ -101,7 +102,6 @@ module.exports = Merge.smart({
             DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
-            Static2UCallouts: './lms/static/js/learner_dashboard/Static2UCallouts.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',

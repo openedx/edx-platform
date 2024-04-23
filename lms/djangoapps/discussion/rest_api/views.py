@@ -948,6 +948,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
             form.cleaned_data["page_size"],
             form.cleaned_data["flagged"],
             form.cleaned_data["requested_fields"],
+            form.cleaned_data["merge_question_type_responses"]
         )
 
     def list_by_user(self, request):
@@ -1099,7 +1100,6 @@ class RetireUserView(APIView):
         Empty string
     """
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
     def post(self, request):
@@ -1147,7 +1147,6 @@ class ReplaceUsernamesView(APIView):
 
     """
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)
 
     def post(self, request):

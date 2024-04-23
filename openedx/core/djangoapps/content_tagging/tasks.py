@@ -10,7 +10,7 @@ from celery_utils.logged_task import LoggedTask
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
-from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from openedx_tagging.core.tagging.models import Taxonomy
 
@@ -36,7 +36,7 @@ def _set_initial_language_tag(content_key: ContentKey, lang_code: str) -> None:
     """
     lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID).cast()
 
-    if lang_code and not api.get_content_tags(object_key=content_key, taxonomy_id=lang_taxonomy.id):
+    if lang_code and not api.get_object_tags(object_id=str(content_key), taxonomy_id=lang_taxonomy.id):
         try:
             lang_tag = lang_taxonomy.tag_for_external_id(lang_code)
         except api.oel_tagging.TagDoesNotExist:
@@ -47,7 +47,11 @@ def _set_initial_language_tag(content_key: ContentKey, lang_code: str) -> None:
                 default_lang_code,
             )
             lang_tag = lang_taxonomy.tag_for_external_id(default_lang_code)
-        api.tag_content_object(content_key, lang_taxonomy, [lang_tag.value])
+        api.tag_object(
+            object_id=str(content_key),
+            taxonomy=lang_taxonomy,
+            tags=[lang_tag.value],
+        )
 
 
 def _delete_tags(content_object: ContentKey) -> None:
@@ -65,7 +69,7 @@ def update_course_tags(course_key_str: str) -> bool:
         course_key_str (str): identifier of the Course
     """
     try:
-        course_key = LearningContextKey.from_string(course_key_str)
+        course_key = CourseKey.from_string(course_key_str)
 
         log.info("Updating tags for Course with id: %s", course_key)
 
@@ -90,7 +94,7 @@ def delete_course_tags(course_key_str: str) -> bool:
         course_key_str (str): identifier of the Course
     """
     try:
-        course_key = LearningContextKey.from_string(course_key_str)
+        course_key = CourseKey.from_string(course_key_str)
 
         log.info("Deleting tags for Course with id: %s", course_key)
 

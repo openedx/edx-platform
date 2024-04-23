@@ -304,6 +304,7 @@ class TeamsetType(Enum):
     open = "open"
     public_managed = "public_managed"
     private_managed = "private_managed"
+    open_managed = "open_managed"
 
     @classmethod
     def get_default(cls):

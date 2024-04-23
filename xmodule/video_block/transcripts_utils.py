@@ -19,8 +19,6 @@ from opaque_keys.edx.locator import BundleDefinitionLocator
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 
-from openedx.core.djangolib import blockstore_cache
-from openedx.core.lib import blockstore_api
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -182,19 +180,22 @@ def get_transcript_link_from_youtube(youtube_id):
     try:
         youtube_html = requests.get(f"{youtube_url_base}{youtube_id}")
         caption_re = settings.YOUTUBE['TRANSCRIPTS']['CAPTION_TRACKS_REGEX']
-        allowed_language_codes = settings.YOUTUBE['TRANSCRIPTS']['ALLOWED_LANGUAGE_CODES']
         caption_matched = re.search(caption_re, youtube_html.content.decode("utf-8"))
         if caption_matched:
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
+            caption_links = {}
             for caption in caption_tracks:
-                if "languageCode" in caption.keys() and caption["languageCode"] in allowed_language_codes:
-                    return caption.get("baseUrl")
+                language_code = caption.get('languageCode', None)
+                if language_code and not language_code == 'None':
+                    link = caption.get("baseUrl")
+                    caption_links[language_code] = link
+            return None if not caption_links else caption_links
         return None
     except ConnectionError:
         return None
 
 
-def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
+def get_transcript_links_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Gets transcripts from youtube for youtube_id.
 
@@ -204,18 +205,29 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     Returns (status, transcripts): bool, dict.
     """
     _ = i18n.gettext
+    transcript_links = get_transcript_link_from_youtube(youtube_id)
 
-    utf8_parser = etree.XMLParser(encoding='utf-8')
-
-    transcript_link = get_transcript_link_from_youtube(youtube_id)
-
-    if not transcript_link:
+    if not transcript_links:
         msg = _("Can't get transcript link from Youtube for {youtube_id}.").format(
             youtube_id=youtube_id,
         )
         raise GetTranscriptsFromYouTubeException(msg)
 
-    data = requests.get(transcript_link)
+    return transcript_links
+
+
+def get_transcript_from_youtube(link, youtube_id, i18n):
+    """
+    Gets transcripts from youtube for youtube_id.
+
+    Parses only utf-8 encoded transcripts.
+    Other encodings are not supported at the moment.
+
+    Returns (status, transcripts): bool, dict.
+    """
+    _ = i18n.gettext
+    utf8_parser = etree.XMLParser(encoding='utf-8')
+    data = requests.get(link)
 
     if data.status_code != 200 or not data.text:
         msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {status_code}.").format(
@@ -260,9 +272,12 @@ def download_youtube_subs(youtube_id, video_block, settings):  # lint-amnesty, p
     """
     i18n = video_block.runtime.service(video_block, "i18n")
     _ = i18n.gettext
-
-    subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
-    return json.dumps(subs, indent=2)
+    transcript_links = get_transcript_links_from_youtube(youtube_id, settings, i18n)
+    subs = []
+    for (language_code, link) in transcript_links.items():
+        sub = get_transcript_from_youtube(link, youtube_id, i18n)
+        subs.append([language_code, json.dumps(sub, indent=2)])
+    return subs
 
 
 def remove_subs_from_store(subs_id, item, lang='en'):
@@ -488,7 +503,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
                     lang,
                 )
-            except TranscriptException as ex:  # lint-amnesty, pylint: disable=unused-variable
+            except TranscriptException:
                 pass
         if reraised_message:
             item.save_with_metadata(user)
@@ -1047,42 +1062,9 @@ def get_transcript_from_blockstore(video_block, language, output_format, transcr
     Returns:
         tuple containing content, filename, mimetype
     """
-    if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
-        raise NotFoundError(f'Invalid transcript format `{output_format}`')
-    transcripts = transcripts_info['transcripts']
-    if language not in transcripts:
-        raise NotFoundError("Video {} does not have a transcript file defined for the '{}' language in its OLX.".format(
-            video_block.scope_ids.usage_id,
-            language,
-        ))
-    filename = transcripts[language]
-    if not filename.endswith('.srt'):
-        # We want to standardize on .srt
-        raise NotFoundError("Video XBlocks in Blockstore only support .srt transcript files.")
-    # Try to load the transcript file out of Blockstore
-    # In lieu of an XBlock API for this (like block.runtime.resources_fs), we use the blockstore API directly.
-    bundle_uuid = video_block.scope_ids.def_id.bundle_uuid
-    path = video_block.scope_ids.def_id.olx_path.rpartition('/')[0] + '/static/' + filename
-    bundle_version = video_block.scope_ids.def_id.bundle_version  # Either bundle_version or draft_name will be set.
-    draft_name = video_block.scope_ids.def_id.draft_name
-    try:
-        content_binary = blockstore_cache.get_bundle_file_data_with_cache(bundle_uuid, path, bundle_version, draft_name)
-    except blockstore_api.BundleFileNotFound:
-        raise NotFoundError("Transcript file '{}' missing for video XBlock {}".format(  # lint-amnesty, pylint: disable=raise-missing-from
-            path,
-            video_block.scope_ids.usage_id,
-        ))
-    # Now convert the transcript data to the requested format:
-    filename_no_extension = os.path.splitext(filename)[0]
-    output_filename = f'{filename_no_extension}.{output_format}'
-    output_transcript = Transcript.convert(
-        content_binary.decode('utf-8'),
-        input_format=Transcript.SRT,
-        output_format=output_format,
-    )
-    if not output_transcript.strip():
-        raise NotFoundError('No transcript content')
-    return output_transcript, output_filename, Transcript.mime_types[output_format]
+    # TODO: Update to use Learning Core data models once static assets support
+    # has been added.
+    raise NotImplementedError("Transcripts not supported.")
 
 
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):

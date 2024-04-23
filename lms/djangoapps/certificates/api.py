@@ -929,9 +929,9 @@ def invalidate_certificate(user_id, course_key_or_id, source):
     Invalidate the user certificate in a given course if it exists and the user is not on the allowlist for this
     course run.
 
-    This function is called in services.py and handlers.py within the certificates folder. As of now,
+    This function is called in services.py and signals.py within the certificates folder. As of now,
     The call in services.py occurs when an exam attempt is rejected in the legacy exams backend, edx-proctoring.
-    The call in handlers.py is occurs when an exam attempt is rejected in the newer exams backend, edx-exams.
+    The call in signals.py is occurs when an exam attempt is rejected in the newer exams backend, edx-exams.
     """
     course_key = _get_key(course_key_or_id, CourseKey)
     if _is_on_certificate_allowlist(user_id, course_key):

@@ -3,7 +3,6 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-{% with site_name='<a href="'|add:site_name|add:'" style="color: '|add:brand_color|add:';">'|safe|add:site_name|add:'</a>'|safe %}
 <table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
         <td>
@@ -40,5 +39,4 @@
         </td>
     </tr>
 </table>
-{% endwith %}
 {% endblock %}

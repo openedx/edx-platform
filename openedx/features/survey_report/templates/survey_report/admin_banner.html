@@ -1,6 +1,6 @@
 {% block survey_report_banner %}
-{% if show_survey_report_banner %}
 {% load static %}
+{% if show_survey_report_banner %}
 <div id="originalContent" style="border: 3px solid #06405d; margin-bottom: 50px; rgb(0 0 0 / 18%) 0px 3px 5px;">
   <div  style="background-color: #06405d;padding: 17px 37px;">
     <h1 style="margin: 0; color: #FFFF; font-weight: 600;">Join the Open edX Data Sharing Initiative and shape the future of learning</h1>
@@ -25,52 +25,12 @@
             <g fill="#377D4D"><path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10Z"></path>
                 <path d="M16.03 8.97a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06l1.47 1.47l2.235-2.236L14.97 8.97a.75.75 0 0 1 1.06 0Z" fill="#FFF"></path>
             </g>
-        </svg>   
+        </svg>
         <span style="font-size: 16px; margin-left: 15px;">Thank you for your collaboration and support! Your contribution is greatly appreciated and will help us continue to improve.</span>
     </div>
 </div>
 {% endif %}
 
-    <!-- The original content of the block -->
-    <script type="text/javascript" src="{% static 'common/js/vendor/jquery.js' %}"></script>
-    <script>
-   $(document).ready(function(){
-    $('#dismissButton').click(function() {
-                $('#originalContent').slideUp('slow', function() {
-                    // If you want to do something after the slide-up, do it here.
-                    // For example, you can hide the entire div:
-                    // $(this).hide();
-                });
-            });
-    // When the form is submitted
-    $("#survey_report_form").submit(function(event){
-        event.preventDefault();  // Prevent the form from submitting traditionally
-        
-        // Make the AJAX request
-        $.ajax({
-            url: $(this).attr("action"),
-            type: $(this).attr("method"),
-            data: $(this).serialize(),
-            success: function(response){
-                // Hide the original content block
-                $("#originalContent").slideUp(400, function() {
-                    //$(this).css('display', 'none');
-                    // Show the thank-you message block with slide down effect
-                    $("#thankYouMessage").slideDown(400, function() {
-                        // Wait for 3 seconds (3000 milliseconds) and then slide up the thank-you message
-                        setTimeout(function() {
-                            $("#thankYouMessage").slideUp(400);
-                        }, 3000);
-                    });
-                });
-            },
-            error: function(error){
-                // Handle any errors
-                console.error("Error sending report:", error);
-            }
-        });
-    });
-});
-</script>
-    
+<script src="{% static 'survey_report/js/admin_banner.js' %}"></script>
+
 {% endblock %}

@@ -862,3 +862,68 @@ class AuthorizeStaffTestCase():
         response = self.make_request()
         assert response.status_code == expect_status
         return response
+
+
+class UpdateCourseDetailsTests(ModuleStoreTestCase):
+    """
+    Unit tests for the `update_course_details` utility function.
+    """
+
+    class Request:
+        """
+        Basic Python class that mocks the required structural components of a WSGIRequest object instance, used in the
+        functions under test.
+        """
+        def __init__(self):
+            self.user = UserFactory.create(username="course_staff", password="password")
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+
+    @patch.dict("django.conf.settings.FEATURES", {
+        "ENABLE_PREREQUISITE_COURSES": False,
+        "ENTRANCE_EXAMS": False,
+    })
+    @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
+    def test_update_course_details_self_paced(self, mock_update):
+        """
+        This test ensures that expected updates and validation occur on a course update before the settings payload
+        is commit to Mongo. This tests checks that we're removing bad certificates display behavior and availability
+        settings before we process the settings updates.
+        """
+        mock_request = self.Request()
+        payload = {
+            "certificate_available_date": "2024-08-01T00:00:00Z",
+            "certificates_display_behavior": "end_with_date",
+            "self_paced": True,
+        }
+        expected_payload = {
+            "certificate_available_date": None,
+            "certificates_display_behavior": "early_no_info",
+            "self_paced": True,
+        }
+
+        utils.update_course_details(mock_request, self.course.id, payload, None)
+        mock_update.assert_called_once_with(self.course.id, expected_payload, mock_request.user)
+
+    @patch.dict("django.conf.settings.FEATURES", {
+        "ENABLE_PREREQUISITE_COURSES": False,
+        "ENTRANCE_EXAMS": False,
+    })
+    @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
+    def test_update_course_details_instructor_paced(self, mock_update):
+        """
+        This test ensures that expected updates and validation occur on a course update before the settings payload
+        is commit to Mongo. This test checks that we don't modify any of the incoming settings when a course is
+        instructor-paced.
+        """
+        mock_request = self.Request()
+        payload = {
+            "certificate_available_date": "2024-08-01T00:00:00Z",
+            "certificates_display_behavior": "end_with_date",
+            "self_paced": False,
+        }
+
+        utils.update_course_details(mock_request, self.course.id, payload, None)
+        mock_update.assert_called_once_with(self.course.id, payload, mock_request.user)

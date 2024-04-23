@@ -37,3 +37,7 @@ class SettingsType():
     COMMON = 'common'
     DEVSTACK = 'devstack'
     TEST = 'test'
+
+
+# Locale root for IDA plugins for LMS and CMS, relative to settings.REPO_ROOT
+plugins_locale_root = 'conf/plugins-locale/plugins'

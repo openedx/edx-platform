@@ -62,7 +62,7 @@ class Command(BaseCommand):
 
         return result
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # pylint: disable=too-many-statements
         """
         By convention set by Django developers, this method actually executes command's actions.
         So, there could be no better docstring than emphasize this once again.
@@ -88,8 +88,8 @@ class Command(BaseCommand):
             logging.warning('Reducing logging to WARNING level for easier progress tracking')
 
         if index_all_courses_option:
-            index_names = (CoursewareSearchIndexer.INDEX_NAME, CourseAboutSearchIndexer.INDEX_NAME)
             if setup_option:
+                index_names = (CoursewareSearchIndexer.INDEX_NAME, CourseAboutSearchIndexer.INDEX_NAME)
                 for index_name in index_names:
                     try:
                         searcher = SearchEngine.get_search_engine(index_name)
@@ -116,16 +116,15 @@ class Command(BaseCommand):
         elif active_option:
             # in case of --active, we get the list of course keys from all courses
             # that are stored in the modulestore and filter out the non-active
-            course_keys = []
+            all_courses = modulestore().get_courses()
 
             today = date.today()
-            all_courses = modulestore().get_courses()
-            for course in all_courses:
-                # Omitting courses without a start date as well as
-                # couses that already ended (end date is in the past)
-                if not course.start or (course.end and course.end.date() < today):
-                    continue
-                course_keys.append(course.id)
+            # We keep the courses that has a start date and either don't have an end date
+            # or the end date is not in the past.
+            active_courses = filter(lambda course: course.start
+                                    and (not course.end or course.end.date() >= today),
+                                    all_courses)
+            course_keys = list(map(lambda course: course.id, active_courses))
 
             logging.warning(f'Selected {len(course_keys)} active courses over a total of {len(all_courses)}.')
 
@@ -135,16 +134,28 @@ class Command(BaseCommand):
 
         total = len(course_keys)
         logging.warning(f'Reindexing {total} courses...')
-        reindexed = 0
         start = time()
+
+        count = 0
+        success = 0
+        errors = []
 
         for course_key in course_keys:
             try:
+                count += 1
                 CoursewareSearchIndexer.do_course_reindex(store, course_key)
-                reindexed += 1
-                if reindexed % 10 == 0 or reindexed == total:
-                    now = time()
-                    t = now - start
-                    logging.warning(f'{reindexed}/{total} reindexed in {t:.1f} seconds.')
+                success += 1
+                if count % 10 == 0 or count == total:
+                    t = time() - start
+                    remaining = total - success - len(errors)
+                    logging.warning(f'{success} courses reindexed in {t:.1f} seconds. {remaining} remaining...')
             except Exception as exc:  # lint-amnesty, pylint: disable=broad-except
+                errors.append(course_key)
                 logging.exception('Error indexing course %s due to the error: %s.', course_key, exc)
+
+        t = time() - start
+        logging.warning(f'{success} of {total} courses reindexed succesfully. Total running time: {t:.1f} seconds.')
+        if errors:
+            logging.warning('Reindex failed for %s courses:', len(errors))
+            for course_key in errors:
+                logging.warning(course_key)

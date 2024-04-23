@@ -12,11 +12,11 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'edx-ui-toolkit/js/ut
     'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
     'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop',
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-    'js/views/utils/tagging_drawer_utils',],
+    'js/views/utils/tagging_drawer_utils', 'js/views/tag_count', 'js/models/tag_count'],
 function(
     $, _, XBlockOutlineView, StringUtils, ViewUtils, XBlockViewUtils,
     XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView,
-    TaggingDrawerUtils
+    TaggingDrawerUtils, TagCountView, TagCountModel
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
@@ -28,7 +28,26 @@ function(
             this.makeContentDraggable(this.el);
             // Show/hide the paste button
             this.initializePasteButton(this.el);
+            this.renderTagCount();
             return renderResult;
+        },
+
+        renderTagCount: function() {
+            const contentId = this.model.get('id');
+            const tagCountsByUnit = this.model.get('tag_counts_by_unit')
+            const tagsCount = tagCountsByUnit !== undefined ? tagCountsByUnit[contentId] : 0
+            var countModel = new TagCountModel({
+                content_id: contentId,
+                tags_count: tagsCount,
+                course_authoring_url: this.model.get('course_authoring_url'),
+            }, {parse: true});
+            var tagCountView = new TagCountView({el: this.$('.tag-count'), model: countModel});
+            tagCountView.setupMessageListener();
+            tagCountView.render();
+            this.$('.tag-count').click((event) => {
+                event.preventDefault();
+                this.openManageTagsDrawer();
+            });
         },
 
         shouldExpandChildren: function() {
@@ -434,6 +453,19 @@ function(
             }
         },
 
+        subsectionShareLinkXBlock: function() {
+            var modal = CourseOutlineModalsFactory.getModal('subsection_share_link', this.model, {
+                onSave: this.refresh.bind(this),
+                xblockType: XBlockViewUtils.getXBlockType(
+                    this.model.get('category'), this.parentView.model, true
+                )
+            });
+
+            if (modal) {
+                modal.show();
+            }
+        },
+
         /**
          * If the new "Actions" menu is enabled, most actions like Configure,
          * Duplicate, Move, Delete, etc. are moved into this menu. For this
@@ -461,10 +493,8 @@ function(
         },
 
         openManageTagsDrawer() {
-            const article = document.querySelector('[data-taxonomy-tags-widget-url]');
-            const taxonomyTagsWidgetUrl = $(article).attr('data-taxonomy-tags-widget-url');
+            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
             const contentId = this.model.get('id');
-
             TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },
 
@@ -483,6 +513,10 @@ function(
                     event.preventDefault();
                     this.highlightsXBlock();
                 }
+            }.bind(this));
+            element.find('.subsection-share-link-button').click(function(event) {
+                event.preventDefault();
+                this.subsectionShareLinkXBlock();
             }.bind(this));
             element.find('.copy-button').click((event) => {
                 event.preventDefault();

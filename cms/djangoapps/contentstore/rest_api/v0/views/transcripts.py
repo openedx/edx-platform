@@ -14,14 +14,14 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from cms.djangoapps.contentstore.api import course_author_access_required
-
+from cms.djangoapps.contentstore.views.transcripts_ajax import check_transcripts, replace_transcripts
 from cms.djangoapps.contentstore.transcript_storage_handlers import (
     upload_transcript,
     delete_video_transcript_or_404,
     handle_transcript_download,
 )
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
-from ..serializers import TranscriptSerializer
+from ..serializers import TranscriptSerializer, YoutubeTranscriptCheckSerializer, YoutubeTranscriptUploadSerializer
 from rest_framework.parsers import (MultiPartParser, FormParser)
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 
@@ -68,3 +68,50 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
         """
 
         return delete_video_transcript_or_404(request)
+
+
+@view_auth_classes()
+class YoutubeTranscriptCheckView(DeveloperErrorViewMixin, RetrieveAPIView):
+    """
+    public rest API endpoints for the CMS API YouTube transcripts.
+    youtube_id: required argument, needed to authorize course authors and identify the video.
+    edx_video_id: required argument, needed to identify the transcript.
+    xblock_id: required argument, needed to identify the transcript.
+    """
+    serializer_class = YoutubeTranscriptCheckSerializer
+    parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not toggles.use_studio_content_api():
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    @course_author_access_required
+    def retrieve(self, request, course_key_string):  # pylint: disable=arguments-differ
+        """
+        Get the status of youtube transcripts for a given youtube video
+        """
+        return check_transcripts(request)
+
+
+@view_auth_classes()
+class YoutubeTranscriptUploadView(DeveloperErrorViewMixin, RetrieveAPIView):
+    """
+    public rest API endpoints for the CMS API YouTube transcripts.
+    youtube_id: required argument, needed to authorize course authors and identify the video.
+    xblock_id: required argument, needed to identify the transcript.
+    """
+    serializer_class = YoutubeTranscriptUploadSerializer
+    parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not toggles.use_studio_content_api():
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    @course_author_access_required
+    def retrieve(self, request, course_key_string):  # pylint: disable=arguments-differ
+        """
+        Get the  youtube transcripts for a give youtube video and add them to video block
+        """
+        return replace_transcripts(request)

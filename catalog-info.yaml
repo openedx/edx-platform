@@ -11,6 +11,6 @@ metadata:
       title: "Documentation"
       icon: "Web"
 spec:
-  owner: group:arch-bom
+  owner: group:2u-arch-bom
   type: 'service'
   lifecycle: 'production'

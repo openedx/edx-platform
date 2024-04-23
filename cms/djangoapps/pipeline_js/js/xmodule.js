@@ -23,11 +23,6 @@ define(
             'mathjax',
             function() {
                 window.MathJax.Hub.Config({
-                    styles: {
-                        '.MathJax_SVG>svg': {'max-width': '100%'},
-                        // This is to resolve for people who use center mathjax with tables
-                        'table>tbody>tr>td>.MathJax_SVG>svg': {'max-width': 'inherit'},
-                    },
                     tex2jax: {
                         inlineMath: [
                             ['\\(', '\\)'],
@@ -65,14 +60,7 @@ define(
                     if (oldWidth !== document.documentElement.scrollWidth) {
                         t = window.setTimeout(function() {
                             oldWidth = document.documentElement.scrollWidth;
-                            MathJax.Hub.Queue(
-                                ['Rerender', MathJax.Hub],
-                                [() => $('.MathJax_SVG>svg').toArray().forEach(el => {
-                                    if ($(el).width() === 0) {
-                                        $(el).css('max-width', 'inherit');
-                                    }
-                                })]
-                            );
+                            MathJax.Hub.Queue(['Rerender', MathJax.Hub]);
                             t = -1;
                         }, delay);
                     }

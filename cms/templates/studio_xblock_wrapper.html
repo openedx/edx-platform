@@ -20,6 +20,7 @@ show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block_type)
 messages = xblock.validate().to_json()
+has_not_configured_message = messages.get('summary',{}).get('type', None) == 'not-configured'
 block_is_unit = is_unit(xblock)
 %>
 
@@ -28,6 +29,9 @@ block_is_unit = is_unit(xblock)
 <%block name="header_extras">
 <script type="text/template" id="xblock-validation-messages-tpl">
     <%static:include path="js/xblock-validation-messages.underscore" />
+</script>
+<script type="text/template" id="tag-count-tpl">
+    <%static:include path="js/tag-count.underscore" />
 </script>
 </%block>
 
@@ -40,6 +44,16 @@ block_is_unit = is_unit(xblock)
         $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
     );
 </script>
+
+<%static:webpack entry="js/factories/tag_count">
+    TagCountFactory({
+        tags_count: "${tags_count | n, js_escaped_string}",
+        content_id: "${xblock.location | n, js_escaped_string}",
+        course_authoring_url: "${course_authoring_url | n, js_escaped_string}",
+    },
+        $('li.tag-count[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
+</%static:webpack>
 
 % if not is_root:
     % if is_reorderable:
@@ -99,14 +113,8 @@ block_is_unit = is_unit(xblock)
             <ul class="actions-list nav-dd ui-right">
                 % if not is_root:
                     % if can_edit:
-                        % if use_tagging and tags_count:
-                            <li class="action-item">
-                                <button data-tooltip="${_("Manage Tags")}" class="btn-default action-button manage-tags-button" data-testid="tag-count-button">
-                                    <span class="icon fa fa-tag" aria-hidden="true"></span>
-                                    <span>${tags_count}</span>
-                                    <span class="sr action-button-text">${_("Manage Tags")}</span>
-                                </button>
-                            </li>
+                        % if use_tagging:
+                            <li class="action-item tag-count" data-locator="${xblock.location}"></li>
                         % endif
                         % if not show_inline:
                             <li class="action-item action-edit">
@@ -183,7 +191,7 @@ block_is_unit = is_unit(xblock)
     </div>
     % if not is_root:
         <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location}"/>
-        % if xblock_url:
+        % if xblock_url and not has_not_configured_message:
         <div class="xblock-header-secondary">
             <div class="meta-info">${_('This block contains multiple components.')}</div>
             <ul class="actions-list">

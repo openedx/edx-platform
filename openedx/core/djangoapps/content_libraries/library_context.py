@@ -7,13 +7,10 @@ import logging
 from django.core.exceptions import PermissionDenied
 
 from openedx.core.djangoapps.content_libraries import api, permissions
-from openedx.core.djangoapps.content_libraries.library_bundle import (
-    LibraryBundle,
-    bundle_uuid_for_library_key,
-    usage_for_child_include,
-)
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.xblock.api import LearningContext
+
+from openedx_learning.core.components import api as components_api
 
 log = logging.getLogger(__name__)
 
@@ -46,10 +43,8 @@ class LibraryContextImpl(LearningContext):
             api.require_permission_for_library_key(usage_key.lib_key, user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         except (PermissionDenied, api.ContentLibraryNotFound):
             return False
-        def_key = self.definition_for_usage(usage_key)
-        if not def_key:
-            return False
-        return True
+
+        return self.block_exists(usage_key)
 
     def can_view_block(self, user, usage_key):
         """
@@ -69,37 +64,32 @@ class LibraryContextImpl(LearningContext):
             )
         except (PermissionDenied, api.ContentLibraryNotFound):
             return False
-        def_key = self.definition_for_usage(usage_key)
-        if not def_key:
-            return False
-        return True
 
-    def definition_for_usage(self, usage_key, **kwargs):
-        """
-        Given a usage key for an XBlock in this context, return the
-        BundleDefinitionLocator which specifies the actual XBlock definition
-        (as a path to an OLX in a specific blockstore bundle).
+        return self.block_exists(usage_key)
 
-        Must return a BundleDefinitionLocator if the XBlock exists in this
-        context, or None otherwise.
+    def block_exists(self, usage_key):
         """
-        library_key = usage_key.context_key
+        Does the block for this usage_key exist in this Library?
+
+        Note that this applies to all versions, i.e. you can put a usage key for
+        a piece of content that has been soft-deleted (removed from Drafts), and
+        it will still return True here. That's because for the purposes of
+        permission checking, we just want to know whether that block has ever
+        existed in this Library, because we could be looking at any older
+        version of it.
+        """
         try:
-            bundle_uuid = bundle_uuid_for_library_key(library_key)
+            content_lib = ContentLibrary.objects.get_by_key(usage_key.context_key)
         except ContentLibrary.DoesNotExist:
-            return None
-        if 'force_draft' in kwargs:  # lint-amnesty, pylint: disable=consider-using-get
-            use_draft = kwargs['force_draft']
-        else:
-            use_draft = self.use_draft
-        bundle = LibraryBundle(library_key, bundle_uuid, use_draft)
-        return bundle.definition_for_usage(usage_key)
+            return False
 
-    def usage_for_child_include(self, parent_usage, parent_definition, parsed_include):
-        """
-        Method that the runtime uses when loading a block's child, to get the
-        ID of the child.
+        learning_package = content_lib.learning_package
+        if learning_package is None:
+            return False
 
-        The child is always from an <xblock-include /> element.
-        """
-        return usage_for_child_include(parent_usage, parent_definition, parsed_include)
+        return components_api.component_exists_by_key(
+            learning_package.id,
+            namespace='xblock.v1',
+            type_name=usage_key.block_type,
+            local_key=usage_key.block_id,
+        )

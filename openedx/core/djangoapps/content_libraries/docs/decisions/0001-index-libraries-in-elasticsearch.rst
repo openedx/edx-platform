@@ -1,8 +1,8 @@
 1. Index libraries in elasticsearch
------------------------------------
+###################################
 
 Status
-------
+******
 
 **Revoked**
 
@@ -30,7 +30,7 @@ code.
 
 
 Context
--------
+*******
 
 The new content libraries reside in blockstore instead of edx-platform's models,
 which means that we are no longer able to query databases to get complete
@@ -46,7 +46,7 @@ This is a very inefficient way to fetch metadata for a list of
 libraries/xblocks, and makes it even harder to filter/query them.
 
 Decision
---------
+********
 
 Index the libraries and xblocks in elasticsearch to make them queryable. These
 indexes are updated whenever a library or XBlock is updated through the studio.
@@ -58,7 +58,7 @@ fallbacks have been implemented in case elastic is down or hasn't been enabled
 yet.
 
 Consequences
-------------
+************
 
 List APIs are significantly faster and are able to support filtering and
 searching now that the metadata can be queried using elasticsearch. This also

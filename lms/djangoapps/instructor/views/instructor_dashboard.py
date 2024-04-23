@@ -205,7 +205,9 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # and enable self-generated certificates for a course.
     # Note: This is hidden for all CCXs
     certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
-    if certs_enabled and access['admin']:
+    certs_instructor_enabled = settings.FEATURES.get('ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE', False)
+
+    if certs_enabled and (access['admin'] or (access['instructor'] and certs_instructor_enabled)):
         sections.append(_section_certificates(course))
 
     openassessment_blocks = modulestore().get_items(
@@ -300,10 +302,15 @@ def _section_special_exams(course, access):
     proctoring_provider = course.proctoring_provider
     escalation_email = None
     mfe_view_url = None
-    if proctoring_provider == 'proctortrack':
-        escalation_email = course.proctoring_escalation_email
-    elif proctoring_provider == 'lti_external':
+    if proctoring_provider == 'lti_external':
         mfe_view_url = f'{settings.EXAMS_DASHBOARD_MICROFRONTEND_URL}/course/{course_key}/exams/embed'
+        # NOTE: LTI proctoring doesn't support onboarding. If that changes, this value should change to True.
+        show_onboarding = False
+    else:
+        # Only call does_backend_support_onboarding if  not using an LTI proctoring provider
+        show_onboarding = does_backend_support_onboarding(course.proctoring_provider)
+        if proctoring_provider == 'proctortrack':
+            escalation_email = course.proctoring_escalation_email
     from edx_proctoring.api import is_backend_dashboard_available
 
     section_data = {
@@ -313,7 +320,7 @@ def _section_special_exams(course, access):
         'course_id': course_key,
         'escalation_email': escalation_email,
         'show_dashboard': is_backend_dashboard_available(course_key),
-        'show_onboarding': does_backend_support_onboarding(course.proctoring_provider),
+        'show_onboarding': show_onboarding,
         'mfe_view_url': mfe_view_url,
     }
     return section_data

@@ -319,6 +319,12 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 assert 'audit_access_expires' not in courses[0]
         else:
             assert 'audit_access_expires' in courses[0]
+
+            for course_mode in courses[0]['course_modes']:
+                assert 'android_sku' in course_mode
+                assert 'ios_sku' in course_mode
+                assert 'min_price' in course_mode
+
             if gating_enabled:
                 assert courses[0].get('audit_access_expires') is not None
 

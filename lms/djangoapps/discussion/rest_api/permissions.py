@@ -93,6 +93,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     is_thread = cc_content["type"] == "thread"
     is_comment = cc_content["type"] == "comment"
     has_moderation_privilege = context["has_moderation_privilege"]
+    is_staff_or_admin = context["is_staff_or_admin"]
 
     if is_thread:
         is_thread_closed = cc_content["closed"]
@@ -107,7 +108,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
         "abuse_flagged": True,
         "closed": is_thread and has_moderation_privilege,
         "close_reason_code": is_thread and has_moderation_privilege,
-        "pinned": is_thread and has_moderation_privilege,
+        "pinned": is_thread and (has_moderation_privilege or is_staff_or_admin),
         "read": is_thread,
     }
     if is_thread:

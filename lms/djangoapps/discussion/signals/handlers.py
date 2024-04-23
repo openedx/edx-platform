@@ -2,23 +2,29 @@
 Signal handlers related to discussions.
 """
 
-
 import logging
 
 from django.conf import settings
 from django.dispatch import receiver
 from django.utils.html import strip_tags
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-from xmodule.modulestore.django import SignalHandler
+
+from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
+from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 from lms.djangoapps.discussion import tasks
-from lms.djangoapps.discussion.rest_api.tasks import send_response_notifications, send_thread_created_notification
+from lms.djangoapps.discussion.rest_api.tasks import (
+    send_response_notifications,
+    send_thread_created_notification,
+    send_response_endorsed_notifications
+)
 from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
 
 log = logging.getLogger(__name__)
-
 
 ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY = 'enable_forum_notifications'
 
@@ -43,7 +49,8 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
 
 
 @receiver(signals.comment_created)
-def send_discussion_email_notification(sender, user, post, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+def send_discussion_email_notification(sender, user, post,
+                                       **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
     current_site = get_current_site()
     if current_site is None:
         log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
@@ -64,7 +71,10 @@ def send_discussion_email_notification(sender, user, post, **kwargs):  # lint-am
 
 @receiver(signals.comment_flagged)
 @receiver(signals.thread_flagged)
-def send_reported_content_email_notification(sender, user, post, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+def send_reported_content_email_notification(sender, user, post, **kwargs):
+    """
+    Sends email notification for reported content.
+    """
     current_site = get_current_site()
     if current_site is None:
         log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
@@ -82,6 +92,19 @@ def send_reported_content_email_notification(sender, user, post, **kwargs):  # l
         return
 
     send_message_for_reported_content(user, post, current_site, sender)
+
+
+@receiver(signals.comment_flagged)
+@receiver(signals.thread_flagged)
+def send_reported_content_notification(sender, user, post, **kwargs):
+    """
+    Sends notification for reported content.
+    """
+    course_key = CourseKey.from_string(post.course_id)
+    if not ENABLE_REPORTED_CONTENT_NOTIFICATIONS.is_enabled(course_key):
+        return
+    course = modulestore().get_course(course_key)
+    DiscussionNotificationSender(post, course, user).send_reported_content_notification()
 
 
 def create_message_context(comment, site):
@@ -105,6 +128,7 @@ def create_message_context_for_reported_content(user, post, site, sender):
     """
     Create message context for reported content.
     """
+
     def get_comment_type(comment):
         """
         Returns type of comment.
@@ -131,7 +155,8 @@ def send_message(comment, site):  # lint-amnesty, pylint: disable=missing-functi
     tasks.send_ace_message.apply_async(args=[context])
 
 
-def send_message_for_reported_content(user, post, site, sender):  # lint-amnesty, pylint: disable=missing-function-docstring
+def send_message_for_reported_content(user, post, site,
+                                      sender):  # lint-amnesty, pylint: disable=missing-function-docstring
     context = create_message_context_for_reported_content(user, post, site, sender)
     tasks.send_ace_message_for_reported_content.apply_async(args=[context], countdown=120)
 
@@ -157,3 +182,16 @@ def create_comment_created_notification(*args, **kwargs):
     parent_id = comment.attributes['parent_id']
     course_key_str = comment.attributes['course_id']
     send_response_notifications.apply_async(args=[thread_id, course_key_str, user.id, parent_id])
+
+
+@receiver(signals.comment_endorsed)
+def create_response_endorsed_on_thread_notification(*args, **kwargs):
+    """
+    Creates  a notification for thread author when response on thread is endorsed
+    and another notification for response author when response is endorsed
+    """
+    comment = kwargs['post']
+    thread_id = comment.attributes['thread_id']
+    course_key_str = comment.attributes['course_id']
+    endorsed_by = kwargs['user'].id
+    send_response_endorsed_notifications.apply_async(args=[thread_id, kwargs['post'].id, course_key_str, endorsed_by])

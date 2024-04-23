@@ -264,7 +264,7 @@ from openedx.core.djangolib.markup import HTML, Text
             "course": {
                 "id": "${context_course.id | n, js_escaped_string}",
                 "name": "${context_course.display_name_with_default | n, js_escaped_string}",
-                "url_name": "${context_course.location.name | n, js_escaped_string}",
+                "url_name": "${context_course.location.block_id | n, js_escaped_string}",
                 "org": "${context_course.location.org | n, js_escaped_string}",
                 "num": "${context_course.location.course | n, js_escaped_string}",
                 "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
@@ -281,5 +281,5 @@ from openedx.core.djangolib.markup import HTML, Text
 </div>
 
 <div id="manage-tags-drawer" class="drawer"></div>
-<div class="drawer-cover"></div>
+<div class="drawer-cover gray-cover"></div>
 </%block>

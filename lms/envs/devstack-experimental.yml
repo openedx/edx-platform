@@ -102,7 +102,7 @@ CACHES:
         KEY_PREFIX: course_structure
         LOCATION:
         - edx.devstack.memcached:11211
-        TIMEOUT: '7200'
+        TIMEOUT: '604800'
     default:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         OPTIONS:

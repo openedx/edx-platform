@@ -14,7 +14,6 @@ from organizations.models import Organization
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from openedx.core.lib.blockstore_api import create_collection
 from openedx.core.djangoapps.content_libraries.api import create_library, create_library_block, delete_library_block
 from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 
@@ -39,6 +38,7 @@ class LanguageTaxonomyTestMixin:
         create the taxonomy, simulating the effect of the following migrations:
             1. openedx_tagging.core.tagging.migrations.0012_language_taxonomy
             2. content_tagging.migrations.0007_system_defined_org_2
+            3. openedx_tagging.core.tagging.migrations.0015_taxonomy_export_id
         """
         super().setUp()
         Taxonomy.objects.get_or_create(id=-1, defaults={
@@ -48,6 +48,7 @@ class LanguageTaxonomyTestMixin:
             "allow_multiple": False,
             "allow_free_text": False,
             "visible_to_authors": True,
+            "export_id": "-1_languages",
             "_taxonomy_class": "openedx_tagging.core.tagging.models.system_defined.LanguageTaxonomy",
         })
         TaxonomyOrg.objects.get_or_create(taxonomy_id=-1, defaults={"org": None})
@@ -73,7 +74,7 @@ class TestAutoTagging(  # type: ignore[misc]
 
         If value is None, check if the ObjectTag does not exists
         """
-        object_tags = list(api.get_content_tags(object_key, taxonomy_id=taxonomy_id))
+        object_tags = list(api.get_object_tags(str(object_key), taxonomy_id=taxonomy_id))
         object_tag = object_tags[0] if len(object_tags) == 1 else None
         if len(object_tags) > 1:
             raise ValueError("Found too many object tags")
@@ -166,7 +167,11 @@ class TestAutoTagging(  # type: ignore[misc]
 
         # Simulates user manually changing a tag
         lang_taxonomy = Taxonomy.objects.get(pk=LANGUAGE_TAXONOMY_ID)
-        api.tag_content_object(course.id, lang_taxonomy, ["Español (España)"])
+        api.tag_object(
+            object_id=str(course.id),
+            taxonomy=lang_taxonomy,
+            tags=["Español (España)"]
+        )
 
         # Update course language
         course.language = "en"
@@ -248,10 +253,8 @@ class TestAutoTagging(  # type: ignore[misc]
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
 
     def test_create_delete_library_block(self):
-        # Create collection and library
-        collection = create_collection("Test library collection")
+        # Create library
         library = create_library(
-            collection_uuid=collection.uuid,
             org=self.orgA,
             slug="lib_a",
             title="Library Org A",
@@ -277,10 +280,8 @@ class TestAutoTagging(  # type: ignore[misc]
 
     @override_waffle_flag(CONTENT_TAGGING_AUTO, active=False)
     def test_waffle_disabled_create_delete_library_block(self):
-        # Create collection and library
-        collection = create_collection("Test library collection 2")
+        # Create library
         library = create_library(
-            collection_uuid=collection.uuid,
             org=self.orgA,
             slug="lib_a2",
             title="Library Org A 2",

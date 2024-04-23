@@ -315,6 +315,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_reorderable': is_reorderable,
             'can_edit': can_edit,
             'can_edit_visibility': context.get('can_edit_visibility', is_course),
+            'course_authoring_url': settings.COURSE_AUTHORING_MICROFRONTEND_URL,
             'is_loading': context.get('is_loading', False),
             'is_selected': context.get('is_selected', False),
             'selectable': context.get('selectable', False),
