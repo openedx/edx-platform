@@ -4,11 +4,15 @@ allow users to paste XBlocks that were copied using the staged_content/clipboard
 APIs.
 """
 import ddt
+from django.test import LiveServerTestCase
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
-from xmodule.modulestore.django import contentstore
+from xmodule.modulestore.django import contentstore, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
-from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, LibraryFactory, ToyCourseFactory
+
+from cms.djangoapps.contentstore.utils import reverse_usage_url
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 
 CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
 XBLOCK_ENDPOINT = "/xblock/"
@@ -109,7 +113,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         """
         Test copying a component (XBlock) from one course into another
         """
-        source_course = CourseFactory.create(display_name='Destination Course')
+        source_course = CourseFactory.create(display_name='Source Course')
         source_block = BlockFactory.create(parent_location=source_course.location, **block_args)
 
         dest_course = CourseFactory.create(display_name='Destination Course')
@@ -204,3 +208,79 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         source_pic2_hash = contentstore().find(source_course.id.make_asset_key("asset", "picture2.jpg")).content_digest
         dest_pic2_hash = contentstore().find(dest_course_key.make_asset_key("asset", "picture2.jpg")).content_digest
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
+
+
+class ClipboardLibraryContentPasteTestCase(LiveServerTestCase, ModuleStoreTestCase):
+    """
+    Test Clipboard Paste functionality with library content
+    """
+
+    def setUp(self):
+        """
+        Set up a v2 Content Library and a library content block
+        """
+        super().setUp()
+        self.client = AjaxEnabledTestClient()
+        self.client.login(username=self.user.username, password=self.user_password)
+        self.store = modulestore()
+
+    def test_paste_library_content_block_v1(self):
+        """
+        Same as the above test, but uses modulestore (v1) content library
+        """
+        library = LibraryFactory.create()
+        data = {
+            'parent_locator': str(library.location),
+            'category': 'html',
+            'display_name': 'HTML Content',
+        }
+        response = self.client.ajax_post(XBLOCK_ENDPOINT, data)
+        self.assertEqual(response.status_code, 200)
+        course = CourseFactory.create(display_name='Course')
+        orig_lc_block = BlockFactory.create(
+            parent=course,
+            category="library_content",
+            source_library_id=str(library.location.library_key),
+            display_name="LC Block",
+            publish_item=False,
+        )
+        orig_lc_block.refresh_children()
+        orig_child = self.store.get_item(orig_lc_block.children[0])
+        assert orig_child.display_name == "HTML Content"
+        # Copy a library content block that has children:
+        copy_response = self.client.post(CLIPBOARD_ENDPOINT, {
+            "usage_key": str(orig_lc_block.location)
+        }, format="json")
+        assert copy_response.status_code == 200
+
+        # Paste the Library content block:
+        paste_response = self.client.ajax_post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(course.location),
+            "staged_content": "clipboard",
+        })
+        assert paste_response.status_code == 200
+        dest_lc_block_key = UsageKey.from_string(paste_response.json()["locator"])
+
+        # Get the ID of the new child:
+        dest_lc_block = self.store.get_item(dest_lc_block_key)
+        dest_child = self.store.get_item(dest_lc_block.children[0])
+        assert dest_child.display_name == "HTML Content"
+
+        # Importantly, the ID of the child must not changed when the library content is synced.
+        # Otherwise, user state saved against this child will be lost when it syncs.
+        dest_lc_block.refresh_children()
+        updated_dest_child = self.store.get_item(dest_lc_block.children[0])
+        assert dest_child.location == updated_dest_child.location
+
+    def _sync_lc_block_from_library(self, attr_name):
+        """
+        Helper method to "sync" a Library Content Block by [re-]fetching its
+        children from the library.
+        """
+        usage_key = getattr(self, attr_name).location
+        # It's easiest to do this via the REST API:
+        handler_url = reverse_usage_url('preview_handler', usage_key, kwargs={'handler': 'upgrade_and_sync'})
+        response = self.client.post(handler_url)
+        assert response.status_code == 200
+        # Now reload the block and make sure the child is in place
+        setattr(self, attr_name, self.store.get_item(usage_key))  # we must reload after upgrade_and_sync

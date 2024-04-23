@@ -90,7 +90,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
             % if user.is_authenticated:
                 <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
             % else:
-                <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
+                <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('update_language')}" data-user-is-authenticated="false">
             % endif
             <label><span class="sr">${_("Choose Language")}</span>
             <select class="input select language-selector" id="settings-language-value" name="language">

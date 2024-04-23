@@ -165,3 +165,19 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
             response,
             'This should not survive being overwritten by static content',
         )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED, GOOGLE_ANALYTICS_4_ID='GA-abc')
+    @with_site_configuration(configuration={'platform_name': 'My Platform Site'})
+    def test_html_view_with_g4(self):
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=str(self.course.id),
+            uuid=self.cert.verify_uuid
+        )
+        self._add_course_certificates(count=1, signatory_count=2)
+        response = self.client.get(test_url)
+        self.assertContains(
+            response,
+            'awarded this My Platform Site Honor Code Certificate of Completion',
+        )
+        self.assertContains(response, 'googletagmanager')

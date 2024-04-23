@@ -325,6 +325,12 @@
 
       .action-secondary {
         @extend %t-action4;
+        cursor: pointer;
+        color: $white;
+
+        &:hover {
+          color: $gray-l3;
+        }
       }
     }
   }
