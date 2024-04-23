@@ -36,7 +36,6 @@ var workerConfig = function() {
                 // eslint-disable-next-line global-require
                 entry: require('../workers.json'),
                 output: {
-                    publicPath: "", // https://stackoverflow.com/a/65272040
                     filename: '[name].js',
                     path: path.resolve(__dirname, 'common/static/bundles')
                 },
