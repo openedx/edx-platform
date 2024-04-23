@@ -788,10 +788,12 @@ openedx-events==9.9.1
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   event-tracking
+    #   ora2
 openedx-filters==1.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
+    #   ora2
 openedx-learning==0.8.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -802,7 +804,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
-ora2==6.6.1
+ora2==6.7.0
     # via -r requirements/edx/bundled.in
 packaging==23.2
     # via
