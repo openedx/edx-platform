@@ -1753,29 +1753,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.request.user = self.user
         set_current_request(self.request)
 
-    def test_get_team_sets_from_settings(self):
-        """
-        Tests that get_team_sets_from_settings returns the correct team sets.
-        """
-        settings_dict = {
-            "teams_configuration": {
-                "value": {
-                    "team_sets": [
-                        {
-                            "team_id": "team1",
-                        },
-                        {
-                            "team_id": "team2",
-                        }
-                    ]
-                }
-            }
-        }
-
-        team_sets = CourseMetadata.get_team_sets_from_settings(settings_dict)
-
-        self.assertEqual(team_sets, settings_dict["teams_configuration"]["value"]["team_sets"])
-
     def test_team_content_groups_off(self):
         """
         Tests that user_partition_id is not added to the model when content groups for teams are off.

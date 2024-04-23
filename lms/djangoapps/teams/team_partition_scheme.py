@@ -40,7 +40,7 @@ class TeamUserPartition(UserPartition):
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course_key):
             return []
 
-        # Get the team-set for this partition via the team_sets_mapping and then get the teams in that team-set
+        # Get the team-set for this partition via the partition parameters and then get the teams in that team-set
         # to create the groups for this partition.
         team_sets = TeamsConfigurationService().get_teams_configuration(course_key).teamsets
         team_set_id = self.parameters["team_set_id"]
