@@ -150,6 +150,19 @@ class TeamsConfig:
                 seen_ids.add(teamset.teamset_id)
         return good_teamsets
 
+    def update_teamsets(self, teamsets):
+        """
+        Update the current team-sets configuration with a list of new team-sets.
+
+        Args:
+            teamsets (list of TeamsetConfig): New team-sets to set.
+        """
+        teamsets_key = 'team_sets'
+        if self._data.get('topics'):
+            # For backwards compatibility, also check "topics" key.
+            teamsets_key = 'topics'
+        self._data[teamsets_key] = [teamset.cleaned_data for teamset in teamsets]
+
     @cached_property
     def teamsets_by_id(self):
         return {teamset.teamset_id: teamset for teamset in self.teamsets}

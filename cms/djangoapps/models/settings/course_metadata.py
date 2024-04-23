@@ -17,7 +17,7 @@ from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
-from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TeamsetType
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TeamsConfig, TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -309,30 +309,16 @@ class CourseMetadata:
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(block.id):
             return
 
-        team_sets = cls.get_team_sets_from_settings(settings_dict)
+        teams_config = TeamsConfig(settings_dict.get('teams_configuration', {}).get('value'))
+        team_sets = teams_config.teamsets
         for team_set in team_sets:
-            if not team_set.get('user_partition_id'):
-                team_set['user_partition_id'] = cls.get_user_partition_id(
+            if not team_set.user_partition_id:
+                team_set.user_partition_id = cls.get_user_partition_id(
                     block,
                     MINIMUM_STATIC_PARTITION_ID,
                     MYSQL_MAX_INT,
                 )
-
-    @classmethod
-    def get_team_sets_from_settings(cls, settings_dict):
-        """
-        Load team-sets from the course metadata settings.
-        """
-        teams_config_value = settings_dict.get('teams_configuration', {}).get('value', {})
-        if not teams_config_value:
-            return []
-        proposed_teamsets = teams_config_value.get('team_sets')
-        if proposed_teamsets:
-            return proposed_teamsets
-        proposed_topics = teams_config_value.get('topics')
-        if proposed_topics:
-            return proposed_topics
-        return []
+        teams_config.update_teamsets(team_sets)
 
     @classmethod
     def update_from_dict(cls, key_values, block, user, save=True):
