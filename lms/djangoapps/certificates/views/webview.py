@@ -458,14 +458,15 @@ def _update_organization_context(context, course):
     Updates context with organization related info.
     """
     partner_long_name, organization_logo = None, None
-    partner_short_name = course.display_organization if course.display_organization else course.org
+    course_org_display = course.display_organization
     organizations = organizations_api.get_course_organizations(course_key=course.id)
     if organizations:
         # TODO Need to add support for multiple organizations, Currently we are interested in the first one.
         organization = organizations[0]
         partner_long_name = organization.get('name', partner_long_name)
-        partner_short_name = organization.get('short_name', partner_short_name)
+        course_org_display = course_org_display or organization.get('short_name')
         organization_logo = organization.get('logo', None)
+    partner_short_name = course_org_display or course.org
 
     context['organization_long_name'] = partner_long_name
     context['organization_short_name'] = partner_short_name
