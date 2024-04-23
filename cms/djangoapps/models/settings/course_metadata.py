@@ -269,7 +269,10 @@ class CourseMetadata:
                 did_validate = False
                 errors.append({'key': key, 'message': err_message, 'model': model})
 
-        cls.fill_teams_user_partitions_ids(block, filtered_dict)
+        teams_config = key_values.get('teams_configuration')
+        if teams_config:
+            key_values['teams_configuration'] = cls.fill_teams_user_partitions_ids(block, teams_config)
+
         team_setting_errors = cls.validate_team_settings(filtered_dict)
         if team_setting_errors:
             errors = errors + team_setting_errors
@@ -299,7 +302,7 @@ class CourseMetadata:
         )
 
     @classmethod
-    def fill_teams_user_partitions_ids(cls, block, settings_dict):
+    def fill_teams_user_partitions_ids(cls, block, teams_config):
         """
         Fill the `user_partition_id` in the team settings if it is not set.
 
@@ -307,18 +310,21 @@ class CourseMetadata:
         based on the team-sets defined in the course.
         """
         if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(block.id):
-            return
+            return teams_config
 
-        teams_config = TeamsConfig(settings_dict.get('teams_configuration', {}).get('value'))
-        team_sets = teams_config.teamsets
-        for team_set in team_sets:
+        for team_set in teams_config.teamsets:
             if not team_set.user_partition_id:
                 team_set.user_partition_id = cls.get_user_partition_id(
                     block,
                     MINIMUM_STATIC_PARTITION_ID,
                     MYSQL_MAX_INT,
                 )
-        teams_config.update_teamsets(team_sets)
+        return TeamsConfig(
+            {
+                **teams_config.cleaned_data,
+                "team_sets": [team_set.cleaned_data for team_set in teams_config.teamsets],
+            }
+        )
 
     @classmethod
     def update_from_dict(cls, key_values, block, user, save=True):
