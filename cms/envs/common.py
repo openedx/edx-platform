@@ -581,7 +581,7 @@ FEATURES = {
     'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
 
     # See annotations in lms/envs/common.py for details.
-    'ENABLE_BLAKE2B_HASHiNG': False,
+    'ENABLE_BLAKE2B_HASHING': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
