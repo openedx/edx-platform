@@ -298,7 +298,7 @@ class EnrollmentSupportListView(GenericAPIView):
 
         From all the attributes of a course enrollment:
 
-          * Filter source_system attributes namespaced under `order`
+          * Filter source_system attribute namespaced under `order`
         """
         username = enrollment['user']
         course_id = enrollment['course_id']
