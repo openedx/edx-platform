@@ -98,7 +98,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
-                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@course+block@course',
                 },
                 {
                     'display_name': 'chapter',
@@ -147,7 +146,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
-                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@course+block@course',
                 },
                 {
                     'display_name': 'Overview',
@@ -191,7 +189,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
-                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@course+block@course',
                 },
                 {
                     'display_name': 'Overview',

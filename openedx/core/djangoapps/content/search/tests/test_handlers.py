@@ -75,7 +75,6 @@ class TestUpdateIndexHandlers(
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
-                    "usage_key": "block-v1:orgA+test_course+test_run+type@course+block@course",
                 },
             ],
             "content": {},
@@ -96,7 +95,6 @@ class TestUpdateIndexHandlers(
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
-                    "usage_key": "block-v1:orgA+test_course+test_run+type@course+block@course",
                 },
                 {
                     "display_name": "sequential",
@@ -149,7 +147,7 @@ class TestUpdateIndexHandlers(
             "block_type": "problem",
             "context_key": "lib:orgA:lib_a",
             "org": "orgA",
-            "breadcrumbs": [{"display_name": "Library Org A", "usage_key": "lib:orgA:lib_a"}],
+            "breadcrumbs": [{"display_name": "Library Org A"}],
             "content": {"problem_types": [], "capa_content": " "},
             "access_id": lib_access.id,
         }

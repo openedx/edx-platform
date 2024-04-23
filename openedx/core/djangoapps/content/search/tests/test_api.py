@@ -74,7 +74,6 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
-                    "usage_key": "block-v1:org1+test_course+test_run+type@course+block@course",
                 },
             ],
             "content": {},
@@ -93,7 +92,6 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
-                    "usage_key": "block-v1:org1+test_course+test_run+type@course+block@course",
                 },
                 {
                     "display_name": "sequential",
@@ -122,7 +120,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "block_type": "problem",
             "context_key": "lib:org1:lib",
             "org": "org1",
-            "breadcrumbs": [{"display_name": "Library", "usage_key": "lib:org1:lib"}],
+            "breadcrumbs": [{"display_name": "Library"}],
             "content": {"problem_types": [], "capa_content": " "},
             "type": "library_block",
             "access_id": lib_access.id,
