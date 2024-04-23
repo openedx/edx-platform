@@ -5,7 +5,10 @@ Grades related signals.
 
 from contextlib import contextmanager
 from logging import getLogger
+from urllib.parse import unquote
 
+from django.conf import settings
+from django.core.cache import cache
 from django.dispatch import receiver
 from opaque_keys.edx.keys import LearningContextKey
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, EXAM_ATTEMPT_VERIFIED
@@ -13,7 +16,7 @@ from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
 from common.djangoapps.student.models import user_by_anonymous_id
-from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.courseware.model_data import get_score, set_score
@@ -347,3 +350,38 @@ def exam_attempt_rejected_event_handler(sender, signal, **kwargs):  # pylint: di
         overrider=None,
         comment=None,
     )
+
+@receiver(ENROLL_STATUS_CHANGE)
+def invalidate_usercount_in_course_cache(sender, signal, **kwargs):  # pylint: disable=unused-argument
+    """
+    Invalidate the cache of get_user_count utility on CourseEnrollment status change.
+    """
+    event_data = kwargs.get('exam_attempt')
+    course_key = event_data.course_id   
+
+    cache_key_prefix = f"usercount.{course_key}"
+    cache_keys = get_cache_keys(cache_key_prefix)
+    cache.delete_many(cache_keys)
+
+
+def get_cache_keys(cache_key_prefix):
+    """
+    Get all cache keys for the given cache key prefix.
+    LocMemCache does not have a keys method, so we need to iterate over the cache
+    and manually filter out the keys that match the given prefix.
+    """
+    cache_backend = settings.CACHES['default']['BACKEND']
+    if cache_backend == 'django_redis.cache.RedisCache':
+        yield cache.iter_keys(f"{cache_key_prefix}*")
+    elif cache_backend == 'django.core.cache.backends.locmem.LocMemCache':
+        for key in cache._cache.keys():  # pylint: disable=protected-access
+            try:
+                decoded_key = unquote(key.split(':', 2)[-1], encoding='utf-8')
+            except IndexError:
+                continue
+
+            if decoded_key.startswith(cache_key_prefix):
+                yield decoded_key
+    else:
+        log.error(f"Unsupported cache backend: {cache_backend}")
+        yield
