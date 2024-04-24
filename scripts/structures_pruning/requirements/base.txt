@@ -10,7 +10,7 @@ click==8.1.7
     #   click-log
 click-log==0.4.0
     # via -r scripts/structures_pruning/requirements/base.in
-edx-opaque-keys==2.5.1
+edx-opaque-keys==2.8.0
     # via -r scripts/structures_pruning/requirements/base.in
 pbr==6.0.0
     # via stevedore
@@ -20,5 +20,5 @@ pymongo==3.13.0
     #   edx-opaque-keys
 stevedore==5.2.0
     # via edx-opaque-keys
-typing-extensions==4.10.0
+typing-extensions==4.11.0
     # via edx-opaque-keys
