@@ -1060,6 +1060,15 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
     'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
 
+    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_VERIFIED_REQUIRED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, the courseware search feature will only be enabled
+    #   for users in a verified enrollment track.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-04-24
+    'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': False,
+
     # .. toggle_name: FEATURES['ENABLE_BLAKE2B_HASHING']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1071,15 +1080,6 @@ FEATURES = {
     # .. toggle_warning: For consistency, keep the value in sync with the setting of the same name in the LMS and CMS.
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34442
     'ENABLE_BLAKE2B_HASHING': False,
-
-    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_VERIFIED_REQUIRED']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When enabled, the courseware search feature will only be enabled
-    #   for users in a verified enrollment track.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-04-24
-    'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
