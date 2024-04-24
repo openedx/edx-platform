@@ -128,3 +128,6 @@ xmlsec<1.3.14
 
 # moto==5.0 contains breaking changes. Needs to be updated separately.
 moto<5.0
+
+# django-countries 7.6 adds Django 5.0 support and causes test failures
+django-countries<7.6
