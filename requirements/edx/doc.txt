@@ -898,7 +898,7 @@ oauthlib==3.2.2
     #   lti-consumer-xblock
     #   requests-oauthlib
     #   social-auth-core
-olxcleaner==0.2.1
+olxcleaner==0.3.0
     # via -r requirements/edx/base.txt
 openai==0.28.1
     # via
