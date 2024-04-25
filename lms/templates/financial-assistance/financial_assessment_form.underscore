@@ -36,7 +36,7 @@
 	<h2><%- gettext('Application Details') %></h2>
 
     <% // xss-lint: disable=underscore-not-escaped %>
-	<%= fields %>
+	<%= fields %> 
 
 	<div class="cta-wrapper clearfix">
 		<button type="submit" class="action action-primary action-update js-submit-form submit-form"><%- gettext("Submit Application") %></button>

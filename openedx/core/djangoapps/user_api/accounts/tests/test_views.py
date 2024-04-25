@@ -721,7 +721,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         self.create_mock_verified_name(self.user)
         # set user's custom visibility preferences
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, CUSTOM_VISIBILITY)
-        shared_fields = ["bio", "language_proficiencies", "name"]
+        shared_fields = ("bio", "language_proficiencies", "name")
         for field_name in shared_fields:
             set_user_preference(self.user, f"visibility.{field_name}", ALL_USERS_VISIBILITY)
 

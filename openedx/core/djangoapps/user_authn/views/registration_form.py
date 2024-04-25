@@ -22,7 +22,6 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password, is_registration_api_v1 as is_api_v1
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
@@ -317,6 +316,8 @@ class RegistrationFormFactory:
     Construct Registration forms and associated fields.
     """
 
+    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
         return self._extra_fields_setting.get(field_name) in ["required", "optional", "optional-exposed"]
@@ -330,8 +331,6 @@ class RegistrationFormFactory:
         return self._extra_fields_setting.get(field_name) in ["required", "optional-exposed"]
 
     def __init__(self):
-
-        self.DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
         self.EXTRA_FIELDS = [
             "confirm_email",
@@ -354,8 +353,6 @@ class RegistrationFormFactory:
             "specialty",
             "marketing_emails_opt_in",
         ]
-        if is_auto_generated_username_enabled():
-            self.DEFAULT_FIELDS.remove('username')
 
         if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in self.EXTRA_FIELDS:
             self.EXTRA_FIELDS.remove('year_of_birth')

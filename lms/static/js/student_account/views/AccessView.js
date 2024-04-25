@@ -86,7 +86,6 @@
                 this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
                 this.is_require_third_party_auth_enabled = options.is_require_third_party_auth_enabled || false;
                 this.enable_coppa_compliance = options.enable_coppa_compliance;
-                this.is_auto_generated_username_enabled = options.is_auto_generated_username_enabled;
 
                 // The login view listens for 'sync' events from the reset model
                 this.resetModel = new PasswordResetModel({}, {
@@ -205,8 +204,7 @@
                     var model = new RegisterModel({}, {
                         method: data.method,
                         url: data.submit_url,
-                        nextUrl: this.nextUrl,
-                        is_auto_generated_username_enabled: this.is_auto_generated_username_enabled,
+                        nextUrl: this.nextUrl
                     });
 
                     this.subview.register = new RegisterView({

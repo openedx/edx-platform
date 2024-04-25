@@ -17,13 +17,11 @@
                 },
                 ajaxType: '',
                 urlRoot: '',
-                is_auto_generated_username_enabled: false,
 
                 initialize: function(attributes, options) {
                     this.ajaxType = options.method;
                     this.urlRoot = options.url;
                     this.nextUrl = options.nextUrl;
-                    this.is_auto_generated_username_enabled = options.is_auto_generated_username_enabled;
                 },
 
                 sync: function(method, model) {
@@ -38,14 +36,8 @@
                         data.course_id = decodeURIComponent(courseId);
                     }
 
-                   // Filter out username if auto-generation is enabled
-                    var attributesToSend = _.omit(model.attributes, function(value, key) {
-                        // Exclude username field if auto-generated username is enabled
-                        return key === 'username' && model.is_auto_generated_username_enabled;
-                    });
-
                     // Include all form fields and analytics info in the data sent to the server
-                    $.extend(data, attributesToSend);
+                    $.extend(data, model.attributes);
 
                     $.ajax({
                         url: model.urlRoot,

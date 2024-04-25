@@ -165,9 +165,6 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
     if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in params:
         params['year_of_birth'] = ''
 
-    if is_auto_generated_username_enabled() and 'username' not in params:
-        params['username'] = get_auto_generated_username(params)
-
     # registration via third party (Google, Facebook) using mobile application
     # doesn't use social auth pipeline (no redirect uri(s) etc involved).
     # In this case all related info (required for account linking)

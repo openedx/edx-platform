@@ -23,10 +23,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import (
 )
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
-from openedx.core.djangoapps.user_authn.toggles import (
-    should_redirect_to_authn_microfrontend,
-    is_auto_generated_username_enabled
-)
+from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.user_authn.views.password_reset import get_password_reset_form
 from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.core.djangoapps.user_authn.views.utils import third_party_auth_context
@@ -268,7 +265,6 @@ def login_and_registration_form(request, initial_mode="login"):
             'is_require_third_party_auth_enabled': is_require_third_party_auth_enabled(),
             'enable_coppa_compliance': settings.ENABLE_COPPA_COMPLIANCE,
             'edx_user_info_cookie_name': settings.EDXMKTG_USER_INFO_COOKIE_NAME,
-            'is_auto_generated_username_enabled': is_auto_generated_username_enabled(),
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
