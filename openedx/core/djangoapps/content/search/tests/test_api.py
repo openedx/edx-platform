@@ -3,6 +3,8 @@ Tests for the Studio content search API.
 """
 from __future__ import annotations
 
+import copy
+
 from unittest.mock import MagicMock, call, patch
 
 import ddt
@@ -11,6 +13,7 @@ from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
@@ -117,6 +120,16 @@ class TestSearchApi(ModuleStoreTestCase):
             "access_id": lib_access.id,
         }
 
+        # Create a couple of taxonomies with tags
+        self.taxonomyA = tagging_api.create_taxonomy(name="A", export_id="A")
+        self.taxonomyB = tagging_api.create_taxonomy(name="B", export_id="B")
+        tagging_api.set_taxonomy_orgs(self.taxonomyA, all_orgs=True)
+        tagging_api.set_taxonomy_orgs(self.taxonomyB, all_orgs=True)
+        tagging_api.add_tag_to_taxonomy(self.taxonomyA, "one")
+        tagging_api.add_tag_to_taxonomy(self.taxonomyA, "two")
+        tagging_api.add_tag_to_taxonomy(self.taxonomyB, "three")
+        tagging_api.add_tag_to_taxonomy(self.taxonomyB, "four")
+
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
         with self.assertRaises(RuntimeError):
@@ -127,11 +140,19 @@ class TestSearchApi(ModuleStoreTestCase):
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_reindex_meilisearch(self, mock_meilisearch):
 
+        # Add tags field to doc, since reindex calls includes tags
+        doc_sequential = copy.deepcopy(self.doc_sequential)
+        doc_sequential["tags"] = {}
+        doc_vertical = copy.deepcopy(self.doc_vertical)
+        doc_vertical["tags"] = {}
+        doc_problem = copy.deepcopy(self.doc_problem)
+        doc_problem["tags"] = {}
+
         api.rebuild_index()
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
-                call([self.doc_sequential, self.doc_vertical]),
-                call([self.doc_problem]),
+                call([doc_sequential, doc_vertical]),
+                call([doc_problem]),
             ],
             any_order=True,
         )
@@ -155,6 +176,40 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with(expected_docs)
 
     @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_xblock_tags(self, mock_meilisearch):
+        """
+        Test indexing an XBlock with tags.
+        """
+
+        # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
+        tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyB, ["three", "four"])
+
+        # Build expected docs with tags at each stage
+        doc_sequential_with_tags1 = {
+            "id": self.doc_sequential["id"],
+            "tags": {
+                'taxonomy': ['A'],
+                'level0': ['A > one', 'A > two']
+            }
+        }
+        doc_sequential_with_tags2 = {
+            "id": self.doc_sequential["id"],
+            "tags": {
+                'taxonomy': ['A', 'B'],
+                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
+            }
+        }
+
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_sequential_with_tags1]),
+                call([doc_sequential_with_tags2]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
     def test_delete_index_xblock(self, mock_meilisearch):
         """
         Test deleting an XBlock doc from the index.
@@ -173,6 +228,40 @@ class TestSearchApi(ModuleStoreTestCase):
         api.upsert_library_block_index_doc(self.problem.usage_key)
 
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem])
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_library_block_tags(self, mock_meilisearch):
+        """
+        Test indexing an Library Block with tags.
+        """
+
+        # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
+        tagging_api.tag_object(str(self.problem.usage_key), self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(self.problem.usage_key), self.taxonomyB, ["three", "four"])
+
+        # Build expected docs with tags at each stage
+        doc_problem_with_tags1 = {
+            "id": self.doc_problem["id"],
+            "tags": {
+                'taxonomy': ['A'],
+                'level0': ['A > one', 'A > two']
+            }
+        }
+        doc_problem_with_tags2 = {
+            "id": self.doc_problem["id"],
+            "tags": {
+                'taxonomy': ['A', 'B'],
+                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
+            }
+        }
+
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_problem_with_tags1]),
+                call([doc_problem_with_tags2]),
+            ],
+            any_order=True,
+        )
 
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_delete_index_library_block(self, mock_meilisearch):

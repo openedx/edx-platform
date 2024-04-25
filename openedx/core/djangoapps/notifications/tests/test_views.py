@@ -16,6 +16,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
@@ -296,6 +297,27 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         }
                     },
                     'non_editable': {}
+                },
+                'ora': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'ora_staff_notification': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for Open response submissions.'
+                        }
+                    },
+                    'non_editable': {}
                 }
             }
         }
@@ -349,6 +371,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         """
         Test get user notification preference.
         """
+        if role:
+            CourseStaffRole(self.course.id).add_users(self.user)
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         role_instance = None
@@ -573,6 +597,27 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                             'push': True,
                             'email_cadence': 'Daily',
                             'info': 'Notifications for new announcements and updates from the course team.'
+                        }
+                    },
+                    'non_editable': {}
+                },
+                'ora': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'ora_staff_notification': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for Open response submissions.'
                         }
                     },
                     'non_editable': {}
@@ -881,7 +926,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['count'], 4)
             self.assertEqual(response.data['count_by_app_name'], {
-                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0})
+                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0, 'ora': 0})
             self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
@@ -902,7 +947,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
-        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0})
+        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0, 'ora': 0})
 
     def test_get_expiry_days_in_count_view(self):
         """
@@ -1065,8 +1110,11 @@ def remove_notifications_with_visibility_settings(expected_response):
     Remove notifications with visibility settings from the expected response.
     """
     not_visible = get_notification_types_with_visibility_settings()
-    for notification_type, visibility_settings in not_visible.items():
-        expected_response['notification_preference_config']['discussion']['notification_types'].pop(
-            notification_type
-        )
+    for expected_response_app in expected_response['notification_preference_config']:
+        for notification_type, visibility_settings in not_visible.items():
+            types = expected_response['notification_preference_config'][expected_response_app]['notification_types']
+            if notification_type in types:
+                expected_response['notification_preference_config'][expected_response_app]['notification_types'].pop(
+                    notification_type
+                )
     return expected_response

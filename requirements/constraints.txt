@@ -23,7 +23,7 @@ click>=8.0,<9.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.15.8
+edx-enterprise==4.16.4
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -122,3 +122,9 @@ optimizely-sdk<5.0
 # lxml 5.1.0 introduced a breaking change in unit test shards
 # This constraint can probably be removed once lxml==5.1.1 is released on PyPI
 lxml<5.0
+
+# xmlsec==1.3.14 breaking tests for all builds, can be removed once a fix is available
+xmlsec<1.3.14
+
+# moto==5.0 contains breaking changes. Needs to be updated separately.
+moto<5.0

@@ -355,6 +355,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
         assert 'enterprise_course_enrollments' not in data[0]
         assert data[0]['order_number'] == ''
+        assert data[0]['source_system'] == ''
 
     @ddt.data(*itertools.product(['username', 'email'], [(3, 'ORD-003'), (1, 'ORD-001')]))
     @ddt.unpack
@@ -375,6 +376,23 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         data = json.loads(response.content.decode('utf-8'))
         assert len(data) == 1
         assert data[0]['order_number'] == order_details[1]
+
+    def test_order_source_system_information(self):
+        CourseEnrollmentAttributeFactory(
+            enrollment=self.enrollment,
+            namespace='order',
+            name='source_system',
+            value='commercetools'
+        )
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': self.student.username}
+        )
+        response = self.client.get(url)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert len(data) == 1
+        assert data[0]['source_system'] == 'commercetools'
 
     @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @enterprise_is_enabled()
