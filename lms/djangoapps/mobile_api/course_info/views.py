@@ -3,7 +3,7 @@ Views for course info API
 """
 
 import logging
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 import django
 from django.contrib.auth import get_user_model
@@ -20,11 +20,13 @@ from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
+from lms.djangoapps.mobile_api.course_info.constants import BLOCK_STRUCTURE_CACHE_TIMEOUT
 from lms.djangoapps.mobile_api.course_info.serializers import (
     CourseInfoOverviewSerializer,
     CourseAccessSerializer,
     MobileCourseEnrollmentSerializer
 )
+from lms.djangoapps.mobile_api.course_info.utils import calculate_progress
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
@@ -357,6 +359,12 @@ class BlocksInfoInCourseView(BlocksInCourseView):
 
             course_info_context = {}
             if requested_user := self.get_requested_user(request.user, requested_username):
+                self._extend_sequential_info_with_assignment_progress(
+                    requested_user,
+                    course_key,
+                    response.data['blocks'],
+                )
+
                 course_info_context = {
                     'user': requested_user
                 }
@@ -380,3 +388,36 @@ class BlocksInfoInCourseView(BlocksInCourseView):
 
             response.data.update(course_data)
         return response
+
+    @staticmethod
+    def _extend_sequential_info_with_assignment_progress(
+        requested_user: User,
+        course_id: CourseKey,
+        blocks_info_data: Dict[str, Dict],
+    ) -> None:
+        """
+        Extends sequential xblock info with assignment's name and progress.
+        """
+        subsection_grades = calculate_progress(requested_user, course_id, BLOCK_STRUCTURE_CACHE_TIMEOUT)
+        grades_with_locations = {str(grade.location): grade for grade in subsection_grades}
+
+        for block_id, block_info in blocks_info_data.items():
+            if block_info['type'] == 'sequential':
+                grade = grades_with_locations.get(block_id)
+                if grade:
+                    graded_total = grade.graded_total if grade.graded else None
+                    points_earned = graded_total.earned if graded_total else 0
+                    points_possible = graded_total.possible if graded_total else 0
+                    assignment_type = grade.format
+                else:
+                    points_earned, points_possible, assignment_type = 0, 0, None
+
+                block_info.update(
+                    {
+                        'assignment_progress': {
+                            'assignment_type': assignment_type,
+                            'num_points_earned': points_earned,
+                            'num_points_possible': points_possible,
+                        }
+                    }
+                )
