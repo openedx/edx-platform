@@ -586,7 +586,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-pyfs
-future==0.18.3
+future==1.0.0
     # via pyjwkest
 geoip2==4.8.0
     # via -r requirements/edx/kernel.in
