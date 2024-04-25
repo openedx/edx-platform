@@ -96,10 +96,21 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "access_id": self.toy_course_access_id,
             "display_name": "Test Problem",
             "breadcrumbs": [
-                {"display_name": "Toy Course"},
-                {"display_name": "chapter"},
-                {"display_name": "sequential"},
-                {"display_name": "vertical"},
+                {
+                    'display_name': 'Toy Course',
+                },
+                {
+                    'display_name': 'chapter',
+                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@chapter+block@vertical_container',
+                },
+                {
+                    'display_name': 'sequential',
+                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@sequential+block@vertical_sequential',
+                },
+                {
+                    'display_name': 'vertical',
+                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@vertical+block@vertical_test',
+                },
             ],
             "content": {
                 "capa_content": "What is a test?",
@@ -133,9 +144,17 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "access_id": self.toy_course_access_id,
             "display_name": "Text",
             "breadcrumbs": [
-                {"display_name": "Toy Course"},
-                {"display_name": "Overview"},
-                {"display_name": "Toy Videos"},
+                {
+                    'display_name': 'Toy Course',
+                },
+                {
+                    'display_name': 'Overview',
+                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@chapter+block@Overview',
+                },
+                {
+                    "display_name": "Toy Videos",
+                    "usage_key": "block-v1:edX+toy+2012_Fall+type@sequential+block@Toy_Videos",
+                },
             ],
             "content": {
                 "html_content": (
@@ -168,8 +187,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "access_id": self.toy_course_access_id,
             "display_name": "Welcome",
             "breadcrumbs": [
-                {"display_name": "Toy Course"},
-                {"display_name": "Overview"},
+                {
+                    'display_name': 'Toy Course',
+                },
+                {
+                    'display_name': 'Overview',
+                    'usage_key': 'block-v1:edX+toy+2012_Fall+type@chapter+block@Overview',
+                },
             ],
             "content": {},
             # This video has no tags.
