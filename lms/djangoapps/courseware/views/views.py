@@ -53,6 +53,8 @@ from xmodule.x_module import STUDENT_VIEW
 
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.course import course_location_from_key
@@ -2261,10 +2263,22 @@ def get_learner_username(learner_identifier):
 @api_view(['GET'])
 def courseware_mfe_search_enabled(request, course_id=None):
     """
-    Simple GET endpoint to expose whether the course may use Courseware Search.
+    Simple GET endpoint to expose whether the user may use Courseware Search
+    for a given course.
     """
-
+    enabled = False
     course_key = CourseKey.from_string(course_id) if course_id else None
+    user = request.user
 
-    payload = {"enabled": courseware_mfe_search_is_enabled(course_key)}
+    if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED'):
+        enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+        if (
+            auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+            or (enrollment_mode in CourseMode.VERIFIED_MODES)
+        ):
+            enabled = True
+    else:
+        enabled = True
+
+    payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
     return JsonResponse(payload)
