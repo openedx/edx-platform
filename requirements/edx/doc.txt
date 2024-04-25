@@ -944,7 +944,7 @@ optimizely-sdk==4.1.1
     #   -r requirements/edx/base.txt
 ora2==6.7.0
     # via -r requirements/edx/base.txt
-packaging==23.2
+packaging==24.0
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg

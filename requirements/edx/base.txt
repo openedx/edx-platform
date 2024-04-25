@@ -806,7 +806,7 @@ optimizely-sdk==4.1.1
     #   -r requirements/edx/bundled.in
 ora2==6.7.0
     # via -r requirements/edx/bundled.in
-packaging==23.2
+packaging==24.0
     # via
     #   drf-yasg
     #   gunicorn
