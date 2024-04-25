@@ -297,7 +297,7 @@ django-js-asset==2.2.0
     # via django-mptt
 django-method-override==1.0.4
     # via -r requirements/edx/kernel.in
-django-model-utils==4.4.0
+django-model-utils==4.5.0
     # via
     #   -r requirements/edx/kernel.in
     #   django-user-tasks
