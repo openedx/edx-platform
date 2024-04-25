@@ -957,7 +957,7 @@ grimp==3.2
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
