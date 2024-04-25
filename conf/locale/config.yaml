@@ -44,7 +44,7 @@ ignore_dirs:
     - src/pystache-custom
     - src/rate-xblock
     - src/xblock-google-drive
-    # Ignore the file we use translations are not setup.
+    # Ignore the file we use when translations are not setup in development environments.
     - common/static/js/src/gettext_fallback.js
 
 
