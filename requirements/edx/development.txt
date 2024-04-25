@@ -496,7 +496,7 @@ django-method-override==1.0.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-model-utils==4.4.0
+django-model-utils==4.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
