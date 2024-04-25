@@ -1015,7 +1015,7 @@ pansi==2020.7.3
     # via
     #   -r requirements/edx/base.txt
     #   py2neo
-path==16.10.0
+path==16.14.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
