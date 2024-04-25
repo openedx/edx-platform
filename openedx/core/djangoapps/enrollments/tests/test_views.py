@@ -1820,3 +1820,105 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         results = content['results']
 
         self.assertCountEqual(results, expected_results)
+
+
+@ddt.ddt
+@skip_unless_lms
+class EnrollmentAllowedViewTest(APITestCase):
+    """
+    Test the view that allows the retrieval and creation of enrollment
+    allowed for a given user email and course id.
+    """
+
+    def setUp(self):
+        self.url = reverse('courseenrollmentallowed')
+        self.staff_user = AdminFactory(
+            username='staff',
+            email='staff@example.com',
+            password='edx'
+        )
+        self.student1 = UserFactory(
+            username='student1',
+            email='student1@example.com',
+            password='edx'
+        )
+        self.data = {
+            'email': 'new-student@example.com',
+            'course_id': 'course-v1:edX+DemoX+Demo_Course'
+        }
+        self.staff_token = create_jwt_for_user(self.staff_user)
+        self.student_token = create_jwt_for_user(self.student1)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.staff_token)
+        return super().setUp()
+
+    @ddt.data(
+        [{'email': 'new-student@example.com', 'course_id': 'course-v1:edX+DemoX+Demo_Course'}, status.HTTP_201_CREATED],
+        [{'course_id': 'course-v1:edX+DemoX+Demo_Course'}, status.HTTP_400_BAD_REQUEST],
+        [{'email': 'new-student@example.com'}, status.HTTP_400_BAD_REQUEST],
+    )
+    @ddt.unpack
+    def test_post_enrollment_allowed(self, data, expected_result):
+        """
+        Expected results:
+        - 201: If the request has email and course_id.
+        - 400: If the request has not.
+        """
+        response = self.client.post(self.url, data)
+        assert response.status_code == expected_result
+
+    def test_post_enrollment_allowed_without_staff(self):
+        """
+        Expected result:
+        - 403: Get when I am not staff.
+        """
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.student_token)
+        response = self.client.post(self.url, self.data)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_get_enrollment_allowed_empty(self):
+        """
+        Expected result:
+        - Get the enrollment allowed from the request.user.
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_get_enrollment_allowed(self):
+        """
+        Expected result:
+        - Get the course enrollment allows.
+        """
+        response = self.client.post(path=self.url, data=self.data)
+        response = self.client.get(self.url, {"email": "new-student@example.com"})
+        self.assertContains(response, 'new-student@example.com', status_code=status.HTTP_200_OK)
+
+    def test_get_enrollment_allowed_without_staff(self):
+        """
+        Expected result:
+        - 403: Get when I am not staff.
+        """
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.student_token)
+        response = self.client.get(self.url, {"email": "new-student@example.com"})
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(
+        [{'email': 'new-student@example.com',
+          'course_id': 'course-v1:edX+DemoX+Demo_Course'},
+         status.HTTP_204_NO_CONTENT],
+        [{'email': 'other-student@example.com',
+          'course_id': 'course-v1:edX+DemoX+Demo_Course'},
+         status.HTTP_404_NOT_FOUND],
+        [{'course_id': 'course-v1:edX+DemoX+Demo_Course'},
+         status.HTTP_400_BAD_REQUEST],
+    )
+    @ddt.unpack
+    def test_delete_enrollment_allowed(self, delete_data, expected_result):
+        """
+        Expected results:
+        - 204: Enrollment allowed deleted.
+        - 404: Not found, the course enrollment allowed doesn't exists.
+        - 400: Bad request, missing data.
+        """
+        self.client.post(self.url, self.data)
+        response = self.client.delete(self.url, delete_data)
+        assert response.status_code == expected_result
