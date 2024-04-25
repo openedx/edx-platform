@@ -3805,6 +3805,7 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         Courseware search is only available when the waffle flag is enabled.
         """
         user_admin = UserFactory(is_staff=True, is_superuser=True)
+        CourseEnrollmentFactory.create(user=user_admin, course_id=self.course.id, mode=CourseMode.VERIFIED)
         self.client.login(username=user_admin.username, password=TEST_PASSWORD)
         response = self.client.get(self.apiUrl, content_type='application/json')
         body = json.loads(response.content.decode('utf-8'))
