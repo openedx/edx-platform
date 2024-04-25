@@ -934,7 +934,7 @@ fs-s3fs==0.1.8
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-django-pyfs
-future==0.18.3
+future==1.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

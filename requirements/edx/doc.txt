@@ -675,7 +675,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-pyfs
-future==0.18.3
+future==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   pyjwkest
