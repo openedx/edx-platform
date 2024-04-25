@@ -433,7 +433,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
-django-ses==3.5.2
+django-ses==4.0.0
     # via -r requirements/edx/base.txt
 django-simple-history==3.4.0
     # via
