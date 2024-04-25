@@ -250,7 +250,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-diff-cover==8.0.3
+diff-cover==9.0.0
     # via -r requirements/edx/coverage.txt
 dill==0.3.8
     # via pylint
