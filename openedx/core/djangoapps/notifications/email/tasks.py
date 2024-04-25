@@ -2,6 +2,7 @@
 Celery tasks for sending email notifications
 """
 from celery import shared_task
+from django.contrib.auth import get_user_model
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -23,6 +24,9 @@ from .utils import (
 )
 
 
+User = get_user_model()
+
+
 def get_audience_for_cadence_email(cadence_type):
     """
     Returns users that are eligible to receive cadence email
@@ -30,11 +34,12 @@ def get_audience_for_cadence_email(cadence_type):
     if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError("Invalid value for parameter cadence_type")
     start_date, end_date = get_start_end_date(cadence_type)
-    users = Notification.objects.filter(
+    user_ids = Notification.objects.filter(
         email=True,
         created__gte=start_date,
         created__lte=end_date
-    ).values_list('user__username', flat=True).distinct()
+    ).values_list('user__id', flat=True).distinct()
+    users = User.objects.filter(id__in=user_ids)
     return users
 
 
