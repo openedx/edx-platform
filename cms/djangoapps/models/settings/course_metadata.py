@@ -13,14 +13,17 @@ from django.utils.translation import gettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
+from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
-from openedx.core.lib.teams_config import TeamsetType
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TeamsConfig, TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 LOGGER = logging.getLogger(__name__)
 
@@ -266,6 +269,10 @@ class CourseMetadata:
                 did_validate = False
                 errors.append({'key': key, 'message': err_message, 'model': model})
 
+        teams_config = key_values.get('teams_configuration')
+        if teams_config:
+            key_values['teams_configuration'] = cls.fill_teams_user_partitions_ids(block, teams_config)
+
         team_setting_errors = cls.validate_team_settings(filtered_dict)
         if team_setting_errors:
             errors = errors + team_setting_errors
@@ -281,6 +288,43 @@ class CourseMetadata:
             updated_data = cls.update_from_dict(key_values, block, user, save=False)
 
         return did_validate, errors, updated_data
+
+    @staticmethod
+    def get_user_partition_id(block, min_partition_id, max_partition_id):
+        """
+        Get a dynamic partition id that is not already in use.
+        """
+        used_partition_ids = {p.id for p in get_all_partitions_for_course(block)}
+        return generate_int_id(
+            min_partition_id,
+            max_partition_id,
+            used_partition_ids,
+        )
+
+    @classmethod
+    def fill_teams_user_partitions_ids(cls, block, teams_config):
+        """
+        Fill the `user_partition_id` in the team settings if it is not set.
+
+        This is used by the Dynamic Team Partition Generator to create the dynamic user partitions
+        based on the team-sets defined in the course.
+        """
+        if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(block.id):
+            return teams_config
+
+        for team_set in teams_config.teamsets:
+            if not team_set.user_partition_id:
+                team_set.user_partition_id = cls.get_user_partition_id(
+                    block,
+                    MINIMUM_STATIC_PARTITION_ID,
+                    MYSQL_MAX_INT,
+                )
+        return TeamsConfig(
+            {
+                **teams_config.cleaned_data,
+                "team_sets": [team_set.cleaned_data for team_set in teams_config.teamsets],
+            }
+        )
 
     @classmethod
     def update_from_dict(cls, key_values, block, user, save=True):
@@ -358,7 +402,14 @@ class CourseMetadata:
         error_list = []
         valid_teamset_types = [TeamsetType.open.value, TeamsetType.public_managed.value,
                                TeamsetType.private_managed.value, TeamsetType.open_managed.value]
-        valid_keys = {'id', 'name', 'description', 'max_team_size', 'type'}
+        valid_keys = {
+            'id',
+            'name',
+            'description',
+            'max_team_size',
+            'type',
+            'user_partition_id',
+        }
         teamset_type = topic_settings.get('type', {})
         if teamset_type:
             if teamset_type not in valid_teamset_types:
