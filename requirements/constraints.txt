@@ -129,6 +129,6 @@ xmlsec<1.3.14
 # moto==5.0 contains breaking changes. Needs to be updated separately.
 moto<5.0
 
-# path==16.14.0 breaks the unit test collections check
+# path==16.13.0 breaks the unit test collections check
 # needs to be investigated and fixed separately
-path<16.14.0
+path<16.13.0

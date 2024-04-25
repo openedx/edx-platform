@@ -1357,7 +1357,7 @@ pansi==2020.7.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   py2neo
-path==16.13.0
+path==16.12.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
