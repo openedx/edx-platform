@@ -342,7 +342,7 @@ django-fernet-fields-v2==0.9
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-filter==23.5
+django-filter==24.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise

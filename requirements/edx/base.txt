@@ -282,7 +282,7 @@ django-environ==0.11.2
     # via openedx-blockstore
 django-fernet-fields-v2==0.9
     # via edx-enterprise
-django-filter==23.5
+django-filter==24.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise

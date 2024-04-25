@@ -474,7 +474,7 @@ django-fernet-fields-v2==0.9
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-filter==23.5
+django-filter==24.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
