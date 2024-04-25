@@ -592,7 +592,7 @@ geoip2==4.8.0
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via -r requirements/edx/kernel.in
 help-tokens==2.4.0
     # via -r requirements/edx/kernel.in
