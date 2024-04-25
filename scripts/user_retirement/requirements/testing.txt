@@ -194,7 +194,7 @@ pyparsing==3.1.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
-pytest==8.1.1
+pytest==8.0.1
     # via -r scripts/user_retirement/requirements/testing.in
 python-dateutil==2.9.0.post0
     # via
