@@ -2253,6 +2253,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         assert response.status_code == 400
 
     def test_modify_access_allow(self):
+        assert CourseEnrollment.is_enrolled(self.other_user, self.course.id) is False
         url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': self.other_user.email,
@@ -2260,6 +2261,8 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'action': 'allow',
         })
         assert response.status_code == 200
+        # User should be auto enrolled in the course
+        assert CourseEnrollment.is_enrolled(self.other_user, self.course.id)
 
     def test_modify_access_allow_with_uname(self):
         url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
