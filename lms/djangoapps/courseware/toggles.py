@@ -68,6 +68,21 @@ COURSEWARE_MICROFRONTEND_SEARCH_ENABLED = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.mfe_courseware_search', __name__
 )
 
+# .. toggle_name: courseware.disable_navigation_sidebar_blocks_caching
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Disable caching of navigation sidebar blocks on Learning MFE.
+# It can be used when caching the structure of large courses for a large number of users
+# at the same time can overload the cache storage (memcache or redis).
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-03-21
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: FC-0056
+# .. toggle_warning: None.
+COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.disable_navigation_sidebar_blocks_caching', __name__
+)
+
 # .. toggle_name: courseware.mfe_progress_milestones_streak_discount_enabled
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -170,3 +185,10 @@ def courseware_mfe_search_is_enabled(course_key=None):
     Return whether the courseware.mfe_courseware_search flag is on.
     """
     return COURSEWARE_MICROFRONTEND_SEARCH_ENABLED.is_enabled(course_key)
+
+
+def courseware_disable_navigation_sidebar_blocks_caching(course_key=None):
+    """
+    Return whether the courseware.disable_navigation_sidebar_blocks_caching flag is on.
+    """
+    return COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING.is_enabled(course_key)
