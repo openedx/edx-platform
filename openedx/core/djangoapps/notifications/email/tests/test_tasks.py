@@ -12,7 +12,9 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.email.tasks import (
-    send_digest_email_to_all_users, send_digest_email_to_user
+    get_audience_for_cadence_email,
+    send_digest_email_to_all_users,
+    send_digest_email_to_user
 )
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -122,6 +124,20 @@ class TestEmailDigestAudience(ModuleStoreTestCase):
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_all_users(EmailCadence.DAILY)
         assert not mock_func.called
+
+    @patch('edx_ace.ace.send')
+    def test_email_is_sent_to_user_when_task_is_called(self, mock_func):
+        created_date = datetime.datetime.now() - datetime.timedelta(days=1)
+        create_notification(self.user, self.course.id, created=created_date)
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_all_users(EmailCadence.DAILY)
+        assert mock_func.called
+        assert mock_func.call_count == 1
+
+    def test_audience_query_count(self):
+        with self.assertNumQueries(1):
+            audience = get_audience_for_cadence_email(EmailCadence.DAILY)
+            list(audience)   # evaluating queryset
 
 
 class TestPreferences(ModuleStoreTestCase):
