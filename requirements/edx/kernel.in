@@ -90,6 +90,7 @@ edx-token-utils			    # Validate exam access tokens
 edx-when
 edxval
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
+event-tracking
 fs
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
