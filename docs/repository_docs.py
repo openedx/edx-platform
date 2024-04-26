@@ -1,10 +1,6 @@
 import fnmatch
 import os
 import shutil
-import sys
-from datetime import datetime
-
-from path import Path
 
 DEFAULT_PATTERNS_TO_EXCLUDE_DIRS = (
     '*.tox',
