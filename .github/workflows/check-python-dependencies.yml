@@ -1,0 +1,47 @@
+name: Check Python Dependencies
+
+on:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check_dependencies:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Clone repo-tools repo
+        uses: actions/checkout@v4
+        with:
+          repository: salman2013/repo-tools
+          path: repo_tools
+          ref: salman/add-python-dependency-script  
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install requests module
+        run: pip install requests
+
+      - name: Install rich module
+        run: pip install rich
+
+      - name: Install requirements parser module
+        run: pip install requirements-parser  
+
+      - name: Make the script files executable
+        run: chmod +x repo_tools/edx_repo_tools/find_dependencies/find_python_dependencies.py
+
+      - name: Run Python script
+        run: python repo_tools/edx_repo_tools/find_dependencies/find_python_dependencies.py requirements/edx/base.txt requirements/edx/testing.txt 
