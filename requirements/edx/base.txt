@@ -682,7 +682,6 @@ lti-consumer-xblock==9.10.0
     # via -r requirements/edx/kernel.in
 lxml==4.9.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-i18n-tools
     #   edxval
