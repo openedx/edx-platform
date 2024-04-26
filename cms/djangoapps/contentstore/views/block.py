@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
@@ -72,8 +73,10 @@ log = logging.getLogger(__name__)
 CREATE_IF_NOT_FOUND = ["course_info"]
 
 # Useful constants for defining predicates
-NEVER = lambda x: False
-ALWAYS = lambda x: True
+def NEVER(x):
+    return False
+def ALWAYS(x):
+    return True
 
 
 # Disable atomic requests so transactions made during the request commit immediately instead of waiting for the end of
@@ -301,20 +304,25 @@ def xblock_view_handler(request, usage_key_string, view_name):
         return HttpResponse(status=406)
 
 
+@xframe_options_exempt
 @require_http_methods("GET")
 @login_required
-def edit_view_xblock(request, usage_key_string):
+def xblock_actions_view(request, usage_key_string, action_name):
     """
     The handler for rendered edit xblock view.
     """
     usage_key = usage_key_with_run(usage_key_string)
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
+    if action_name not in ['edit', 'move']:
+        return HttpResponse(status=404)
+
     store = modulestore()
 
     with store.bulk_operations(usage_key.course_key):
         course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
         container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
+        container_handler_context.update({'action_name': action_name})
         return render_to_response('container_editor.html', container_handler_context)
 
 

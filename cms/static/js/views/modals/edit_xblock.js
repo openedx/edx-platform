@@ -208,6 +208,11 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             // Notify child views to stop listening events
             Backbone.trigger('xblock:editorModalHidden');
 
+            window.parent.postMessage({
+              method: 'close_edit_modal',
+              msg: 'Sends a message when the modal window is closed'
+            }, '*');
+
             BaseModal.prototype.hide.call(this);
 
             // Notify the runtime that the modal has been hidden

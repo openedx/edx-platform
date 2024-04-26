@@ -119,6 +119,10 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                     event.preventDefault();
                     event.stopPropagation(); // Make sure parent modals don't see the click
                 }
+                window.parent.postMessage({
+                    method: 'close_edit_modal',
+                    msg: 'Sends a message when the modal window is closed'
+                }, '*');
                 this.hide();
             },
 

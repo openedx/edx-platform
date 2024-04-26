@@ -185,6 +185,10 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
                     targetParentLocator: this.targetParentXBlockInfo.id
                 }
             );
+            window.parent.postMessage({
+                method: 'close_edit_modal',
+                msg: 'Sends a message when the modal window is closed'
+            }, '*');
         }
     });
 

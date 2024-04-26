@@ -150,68 +150,6 @@ from openedx.core.djangolib.markup import HTML, Text
         <main id="main" aria-label="Content" tabindex="-1">
             <div id="content">
                 <%block name="content">
-                    <script type="text/javascript">
-                        window.STUDIO_FRONTEND_IN_CONTEXT_IMAGE_SELECTION = true;
-                    </script>
-
-                    <div style="display:none" class="wrapper-mast wrapper">
-                        <header class="mast has-actions has-navigation has-subtitle">
-                            <nav class="nav-actions" aria-label="${_('Page Actions')}">
-                                <ul>
-                                    <li class="action-item action-edit nav-item">
-                                        <a href="#"  class="button button-edit action-button edit-button">
-                                            <span class="icon fa fa-pencil" aria-hidden="true"></span>
-                                            <span class="action-button-text">${_("Edit")}</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </header>
-                    </div>
-
-                    <script type="text/javascript">
-                        $(document).ready(() => {
-                            // Serves to initialize the rendering of a xblock edit modal window.
-                            setTimeout(() => $('.button-edit').trigger('click'), 300);
-
-                            /**
-                             * Callback function for the MutationObserver to handle mutations
-                             * and send information when the modal window close logic is triggered.
-                             *
-                             * @callback mutationCallback
-                             * @param {MutationRecord[]} mutations - The list of mutations detected by the observer.
-                             */
-                            const xblockEditModalObserver = new MutationObserver((mutations) => {
-                                const modalClassName = 'wrapper-modal-window-edit-xblock';
-
-                                // When a modal window is opened while the template is rendering,
-                                // an element with class modalClassName is rendered,
-                                // the MutationObserver defines this process in removedNodes.
-                                const modalElementMutationRecords = mutations
-                                    .filter(({ removedNodes }) => {
-                                        const filteredModalClassName = Array.from(removedNodes).filter((node) =>
-                                            node.className && node.className.includes(modalClassName));
-
-                                        return filteredModalClassName.length > 0;
-                                    });
-
-                                // If the element was present and deleted, close the modal window.
-                                if (modalElementMutationRecords.length > 0 && !$('.' + modalClassName).length) {
-                                    window.parent.postMessage({
-                                        method: 'close_edit_modal',
-                                        msg: 'Sends a message when the modal window is closed'
-                                    }, '*');
-                                }
-                            });
-
-                            xblockEditModalObserver.observe(document, {
-                                childList: true,
-                                subtree: true,
-                                attributes: true,
-                                attributeFilter: ['class']
-                            });
-                        });
-                    </script>
                 </%block>
             </div>
         </main>
@@ -250,64 +188,24 @@ from openedx.core.djangolib.markup import HTML, Text
             });
         </script>
         <%static:webpack entry="js/factories/container">
-            ContainerFactory(
-                ${component_templates | n, dump_js_escaped_json},
-                ${xblock_info | n, dump_js_escaped_json},
-                '${action | n, js_escaped_string}',
-                {
-                    isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
-                    canEdit: true,
-                    outlineURL: '${outline_url | n, js_escaped_string}',
-                    clipboardData: ${user_clipboard | n, dump_js_escaped_json},
-                }
-            );
 
-            require(['js/models/xblock_info', 'js/views/xblock', 'js/views/utils/xblock_utils', 'common/js/components/utils/view_utils', 'gettext'], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils, gettext) {
-                var model = new XBlockInfo({ id: '${subsection.location|n, decode.utf8}' });
-                var xblockView = new XBlockView({
-                    model: model,
-                    el: $('#sequence-nav'),
-                    view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}',
-                    clipboardData: ${user_clipboard | n, dump_js_escaped_json},
-                });
+            require(['js/models/xblock_info', 'js/views/xblock', 'js/views/utils/xblock_utils',
+'common/js/components/utils/view_utils', 'gettext', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal'],
+function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils, gettext, EditXBlockModal, MoveXBlockModal) {
+            if ('${action_name|n, decode.utf8}' === 'move') {
+                 var parentModel = new XBlockInfo({ id: '${unit.location|n, decode.utf8}', category: 'vertical' });
+                 var moveModal = new MoveXBlockModal({
+                         sourceXBlockInfo: new XBlockInfo(${xblock_info | n, dump_js_escaped_json}),
+                         sourceParentXBlockInfo: parentModel,
+                         XBlockURLRoot: "/xblock",
+                         outlineURL: '${outline_url | n, js_escaped_string}',
+                     });
+                moveModal.show();
+            } else if ('${action_name|n, decode.utf8}' === 'edit') {
+             var editModal = new EditXBlockModal();
 
-                xblockView.xblockReady = function() {
-                    var toggleCaretButton = function(clipboardData) {
-                        if (clipboardData && clipboardData.content && clipboardData.source_usage_key.includes('vertical')) {
-                            $('.dropdown-toggle-button').show();
-                        } else {
-                            $('.dropdown-toggle-button').hide();
-                            $('.dropdown-options').hide();
-                        }
-                    };
-                    this.clipboardBroadcastChannel = new BroadcastChannel('studio_clipboard_channel');
-                    this.clipboardBroadcastChannel.onmessage = (event) => toggleCaretButton(event.data);
-                    toggleCaretButton(this.options.clipboardData);
-
-                    $('#new-unit-button').on('click', function(event) {
-                        event.preventDefault();
-                        XBlockUtils.addXBlock($(this)).done(function(locator) {
-                            ViewUtils.redirect('/container/' + locator + '?action=new');
-                        });
-                    });
-
-                    $('.custom-dropdown .dropdown-toggle-button').on('click', function(event) {
-                        event.stopPropagation(); // Prevent the event from closing immediately when we open it
-                        $(this).next('.dropdown-options').slideToggle('fast'); // This toggles the dropdown visibility
-                        var isExpanded = $(this).attr('aria-expanded') === 'true';
-                        $(this).attr('aria-expanded', !isExpanded);
-                    });
-
-                    $('.seq_paste_unit').on('click', function(event) {
-                        event.preventDefault();
-                        $('.dropdown-options').hide();
-                        XBlockUtils.pasteXBlock($(this)).done(function(data) {
-                            ViewUtils.redirect('/container/' + data.locator + '?action=new');
-                        });
-                    });
-                };
-
-                xblockView.render();
+             editModal.edit([], new XBlockInfo(${xblock_info | n, dump_js_escaped_json}), {});
+            }
             });
         </%static:webpack>
     </%block>
