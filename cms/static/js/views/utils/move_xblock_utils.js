@@ -26,8 +26,25 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
             .done(function(response) {
             // hide modal
                 Backbone.trigger('move:hideMoveModal');
-                // hide xblock element
-                data.sourceXBlockElement.hide();
+                if (data.sourceXBlockElement) {
+                   // hide xblock element
+                  data.sourceXBlockElement.hide();
+                }
+
+                window.parent.postMessage({
+                  method: 'move_xblock',
+                  msg: 'Sends a message when the xblock is moved',
+                  params: {
+                    sourceDisplayName: data.sourceDisplayName,
+                    sourceLocator: data.sourceLocator,
+                    targetParentLocator: data.targetParentLocator,
+                  }
+                }, '*');
+                window.parent.postMessage({
+                  method: 'close_modal',
+                  msg: 'Sends a message when the modal window is closed'
+                }, '*');
+
                 showMovedNotification(
                     StringUtils.interpolate(
                         gettext('Success! "{displayName}" has been moved.'),
@@ -36,7 +53,7 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                         }
                     ),
                     {
-                        sourceXBlockElement: data.sourceXBlockElement,
+                        sourceXBlockElement: data.sourceXBlockElement ? data.sourceXBlockElement : null,
                         sourceDisplayName: data.sourceDisplayName,
                         sourceLocator: data.sourceLocator,
                         sourceParentLocator: data.sourceParentLocator,
@@ -78,7 +95,7 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                         click: function() {
                             undoMoveXBlock(
                                 {
-                                    sourceXBlockElement: data.sourceXBlockElement,
+                                    sourceXBlockElement: data.sourceXBlockElement ? data.sourceXBlockElement : null,
                                     sourceDisplayName: data.sourceDisplayName,
                                     sourceLocator: data.sourceLocator,
                                     sourceParentLocator: data.sourceParentLocator,

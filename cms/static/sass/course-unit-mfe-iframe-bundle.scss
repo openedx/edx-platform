@@ -171,6 +171,10 @@ body {
     }
   }
 
+  .edit-xblock-modal select {
+    background-color: $white;
+  }
+
   &.wrapper-modal-window .modal-window .modal-actions a {
     color: $text-color;
     background-color: $transparent;
