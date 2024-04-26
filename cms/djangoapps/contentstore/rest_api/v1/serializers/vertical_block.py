@@ -152,3 +152,4 @@ class VerticalContainerSerializer(serializers.Serializer):
 
     children = ChildVerticalContainerSerializer(many=True)
     is_published = serializers.BooleanField()
+    can_paste_component = serializers.BooleanField()

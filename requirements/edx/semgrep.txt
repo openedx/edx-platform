@@ -52,7 +52,7 @@ markdown-it-py==3.0.0
     # via rich
 mdurl==0.1.2
     # via markdown-it-py
-packaging==23.2
+packaging==24.0
     # via semgrep
 peewee==3.17.1
     # via semgrep
