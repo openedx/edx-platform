@@ -9,13 +9,14 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from cms.djangoapps.contentstore.utils import load_services_for_studio
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.student.auth import (
     has_studio_read_access,
     has_studio_write_access,
@@ -44,6 +45,8 @@ from ..helpers import (
     is_unit,
 )
 from .preview import get_preview_fragment
+from .component import _get_item_in_course
+from ..utils import get_container_handler_context
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     handle_xblock,
@@ -300,6 +303,30 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
     else:
         return HttpResponse(status=406)
+
+
+@xframe_options_exempt
+@require_http_methods("GET")
+@login_required
+def xblock_actions_view(request, usage_key_string, action_name):
+    """
+    Return rendered xblock action view.
+    The action name should be provided as an argument.
+    Valid options for action names are edit and move.
+    """
+    usage_key = usage_key_with_run(usage_key_string)
+    if not has_studio_read_access(request.user, usage_key.course_key):
+        raise PermissionDenied()
+    if action_name not in ['edit', 'move']:
+        return HttpResponse(status=404)
+
+    store = modulestore()
+
+    with store.bulk_operations(usage_key.course_key):
+        course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+        container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
+        container_handler_context.update({'action_name': action_name})
+        return render_to_response('container_editor.html', container_handler_context)
 
 
 @require_http_methods("GET")

@@ -1,7 +1,11 @@
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
-.wrapper {
+html body {
+  background: transparent;
+}
+
+[class*="view-"] .wrapper {
   .wrapper-xblock {
     background-color: $transparent;
     border-radius: 6px;
@@ -52,6 +56,7 @@
       &:hover {
         background-color: $primary;
         border-color: $transparent;
+        color: $white;
       }
 
       &:focus {
@@ -105,6 +110,10 @@
         }
       }
     }
+  }
+
+  .edit-xblock-modal select {
+    background-color: $white;
   }
 
   &.wrapper-modal-window .modal-window .modal-actions a {
@@ -648,4 +657,15 @@ select {
 
 .wrapper-comp-setting.metadata-list-enum .action.setting-clear.active {
   margin-top: 0;
+}
+
+.wrapper-xblock .xblock-header-primary .header-actions {
+  .wrapper-nav-sub {
+    z-index: 15;
+  }
+
+  .actions-list .action-item.tag-count button.btn-default.action-button.manage-tags-button {
+    width: auto;
+    border-radius: 0;
+  }
 }

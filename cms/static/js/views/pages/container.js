@@ -128,6 +128,12 @@ function($, _, Backbone, gettext, BasePage,
 
             }
 
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'refreshXBlock') {
+                    this.render();
+                }
+            });
+
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
         },
 
@@ -385,10 +391,13 @@ function($, _, Backbone, gettext, BasePage,
             event.preventDefault();
             try {
                 if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
+                    return window.parent.postMessage(
                         {
                             type: 'editXBlock',
-                            payload: {}
+                            message: 'Sends a message when the modal window is shown',
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator')
+                            }
                         }, document.referrer
                     );
                 }
