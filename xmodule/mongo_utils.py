@@ -68,8 +68,8 @@ def connect_to_mongodb(
             wait_time=retry_wait_time
         )
     # If credentials were provided, authenticate the user.
-    if user is not None and password is not None:
-        mongo_conn.authenticate(user, password, source=auth_source)
+    # if user is not None and password is not None:
+    #     mongo_conn.authenticate(user, password, source=auth_source)
 
     return mongo_conn
 

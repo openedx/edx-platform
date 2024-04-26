@@ -43,7 +43,6 @@ cryptography==38.0.4
     #   simple-salesforce
 django==4.2.9
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   django-crum
     #   django-waffle

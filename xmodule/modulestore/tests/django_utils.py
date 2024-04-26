@@ -331,7 +331,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
         settings from before :py:meth:`start_modulestore_isolation` was
         called.
         """
-        drop_mongo_collections()  # pylint: disable=no-value-for-parameter
+        # drop_mongo_collections()  # pylint: disable=no-value-for-parameter
         XMODULE_FACTORY_LOCK.disable()
         cls.__settings_overrides.pop().__exit__(None, None, None)
 

@@ -157,7 +157,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         )
         self.connection.drop_database(self.DB)
         self.addCleanup(self.connection.drop_database, self.DB)
-        self.addCleanup(self.connection.close)
 
         # define attrs which get set in initdb to quell pylint
         self.writable_chapter_location = self.store = self.fake_location = None

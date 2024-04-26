@@ -3,6 +3,7 @@ MongoDB/GridFS-level code for the contentstore.
 """
 
 
+import hashlib
 import json
 import os
 
@@ -10,7 +11,7 @@ import gridfs
 import pymongo
 from bson.son import SON
 from fs.osfs import OSFS
-from gridfs.errors import NoFile, FileExists
+from gridfs.errors import FileExists, NoFile
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
 
@@ -55,7 +56,7 @@ class MongoContentStore(ContentStore):
         """
         Closes any open connections to the underlying databases
         """
-        self.fs_files.database.client.close()
+        pass
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -142,12 +143,16 @@ class MongoContentStore(ContentStore):
                         'thumbnail',
                         thumbnail_location[4]
                     )
+
+                if getattr(fp, 'md5', None) is None:
+                    md5 = hashlib.md5().hexdigest()
+
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
                     import_path=getattr(fp, 'import_path', None),
                     length=fp.length, locked=getattr(fp, 'locked', False),
-                    content_digest=getattr(fp, 'md5', None),
+                    content_digest=md5
                 )
             else:
                 with self.fs.get(content_id) as fp:
@@ -161,12 +166,16 @@ class MongoContentStore(ContentStore):
                             'thumbnail',
                             thumbnail_location[4]
                         )
+
+                    if getattr(fp, 'md5', None) is None:
+                        md5 = hashlib.md5().hexdigest()
+
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,
                         import_path=getattr(fp, 'import_path', None),
                         length=fp.length, locked=getattr(fp, 'locked', False),
-                        content_digest=getattr(fp, 'md5', None),
+                        content_digest=md5
                     )
         except NoFile:
             if throw_on_not_found:  # lint-amnesty, pylint: disable=no-else-raise

@@ -23,7 +23,7 @@ click>=8.0,<9.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.16.4
+edx-enterprise==4.16.5
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -35,9 +35,8 @@ django-oauth-toolkit==1.7.1
 # incremental upgrade
 django-simple-history==3.4.0
 
-# constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
-# Major upgrade will be done in separate ticket.
-pymongo<4.0.0
+# to upgrade mongo to 6.0 or greater need to update this driver.
+pymongo<4.4.1
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
@@ -128,3 +127,4 @@ moto<5.0
 # path==16.12.0 breaks the unit test collections check
 # needs to be investigated and fixed separately
 path<16.12.0
+
