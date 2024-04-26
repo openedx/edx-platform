@@ -1005,11 +1005,12 @@ def modify_access(request, course_id):
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
+    unique_student_identifier = request.POST.get('unique_student_identifier')
     try:
-        user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
+        user = get_student_from_identifier(unique_student_identifier)
     except User.DoesNotExist:
         response_payload = {
-            'unique_student_identifier': request.POST.get('unique_student_identifier'),
+            'unique_student_identifier': unique_student_identifier,
             'userDoesNotExist': True,
         }
         return JsonResponse(response_payload)
@@ -1044,6 +1045,8 @@ def modify_access(request, course_id):
 
     if action == 'allow':
         allow_access(course, user, rolename)
+        if not is_user_enrolled_in_course(user, course_id):
+            CourseEnrollment.enroll(user, course_id)
     elif action == 'revoke':
         revoke_access(course, user, rolename)
     else:

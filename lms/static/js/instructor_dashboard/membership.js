@@ -510,7 +510,7 @@ such that the value can be defined later than this assignment (file load order).
                             text: identifier
                         }));
                     }
-                } 
+                }
                 return displayResponse.$task_response.append($taskResSection);
             };
             if (errors.length === 0 && successes.length === 0 && noUsers.length === 0) {
