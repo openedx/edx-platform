@@ -814,7 +814,7 @@ packaging==24.0
     #   snowflake-connector-python
 pansi==2020.7.3
     # via py2neo
-path==16.12.0
+path==16.11.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
