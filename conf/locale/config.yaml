@@ -1,95 +1,7 @@
 # Configuration for i18n workflow.
 
-# This will copy each source language to a new directory at the end of the i18n generate step
-# which allows us to migrate to a new locale code without re-creating the Transifex project.
-edx_lang_map:
-    zh_CN: zh_HANS
-
 locales:
     - en  # English - Source Language
-    # - am  # Amharic
-    - ar  # Arabic
-    # - az  # Azerbaijani
-    # - bg_BG  # Bulgarian (Bulgaria)
-    # - bn_BD  # Bengali (Bangladesh)
-    # - bn_IN  # Bengali (India)
-    # - bs  # Bosnian
-    - ca  # Catalan
-    # - ca@valencia  # Catalan (Valencia)
-    # - cs  # Czech
-    # - cy  # Welsh
-    # - da  # Danish
-    - de_DE  # German (Germany)
-    - el  # Greek
-    # - en_GB  # English (United Kingdom)
-    # # Don't pull these until we figure out why pages randomly display in these locales,
-    # # when the user's browser is in English and the user is not logged in.
-    # #- en@lolcat  # LOLCAT English
-    # #- en@pirate  # Pirate English
-    - es_419  # Spanish (Latin America)
-    # - es_AR  # Spanish (Argentina)
-    # - es_EC  # Spanish (Ecuador)
-    # - es_ES  # Spanish (Spain)
-    # - es_MX  # Spanish (Mexico)
-    # - es_PE  # Spanish (Peru)
-    # - et_EE  # Estonian (Estonia)
-    - eu_ES  # Basque (Spain)
-    # - fa  # Persian
-    - fa_IR  # Persian (Iran)
-    # - fi_FI  # Finnish (Finland)
-    # - fil  # Filipino
-    - fr  # French
-    # - gl  # Galician
-    # - gu  # Gujarati
-    - he  # Hebrew
-    - hi  # Hindi
-    # - hr  # Croatian
-    # - hu  # Hungarian
-    # - hy_AM  # Armenian (Armenia)
-    - id  # Indonesian
-    - it_IT  # Italian (Italy)
-    - ja_JP  # Japanese (Japan)
-    - ka  # Georgian
-    # - kk_KZ  # Kazakh (Kazakhstan)
-    # - km_KH  # Khmer (Cambodia)
-    # - kn  # Kannada
-    - ko_KR  # Korean (Korea)
-    - lt_LT  # Lithuanian (Lithuania)
-    - lv  # Latvian
-    # - ml  # Malayalam
-    - mn  # Mongolian
-    # - mr  # Marathi
-    # - ms  # Malay
-    # - nb  # Norwegian Bokmål
-    # - ne  # Nepali
-    # - nl_NL  # Dutch (Netherlands)
-    # - or  # Oriya
-    - pl  # Polish
-    - pt_BR  # Portuguese (Brazil)
-    - pt_PT  # Portuguese (Portugal)
-    # - ro  # Romanian
-    - ru  # Russian
-    # - si  # Sinhala
-    - sk  # Slovak
-    # - sl  # Slovenian
-    # - sq  # Albanian
-    # - sr  # Serbian
-    # - sv  # Swedish
-    # - sw  # Swahili
-    - sw_KE  # Swahili (Kenya)
-
-    # - ta  # Tamil
-    # - te  # Telugu
-    - th  # Thai
-    - tr_TR  # Turkish (Turkey)
-    - uk  # Ukranian
-    # - ur  # Urdu
-    # - uz  # Uzbek
-    - vi  # Vietnamese
-    - zh_CN  # Chinese (China)
-    # - zh_HK  # Chinese (Hong Kong)
-    - zh_TW  # Chinese (Taiwan)
-
 
 # The locales used for fake-accented English, for testing.
 dummy_locales:
@@ -132,54 +44,13 @@ ignore_dirs:
     - src/pystache-custom
     - src/rate-xblock
     - src/xblock-google-drive
+    # Ignore the file we use when translations are not setup in development environments.
+    - common/static/js/src/gettext_fallback.js
 
 
 # Third-party installed apps that we also extract strings from.  When adding a
 # file here, also add it to the django.po merge files below, and to the
-# .tx/config file so that it will be pushed to and pulled from transifex.
+# Makefile `extract_translations` target to ensure it makes to Transifex.
 third_party:
     - wiki
     - edx_proctoring_proctortrack
-
-
-# How should .po files be segmented?  See i18n/segment.py for details. Strings
-# that are only found in a particular segment are segregated into that .po file
-# so that translators can focus on separate parts of the product.
-#
-# We segregate Studio so we can provide new languages for LMS without having to
-# also translate the Studio strings. LMS needs the strings from lms/* and
-# common/*, so those will stay in the main .po file.
-segment:
-    django-partial.po:          # This .po file..
-        django-studio.po:       #  produces this .po file..
-            - cms/*             #   by segregating strings from these files.
-        # Anything that doesn't match a pattern stays in the original file.
-    djangojs-partial.po:
-        djangojs-studio.po:
-            - cms/*
-        djangojs-account-settings-view.po:
-            - lms/static/js/student_account/views/account_settings_view.js
-        # Segregating student account settings view strings, so that beta language message
-        # can be translated for wide set of partially supported languages.
-    mako.po:
-        mako-studio.po:
-            - cms/*
-    underscore.po:
-        underscore-studio.po:
-            - cms/*
-
-# How should the generate step merge files?
-generate_merge:
-    django.po:
-        - django-partial.po
-        - django-studio.po
-        - mako.po
-        - mako-studio.po
-        - wiki.po
-        - edx_proctoring_proctortrack.po
-    djangojs.po:
-        - djangojs-partial.po
-        - djangojs-studio.po
-        - djangojs-account-settings-view.po
-        - underscore.po
-        - underscore-studio.po

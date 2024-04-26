@@ -110,13 +110,21 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     Serializer for LibraryXBlockMetadata
     """
     id = serializers.CharField(source="usage_key", read_only=True)
-    def_key = serializers.CharField(read_only=True)
+
+    # TODO: Remove this serializer field once the frontend no longer relies on
+    # it. Learning Core doesn't use definition IDs, but we're passing this dummy
+    # value back to preserve the REST API contract (just to reduce the number of
+    # things we're changing at one time).
+    def_key = serializers.ReadOnlyField(default=None)
+
     block_type = serializers.CharField(source="usage_key.block_type")
     display_name = serializers.CharField(read_only=True)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
+
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
+    tags_count = serializers.IntegerField(read_only=True)
 
 
 class LibraryXBlockTypeSerializer(serializers.Serializer):
@@ -127,41 +135,25 @@ class LibraryXBlockTypeSerializer(serializers.Serializer):
     display_name = serializers.CharField()
 
 
-class LibraryBundleLinkSerializer(serializers.Serializer):
-    """
-    Serializer for a link from a content library blockstore bundle to another
-    blockstore bundle.
-    """
-    id = serializers.SlugField()  # Link name
-    bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
-    # What version of this bundle we are currently linking to.
-    # This is never NULL but can optionally be set to null when creating a new link, which means "use latest version."
-    version = serializers.IntegerField(allow_null=True)
-    # What the latest version of the linked bundle is:
-    # (if latest_version > version), the link can be "updated" to the latest version.
-    latest_version = serializers.IntegerField(read_only=True)
-    # Opaque key: If the linked bundle is a library or other learning context whose opaque key we can deduce, then this
-    # is the key. If we don't know what type of blockstore bundle this link is pointing to, then this is blank.
-    opaque_key = serializers.CharField()
-
-
-class LibraryBundleLinkUpdateSerializer(serializers.Serializer):
-    """
-    Serializer for updating an existing link in a content library blockstore
-    bundle.
-    """
-    version = serializers.IntegerField(allow_null=True)
-
-
 class LibraryXBlockCreationSerializer(serializers.Serializer):
     """
     Serializer for adding a new XBlock to a content library
     """
     # Parent block: optional usage key of an existing block to add this child
-    # block to.
+    # block to. TODO: Remove this, because we don't support it.
     parent_block = serializers.CharField(required=False)
+
     block_type = serializers.CharField()
-    definition_id = serializers.SlugField()
+
+    # TODO: Rename to ``block_id`` or ``slug``. The Learning Core XBlock runtime
+    # doesn't use definition_ids, but this field is really just about requesting
+    # a specific block_id, e.g. the "best_tropical_vacation_spots" portion of a
+    # problem with UsageKey:
+    #   lb:Axim:VacationsLib:problem:best_tropical_vacation_spots
+    #
+    # It doesn't look like the frontend actually uses this to put meaningful
+    # slugs at the moment, but hopefully we can change this soon.
+    definition_id = serializers.CharField(validators=(validate_unicode_slug, ))
 
 
 class LibraryXBlockOlxSerializer(serializers.Serializer):

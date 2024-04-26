@@ -21,7 +21,7 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 
-from lms.djangoapps.discussion.config.waffle import ENABLE_LEARNERS_STATS
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -496,6 +496,7 @@ class CommentViewSetListByUserTest(
 @override_settings(DISCUSSION_MODERATION_CLOSE_REASON_CODES={"test-close-reason": "Test Close Reason"})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
+
     def setUp(self):
         super().setUp()
         self.url = reverse("discussion_course", kwargs={"course_id": str(self.course.id)})
@@ -535,8 +536,6 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "is_group_ta": False,
                 'is_user_admin': False,
                 "user_roles": ["Student"],
-                'learners_tab_enabled': False,
-                "reason_codes_enabled": False,
                 "edit_reasons": [{"code": "test-edit-reason", "label": "Test Edit Reason"}],
                 "post_close_reasons": [{"code": "test-close-reason", "label": "Test Close Reason"}],
             }
@@ -547,6 +546,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
+
     def setUp(self):
         super().setUp()
         RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
@@ -622,6 +622,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ReplaceUsernamesView"""
+
     def setUp(self):
         super().setUp()
         self.worker = UserFactory()
@@ -677,7 +678,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         # Test unauthenticated
         response = self.client.post(self.url, data)
-        assert response.status_code == 401
+        assert response.status_code == 403
 
         # Test non-service worker
         random_user = UserFactory()
@@ -717,6 +718,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
     """
     Tests for CourseTopicsView
     """
+
     def setUp(self):
         httpretty.reset()
         httpretty.enable()
@@ -927,6 +929,7 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
     """
     Tests for CourseTopicsViewV3
     """
+
     def setUp(self) -> None:
         super().setUp()
         self.password = self.TEST_PASSWORD
@@ -1015,6 +1018,7 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for ThreadViewSet list"""
+
     def setUp(self):
         super().setUp()
         self.author = UserFactory.create()
@@ -1356,6 +1360,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet create"""
+
     def setUp(self):
         super().setUp()
         self.url = reverse("thread-list")
@@ -1426,6 +1431,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
     """Tests for ThreadViewSet partial_update"""
+
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
         super().setUp()
@@ -1569,6 +1575,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
+
     def setUp(self):
         super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
@@ -1908,6 +1915,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for CommentViewSet list"""
+
     def setUp(self):
         super().setUp()
         self.author = UserFactory.create()
@@ -1972,6 +1980,13 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         response_data.update(overrides or {})
         return response_data
@@ -2035,6 +2050,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "recursive": ["False"],
                 "with_responses": ["True"],
                 "reverse_order": ["False"],
+                "merge_question_type_responses": ["False"],
             }
         )
 
@@ -2070,8 +2086,36 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "recursive": ["False"],
                 "with_responses": ["True"],
                 "reverse_order": ["False"],
+                "merge_question_type_responses": ["False"],
             }
         )
+
+    def test_question_content_with_merge_question_type_responses(self):
+        self.register_get_user_response(self.user)
+        thread = self.make_minimal_cs_thread({
+            "thread_type": "question",
+            "children": [make_minimal_cs_comment({
+                "id": "endorsed_comment",
+                "user_id": self.user.id,
+                "username": self.user.username,
+                "endorsed": True,
+            }),
+                make_minimal_cs_comment({
+                    "id": "non_endorsed_comment",
+                    "user_id": self.user.id,
+                    "username": self.user.username,
+                    "endorsed": False,
+                })],
+            "resp_total": 2,
+        })
+        self.register_get_thread_response(thread)
+        response = self.client.get(self.url, {
+            "thread_id": thread["id"],
+            "merge_question_type_responses": True
+        })
+        parsed_content = json.loads(response.content.decode('utf-8'))
+        assert parsed_content['results'][0]['id'] == "endorsed_comment"
+        assert parsed_content['results'][1]['id'] == "non_endorsed_comment"
 
     @ddt.data(
         (True, "endorsed_comment"),
@@ -2139,7 +2183,12 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             }}
         )
 
-    def test_child_comments_count(self):
+    @ddt.data(
+        ("discussion", False),
+        ("question", True)
+    )
+    @ddt.unpack
+    def test_child_comments_count(self, thread_type, merge_question_type_responses):
         self.register_get_user_response(self.user)
         response_1 = make_minimal_cs_comment({
             "id": "test_response_1",
@@ -2158,15 +2207,16 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         thread = self.make_minimal_cs_thread({
             "id": self.thread_id,
             "course_id": str(self.course.id),
-            "thread_type": "discussion",
+            "thread_type": thread_type,
             "children": [response_1, response_2],
             "resp_total": 2,
             "comments_count": 8,
             "unread_comments_count": 0,
-
         })
         self.register_get_thread_response(thread)
-        response = self.client.get(self.url, {"thread_id": self.thread_id})
+        response = self.client.get(self.url, {
+            "thread_id": self.thread_id,
+            "merge_question_type_responses": merge_question_type_responses})
         expected_comments = [
             self.expected_response_comment(overrides={"id": "test_response_1", "child_count": 2, "can_delete": False}),
             self.expected_response_comment(overrides={"id": "test_response_2", "child_count": 3, "can_delete": False}),
@@ -2311,6 +2361,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "recursive": ["False"],
                 "with_responses": ["True"],
                 "reverse_order": ["True"],
+                "merge_question_type_responses": ["False"],
             }
         )
 
@@ -2360,6 +2411,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch("lms.djangoapps.discussion.signals.handlers.send_response_notifications", new=mock.Mock())
 class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet create"""
+
     def setUp(self):
         super().setUp()
         self.url = reverse("comment-list")
@@ -2398,6 +2450,13 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         response = self.client.post(
             self.url,
@@ -2450,6 +2509,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
     """Tests for CommentViewSet partial_update"""
+
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
         super().setUp()
@@ -2490,6 +2550,13 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         response_data.update(overrides or {})
         return response_data
@@ -2567,6 +2634,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for ThreadViewSet Retrieve"""
+
     def setUp(self):
         super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
@@ -2618,6 +2686,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for CommentViewSet Retrieve"""
+
     def setUp(self):
         super().setUp()
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
@@ -2680,6 +2749,13 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
 
         response = self.client.get(self.url)
@@ -2815,7 +2891,6 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             'division_scheme': 'cohort',
             'available_division_schemes': ['cohort'],
             'reported_content_email_notifications': False,
-            'reported_content_email_notifications_flag': False,
         }
 
     def patch_request(self, data, headers=None):
@@ -3232,7 +3307,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
 @ddt.ddt
 @httpretty.activate
-@override_waffle_flag(ENABLE_LEARNERS_STATS, True)
+@override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
 class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
                               SharedModuleStoreTestCase):
     """

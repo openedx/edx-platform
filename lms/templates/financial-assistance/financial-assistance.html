@@ -31,9 +31,6 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
       <p>${_("If you are interested in working toward a Verified Certificate, but cannot afford to pay the fee, please apply now. Please note that financial assistance is limited and may not be awarded to all eligible candidates.")}</p>
 
       ## Translators: This string will not be used in Open edX installations.
-      <p>${_("In order to be eligible for edX Financial Assistance, you must demonstrate that paying the Verified Certificate fee would cause you economic hardship. To apply, you will be asked to answer a few questions about why you are applying and how the Verified Certificate will benefit you.")}</p>
-
-      ## Translators: This string will not be used in Open edX installations.
       <p>${_("If your application is approved, we'll give you instructions for verifying your identity on edx.org so you can start working toward completing your edX course.")}</p>
 
       ## Translators: This string will not be used in Open edX installations.
@@ -45,14 +42,8 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
 
 
   <div class="financial-assistance-footer">
-  <%
-    faq_link = marketing_link('FAQ')
-  %>
-  % if faq_link != '#':
-    <a class="faq-link" href="${faq_link}">${_("Back to Student FAQs")}</a>
-  % endif
   % if not reason:
-    <a class="action-link" href="${apply_url}">${_("Apply for Financial Assistance")}</a>
+    <a class="btn btn-primary action-link" href="${apply_url}" role="button">${_("Apply for Financial Assistance")}</a>
   % endif
   </div>
 </div>

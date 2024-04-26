@@ -23,7 +23,6 @@ class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: di
         request = self.context.get('request')
         api_version = self.context.get('api_version')
         enrollment = CourseEnrollment.get_enrollment(user=self.context.get('request').user, course_key=course_id)
-
         return {
             # identifiers
             'id': course_id,
@@ -74,7 +73,7 @@ class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: di
                 'discussion_course',
                 kwargs={'course_id': course_id},
                 request=request,
-            ) if course_overview.is_discussion_tab_enabled() else None,
+            ) if course_overview.is_discussion_tab_enabled(request.user) else None,
 
             # This is an old API that was removed as part of DEPR-4. We keep the
             # field present in case API parsers expect it, but this API is now
@@ -180,3 +179,4 @@ class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     sku = serializers.CharField()
     android_sku = serializers.CharField()
     ios_sku = serializers.CharField()
+    min_price = serializers.IntegerField()

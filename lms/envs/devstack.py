@@ -168,6 +168,7 @@ FEATURES['LICENSING'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF'] = True
 SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = True
 
 ELASTIC_SEARCH_CONFIG = [
     {
@@ -237,6 +238,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and (
 ):
     AUTHENTICATION_BACKENDS = ['common.djangoapps.third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
 
+########################## Authn MFE Context API #######################
+ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
+
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
@@ -279,6 +283,9 @@ WRITABLE_GRADEBOOK_URL = 'http://localhost:1994'
 
 ########################## ORA STAFF GRADING APP ##############################
 ORA_GRADING_MICROFRONTEND_URL = 'http://localhost:1993'
+
+########################## ORA MFE APP ##############################
+ORA_MICROFRONTEND_URL = 'http://localhost:1992'
 
 ########################## LEARNER HOME APP ##############################
 LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
@@ -388,7 +395,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
-EXAMS_DATE_MICROFRONTEND_URL = 'http://localhost:2020'
+EXAMS_DASHBOARD_MICROFRONTEND_URL = 'http://localhost:2020'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
@@ -509,6 +516,20 @@ EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
 
+certificate_revoked_event_config = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.revoked.v1']
+certificate_revoked_event_config['learning-certificate-lifecycle']['enabled'] = True
+certificate_created_event_config = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.created.v1']
+certificate_created_event_config['learning-certificate-lifecycle']['enabled'] = True
+
+course_access_role_added_event_setting = EVENT_BUS_PRODUCER_CONFIG[
+    'org.openedx.learning.user.course_access_role.added.v1'
+]
+course_access_role_added_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
+course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
+    'org.openedx.learning.user.course_access_role.removed.v1'
+]
+course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
+
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
@@ -524,6 +545,25 @@ API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
+############################ CSRF ##################################
+
+# MFEs that will call this service in devstack
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:2000',  # frontend-app-learning
+    'http://localhost:1997',  # frontend-app-account
+    'http://localhost:1995',  # frontend-app-profile
+    'http://localhost:1992',  # frontend-app-ora
+    'http://localhost:2002',  # frontend-app-discussions
+    'http://localhost:1991',  # frontend-app-admin-portal
+    'http://localhost:1999',  # frontend-app-authn
+    'http://localhost:18450',  # frontend-app-support-tools
+    'http://localhost:1994',  # frontend-app-gradebook
+]
+
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

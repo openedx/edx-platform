@@ -86,6 +86,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         assert self.client.get(self.url).data['username'] == self.user.username
 
     def test_get_unknown_course(self):
+        self.client.logout()
         url = reverse('course-home:course-metadata', args=['course-v1:unknown+course+2T2020'])
         # Django TestCase wraps every test in a transaction, so we must specifically wrap this when we expect an error
         with transaction.atomic():

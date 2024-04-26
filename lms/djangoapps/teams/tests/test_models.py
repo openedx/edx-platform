@@ -320,8 +320,11 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
             user = getattr(self, user)
             with patch('lms.djangoapps.discussion.rest_api.tasks.send_response_notifications.apply_async'):
                 with patch('lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'):
-                    signal = self.SIGNALS[signal_name]
-                    signal.send(sender=None, user=user, post=self.mock_comment())
+                    with patch(
+                        'lms.djangoapps.discussion.rest_api.tasks.send_response_endorsed_notifications.apply_async'
+                    ):
+                        signal = self.SIGNALS[signal_name]
+                        signal.send(sender=None, user=user, post=self.mock_comment())
 
     @ddt.data('thread_voted', 'comment_voted')
     def test_vote_others_post(self, signal_name):
@@ -339,5 +342,8 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         with self.assert_last_activity_updated(False):
             with patch('lms.djangoapps.discussion.rest_api.tasks.send_response_notifications.apply_async'):
                 with patch('lms.djangoapps.discussion.rest_api.tasks.send_thread_created_notification.apply_async'):
-                    signal = self.SIGNALS[signal_name]
-                    signal.send(sender=None, user=self.user, post=self.mock_comment(context='course'))
+                    with patch(
+                        'lms.djangoapps.discussion.rest_api.tasks.send_response_endorsed_notifications.apply_async'
+                    ):
+                        signal = self.SIGNALS[signal_name]
+                        signal.send(sender=None, user=self.user, post=self.mock_comment(context='course'))

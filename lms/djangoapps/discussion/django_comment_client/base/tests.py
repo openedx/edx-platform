@@ -177,8 +177,10 @@ class ThreadActionGroupIdTestCase(
         self._assert_json_response_contains_group_info(response)
 
     def test_flag(self, mock_request):
-        response = self.call_view("flag_abuse_for_thread", mock_request)
-        self._assert_json_response_contains_group_info(response)
+        with mock.patch('openedx.core.djangoapps.django_comment_common.signals.thread_flagged.send') as signal_mock:
+            response = self.call_view("flag_abuse_for_thread", mock_request)
+            self._assert_json_response_contains_group_info(response)
+            self.assertEqual(signal_mock.call_count, 1)
         response = self.call_view("un_flag_abuse_for_thread", mock_request)
         self._assert_json_response_contains_group_info(response)
 
@@ -397,6 +399,7 @@ class ViewsQueryCountTestCase(
         Decorates test methods to count mongo and SQL calls for a
         particular modulestore.
         """
+
         def inner(self, default_store, block_count, mongo_calls, sql_queries, *args, **kwargs):
             with modulestore().default_store(default_store):
                 self.set_up_course(block_count=block_count)
@@ -407,7 +410,7 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 8, 43),
+        (ModuleStoreEnum.Type.split, 3, 8, 42),
     )
     @ddt.unpack
     @count_queries
@@ -415,7 +418,7 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 6, 42),
+        (ModuleStoreEnum.Type.split, 3, 6, 41),
     )
     @ddt.unpack
     @count_queries
@@ -424,6 +427,8 @@ class ViewsQueryCountTestCase(
 
 
 @ddt.ddt
+@disable_signal(views, 'comment_flagged')
+@disable_signal(views, 'thread_flagged')
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
         ForumsEnableMixin,
@@ -790,7 +795,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -808,7 +814,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -867,7 +874,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -885,7 +893,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -1349,6 +1358,48 @@ class UpdateCommentUnicodeTestCase(
         assert mock_request.call_args[1]['data']['body'] == text
 
 
+@patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+class CommentActionTestCase(
+        MockRequestSetupMixin,
+        CohortedTestCase,
+        GroupIdAssertionMixin
+):
+    def call_view(
+            self,
+            view_name,
+            mock_request,
+            user=None,
+            post_params=None,
+            view_args=None
+    ):
+        self._set_mock_request_data(
+            mock_request,
+            {
+                "user_id": str(self.student.id),
+                "group_id": self.student_cohort.id,
+                "closed": False,
+                "type": "thread",
+                "commentable_id": "non_team_dummy_id",
+                "body": "test body",
+            }
+        )
+        request = RequestFactory().post("dummy_url", post_params or {})
+        request.user = user or self.student
+        request.view_name = view_name
+
+        return getattr(views, view_name)(
+            request,
+            course_id=str(self.course.id),
+            comment_id="dummy",
+            **(view_args or {})
+        )
+
+    def test_flag(self, mock_request):
+        with mock.patch('openedx.core.djangoapps.django_comment_common.signals.comment_flagged.send') as signal_mock:
+            self.call_view("flag_abuse_for_comment", mock_request)
+            self.assertEqual(signal_mock.call_count, 1)
+
+
 @disable_signal(views, 'comment_created')
 class CreateSubCommentUnicodeTestCase(
         ForumsEnableMixin,
@@ -1670,7 +1721,13 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread", "body": 'dummy body'},
+            {
+                "closed": False,
+                "commentable_id": commentable_id,
+                "thread_id": "dummy_thread",
+                "body": 'dummy body',
+                "course_id": str(self.course.id)
+            },
         )
         for action in ["upvote_comment", "downvote_comment", "un_flag_abuse_for_comment", "flag_abuse_for_comment"]:
             response = self.client.post(
@@ -1691,7 +1748,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "body": "dummy body"},
+            {"closed": False, "commentable_id": commentable_id, "body": "dummy body", "course_id": str(self.course.id)}
         )
         for action in ["upvote_thread", "downvote_thread", "un_flag_abuse_for_thread", "flag_abuse_for_thread",
                        "follow_thread", "unfollow_thread"]:

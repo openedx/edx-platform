@@ -2,7 +2,7 @@
 API Serializers for videos
 """
 from rest_framework import serializers
-from .common import StrictSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import StrictSerializer
 
 
 class FileSpecSerializer(StrictSerializer):
@@ -58,6 +58,20 @@ class VideoModelSerializer(serializers.Serializer):
     )
 
 
+class VideoActiveTranscriptPreferencesSerializer(serializers.Serializer):
+    """Serializer for a videos active transcript preferences"""
+    course_id = serializers.CharField()
+    provider = serializers.CharField()
+    cielo24_fidelity = serializers.CharField()
+    cielo24_turnaround = serializers.CharField()
+    three_play_turnaround = serializers.CharField()
+    preferred_languages = serializers.ListField(
+        child=serializers.CharField()
+    )
+    video_source_language = serializers.CharField()
+    modified = serializers.CharField()
+
+
 class CourseVideosSerializer(serializers.Serializer):
     """Serializer for course videos"""
     image_upload_url = serializers.CharField()
@@ -72,9 +86,10 @@ class CourseVideosSerializer(serializers.Serializer):
     video_upload_max_file_size = serializers.CharField()
     video_image_settings = VideoImageSettingsSerializer(required=True, allow_null=False)
     is_video_transcript_enabled = serializers.BooleanField()
-    active_transcript_preferences = serializers.BooleanField(required=False, allow_null=True)
+    is_ai_translations_enabled = serializers.BooleanField()
+    active_transcript_preferences = VideoActiveTranscriptPreferencesSerializer(required=False, allow_null=True)
     transcript_credentials = serializers.DictField(
-        child=serializers.CharField()
+        child=serializers.BooleanField()
     )
     transcript_available_languages = serializers.ListField(
         child=serializers.DictField(
@@ -92,7 +107,16 @@ class CourseVideosSerializer(serializers.Serializer):
 class VideoUsageSerializer(serializers.Serializer):
     """Serializer for video usage"""
     usage_locations = serializers.ListField(
-        child=serializers.CharField()
+        child=serializers.DictField()
+    )
+
+
+class VideoDownloadSerializer(serializers.Serializer):
+    """Serializer for video downloads"""
+    files = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
     )
 
 

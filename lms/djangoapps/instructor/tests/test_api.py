@@ -88,6 +88,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     generate_already_running_error_message
 )
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
+from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -712,7 +713,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Try uploading some non-CSV file and verify that it is rejected
         """
-        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \xC3\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
@@ -919,15 +920,16 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 2
 
-    @patch('lms.djangoapps.instructor.views.api', 'generate_random_string',
-           Mock(side_effect=['first', 'first', 'second']))
     def test_generate_unique_password_no_reuse(self):
         """
         generate_unique_password should generate a unique password string that hasn't been generated before.
         """
-        generated_password = ['first']
-        password = generate_unique_password(generated_password, 12)
-        assert password != 'first'
+        with patch('lms.djangoapps.instructor.views.api.generate_random_string') as mock:
+            mock.side_effect = ['first', 'first', 'second']
+
+            generated_password = ['first']
+            password = generate_unique_password(generated_password, 12)
+            assert password != 'first'
 
     @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
     def test_allow_automated_signups_flag_not_set(self):
@@ -3773,7 +3775,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.emails = {}
         self.emails_info = {}
 
-    def setup_fake_email_info(self, num_emails, with_failures=False):
+    def setup_fake_email_info(self, num_emails, with_failures=False, with_schedules=False):
         """ Initialize the specified number of fake emails """
         for email_id in range(num_emails):
             num_sent = random.randint(1, 15401)
@@ -3785,15 +3787,25 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
             self.tasks[email_id] = FakeContentTask(email_id, num_sent, failed, 'expected')
             self.emails[email_id] = FakeEmail(email_id)
             self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent, failed)
+            if with_schedules and email_id % 2 == 0:
+                instructor_task = InstructorTask.create(self.course.id, self.tasks[email_id].task_type,
+                                                        self.tasks[email_id].task_key, self.tasks[email_id].task_input,
+                                                        self.instructor)
+                schedule = "2099-05-02T14:00:00.000Z"
+                InstructorTaskSchedule.objects.create(
+                    task=instructor_task,
+                    task_args=json.dumps(self.tasks[email_id].task_output),
+                    task_due=schedule,
+                )
 
     def get_matching_mock_email(self, **kwargs):
         """ Returns the matching mock emails for the given id """
         email_id = kwargs.get('id', 0)
         return self.emails[email_id]
 
-    def get_email_content_response(self, num_emails, task_history_request, with_failures=False):
+    def get_email_content_response(self, num_emails, task_history_request, with_failures=False, with_schedules=False):
         """ Calls the list_email_content endpoint and returns the respsonse """
-        self.setup_fake_email_info(num_emails, with_failures)
+        self.setup_fake_email_info(num_emails, with_failures, with_schedules)
         task_history_request.return_value = list(self.tasks.values())
         url = reverse('list_email_content', kwargs={'course_id': str(self.course.id)})
         with patch(
@@ -3804,9 +3816,9 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         assert response.status_code == 200
         return response
 
-    def check_emails_sent(self, num_emails, task_history_request, with_failures=False):
+    def check_emails_sent(self, num_emails, task_history_request, with_failures=False, with_schedules=False):
         """ Tests sending emails with or without failures """
-        response = self.get_email_content_response(num_emails, task_history_request, with_failures)
+        response = self.get_email_content_response(num_emails, task_history_request, with_failures, with_schedules)
         assert task_history_request.called
         expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
         actual_email_info = json.loads(response.content.decode('utf-8'))['emails']
@@ -3844,6 +3856,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
     def test_content_list_email_content_many(self, task_history_request):
         """ Test listing of bulk emails sent large amount of emails """
         self.check_emails_sent(50, task_history_request)
+        self.check_emails_sent(50, task_history_request, False, True)
 
     def test_list_email_content_error(self, task_history_request):
         """ Test handling of error retrieving email """
@@ -3864,10 +3877,12 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
     def test_list_email_with_failure(self, task_history_request):
         """ Test the handling of email task that had failures """
         self.check_emails_sent(1, task_history_request, True)
+        self.check_emails_sent(1, task_history_request, True, True)
 
     def test_list_many_emails_with_failures(self, task_history_request):
         """ Test the handling of many emails with failures """
         self.check_emails_sent(50, task_history_request, True)
+        self.check_emails_sent(50, task_history_request, True, True)
 
     def test_list_email_with_no_successes(self, task_history_request):
         task_info = FakeContentTask(0, 0, 10, 'expected')

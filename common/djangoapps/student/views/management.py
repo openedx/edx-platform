@@ -38,6 +38,7 @@ from pytz import UTC
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
+from common.djangoapps.student.toggles import should_redirect_to_courseware_after_enrollment
 from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
@@ -171,7 +172,9 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-def compose_activation_email(user, user_registration=None, route_enabled=False, profile_name='', redirect_url=None):
+def compose_activation_email(
+    user, user_registration=None, route_enabled=False, profile_name='', redirect_url=None, registration_flow=False
+):
     """
     Construct all the required params for the activation email
     through celery task
@@ -186,6 +189,8 @@ def compose_activation_email(user, user_registration=None, route_enabled=False, 
         'routed_user': user.username,
         'routed_user_email': user.email,
         'routed_profile_name': profile_name,
+        'registration_flow': registration_flow,
+        'is_enterprise_learner': is_enterprise_learner(user),
     })
 
     if route_enabled:
@@ -221,7 +226,9 @@ def _get_activation_confirmation_link(activation_key, redirect_url=None):
     return urllib.parse.urlunparse((scheme, netloc, path, params, query, fragment))
 
 
-def compose_and_send_activation_email(user, profile, user_registration=None, redirect_url=None):
+def compose_and_send_activation_email(
+    user, profile, user_registration=None, redirect_url=None, registration_flow=False,
+):
     """
     Construct all the required params and send the activation email
     through celery task
@@ -231,10 +238,13 @@ def compose_and_send_activation_email(user, profile, user_registration=None, red
         profile: profile object of the current logged-in user
         user_registration: registration of the current logged-in user
         redirect_url: The URL to redirect to after successful activation
+        registration_flow: Is the request coming from registration workflow
     """
     route_enabled = settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL')
 
-    msg = compose_activation_email(user, user_registration, route_enabled, profile.name, redirect_url)
+    msg = compose_activation_email(
+        user, user_registration, route_enabled, profile.name, redirect_url, registration_flow
+    )
     from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS') or (
         configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     )
@@ -400,8 +410,10 @@ def change_enrollment(request, check_access=True):
                 reverse("course_modes_choose", kwargs={'course_id': str(course_id)})
             )
 
-        # Otherwise, there is only one mode available (the default)
-        return HttpResponse()
+        if should_redirect_to_courseware_after_enrollment():
+            return HttpResponse(reverse('courseware', args=[str(course_id)]))
+        else:
+            return HttpResponse()
     elif action == "unenroll":
         if configuration_helpers.get_value(
             "DISABLE_UNENROLLMENT",
@@ -907,7 +919,7 @@ def confirm_email_change(request, key):
 
         response = render_to_response("email_change_successful.html", address_context)
 
-        USER_EMAIL_CHANGED.send(sender=None, user=user)
+        USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
         return response
 
 

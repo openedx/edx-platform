@@ -49,6 +49,47 @@ class StudioEditableBlock(XBlockMixin):
         """
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 
+    # Some parts of the code use getattr to dynamically check for the following methods on subclasses.
+    # We'd like to refactor so that we can actually declare them here as overridable methods.
+    # For now, we leave them here as documentation.
+    # See https://github.com/openedx/edx-platform/issues/33715.
+    #
+    # def editor_saved(self, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
+    #     """
+    #     Called right *before* the block is written to the DB. Can be used, e.g., to modify fields before saving.
+    #
+    #     By default, is a no-op. Can be overriden in subclasses.
+    #     """
+    #
+    # def post_editor_saved(self, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
+    #     """
+    #     Called right *after* the block is written to the DB. Can be used, e.g., to spin up followup tasks.
+    #
+    #     By default, is a no-op. Can be overriden in subclasses.
+    #     """
+    #
+    # def studio_post_duplicate(self, store, source_block) -> bool:  # pylint: disable=unused-argument
+    #     """
+    #     Called when a the block is duplicated. Can be used, e.g., for special handling of child duplication.
+    #
+    #     Returns 'True' if children have been handled and thus shouldn't be handled by the standard
+    #     duplication logic.
+    #
+    #     By default, is a no-op. Can be overriden in subclasses.
+    #     """
+    #     return False
+    #
+    # def studio_post_paste(self, store, source_node) -> bool:  # pylint: disable=unused-argument
+    #     """
+    #     Called after a block is copy-pasted. Can be used, e.g., for special handling of child duplication.
+    #
+    #     Returns 'True' if children have been handled and thus shouldn't be handled by the standard
+    #     duplication logic.
+    #
+    #     By default, is a no-op. Can be overriden in subclasses.
+    #     """
+    #     return False
+
 
 def has_author_view(block):
     """

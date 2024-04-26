@@ -4,7 +4,7 @@ API Serializers for course settings
 
 from rest_framework import serializers
 
-from .common import CourseCommonSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import CourseCommonSerializer
 
 
 class CourseSettingsSerializer(serializers.Serializer):

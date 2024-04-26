@@ -6,8 +6,6 @@
 🌳🌳🌳🌳         or ask in the #wg-build-test-release Slack channel if you have any questions or need help.
 🌳🌳
 
-🌴🌴🌴🌴🌴🌴     🌴 Note: the Palm release is still supported.
-                Please consider whether your change should be applied to Palm as well.
 
 Please give your pull request a short but descriptive title.
 Use conventional commits to separate and summarize commits logically:

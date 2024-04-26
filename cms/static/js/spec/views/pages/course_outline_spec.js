@@ -42,6 +42,8 @@ describe('CourseOutlinePage', function() {
             user_partition_info: {},
             highlights_enabled: true,
             highlights_enabled_for_messaging: false,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -68,7 +70,9 @@ describe('CourseOutlinePage', function() {
             show_review_rules: true,
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -93,7 +97,9 @@ describe('CourseOutlinePage', function() {
             group_access: {},
             user_partition_info: {},
             highlights: [],
-            highlights_enabled: true
+            highlights_enabled: true,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -123,7 +129,9 @@ describe('CourseOutlinePage', function() {
             },
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true,
         }, options, {child_info: {children: children}});
     };
 
@@ -141,7 +149,9 @@ describe('CourseOutlinePage', function() {
             edited_by: 'MockUser',
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options);
     };
 
@@ -313,7 +323,8 @@ describe('CourseOutlinePage', function() {
             'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
-            'course-highlights-enable', 'course-video-sharing-enable', 'summary-configuration-editor'
+            'course-highlights-enable', 'course-video-sharing-enable', 'summary-configuration-editor',
+            'subsection-share-link-modal-tabs', 'full-page-share-link-editor', 'embed-link-share-link-editor',
         ]);
         appendSetFixtures(mockOutlinePage);
         mockCourseJSON = createMockCourseJSON({}, [
@@ -1214,7 +1225,9 @@ describe('CourseOutlinePage', function() {
                 is_practice_exam: false,
                 is_proctored_exam: false,
                 default_time_limit_minutes: 150,
-                hide_after_due: true
+                hide_after_due: true,
+                hide_from_toc: false,
+                enable_hide_from_toc_ui: true,
             }, [
                 createMockVerticalJSON({
                     has_changes: true,
@@ -1397,6 +1410,7 @@ describe('CourseOutlinePage', function() {
                     default_time_limit_minutes: 150,
                     hide_after_due: true,
                     is_onboarding_exam: false,
+                    hide_from_toc: null,
                 }
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -2240,6 +2254,8 @@ describe('CourseOutlinePage', function() {
                     is_practice_exam: false,
                     is_proctored_exam: false,
                     default_time_limit_minutes: null,
+                    hide_from_toc: false,
+                    enable_hide_from_toc_ui: true,
                 }, [
                     createMockVerticalJSON({
                         has_changes: true,
@@ -2521,6 +2537,7 @@ describe('CourseOutlinePage', function() {
                     publish: 'republish',
                     metadata: {
                         visible_to_staff_only: null,
+                        hide_from_toc: null
                     }
                 });
             })

@@ -10,8 +10,6 @@ from django.test import TestCase
 from openedx.core.lib import blockstore_api as api
 from openedx.core.lib.blockstore_api.tests.base import (
     BlockstoreAppTestMixin,
-    requires_blockstore,
-    requires_blockstore_app,
 )
 
 # A fake UUID that won't represent any real bundle/draft/collection:
@@ -197,14 +195,6 @@ class BlockstoreApiClientTestMixin:
         assert not api.get_bundle_links(course_bundle.uuid, use_draft=course_draft.name)
 
 
-@requires_blockstore
-class BlockstoreServiceApiClientTest(BlockstoreApiClientTestMixin, TestCase):
-    """
-    Test the Blockstore API Client, using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
 class BlockstoreAppApiClientTest(BlockstoreApiClientTestMixin, BlockstoreAppTestMixin, TestCase):
     """
     Test the Blockstore API Client, using the installed Blockstore app.

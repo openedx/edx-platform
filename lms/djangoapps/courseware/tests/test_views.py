@@ -110,7 +110,14 @@ from openedx.features.course_experience.url_helpers import (
     get_learning_mfe_home_url,
     make_learning_mfe_courseware_url
 )
+from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerUserFactory,
+    EnterpriseCustomerFactory
+)
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.features.enterprise_support.api import add_enterprise_customer_to_session
+from enterprise.api.v1.serializers import EnterpriseCustomerSerializer
 
 QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
@@ -932,27 +939,22 @@ class ViewsTestCase(BaseViewsTestCase):
         url = reverse(submit_url)
         return self.client.post(url, json.dumps(data), content_type='application/json', HTTP_REFERER=referrer_url)
 
+    @override_settings(ZENDESK_CUSTOM_FIELDS={'course_id': 'custom_123'})
     @patch.object(views, 'create_zendesk_ticket', return_value=200)
     def test_submit_financial_assistance_request(self, mock_create_zendesk_ticket):
         username = self.user.username
         course = str(self.course_key)
         legal_name = 'Jesse Pinkman'
         country = 'United States'
-        income = '1234567890'
-        reason_for_applying = "It's just basic chemistry, yo."
-        goals = "I don't know if it even matters, but... work with my hands, I guess."
-        effort = "I'm done, okay? You just give me my money, and you and I, we're done."
         data = {
             'username': username,
             'course': course,
             'name': legal_name,
             'email': self.user.email,
             'country': country,
-            'income': income,
-            'reason_for_applying': reason_for_applying,
-            'goals': goals,
-            'effort': effort,
-            'mktg-permission': False,
+            'certify-economic-hardship': False,
+            'certify-complete-certificate': False,
+            'certify-honor-code': False,
         }
         response = self._submit_financial_assistance_form(data)
         assert response.status_code == 204
@@ -960,17 +962,19 @@ class ViewsTestCase(BaseViewsTestCase):
         __, __, ticket_subject, __ = mock_create_zendesk_ticket.call_args[0]
         mocked_kwargs = mock_create_zendesk_ticket.call_args[1]
         group_name = mocked_kwargs['group']
-        tags = mocked_kwargs['tags']
+        custom_fields = mocked_kwargs['custom_fields']
         additional_info = mocked_kwargs['additional_info']
 
         private_comment = '\n'.join(list(additional_info.values()))
-        for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
+        for info in (country, username, legal_name, course):
             assert info in private_comment
 
-        assert additional_info['Allowed for marketing purposes'] == 'No'
+        assert additional_info['Paying for the course would cause economic hardship'] == 'No'
+        assert additional_info['Certify work diligently to receive a certificate'] == 'No'
+        assert additional_info['Certify abide by the honor code'] == 'No'
 
         assert ticket_subject == f'Financial assistance request for learner {username} in course {self.course.display_name}'  # pylint: disable=line-too-long
-        self.assertDictContainsSubset({'course_id': course}, tags)
+        self.assertEqual([{'id': 'custom_123', 'value': course}], custom_fields)
         assert 'Client IP' in additional_info
         assert group_name == 'Financial Assistance'
 
@@ -982,11 +986,9 @@ class ViewsTestCase(BaseViewsTestCase):
             'name': '',
             'email': '',
             'country': '',
-            'income': '',
-            'reason_for_applying': '',
-            'goals': '',
-            'effort': '',
-            'mktg-permission': False,
+            'certify-economic-hardship': False,
+            'certify-complete-certificate': False,
+            'certify-honor-code': False,
         })
         assert response.status_code == 500
 
@@ -995,18 +997,21 @@ class ViewsTestCase(BaseViewsTestCase):
     )
     @ddt.data(
         ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_204_NO_CONTENT),
+        ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_403_FORBIDDEN),
         ('/financial-assistance/course-v1:invalid+ErrorX+Invalid_Course/apply/', status.HTTP_400_BAD_REQUEST)
     )
     @ddt.unpack
     def test_submit_financial_assistance_request_v2(self, referrer_url, expected_status, *args):
+        # We expect a 403 if the user account is not active
+        if expected_status == status.HTTP_403_FORBIDDEN:
+            self.user.is_active = False
+            self.user.save()
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',
-            'income': '$25,000 - $40,000',
-            'reason_for_applying': "It's just basic chemistry, yo.",
-            'goals': "I don't know if it even matters, but... work with my hands, I guess.",
-            'effort': "I'm done, okay? You just give me my money, and you and I, we're done.",
-            'mktg-permission': False
+            'certify-economic-hardship': False,
+            'certify-complete-certificate': False,
+            'certify-honor-code': False,
         }
         response = self._submit_financial_assistance_form(
             form_data,
@@ -1513,7 +1518,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
         for _ in range(2):
             with self.assertNumQueries(
-                37, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                38, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
 
@@ -3230,17 +3235,71 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     Test access utilities
     """
     @ddt.data(
-        (1, False),
-        (-1, True)
+        {
+            'start_date_modifier': 1,  # course starts in future
+            'setup_enterprise_enrollment': False,
+            'expected_has_access': False,
+            'expected_error_code': 'course_not_started',
+        },
+        {
+            'start_date_modifier': -1,  # course already started
+            'setup_enterprise_enrollment': False,
+            'expected_has_access': True,
+            'expected_error_code': None,
+        },
+        {
+            'start_date_modifier': 1,  # course starts in future
+            'setup_enterprise_enrollment': True,
+            'expected_has_access': False,
+            'expected_error_code': 'course_not_started_enterprise_learner',
+        },
+        {
+            'start_date_modifier': -1,  # course already started
+            'setup_enterprise_enrollment': True,
+            'expected_has_access': True,
+            'expected_error_code': None,
+        },
     )
     @ddt.unpack
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_is_course_open_for_learner(self, start_date_modifier, expected_value):
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
+    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
+    def test_is_course_open_for_learner(
+        self,
+        start_date_modifier,
+        setup_enterprise_enrollment,
+        expected_has_access,
+        expected_error_code,
+    ):
+        """
+        Test is_course_open_for_learner().
+
+        When setup_enterprise_enrollment == True, make an enterprise-subsidized enrollment, setting up one of each:
+        * CourseEnrollment
+        * EnterpriseCustomer
+        * EnterpriseCustomerUser
+        * EnterpriseCourseEnrollment
+        * A mock request session to pre-cache the enterprise customer data.
+        """
         staff_user = AdminFactory()
         start_date = datetime.now(UTC) + timedelta(days=start_date_modifier)
         course = CourseFactory.create(start=start_date)
+        request = RequestFactory().get('/')
+        request.user = staff_user
+        request.session = {}
+        if setup_enterprise_enrollment:
+            course_enrollment = CourseEnrollmentFactory(mode=CourseMode.VERIFIED, user=staff_user, course_id=course.id)
+            enterprise_customer = EnterpriseCustomerFactory(enable_learner_portal=True)
+            add_enterprise_customer_to_session(request, EnterpriseCustomerSerializer(enterprise_customer).data)
+            enterprise_customer_user = EnterpriseCustomerUserFactory(
+                user_id=staff_user.id,
+                enterprise_customer=enterprise_customer,
+            )
+            EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
+        set_current_request(request)
 
-        assert bool(check_course_open_for_learner(staff_user, course)) == expected_value
+        access_response = check_course_open_for_learner(staff_user, course)
+        assert bool(access_response) == expected_has_access
+        assert access_response.error_code == expected_error_code
 
 
 class DatesTabTestCase(TestCase):
@@ -3689,6 +3748,8 @@ class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
             assert context['course'] == self.course
 
 
+@ddt.ddt
+@override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=True)
 class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
     """
     Tests the endpoint to fetch the Courseware Search waffle flag enabled status.
@@ -3702,12 +3763,36 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.client = APIClient()
         self.apiUrl = reverse('courseware_search_enabled_view', kwargs={'course_id': str(self.course.id)})
 
-    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=True)
-    def test_courseware_mfe_search_enabled(self):
+    @ddt.data(
+        (CourseMode.AUDIT, False),
+        (CourseMode.VERIFIED, True),
+        (CourseMode.MASTERS, True),
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': True})
+    def test_courseware_mfe_search_verified_only(self, mode, expected_enabled):
         """
-        Getter to check if user is allowed to use Courseware Search.
+        Only verified enrollees may use Courseware Search if ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED
+        is enabled.
         """
+        user = UserFactory()
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
 
+        self.client.login(username=user.username, password=TEST_PASSWORD)
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': expected_enabled})
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': True})
+    def test_courseware_mfe_search_staff_access(self):
+        """
+        Staff users may use Courseware Search regardless of their enrollment status.
+        """
+        user_staff = UserFactory(is_staff=True)  # not enrolled
+
+        self.client.login(username=user_staff.username, password=TEST_PASSWORD)
         response = self.client.get(self.apiUrl, content_type='application/json')
         body = json.loads(response.content.decode('utf-8'))
 
@@ -3715,11 +3800,13 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.assertEqual(body, {'enabled': True})
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
-    def test_is_mfe_search_disabled(self):
+    def test_is_mfe_search_waffle_disabled(self):
         """
-        Getter to check if user is allowed to use Courseware Search.
+        Courseware search is only available when the waffle flag is enabled.
         """
-
+        user_admin = UserFactory(is_staff=True, is_superuser=True)
+        CourseEnrollmentFactory.create(user=user_admin, course_id=self.course.id, mode=CourseMode.VERIFIED)
+        self.client.login(username=user_admin.username, password=TEST_PASSWORD)
         response = self.client.get(self.apiUrl, content_type='application/json')
         body = json.loads(response.content.decode('utf-8'))
 

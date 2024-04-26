@@ -56,6 +56,7 @@ class CourseVideosViewTest(CourseTestCase, PermissionAccessMixin):
                 "supported_file_formats": settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
             },
             "is_video_transcript_enabled": False,
+            "is_ai_translations_enabled": False,
             "active_transcript_preferences": None,
             "transcript_credentials": None,
             "transcript_available_languages": get_all_transcript_languages(),
@@ -126,3 +127,10 @@ class CourseVideosViewTest(CourseTestCase, PermissionAccessMixin):
             )
             self.assertIn("transcript_credentials_handler_url", transcript_settings)
             self.assertEqual(expected_credentials_handler, transcript_settings["transcript_credentials_handler_url"])
+        with patch(
+            'openedx.core.djangoapps.video_config.toggles.XPERT_TRANSLATIONS_UI.is_enabled'
+        ) as xpertTranslationfeature:
+            xpertTranslationfeature.return_value = True
+            response = self.client.get(self.url)
+            self.assertIn("is_ai_translations_enabled", response.data)
+            self.assertTrue(response.data["is_ai_translations_enabled"])

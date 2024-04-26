@@ -53,26 +53,57 @@ from openedx.core.djangolib.markup import HTML, Text
                 clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             }
         );
-        require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils) {
+
+        require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils", "gettext"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils, gettext) {
             var model = new XBlockInfo({
                 id: '${subsection.location|n, decode.utf8}'
             });
             var xblockView = new XBlockView({
                 model: model,
                 el: $('#sequence-nav'),
-                view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}'
+                view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}',
+                clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             });
+
             xblockView.xblockReady = function() {
-                $('.seq_new_button').click(function(evt) {
-                    evt.preventDefault();
-                    XBlockUtils.addXBlock($(evt.target)).done(function(locator) {
+
+                var toggleCaretButton = function(clipboardData) {
+                    if (clipboardData && clipboardData.content && clipboardData.source_usage_key.includes("vertical")) {
+                        $('.dropdown-toggle-button').show();
+                    } else {
+                        $('.dropdown-toggle-button').hide();
+                        $('.dropdown-options').hide();
+                    }
+                };
+                this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+                this.clipboardBroadcastChannel.onmessage = (event) => {
+                    toggleCaretButton(event.data);
+                };
+                toggleCaretButton(this.options.clipboardData);
+
+                $('#new-unit-button').on('click', function(event) {
+                    event.preventDefault();
+                    XBlockUtils.addXBlock($(this)).done(function(locator) {
                         ViewUtils.redirect('/container/' + locator + '?action=new');
-                        return false;
                     });
-                    return false;
                 });
 
+                $('.custom-dropdown .dropdown-toggle-button').on('click', function(event) {
+                    event.stopPropagation(); // Prevent the event from closing immediately when we open it
+                    $(this).next('.dropdown-options').slideToggle('fast'); // This toggles the dropdown visibility
+                    var isExpanded = $(this).attr('aria-expanded') === 'true';
+                    $(this).attr('aria-expanded', !isExpanded);
+                });
+
+                $('.seq_paste_unit').on('click', function(event) {
+                    event.preventDefault();
+                    $('.dropdown-options').hide();
+                    XBlockUtils.pasteXBlock($(this)).done(function(data) {
+                        ViewUtils.redirect('/container/' + data.locator + '?action=new');
+                    });
+                });
             };
+
             xblockView.render();
         });
     </%static:webpack>
@@ -152,6 +183,14 @@ from openedx.core.djangolib.markup import HTML, Text
                             <span class="action-button-text">${_("Edit")}</span>
                         </a>
                     </li>
+                    % if is_collapsible:
+                        <li class="action-item action-toggle-preview nav-item">
+                            <a href="#" class="button button-toggle-preview action-button">
+                                <span class="icon fa fa-arrow-up" aria-hidden="true"></span>
+                                <span class="action-button-text preview-text">${_("Collapse All")}</span>
+                            </a>
+                        </li>
+                    % endif
                 % endif
             </ul>
         </nav>
@@ -164,8 +203,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <div class="wrapper-content wrapper">
     <div class="inner-wrapper">
         <section class="content-area">
-
-            <article class="content-primary">
+            <article class="content-primary ${'content-primary-fullwidth' if is_fullwidth_content else ''}">
                 <div class="container-message wrapper-message"></div>
                 <%
                     assets_url = reverse('assets_handler', kwargs={'course_key_string': str(xblock_locator.course_key)})
@@ -213,7 +251,10 @@ from openedx.core.djangolib.markup import HTML, Text
                                 )}</span>
                             </p>
                         </div>
-                     </div>
+                    </div>
+                    % if show_unit_tags:
+                        <div class="unit-tags is-hidden"></div>
+                    % endif
                 % endif
             </aside>
         </section>
@@ -223,7 +264,7 @@ from openedx.core.djangolib.markup import HTML, Text
             "course": {
                 "id": "${context_course.id | n, js_escaped_string}",
                 "name": "${context_course.display_name_with_default | n, js_escaped_string}",
-                "url_name": "${context_course.location.name | n, js_escaped_string}",
+                "url_name": "${context_course.location.block_id | n, js_escaped_string}",
                 "org": "${context_course.location.org | n, js_escaped_string}",
                 "num": "${context_course.location.course | n, js_escaped_string}",
                 "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
@@ -238,4 +279,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
     </div>
 </div>
+
+<div id="manage-tags-drawer" class="drawer"></div>
+<div class="drawer-cover gray-cover"></div>
 </%block>

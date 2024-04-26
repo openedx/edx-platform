@@ -89,6 +89,23 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     margin: 1em 0 0;
   }
 
+  .wrapper-video-bottom-section {
+    display: flex;
+
+    .wrapper-download-video,
+    .wrapper-download-transcripts,
+    .wrapper-handouts,
+    .branding,
+    .wrapper-transcript-feedback {
+      flex: 1;
+      margin-top: $baseline;
+
+      @include padding-right($baseline);
+
+      vertical-align: top;
+    }
+  }
+
   .wrapper-downloads {
     @include media-breakpoint-up(md) {
       display: flex;
@@ -96,18 +113,6 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
     .hd {
       margin: 0;
-    }
-
-    .wrapper-download-video,
-    .wrapper-download-transcripts,
-    .wrapper-handouts,
-    .branding {
-      flex: 1;
-      margin-top: $baseline;
-
-      @include padding-right($baseline);
-
-      vertical-align: top;
     }
 
     .wrapper-download-video {
@@ -151,6 +156,24 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         padding: ($baseline/4) 0;
         vertical-align: middle;
       }
+    }
+
+  }
+
+  .wrapper-transcript-feedback {
+    display: none;
+    
+    .transcript-feedback-buttons {
+      display: flex;
+    }
+    .transcript-feedback-btn-wrapper {
+      margin-right: 10px;
+    }
+    .thumbs-up-btn,
+    .thumbs-down-btn {
+      border: none;
+      box-shadow: none;
+      background: transparent;
     }
   }
 

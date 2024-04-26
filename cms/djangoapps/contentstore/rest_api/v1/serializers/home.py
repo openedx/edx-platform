@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from openedx.core.lib.api.serializers import CourseKeyField
 
-from .common import CourseCommonSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import CourseCommonSerializer
 
 
 class UnsucceededCourseSerializer(serializers.Serializer):
@@ -29,6 +29,16 @@ class LibraryViewSerializer(serializers.Serializer):
     org = serializers.CharField()
     number = serializers.CharField()
     can_edit = serializers.BooleanField()
+
+
+class CourseHomeTabSerializer(serializers.Serializer):
+    archived_courses = CourseCommonSerializer(required=False, many=True)
+    courses = CourseCommonSerializer(required=False, many=True)
+    in_process_course_actions = UnsucceededCourseSerializer(many=True, required=False, allow_null=True)
+
+
+class LibraryTabSerializer(serializers.Serializer):
+    libraries = LibraryViewSerializer(many=True, required=False, allow_null=True)
 
 
 class CourseHomeSerializer(serializers.Serializer):

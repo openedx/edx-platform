@@ -26,7 +26,6 @@ from django.utils.decorators import method_decorator
 from django.utils.text import slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import gettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -54,6 +53,8 @@ from xmodule.x_module import STUDENT_VIEW
 
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.course import course_location_from_key
@@ -138,7 +139,10 @@ from openedx.features.enterprise_support.api import data_sharing_consent_require
 
 from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor
 from ..tabs import _get_dynamic_tabs
-from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
+from ..toggles import (
+    COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
+    ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER,
+)
 
 log = logging.getLogger("edx.courseware")
 
@@ -276,6 +280,7 @@ def courses(request):
     """
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
+    set_default_filter = ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER.is_enabled()
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = get_courses(request.user)
 
@@ -293,6 +298,7 @@ def courses(request):
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
+            'set_default_filter': set_default_filter,
             'programs_list': programs_list,
         }
     )
@@ -1966,13 +1972,13 @@ class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
-    ' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'  # lint-amnesty, pylint: disable=line-too-long
-    ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
-    ' audit track for a course that offers Verified Certificates, and then complete this application.'
-    ' Note that you must complete a separate application for each course you take.\n We plan to use this'
-    ' information to evaluate your application for financial assistance and to further develop our'
-    ' financial assistance program.'
+    'We plan to use this information to evaluate your application for financial assistance and to further develop our'
+    ' financial assistance program. Please note that while \nassistance is available in most courses that offer'
+    ' verified certificates, a few courses and programs are not eligible. You must complete a separate application'
+    ' \nfor each course you take. You may be approved for financial assistance five (5) times each year'
+    ' (based on 12-month period from you first approval). \nTo apply for financial assistance: \n'
+    '1. Enroll in the audit track for an eligible course that offers Verified Certificates \n2. Complete this'
+    '  application \n3. Check your email, your application will be reviewed in 3-4 business days'
 )
 
 
@@ -1980,15 +1986,6 @@ def _get_fa_header(header):
     return header.\
         format(percent_sign="%",
                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
-
-
-FA_INCOME_LABEL = gettext_noop('Annual Household Income')
-FA_REASON_FOR_APPLYING_LABEL = gettext_noop('Tell us about your current financial situation. Why do you need assistance?')  # lint-amnesty, pylint: disable=line-too-long
-FA_GOALS_LABEL = gettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')  # lint-amnesty, pylint: disable=line-too-long
-
-FA_EFFORT_LABEL = gettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')  # lint-amnesty, pylint: disable=line-too-long
-
-FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
 
 @login_required
@@ -2018,17 +2015,19 @@ def financial_assistance_request(request):
         username = data['username']
         if request.user.username != username:
             return HttpResponseForbidden()
+        # Require email verification
+        if request.user.is_active is not True:
+            logging.warning('FA_v1: User %s tried to submit app without activating their account.', username)
+            return HttpResponseForbidden('Please confirm your email before applying for financial assistance.')
 
         course_id = data['course']
         course = modulestore().get_course(CourseKey.from_string(course_id))
         legal_name = data['name']
         email = data['email']
         country = data['country']
-        income = data['income']
-        reason_for_applying = data['reason_for_applying']
-        goals = data['goals']
-        effort = data['effort']
-        marketing_permission = data['mktg-permission']
+        certify_economic_hardship = data['certify-economic-hardship']
+        certify_complete_certificate = data['certify-complete-certificate']
+        certify_honor_code = data['certify-honor-code']
         ip_address = get_client_ip(request)[0]
     except ValueError:
         # Thrown if JSON parsing fails
@@ -2048,7 +2047,12 @@ def financial_assistance_request(request):
             course_name=course.display_name
         ),
         'Financial Assistance Request',
-        tags={'course_id': course_id},
+        custom_fields=[
+            {
+                'id': settings.ZENDESK_CUSTOM_FIELDS.get('course_id'),
+                'value': course_id,
+            },
+        ],
         # Send the application as additional info on the ticket so
         # that it is not shown when support replies. This uses
         # OrderedDict so that information is presented in the right
@@ -2057,12 +2061,10 @@ def financial_assistance_request(request):
             ('Username', username),
             ('Full Name', legal_name),
             ('Course ID', course_id),
-            (FA_INCOME_LABEL, income),
             ('Country', country),
-            ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
-            (FA_REASON_FOR_APPLYING_LABEL, '\n' + reason_for_applying + '\n\n'),
-            (FA_GOALS_LABEL, '\n' + goals + '\n\n'),
-            (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
+            ('Paying for the course would cause economic hardship', 'Yes' if certify_economic_hardship else 'No'),
+            ('Certify work diligently to receive a certificate', 'Yes' if certify_complete_certificate else 'No'),
+            ('Certify abide by the honor code', 'Yes' if certify_honor_code else 'No'),
             ('Client IP', ip_address),
         )),
         group='Financial Assistance',
@@ -2089,16 +2091,18 @@ def financial_assistance_request_v2(request):
         # submitting an FA request
         if request.user.username != username:
             return HttpResponseForbidden()
+        # Require email verification
+        if request.user.is_active is not True:
+            logging.warning('FA_v2: User %s tried to submit app without activating their account.', username)
+            return HttpResponseForbidden('Please confirm your email before applying for financial assistance.')
 
         course_id = data['course']
         if course_id and course_id not in request.META.get('HTTP_REFERER'):
             return HttpResponseBadRequest('Invalid Course ID provided.')
         lms_user_id = request.user.id
-        income = data['income']
-        learner_reasons = data['reason_for_applying']
-        learner_goals = data['goals']
-        learner_plans = data['effort']
-        allowed_for_marketing = data['mktg-permission']
+        certify_economic_hardship = data['certify-economic-hardship']
+        certify_complete_certificate = data['certify-complete-certificate']
+        certify_honor_code = data['certify-honor-code']
 
     except ValueError:
         # Thrown if JSON parsing fails
@@ -2110,11 +2114,9 @@ def financial_assistance_request_v2(request):
     form_data = {
         'lms_user_id': lms_user_id,
         'course_id': course_id,
-        'income': income,
-        'learner_reasons': learner_reasons,
-        'learner_goals': learner_goals,
-        'learner_plans': learner_plans,
-        'allowed_for_marketing': allowed_for_marketing
+        'certify_economic_hardship': certify_economic_hardship,
+        'certify_complete_certificate': certify_complete_certificate,
+        'certify-honor-code': certify_honor_code,
     }
     return create_financial_assistance_application(form_data)
 
@@ -2127,13 +2129,13 @@ def financial_assistance_form(request, course_id=None):
     if course_id:
         disabled = True
     enrolled_courses = get_financial_aid_courses(user, course_id)
-    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000',
-               '$25,000 - $40,000', '$40,000 - $55,000', '$55,000 - $70,000', '$70,000 - $85,000',
-               '$85,000 - $100,000', 'More than $100,000']
 
-    annual_incomes = [
-        {'name': _(income), 'value': income} for income in incomes  # lint-amnesty, pylint: disable=translation-of-non-string
-    ]
+    default_course = ''
+    for enrolled_course in enrolled_courses:
+        if enrolled_course['value'] == course_id:
+            default_course = enrolled_course['name']
+            break
+
     if course_id and _use_new_financial_assistance_flow(course_id):
         submit_url = 'submit_financial_assistance_request_v2'
     else:
@@ -2141,7 +2143,7 @@ def financial_assistance_form(request, course_id=None):
 
     return render_to_response('financial-assistance/apply.html', {
         'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
-        'student_faq_url': marketing_link('FAQ'),
+        'course_id': course_id,
         'dashboard_url': reverse('dashboard'),
         'account_settings_url': reverse('account_settings'),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
@@ -2158,7 +2160,7 @@ def financial_assistance_form(request, course_id=None):
                 'type': 'select',
                 'label': _('Course'),
                 'placeholder': '',
-                'defaultValue': '',
+                'defaultValue': default_course,
                 'required': True,
                 'disabled': disabled,
                 'options': enrolled_courses,
@@ -2169,64 +2171,46 @@ def financial_assistance_form(request, course_id=None):
                 )
             },
             {
-                'name': 'income',
-                'type': 'select',
-                'label': _(FA_INCOME_LABEL),  # lint-amnesty, pylint: disable=translation-of-non-string
-                'placeholder': '',
-                'defaultValue': '',
-                'required': True,
-                'options': annual_incomes,
-                'instructions': _('Specify your annual household income in US Dollars.')
-            },
-            {
-                'name': 'reason_for_applying',
-                'type': 'textarea',
-                'label': _(FA_REASON_FOR_APPLYING_LABEL),  # lint-amnesty, pylint: disable=translation-of-non-string
-                'placeholder': '',
-                'defaultValue': '',
-                'required': True,
-                'restrictions': {
-                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
-                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
-                },
-                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
-            },
-            {
-                'name': 'goals',
-                'type': 'textarea',
-                'label': _(FA_GOALS_LABEL),  # lint-amnesty, pylint: disable=translation-of-non-string
-                'placeholder': '',
-                'defaultValue': '',
-                'required': True,
-                'restrictions': {
-                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
-                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
-                },
-                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
-            },
-            {
-                'name': 'effort',
-                'type': 'textarea',
-                'label': _(FA_EFFORT_LABEL),  # lint-amnesty, pylint: disable=translation-of-non-string
-                'placeholder': '',
-                'defaultValue': '',
-                'required': True,
-                'restrictions': {
-                    'min_length': settings.FINANCIAL_ASSISTANCE_MIN_LENGTH,
-                    'max_length': settings.FINANCIAL_ASSISTANCE_MAX_LENGTH
-                },
-                'instructions': FA_SHORT_ANSWER_INSTRUCTIONS
+                'name': 'certify-heading',
+                'label': _('I certify that: '),
+                'type': 'plaintext',
             },
             {
                 'placeholder': '',
-                'name': 'mktg-permission',
+                'name': 'certify-economic-hardship',
                 'label': _(
-                    'I allow {platform_name} to use the information provided in this application '
-                    '(except for financial information) for {platform_name} marketing purposes.'
-                ).format(platform_name=settings.PLATFORM_NAME),
+                    'Paying the verified certificate fee for the above course would cause me economic hardship'
+                ),
                 'defaultValue': '',
                 'type': 'checkbox',
-                'required': False,
+                'required': True,
+                'instructions': '',
+                'restrictions': {}
+            },
+            {
+                'placeholder': '',
+                'name': 'certify-complete-certificate',
+                'label': _(
+                    'I will work diligently to complete the course work and receive a certificate'
+                ),
+                'defaultValue': '',
+                'type': 'checkbox',
+                'required': True,
+                'instructions': '',
+                'restrictions': {}
+            },
+            {
+                'placeholder': '',
+                'name': 'certify-honor-code',
+                'label': Text(_(
+                    'I have read, understand, and will abide by the {honor_code_link} for the edX Site'
+                )).format(honor_code_link=HTML('<a href="{honor_code_url}">{honor_code_label}</a>').format(
+                    honor_code_label=_("Honor Code"),
+                    honor_code_url=marketing_link('TOS') + "#honor",
+                )),
+                'defaultValue': '',
+                'type': 'checkbox',
+                'required': True,
                 'instructions': '',
                 'restrictions': {}
             }
@@ -2263,7 +2247,6 @@ def get_financial_aid_courses(user, course_id=None):
                     'value': str(enrollment.course_id)
                 }
             )
-
     if course_id is not None and use_new_flow is False:
         # We don't want to show financial_aid_courses if the course_id is not found in the enrolled courses.
         return []
@@ -2280,10 +2263,22 @@ def get_learner_username(learner_identifier):
 @api_view(['GET'])
 def courseware_mfe_search_enabled(request, course_id=None):
     """
-    Simple GET endpoint to expose whether the course may use Courseware Search.
+    Simple GET endpoint to expose whether the user may use Courseware Search
+    for a given course.
     """
-
+    enabled = False
     course_key = CourseKey.from_string(course_id) if course_id else None
+    user = request.user
 
-    payload = {"enabled": courseware_mfe_search_is_enabled(course_key)}
+    if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED'):
+        enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+        if (
+            auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+            or (enrollment_mode in CourseMode.VERIFIED_MODES)
+        ):
+            enabled = True
+    else:
+        enabled = True
+
+    payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
     return JsonResponse(payload)

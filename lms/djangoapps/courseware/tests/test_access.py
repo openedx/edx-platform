@@ -57,6 +57,14 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
 )
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.features.enterprise_support.api import add_enterprise_customer_to_session
+from enterprise.api.v1.serializers import EnterpriseCustomerSerializer
+from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerUserFactory,
+    EnterpriseCustomerFactory
+)
+from crum import set_current_request
 
 QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
@@ -847,7 +855,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_course_catalog_access_num_queries(self, user_attr_name, action, course_attr_name):
+    def test_course_catalog_access_num_queries_no_enterprise(self, user_attr_name, action, course_attr_name):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
 
         course = getattr(self, course_attr_name)
@@ -886,3 +894,72 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         course_overview = CourseOverview.get_from_id(course.id)
         with self.assertNumQueries(num_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             bool(access.has_access(user, action, course_overview, course_key=course.id))
+
+    @ddt.data(
+        *itertools.product(
+            ['user_normal', 'user_staff', 'user_anonymous'],
+            ['course_started', 'course_not_started'],
+        )
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
+    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
+    def test_course_catalog_access_num_queries_enterprise(self, user_attr_name, course_attr_name):
+        """
+        Similar to test_course_catalog_access_num_queries_no_enterprise, except enable enterprise features and make the
+        basic enrollment look like an enterprise-subsidized enrollment, setting up one of each:
+
+        * EnterpriseCustomer
+        * EnterpriseCustomerUser
+        * EnterpriseCourseEnrollment
+        * A mock request session to pre-cache the enterprise customer data.
+        """
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
+
+        course = getattr(self, course_attr_name)
+
+        request = RequestFactory().get('/')
+        request.session = {}
+
+        # get a fresh user object that won't have any cached role information
+        if user_attr_name == 'user_anonymous':
+            user = AnonymousUserFactory()
+            request.user = user
+        else:
+            user = getattr(self, user_attr_name)
+            user = User.objects.get(id=user.id)
+            request.user = user
+            course_enrollment = CourseEnrollmentFactory(user=user, course_id=course.id)
+            enterprise_customer = EnterpriseCustomerFactory(enable_learner_portal=True)
+            add_enterprise_customer_to_session(request, EnterpriseCustomerSerializer(enterprise_customer).data)
+            enterprise_customer_user = EnterpriseCustomerUserFactory(
+                user_id=user.id,
+                enterprise_customer=enterprise_customer,
+            )
+            EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
+        set_current_request(request)
+
+        if user_attr_name == 'user_staff':
+            if course_attr_name == 'course_started':
+                # read: CourseAccessRole + django_comment_client.Role
+                num_queries = 2
+            else:
+                # read: CourseAccessRole + EnterpriseCourseEnrollment
+                num_queries = 2
+        elif user_attr_name == 'user_normal':
+            if course_attr_name == 'course_started':
+                # read: CourseAccessRole + django_comment_client.Role + FBEEnrollmentExclusion + CourseMode
+                num_queries = 4
+            else:
+                # read: CourseAccessRole + CourseEnrollmentAllowed + EnterpriseCourseEnrollment
+                num_queries = 3
+        elif user_attr_name == 'user_anonymous':
+            if course_attr_name == 'course_started':
+                # read: CourseMode
+                num_queries = 1
+            else:
+                num_queries = 0
+
+        course_overview = CourseOverview.get_from_id(course.id)
+        with self.assertNumQueries(num_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+            bool(access.has_access(user, 'see_exists', course_overview, course_key=course.id))

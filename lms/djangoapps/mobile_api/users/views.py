@@ -21,6 +21,7 @@ from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
+from edx_rest_framework_extensions.paginators import DefaultPagination
 
 from common.djangoapps.student.models import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
 from lms.djangoapps.courseware.access import is_mobile_available_for_user
@@ -30,7 +31,7 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.mobile_api.models import MobileConfig
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3
 from openedx.features.course_duration_limits.access import check_course_expired
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -372,7 +373,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         response = super().list(request, *args, **kwargs)
         api_version = self.kwargs.get('api_version')
 
-        if api_version == API_V2:
+        if api_version in (API_V2, API_V3):
             enrollment_data = {
                 'configs': MobileConfig.get_structured_configs(),
                 'enrollments': response.data
@@ -380,6 +381,23 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             return Response(enrollment_data)
 
         return response
+
+    # pylint: disable=attribute-defined-outside-init
+    @property
+    def paginator(self):
+        """
+        Override API View paginator property to dynamically determine pagination class
+
+        Implements solutions from the discussion at
+        https://www.github.com/encode/django-rest-framework/issues/6397.
+        """
+        super().paginator  # pylint: disable=expression-not-assigned
+        api_version = self.kwargs.get('api_version')
+
+        if self._paginator is None and api_version == API_V3:
+            self._paginator = DefaultPagination()
+
+        return self._paginator
 
 
 @api_view(["GET"])

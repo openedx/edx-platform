@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import UsageKeyField
 from opaque_keys.edx.keys import LearningContextKey
+from openedx_learning.lib.fields import case_insensitive_char_field, MultiCollationTextField
 
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
@@ -18,6 +19,11 @@ from .data import CLIPBOARD_PURPOSE, StagedContentStatus
 log = logging.getLogger(__name__)
 
 User = get_user_model()
+
+CASE_SENSITIVE_COLLATIONS = {
+    "sqlite": "BINARY",
+    "mysql": "utf8mb4_bin",
+}
 
 
 class StagedContent(models.Model):
@@ -51,12 +57,15 @@ class StagedContent(models.Model):
             e.g. "video" if a video is staged, or "vertical" for a unit.
         """),
     )
-    olx = models.TextField(null=False, blank=False)
+    olx = MultiCollationTextField(null=False, blank=False, db_collations=CASE_SENSITIVE_COLLATIONS)
     # The display name of whatever item is staged here, i.e. the root XBlock.
-    display_name = models.CharField(max_length=1024)
+    display_name = case_insensitive_char_field(max_length=768)
     # A _suggested_ URL name to use for this content. Since this suggestion may already be in use, it's fine to generate
     # a new url_name instead.
     suggested_url_name = models.CharField(max_length=1024)
+
+    # Tags applied to the original source block(s) will be copied to the new block(s) on paste.
+    tags = models.JSONField(null=True, help_text=_("Content tags applied to these blocks"))
 
     @property
     def olx_filename(self) -> str:

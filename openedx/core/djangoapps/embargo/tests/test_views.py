@@ -148,7 +148,7 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
     def test_course_access_endpoint_with_logged_out_user(self):
         self.client.logout()
         response = self.client.get(self.url, data=self.request_data)
-        assert response.status_code == 403
+        assert response.status_code == 401
 
     def test_course_access_endpoint_with_non_staff_user(self):
         user = UserFactory(is_staff=False)

@@ -2,17 +2,12 @@
 Tests for store_utilities.py
 """
 
-
 import unittest
-from unittest import TestCase
 from unittest.mock import Mock
 
 import ddt
 
-from opaque_keys.edx.keys import CourseKey
-
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots, derived_key
+from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
 
 
 @ddt.ddt
@@ -86,43 +81,3 @@ class TestUtils(unittest.TestCase):
         subtree_roots_urls = [root.url for root in get_draft_subtree_roots(block_nodes)]
         # check that we return the expected urls
         assert set(subtree_roots_urls) == set(expected_roots_urls)
-
-
-mock_block = Mock()
-mock_block.id = CourseKey.from_string('course-v1:Beeper+B33P+BOOP')
-
-
-derived_key_scenarios = [
-    {
-        'courselike_source_key': CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'),
-        'block_key': BlockKey('chapter', 'interactive_demonstrations'),
-        'parent': mock_block,
-        'expected': BlockKey(
-            'chapter', '5793ec64e25ed870a7dd',
-        ),
-    },
-    {
-        'courselike_source_key': CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'),
-        'block_key': BlockKey('chapter', 'interactive_demonstrations'),
-        'parent': BlockKey(
-            'chapter', 'thingy',
-        ),
-        'expected': BlockKey(
-            'chapter', '599792a5622d85aa41e6',
-        ),
-    }
-]
-
-
-@ddt.ddt
-class TestDerivedKey(TestCase):
-    """
-    Test reproducible block ID generation.
-    """
-    @ddt.data(*derived_key_scenarios)
-    @ddt.unpack
-    def test_derived_key(self, courselike_source_key, block_key, parent, expected):
-        """
-        Test that derived_key returns the expected value.
-        """
-        self.assertEqual(derived_key(courselike_source_key, block_key, parent), expected)

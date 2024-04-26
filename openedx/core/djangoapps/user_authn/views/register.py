@@ -247,7 +247,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
     else:
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        compose_and_send_activation_email(user, profile, registration, redirect_url)
+        compose_and_send_activation_email(user, profile, registration, redirect_url, True)
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
@@ -288,7 +288,13 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
 def is_new_user(password, user):
     if user is not None:
         AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
-        check_pwned_password_and_send_track_event.delay(user.id, password, user.is_staff, True)
+        check_pwned_password_and_send_track_event.delay(
+            user_id=user.id,
+            password=password,
+            internal_user=user.is_staff,
+            is_new_user=True,
+            request_page='registration'
+        )
 
 
 def _link_user_to_third_party_provider(
@@ -590,7 +596,7 @@ class RegistrationView(APIView):
 
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        authenticated_user = {'username': user.username, 'user_id': user.id}
+        authenticated_user = {'username': user.username, 'full_name': user.profile.name, 'user_id': user.id}
         response = self._create_response(
             request, {'authenticated_user': authenticated_user}, status_code=200, redirect_url=redirect_url
         )

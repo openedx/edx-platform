@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Hello {{full_name}}, {% endblocktrans %}
+{% blocktrans %}Your progress in course {{course_title}} has been reset on your behalf.{% endblocktrans %}
+{% blocktrans %}You will be able to re-attempt this course and earn a verified certificate upon successful completion.{% endblocktrans %}
+
+{% trans "Best," %}
+{% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+{% endautoescape %}

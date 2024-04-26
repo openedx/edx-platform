@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-tests:
-    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
+    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},mongo-${{ matrix.mongo-version }},${{ matrix.shard_name }}
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
     runs-on: [ edx-platform-runner ]
     strategy:
@@ -17,7 +17,6 @@ jobs:
           - "3.8"
         django-version:
           - "pinned"
-          - "4.2"
         # When updating the shards, remember to make the same changes in
         # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
@@ -37,12 +36,25 @@ jobs:
           - "common-with-cms"
           - "xmodule-with-lms"
           - "xmodule-with-cms"
+        mongo-version:
+          - "4.4"
+          - "7.0"
     # We expect Django 4.0 to fail, so don't stop when it fails.
     continue-on-error: ${{ matrix.django-version == '4.0' }}
 
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
+
+      - name: install mongo version
+        run: |
+          if [[ "${{ matrix.mongo-version }}" != "4.4" ]]; then
+            sudo apt-get purge -y "mongodb-org*"
+            sudo apt-get remove -y mongodb-org
+            wget -qO - https://www.mongodb.org/static/pgp/server-${{ matrix.mongo-version }}.asc | sudo apt-key add -
+            echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${{ matrix.mongo-version }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ matrix.mongo-version }}.list
+            sudo apt-get update && sudo apt-get install -y mongodb-org="${{ matrix.mongo-version }}.*"
+          fi
 
       - name: checkout repo
         uses: actions/checkout@v3

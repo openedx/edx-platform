@@ -1,9 +1,10 @@
 """
 API Client for Blockstore
 
-This API does not do any caching; consider using BundleCache or (in
-openedx.core.djangolib.blockstore_cache) together with these API methods for
-improved performance.
+TODO: This should all get ripped out.
+
+TODO: This wrapper is extraneous now that Blockstore-as-a-service isn't supported.
+      This whole directory tree should be removed by https://github.com/openedx/blockstore/issues/296.
 """
 from blockstore.apps.api.data import (
     BundleFileData,
@@ -16,7 +17,7 @@ from blockstore.apps.api.exceptions import (
     BundleFileNotFound,
     BundleStorageError,
 )
-from .methods import (
+from blockstore.apps.api.methods import (
     # Collections:
     get_collection,
     create_collection,

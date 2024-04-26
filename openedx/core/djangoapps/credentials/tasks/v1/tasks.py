@@ -6,7 +6,6 @@ import time
 from urllib.parse import urljoin
 
 from celery import shared_task
-from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
 from celery_utils.logged_task import LoggedTask
 from django.conf import settings
@@ -24,7 +23,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory, get_recently_modified_
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
-from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.api import is_credentials_enabled
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_base_url, get_credentials_api_client
 from openedx.core.djangoapps.programs.signals import (
     handle_course_cert_awarded,
@@ -43,12 +42,16 @@ INTERESTING_STATUSES = [
     CertificateStatuses.downloadable,
 ]
 
-# Maximum number of retries before giving up. For reference, 11 retries with exponential backoff yields a maximum
-# waiting time of 2047 seconds (about 30 minutes). Setting this to None could yield unwanted behavior: infinite retries.
-MAX_RETRIES = 11
 
-
-@shared_task(bind=True, ignore_result=True)
+@shared_task(
+    bind=True,
+    ignore_result=True,
+    autoretry_for=(Exception,),
+    max_retries=10,
+    retry_backoff=30,
+    retry_backoff_max=600,
+    retry_jitter=True,
+)
 @set_code_owner_attribute
 def send_grade_to_credentials(
     self,
@@ -62,6 +65,10 @@ def send_grade_to_credentials(
     """
     Celery task to notify the Credentials IDA of an "interesting" grade change via an API call.
 
+    If an exception occurs when trying to send data to the Credentials IDA, we will retry the task a maximum number of
+    11 times (initial attempt + 10 retries). We are relying on built-in functionality of Celery to add a randomized
+    jitter to the retries so that the tasks don't retry exactly at the same time.
+
     Args:
         username (string): The username of the learner we are currently processing
         course_run_key (string): String identifier of the course run associated with the grade update
@@ -70,35 +77,26 @@ def send_grade_to_credentials(
         percent_grade (float): Number representing the learner's grade in this course run
         grade_last_updated (string): String describing the last time this grade was modified in the LMS
     """
-    logger.info(f"Running task send_grade_to_credentials for username {username} and course {course_run_key}")
+    data = {
+        'username': username,
+        'course_run': course_run_key,
+        'letter_grade': letter_grade,
+        'percent_grade': percent_grade,
+        'verified': verified,
+        'lms_last_updated_at': grade_last_updated
+    }
+    logger.info(f"Running task `send_grade_to_credentials` for username {username} with data: {data}")
 
-    countdown = 2 ** self.request.retries
     course_key = CourseKey.from_string(course_run_key)
+    credentials_client = get_credentials_api_client(User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME))
+    api_url = urljoin(f"{get_credentials_api_base_url(org=course_key.org)}/", "grades/")
 
-    try:
-        credentials_client = get_credentials_api_client(
-            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
-        )
-        api_url = urljoin(f"{get_credentials_api_base_url(org=course_key.org)}/", "grades/")
-        response = credentials_client.post(
-            api_url,
-            data={
-                'username': username,
-                'course_run': course_run_key,
-                'letter_grade': letter_grade,
-                'percent_grade': percent_grade,
-                'verified': verified,
-                'lms_last_updated_at': grade_last_updated
-            }
-        )
-        response.raise_for_status()
-        logger.info(f"Sent grade for course {course_run_key} for user {username}")
-    except Exception:  # lint-amnesty, pylint: disable=W0703
-        grade_str = f'(percent: {percent_grade} letter: {letter_grade})'
-        error_msg = f'Failed to send grade {grade_str} for course {course_run_key} for user {username}.'
-        logger.exception(error_msg)
-        exception = MaxRetriesExceededError(f"Failed to send grade to credentials. Reason: {error_msg}")
-        raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)  # pylint: disable=raise-missing-from
+    response = credentials_client.post(
+        api_url,
+        data=data,
+    )
+    response.raise_for_status()
+    logger.info(f"Sent grade for user {username} in course {course_run_key} to Credentials")
 
 
 @shared_task(base=LoggedTask, ignore_result=True)
@@ -331,71 +329,64 @@ def send_grade_if_interesting(
          LMS.
         verbose (bool): A value determining the logging level desired for this grade update
     """
-    if verbose:
-        msg = (
-            f"Starting send_grade_if_interesting with_params: user [{getattr(user, 'username', None)}], "
-            f"course_run_key [{course_run_key}], mode [{mode}], status [{status}], letter_grade [{letter_grade}], "
-            f"percent_grade [{percent_grade}], grade_last_updated [{grade_last_updated}], verbose [{verbose}]"
-        )
-        logger.info(msg)
+    warning_base = f"Skipping send grade for user {user} in course run {course_run_key}:"
 
-    # Avoid scheduling new tasks if certification is disabled. (Grades are a part of the records/cert story)
-    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+    if verbose:
+        logger.info(
+            f"Starting send_grade_if_interesting with params: user [{user}], course_run_key [{course_run_key}], mode "
+            f"[{mode}], status [{status}], letter_grade [{letter_grade}], percent_grade [{percent_grade}], "
+            f"grade_last_updated [{grade_last_updated}, verbose [{verbose}]"
+        )
+
+    if not is_credentials_enabled():
         if verbose:
-            logger.info("Skipping send grade: is_learner_issuance_enabled False")
+            logger.warning(f"{warning_base} use of the Credentials IDA is disabled by config")
         return
 
-    # Avoid scheduling new tasks if learner records are disabled for this site.
+    # avoid scheduling tasks if the learner records feature has been disabled for this org
     if not is_learner_records_enabled_for_org(course_run_key.org):
         if verbose:
-            logger.info(
-                "Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
-                    org=course_run_key.org
-                )
-            )
+            logger.warning(f"{warning_base} the learner records feature is disabled for the org {course_run_key.org}")
         return
 
-    # Grab mode/status if we don't have them in hand
+    # If we don't have mode and/or status, retrieve them from the learner's certificate record
     if mode is None or status is None:
         try:
             cert = GeneratedCertificate.objects.get(user=user, course_id=course_run_key)  # pylint: disable=no-member
             mode = cert.mode
             status = cert.status
         except GeneratedCertificate.DoesNotExist:
-            # We only care about grades for which there is a certificate.
+            # we only care about grades for which there is a certificate record
             if verbose:
-                logger.info(
-                    f"Skipping send grade: no cert for user [{getattr(user, 'username', None)}] & course_id "
-                    f"[{course_run_key}]"
-                )
+                logger.warning(f"{warning_base} no certificate record in the specified course run")
             return
 
-    # Don't worry about whether it's available as well as awarded. Just awarded is good enough to record a verified
-    # attempt at a course. We want even the grades that didn't pass the class because Credentials wants to know about
-    # those too.
-    if mode not in INTERESTING_MODES or status not in INTERESTING_STATUSES:
+    # Don't worry about the certificate record being in a passing or awarded status. Having a certificate record in any
+    # status is good enough to record a verified attempt at a course. The Credentials IDA keeps track of how many times
+    # a learner has made an attempt at a course run of a course, so it wants to know about all the learner's efforts.
+    # This check is attempt to prevent updates being sent to Credentials that it does not care about (e.g. updates
+    # related to a legacy Audit course)
+    if (
+        mode not in INTERESTING_MODES
+        and not CourseMode.is_eligible_for_certificate(mode)
+        or status not in INTERESTING_STATUSES
+    ):
         if verbose:
-            logger.info(f"Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]")
+            logger.warning(f"{warning_base} mode ({mode}) or status ({status}) is not interesting to Credentials")
         return
 
-    # If the course isn't in any program, don't bother telling Credentials about it. When Credentials grows support
-    # for course records as well as program records, we'll need to open this up.
+    # don't bother sending an update if the course run is not associated with any programs
     if not is_course_run_in_a_program(course_run_key):
         if verbose:
-            logger.info(
-                f"Skipping send grade: course run not in a program. [{course_run_key}]"
-            )
+            logger.warning(f"{warning_base} course run is not associated with any programs")
         return
 
-    # Grab grade data if we don't have them in hand
+    # grab additional grade data if we don't have it in hand
     if letter_grade is None or percent_grade is None or grade_last_updated is None:
         grade = CourseGradeFactory().read(user, course_key=course_run_key, create_if_needed=False)
         if grade is None:
             if verbose:
-                logger.info(
-                    f"Skipping send grade: No grade found for user [{getattr(user, 'username', None)}] & course_id "
-                    f"[{course_run_key}]"
-                )
+                logger.warning(f"{warning_base} no grade found for user in the specified course run")
             return
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
@@ -452,7 +443,10 @@ def backfill_date_for_all_course_runs():
         course_key = str(course_run.id)
         course_modes = CourseMode.objects.filter(course_id=course_key)
         # There should only ever be one certificate relevant mode per course run
-        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+        modes = [
+            mode.slug for mode in course_modes
+            if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES or CourseMode.is_eligible_for_certificate(mode.slug)
+        ]
         if len(modes) != 1:
             logger.exception(
                 f'Either course {course_key} has no certificate mode or multiple modes. Task failed.'
@@ -477,53 +471,6 @@ def backfill_date_for_all_course_runs():
                 )
                 response.raise_for_status()
 
-                logger.info(f"certificate_available_date updated for course {course_key}")
-            except Exception:  # lint-amnesty, pylint: disable=W0703
-                error_msg = f"Failed to send certificate_available_date for course {course_key}."
-                logger.exception(error_msg)
-        if index % 10 == 0:
-            time.sleep(3)
-
-
-@shared_task(base=LoggedTask, ignore_result=True)
-@set_code_owner_attribute
-def clean_certificate_available_date():
-    """
-    Historically, when courses changed their certificates_display_behavior, the certificate_available_date was not
-    updating properly. This task will clean out course runs that have a misconfigured certificate available date in the
-    Credentials IDA.
-    """
-    course_run_list = CourseOverview.objects.exclude(
-        self_paced=0,
-        certificates_display_behavior="end",
-        certificate_available_date__isnull=False
-    )
-    for index, course_run in enumerate(course_run_list):
-        logger.info(f"removing certificate_available_date for course {course_run.id}")
-        course_key = str(course_run.id)
-        course_modes = CourseMode.objects.filter(course_id=course_key)
-        # There should only ever be one certificate relevant mode per course run
-        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
-        if len(modes) != 1:
-            logger.exception(f'Either course {course_key} has no certificate mode or multiple modes. Task failed.')
-        # if there is only one relevant mode, post to credentials
-        else:
-            try:
-                credentials_client = get_credentials_api_client(
-                    User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
-                )
-                credentials_api_base_url = get_credentials_api_base_url()
-                api_url = urljoin(f"{credentials_api_base_url}/", "course_certificates/")
-                response = credentials_client.post(
-                    api_url,
-                    json={
-                        "course_id": course_key,
-                        "certificate_type": modes[0],
-                        "certificate_available_date": None,
-                        "is_active": True,
-                    }
-                )
-                response.raise_for_status()
                 logger.info(f"certificate_available_date updated for course {course_key}")
             except Exception:  # lint-amnesty, pylint: disable=W0703
                 error_msg = f"Failed to send certificate_available_date for course {course_key}."

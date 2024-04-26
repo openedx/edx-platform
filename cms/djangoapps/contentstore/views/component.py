@@ -4,7 +4,6 @@ Studio component views
 
 
 import logging
-from urllib.parse import quote_plus
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -25,20 +24,14 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
-from cms.djangoapps.contentstore.toggles import use_new_problem_editor
+from cms.djangoapps.contentstore.helpers import is_unit
+from cms.djangoapps.contentstore.toggles import use_new_problem_editor, use_new_unit_page
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import load_services_for_studio
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
-from openedx.core.djangoapps.content_staging import api as content_staging_api
+from openedx.core.djangoapps.content_tagging.api import get_object_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from ..toggles import use_new_unit_page
-from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url, get_unit_url
-from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
-    add_container_page_publishing_info,
-    create_xblock_info,
-    load_services_for_studio,
-)
 
 __all__ = [
     'container_handler',
@@ -61,7 +54,7 @@ CONTAINER_TEMPLATES = [
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
-    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
+    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history", "tag-list",
     "unit-outline", "container-message", "container-access", "license-selector", "copy-clipboard-button",
     "edit-title-button",
 ]
@@ -109,7 +102,7 @@ def _load_mixed_class(category):
 
 @require_GET
 @login_required
-def container_handler(request, usage_key_string):
+def container_handler(request, usage_key_string):  # pylint: disable=too-many-statements
     """
     The restful handler for container xblock requests.
 
@@ -117,6 +110,9 @@ def container_handler(request, usage_key_string):
         html: returns the HTML page for editing a container
         json: not currently supported
     """
+
+    from ..utils import get_container_handler_context, get_unit_url
+
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
 
         try:
@@ -128,10 +124,6 @@ def container_handler(request, usage_key_string):
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
-            component_templates = get_component_templates(course)
-            ancestor_xblocks = []
-            parent = get_parent_xblock(xblock)
-            action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
@@ -139,86 +131,12 @@ def container_handler(request, usage_key_string):
             if is_unit_page and use_new_unit_page(course.id):
                 return redirect(get_unit_url(course.id, unit.location))
 
-            is_first = True
-            block = xblock
-
-            # Build the breadcrumbs and find the ``Unit`` ancestor
-            # if it is not the immediate parent.
-            while parent:
-
-                if unit is None and is_unit(block):
-                    unit = block
-
-                # add all to nav except current xblock page
-                if xblock != block:
-                    current_block = {
-                        'title': block.display_name_with_default,
-                        'children': parent.get_children(),
-                        'is_last': is_first
-                    }
-                    is_first = False
-                    ancestor_xblocks.append(current_block)
-
-                block = parent
-                parent = get_parent_xblock(parent)
-
-            ancestor_xblocks.reverse()
-
-            assert unit is not None, "Could not determine unit page"
-            subsection = get_parent_xblock(unit)
-            assert subsection is not None, "Could not determine parent subsection from unit " + str(
-                unit.location)
-            section = get_parent_xblock(subsection)
-            assert section is not None, "Could not determine ancestor section from unit " + str(unit.location)
-
-            # for the sequence navigator
-            prev_url, next_url = get_sibling_urls(subsection, unit.location)
-            # these are quoted here because they'll end up in a query string on the page,
-            # and quoting with mako will trigger the xss linter...
-            prev_url = quote_plus(prev_url) if prev_url else None
-            next_url = quote_plus(next_url) if next_url else None
-
-            # Fetch the XBlock info for use by the container page. Note that it includes information
-            # about the block's ancestors and siblings for use by the Unit Outline.
-            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
-
-            if is_unit_page:
-                add_container_page_publishing_info(xblock, xblock_info)
-
-            # need to figure out where this item is in the list of children as the
-            # preview will need this
-            index = 1
-            for child in subsection.get_children():
-                if child.location == unit.location:
-                    break
-                index += 1
-
-            # Get the status of the user's clipboard so they can paste components if they have something to paste
-            user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
-            return render_to_response('container.html', {
-                'language_code': request.LANGUAGE_CODE,
-                'context_course': course,  # Needed only for display of menus at top of page.
-                'action': action,
-                'xblock': xblock,
-                'xblock_locator': xblock.location,
-                'unit': unit,
-                'is_unit_page': is_unit_page,
-                'subsection': subsection,
-                'section': section,
-                'position': index,
-                'prev_url': prev_url,
-                'next_url': next_url,
-                'new_unit_category': 'vertical',
-                'outline_url': '{url}?format=concise'.format(url=reverse_course_url('course_handler', course.id)),
-                'ancestor_xblocks': ancestor_xblocks,
-                'component_templates': component_templates,
-                'xblock_info': xblock_info,
+            container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
+            container_handler_context.update({
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES,
-                # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
-                'user_clipboard': user_clipboard,
             })
+            return render_to_response('container.html', container_handler_context)
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
 
@@ -227,6 +145,9 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
+
+    from ..helpers import xblock_type_display_name
+
     def create_template_dict(name, category, support_level, boilerplate_name=None, tab="common", hinted=False):
         """
         Creates a component template dict.
@@ -530,6 +451,9 @@ def _get_item_in_course(request, usage_key):
 
     Verifies that the caller has permission to access this item.
     """
+
+    from ..utils import get_lms_link_for_item
+
     # usage_key's course_key may have an empty run property
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
@@ -598,3 +522,84 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         )
 
     return webob_to_django_response(resp)
+
+
+def get_unit_tags(usage_key):
+    """
+    Get the tags of a Unit and build a json to be read by the UI
+
+    Note: When migrating the `TagList` subview from `container_subview.js` to the course-authoring MFE,
+    this function can be simplified to use the REST API of openedx-learning,
+    which already provides this grouping + sorting logic.
+    """
+    # Get content tags from content tagging API
+    content_tags = get_object_tags(str(usage_key))
+
+    # Group content tags by taxonomy
+    taxonomy_dict = {}
+    for content_tag in content_tags:
+        taxonomy_id = content_tag.taxonomy_id
+        # When a taxonomy is deleted, the id here is None.
+        # In that case the tag is not shown in the UI.
+        if taxonomy_id:
+            if taxonomy_id not in taxonomy_dict:
+                taxonomy_dict[taxonomy_id] = []
+            taxonomy_dict[taxonomy_id].append(content_tag)
+
+    taxonomy_list = []
+    total_count = 0
+
+    def handle_tag(tags, root_ids, tag, child_tag_id=None):
+        """
+        Group each tag by parent to build a tree.
+        """
+        tag_processed_before = tag.id in tags
+        if not tag_processed_before:
+            tags[tag.id] = {
+                'id': tag.id,
+                'value': tag.value,
+                'children': [],
+            }
+        if child_tag_id:
+            # Add a child into the children list
+            tags[tag.id].get('children').append(tags[child_tag_id])
+        if tag.parent_id is None:
+            if tag.id not in root_ids:
+                root_ids.append(tag.id)
+        elif not tag_processed_before:
+            # Group all the lineage of this tag.
+            #
+            # Skip this if the tag has been processed before,
+            # we don't need to process lineage again to avoid duplicates.
+            handle_tag(tags, root_ids, tag.parent, tag.id)
+
+    # Build a tag tree for each taxonomy
+    for content_tag_list in taxonomy_dict.values():
+        tags = {}
+        root_ids = []
+
+        for content_tag in content_tag_list:
+            # When a tag is deleted from the taxonomy, the `tag` here is None.
+            # In that case the tag is not shown in the UI.
+            if content_tag.tag:
+                handle_tag(tags, root_ids, content_tag.tag)
+
+        taxonomy = content_tag_list[0].taxonomy
+
+        if tags:
+            count = len(tags)
+            # Add the tree to the taxonomy list
+            taxonomy_list.append({
+                'id': taxonomy.id,
+                'value': taxonomy.name,
+                'tags': [tags[tag_id] for tag_id in root_ids],
+                'count': count,
+            })
+            total_count += count
+
+    unit_tags = {
+        'count': total_count,
+        'taxonomies': taxonomy_list,
+    }
+
+    return unit_tags

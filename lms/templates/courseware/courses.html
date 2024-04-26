@@ -23,7 +23,8 @@
       ${course_discovery_meanings | n, dump_js_escaped_json},
       getParameterByName('search_query'),
       "${user_language | n, js_escaped_string}",
-      "${user_timezone | n, js_escaped_string}"
+      "${user_timezone | n, js_escaped_string}",
+      ${set_default_filter | n, dump_js_escaped_json}
     );
   </%static:require_module>
 </%block>

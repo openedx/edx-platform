@@ -37,8 +37,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
-from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -68,6 +67,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
+    comment_endorsed,
     comment_edited,
     comment_flagged,
     comment_voted,
@@ -75,7 +75,9 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_deleted,
     thread_edited,
     thread_flagged,
-    thread_voted
+    thread_followed,
+    thread_voted,
+    thread_unfollowed
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
@@ -83,7 +85,6 @@ from xmodule.course_block import CourseBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
 
-from ..config.waffle import ENABLE_LEARNERS_STATS
 from ..django_comment_client.base.views import (
     track_comment_created_event,
     track_comment_deleted_event,
@@ -101,7 +102,6 @@ from ..django_comment_client.utils import (
     has_discussion_privileges,
     is_commentable_divided
 )
-from ..toggles import ENABLE_DISCUSSION_MODERATION_REASON_CODES
 from .exceptions import CommentNotFoundError, DiscussionBlackOutException, DiscussionDisabledError, ThreadNotFoundError
 from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
@@ -364,8 +364,6 @@ def get_course(request, course_key):
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
-        'learners_tab_enabled': ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE.is_enabled(course_key),
-        "reason_codes_enabled": ENABLE_DISCUSSION_MODERATION_REASON_CODES.is_enabled(course_key),
         "edit_reasons": [
             {"code": reason_code, "label": label}
             for (reason_code, label) in EDIT_REASON_CODES.items()
@@ -1170,7 +1168,8 @@ def get_learner_active_thread_list(request, course_key, query_params):
         })
 
 
-def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None):
+def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None,
+                     merge_question_type_responses=False):
     """
     Return the list of comments in the given thread.
 
@@ -1213,13 +1212,13 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
             "response_skip": response_skip,
             "response_limit": page_size,
             "reverse_order": reverse_order,
+            "merge_question_type_responses": merge_question_type_responses
         }
     )
-
     # Responses to discussion threads cannot be separated by endorsed, but
     # responses to question threads must be separated by endorsed due to the
     # existing comments service interface
-    if cc_thread["thread_type"] == "question":
+    if cc_thread["thread_type"] == "question" and not merge_question_type_responses:
         if endorsed is None:  # lint-amnesty, pylint: disable=no-else-raise
             raise ValidationError({"endorsed": ["This field is required for question threads."]})
         elif endorsed:
@@ -1231,10 +1230,11 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
             responses = cc_thread["non_endorsed_responses"]
             resp_total = cc_thread["non_endorsed_resp_total"]
     else:
-        if endorsed is not None:
-            raise ValidationError(
-                {"endorsed": ["This field may not be specified for discussion threads."]}
-            )
+        if not merge_question_type_responses:
+            if endorsed is not None:
+                raise ValidationError(
+                    {"endorsed": ["This field may not be specified for discussion threads."]}
+                )
         responses = cc_thread["children"]
         resp_total = cc_thread["resp_total"]
 
@@ -1354,6 +1354,8 @@ def _handle_following_field(form_value, user, cc_content, request):
         user.follow(cc_content)
     else:
         user.unfollow(cc_content)
+    signal = thread_followed if form_value else thread_unfollowed
+    signal.send(sender=None, user=user, post=cc_content)
     track_thread_followed_event(request, course, cc_content, form_value)
 
 
@@ -1364,8 +1366,7 @@ def _handle_abuse_flagged_field(form_value, user, cc_content, request):
     if form_value:
         cc_content.flagAbuse(user, cc_content)
         track_discussion_reported_event(request, course, cc_content)
-        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and reported_content_email_notification_enabled(
-                course_key):
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key):
             if cc_content.type == 'thread':
                 thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
             else:
@@ -1416,6 +1417,15 @@ def _handle_pinned_field(pin_thread: bool, cc_content: Thread, user: User):
         cc_content.pin(user, cc_content.id)
     else:
         cc_content.un_pin(user, cc_content.id)
+
+
+def _handle_comment_signals(update_data, comment, user, sender=None):
+    """
+    Send signals depending upon the the patch (update_data)
+    """
+    for key, value in update_data.items():
+        if key == "endorsed" and value is True:
+            comment_endorsed.send(sender=sender, user=user, post=comment)
 
 
 def create_thread(request, thread_data):
@@ -1599,6 +1609,7 @@ def update_comment(request, comment_id, update_data):
         comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(update_data.keys()), actions_form, context, request)
+    _handle_comment_signals(update_data, cc_comment, request.user)
     return api_comment
 
 
@@ -1845,16 +1856,6 @@ def get_course_discussion_user_stats(
         order_by = order_by or UserOrdering.BY_ACTIVITY
         if order_by == UserOrdering.BY_FLAGS:
             raise ValidationError({"order_by": "Invalid value"})
-
-    if not ENABLE_LEARNERS_STATS.is_enabled(course_key):
-        return get_users_without_stats(
-            username_search_string,
-            course_key,
-            page,
-            page_size,
-            request,
-            is_privileged
-        )
 
     params = {
         'sort_key': str(order_by),

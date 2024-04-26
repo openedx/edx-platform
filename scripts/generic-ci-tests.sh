@@ -5,7 +5,8 @@ set -e
 #
 #   generic-ci-tests.sh
 #
-#   Execute all tests for edx-platform.
+#   Execute some tests for edx-platform.
+#   (Most other tests are run by invoking `pytest`, `pylint`, etc. directly)
 #
 #   This script can be called from CI jobs that define
 #   these environment variables:
@@ -14,41 +15,11 @@ set -e
 #   Possible values are:
 #
 #       - "quality": Run the quality (pycodestyle/pylint) checks
-#       - "lms-unit": Run the LMS Python unit tests
-#       - "cms-unit": Run the CMS Python unit tests
 #       - "js-unit": Run the JavaScript tests
-#       - "pavelib-unit": Run Python unit tests from the pavelib/lib directory
 #       - "pavelib-js-unit": Run the JavaScript tests and the Python unit
 #           tests from the pavelib/lib directory
-#       - "bok-choy": Run acceptance tests that use the bok-choy framework
-#
-#   `SHARD` is a number indicating which subset of the tests to build.
-#
-#       For "bok-choy" and "lms-unit", the tests are put into shard groups
-#       using the 'attr' decorator (e.g. "@attr(shard=1)"). Anything with
-#       the 'shard=n' attribute will run in the nth shard. If there isn't a
-#       shard explicitly assigned, the test will run in the last shard.
-#
-#   Jenkins-specific configuration details:
-#
-#   - The edx-platform git repository is checked out by the Jenkins git plugin.
-#   - Jenkins logs in as user "jenkins"
-#   - The Jenkins file system root is "/home/jenkins"
-#   - An init script creates a virtualenv at "/home/jenkins/edx-venv"
-#     with some requirements pre-installed (such as scipy)
-#
-#  Jenkins worker setup:
-#  See the edx/configuration repo for Jenkins worker provisioning scripts.
-#  The provisioning scripts install requirements that this script depends on!
 #
 ###############################################################################
-
-# If the environment variable 'SHARD' is not set, default to 'all'.
-# This could happen if you are trying to use this script from
-# jenkins and do not define 'SHARD' in your multi-config project.
-# Note that you will still need to pass a value for 'TEST_SUITE'
-# or else no tests will be executed.
-SHARD=${SHARD:="all"}
 
 # Clean up previous builds
 git clean -qxfd
@@ -106,40 +77,20 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
 
-        case "$SHARD" in
-            1)
-                echo "Finding pylint violations and storing in report..."
-                run_paver_quality run_pylint --system=common  || { EXIT=1; }
-                ;;
-
-            2)
-                echo "Finding pylint violations and storing in report..."
-                run_paver_quality run_pylint --system=lms || { EXIT=1; }
-                ;;
-
-            3)
-                echo "Finding pylint violations and storing in report..."
-                run_paver_quality run_pylint --system="cms,openedx,pavelib" || { EXIT=1; }
-                ;;
-
-            4)
-                echo "Finding fixme's and storing report..."
-                run_paver_quality find_fixme || { EXIT=1; }
-                echo "Finding pycodestyle violations and storing report..."
-                run_paver_quality run_pep8 || { EXIT=1; }
-                echo "Finding ESLint violations and storing report..."
-                run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
-                echo "Finding Stylelint violations and storing report..."
-                run_paver_quality run_stylelint || { EXIT=1; }
-                echo "Running xss linter report."
-                run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
-                echo "Running PII checker on all Django models..."
-                run_paver_quality run_pii_check || { EXIT=1; }
-                echo "Running reserved keyword checker on all Django models..."
-                run_paver_quality check_keywords || { EXIT=1; }
-                ;;
-
-        esac
+        echo "Finding fixme's and storing report..."
+        run_paver_quality find_fixme || { EXIT=1; }
+        echo "Finding pycodestyle violations and storing report..."
+        run_paver_quality run_pep8 || { EXIT=1; }
+        echo "Finding ESLint violations and storing report..."
+        run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
+        echo "Finding Stylelint violations and storing report..."
+        run_paver_quality run_stylelint || { EXIT=1; }
+        echo "Running xss linter report."
+        run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
+        echo "Running PII checker on all Django models..."
+        run_paver_quality run_pii_check || { EXIT=1; }
+        echo "Running reserved keyword checker on all Django models..."
+        run_paver_quality check_keywords || { EXIT=1; }
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.

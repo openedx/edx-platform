@@ -82,14 +82,14 @@ class TestSendGradeToCredentialTask(TestCase):
 
     def test_retry(self, mock_get_api_client):
         """
-        Test that we retry when an exception occurs.
+        Test that we retry the appropriate number of times when an exception occurs.
         """
         mock_get_api_client.side_effect = boom
 
         task = tasks.send_grade_to_credentials.delay('user', 'course-v1:org+course+run', True, 'A', 1.0, None)
 
         pytest.raises(Exception, task.get)
-        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
+        assert mock_get_api_client.call_count == 11
 
 
 @ddt.ddt

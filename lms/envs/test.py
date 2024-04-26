@@ -418,16 +418,6 @@ FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
 
-####################### ELASTICSEARCH TESTS #######################
-# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
-ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
-    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
-
-TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
-    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
-TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch710')
-TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
-
 ######### custom courses #########
 INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
 FEATURES['CUSTOM_COURSES_EDX'] = True
@@ -557,11 +547,6 @@ add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
 derive_settings(__name__)
 
 ############################### BLOCKSTORE #####################################
-# Blockstore tests
-RUN_BLOCKSTORE_TESTS = os.environ.get('EDXAPP_RUN_BLOCKSTORE_TESTS', 'no').lower() in ('true', 'yes', '1')
-BLOCKSTORE_USE_BLOCKSTORE_APP_API = not RUN_BLOCKSTORE_TESTS
-BLOCKSTORE_API_URL = os.environ.get('EDXAPP_BLOCKSTORE_API_URL', "http://edx.devstack.blockstore-test:18251/api/v1/")
-BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', 'edxapp-test-key')
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'blockstore'  # This must be set to a working cache for the tests to pass
 BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
@@ -605,6 +590,7 @@ LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 LEARNER_HOME_MICROFRONTEND_URL = "http://learner-home-mfe"
 ORA_GRADING_MICROFRONTEND_URL = "http://ora-grading-mfe"
+ORA_MICROFRONTEND_URL = "http://ora-mfe"
 
 ########################## limiting dashboard courses ######################
 
@@ -677,6 +663,8 @@ MFE_CONFIG_OVERRIDES = {
 ############## Settings for survey report ##############
 SURVEY_REPORT_EXTRA_DATA = {}
 SURVEY_REPORT_ENDPOINT = "https://example.com/survey_report"
+SURVEY_REPORT_CHECK_THRESHOLD = 6
+SURVEY_REPORT_ENABLE = True
 ANONYMOUS_SURVEY_REPORT = False
 
 ######################## Subscriptions API SETTINGS ########################

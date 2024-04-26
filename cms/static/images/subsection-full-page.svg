@@ -1,0 +1,60 @@
+<svg width="225" height="157" viewBox="0 0 225 157" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="225" height="157" rx="5" fill="white"/>
+<rect x="0.5" y="0.5" width="224" height="156" rx="4.5" stroke="black" stroke-opacity="0.1"/>
+<rect width="225" height="157" rx="5" fill="white"/>
+<rect x="17" y="7" width="192" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="7;0;7" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="17" y="13" width="192" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="13;6;13" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="17" y="19" width="192" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="19;12;19" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="17" y="25" width="192" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="25;18;25" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="17" y="42" width="192" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="42;35;42" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="52" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="52;45;52" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="88" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="88;81;88" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="118" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="118;111;118" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="58" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="58;51;58" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="94" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="94;87;94" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="124" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="124;117;124" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="64" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="64;57;64" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="100" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="100;93;100" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="70" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="70;63;70" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="106" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="106;99;106" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="76" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="76;69;76" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="82" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="82;75;82" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect x="110" y="112" width="99" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="112;105;112" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<path d="M17 62.7143C17 59.8727 18.1194 57.1475 20.112 55.1381C22.1046 53.1288 24.8071 52 27.625 52L91.375 52C94.1929 52 96.8954 53.1288 98.888 55.1381C100.881 57.1475 102 59.8727 102 62.7143L102 116.286C102 119.127 100.881 121.853 98.888 123.862C96.8954 125.871 94.1929 127 91.375 127L27.625 127C24.8071 127 22.1046 125.871 20.112 123.862C18.1194 121.853 17 119.127 17 116.286L17 62.7143ZM22.3125 110.929L22.3125 116.286C22.3125 117.707 22.8722 119.069 23.8685 120.074C24.8648 121.078 26.216 121.643 27.625 121.643L91.375 121.643C92.784 121.643 94.1352 121.078 95.1315 120.074C96.1278 119.069 96.6875 117.707 96.6875 116.286L96.6875 97.5357L76.6222 87.1054C76.124 86.8537 75.5599 86.7664 75.0098 86.8558C74.4597 86.9452 73.9514 87.2068 73.5569 87.6036L53.8475 107.479L39.7163 97.9857C39.206 97.6432 38.594 97.4891 37.984 97.5496C37.374 97.6102 36.8036 97.8816 36.3694 98.3179L22.3125 110.929ZM48.875 76.1071C48.875 73.9759 48.0354 71.932 46.541 70.425C45.0466 68.918 43.0197 68.0714 40.9062 68.0714C38.7928 68.0714 36.7659 68.918 35.2715 70.425C33.7771 71.932 32.9375 73.9759 32.9375 76.1071C32.9375 78.2383 33.7771 80.2823 35.2715 81.7893C36.7659 83.2962 38.7928 84.1429 40.9062 84.1429C43.0197 84.1429 45.0466 83.2962 46.541 81.7893C48.0354 80.2823 48.875 78.2383 48.875 76.1071Z" fill="#EBEBEB">
+                                    <animate attributeName="d" values="M17 62.7143C17 59.8727 18.1194 57.1475 20.112 55.1381C22.1046 53.1288 24.8071 52 27.625 52L91.375 52C94.1929 52 96.8954 53.1288 98.888 55.1381C100.881 57.1475 102 59.8727 102 62.7143L102 116.286C102 119.127 100.881 121.853 98.888 123.862C96.8954 125.871 94.1929 127 91.375 127L27.625 127C24.8071 127 22.1046 125.871 20.112 123.862C18.1194 121.853 17 119.127 17 116.286L17 62.7143ZM22.3125 110.929L22.3125 116.286C22.3125 117.707 22.8722 119.069 23.8685 120.074C24.8648 121.078 26.216 121.643 27.625 121.643L91.375 121.643C92.784 121.643 94.1352 121.078 95.1315 120.074C96.1278 119.069 96.6875 117.707 96.6875 116.286L96.6875 97.5357L76.6222 87.1054C76.124 86.8537 75.5599 86.7664 75.0098 86.8558C74.4597 86.9452 73.9514 87.2068 73.5569 87.6036L53.8475 107.479L39.7163 97.9857C39.206 97.6432 38.594 97.4891 37.984 97.5496C37.374 97.6102 36.8036 97.8816 36.3694 98.3179L22.3125 110.929ZM48.875 76.1071C48.875 73.9759 48.0354 71.932 46.541 70.425C45.0466 68.918 43.0197 68.0714 40.9062 68.0714C38.7928 68.0714 36.7659 68.918 35.2715 70.425C33.7771 71.932 32.9375 73.9759 32.9375 76.1071C32.9375 78.2383 33.7771 80.2823 35.2715 81.7893C36.7659 83.2962 38.7928 84.1429 40.9062 84.1429C43.0197 84.1429 45.0466 83.2962 46.541 81.7893C48.0354 80.2823 48.875 78.2383 48.875 76.1071Z;M17 55.7143C17 52.8727 18.1194 50.1475 20.112 48.1381C22.1046 46.1288 24.8071 45 27.625 45L91.375 45C94.1929 45 96.8954 46.1288 98.888 48.1381C100.881 50.1475 102 52.8727 102 55.7143L102 109.286C102 112.127 100.881 114.853 98.888 116.862C96.8954 118.871 94.1929 120 91.375 120L27.625 120C24.8071 120 22.1046 118.871 20.112 116.862C18.1194 114.853 17 112.127 17 109.286L17 55.7143ZM22.3125 103.929L22.3125 109.286C22.3125 110.707 22.8722 112.069 23.8685 113.074C24.8648 114.078 26.216 114.643 27.625 114.643L91.375 114.643C92.784 114.643 94.1352 114.078 95.1315 113.074C96.1278 112.069 96.6875 110.707 96.6875 109.286L96.6875 90.5357L76.6222 80.1054C76.124 79.8537 75.5599 79.7664 75.0098 79.8558C74.4597 79.9452 73.9514 80.2068 73.5569 80.6036L53.8475 100.479L39.7163 90.9857C39.206 90.6432 38.594 90.4891 37.984 90.5496C37.374 90.6102 36.8036 90.8816 36.3694 91.3179L22.3125 103.929ZM48.875 69.1071C48.875 66.9759 48.0354 64.932 46.541 63.425C45.0466 61.918 43.0197 61.0714 40.9062 61.0714C38.7928 61.0714 36.7659 61.918 35.2715 63.425C33.7771 64.932 32.9375 66.9759 32.9375 69.1071C32.9375 71.2383 33.7771 73.2823 35.2715 74.7893C36.7659 76.2962 38.7928 77.1429 40.9062 77.1429C43.0197 77.1429 45.0466 76.2962 46.541 74.7893C48.0354 73.2823 48.875 71.2383 48.875 69.1071Z;M17 62.7143C17 59.8727 18.1194 57.1475 20.112 55.1381C22.1046 53.1288 24.8071 52 27.625 52L91.375 52C94.1929 52 96.8954 53.1288 98.888 55.1381C100.881 57.1475 102 59.8727 102 62.7143L102 116.286C102 119.127 100.881 121.853 98.888 123.862C96.8954 125.871 94.1929 127 91.375 127L27.625 127C24.8071 127 22.1046 125.871 20.112 123.862C18.1194 121.853 17 119.127 17 116.286L17 62.7143ZM22.3125 110.929L22.3125 116.286C22.3125 117.707 22.8722 119.069 23.8685 120.074C24.8648 121.078 26.216 121.643 27.625 121.643L91.375 121.643C92.784 121.643 94.1352 121.078 95.1315 120.074C96.1278 119.069 96.6875 117.707 96.6875 116.286L96.6875 97.5357L76.6222 87.1054C76.124 86.8537 75.5599 86.7664 75.0098 86.8558C74.4597 86.9452 73.9514 87.2068 73.5569 87.6036L53.8475 107.479L39.7163 97.9857C39.206 97.6432 38.594 97.4891 37.984 97.5496C37.374 97.6102 36.8036 97.8816 36.3694 98.3179L22.3125 110.929ZM48.875 76.1071C48.875 73.9759 48.0354 71.932 46.541 70.425C45.0466 68.918 43.0197 68.0714 40.9062 68.0714C38.7928 68.0714 36.7659 68.918 35.2715 70.425C33.7771 71.932 32.9375 73.9759 32.9375 76.1071C32.9375 78.2383 33.7771 80.2823 35.2715 81.7893C36.7659 83.2962 38.7928 84.1429 40.9062 84.1429C43.0197 84.1429 45.0466 83.2962 46.541 81.7893C48.0354 80.2823 48.875 78.2383 48.875 76.1071Z" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></path>
+<rect x="17" y="130" width="192" height="4" fill="#EBEBEB">
+                                    <animate attributeName="y" values="130;123;130" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<rect y="23" width="225" height="12" fill="#D9D9D9"/>
+<path d="M0 5C0 2.23858 2.23858 0 5 0H220C222.761 0 225 2.23858 225 5V23H0V5Z" fill="#238FC9"/>
+<rect x="17" y="7" width="32" height="10" rx="2" fill="#186E9D"/>
+<rect x="180" y="7" width="29" height="10" rx="2" fill="#186E9D"/>
+<rect x="116" y="7" width="59" height="10" rx="2" fill="#186E9D"/>
+<rect x="17" y="34" width="22" height="1" fill="#238FC9"/>
+<rect x="17" y="27" width="22" height="4" rx="2" fill="#ADADAD"/>
+<rect x="43" y="27" width="22" height="4" rx="2" fill="#ADADAD"/>
+<rect x="68" y="27" width="22" height="4" rx="2" fill="#ADADAD"/>
+<rect x="94" y="27" width="22" height="4" rx="2" fill="#ADADAD"/>
+<rect x="216" y="41" width="5" height="66" rx="2.5" fill="#D9D9D9">
+                                    <animate attributeName="y" values="41;60;41" begin="0s" dur="2.5s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.5;1"/></rect>
+<path d="M0 134H225V152C225 154.761 222.761 157 220 157H5C2.23858 157 0 154.761 0 152V134Z" fill="#238FC9"/>
+<rect x="17" y="140" width="32" height="10" rx="2" fill="#186E9D"/>
+<rect x="52" y="143" width="156" height="5" rx="2" fill="#186E9D"/>
+</svg>

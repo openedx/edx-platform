@@ -30,9 +30,9 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE, TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
@@ -448,6 +448,7 @@ class VideoBlock(
             'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
                 self, 'transcript', 'available_translations'
             ).rstrip('/?'),
+            'aiTranslationsUrl': settings.AI_TRANSLATIONS_API_URL,
             'transcriptLanguage': transcript_language,
             'transcriptLanguages': sorted_languages,
             'transcriptTranslationUrl': self.runtime.handler_url(
@@ -479,6 +480,8 @@ class VideoBlock(
             'id': self.location.html_id(),
             'block_id': str(self.location),
             'course_id': str(self.location.course_key),
+            'video_id': str(self.edx_video_id),
+            'user_id': self.get_user_id(),
             'is_embed': is_embed,
             'license': getattr(self, "license", None),
             'metadata': json.dumps(OrderedDict(metadata)),
@@ -486,6 +489,7 @@ class VideoBlock(
             'track': track_url,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
+            'transcript_feedback_enabled': self.is_transcript_feedback_enabled(),
         }
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
@@ -540,6 +544,21 @@ class VideoBlock(
         # Equivalent to COURSE_VIDEO_SHARING_PER_VIDEO or None / unset
         else:
             return self.public_access
+
+    def is_transcript_feedback_enabled(self):
+        """
+        Is transcript feedback enabled for this video?
+        """
+        try:
+            # Video transcript feedback must be enabled in order to show the widget
+            feature_enabled = TRANSCRIPT_FEEDBACK.is_enabled(self.location.course_key)
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.location.course_key}")
+            return False
+        return feature_enabled
+
+    def get_user_id(self):
+        return self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
 
     def get_public_video_url(self):
         """
@@ -708,7 +727,7 @@ class VideoBlock(
         return video_block
 
     @classmethod
-    def parse_xml(cls, node, runtime, _keys, id_generator):
+    def parse_xml(cls, node, runtime, _keys):
         """
         Use `node` to construct a new block.
 
@@ -716,13 +735,13 @@ class VideoBlock(
         """
         url_name = node.get('url_name')
         block_type = 'video'
-        definition_id = id_generator.create_definition(block_type, url_name)
-        usage_id = id_generator.create_usage(definition_id)
+        definition_id = runtime.id_generator.create_definition(block_type, url_name)
+        usage_id = runtime.id_generator.create_usage(definition_id)
         if is_pointer_tag(node):
             filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
             node = cls.load_file(filepath, runtime.resources_fs, usage_id)
-            runtime.parse_asides(node, definition_id, usage_id, id_generator)
-        field_data = cls.parse_video_xml(node, id_generator)
+            runtime.parse_asides(node, definition_id, usage_id, runtime.id_generator)
+        field_data = cls.parse_video_xml(node, runtime.id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
         video = runtime.construct_xblock_from_class(
@@ -738,7 +757,7 @@ class VideoBlock(
         video.edx_video_id = video.import_video_info_into_val(
             node,
             runtime.resources_fs,
-            getattr(id_generator, 'target_course_id', None)
+            getattr(runtime.id_generator, 'target_course_id', None)
         )
 
         return video

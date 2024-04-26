@@ -5,11 +5,13 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.user_tours.handlers import init_user_tour
 from lms.djangoapps.user_tours.models import UserTour, UserDiscussionsTours
+from lms.djangoapps.user_tours.toggles import USER_TOURS_DISABLED
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
 User = get_user_model()
@@ -46,6 +48,13 @@ class TestUserTourView(TestCase):
             return self.client.get(url, **headers)
         elif method == 'PATCH':
             return self.client.patch(url, data, content_type='application/json', **headers)
+
+    @ddt.data('GET', 'PATCH')
+    @override_waffle_flag(USER_TOURS_DISABLED, active=True)
+    def test_tours_disabled(self, method):
+        """ Test that the tours can be turned off with a waffle flag. """
+        response = self.send_request(self.staff_user, self.user, method)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @ddt.data('GET', 'PATCH')
     def test_unauthorized_user(self, method):
@@ -188,6 +197,11 @@ class UserDiscussionsToursViewTestCase(TestCase):
         self.assertEqual(response.data[1]['tour_name'], 'not_responded_filter')
         self.assertTrue(response.data[1]['show_tour'])
 
+        # Test that the view can be disabled by a waffle flag.
+        with override_waffle_flag(USER_TOURS_DISABLED, active=True):
+            response = self.client.get(self.url, **headers)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_get_tours_unauthenticated(self):
         """
         Test that an unauthenticated user cannot access the discussion tours endpoint.
@@ -215,3 +229,8 @@ class UserDiscussionsToursViewTestCase(TestCase):
         # Check that the tour was updated in the database
         updated_tour = UserDiscussionsTours.objects.get(id=self.tour.id)
         self.assertEqual(updated_tour.show_tour, False)
+
+        # Test that the view can be disabled by a waffle flag.
+        with override_waffle_flag(USER_TOURS_DISABLED, active=True):
+            response = self.client.put(url, updated_data, content_type='application/json', **headers)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

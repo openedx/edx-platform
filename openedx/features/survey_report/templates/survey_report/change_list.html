@@ -5,7 +5,7 @@
     <li>
         <form method="POST" action="{% url 'openedx.generate_survey_report' %}" class="inline">
             {% csrf_token %}
-            <input type="submit" value="Generate Report" class="default" name="_generatereport">
+            <input type="submit" value="Generate and Send Report" class="default" name="_sendreport">
         </form>
     </li>
 </ul>

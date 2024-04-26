@@ -191,7 +191,7 @@ define([
          * @return {JSON} the data of the previous export
          */
         storedExport: function(contentHomeUrl) {
-            var storedData = JSON.parse($.cookie(COOKIE_NAME));
+            var storedData = JSON.parse($.cookie(COOKIE_NAME) || null);
             if (storedData) {
                 successUnixDate = storedData.date;
             }

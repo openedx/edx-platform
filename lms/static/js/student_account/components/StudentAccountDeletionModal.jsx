@@ -94,13 +94,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
             validationMessage,
         } = this.state;
         const { onClose } = this.props;
-        const loseAccessText = StringUtils.interpolate(
-            gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
-            {
-                htmlStart: '<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/OpenSFD_certificates.html#print-a-web-certificate" rel="noopener" target="_blank">',
-                htmlEnd: '</a>',
-            },
-        );
+        const loseAccessText = gettext('You may also lose access to verified certificates and other program credentials. You can make a copy of these for your records before proceeding with deletion.')
 
         const noteDeletion = StringUtils.interpolate(
             gettext('You have selected “Delete my account.” Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.'),
@@ -168,7 +162,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                                                 <span>{bodyDeletion2}</span>
                                             </p>
                                             {/* eslint-disable-next-line react/no-danger */}
-                                            <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
+                                            <p>{loseAccessText}</p>
                                         </div>
                                     </div>
                                 )}

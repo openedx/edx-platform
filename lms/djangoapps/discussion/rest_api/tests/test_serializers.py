@@ -102,9 +102,9 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         assert actual_serialized_anonymous == expected_serialized_anonymous
 
     @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, False, "Staff"),
+        (FORUM_ROLE_ADMINISTRATOR, False, "Moderator"),
         (FORUM_ROLE_ADMINISTRATOR, True, None),
-        (FORUM_ROLE_MODERATOR, False, "Staff"),
+        (FORUM_ROLE_MODERATOR, False, "Moderator"),
         (FORUM_ROLE_MODERATOR, True, None),
         (FORUM_ROLE_COMMUNITY_TA, False, "Community TA"),
         (FORUM_ROLE_COMMUNITY_TA, True, None),
@@ -116,7 +116,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         """
         Test correctness of the author_label field.
 
-        The label should be "Staff", "Staff", or "Community TA" for the
+        The label should be "Staff", "Moderator", or "Community TA" for the
         Administrator, Moderator, and Community TA roles, respectively, but
         the label should not be present if the content is anonymous.
 
@@ -274,7 +274,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "unread_comments_count": 3,
             "closed_by": moderator
         })
-        closed_by_label = "Staff" if visible else None
+        closed_by_label = "Moderator" if visible else None
         closed_by = moderator if visible else None
         can_delete = role != FORUM_ROLE_STUDENT
         editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
@@ -329,7 +329,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "unread_comments_count": 3,
             "closed_by": None
         })
-        edit_by_label = "Staff" if visible else None
+        edit_by_label = "Moderator" if visible else None
         can_delete = role != FORUM_ROLE_STUDENT
         last_edit = None if role == FORUM_ROLE_STUDENT else {"editor_username": moderator}
         editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
@@ -448,6 +448,13 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "can_delete": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
 
         assert self.serialize(comment) == expected
@@ -484,8 +491,8 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         assert actual_endorser_anonymous == expected_endorser_anonymous
 
     @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, "Staff"),
-        (FORUM_ROLE_MODERATOR, "Staff"),
+        (FORUM_ROLE_ADMINISTRATOR, "Moderator"),
+        (FORUM_ROLE_MODERATOR, "Moderator"),
         (FORUM_ROLE_COMMUNITY_TA, "Community TA"),
         (FORUM_ROLE_STUDENT, None),
     )
@@ -494,7 +501,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         """
         Test correctness of the endorsed_by_label field.
 
-        The label should be "Staff", "Staff", or "Community TA" for the
+        The label should be "Staff", "Moderator", or "Community TA" for the
         Administrator, Moderator, and Community TA roles, respectively.
 
         role_name is the name of the author's role.

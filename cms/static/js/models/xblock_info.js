@@ -173,6 +173,18 @@ define(
              * True if summary configuration is enabled.
              */
                 summary_configuration_enabled: null,
+               /**
+                * List of tags of the unit. This list is managed by the content_tagging module.
+                */
+               tags: null,
+               /**
+                * True if the xblock is not visible to students only via links.
+                */
+               hide_from_toc: null,
+               /**
+                * True iff this xblock should display a "Contains staff only content" message.
+                */
+               hide_from_toc_message: null,
             },
 
             initialize: function() {

@@ -8,7 +8,6 @@ from django.test import TestCase, override_settings
 from openedx.core.djangoapps.content_libraries.constants import PROBLEM
 
 from .base import (
-    ContentLibrariesRestApiBlockstoreServiceTest,
     ContentLibrariesRestApiTest,
     URL_LIB_LTI_JWKS,
     skip_unless_cms,
@@ -79,17 +78,6 @@ class LibraryBlockLtiUrlViewTestMixin:
         Test the LTI URL cannot be generated as the block not found.
         """
         self._api("get", '/api/libraries/v2/blocks/lb:CL-TEST:libgg:problem:bad-block/lti/', None, expect_response=404)
-
-
-@override_features(ENABLE_CONTENT_LIBRARIES=True,
-                   ENABLE_CONTENT_LIBRARIES_LTI_TOOL=True)
-class LibraryBlockLtiUrlViewBlockstoreServiceTest(
-    LibraryBlockLtiUrlViewTestMixin,
-    ContentLibrariesRestApiBlockstoreServiceTest,
-):
-    """
-    Test generating LTI URL for a block in a library, using the standalone Blockstore service.
-    """
 
 
 @override_features(ENABLE_CONTENT_LIBRARIES=True,

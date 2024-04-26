@@ -2,14 +2,17 @@
 Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
-
 from datetime import datetime, timezone
 from unittest import mock
 from uuid import uuid4
 
 import ddt
-from django.test.utils import override_settings
+from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_events.data import EventsMetadata
+from openedx_events.learning.data import ExamAttemptData, UserData, UserPersonalData
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -21,17 +24,11 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.signals import (
-    listen_for_certificate_created_event,
-    listen_for_certificate_revoked_event
-)
+from lms.djangoapps.certificates.signals import handle_exam_attempt_rejected_event
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx_events.data import EventsMetadata
-from openedx_events.learning.signals import CERTIFICATE_CREATED, CERTIFICATE_REVOKED
-from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
@@ -445,47 +442,52 @@ class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
             mock_allowlist_task.assert_not_called()
 
 
-class CertificateEventBusTests(ModuleStoreTestCase):
+class ExamCompletionEventBusTests(TestCase):
     """
-    Tests for Certificate events that interact with the event bus.
+    Tests completion events from the event bus.
     """
-    def setUp(self):
-        super().setUp()
-        self.user = UserFactory.create()
-        self.name = f'{self.user.first_name} {self.user.last_name}'
-        self.course = CourseFactory.create(self_paced=True)
-        self.enrollment = CourseEnrollmentFactory(
-            user=self.user,
-            course_id=self.course.id,
-            is_active=True,
-            mode='verified',
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course_key = CourseKey.from_string('course-v1:edX+TestX+Test_Course')
+        cls.subsection_id = 'block-v1:edX+TestX+Test_Course+type@sequential+block@subsection'
+        cls.usage_key = UsageKey.from_string(cls.subsection_id)
+        cls.student_user = UserFactory(
+            username='student_user',
         )
 
-    def _create_event_data(self, event_type, certificate_status):
-        """
-        Utility function to create test data for unit tests.
-        """
-        expected_course_data = CourseData(course_key=self.course.id)
-        expected_user_data = UserData(
-            pii=UserPersonalData(
-                username=self.user.username,
-                email=self.user.email,
-                name=self.name,
+    @staticmethod
+    def _get_exam_event_data(student_user, course_key, usage_key, exam_type, requesting_user=None):
+        """ create ExamAttemptData object for exam based event """
+        if requesting_user:
+            requesting_user_data = UserData(
+                id=requesting_user.id,
+                is_active=True,
+                pii=None
+            )
+        else:
+            requesting_user_data = None
+
+        return ExamAttemptData(
+            student_user=UserData(
+                id=student_user.id,
+                is_active=True,
+                pii=UserPersonalData(
+                    username=student_user.username,
+                    email=student_user.email,
+                ),
             ),
-            id=self.user.id,
-            is_active=self.user.is_active
+            course_key=course_key,
+            usage_key=usage_key,
+            requesting_user=requesting_user_data,
+            exam_type=exam_type,
         )
-        expected_certificate_data = CertificateData(
-            user=expected_user_data,
-            course=expected_course_data,
-            mode='verified',
-            grade='',
-            current_status=certificate_status,
-            download_url='',
-            name='',
-        )
-        expected_event_metadata = EventsMetadata(
-            event_type=event_type.event_type,
+
+    @staticmethod
+    def _get_exam_event_metadata(event_signal):
+        """ create metadata object for event """
+        return EventsMetadata(
+            event_type=event_signal.event_type,
             id=uuid4(),
             minorversion=0,
             source='openedx/lms/web',
@@ -493,59 +495,20 @@ class CertificateEventBusTests(ModuleStoreTestCase):
             time=datetime.now(timezone.utc)
         )
 
-        return {
-            'certificate': expected_certificate_data,
-            'metadata': expected_event_metadata,
+    @mock.patch('lms.djangoapps.certificates.signals.invalidate_certificate')
+    def test_exam_attempt_rejected_event(self, mock_api_function):
+        """
+        Assert that CertificateService api's invalidate_certificate is called upon consuming the event
+        """
+        exam_event_data = self._get_exam_event_data(self.student_user,
+                                                    self.course_key,
+                                                    self.usage_key,
+                                                    exam_type='proctored')
+        event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_REJECTED)
+
+        event_kwargs = {
+            'exam_attempt': exam_event_data,
+            'metadata': event_metadata
         }
-
-    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=False)
-    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
-    def test_certificate_created_event_disabled(self, mock_producer):
-        """
-        Test to verify that we do not publish `CERTIFICATE_CREATED` events to the event bus if the
-        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is disabled.
-        """
-        listen_for_certificate_created_event(None, CERTIFICATE_CREATED)
-        mock_producer.assert_not_called()
-
-    @override_settings(SEND_CERTIFICATE_REVOKED_SIGNAL=False)
-    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
-    def test_certificate_revoked_event_disabled(self, mock_producer):
-        """
-        Test to verify that we do not publish `CERTIFICATE_REVOKED` events to the event bus if the
-        `SEND_CERTIFICATE_REVOKED_SIGNAL` setting is disabled.
-        """
-        listen_for_certificate_created_event(None, CERTIFICATE_REVOKED)
-        mock_producer.assert_not_called()
-
-    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=True)
-    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
-    def test_certificate_created_event_enabled(self, mock_producer):
-        """
-        Test to verify that we push `CERTIFICATE_CREATED` events to the event bus if the
-        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is enabled.
-        """
-        event_data = self._create_event_data(CERTIFICATE_CREATED, CertificateStatuses.downloadable)
-        listen_for_certificate_created_event(None, CERTIFICATE_CREATED, **event_data)
-        # verify that the data sent to the event bus matches what we expect
-        data = mock_producer.return_value.send.call_args.kwargs
-        assert data['signal'].event_type == CERTIFICATE_CREATED.event_type
-        assert data['event_data']['certificate'] == event_data['certificate']
-        assert data['topic'] == 'learning-certificate-lifecycle'
-        assert data['event_key_field'] == 'certificate.course.course_key'
-
-    @override_settings(SEND_CERTIFICATE_REVOKED_SIGNAL=True)
-    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
-    def test_certificate_revoked_event_enabled(self, mock_producer):
-        """
-        Test to verify that we push `CERTIFICATE_REVOKED` events to the event bus if the
-        `SEND_CERTIFICATE_REVOKED_SIGNAL` setting is enabled.
-        """
-        event_data = self._create_event_data(CERTIFICATE_REVOKED, CertificateStatuses.notpassing)
-        listen_for_certificate_revoked_event(None, CERTIFICATE_REVOKED, **event_data)
-        # verify that the data sent to the event bus matches what we expect
-        data = mock_producer.return_value.send.call_args.kwargs
-        assert data['signal'].event_type == CERTIFICATE_REVOKED.event_type
-        assert data['event_data']['certificate'] == event_data['certificate']
-        assert data['topic'] == 'learning-certificate-lifecycle'
-        assert data['event_key_field'] == 'certificate.course.course_key'
+        handle_exam_attempt_rejected_event(None, EXAM_ATTEMPT_REJECTED, **event_kwargs)
+        mock_api_function.assert_called_once_with(self.student_user.id, self.course_key, source='exam_event')

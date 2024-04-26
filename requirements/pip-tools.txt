@@ -10,20 +10,24 @@ click==8.1.6
     # via
     #   -c requirements/constraints.txt
     #   pip-tools
-importlib-metadata==6.8.0
+importlib-metadata==6.11.0
+    # via
+    #   -c requirements/common_constraints.txt
+    #   build
+packaging==24.0
     # via build
-packaging==23.2
-    # via build
-pip-tools==7.3.0
+pip-tools==7.4.0
     # via -r requirements/pip-tools.in
 pyproject-hooks==1.0.0
-    # via build
+    # via
+    #   build
+    #   pip-tools
 tomli==2.0.1
     # via
     #   build
     #   pip-tools
     #   pyproject-hooks
-wheel==0.41.2
+wheel==0.42.0
     # via pip-tools
 zipp==3.17.0
     # via importlib-metadata

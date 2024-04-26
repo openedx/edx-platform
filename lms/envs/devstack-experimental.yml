@@ -57,8 +57,6 @@ AWS_SES_REGION_ENDPOINT: email.us-east-1.amazonaws.com
 AWS_SES_REGION_NAME: us-east-1
 AWS_STORAGE_BUCKET_NAME: SET-ME-PLEASE (ex. bucket-name)
 BASE_COOKIE_DOMAIN: localhost
-BLOCKSTORE_API_URL: http://localhost:18250/api/v1
-BLOCKSTORE_PUBLIC_URL_ROOT: http://localhost:18250
 BLOCK_STRUCTURES_SETTINGS:
     COURSE_PUBLISH_TASK_DELAY: 30
     TASK_DEFAULT_RETRY_DELAY: 30
@@ -104,7 +102,7 @@ CACHES:
         KEY_PREFIX: course_structure
         LOCATION:
         - edx.devstack.memcached:11211
-        TIMEOUT: '7200'
+        TIMEOUT: '604800'
     default:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         OPTIONS:

@@ -48,110 +48,129 @@ from openedx.core.djangolib.js_utils import (
 
     <div class="focus_grabber last"></div>
 
-    % if (download_video_link or track or handout or branding_info or public_sharing_enabled) and not hide_downloads:
-    <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
-    <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
-        % if download_video_link or public_sharing_enabled:
-            <div class="wrapper-download-video">
-                <h4 class="hd hd-5">${_('Video')}</h4>
-                % if download_video_link:
-                    <span class="icon fa fa-download" aria-hidden="true"></span>
-                    <a class="btn-link video-sources video-download-button" href="${download_video_link}">
-                        ${_('Download video file')}
-                    </a>
-                % endif
-                % if download_video_link and public_sharing_enabled:
-                    <br>
-                % endif
-                % if sharing_sites_info:
-                    <div class="wrapper-social-share">
-                        <button
-                            style="background-image: none; background-color: rgb(0, 38, 43); border-radius: 0px; color: white" 
-                            class="social-toggle-btn btn"
-                        >
-                            <span class="icon fa fa-share-alt mr-2" style="text-shadow: none"></span>
-                            ${_('Share this video')}
-                        </button>
-                        <div
-                            hidden
-                            class="container-social-share color-black p-2"
-                            style="width: 300px; border-radius: 6px; background-color: white; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15),0 .25rem .625rem rgba(0,0,0,.15)"
-                        >
-                            ${_('Share this video')}
-                            <div class="btn-link close-btn float-right">
-                                <span style="color: black" class="icon fa fa-close" />
-                            </div>
-
-                            <br />
-                            % for sharing_site_info in sharing_sites_info:
-                            <a
-                                class="btn-link social-share-link"
-                                data-source="${sharing_site_info['name']}"
-                                href="${sharing_site_info['sharing_url']}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style="font-size: 1.5rem"
+    <div class="wrapper-video-bottom-section">
+        % if ((download_video_link or track or handout or branding_info or public_sharing_enabled) and not hide_downloads):
+        <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
+        <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
+            % if download_video_link or public_sharing_enabled:
+                <div class="wrapper-download-video">
+                    <h4 class="hd hd-5">${_('Video')}</h4>
+                    % if download_video_link:
+                        <span class="icon fa fa-download" aria-hidden="true"></span>
+                        <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                            ${_('Download video file')}
+                        </a>
+                    % endif
+                    % if download_video_link and public_sharing_enabled:
+                        <br>
+                    % endif
+                    % if sharing_sites_info:
+                        <div class="wrapper-social-share">
+                            <button
+                                style="background-image: none; background-color: rgb(0, 38, 43); border-radius: 0px; color: white"
+                                class="social-toggle-btn btn"
                             >
-                                <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
-                                <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
-                            </a>
-                            % endfor
-                            <br />
-                            <div style="background-color: #F2F0EF" class="public-video-url-container p-2">
-                                <a href=${public_video_url} class="d-inline-block align-middle" style="width: 200px">
-                                    <div
-                                        class="text-nowrap"
-                                        style="color: black; overflow: hidden; text-overflow: ellipsis; vertical-align: middle"
-                                    >
-                                        ${public_video_url}
-                                    </div>
-                                </a>
-                                <div
-                                    class="public-video-copy-btn btn-link d-inline-block float-right"
-                                    data-url=${public_video_url}
-                                >
-                                    <span class="icon fa fa-link pr-1"></span>
-                                    <span>${_('Copy')}</span>
+                                <span class="icon fa fa-share-alt mr-2" style="text-shadow: none"></span>
+                                ${_('Share this video')}
+                            </button>
+                            <div
+                                hidden
+                                class="container-social-share color-black p-2"
+                                style="width: 300px; border-radius: 6px; background-color: white; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15),0 .25rem .625rem rgba(0,0,0,.15)"
+                            >
+                                ${_('Share this video')}
+                                <div class="btn-link close-btn float-right">
+                                    <span style="color: black" class="icon fa fa-close" />
                                 </div>
-                              <span>
+
+                                <br />
+                                % for sharing_site_info in sharing_sites_info:
+                                <a
+                                    class="btn-link social-share-link"
+                                    data-source="${sharing_site_info['name']}"
+                                    href="${sharing_site_info['sharing_url']}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style="font-size: 1.5rem"
+                                >
+                                    <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
+                                    <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
+                                </a>
+                                % endfor
+                                <br />
+                                <div style="background-color: #F2F0EF" class="public-video-url-container p-2">
+                                    <a href=${public_video_url} class="d-inline-block align-middle" style="width: 200px">
+                                        <div
+                                            class="text-nowrap"
+                                            style="color: black; overflow: hidden; text-overflow: ellipsis; vertical-align: middle"
+                                        >
+                                            ${public_video_url}
+                                        </div>
+                                    </a>
+                                    <div
+                                        class="public-video-copy-btn btn-link d-inline-block float-right"
+                                        data-url=${public_video_url}
+                                    >
+                                        <span class="icon fa fa-link pr-1"></span>
+                                        <span>${_('Copy')}</span>
+                                    </div>
+                                  <span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    % endif
+                </div>
+            % endif
+            % if track:
+            <div class="wrapper-download-transcripts">
+                <h4 class="hd hd-5">${_('Transcripts')}</h4>
+                % if transcript_download_format:
+                <ul class="list-download-transcripts">
+                    % for item in transcript_download_formats_list:
+                        <li class="transcript-option">
+                            <span class="icon fa fa-download" aria-hidden="true"></span>
+                            <% dname = _("Download {file}").format(file=item['display_name']) %>
+                            <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
+                        </li>
+                    % endfor
+                </ul>
+                % else:
+                <a class="btn-link external-track" href="${track}">${_('Download transcript')}</a>
                 % endif
             </div>
-        % endif
-        % if track:
-        <div class="wrapper-download-transcripts">
-            <h4 class="hd hd-5">${_('Transcripts')}</h4>
-            % if transcript_download_format:
-            <ul class="list-download-transcripts">
-                % for item in transcript_download_formats_list:
-                    <li class="transcript-option">
-                        <span class="icon fa fa-download" aria-hidden="true"></span>
-                        <% dname = _("Download {file}").format(file=item['display_name']) %>
-                        <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
-                    </li>
-                % endfor
-            </ul>
-            % else:
-            <a class="btn-link external-track" href="${track}">${_('Download transcript')}</a>
+            % endif
+            % if handout:
+            <div class="wrapper-handouts">
+                <h4 class="hd hd-5">${_('Handouts')}</h4>
+                <a class="btn-link" href="${handout}">${_('Download Handout')}</a>
+            </div>
+            % endif
+            % if branding_info:
+            <div class="branding">
+                <span class="host-tag">${branding_info['logo_tag']}</span>
+                <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+            </div>
             % endif
         </div>
         % endif
-        % if handout:
-        <div class="wrapper-handouts">
-            <h4 class="hd hd-5">${_('Handouts')}</h4>
-            <a class="btn-link" href="${handout}">${_('Download Handout')}</a>
-        </div>
-        % endif
-        % if branding_info:
-        <div class="branding">
-            <span class="host-tag">${branding_info['logo_tag']}</span>
-            <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+        % if transcript_feedback_enabled and video_id:
+        <div class="wrapper-transcript-feedback" data-video-id='${video_id}' data-user-id='${user_id}'>
+            <h4 class="hd hd-5">${_('How is the transcript quality ?')}</h4>
+            <div class="transcript-feedback-buttons">
+                <div class="transcript-feedback-btn-wrapper">
+                    <button class="thumbs-up-btn">
+                        <span class="icon fa fa-thumbs-o-up thumbs-up-icon"></span>
+                    </button>
+                </div>
+                <div class="transcript-feedback-btn-wrapper">
+                    <button class="thumbs-down-btn">
+                        <span class="icon fa fa-thumbs-o-down thumbs-down-icon"></span>
+                    </button>
+                </div>
+            </div>
         </div>
         % endif
     </div>
-    % endif
 </div>
 
 % if cdn_eval:

@@ -11,7 +11,7 @@ from .views import (
     NotificationCountView,
     NotificationListAPIView,
     NotificationReadAPIView,
-    UserNotificationPreferenceView
+    UserNotificationPreferenceView, UserNotificationChannelPreferenceView,
 )
 
 router = routers.DefaultRouter()
@@ -23,6 +23,11 @@ urlpatterns = [
         fr'^configurations/{settings.COURSE_KEY_PATTERN}$',
         UserNotificationPreferenceView.as_view(),
         name='notification-preferences'
+    ),
+    re_path(
+        fr'^channel/configurations/{settings.COURSE_KEY_PATTERN}$',
+        UserNotificationChannelPreferenceView.as_view(),
+        name='notification-channel-preferences'
     ),
     path('', NotificationListAPIView.as_view(), name='notifications-list'),
     path('count/', NotificationCountView.as_view(), name='notifications-count'),

@@ -4,32 +4,37 @@ Test that various events are fired for models in the student app.
 
 
 from unittest import mock
-import pytest
 
+import ddt
+import pytest
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
-
-from common.djangoapps.student.models import CourseEnrollmentAllowed, CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory, UserProfileFactory
-from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
-
+from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import (  # lint-amnesty, pylint: disable=wrong-import-order
+    CourseAccessRoleData,
     CourseData,
     CourseEnrollmentData,
     UserData,
-    UserPersonalData,
+    UserPersonalData
 )
 from openedx_events.learning.signals import (  # lint-amnesty, pylint: disable=wrong-import-order
+    COURSE_ACCESS_ROLE_ADDED,
+    COURSE_ACCESS_ROLE_REMOVED,
     COURSE_ENROLLMENT_CHANGED,
     COURSE_ENROLLMENT_CREATED,
-    COURSE_UNENROLLMENT_COMPLETED,
+    COURSE_UNENROLLMENT_COMPLETED
 )
 from openedx_events.tests.utils import OpenEdxEventsTestMixin  # lint-amnesty, pylint: disable=wrong-import-order
+
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory, UserProfileFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import \
+    SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -373,6 +378,112 @@ class EnrollmentEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
                     mode=enrollment.mode,
                     is_active=False,
                     creation_date=enrollment.created,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+
+@skip_unless_lms
+@ddt.ddt
+class TestCourseAccessRoleEvents(TestCase, OpenEdxEventsTestMixin):
+    """
+    Tests for the events associated with the CourseAccessRole model.
+    """
+    ENABLED_OPENEDX_EVENTS = [
+        'org.openedx.learning.user.course_access_role.added.v1',
+        'org.openedx.learning.user.course_access_role.removed.v1',
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.start_events_isolation()
+
+    def setUp(self):
+        self.course_key = CourseKey.from_string("course-v1:test+blah+blah")
+        self.user = UserFactory.create(
+            username="test",
+            email="test@example.com",
+            password="password",
+        )
+        self.receiver_called = False
+
+    def _event_receiver_side_effect(self, **kwargs):  # pylint: disable=unused-argument
+        """
+        Used show that the Open edX Event was called by the Django signal handler.
+        """
+        self.receiver_called = True
+
+    @ddt.data(
+        CourseStaffRole,
+        CourseInstructorRole,
+    )
+    def test_access_role_created_event_emitted(self, AccessRole):
+        """
+        Event is emitted with the correct data when a CourseAccessRole is created.
+        """
+        event_receiver = mock.Mock(side_effect=self._event_receiver_side_effect)
+        COURSE_ACCESS_ROLE_ADDED.connect(event_receiver)
+
+        role = AccessRole(self.course_key)
+        role.add_users(self.user)
+
+        self.assertTrue(self.receiver_called)
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_ACCESS_ROLE_ADDED,
+                "sender": None,
+                "course_access_role_data": CourseAccessRoleData(
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course_key=self.course_key,
+                    org_key=self.course_key.org,
+                    role=role._role_name,  # pylint: disable=protected-access
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    @ddt.data(
+        CourseStaffRole,
+        CourseInstructorRole,
+    )
+    def test_access_role_removed_event_emitted(self, AccessRole):
+        """
+        Event is emitted with the correct data when a CourseAccessRole is deleted.
+        """
+        role = AccessRole(self.course_key)
+        role.add_users(self.user)
+
+        # connect mock only after initial role is added
+        event_receiver = mock.Mock(side_effect=self._event_receiver_side_effect)
+        COURSE_ACCESS_ROLE_REMOVED.connect(event_receiver)
+        role.remove_users(self.user)
+
+        self.assertTrue(self.receiver_called)
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_ACCESS_ROLE_REMOVED,
+                "sender": None,
+                "course_access_role_data": CourseAccessRoleData(
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course_key=self.course_key,
+                    org_key=self.course_key.org,
+                    role=role._role_name,  # pylint: disable=protected-access
                 ),
             },
             event_receiver.call_args.kwargs

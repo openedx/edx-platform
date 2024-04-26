@@ -9,32 +9,39 @@ Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 # pylint: disable=unused-import
 
+from datetime import datetime
 import logging
 import threading
 
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from openedx_learning.core.components import api as components_api
+from openedx_learning.core.components.models import Component
+from openedx_learning.core.publishing import api as publishing_api
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import BundleDefinitionLocator
+from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
+
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchViewError
+from xblock.plugin import PluginMissingError
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
-from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import BlockstoreXBlockRuntime, xml_for_definition
+
+from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
+    LearningCoreFieldData,
+    LearningCoreXBlockRuntime,
+)
+
+
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
-from openedx.core.djangolib.blockstore_cache import BundleCache
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
+
+from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
 
 # Made available as part of this package's public API:
 from openedx.core.djangoapps.xblock.learning_context import LearningContext
-from openedx.core.djangoapps.xblock.runtime.olx_parsing import (
-    BundleFormatException,
-    definition_for_include,
-    parse_xblock_include,
-    XBlockInclude,
-)
 
 # Implementation:
 
@@ -43,31 +50,33 @@ log = logging.getLogger(__name__)
 
 def get_runtime_system():
     """
-    Get the XBlockRuntimeSystem, which is a single long-lived factory that can
-    create user-specific runtimes.
+    Return a new XBlockRuntimeSystem.
 
-    The Runtime System isn't always needed (e.g. for management commands), so to
-    keep application startup faster, it's only initialized when first accessed
-    via this method.
+    TODO: Refactor to get rid of the XBlockRuntimeSystem entirely and just
+    create the LearningCoreXBlockRuntime and return it. We used to want to keep
+    around a long lived runtime system (a factory that returns runtimes) for
+    caching purposes, and have it dynamically construct a runtime on request.
+    Now we're just re-constructing both the system and the runtime in this call
+    and returning it every time, because:
+
+    1. We no longer have slow, Blockstore-style definitions to cache, so the
+       performance of this is perfectly acceptable.
+    2. Having a singleton increases complexity and the chance of bugs.
+    3. Creating the XBlockRuntimeSystem every time only takes about 10-30 µs.
+
+    Given that, the extra XBlockRuntimeSystem class just adds confusion. But
+    despite that, it's tested, working code, and so I'm putting off refactoring
+    for now.
     """
-    # The runtime system should not be shared among threads, as there is currently a race condition when parsing XML
-    # that can lead to duplicate children.
-    # (In BlockstoreXBlockRuntime.get_block(), has_cached_definition(def_id) returns false so parse_xml is called, but
-    # meanwhile another thread parses the XML and caches the definition; then when parse_xml gets to XML nodes for
-    # child blocks, it appends them to the children already cached by the other thread and saves the doubled list of
-    # children; this happens only occasionally but is very difficult to avoid in a clean way due to the API of parse_xml
-    # and XBlock field data in general [does not distinguish between setting initial values during parsing and changing
-    # values at runtime due to user interaction], and how it interacts with BlockstoreFieldData. Keeping the caches
-    # local to each thread completely avoids this problem.)
-    cache_name = f'_system_{threading.get_ident()}'
-    if not hasattr(get_runtime_system, cache_name):
-        params = dict(
-            handler_url=get_handler_url,
-            runtime_class=BlockstoreXBlockRuntime,
-        )
-        params.update(get_xblock_app_config().get_runtime_system_params())
-        setattr(get_runtime_system, cache_name, _XBlockRuntimeSystem(**params))
-    return getattr(get_runtime_system, cache_name)
+    params = get_xblock_app_config().get_runtime_system_params()
+    params.update(
+        runtime_class=LearningCoreXBlockRuntime,
+        handler_url=get_handler_url,
+        authored_data_store=LearningCoreFieldData(),
+    )
+    runtime = _XBlockRuntimeSystem(**params)
+
+    return runtime
 
 
 def load_block(usage_key, user):
@@ -87,6 +96,7 @@ def load_block(usage_key, user):
     # Is this block part of a course, a library, or what?
     # Get the Learning Context Implementation based on the usage key
     context_impl = get_learning_context_impl(usage_key)
+
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
     if user is not None and not context_impl.can_view_block(user, usage_key):
@@ -98,7 +108,6 @@ def load_block(usage_key, user):
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
     # set to 3.
     # field_overrides = context_impl.get_field_overrides(usage_key)
-
     runtime = get_runtime_system().get_runtime(user=user)
 
     return runtime.get_block(usage_key)
@@ -146,65 +155,68 @@ def get_block_metadata(block, includes=()):
     return data
 
 
-def resolve_definition(block_or_key):
-    """
-    Given an XBlock, definition key, or usage key, return the definition key.
-    """
-    if isinstance(block_or_key, BundleDefinitionLocator):
-        return block_or_key
-    elif isinstance(block_or_key, UsageKeyV2):
-        context_impl = get_learning_context_impl(block_or_key)
-        return context_impl.definition_for_usage(block_or_key)
-    elif isinstance(block_or_key, XBlock):
-        return block_or_key.scope_ids.def_id
-    else:
-        raise TypeError(block_or_key)
-
-
 def xblock_type_display_name(block_type):
     """
     Get the display name for the specified XBlock class.
     """
-    block_class = XBlock.load_class(block_type)
+    try:
+        # We want to be able to give *some* value, even if the XBlock is later
+        # uninstalled.
+        block_class = XBlock.load_class(block_type)
+    except PluginMissingError:
+        return block_type
+
     if hasattr(block_class, 'display_name') and block_class.display_name.default:
         return _(block_class.display_name.default)  # pylint: disable=translation-of-non-string
     else:
         return block_type  # Just use the block type as the name
 
 
-def get_block_display_name(block_or_key):
+def get_block_display_name(block: XBlock) -> str:
     """
-    Efficiently get the display name of the specified block. This is done in a
-    way that avoids having to load and parse the block's entire XML field data
-    using its parse_xml() method, which may be very expensive (e.g. the video
-    XBlock parse_xml leads to various slow edxval API calls in some cases).
-
-    This method also defines and implements various fallback mechanisms in case
-    the ID can't be loaded.
-
-    block_or_key can be an XBlock instance, a usage key or a definition key.
-
-    Returns the display name as a string
+    Get the display name from an instatiated XBlock, falling back to the XBlock-type-defined-default.
     """
-    def_key = resolve_definition(block_or_key)
-    use_draft = get_xblock_app_config().get_learning_context_params().get('use_draft')
-    cache = BundleCache(def_key.bundle_uuid, draft_name=use_draft)
-    cache_key = ('block_display_name', str(def_key))
-    display_name = cache.get(cache_key)
-    if display_name is None:
-        # Instead of loading the block, just load its XML and parse it
-        try:
-            olx_node = xml_for_definition(def_key)
-        except Exception:  # pylint: disable=broad-except
-            log.exception("Error when trying to get display_name for block definition %s", def_key)
-            # Return now so we don't cache the error result
-            return xblock_type_display_name(def_key.block_type)
-        try:
-            display_name = olx_node.attrib['display_name']
-        except KeyError:
-            display_name = xblock_type_display_name(def_key.block_type)
-        cache.set(cache_key, display_name)
-    return display_name
+    display_name = getattr(block, "display_name", None)
+    if display_name is not None:
+        return display_name
+    else:
+        return xblock_type_display_name(block.scope_ids.block_type)
+
+
+def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
+    """
+    Fetch the Component object for a given usage key.
+
+    Raises a ObjectDoesNotExist error if no such Component exists.
+
+    This is a lower-level function that will return a Component even if there is
+    no current draft version of that Component (because it's been soft-deleted).
+    """
+    learning_package = publishing_api.get_learning_package_by_key(
+        str(usage_key.context_key)
+    )
+    return components_api.get_component_by_key(
+        learning_package.id,
+        namespace='xblock.v1',
+        type_name=usage_key.block_type,
+        local_key=usage_key.block_id,
+    )
+
+
+def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
+    """
+    Get the OLX source of the draft version of the given Learning-Core-backed XBlock.
+    """
+    # Inefficient but simple approach. Optimize later if needed.
+    component = get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+
+    # TODO: we should probably make a method on ComponentVersion that returns
+    # a content based on the name. Accessing by componentversioncontent__key is
+    # awkward.
+    content = component_version.contents.get(componentversioncontent__key="block.xml")
+
+    return content.text
 
 
 def render_block_view(block, view_name, user):  # pylint: disable=unused-argument

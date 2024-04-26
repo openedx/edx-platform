@@ -34,7 +34,8 @@ from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixi
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
 from openedx.core.djangoapps.user_api.accounts.api import (
     get_account_settings,
-    update_account_settings
+    update_account_settings,
+    get_name_validation_error
 )
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
@@ -569,6 +570,13 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['country'] is None
         assert account_settings['state'] is None
+
+    def test_get_name_validation_error_too_long(self):
+        """
+        Test validation error when the name is too long.
+        """
+        result = get_name_validation_error("A" * 256)
+        assert result == "Full name can't be longer than 255 symbols"
 
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])

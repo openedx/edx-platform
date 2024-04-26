@@ -8,6 +8,12 @@ import csv
 import io
 import json
 import logging
+import os
+import requests
+import shutil
+import pathlib
+import zipfile
+
 from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -15,8 +21,7 @@ from boto.s3.connection import S3Connection
 from boto import s3
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import PermissionDenied
-from django.http import FileResponse, HttpResponseNotFound
+from django.http import FileResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
@@ -36,13 +41,16 @@ from edxval.api import (
     update_video_image,
     update_video_status
 )
+from fs.osfs import OSFS
 from opaque_keys.edx.keys import CourseKey
+from path import Path as path
 from pytz import UTC
 from rest_framework import status as rest_status
 from rest_framework.response import Response
+from tempfile import NamedTemporaryFile, mkdtemp
+from wsgiref.util import FileWrapper
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
@@ -223,13 +231,58 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         return JsonResponse(data, status=status)
 
 
-def get_video_usage_path(request, course_key, edx_video_id):
+def send_zip(zip_file, size=None):
+    """
+    Generates a streaming http response for the zip file
+    """
+    wrapper = FileWrapper(zip_file, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
+    response = StreamingHttpResponse(wrapper, content_type='application/zip')
+    response['Content-Dispositon'] = 'attachment; filename=%s' % os.path.basename(zip_file.name)
+    response['Content-Length'] = size
+    return response
+
+
+def create_video_zip(course_key_string, files):
+    """
+    Generates the video zip, or returns None if there was an error.
+
+    Updates the context with any error information if applicable.
+    """
+    name = course_key_string + '_videos'
+    video_folder_zip = NamedTemporaryFile(prefix=name + '_',
+                                          suffix=".zip")  # lint-amnesty, pylint: disable=consider-using-with
+    root_dir = path(mkdtemp())
+    video_dir = root_dir + '/' + name
+    zip_folder = None
+    try:
+        for file in files:
+            url = file['url']
+            file_name = file['name']
+            response = requests.get(url, allow_redirects=True)
+            file_type = '.' + response.headers['Content-Type'][6:]
+            if file_type not in file_name:
+                file_name = file['name'] + file_type
+            if not os.path.isdir(video_dir):
+                os.makedirs(video_dir)
+            with OSFS(video_dir).open(file_name, mode="wb") as f:
+                f.write(response.content)
+        directory = pathlib.Path(video_dir)
+        with zipfile.ZipFile(video_folder_zip, mode="w") as archive:
+            for file_path in directory.iterdir():
+                archive.write(file_path, arcname=file_path.name)
+        zip_folder = open(video_folder_zip.name, '+rb')
+
+        return send_zip(zip_folder, video_folder_zip.tell())
+    finally:
+        if os.path.exists(root_dir / name):
+            shutil.rmtree(root_dir / name)
+
+
+def get_video_usage_path(course_key, edx_video_id):
     """
     API for fetching the locations a specific video is used in a course.
     Returns a list of paths to a video.
     """
-    if not has_course_author_access(request.user, course_key):
-        raise PermissionDenied()
     store = modulestore()
     usage_locations = []
     videos = store.get_items(
@@ -238,15 +291,26 @@ def get_video_usage_path(request, course_key, edx_video_id):
             'category': 'video'
         },
     )
+
     for video in videos:
         video_id = getattr(video, 'edx_video_id', '')
-        if video_id == edx_video_id:
-            unit = video.get_parent()
-            subsection = unit.get_parent()
-            subsection_display_name = getattr(subsection, 'display_name', '')
-            unit_display_name = getattr(unit, 'display_name', '')
-            xblock_display_name = getattr(video, 'display_name', '')
-            usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
+        try:
+            if video_id == edx_video_id:
+                usage_dict = {'display_location': '', 'url': ''}
+                video_location = str(video.location)
+                xblock_display_name = getattr(video, 'display_name', '')
+                unit = video.get_parent()
+                unit_location = str(video.parent)
+                unit_display_name = getattr(unit, 'display_name', '')
+                subsection = unit.get_parent()
+                subsection_display_name = getattr(subsection, 'display_name', '')
+                usage_dict['display_location'] = (f'{subsection_display_name} - '
+                                                  f'{unit_display_name} / {xblock_display_name}')
+                usage_dict['url'] = f'/container/{unit_location}#{video_location}'
+                usage_locations.append(usage_dict)
+        except AttributeError:
+            continue
+
     return {'usage_locations': usage_locations}
 
 
@@ -616,15 +680,15 @@ def _get_index_videos(course, pagination_conf=None):
         'transcript_urls', 'error_description'
     ]
 
-    def _get_values(video):
+    def _get_values(video, course):
         """
         Get data for predefined video attributes.
         """
         values = {}
         for attr in attrs:
             if attr == 'courses':
-                course = [c for c in video['courses'] if course_id in c]
-                (__, values['course_video_image_url']), = list(course[0].items())
+                current_course = [c for c in video['courses'] if course_id in c]
+                (__, values['course_video_image_url']), = list(current_course[0].items())
             elif attr == 'encoded_videos':
                 values['download_link'] = ''
                 values['file_size'] = 0
@@ -637,7 +701,7 @@ def _get_index_videos(course, pagination_conf=None):
         return values
 
     videos, pagination_context = _get_videos(course, pagination_conf)
-    return [_get_values(video) for video in videos], pagination_context
+    return [_get_values(video, course) for video in videos], pagination_context
 
 
 def get_all_transcript_languages():
@@ -669,12 +733,12 @@ def videos_index_html(course, pagination_conf=None):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
+    if use_new_video_uploads_page(course.id):
+        return redirect(get_video_uploads_url(course.id))
     context = get_course_videos_context(
         course,
         pagination_conf,
     )
-    if use_new_video_uploads_page(course.id):
-        return redirect(get_video_uploads_url(course.id))
     return render_to_response('videos_index.html', context)
 
 

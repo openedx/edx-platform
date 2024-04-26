@@ -34,8 +34,9 @@ from lms.djangoapps.mobile_api.testutils import (
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
@@ -318,6 +319,12 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 assert 'audit_access_expires' not in courses[0]
         else:
             assert 'audit_access_expires' in courses[0]
+
+            for course_mode in courses[0]['course_modes']:
+                assert 'android_sku' in course_mode
+                assert 'ios_sku' in course_mode
+                assert 'min_price' in course_mode
+
             if gating_enabled:
                 assert courses[0].get('audit_access_expires') is not None
 
@@ -375,6 +382,29 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         response = self.api_response(api_version=API_V2)
         self.assertDictEqual(response.data['configs'], expected_result)
         assert 'enrollments' in response.data
+
+    def test_pagination_enrollment(self):
+        """
+        Test pagination for UserCourseEnrollmentsList view v3
+        for 3rd version of this view we use DefaultPagination
+
+        Test for /api/mobile/{api_version}/users/<user_name>/course_enrollments/
+        api_version = v3
+        """
+        self.login()
+        # Create and enroll to 15 courses
+        courses = [CourseFactory.create(org="my_org", mobile_available=True) for _ in range(15)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V3)
+        assert response.status_code == 200
+        assert response.data["enrollments"]["count"] == 15
+        assert response.data["enrollments"]["num_pages"] == 2
+        assert response.data["enrollments"]["current_page"] == 1
+        assert len(response.data["enrollments"]["results"]) == 10
+        assert "next" in response.data["enrollments"]
+        assert "previous" in response.data["enrollments"]
 
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -690,3 +720,51 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         assert serialized['course']['number'] == self.course.display_coursenumber
         assert serialized['course']['org'] == self.course.display_organization
         self._expiration_in_response(serialized, api_version)
+
+
+@ddt.ddt
+class TestDiscussionCourseEnrollmentSerializer(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
+    """
+    Tests discussion data in course enrollment serializer
+    """
+
+    def setUp(self):
+        """
+        Setup data for test
+        """
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_DISCUSSION_SERVICE': True}):
+            super().setUp()
+        self.login_and_enroll()
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+
+    def get_serialized_data(self, api_version):
+        """
+        Return data from CourseEnrollmentSerializer
+        """
+        if api_version == API_V05:
+            serializer = CourseEnrollmentSerializerv05
+        else:
+            serializer = CourseEnrollmentSerializer
+
+        return serializer(
+            CourseEnrollment.enrollments_for_user(self.user)[0],
+            context={'request': self.request, 'api_version': api_version},
+        ).data
+
+    @ddt.data(True, False)
+    def test_discussion_tab_url(self, discussion_tab_enabled):
+        """
+        Tests discussion tab url is None if tab is disabled
+        """
+        config, _ = DiscussionsConfiguration.objects.get_or_create(context_key=self.course.id)
+        config.enabled = discussion_tab_enabled
+        config.save()
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_DISCUSSION_SERVICE': True}):
+            serialized = self.get_serialized_data(API_V2)
+        discussion_url = serialized["course"]["discussion_url"]
+        if discussion_tab_enabled:
+            assert discussion_url is not None
+            assert isinstance(discussion_url, str)
+        else:
+            assert discussion_url is None

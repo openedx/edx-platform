@@ -373,7 +373,7 @@ class VideosHandlerTestCase(
                     'transcripts',
                     'transcription_status',
                     'transcript_urls',
-                    'error_description'
+                    'error_description',
                 }
             )
             dateutil.parser.parse(response_video['created'])
@@ -389,7 +389,8 @@ class VideosHandlerTestCase(
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
                 'status', 'course_video_image_url', 'file_size', 'download_link',
-                'transcripts', 'transcription_status', 'transcript_urls', 'error_description'
+                'transcripts', 'transcription_status', 'transcript_urls',
+                'error_description'
             ],
             [
                 {
@@ -406,7 +407,8 @@ class VideosHandlerTestCase(
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
                 'status', 'course_video_image_url', 'file_size', 'download_link',
-                'transcripts', 'transcription_status', 'transcript_urls', 'error_description'
+                'transcripts', 'transcription_status', 'transcript_urls',
+                'error_description'
             ],
             [
                 {

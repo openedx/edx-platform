@@ -4,6 +4,7 @@ Helpers for courseware tests.
 
 
 import ast
+import re
 import json
 from collections import OrderedDict
 from datetime import timedelta
@@ -450,11 +451,15 @@ def get_context_dict_from_string(data):
     Retrieve dictionary from string.
     """
     # Replace tuple and un-necessary info from inside string and get the dictionary.
-    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())
-    cleaned_data['metadata'] = OrderedDict(
-        sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
+    cleaned_data = data.split('((\'video.html\',')[1].replace("),\n {})", '').strip()
+    # Omit user_id validation
+    cleaned_data_without_user = re.sub(".*user_id.*\n?", '', cleaned_data)
+
+    validated_data = ast.literal_eval(cleaned_data_without_user)
+    validated_data['metadata'] = OrderedDict(
+        sorted(json.loads(validated_data['metadata']).items(), key=lambda t: t[0])
     )
-    return cleaned_data
+    return validated_data
 
 
 def set_preview_mode(preview_mode: bool):

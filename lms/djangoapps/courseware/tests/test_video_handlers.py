@@ -12,9 +12,12 @@ import ddt
 import freezegun
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from django.test import RequestFactory
 from edxval import api
+from xblock.django.request import DjangoWebobRequest
 from webob import Request, Response
 
+from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import normalize_repr
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
@@ -36,6 +39,7 @@ from xmodule.x_module import STUDENT_VIEW
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 
+TEST_USERNAME = 'test-user'
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
 SRT_content = textwrap.dedent("""
@@ -574,6 +578,16 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
             assert response.headers[attribute] == value
 
 
+def _create_djangowebobrequest_object_for_url(url: str) -> DjangoWebobRequest:
+    """
+    create a DjangoWebobRequest (The type of requests used by xblocks)
+    with a relevant user,
+    """
+    django_request = RequestFactory().get(url)
+    django_request.user = UserFactory.create(username=TEST_USERNAME)
+    return DjangoWebobRequest(django_request)
+
+
 @ddt.ddt
 class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
@@ -620,7 +634,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
     )
     @ddt.unpack
     def test_translation_fails(self, url, dispatch, status_code):
-        request = Request.blank(url)
+        request = _create_djangowebobrequest_object_for_url(url)
         response = self.block.transcript(request=request, dispatch=dispatch)
         assert response.status == status_code
 
@@ -635,7 +649,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         subs_id = _get_subs_id(good_sjson.name)
 
         attach(self.block, subs_id)
-        request = Request.blank(url.format(subs_id))
+        request = _create_djangowebobrequest_object_for_url(url.format(subs_id))
         response = self.block.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), subs)
 
@@ -655,12 +669,12 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         self.block.youtube_id_1_0 = subs_id
         self.block.youtube_id_0_75 = '0_75'
         self.store.update_item(self.block, self.user.id)
-        request = Request.blank(f'/translation/uk?videoId={subs_id}')
+        request = _create_djangowebobrequest_object_for_url(f'/translation/uk?videoId={subs_id}')
         response = self.block.transcript(request=request, dispatch='translation/uk')
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), subs)
 
         # 0_75 subs are exist
-        request = Request.blank('/translation/uk?videoId={}'.format('0_75'))
+        request = _create_djangowebobrequest_object_for_url('/translation/uk?videoId={}'.format('0_75'))
         response = self.block.transcript(request=request, dispatch='translation/uk')
         calculated_0_75 = {
             'end': [75],
@@ -674,7 +688,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         # 1_5 will be generated from 1_0
         self.block.youtube_id_1_5 = '1_5'
         self.store.update_item(self.block, self.user.id)
-        request = Request.blank('/translation/uk?videoId={}'.format('1_5'))
+        request = _create_djangowebobrequest_object_for_url('/translation/uk?videoId={}'.format('1_5'))
         response = self.block.transcript(request=request, dispatch='translation/uk')
         calculated_1_5 = {
             'end': [150],
@@ -696,7 +710,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
 
         attach(self.block, subs_id)
         self.store.update_item(self.block, self.user.id)
-        request = Request.blank(url)
+        request = _create_djangowebobrequest_object_for_url(url)
         response = self.block.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), TRANSCRIPT)
 
@@ -713,7 +727,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
 
         # manually clean youtube_id_1_0, as it has default value
         self.block.youtube_id_1_0 = ""
-        request = Request.blank('/translation/uk')
+        request = _create_djangowebobrequest_object_for_url('/translation/uk')
         response = self.block.transcript(request=request, dispatch='translation/uk')
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), subs)
 
@@ -731,21 +745,21 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         self.block.runtime.modulestore = test_modulestore
 
         # Test youtube style en
-        request = Request.blank('/translation/en?videoId=12345')
+        request = _create_djangowebobrequest_object_for_url('/translation/en?videoId=12345')
         response = self.block.transcript(request=request, dispatch='translation/en')
         assert response.status == '307 Temporary Redirect'
         assert ('Location', '/static/dummy/static/subs_12345.srt.sjson') in response.headerlist
 
         # Test HTML5 video style
         self.block.sub = 'OEoXaMPEzfM'
-        request = Request.blank('/translation/en')
+        request = _create_djangowebobrequest_object_for_url('/translation/en')
         response = self.block.transcript(request=request, dispatch='translation/en')
         assert response.status == '307 Temporary Redirect'
         assert ('Location', '/static/dummy/static/subs_OEoXaMPEzfM.srt.sjson') in response.headerlist
 
         # Test different language to ensure we are just ignoring it since we can't
         # translate with static fallback
-        request = Request.blank('/translation/uk')
+        request = _create_djangowebobrequest_object_for_url('/translation/uk')
         response = self.block.transcript(request=request, dispatch='translation/uk')
         assert response.status == '404 Not Found'
 
@@ -773,7 +787,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
 
         if attach:
             attach(self.block, sub)
-        request = Request.blank(url)
+        request = _create_djangowebobrequest_object_for_url(url)
         response = self.block.transcript(request=request, dispatch=dispatch)
         assert response.status == status_code
         if sub:
@@ -788,7 +802,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         self._set_static_asset_path()
 
         # When course_id is not mocked out, these values would result in 307, as tested above.
-        request = Request.blank('/translation/en?videoId=12345')
+        request = _create_djangowebobrequest_object_for_url('/translation/en?videoId=12345')
         response = self.block.transcript(request=request, dispatch='translation/en')
         assert response.status == '404 Not Found'
 
@@ -819,7 +833,8 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         mock_get_video_transcript_data.return_value = transcript
 
         # Make request to XModule transcript handler
-        response = self.block.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
+        request = _create_djangowebobrequest_object_for_url('/translation/en')
+        response = self.block.transcript(request=request, dispatch='translation/en')
 
         # Expected headers
         expected_headers = {
@@ -840,7 +855,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         Verify that val transcript is not returned when its feature is disabled.
         """
         # Make request to XModule transcript handler
-        response = self.block.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
+        response = self.block.transcript(
+            request=_create_djangowebobrequest_object_for_url('/translation/en'),
+            dispatch='translation/en'
+        )
         # Assert the actual response
         assert response.status_code == 404
 

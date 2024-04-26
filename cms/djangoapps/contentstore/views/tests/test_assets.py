@@ -56,6 +56,7 @@ class AssetsTestCase(CourseTestCase):
         Post to the asset upload url
         """
         asset = self.get_sample_asset(name, asset_type)
+        print(asset)
         response = self.client.post(self.url, {"name": name, "file": asset})
         return response
 
@@ -242,7 +243,8 @@ class PaginationTestCase(AssetsTestCase):
                     "thumbnail": None,
                     "thumbnail_location": thumbnail_location,
                     "locked": None,
-                    "static_full_url": "/assets/courseware/v1/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
+                    "static_full_url": "/assets/courseware/v1/asset-v1:org+class+run+type@asset+block@my_file_name.jpg",
+                    "usage_locations": {str(asset_key): []}
                 }
             ],
             1

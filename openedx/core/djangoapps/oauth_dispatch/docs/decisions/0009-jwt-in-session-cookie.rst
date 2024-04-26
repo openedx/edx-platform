@@ -54,14 +54,17 @@ Login -> Cookie -> API
    design`_), included in the login response, and stored in the user's browser cookie jar:
 
    * **"JWT Header/Payload Cookie"**
+
      * Contains only the header and payload portions of the JWT.
      * Disable HTTPOnly_ so the microfrontend can access user/role data in the JWT payload.
 
    * **"JWT Signature Cookie"**
+
      * Contains only the public key signature portion of the JWT.
      * Enable HTTPOnly_ so the signature is unavailable to JS code. See `JWT Cookie Security`_ below.
 
 #. **Automatically recombine and extract the JWT from Cookies on API calls.**
+
      * A new middleware JwtAuthCookieMiddleware will reconstitute the divided JWT from its two cookies and store the
        recombined JWT in a temporary cookie specified by JWT_AUTH_COOKIE_.
      * The `Django Rest Framework JWT`_ library we use makes use of the JWT_AUTH_COOKIE_ configuration setting.
@@ -69,7 +72,12 @@ Login -> Cookie -> API
        open edX REST endpoints that support JWT-based authentication derive from this base class, their authentication
        checks will make use of the JWTs provided in the JWT-related cookies.
 
-#. **Introduce HTTP_USE_JWT_COOKIE header for backward compatibility and rollout.**
+#. **Introduce forgiving JWTs for backward compatibility.**
+
+     * **Update**: As of Nov-2023, the title of this section has been updated from its original: "Introduce
+       HTTP_USE_JWT_COOKIE header for backward compatibility and rollout." The purpose of this old header has not
+       changed, but the implementation has changed to a concept which can be read about "forgiving JWTs" in this
+       `Replace USE-JWT-COOKIE ADR`_.
      * As we incrementally add JWTAuthentication throughout all backend microservices and APIs, we will need to support
        multiple authentication mechanisms for a period of time. Once JWT cookies are enabled and automatically sent with
        every (post-Login) AJAX request from the browser, backend APIs will try to authenticate the request with the
@@ -81,17 +89,26 @@ Login -> Cookie -> API
      * To prevent this issue, we will introduce a new HTTP header called "HTTP_USE_JWT_COOKIE" that will be selectively
        set only by microfrontends that want to use JWT cookie based authentication. The new middleware will check for
        this header before trying to reconstitute and use the JWT token.
+
+        * **Update**: As of Nov-2023, "forgiving JWTs" is the replacement implementation that can be read about in
+          the `Replace USE-JWT-COOKIE ADR`_.
+
      * Additionally, select login-required APIs can be updated to redirect the caller to the Login page when the JWT
        expires. This can be accomplished by enabling `JwtRedirectToLoginIfUnauthenticatedMiddleware`_ in the Django
        service and updating the API to require the `LoginRedirectIfUnauthenticated`_ permission class. The middleware
        automatically sets "HTTP_USE_JWT_COOKIE" for incoming requests to APIs that require the
        `LoginRedirectIfUnauthenticated`_ permission.
 
+       * **Update**: As of Nov-2023, the middleware no longer needs to set this header, as can be read about in the
+         `Replace USE-JWT-COOKIE ADR`_.
+
+
 .. _`Lightrail's design`: https://medium.com/lightrail/getting-token-authentication-right-in-a-stateless-single-page-application-57d0c6474e3
 .. _Django Rest Framework JWT: https://getblimp.github.io/django-rest-framework-jwt/
 .. _JWT_AUTH_COOKIE: https://github.com/GetBlimp/django-rest-framework-jwt/blob/master/docs/index.md#jwt_auth_cookie
 .. _JSONWebTokenAuthentication: https://github.com/GetBlimp/django-rest-framework-jwt/blob/0a0bd402ec21fd6b9a5f715d114411836fbb2923/rest_framework_jwt/authentication.py#L71
 .. _automatically extracts the JWT from the cookie: https://github.com/GetBlimp/django-rest-framework-jwt/blob/0a0bd402ec21fd6b9a5f715d114411836fbb2923/rest_framework_jwt/authentication.py#L86-L87
+.. _Replace USE-JWT-COOKIE ADR: https://github.com/openedx/edx-drf-extensions/blob/master/docs/decisions/0002-remove-use-jwt-cookie-header.rst
 .. _JwtRedirectToLoginIfUnauthenticatedMiddleware: https://github.com/openedx/edx-drf-extensions/blob/0351010f1836e4cebd6bdc757d477b2f56265b17/edx_rest_framework_extensions/auth/jwt/middleware.py#L76
 .. _LoginRedirectIfUnauthenticated: https://github.com/openedx/edx-drf-extensions/blob/0351010f1836e4cebd6bdc757d477b2f56265b17/edx_rest_framework_extensions/permissions.py#L147
 
@@ -218,3 +235,31 @@ References
 * http://www.redotheweb.com/2015/11/09/api-security.html
 * http://flask-jwt-extended.readthedocs.io/en/latest/tokens_in_cookies.html
 * https://medium.com/lightrail/getting-token-authentication-right-in-a-stateless-single-page-application-57d0c6474e3
+
+Change history
+--------------
+
+2023-11-08
+^^^^^^^^^^
+
+* Added updated implementation notes since USE-JWT-COOKIE header was replaced with "forgiving JWTs", a different implementation that solves the same problem.
+
+2019-09-04
+^^^^^^^^^^
+
+* Added notes about new JwtRedirectToLoginIfUnauthenticatedMiddleware, and other minor changes.
+
+2019-03-12
+^^^^^^^^^^
+
+* Removed details about a refresh cookie, since the LMS as identity provider's session was used instead.
+
+2018-11-27
+^^^^^^^^^^
+
+* Introduce USE-JWT-COOKIE header to solve backward compatability issue.
+
+2018-09-17
+^^^^^^^^^^
+
+* Original ADR

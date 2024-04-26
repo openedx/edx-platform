@@ -434,7 +434,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [50, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
+        query_counts = [52, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
@@ -448,6 +448,46 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
                 assert response.data['pagination']['count'] == 303
                 assert len(response.data['results']) == (30 if (page < 11) else 3)
                 assert [c['id'] for c in response.data['results']] == ordered_course_ids[((page - 1) * 30):(page * 30)]
+
+    def test_count_item_pagination_with_search_term(self):
+        """
+        Test count items in pagination for api courses list - class CourseListView
+        """
+        # Create 15 new courses, courses have the word "new" in the title
+        [self.create_and_index_course(f"numb_{number}", f"new_{number}") for number in range(15)]  # pylint: disable=expression-not-assigned
+        response = self.verify_response(params={"search_term": "new"})
+        self.assertEqual(response.status_code, 200)
+        # We don't have 'count' 15 because 'mobile_search' param is None
+        # And LazySequence contains all courses
+        self.assertEqual(response.json()["pagination"]["count"], 18)
+
+    def test_count_item_pagination_with_search_term_and_filter(self):
+        """
+        Test count items in pagination for api courses list
+        with search_term and filter by organisation -
+        class CourseListView
+        """
+        # Create 25 new courses with two different organisations
+        [self.create_and_index_course("Org_N", f"new_{number}") for number in range(10)]  # pylint: disable=expression-not-assigned
+        [self.create_and_index_course("Org_X", f"new_{number}") for number in range(15)]  # pylint: disable=expression-not-assigned
+        response = self.verify_response(params={"org": "Org_X", "search_term": "new"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["pagination"]["count"], 15)
+
+    def test_count_item_pagination_with_search_term_and_mobile_search(self):
+        """
+        Test count items in pagination for api courses list
+        with search_term and 'mobile_search' is True
+        """
+        # Create 25 new courses with two different words in titles
+        [self.create_and_index_course("Org_N", f"old_{number}") for number in range(10)]  # pylint: disable=expression-not-assigned
+        [self.create_and_index_course("Org_N", f"new_{number}") for number in range(15)]  # pylint: disable=expression-not-assigned
+        response = self.verify_response(
+            params={"search_term": "new", "mobile_search": True}
+        )
+        self.assertEqual(response.status_code, 200)
+        # We have 'count' 15 because 'mobile_search' param is true
+        self.assertEqual(response.json()["pagination"]["count"], 15)
 
 
 class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
