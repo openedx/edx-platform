@@ -21,6 +21,7 @@ from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TEAM_SCHEME
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -2146,6 +2147,12 @@ def get_group_configurations_context(course, store):
             # Add it to the front of the list if it should be shown.
             if should_show_enrollment_track:
                 displayable_partitions.insert(0, partition)
+        elif partition['scheme'] == TEAM_SCHEME:
+            should_show_team_partitions = len(partition['groups']) > 0 and CONTENT_GROUPS_FOR_TEAMS.is_enabled(
+                course_key
+            )
+            if should_show_team_partitions:
+                displayable_partitions.append(partition)
         elif partition['scheme'] != RANDOM_SCHEME:
             # Experiment group configurations are handled explicitly above. We don't
             # want to display their groups twice.
