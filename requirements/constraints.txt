@@ -36,7 +36,7 @@ django-oauth-toolkit==1.7.1
 django-simple-history==3.4.0
 
 # to upgrade mongo to 6.0 or greater need to update this driver.
-pymongo<5.0.0
+pymongo<4.4.1
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
