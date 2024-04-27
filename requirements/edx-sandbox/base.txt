@@ -22,7 +22,7 @@ cryptography==38.0.4
     #   -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.49.0
+fonttools==4.51.0
     # via matplotlib
 importlib-resources==6.1.1
     # via matplotlib
