@@ -42,15 +42,15 @@ cffi==1.16.0
     #   -r scripts/user_retirement/requirements/base.txt
     #   cryptography
     #   pynacl
-charset-normalizer==3.3.2
+charset-normalizer==2.0.12
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
-click==8.1.7
+click==8.1.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-cryptography==42.0.0
+cryptography==38.0.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto

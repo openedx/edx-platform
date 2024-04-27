@@ -781,7 +781,7 @@ edx-name-affirmation==2.3.7
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-opaque-keys[django]==2.8.0
+edx-opaque-keys[django]==2.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1135,7 +1135,6 @@ lti-consumer-xblock==9.10.0
     #   -r requirements/edx/testing.txt
 lxml==4.9.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools
@@ -1602,7 +1601,7 @@ pysrt==1.1.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-pytest==8.1.1
+pytest==8.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-pytest
@@ -2200,7 +2199,7 @@ xblock[django]==4.0.0
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2==3.4.0
+xblock-drag-and-drop-v2==4.0.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

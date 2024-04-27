@@ -495,7 +495,7 @@ edx-milestones==0.6.0
     # via -r requirements/edx/kernel.in
 edx-name-affirmation==2.3.7
     # via -r requirements/edx/kernel.in
-edx-opaque-keys[django]==2.8.0
+edx-opaque-keys[django]==2.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
@@ -682,7 +682,6 @@ lti-consumer-xblock==9.10.0
     # via -r requirements/edx/kernel.in
 lxml==4.9.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-i18n-tools
     #   edxval
@@ -1238,7 +1237,7 @@ xblock[django]==4.0.0
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2==3.4.0
+xblock-drag-and-drop-v2==4.0.2
     # via -r requirements/edx/bundled.in
 xblock-google-drive==0.6.1
     # via -r requirements/edx/bundled.in
