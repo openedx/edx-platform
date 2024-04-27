@@ -22,11 +22,11 @@ cryptography==38.0.4
     #   -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.49.0
+fonttools==4.51.0
     # via matplotlib
-importlib-resources==6.1.1
+importlib-resources==6.4.0
     # via matplotlib
-joblib==1.3.2
+joblib==1.4.0
     # via nltk
 kiwisolver==1.4.5
     # via matplotlib
@@ -59,17 +59,17 @@ openedx-calc==3.1.0
     # via -r requirements/edx-sandbox/base.in
 packaging==24.0
     # via matplotlib
-pillow==10.2.0
+pillow==10.3.0
     # via matplotlib
-pycparser==2.21
+pycparser==2.22
     # via cffi
-pyparsing==3.1.1
+pyparsing==3.1.2
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
     #   matplotlib
     #   openedx-calc
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
     # via matplotlib
 random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
@@ -91,5 +91,5 @@ sympy==1.12
     #   openedx-calc
 tqdm==4.66.2
     # via nltk
-zipp==3.17.0
+zipp==3.18.1
     # via importlib-resources
