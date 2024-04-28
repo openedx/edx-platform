@@ -80,6 +80,7 @@ from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_SEARCH_ENABLED,
     COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
+    COURSEWARE_SHOW_DEFAULT_RIGHT_SIDEBAR,
 )
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.views import (
@@ -3812,3 +3813,39 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body, {'enabled': False})
+
+
+class TestMFEDiscussionSidebarEnabledAPI(SharedModuleStoreTestCase):
+    """
+    Tests the endpoint to fetch the Courseware Discussion/Notifications Sidebar waffle flag status.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.course = CourseFactory.create()
+
+        self.client = APIClient()
+        self.apiUrl = reverse('show_default_right_sidebar_enabled_view', kwargs={'course_id': str(self.course.id)})
+
+    @override_waffle_flag(COURSEWARE_SHOW_DEFAULT_RIGHT_SIDEBAR, active=False)
+    def test_is_mfe_show_default_right_sidebar_disabled(self):
+        """
+        Getter to check if Discussion/Notifications Sidebar shouldn't be opened by default.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': False})
+
+    @override_waffle_flag(COURSEWARE_SHOW_DEFAULT_RIGHT_SIDEBAR, active=True)
+    def test_is_mfe_show_default_right_sidebar_enabled(self):
+        """
+        Getter to check if Discussion/Notifications Sidebar should be opened by default.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': True})
