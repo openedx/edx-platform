@@ -83,6 +83,21 @@ COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING = CourseWaffl
     f'{WAFFLE_FLAG_NAMESPACE}.disable_navigation_sidebar_blocks_caching', __name__
 )
 
+# .. toggle_name: courseware.show_default_right_sidebar
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: If waffle flag disabled
+# Discussions or Notifications sidebar shouldn't be displayed at all on Learning MFE.
+# If waffle flag enabled - Discussions opens always on the pages with discussions,
+# if user is in Audit and course has verified mode - show Notifications.# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-04-28
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: FC-0056
+# .. toggle_warning: None.
+COURSEWARE_SHOW_DEFAULT_RIGHT_SIDEBAR = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.show_default_right_sidebar', __name__
+)
+
 # .. toggle_name: courseware.mfe_progress_milestones_streak_discount_enabled
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -192,3 +207,10 @@ def courseware_disable_navigation_sidebar_blocks_caching(course_key=None):
     Return whether the courseware.disable_navigation_sidebar_blocks_caching flag is on.
     """
     return COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING.is_enabled(course_key)
+
+
+def courseware_show_default_right_sidebar_is_enabled(course_key=None):
+    """
+    Return whether the courseware.show_default_right_sidebar flag is on.
+    """
+    return COURSEWARE_SHOW_DEFAULT_RIGHT_SIDEBAR.is_enabled(course_key)
