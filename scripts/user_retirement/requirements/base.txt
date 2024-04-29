@@ -81,7 +81,7 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-lxml==5.2.1
+lxml==5.2.1 --no-binary lxml
     # via zeep
 more-itertools==10.2.0
     # via simple-salesforce
