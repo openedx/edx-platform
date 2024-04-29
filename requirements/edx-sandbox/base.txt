@@ -30,7 +30,7 @@ joblib==1.4.0
     # via nltk
 kiwisolver==1.4.5
     # via matplotlib
-lxml==5.2.1
+lxml==5.2.1 --no-binary lxml
     # via
     #   -r requirements/edx-sandbox/base.in
     #   openedx-calc
