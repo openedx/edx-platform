@@ -11,4 +11,3 @@ unicodecsv
 simplejson
 simple-salesforce
 google-api-python-client
-lxml --no-binary lxml

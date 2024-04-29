@@ -42,11 +42,6 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: setup dev for lxml dependency
-        if: ${{ env.RELEVANT == 'true' }}
-        run: |
-            sudo apt-get update && sudo apt-get install -y libxml2-dev libxslt-dev
-  
       - name: "Recompile requirements"
         if: ${{ env.RELEVANT == 'true' }}
         run: |
