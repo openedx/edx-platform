@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+--no-binary lxml
+
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via
     #   -r requirements/edx/doc.txt
@@ -1134,7 +1136,7 @@ lti-consumer-xblock==9.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-lxml[html-clean]==5.2.1 --no-binary lxml
+lxml[html-clean]==5.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

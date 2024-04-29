@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+--no-binary lxml
+
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
 accessible-pygments==0.0.4
@@ -803,7 +805,7 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.11.0
     # via -r requirements/edx/base.txt
-lxml[html-clean]==5.2.1 --no-binary lxml
+lxml[html-clean]==5.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
