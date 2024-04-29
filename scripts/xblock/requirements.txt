@@ -10,7 +10,7 @@ charset-normalizer==2.0.12
     # via
     #   -c scripts/xblock/../../requirements/constraints.txt
     #   requests
-idna==3.7
+idna==3.6
     # via requests
 requests==2.31.0
     # via -r scripts/xblock/requirements.in
