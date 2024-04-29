@@ -254,6 +254,7 @@ def refund_seat(course_enrollment, change_mode=False):
     User = get_user_model()  # pylint:disable=invalid-name
     course_key_str = str(course_enrollment.course_id)
     enrollee = course_enrollment.user
+    enrollment_attributes = CourseEnrollmentAttribute.get_enrollment_attributes(course_enrollment)
 
     if should_redirect_to_commerce_coordinator_refunds():
         if _refund_in_commerce_coordinator(course_enrollment, change_mode):
@@ -267,7 +268,11 @@ def refund_seat(course_enrollment, change_mode=False):
     refunds_url = urljoin(f"{get_ecommerce_api_base_url()}/", "refunds/")
     refunds_response = api_client.post(
         refunds_url,
-        data={'course_id': course_key_str, 'username': enrollee.username}
+        data={
+            'course_id': course_key_str,
+            'username': enrollee.username,
+            'enrollment_attributes': enrollment_attributes
+        }
     )
     refunds_response.raise_for_status()
     refund_ids = refunds_response.json() if refunds_response.content else None
