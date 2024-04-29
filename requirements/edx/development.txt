@@ -1133,7 +1133,7 @@ lti-consumer-xblock==9.10.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-lxml==4.9.4
+lxml==5.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

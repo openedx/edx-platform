@@ -856,7 +856,7 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.10.0
     # via -r requirements/edx/base.txt
-lxml==4.9.4
+lxml==5.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
