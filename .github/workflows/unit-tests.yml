@@ -65,6 +65,10 @@ jobs:
           sudo chmod -R a+rw /data/db
           mongod &
 
+      - name: setup dev for lxml dependency
+        run: |
+          apt-get update && apt-get install libxml2-dev libxslt-dev
+  
       - name: install requirements
         run: |
           sudo make test-requirements
@@ -76,7 +80,7 @@ jobs:
       - name: list installed package versions
         run: |
           sudo pip freeze
-
+      
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
 
