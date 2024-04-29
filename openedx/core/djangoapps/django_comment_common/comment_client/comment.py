@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring,protected-access
-
+from bs4 import BeautifulSoup
 
 from openedx.core.djangoapps.django_comment_common.comment_client import models, settings
 
@@ -98,6 +98,14 @@ class Comment(models.Model):
             metric_action='comment.abuse.unflagged'
         )
         voteable._update_from_response(response)
+
+    @property
+    def body_text(self):
+        """
+        Return the text content of the comment html body.
+        """
+        soup = BeautifulSoup(self.body, 'html.parser')
+        return soup.get_text()
 
 
 def _url_for_thread_comments(thread_id):
