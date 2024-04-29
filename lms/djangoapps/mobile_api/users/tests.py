@@ -902,6 +902,21 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(enrollments['results'][2]['course']['id'], str(old_course.id))
         self.assertNotIn('primary', response.data)
 
+    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
+    def test_response_contains_primary_enrollment_assignments_info(self, cache_mock: MagicMock):
+        self.login()
+        course = CourseFactory.create(org='edx', mobile_available=True)
+        self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_assignments', response.data['primary'])
+        self.assertIn('past_assignments', response.data['primary']['course_assignments'])
+        self.assertIn('future_assignments', response.data['primary']['course_assignments'])
+        self.assertListEqual(response.data['primary']['course_assignments']['past_assignments'], [])
+        self.assertListEqual(response.data['primary']['course_assignments']['future_assignments'], [])
+
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
