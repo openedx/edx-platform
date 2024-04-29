@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+--no-binary lxml
+
 asgiref==3.8.1
     # via django
 attrs==23.2.0
@@ -81,7 +83,7 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-lxml==5.2.1 --no-binary lxml
+lxml==5.2.1
     # via zeep
 more-itertools==10.2.0
     # via simple-salesforce

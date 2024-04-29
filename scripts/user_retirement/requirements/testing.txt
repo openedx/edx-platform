@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+--no-binary lxml
+
 asgiref==3.8.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
@@ -122,7 +124,7 @@ jmespath==1.0.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   botocore
-lxml==5.2.1 --no-binary lxml
+lxml==5.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
