@@ -67,7 +67,7 @@ jobs:
 
       - name: setup dev for lxml dependency
         run: |
-          apt-get update && apt-get install libxml2-dev libxslt-dev
+          sudo apt-get update && sudo apt-get install -y libxml2-dev libxslt-dev
   
       - name: install requirements
         run: |
