@@ -670,7 +670,7 @@ enmerkar==0.7.1
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar-underscore
-enmerkar-underscore==2.2.0
+enmerkar-underscore==2.3.0
     # via -r requirements/edx/base.txt
 event-tracking==2.4.0
     # via
@@ -885,10 +885,6 @@ markdown==3.3.7
     #   openedx-django-wiki
     #   staff-graded-xblock
     #   xblock-poll
-markey==0.8
-    # via
-    #   -r requirements/edx/base.txt
-    #   enmerkar-underscore
 markupsafe==2.1.5
     # via
     #   -r requirements/edx/base.txt
