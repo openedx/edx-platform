@@ -1134,7 +1134,7 @@ lti-consumer-xblock==9.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-lxml[html-clean]==5.2.1
+lxml[html-clean]==5.2.1 --no-binary lxml
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
