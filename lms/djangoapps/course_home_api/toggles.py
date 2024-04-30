@@ -21,6 +21,21 @@ COURSE_HOME_MICROFRONTEND_PROGRESS_TAB = CourseWaffleFlag(
 )
 
 
+# Waffle flag to enable new discussion sidebar view on course home page
+#
+# .. toggle_name: course_home.new_discussion_sidebar_view
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This toggle controls the user interface behavior of the discussion sidebar on course home page.
+# .. toggle_use_cases: open_edx, temporary
+# .. toggle_creation_date: 2024-04-22
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: INF-1338
+COURSE_HOME_NEW_DISCUSSION_SIDEBAR_VIEW = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.new_discussion_sidebar_view', __name__
+)
+
+
 def course_home_mfe_progress_tab_is_active(course_key):
     # Avoiding a circular dependency
     from .models import DisableProgressPageStackedConfig
@@ -29,3 +44,10 @@ def course_home_mfe_progress_tab_is_active(course_key):
         COURSE_HOME_MICROFRONTEND_PROGRESS_TAB.is_enabled(course_key) and
         not DisableProgressPageStackedConfig.current(course_key=course_key).disabled
     )
+
+
+def new_discussion_sidebar_view_is_enabled(course_key):
+    """
+    Returns True if the new discussion sidebar view is enabled for the given course.
+    """
+    return COURSE_HOME_NEW_DISCUSSION_SIDEBAR_VIEW.is_enabled(course_key)
