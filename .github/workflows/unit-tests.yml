@@ -40,7 +40,7 @@ jobs:
           - "4.4"
           - "7.0"
     # We expect Django 4.0 to fail, so don't stop when it fails.
-    continue-on-error: ${{ matrix.django-version == '4.2' }}
+    continue-on-error: ${{ matrix.django-version == 'pinned' }}
 
     steps:
       - name: sync directory owner
