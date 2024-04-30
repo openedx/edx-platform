@@ -83,6 +83,19 @@ COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING = CourseWaffl
     f'{WAFFLE_FLAG_NAMESPACE}.disable_navigation_sidebar_blocks_caching', __name__
 )
 
+# .. toggle_name: courseware.disable_navigation_sidebar
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Disable navi sidebar on Learning MFE
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-03-07
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: AXIMST-611
+# .. toggle_warning: None.
+COURSEWARE_MICROFRONTEND_SIDEBAR_DISABLED = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.disable_navigation_sidebar', __name__
+)
+
 # .. toggle_name: courseware.show_default_right_sidebar
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -207,6 +220,13 @@ def courseware_disable_navigation_sidebar_blocks_caching(course_key=None):
     Return whether the courseware.disable_navigation_sidebar_blocks_caching flag is on.
     """
     return COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING.is_enabled(course_key)
+
+
+def courseware_mfe_sidebar_is_disabled(course_key=None):
+    """
+    Return whether the courseware.disable_navigation_sidebar flag is on.
+    """
+    return COURSEWARE_MICROFRONTEND_SIDEBAR_DISABLED.is_enabled(course_key)
 
 
 def courseware_show_default_right_sidebar_is_enabled(course_key=None):
