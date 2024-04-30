@@ -314,7 +314,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'email': True,
                             'push': True,
                             'email_cadence': 'Daily',
-                            'info': 'Notifications for Open response submissions.'
+                            'info': 'Notifications for submission grading.'
                         }
                     },
                     'non_editable': {}
@@ -617,7 +617,7 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                             'email': True,
                             'push': True,
                             'email_cadence': 'Daily',
-                            'info': 'Notifications for Open response submissions.'
+                            'info': 'Notifications for submission grading.'
                         }
                     },
                     'non_editable': {}
