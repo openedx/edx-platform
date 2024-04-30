@@ -159,7 +159,7 @@ class VideoBlock(
 
     uses_xmodule_styles_setup = True
 
-    def get_transcripts_for_student(self, transcripts):
+    def get_transcripts_for_student(self, transcripts, dest_lang):
         """Return transcript information necessary for rendering the XModule student view.
         This is more or less a direct extraction from `get_html`.
 
@@ -180,7 +180,7 @@ class VideoBlock(
             elif sub or other_lang:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
-        transcript_language = self.get_default_transcript_language(transcripts)
+        transcript_language = self.get_default_transcript_language(transcripts, dest_lang)
         native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
         languages = {
             lang: native_languages.get(lang, display)
@@ -237,11 +237,11 @@ class VideoBlock(
 
         return False
 
-    def student_view(self, _context):
+    def student_view(self, context):
         """
         Return the student view.
         """
-        fragment = Fragment(self.get_html())
+        fragment = Fragment(self.get_html(context=context))
         add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
@@ -371,7 +371,10 @@ class VideoBlock(
                 download_video_link = next((url for url in self.html5_sources if not url.endswith('.m3u8')), None)
 
         transcripts = self.get_transcripts_info()
-        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
+        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(
+            transcripts=transcripts,
+            dest_lang=context.get("dest_lang")
+        )
 
         cdn_eval = False
         cdn_exp_group = None

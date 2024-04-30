@@ -856,7 +856,7 @@ class VideoTranscriptsMixin:
         # to clean redundant language codes.
         return list(set(translations))
 
-    def get_default_transcript_language(self, transcripts):
+    def get_default_transcript_language(self, transcripts, dest_lang):
         """
         Returns the default transcript language for this video block.
 
@@ -864,7 +864,10 @@ class VideoTranscriptsMixin:
             transcripts (dict): A dict with all transcripts and a sub.
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
-        if self.transcript_language in other_lang:
+
+        if dest_lang and dest_lang in other_lang.keys():
+            transcript_language = dest_lang
+        elif self.transcript_language in other_lang:
             transcript_language = self.transcript_language
         elif sub:
             transcript_language = 'en'
