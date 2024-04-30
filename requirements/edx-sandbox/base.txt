@@ -30,7 +30,7 @@ joblib==1.4.0
     # via nltk
 kiwisolver==1.4.5
     # via matplotlib
-lxml==5.2.1
+lxml==4.9.4
     # via openedx-calc
 markupsafe==2.1.5
     # via
