@@ -298,7 +298,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                     },
                     'non_editable': {}
                 },
-                'ora': {
+                'grading': {
                     'enabled': True,
                     'core_notification_types': [],
                     'notification_types': {
@@ -601,7 +601,7 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
                     },
                     'non_editable': {}
                 },
-                'ora': {
+                'grading': {
                     'enabled': True,
                     'core_notification_types': [],
                     'notification_types': {
@@ -926,7 +926,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['count'], 4)
             self.assertEqual(response.data['count_by_app_name'], {
-                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0, 'ora': 0})
+                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0, 'grading': 0})
             self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
@@ -947,7 +947,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
-        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0, 'ora': 0})
+        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0, 'grading': 0})
 
     def test_get_expiry_days_in_count_view(self):
         """
