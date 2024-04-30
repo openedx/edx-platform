@@ -540,7 +540,7 @@ edx-django-release-util==1.4.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.2.0
     # via -r requirements/edx/base.txt
-edx-django-utils==5.12.0
+edx-django-utils==5.13.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -811,6 +811,7 @@ lti-consumer-xblock==9.11.0
     # via -r requirements/edx/base.txt
 lxml[html-clean]==5.2.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
     #   edxval

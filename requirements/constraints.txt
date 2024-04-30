@@ -118,6 +118,11 @@ openai<=0.28.1
 # https://github.com/openedx/edx-platform/issues/34103
 optimizely-sdk<5.0
 
+# lxml>=5.0 introduced breaking changes related to system dependencies
+# lxml==5.2.1 introduced new extra so we'll nee to rename lxml --> lxml[html-clean] 
+# This constraint can be removed once we upgrade to Python 3.11
+lxml<5.0
+
 # xmlsec==1.3.14 breaking tests for all builds, can be removed once a fix is available
 xmlsec<1.3.14
 
