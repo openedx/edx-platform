@@ -72,7 +72,12 @@ class TestUpdateIndexHandlers(
             "block_type": "sequential",
             "context_key": "course-v1:orgA+test_course+test_run",
             "org": "orgA",
-            "breadcrumbs": [{"display_name": "Test Course"}], "content": {},
+            "breadcrumbs": [
+                {
+                    "display_name": "Test Course",
+                },
+            ],
+            "content": {},
             "access_id": course_access.id,
 
         }
@@ -87,7 +92,15 @@ class TestUpdateIndexHandlers(
             "block_type": "vertical",
             "context_key": "course-v1:orgA+test_course+test_run",
             "org": "orgA",
-            "breadcrumbs": [{"display_name": "Test Course"}, {"display_name": "sequential"}],
+            "breadcrumbs": [
+                {
+                    "display_name": "Test Course",
+                },
+                {
+                    "display_name": "sequential",
+                    "usage_key": "block-v1:orgA+test_course+test_run+type@sequential+block@test_sequential",
+                },
+            ],
             "content": {},
             "access_id": course_access.id,
         }

@@ -3748,6 +3748,8 @@ class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
             assert context['course'] == self.course
 
 
+@ddt.ddt
+@override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=True)
 class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
     """
     Tests the endpoint to fetch the Courseware Search waffle flag enabled status.
@@ -3761,12 +3763,36 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.client = APIClient()
         self.apiUrl = reverse('courseware_search_enabled_view', kwargs={'course_id': str(self.course.id)})
 
-    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=True)
-    def test_courseware_mfe_search_enabled(self):
+    @ddt.data(
+        (CourseMode.AUDIT, False),
+        (CourseMode.VERIFIED, True),
+        (CourseMode.MASTERS, True),
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': True})
+    def test_courseware_mfe_search_verified_only(self, mode, expected_enabled):
         """
-        Getter to check if user is allowed to use Courseware Search.
+        Only verified enrollees may use Courseware Search if ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED
+        is enabled.
         """
+        user = UserFactory()
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
 
+        self.client.login(username=user.username, password=TEST_PASSWORD)
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': expected_enabled})
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': True})
+    def test_courseware_mfe_search_staff_access(self):
+        """
+        Staff users may use Courseware Search regardless of their enrollment status.
+        """
+        user_staff = UserFactory(is_staff=True)  # not enrolled
+
+        self.client.login(username=user_staff.username, password=TEST_PASSWORD)
         response = self.client.get(self.apiUrl, content_type='application/json')
         body = json.loads(response.content.decode('utf-8'))
 
@@ -3774,11 +3800,13 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.assertEqual(body, {'enabled': True})
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
-    def test_is_mfe_search_disabled(self):
+    def test_is_mfe_search_waffle_disabled(self):
         """
-        Getter to check if user is allowed to use Courseware Search.
+        Courseware search is only available when the waffle flag is enabled.
         """
-
+        user_admin = UserFactory(is_staff=True, is_superuser=True)
+        CourseEnrollmentFactory.create(user=user_admin, course_id=self.course.id, mode=CourseMode.VERIFIED)
+        self.client.login(username=user_admin.username, password=TEST_PASSWORD)
         response = self.client.get(self.apiUrl, content_type='application/json')
         body = json.loads(response.content.decode('utf-8'))
 

@@ -1,0 +1,3 @@
+# We want to ignore files in this directory which we do in the
+# top-level .gitignore file but we still want this directory to
+# be automatically created.

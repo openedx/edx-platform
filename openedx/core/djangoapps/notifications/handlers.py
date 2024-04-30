@@ -110,7 +110,7 @@ def generate_course_notifications(signal, sender, course_notification_data, meta
     """
     if (
         course_notification_data.notification_type == 'ora_staff_notification'
-        and not ENABLE_ORA_STAFF_NOTIFICATION.is_enabled(course_notification_data['course_key'])
+        and not ENABLE_ORA_STAFF_NOTIFICATION.is_enabled(course_notification_data.course_key)
     ):
         return
 

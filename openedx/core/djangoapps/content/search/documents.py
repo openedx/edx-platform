@@ -117,7 +117,15 @@ def _fields_from_block(block) -> dict:
                 # this would be very inefficient. Better to recurse the tree top-down with the parent blocks loaded.
                 log.warning(f"Updating Studio search index for XBlock {block.usage_key} but ancestors weren't cached.")
             cur_block = cur_block.get_parent()
-            block_data[Fields.breadcrumbs].insert(0, {"display_name": xblock_api.get_block_display_name(cur_block)})
+            parent_data = {
+                "display_name": xblock_api.get_block_display_name(cur_block),
+            }
+            if cur_block.scope_ids.block_type != "course":
+                parent_data["usage_key"] = str(cur_block.usage_key)
+            block_data[Fields.breadcrumbs].insert(
+                0,
+                parent_data,
+            )
     try:
         content_data = block.index_dictionary()
         # Will be something like:
@@ -220,6 +228,7 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     doc = {
         Fields.id: meili_id_from_opaque_key(xblock_metadata.usage_key),
         Fields.type: DocType.library_block,
+        Fields.breadcrumbs: []
     }
 
     doc.update(_fields_from_block(block))

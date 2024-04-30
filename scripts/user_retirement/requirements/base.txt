@@ -28,16 +28,23 @@ cffi==1.16.0
     # via
     #   cryptography
     #   pynacl
-charset-normalizer==3.3.2
-    # via requests
-click==8.1.7
+charset-normalizer==2.0.12
     # via
+    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   requests
+click==8.1.6
+    # via
+    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==42.0.0
-    # via simple-salesforce
+cryptography==38.0.4
+    # via
+    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   simple-salesforce
 django==4.2.9
     # via
+    #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
+    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   django-crum
     #   django-waffle
     #   edx-django-utils
@@ -79,7 +86,9 @@ jmespath==1.0.1
     #   boto3
     #   botocore
 lxml==4.9.3
-    # via zeep
+    # via
+    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   zeep
 more-itertools==10.2.0
     # via simple-salesforce
 newrelic==9.5.0
@@ -170,6 +179,7 @@ uritemplate==4.1.1
     # via google-api-python-client
 urllib3==1.26.18
     # via
+    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   botocore
     #   requests
 zeep==4.2.1

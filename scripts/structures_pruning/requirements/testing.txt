@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-click==8.1.7
+click==8.1.6
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   click-log
