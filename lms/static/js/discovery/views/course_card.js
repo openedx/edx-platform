@@ -47,6 +47,11 @@
                         userTimezone
                     );
                 }
+                data.end = formatDate(
+                    new Date(data.end),
+                    userLanguage,
+                    userTimezone
+                );
                 data.enrollment_start = formatDate(
                     new Date(data.enrollment_start),
                     userLanguage,

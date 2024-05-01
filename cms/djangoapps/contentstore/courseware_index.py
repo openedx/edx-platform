@@ -611,6 +611,7 @@ class CourseAboutSearchIndexer(CoursewareSearchIndexer):
             'course': course_id,
             'content': {},
             'image_url': course_image_url(course),
+            'self_paced': course.self_paced
         }
 
         # load data for all of the 'about' blocks for this course into a dictionary
