@@ -862,6 +862,7 @@ class VideoTranscriptsMixin:
 
         Args:
             transcripts (dict): A dict with all transcripts and a sub.
+            dest_lang (unicode): language coming from unit translation language selector.
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
 
