@@ -7,14 +7,15 @@ from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow, use_tagging_taxonomy_list_page
+from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 %>
 <%
 use_new_editor_text = use_new_text_editor()
 use_new_editor_video = use_new_video_editor()
 use_new_editor_problem = use_new_problem_editor()
 use_new_video_gallery_flow = use_video_gallery_flow()
-use_tagging = use_tagging_taxonomy_list_page()
+use_tagging =  not is_tagging_feature_disabled()
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"

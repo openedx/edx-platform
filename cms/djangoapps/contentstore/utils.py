@@ -57,6 +57,7 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -90,7 +91,6 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_editor,
     use_new_video_uploads_page,
     use_new_custom_pages,
-    use_tagging_taxonomy_list_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -488,16 +488,19 @@ def get_custom_pages_url(course_locator) -> str:
     return custom_pages_url
 
 
-def get_taxonomy_list_url():
+def get_taxonomy_list_url() -> str | None:
     """
     Gets course authoring microfrontend URL for taxonomy list page view.
     """
-    taxonomy_list_url = None
-    if use_tagging_taxonomy_list_page():
-        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        if mfe_base_url:
-            taxonomy_list_url = f'{mfe_base_url}/taxonomies'
-    return taxonomy_list_url
+    if is_tagging_feature_disabled():
+        return None
+
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+
+    if not mfe_base_url:
+        return None
+
+    return f'{mfe_base_url}/taxonomies'
 
 
 def get_taxonomy_tags_widget_url(course_locator=None) -> str | None:
@@ -506,15 +509,18 @@ def get_taxonomy_tags_widget_url(course_locator=None) -> str | None:
 
     The `content_id` needs to be appended to the end of the URL when using it.
     """
-    taxonomy_tags_widget_url = None
-    # Uses the same waffle flag as taxonomy list page
-    if use_tagging_taxonomy_list_page():
+    if is_tagging_feature_disabled():
+        return None
+
+    if course_locator:
+        mfe_base_url = get_course_authoring_url(course_locator)
+    else:
         mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        if course_locator:
-            mfe_base_url = get_course_authoring_url(course_locator)
-        if mfe_base_url:
-            taxonomy_tags_widget_url = f'{mfe_base_url}/tagging/components/widget/'
-    return taxonomy_tags_widget_url
+
+    if not mfe_base_url:
+        return None
+
+    return f'{mfe_base_url}/tagging/components/widget/'
 
 
 def course_import_olx_validation_is_enabled():
@@ -1686,7 +1692,7 @@ def get_home_context(request, no_course=False):
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
-        'taxonomies_enabled': use_tagging_taxonomy_list_page(),
+        'taxonomies_enabled': not is_tagging_feature_disabled(),
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         'taxonomy_list_mfe_url': get_taxonomy_list_url(),
@@ -1982,7 +1988,7 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
     prev_url = quote_plus(prev_url) if prev_url else None
     next_url = quote_plus(next_url) if next_url else None
 
-    show_unit_tags = use_tagging_taxonomy_list_page()
+    show_unit_tags = not is_tagging_feature_disabled()
     unit_tags = None
     if show_unit_tags and is_unit_page:
         unit_tags = get_unit_tags(usage_key)

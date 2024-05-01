@@ -17,7 +17,6 @@ from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -85,7 +84,6 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     add_container_page_publishing_info,
     create_xblock_info,
 )
-from cms.djangoapps.contentstore.toggles import ENABLE_TAGGING_TAXONOMY_LIST_PAGE
 
 
 class AsideTest(XBlockAside):
@@ -272,7 +270,6 @@ class GetItemTest(ItemTest):
             ),
         )
 
-    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, True)
     @patch("cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers.get_object_tag_counts")
     def test_tag_count_in_container_fragment(self, mock_get_object_tag_counts):
         root_usage_key = self._create_vertical()
