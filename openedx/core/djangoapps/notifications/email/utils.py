@@ -148,8 +148,8 @@ def get_time_ago(datetime_obj):
     """
     Returns time_ago for datetime instance
     """
-    current_date = datetime.date.today()
-    days_diff = current_date.day - datetime_obj.day
+    current_date = utc.localize(datetime.datetime.today())
+    days_diff = (current_date - datetime_obj).days
     if days_diff == 0:
         return "Today"
     if days_diff >= 7:

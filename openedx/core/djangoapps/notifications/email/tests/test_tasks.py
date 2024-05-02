@@ -80,6 +80,7 @@ class TestEmailDigestForUser(ModuleStoreTestCase):
         assert not mock_func.called
 
 
+@ddt.ddt
 class TestEmailDigestAudience(ModuleStoreTestCase):
     """
     Tests audience for notification digest email
@@ -138,6 +139,18 @@ class TestEmailDigestAudience(ModuleStoreTestCase):
         with self.assertNumQueries(1):
             audience = get_audience_for_cadence_email(EmailCadence.DAILY)
             list(audience)   # evaluating queryset
+
+    @ddt.data(True, False)
+    @patch('edx_ace.ace.send')
+    def test_digest_should_contain_email_enabled_notifications(self, email_value, mock_func):
+        """
+        Tests email is sent only when notifications with email=True exists
+        """
+        created_date = datetime.datetime.now() - datetime.timedelta(days=1)
+        create_notification(self.user, self.course.id, created=created_date, email=email_value)
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY)
+            assert mock_func.called is email_value
 
 
 class TestPreferences(ModuleStoreTestCase):

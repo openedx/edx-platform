@@ -4,6 +4,7 @@ Test utils.py
 import datetime
 import ddt
 
+from pytz import utc
 from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -74,7 +75,7 @@ class TestUtilFunctions(ModuleStoreTestCase):
         """
         Tests time_ago string
         """
-        current_datetime = datetime.datetime.now()
+        current_datetime = utc.localize(datetime.datetime.now())
         assert "Today" == get_time_ago(current_datetime)
         assert "1d" == get_time_ago(current_datetime - datetime.timedelta(days=1))
         assert "1w" == get_time_ago(current_datetime - datetime.timedelta(days=7))
