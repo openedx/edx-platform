@@ -78,8 +78,9 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-backports-zoneinfo[tzdata]==0.2.1
+backports-zoneinfo[tzdata]==0.2.1 ; python_version < "3.9"
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   celery
     #   django
@@ -880,7 +881,7 @@ nltk==3.8.1
     #   chem
 nodeenv==1.8.0
     # via -r requirements/edx/base.txt
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1239,9 +1240,8 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.7.3
+scipy==1.10.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   chem
     #   openedx-calc
