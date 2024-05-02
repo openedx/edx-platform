@@ -456,7 +456,7 @@ def get_textbooks_url(course_locator) -> str:
     textbooks_url = None
     if use_new_textbooks_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/pages-and-resources/textbooks'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
         if mfe_base_url:
             textbooks_url = course_mfe_url
     return textbooks_url

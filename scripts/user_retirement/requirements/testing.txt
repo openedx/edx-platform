@@ -14,7 +14,7 @@ attrs==23.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-backports-zoneinfo==0.2.1
+backports-zoneinfo==0.2.1 ; python_version < "3.9"
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django

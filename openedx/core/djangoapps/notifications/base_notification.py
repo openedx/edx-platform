@@ -187,7 +187,7 @@ COURSE_NOTIFICATION_TYPES = {
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
     'ora_staff_notification': {
-        'notification_app': 'ora',
+        'notification_app': 'grading',
         'name': 'ora_staff_notification',
         'is_core': False,
         'info': '',
@@ -227,9 +227,9 @@ COURSE_NOTIFICATION_APPS = {
         'core_email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
-    'ora': {
+    'grading': {
         'enabled': True,
-        'core_info': _('Notifications for Open response submissions.'),
+        'core_info': _('Notifications for submission grading.'),
         'core_web': True,
         'core_email': True,
         'core_push': True,

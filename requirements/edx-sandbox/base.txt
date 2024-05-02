@@ -49,7 +49,7 @@ nltk==3.8.1
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   chem
     #   contourpy
@@ -76,9 +76,8 @@ random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
 regex==2024.4.16
     # via nltk
-scipy==1.7.3
+scipy==1.10.1
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/base.in
     #   chem
     #   openedx-calc
