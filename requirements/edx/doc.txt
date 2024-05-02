@@ -6,6 +6,14 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
+-e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
+-e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
+    # via -r requirements/edx/base.txt
 accessible-pygments==0.0.4
     # via pydata-sphinx-theme
 acid-xblock==0.3.1
@@ -455,6 +463,10 @@ djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
+dnspython==2.6.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   pymongo
 docutils==0.19
     # via
     #   pydata-sphinx-theme
@@ -546,7 +558,7 @@ edx-event-bus-kafka==5.7.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.5.0
     # via -r requirements/edx/base.txt
-edx-i18n-tools==1.5.0
+edx-i18n-tools==1.6.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -628,12 +640,6 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/base.txt
-event-tracking==2.4.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
 fastavro==1.9.4
     # via
     #   -r requirements/edx/base.txt
@@ -785,7 +791,7 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.11.0
     # via -r requirements/edx/base.txt
-lxml==4.9.4
+lxml[html-clean]==4.9.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -910,8 +916,6 @@ openedx-learning==0.9.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-openedx-mongodbproxy==0.2.0
-    # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1045,7 +1049,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/base.txt
 pymemcache==4.0.0
     # via -r requirements/edx/base.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

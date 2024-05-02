@@ -6,6 +6,14 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/github.in
+-e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/github.in
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
+-e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
+    # via -r requirements/edx/github.in
 acid-xblock==0.3.1
     # via -r requirements/edx/kernel.in
 aiohttp==3.9.5
@@ -77,13 +85,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.34.104
+
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.104
+
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -167,7 +175,7 @@ cryptography==42.0.7
     #   pyopenssl
     #   snowflake-connector-python
     #   social-auth-core
-cssutils==2.10.3
+
     # via pynliner
 defusedxml==0.7.1
     # via
@@ -176,7 +184,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.13
+
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -282,7 +290,7 @@ django-filter==24.2
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   lti-consumer-xblock
-django-ipware==7.0.1
+
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -389,11 +397,15 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+dnspython==2.6.1
+    # via
+    #   -r requirements/edx/paver.txt
+    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
     # via edx-drf-extensions
-drf-spectacular==0.27.2
+
     # via -r requirements/edx/kernel.in
 drf-yasg==1.21.5
     # via
@@ -407,8 +419,7 @@ edx-api-doc-tools==1.8.0
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
 edx-auth-backends==4.3.0
-    # via -r requirements/edx/kernel.in
-edx-braze-client==0.2.5
+
     # via
     #   -r requirements/edx/bundled.in
     #   edx-enterprise
@@ -472,7 +483,7 @@ edx-event-bus-kafka==5.7.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.5.0
     # via -r requirements/edx/kernel.in
-edx-i18n-tools==1.5.0
+edx-i18n-tools==1.6.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
@@ -548,12 +559,6 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
-event-tracking==2.4.0
-    # via
-    #   -r requirements/edx/kernel.in
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
 fastavro==1.9.4
     # via openedx-events
 filelock==3.14.0
@@ -667,7 +672,7 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.11.0
     # via -r requirements/edx/kernel.in
-lxml==4.9.4
+lxml[html-clean]==4.9.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -682,7 +687,7 @@ lxml==4.9.4
     #   xmlsec
 mailsnake==1.6.4
     # via -r requirements/edx/bundled.in
-mako==1.3.5
+
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
@@ -706,7 +711,7 @@ markupsafe==2.1.5
     #   xblock
 maxminddb==2.6.1
     # via geoip2
-meilisearch==0.31.1
+
     # via -r requirements/edx/kernel.in
 mock==5.1.0
     # via -r requirements/edx/paver.txt
@@ -723,8 +728,7 @@ multidict==6.0.5
     #   aiohttp
     #   yarl
 mysqlclient==2.2.4
-    # via -r requirements/edx/kernel.in
-newrelic==9.9.1
+
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -779,8 +783,6 @@ openedx-learning==0.9.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-openedx-mongodbproxy==0.2.0
-    # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -881,7 +883,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -977,7 +979,7 @@ referencing==0.35.1
     # via
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.5.10
+
     # via nltk
 requests==2.31.0
     # via
@@ -1098,8 +1100,7 @@ sortedcontainers==2.4.0
     #   snowflake-connector-python
 soupsieve==2.5
     # via beautifulsoup4
-sqlparse==0.5.0
-    # via django
+
 staff-graded-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 stevedore==5.2.0
@@ -1121,7 +1122,7 @@ text-unidecode==1.3
     # via python-slugify
 tinycss2==1.2.1
     # via bleach
-tomlkit==0.12.5
+
     # via snowflake-connector-python
 tqdm==4.66.4
     # via

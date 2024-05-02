@@ -57,6 +57,14 @@ class MongoContentStore(ContentStore):
         """
         self.fs_files.database.client.close()
 
+    def check_connection(self):
+        connection = self.fs_files.database.client
+        try:
+            connection.admin.command("ping")
+            return True
+        except pymongo.errors.InvalidOperation:
+            return False
+
     def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
@@ -69,8 +77,10 @@ class MongoContentStore(ContentStore):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.fs_files.database.client
+        if not self.check_connection():
+            return
 
+        connection = self.fs_files.database.client
         if database:
             connection.drop_database(self.fs_files.database.name)
         elif collections:
