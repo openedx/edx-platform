@@ -473,30 +473,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         super().__init__(contentstore=contentstore, **kwargs)
 
-        def do_connection(
-            db, collection, host, port=27017, tz_aware=True, user=None, password=None, asset_collection=None, **kwargs
-        ):
-            """
-            Create & open the connection, authenticate, and provide pointers to the collection
-            """
-            # Set a write concern of 1, which makes writes complete successfully to the primary
-            # only before returning. Also makes pymongo report write errors.
-            kwargs['w'] = 1
-
-            self.database = connect_to_mongodb(
-                db, host,
-                port=port, tz_aware=tz_aware, user=user, password=password,
-                retry_wait_time=retry_wait_time, **kwargs
-            )
-
-            self.collection = self.database[collection]
-
-            # Collection which stores asset metadata.
-            if asset_collection is None:
-                asset_collection = self.DEFAULT_ASSET_COLLECTION_NAME
-            self.asset_collection = self.database[asset_collection]
-
-        do_connection(**doc_store_config)
+        self.doc_store_config = doc_store_config
+        self.retry_wait_time = retry_wait_time
+        self.do_connection(**self.doc_store_config)
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -523,6 +502,48 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self._course_run_cache = {}
         self.signal_handler = signal_handler
 
+    def check_connection(self):
+        """
+        Check if mongodb connection is open or not.
+        """
+        try:
+            # The ismaster command is cheap and does not require auth.
+            self.database.client.admin.command('ismaster')
+            return True
+        except pymongo.errors.InvalidOperation:
+            return False
+
+    def ensure_connection(self):
+        """
+        Ensure that mongodb connection is open.
+        """
+        if self.check_connection():
+            return
+        self.do_connection(**self.doc_store_config)
+
+    def do_connection(
+        self, db, collection, host, port=27017, tz_aware=True, user=None, password=None, asset_collection=None, **kwargs
+    ):
+        """
+        Create & open the connection, authenticate, and provide pointers to the collection
+        """
+        # Set a write concern of 1, which makes writes complete successfully to the primary
+        # only before returning. Also makes pymongo report write errors.
+        kwargs['w'] = 1
+
+        self.database = connect_to_mongodb(
+            db, host,
+            port=port, tz_aware=tz_aware, user=user, password=password,
+            retry_wait_time=self.retry_wait_time, **kwargs
+        )
+
+        self.collection = self.database[collection]
+
+        # Collection which stores asset metadata.
+        if asset_collection is None:
+            asset_collection = self.DEFAULT_ASSET_COLLECTION_NAME
+        self.asset_collection = self.database[asset_collection]
+
     def close_connections(self):
         """
         Closes any open connections to the underlying database
@@ -541,6 +562,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         If connections is True, then close the connection to the database as well.
         """
+        self.ensure_connection()
         # drop the assets
         super()._drop_database(database, collections, connections)
 
@@ -872,6 +894,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
         else:
             course_query = {'_id': location.to_deprecated_son()}
+
+        self.ensure_connection()
         course = self.collection.find_one(course_query, projection={'_id': True})
         if course:
             return CourseKey.from_string('/'.join([

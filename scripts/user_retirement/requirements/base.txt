@@ -83,7 +83,7 @@ lxml==4.9.4
     #   zeep
 more-itertools==10.3.0
     # via simple-salesforce
-newrelic==9.12.0
+
     # via edx-django-utils
 pbr==6.0.0
     # via stevedore

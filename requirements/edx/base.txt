@@ -81,7 +81,7 @@ bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 camel-converter[pydantic]==3.1.2
     # via meilisearch
-celery==5.4.0
+celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -376,6 +376,10 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+dnspython==2.6.1
+    # via
+    #   -r requirements/edx/paver.txt
+    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
@@ -536,7 +540,7 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
-event-tracking==2.4.0
+event-tracking==2.4.1
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/kernel.in
@@ -865,7 +869,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

@@ -166,7 +166,7 @@ camel-converter[pydantic]==3.1.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   meilisearch
-celery==5.4.0
+celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -614,8 +614,10 @@ djangorestframework-xml==2.0.0
     #   edx-enterprise
 dnspython==2.6.1
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   email-validator
+    #   pymongo
 docutils==0.21.2
     # via
     #   -r requirements/edx/doc.txt
@@ -853,7 +855,7 @@ enmerkar-underscore==2.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-event-tracking==2.4.0
+event-tracking==2.4.1
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1535,7 +1537,7 @@ pymemcache==4.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
