@@ -85,20 +85,20 @@ COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING = CourseWaffl
 
 # .. toggle_name: courseware.disable_navigation_sidebar
 # .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
+# .. toggle_default: True
 # .. toggle_description: Disable navi sidebar on Learning MFE
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2024-03-07
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: AXIMST-611
 # .. toggle_warning: None.
-COURSEWARE_MICROFRONTEND_SIDEBAR_DISABLED = CourseWaffleFlag(
+COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.disable_navigation_sidebar', __name__
 )
 
 # .. toggle_name: courseware.show_default_right_sidebar
 # .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
+# .. toggle_default: True
 # .. toggle_description: If waffle flag disabled
 # Discussions or Notifications sidebar shouldn't be displayed at all on Learning MFE.
 # If waffle flag enabled - Discussions opens always on the pages with discussions,
@@ -107,7 +107,7 @@ COURSEWARE_MICROFRONTEND_SIDEBAR_DISABLED = CourseWaffleFlag(
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: FC-0056
 # .. toggle_warning: None.
-COURSEWARE_SHOW_DEFAULT_RIGHT_SIDEBAR = CourseWaffleFlag(
+COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.show_default_right_sidebar', __name__
 )
 
