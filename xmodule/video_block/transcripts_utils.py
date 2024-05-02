@@ -856,7 +856,7 @@ class VideoTranscriptsMixin:
         # to clean redundant language codes.
         return list(set(translations))
 
-    def get_default_transcript_language(self, transcripts, dest_lang):
+    def get_default_transcript_language(self, transcripts, dest_lang=None):
         """
         Returns the default transcript language for this video block.
 

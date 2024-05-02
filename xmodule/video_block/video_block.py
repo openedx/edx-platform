@@ -159,7 +159,7 @@ class VideoBlock(
 
     uses_xmodule_styles_setup = True
 
-    def get_transcripts_for_student(self, transcripts, dest_lang):
+    def get_transcripts_for_student(self, transcripts, dest_lang=None):
         """Return transcript information necessary for rendering the XModule student view.
         This is more or less a direct extraction from `get_html`.
 
