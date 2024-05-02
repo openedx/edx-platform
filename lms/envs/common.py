@@ -4731,19 +4731,6 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
 
-# .. toggle_name: COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR
-# .. toggle_implementation: SettingToggle
-# .. toggle_default: False
-# .. toggle_description: If disabled (False), this switch causes the CourseTabView API (or whatever else calls
-#    check_course_open_for_learner()) to always return the legacy `course_not_started` error code in ALL cases where the
-#    course has not started.  If enabled (True), the API will respond with `course_not_started_enterprise_learner` in a
-#    subset of cases where the learner is enrolled via subsidy, and `course_not_started` in all other cases.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-12-18
-# .. toggle_target_removal_date: 2023-12-19
-# .. toggle_tickets: ENT-8078
-COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR = False
-
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
 # of a particular type of course enrollment mode. This is not to be confused
