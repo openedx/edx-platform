@@ -2,6 +2,7 @@
 Celery tasks for sending email notifications
 """
 from celery import shared_task
+from celery.utils.log import get_task_logger
 from django.contrib.auth import get_user_model
 from edx_ace import ace
 from edx_ace.recipient import Recipient
@@ -25,6 +26,7 @@ from .utils import (
 
 
 User = get_user_model()
+logger = get_task_logger(__name__)
 
 
 def get_audience_for_cadence_email(cadence_type):
@@ -73,17 +75,21 @@ def send_digest_email_to_user(user, cadence_type, course_language='en', courses_
     """
     if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
+    logger.info(f'<Email Cadence> Sending email to user {user.username} ==Temp Log==')
     if not is_email_notification_flag_enabled(user):
+        logger.info(f'<Email Cadence> Flag disabled for {user.username} ==Temp Log==')
         return
     start_date, end_date = get_start_end_date(cadence_type)
     notifications = Notification.objects.filter(user=user, email=True,
                                                 created__gte=start_date, created__lte=end_date)
     if not notifications:
+        logger.info(f'<Email Cadence> No notification for {user.username} ==Temp Log==')
         return
     course_ids = get_unique_course_ids(notifications)
     preferences = get_user_preferences_for_courses(course_ids, user)
     notifications = filter_notification_with_email_enabled_preferences(notifications, preferences, cadence_type)
     if not notifications:
+        logger.info(f'<Email Cadence> No filtered notification for {user.username} ==Temp Log==')
         return
     apps_dict = create_app_notifications_dict(notifications)
     message_context = create_email_digest_context(apps_dict, start_date, end_date, cadence_type,
@@ -93,6 +99,7 @@ def send_digest_email_to_user(user, cadence_type, course_language='en', courses_
         app_label="notifications", name="email_digest"
     ).personalize(recipient, course_language, message_context)
     ace.send(message)
+    logger.info(f'<Email Cadence> Email sent to {user.username} ==Temp Log==')
 
 
 @shared_task(ignore_result=True)
@@ -101,7 +108,9 @@ def send_digest_email_to_all_users(cadence_type):
     """
     Send email digest to all eligible users
     """
+    logger.info(f'<Email Cadence> Sending cadence email of type {cadence_type}')
     users = get_audience_for_cadence_email(cadence_type)
     courses_data = {}
+    logger.info(f'<Email Cadence> Email Cadence Audience {len(users)}')
     for user in users:
         send_digest_email_to_user(user, cadence_type, courses_data=courses_data)
