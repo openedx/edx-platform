@@ -187,7 +187,7 @@ if (is_proctored_exam) {
                     </li>
                 <% } %>
 
-                <% if (xblockInfo.isVertical() && typeof useTaggingTaxonomyListPage !== "undefined" && useTaggingTaxonomyListPage) { %>
+                <% if (xblockInfo.isVertical() && !isTaggingFeatureDisabled) { %>
                     <li class="action-item tag-count" data-locator="<%- xblockId %>"></li>
                 <% } %>
 
@@ -211,7 +211,7 @@ if (is_proctored_exam) {
                                         </li>
                                     <% } %>
                                     <% if (xblockInfo.isVertical()) { %>
-                                        <% if (typeof useTaggingTaxonomyListPage !== "undefined" && useTaggingTaxonomyListPage) { %>
+                                        <% if (!isTaggingFeatureDisabled) { %>
                                             <li class="nav-item">
                                                 <a class="manage-tags-button" href="#" role="button"><%- gettext('Manage Tags') %></a>
                                             </li>

@@ -116,6 +116,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 enableHideFromTOC: this.model.get('hide_from_toc'),
                 course: course,
                 enableCopyPasteUnits: this.model.get('enable_copy_paste_units'), // ENABLE_COPY_PASTE_UNITS waffle flag
+                isTaggingFeatureDisabled: this.model.get('is_tagging_feature_disabled'), // DISABLE_TAGGING_FEATURE waffle flag
             };
         },
 
