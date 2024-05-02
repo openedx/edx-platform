@@ -3737,6 +3737,9 @@ REGISTRATION_FIELD_ORDER = [
 # that match a regex in this list. Set to None to allow any email (default).
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 
+# String length for the configurable part of the auto-generated username
+AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
+
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
