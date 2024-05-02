@@ -52,6 +52,7 @@ def validate_course_id(course_id):
             )
         )
 
+    # import pdb; pdb.set_trace() # pdb1
     if not modulestore().has_course(course_key):
         raise serializers.ValidationError(
             _('Course {course_id} does not exist.').format(

@@ -1237,6 +1237,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
             ignore_case (boolean): some modulestores are case-insensitive. Use this flag
                 to search for whether a potentially conflicting course exists in that case.
         """
+        # import pdb; pdb.set_trace() # pdb4
         # linear search through list
         assert isinstance(course_id, CourseKey)
         if ignore_case:

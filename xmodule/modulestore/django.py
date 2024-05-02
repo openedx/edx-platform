@@ -265,6 +265,7 @@ def create_modulestore_instance(
     # Import is placed here to avoid model import at project startup.
     import xblock.reference.plugins
 
+    # import pdb; pdb.set_trace() # pdb8
     class_ = load_function(engine)
 
     _options = {}
@@ -308,6 +309,7 @@ def create_modulestore_instance(
             request_cache.data['disabled_xblock_types'] = [block.name for block in disabled_xblocks()]
         return request_cache.data['disabled_xblock_types']
 
+    # import pdb; pdb.set_trace() # pdb12
     return class_(
         contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,

@@ -92,6 +92,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        # import pdb; pdb.set_trace()
         cls.store.delete_course(cls.course.id, cls.user.id)
 
     def setUp(self):

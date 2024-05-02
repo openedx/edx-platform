@@ -181,6 +181,7 @@ class ClipboardEndpoint(APIView):
         """
         Helper method for "post to clipboard" API endpoint. This deals with copying static files into the clipboard.
         """
+        # 🔥🔥🔥🔥
         for f in static_files:
             source_key = (
                 StaticContent.get_asset_key_from_path(usage_key.context_key, f.url)
@@ -189,6 +190,7 @@ class ClipboardEndpoint(APIView):
             # Compute the MD5 hash and get the content:
             content: bytes | None = f.data
             md5_hash = ""  # Unknown
+            # import pdb; pdb.set_trace()
             if content:
                 md5_hash = hashlib.md5(content).hexdigest()
                 # This asset came from the XBlock's filesystem, e.g. a video block's transcript file

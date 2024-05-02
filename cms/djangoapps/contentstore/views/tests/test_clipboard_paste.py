@@ -371,6 +371,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
 
         # Paste the video
         dest_parent_key = dest_course_key.make_usage_key("vertical", "vertical_test")
+        # import pdb; pdb.set_trace()
         paste_response = client.post(XBLOCK_ENDPOINT, {
             "parent_locator": str(dest_parent_key),
             "staged_content": "clipboard",

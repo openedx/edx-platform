@@ -505,6 +505,7 @@ class UserBasedRole:
         """
         Return whether the role's user has the configured role access to the passed course
         """
+        # import pdb; pdb.set_trace() # pdb7
         if not (self.user.is_authenticated and self.user.is_active):
             return False
 

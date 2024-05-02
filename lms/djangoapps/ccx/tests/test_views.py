@@ -890,6 +890,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         Hides nodes at a different depth and checks that these nodes
         are not in the schedule.
         """
+        # import pdb; pdb.set_trace() # pdb
         today.return_value = datetime.datetime(2014, 11, 25, tzinfo=UTC)
         self.make_coach()
         ccx = self.make_ccx()

@@ -168,6 +168,7 @@ def drop_mongo_collections(mock_create):
     """
     If using a Mongo-backed modulestore & contentstore, drop the collections.
     """
+    # import pdb; pdb.set_trace() # pdb
     # Do not create the modulestore if it does not exist.
     mock_create.return_value = None
 

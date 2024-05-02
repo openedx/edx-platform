@@ -156,6 +156,7 @@ class CCXModulestoreWrapper:
 
     def has_course(self, course_id, ignore_case=False, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
+        # import pdb; pdb.set_trace() # pdb2 🔴
         with remove_ccx(course_id) as (course_id, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
             return restore(self._modulestore.has_course(
                 course_id, ignore_case=ignore_case, **kwargs

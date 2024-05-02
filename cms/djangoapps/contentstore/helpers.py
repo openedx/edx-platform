@@ -421,6 +421,7 @@ def _import_files_into_course(
     need to end up in the course's Files & Uploads page), import them into the destination course, unless they already
     exist.
     """
+    # import pdb; pdb.set_trace()
     # List of files that were newly added to the destination course
     new_files = []
     # List of files that conflicted with identically named files already in the destination course

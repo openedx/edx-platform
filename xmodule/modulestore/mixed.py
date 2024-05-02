@@ -86,6 +86,7 @@ def strip_key(func):
                     field_value = strip_key_func(field_value)
             return field_value
 
+        # import pdb; pdb.set_trace() # pdb15 🔴
         # call the decorated function
         retval = func(field_decorator=strip_key_collection, *args, **kwargs)
 
@@ -182,6 +183,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 if store_name == key:
                     self.mappings[course_key] = store
             self.modulestores.append(store)
+        # import pdb; pdb.set_trac() # pdb13
 
     def _clean_locator_for_mapping(self, locator):
         """
@@ -203,6 +205,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         If locator is None, returns the first (ordered) store as the default
         """
+        # import pdb; pdb.set_trace() # pdb16 🔴
         if locator is not None:
             locator = self._clean_locator_for_mapping(locator)
             mapping = self.mappings.get(locator, None)
@@ -444,6 +447,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             False, do a case sensitive search
         """
         assert isinstance(course_id, CourseKey)
+        # import pdb; pdb.set_trace() # pdb5 🔴🔴
         store = self._get_modulestore_for_courselike(course_id)
         return store.has_course(course_id, ignore_case, **kwargs)
 
