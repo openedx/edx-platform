@@ -91,8 +91,8 @@ from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_CO
 from lms.djangoapps.courseware.toggles import (
     course_is_invitation_only,
     courseware_mfe_search_is_enabled,
-    courseware_show_default_right_sidebar_is_enabled,
-    courseware_mfe_sidebar_is_disabled,
+    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
+    COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
 )
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
@@ -2290,24 +2290,9 @@ def courseware_mfe_search_enabled(request, course_id=None):
 
 
 @api_view(['GET'])
-def courseware_mfe_sidebar_enabled(request, course_id=None):
+def courseware_mfe_navigation_sidebar_toggles(request, course_id=None):
     """
-    GET endpoint to expose whether the course may display navigation sidebar.
-    """
-    try:
-        course_key = CourseKey.from_string(course_id) if course_id else None
-    except InvalidKeyError:
-        return JsonResponse({"error": "Invalid course_id"})
-
-    return JsonResponse({
-        "enabled": not courseware_mfe_sidebar_is_disabled(course_key)
-    })
-
-
-@api_view(['GET'])
-def courseware_mfe_show_default_right_sidebar_is_enabled(request, course_id=None):
-    """
-    Simple GET endpoint to expose whether the course may open discussion sidebar by default.
+    GET endpoint to return navigation sidebar toggles.
     """
     try:
         course_key = CourseKey.from_string(course_id) if course_id else None
@@ -2315,5 +2300,6 @@ def courseware_mfe_show_default_right_sidebar_is_enabled(request, course_id=None
         return JsonResponse({"error": "Invalid course_id"})
 
     return JsonResponse({
-        "enabled": courseware_show_default_right_sidebar_is_enabled(course_key)
+        "enable_navigation_sidebar": COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR.is_enabled(course_key),
+        "always_open_auxiliary_sidebar": COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR.is_enabled(course_key),
     })
