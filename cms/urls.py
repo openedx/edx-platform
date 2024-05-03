@@ -74,6 +74,9 @@ urlpatterns = oauth2_urlpatterns + [
     path('heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
 
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
+
     # User API endpoints
     path('api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
