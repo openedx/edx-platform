@@ -73,10 +73,8 @@ log = logging.getLogger(__name__)
 CREATE_IF_NOT_FOUND = ["course_info"]
 
 # Useful constants for defining predicates
-def NEVER(x):
-    return False
-def ALWAYS(x):
-    return True
+NEVER = lambda x: False
+ALWAYS = lambda x: True
 
 
 # Disable atomic requests so transactions made during the request commit immediately instead of waiting for the end of
@@ -309,7 +307,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
 @login_required
 def xblock_actions_view(request, usage_key_string, action_name):
     """
-    The handler for rendered edit xblock view.
+    Return rendered xblock action view.
+    The action name should be provided as an argument.
+    Valid options for action names are edit and move.
     """
     usage_key = usage_key_with_run(usage_key_string)
     if not has_studio_read_access(request.user, usage_key.course_key):

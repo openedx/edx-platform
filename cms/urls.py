@@ -146,7 +146,7 @@ urlpatterns = oauth2_urlpatterns + [
             name='xblock_outline_handler'),
     re_path(fr'^xblock/container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.xblock_container_handler,
             name='xblock_container_handler'),
-    re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}/actions/(?P<action_name>[^/]+)$$', xblock_actions_view,
+    re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}/actions/(?P<action_name>[^/]+)$', xblock_actions_view,
             name='xblock_actions_handler'),
     re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}/(?P<view_name>[^/]+)$', contentstore_views.xblock_view_handler,
             name='xblock_view_handler'),

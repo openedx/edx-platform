@@ -209,8 +209,8 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             Backbone.trigger('xblock:editorModalHidden');
 
             window.parent.postMessage({
-              method: 'close_edit_modal',
-              msg: 'Sends a message when the modal window is closed'
+              method: 'close_modal',
+              msg: 'Sends a message when the edit modal window is closed'
             }, '*');
 
             BaseModal.prototype.hide.call(this);

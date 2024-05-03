@@ -192,20 +192,28 @@ from openedx.core.djangolib.markup import HTML, Text
             require(['js/models/xblock_info', 'js/views/xblock', 'js/views/utils/xblock_utils',
 'common/js/components/utils/view_utils', 'gettext', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal'],
 function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils, gettext, EditXBlockModal, MoveXBlockModal) {
-            if ('${action_name|n, decode.utf8}' === 'move') {
-                 var parentModel = new XBlockInfo({ id: '${unit.location|n, decode.utf8}', category: 'vertical' });
-                 var moveModal = new MoveXBlockModal({
-                         sourceXBlockInfo: new XBlockInfo(${xblock_info | n, dump_js_escaped_json}),
-                         sourceParentXBlockInfo: parentModel,
-                         XBlockURLRoot: "/xblock",
-                         outlineURL: '${outline_url | n, js_escaped_string}',
-                     });
-                moveModal.show();
-            } else if ('${action_name|n, decode.utf8}' === 'edit') {
-             var editModal = new EditXBlockModal();
+                function showMoveModal(unitLocation, xblockInfo, outlineUrl) {
+                    var parentModel = new XBlockInfo({ id: unitLocation, category: 'vertical' });
+                    var moveModal = new MoveXBlockModal({
+                        sourceXBlockInfo: new XBlockInfo(xblockInfo),
+                        sourceParentXBlockInfo: parentModel,
+                        XBlockURLRoot: '/xblock',
+                        outlineURL: outlineUrl,
+                    });
+                    moveModal.show();
+                }
 
-             editModal.edit([], new XBlockInfo(${xblock_info | n, dump_js_escaped_json}), {});
-            }
+                function showEditModal(xblockInfo) {
+                    var editModal = new EditXBlockModal();
+                    editModal.edit([], new XBlockInfo(xblockInfo), {});
+                }
+
+                var actionName = '${action_name|n, decode.utf8}';
+                if (actionName === 'move') {
+                    showMoveModal('${unit.location|n, decode.utf8}', ${xblock_info | n, dump_js_escaped_json}, '${outline_url | n, js_escaped_string}');
+                } else if (actionName === 'edit') {
+                    showEditModal(${xblock_info | n, dump_js_escaped_json});
+                }
             });
         </%static:webpack>
     </%block>
