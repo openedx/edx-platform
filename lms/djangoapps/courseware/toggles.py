@@ -72,8 +72,8 @@ COURSEWARE_MICROFRONTEND_SEARCH_ENABLED = CourseWaffleFlag(
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Disable caching of navigation sidebar blocks on Learning MFE.
-# It can be used when caching the structure of large courses for a large number of users
-# at the same time can overload the cache storage (memcache or redis).
+#   It can be used when caching the structure of large courses for a large number of users
+#   at the same time can overload the cache storage (memcache or redis).
 # .. toggle_use_cases: opt_out, open_edx
 # .. toggle_creation_date: 2024-03-21
 # .. toggle_target_removal_date: None
@@ -98,12 +98,14 @@ COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR = CourseWaffleFlag(
 # .. toggle_name: courseware.always_open_auxiliary_sidebar
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: True
-# .. toggle_description: TBD
+# .. toggle_description: Waffle flag that determines whether the auxiliary sidebar,
+#   such as discussion or notification, should automatically expand
+#   on each course unit page within the Learning MFE, without preserving
+#   the previous state of the sidebar.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2024-04-28
 # .. toggle_target_removal_date: 2024-07-28
 # .. toggle_tickets: FC-0056
-# .. toggle_warning: This toggle will have effect only if navigation sidebar is enabled
 COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.always_open_auxiliary_sidebar', __name__
 )
