@@ -1243,6 +1243,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
             if use_tagging_taxonomy_list_page():
                 xblock_info["use_tagging_taxonomy_list_page"] = True
+                xblock_info["course_tags_count"] = _get_course_tags_count(course.id)
                 xblock_info["tag_counts_by_unit"] = _get_course_unit_tags(xblock.location.context_key)
 
             xblock_info[
@@ -1260,6 +1261,17 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
 
     return xblock_info
+
+
+@request_cached()
+def _get_course_tags_count(course_key) -> dict:
+    """
+    Get the count of tags that are applied to the course as a dict: {course_key: tags_count}
+    """
+    if not course_key.is_course:
+        return {}  # Unsupported key type
+
+    return get_object_tag_counts(str(course_key), count_implicit=True)
 
 
 @request_cached()
