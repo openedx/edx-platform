@@ -164,7 +164,7 @@ six==1.16.0
     #   requests-file
 slumber==0.7.1
     # via edx-rest-api-client
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via django
 stevedore==5.1.0
     # via edx-django-utils
