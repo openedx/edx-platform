@@ -1120,7 +1120,6 @@ soupsieve==2.5
     # via beautifulsoup4
 sqlparse==0.4.4
     # via
-    #   -r requirements/edx/kernel.in
     #   django
     #   openedx-blockstore
 staff-graded-xblock==2.3.0
