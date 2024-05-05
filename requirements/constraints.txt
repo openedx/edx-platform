@@ -68,8 +68,6 @@ pyopenssl==22.0.0
 
 cryptography==38.0.4 # greater version has some issues with openssl.
 
-pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
-
 # adding these constraints to minimize boto3 and botocore changeset
 social-auth-core==4.3.0
 

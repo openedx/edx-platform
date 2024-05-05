@@ -245,7 +245,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if (
                 track and hasattr(request, 'session') and
                 session_key not in request.session and
-                not masquerading_as_specific_student and not anonymous
+                not masquerading_as_specific_student and not anonymous  # pylint: disable=used-before-assignment
         ):
             segment.track(
                 user_id=user.id,
