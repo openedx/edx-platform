@@ -1928,7 +1928,7 @@ MANAGERS = ADMINS
 
 # Static content
 STATIC_URL = '/static/'
-STATIC_ROOT = os.environ.get('STATIC_ROOT_LMS', ENV_ROOT / "staticfiles")
+STATIC_ROOT = ENV_ROOT / "staticfiles"
 STATIC_URL_BASE = '/static/'
 
 STATICFILES_DIRS = [
@@ -2822,14 +2822,7 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-
-# .. setting_name: WEBPACK_CONFIG_PATH
-# .. setting_default: "webpack.prod.config.js"
-# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
-#   see: https://github.com/openedx/edx-platform/issues/31895
-WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
+WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
@@ -4556,11 +4549,9 @@ SITE_ID = 1
 
 # .. setting_name: COMPREHENSIVE_THEME_DIRS
 # .. setting_default: []
-# .. setting_description: A list of paths to directories, each of which will
-#   be searched for comprehensive themes. Do not override this Django setting directly.
-#   Instead, set the COMPREHENSIVE_THEME_DIRS environment variable, using colons (:) to
-#   separate paths.
-COMPREHENSIVE_THEME_DIRS = os.environ.get("COMPREHENSIVE_THEME_DIRS", "").split(":")
+# .. setting_description: A list of directories containing themes folders,
+#   each entry should be a full path to the directory containing the theme folder.
+COMPREHENSIVE_THEME_DIRS = []
 
 # .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
 # .. setting_default: []

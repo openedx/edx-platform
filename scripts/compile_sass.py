@@ -67,12 +67,14 @@ NORMALIZED_ENVS = {
     "theme_dirs",
     metavar="PATH",
     multiple=True,
-    envvar="COMPREHENSIVE_THEME_DIRS",
-    type=click.Path(path_type=Path),
+    envvar="EDX_PLATFORM_THEME_DIRS",
+    type=click.Path(
+        exists=True, file_okay=False, readable=True, writable=True, path_type=Path
+    ),
     help=(
         "Consider sub-dirs of PATH as themes. "
         "Multiple theme dirs are accepted. "
-        "If none are provided, we look at colon-separated paths on the COMPREHENSIVE_THEME_DIRS env var."
+        "If none are provided, we look at colon-separated paths on the EDX_PLATFORM_THEME_DIRS env var."
     ),
 )
 @click.option(
