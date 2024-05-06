@@ -4,11 +4,11 @@
 # Invoke from repo root as `npm run watch-sass`.
 
 # By default, only watches default Sass.
-# To watch themes too, provide colon-separated paths in the COMPREHENSIVE_THEME_DIRS environment variable.
+# To watch themes too, provide colon-separated paths in the EDX_PLATFORM_THEME_DIRS environment variable.
 # Each path will be treated as a "theme dir", which means that every immediate child directory is watchable as a theme.
 # For example:
 #
-#   COMPREHENSIVE_THEME_DIRS=/openedx/themes:./themes npm run watch-sass
+#   EDX_PLATFORM_THEME_DIRS=/openedx/themes:./themes npm run watch-sass
 #
 # would watch default Sass as well as /openedx/themes/indigo, /openedx/themes/mytheme, ./themes/red-theme, etc.
 
