@@ -994,7 +994,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.7.0
+ora2==6.9.0
     # via -r requirements/edx/base.txt
 packaging==24.0
     # via
