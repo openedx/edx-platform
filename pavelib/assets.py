@@ -1,5 +1,9 @@
 """
 Asset compilation and collection.
+
+This entire module is DEPRECATED. In Redwood, it exists just as a collection of temporary compatibility wrappers.
+In Sumac, this module will be deleted. To migrate, follow the advice in the printed warnings and/or read the
+instructions on the DEPR ticket: https://github.com/openedx/edx-platform/issues/31895
 """
 
 import argparse
@@ -13,31 +17,48 @@ from threading import Timer
 from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, sh, task
 from watchdog.events import PatternMatchingEventHandler
-from watchdog.observers import Observer  # pylint disable=unused-import  # Used by Tutor. Remove after Sumac cut.
+from watchdog.observers import Observer  # pylint: disable=unused-import  # Used by Tutor. Remove after Sumac cut.
 
-from .utils.cmd import cmd, django_cmd
+from .utils.cmd import django_cmd
 from .utils.envs import Env
-from .utils.process import run_background_process
 from .utils.timer import timed
 
-# setup baseline paths
-
-ALL_SYSTEMS = ['lms', 'studio']
-
-LMS = 'lms'
-CMS = 'cms'
 
 SYSTEMS = {
-    'lms': LMS,
-    'cms': CMS,
-    'studio': CMS
+    'lms': 'lms',
+    'cms': 'cms',
+    'studio': 'cms',
 }
 
-# Collectstatic log directory setting
-COLLECTSTATIC_LOG_DIR_ARG = 'collect_log_dir'
+WARNING_SYMBOLS = "⚠️ " * 50  # A row of 'warning' emoji to catch CLI users' attention
 
-# Webpack command
-WEBPACK_COMMAND = 'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} webpack {options}'
+
+def run_deprecated_command_wrapper(*, old_command, ignored_old_flags, new_command):
+    """
+    Run the new version of shell command, plus a warning that the old version is deprecated.
+    """
+    depr_warning = (
+        "\n" +
+        f"{WARNING_SYMBOLS}\n" +
+        "\n" +
+        f"WARNING: '{old_command}' is DEPRECATED! It will be removed before Sumac.\n" +
+        "The command you ran is now just a temporary wrapper around a new,\n" +
+        "supported command, which you should use instead:\n" +
+        "\n" +
+        f"\t{new_command}\n" +
+        "\n" +
+        "Details: https://github.com/openedx/edx-platform/issues/31895\n" +
+        "".join(
+            f" WARNING: ignored deprecated paver flag '{flag}'\n"
+            for flag in ignored_old_flags
+        ) +
+        f"{WARNING_SYMBOLS}\n" +
+        "\n"
+    )
+    # Print deprecation warning twice so that it's more likely to be seen in the logs.
+    print(depr_warning)
+    sh(new_command)
+    print(depr_warning)
 
 
 def debounce(seconds=1):
@@ -45,6 +66,8 @@ def debounce(seconds=1):
     Prevents the decorated function from being called more than every `seconds`
     seconds. Waits until calls stop coming in before calling the decorated
     function.
+
+    This is DEPRECATED. It exists in Redwood just to ease the transition for Tutor.
     """
     def decorator(func):
         func.timer = None
@@ -66,6 +89,8 @@ def debounce(seconds=1):
 class SassWatcher(PatternMatchingEventHandler):
     """
     Watches for sass file changes
+
+    This is DEPRECATED. It exists in Redwood just to ease the transition for Tutor.
     """
     ignore_directories = True
     patterns = ['*.scss']
@@ -102,7 +127,7 @@ class SassWatcher(PatternMatchingEventHandler):
     ('system=', 's', 'The system to compile sass for (defaults to all)'),
     ('theme-dirs=', '-td', 'Theme dirs containing all themes (defaults to None)'),
     ('themes=', '-t', 'The theme to compile sass for (defaults to None)'),
-    ('debug', 'd', 'DEPRECATED. Debug mode is now determined by NODE_ENV.'),
+    ('debug', 'd', 'Whether to use development settings'),
     ('force', '', 'DEPRECATED. Full recompilation is now always forced.'),
 ])
 @timed
@@ -143,16 +168,18 @@ def compile_sass(options):
 
     This is a DEPRECATED COMPATIBILITY WRAPPER. Use `npm run compile-sass` instead.
     """
-    systems = set(get_parsed_option(options, 'system', ALL_SYSTEMS))
-    command = shlex.join(
-        [
+    systems = [SYSTEMS[sys] for sys in get_parsed_option(options, 'system', ['lms', 'cms'])]  # normalize studio->cms
+    run_deprecated_command_wrapper(
+        old_command="paver compile_sass",
+        ignored_old_flags=(set(["--force"]) & set(options)),
+        new_command=shlex.join([
             "npm",
             "run",
-            "compile-sass",
+            ("compile-sass-dev" if options.get("debug") else "compile-sass"),
             "--",
             *(["--dry"] if tasks.environment.dry_run else []),
-            *(["--skip-lms"] if not systems & {"lms"} else []),
-            *(["--skip-cms"] if not systems & {"cms", "studio"} else []),
+            *(["--skip-lms"] if "lms" not in systems else []),
+            *(["--skip-cms"] if "cms" not in systems else []),
             *(
                 arg
                 for theme_dir in get_parsed_option(options, 'theme_dirs', [])
@@ -160,77 +187,50 @@ def compile_sass(options):
             ),
             *(
                 arg
-                for theme in get_parsed_option(options, "theme", [])
+                for theme in get_parsed_option(options, "themes", [])
                 for arg in ["--theme", theme]
             ),
-        ]
+        ]),
     )
-    depr_warning = (
-        "\n" +
-        "⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ \n" +
-        "\n" +
-        "WARNING: 'paver compile_sass' is DEPRECATED! It will be removed before Sumac.\n" +
-        "The command you ran is now just a temporary wrapper around a new,\n" +
-        "supported command, which you should use instead:\n" +
-        "\n" +
-        f"\t{command}\n" +
-        "\n" +
-        "Details: https://github.com/openedx/edx-platform/issues/31895\n" +
-        "\n" +
-        ("WARNING: ignoring deprecated flag '--debug'\n" if options.get("debug") else "") +
-        ("WARNING: ignoring deprecated flag '--force'\n" if options.get("force") else "") +
-        "⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ \n" +
-        "\n"
-    )
-    # Print deprecation warning twice so that it's more likely to be seen in the logs.
-    print(depr_warning)
-    sh(command)
-    print(depr_warning)
 
 
-def _compile_sass(system, theme, _debug, _force, _timing_info):
+def _compile_sass(system, theme, debug, force, _timing_info):
     """
     This is a DEPRECATED COMPATIBILITY WRAPPER
 
     It exists to ease the transition for Tutor in Redwood, which directly imported and used this function.
     """
-    command = shlex.join(
-        [
+    run_deprecated_command_wrapper(
+        old_command="pavelib.assets:_compile_sass",
+        ignored_old_flags=(set(["--force"]) if force else set()),
+        new_command=[
             "npm",
             "run",
-            "compile-sass",
+            ("compile-sass-dev" if debug else "compile-sass"),
             "--",
             *(["--dry"] if tasks.environment.dry_run else []),
-            *(["--skip-default", "--theme-dir", str(theme.parent), "--theme", str(theme.name)] if theme else []),
+            *(
+                ["--skip-default", "--theme-dir", str(theme.parent), "--theme", str(theme.name)]
+                if theme
+                else []
+            ),
             ("--skip-cms" if system == "lms" else "--skip-lms"),
         ]
     )
-    depr_warning = (
-        "\n" +
-        "⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ \n" +
-        "\n" +
-        "WARNING: 'pavelib/assets.py' is DEPRECATED! It will be removed before Sumac.\n" +
-        "The function you called is just a temporary wrapper around a new, supported command,\n" +
-        "which you should use instead:\n" +
-        "\n" +
-        f"\t{command}\n" +
-        "\n" +
-        "Details: https://github.com/openedx/edx-platform/issues/31895\n" +
-        "\n" +
-        "⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ \n" +
-        "\n"
-    )
-    # Print deprecation warning twice so that it's more likely to be seen in the logs.
-    print(depr_warning)
-    sh(command)
-    print(depr_warning)
 
 
 def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
+
+    This is a DEPRECATED COMPATIBILITY WRAPPER. It is now handled as part of `npm clean-install`.
+    If you need to invoke it explicitly, you can run `npm run postinstall`.
     """
-    sh('scripts/copy-node-modules.sh')
+    run_deprecated_command_wrapper(
+        old_command="pavelib.assets:process_npm_assets",
+        ignored_old_flags=[],
+        new_command=shlex.join(["npm", "run", "postinstall"]),
+    )
 
 
 @task
@@ -238,9 +238,21 @@ def process_npm_assets():
 def process_xmodule_assets():
     """
     Process XModule static assets.
+
+    This is a DEPRECATED COMPATIBILITY STUB. Refrences to it should be deleted.
     """
-    print("\t\tProcessing xmodule assets is no longer needed. This task is now a no-op.")
-    print("\t\tWhen paver is removed from edx-platform, this step will not replaced.")
+    print(
+        "\n" +
+        f"{WARNING_SYMBOLS}",
+        "\n" +
+        "WARNING: 'paver process_xmodule_assets' is DEPRECATED! It will be removed before Sumac.\n" +
+        "\n" +
+        "Starting with Quince, it is no longer necessary to post-process XModule assets, so \n" +
+        "'paver process_xmodule_assets' is a no-op. Please simply remove it from your build scripts.\n" +
+        "\n" +
+        "Details: https://github.com/openedx/edx-platform/issues/31895\n" +
+        f"{WARNING_SYMBOLS}",
+    )
 
 
 def collect_assets(systems, settings, **kwargs):
@@ -249,33 +261,29 @@ def collect_assets(systems, settings, **kwargs):
     `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
     `settings` is the Django settings module to use.
     `**kwargs` include arguments for using a log directory for collectstatic output. Defaults to /dev/null.
+
+    This is a DEPRECATED COMPATIBILITY WRAPPER
+
+    It exists to ease the transition for Tutor in Redwood, which directly imported and used this function.
     """
-    for sys in systems:
-        collectstatic_stdout_str = _collect_assets_cmd(sys, **kwargs)
-        sh(django_cmd(sys, settings, "collectstatic --noinput {logfile_str}".format(
-            logfile_str=collectstatic_stdout_str
-        )))
-        print(f"\t\tFinished collecting {sys} assets.")
-
-
-def _collect_assets_cmd(system, **kwargs):
-    """
-    Returns the collecstatic command to be used for the given system
-
-    Unless specified, collectstatic (which can be verbose) pipes to /dev/null
-    """
-    try:
-        if kwargs[COLLECTSTATIC_LOG_DIR_ARG] is None:
-            collectstatic_stdout_str = ""
-        else:
-            collectstatic_stdout_str = "> {output_dir}/{sys}-collectstatic.log".format(
-                output_dir=kwargs[COLLECTSTATIC_LOG_DIR_ARG],
-                sys=system
-            )
-    except KeyError:
-        collectstatic_stdout_str = "> /dev/null"
-
-    return collectstatic_stdout_str
+    run_deprecated_command_wrapper(
+        old_command="pavelib.asset:collect_assets",
+        ignored_old_flags=[],
+        new_command=" && ".join(
+            "( " +
+            shlex.join(
+                ["./manage.py", SYSTEMS[sys], f"--settings={settings}", "collectstatic", "--noinput"]
+            ) + (
+                ""
+                if "collect_log_dir" not in kwargs else
+                " > /dev/null"
+                if kwargs["collect_log_dir"] is None else
+                f"> {kwargs['collect_log_dir']}/{SYSTEMS[sys]}-collectstatic.out"
+            ) +
+            " )"
+            for sys in systems
+        ),
+    )
 
 
 def execute_compile_sass(args):
@@ -283,6 +291,8 @@ def execute_compile_sass(args):
     Construct django management command compile_sass (defined in theming app) and execute it.
     Args:
         args: command line argument passed via update_assets command
+
+    This is a DEPRECATED COMPATIBILITY WRAPPER. Use `npm run compile-sass` instead.
     """
     for sys in args.system:
         options = ""
@@ -305,12 +315,14 @@ def execute_compile_sass(args):
 @task
 @cmdopts([
     ('settings=', 's', "Django settings (defaults to devstack)"),
-    ('watch', 'w', "Watch file system and rebuild on change (defaults to off)"),
+    ('watch', 'w', "DEPRECATED. This flag never did anything anyway."),
 ])
 @timed
 def webpack(options):
     """
     Run a Webpack build.
+
+    This is a DEPRECATED COMPATIBILITY WRAPPER. Use `npm run webpack` instead.
     """
     settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
     result = Env.get_django_settings(['STATIC_ROOT', 'WEBPACK_CONFIG_PATH'], "lms", settings=settings)
@@ -318,44 +330,20 @@ def webpack(options):
     static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     js_env_extra_config_setting, = Env.get_django_json_settings(["JS_ENV_EXTRA_CONFIG"], "cms", settings=settings)
     js_env_extra_config = json.dumps(js_env_extra_config_setting or "{}")
-    environment = (
-        "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
-        "JS_ENV_EXTRA_CONFIG={js_env_extra_config}"
-    ).format(
-        node_env="development" if config_path == 'webpack.dev.config.js' else "production",
-        static_root_lms=static_root_lms,
-        static_root_cms=static_root_cms,
-        js_env_extra_config=js_env_extra_config,
-    )
-    sh(
-        cmd(
-            '{environment} webpack --config={config_path}'.format(
-                environment=environment,
-                config_path=config_path
-            )
-        )
-    )
-
-
-def execute_webpack_watch(settings=None):
-    """
-    Run the Webpack file system watcher.
-    """
-    # We only want Webpack to re-run on changes to its own entry points,
-    # not all JS files, so we use its own watcher instead of subclassing
-    # from Watchdog like the other watchers do.
-
-    result = Env.get_django_settings(["STATIC_ROOT", "WEBPACK_CONFIG_PATH"], "lms", settings=settings)
-    static_root_lms, config_path = result
-    static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
-    run_background_process(
-        'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} webpack {options}'.format(
-            options='--watch --config={config_path}'.format(
-                config_path=config_path
-            ),
-            static_root_lms=static_root_lms,
-            static_root_cms=static_root_cms,
-        )
+    node_env = "development" if config_path == 'webpack.dev.config.js' else "production"
+    run_deprecated_command_wrapper(
+        old_command="paver webpack",
+        ignored_old_flags=(set(["watch"]) & set(options)),
+        new_command=' '.join([
+            f"WEBPACK_CONFIG_PATH={config_path}",
+            f"NODE_ENV={node_env}",
+            f"STATIC_ROOT_LMS={static_root_lms}",
+            f"STATIC_ROOT_CMS={static_root_cms}",
+            f"JS_ENV_EXTRA_CONFIG={js_env_extra_config}",
+            "npm",
+            "run",
+            "webpack",
+        ]),
     )
 
 
@@ -411,39 +399,19 @@ def watch_assets(options):
         return
 
     theme_dirs = ':'.join(get_parsed_option(options, 'theme_dirs', []))
-    command = shlex.join(
-        [
+    run_deprecated_command_wrapper(
+        old_command="paver watch_assets",
+        ignored_old_flags=(set(["debug", "themes", "settings", "background"]) & set(options)),
+        new_command=shlex.join([
             *(
-                ["env", f"EDX_PLATFORM_THEME_DIRS={theme_dirs}"] if theme_dirs else []
+                ["env", f"COMPREHENSIVE_THEME_DIRS={theme_dirs}"]
+                if theme_dirs else []
             ),
             "npm",
             "run",
             "watch",
-        ]
+        ]),
     )
-    depr_warning = (
-        "\n" +
-        "⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ \n" +
-        "\n" +
-        "WARNING: 'paver watch_assets' is DEPRECATED! It will be removed before Sumac.\n" +
-        "The command you ran is now just a temporary wrapper around a new,\n" +
-        "supported command, which you should use instead:\n" +
-        "\n" +
-        f"\t{command}\n" +
-        "\n" +
-        "Details: https://github.com/openedx/edx-platform/issues/31895\n" +
-        "\n" +
-        ("WARNING: ignoring deprecated flag '--debug'\n" if options.get("debug") else "") +
-        ("WARNING: ignoring deprecated flag '--themes'\n" if options.get("themes") else "") +
-        ("WARNING: ignoring deprecated flag '--settings'\n" if options.get("settings") else "") +
-        ("WARNING: ignoring deprecated flag '--background'\n" if options.get("background") else "") +
-        "⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ \n" +
-        "\n"
-    )
-    # Print deprecation warning twice so that it's more likely to be seen in the logs.
-    print(depr_warning)
-    sh(command)
-    print(depr_warning)
 
 
 @task
@@ -456,10 +424,19 @@ def watch_assets(options):
 def update_assets(args):
     """
     Compile Sass, then collect static assets.
+
+    This is a DEPRECATED COMPATIBILITY WRAPPER around other DEPRECATED COMPATIBILITY WRAPPERS.
+    The aggregate affect of this command can be achieved with this sequence of commands instead:
+
+    * pip install -r requirements/edx/assets.txt   # replaces install_python_prereqs
+    * npm clean-install                            # replaces install_node_prereqs
+    * npm run build                                # replaces execute_compile_sass and webpack
+    * ./manage.py lms collectstatic --noinput      # replaces collect_assets (for LMS)
+    * ./manage.py cms collectstatic --noinput      # replaces collect_assets (for CMS)
     """
     parser = argparse.ArgumentParser(prog='paver update_assets')
     parser.add_argument(
-        'system', type=str, nargs='*', default=ALL_SYSTEMS,
+        'system', type=str, nargs='*', default=["lms", "studio"],
         help="lms or studio",
     )
     parser.add_argument(
@@ -488,18 +465,17 @@ def update_assets(args):
     )
     parser.add_argument(
         '--themes', type=str, nargs='+', default=None,
-        help="list of themes to compile sass for",
+        help="list of themes to compile sass for. ignored when --watch is used; all themes are watched.",
     )
     parser.add_argument(
-        '--collect-log', dest=COLLECTSTATIC_LOG_DIR_ARG, default=None,
+        '--collect-log', dest="collect_log_dir", default=None,
         help="When running collectstatic, direct output to specified log directory",
     )
     parser.add_argument(
         '--wait', type=float, default=0.0,
-        help="How long to pause between filesystem scans"
+        help="DEPRECATED. Watchdog's default wait time is now used.",
     )
     args = parser.parse_args(args)
-    collect_log_args = {}
 
     # Build Webpack
     call_task('pavelib.assets.webpack', options={'settings': args.settings})
@@ -508,11 +484,12 @@ def update_assets(args):
     execute_compile_sass(args)
 
     if args.collect:
-        if args.debug or args.debug_collect:
-            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: None})
-
         if args.collect_log_dir:
-            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: args.collect_log_dir})
+            collect_log_args = {"collect_log_dir": args.collect_log_dir}
+        elif args.debug or args.debug_collect:
+            collect_log_args = {"collect_log_dir": None}
+        else:
+            collect_log_args = {}
 
         collect_assets(args.system, args.settings, **collect_log_args)
 
