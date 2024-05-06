@@ -330,7 +330,6 @@ class VideoStudentViewHandlers:
                 return Response(status=404)
 
             if language != self.transcript_language:
-
                 self.transcript_language = language
 
             try:
