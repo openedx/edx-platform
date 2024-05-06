@@ -86,7 +86,9 @@ jobs:
         with:
           branch: "${{ github.triggering_actor }}/upgrade-${{ inputs.package }}"
           branch-suffix: short-commit-hash
-          add-paths: requirements
+          add-paths: |
+            requirements
+            scripts/**/requirements
           commit-message: |
             feat: Upgrade Python dependency ${{ inputs.package }}
 
