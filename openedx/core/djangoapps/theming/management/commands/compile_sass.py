@@ -73,8 +73,8 @@ class Command(BaseCommand):
             {"lms": "lms", "cms": "cms", "studio": "cms"}[sys]
             for sys in options.get("system", ["lms", "cms"])
         )
-        theme_dirs = options.get("theme_dirs", settings.COMPREHENSIVE_THEME_DIRS) or []
-        themes_option = options.get("themes", [])  # '[]' means 'all'
+        theme_dirs = options.get("theme_dirs") or settings.COMPREHENSIVE_THEME_DIRS or []
+        themes_option = options.get("themes") or []  # '[]' means 'all'
         if not settings.ENABLE_COMPREHENSIVE_THEMING:
             compile_themes = False
             themes = []
