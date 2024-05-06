@@ -687,7 +687,7 @@ execnet==2.0.2
     # via pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.in
-faker==24.14.0
+faker==25.0.1
     # via factory-boy
 fastapi==0.109.2
     # via pact-python
@@ -1513,7 +1513,6 @@ typing-extensions==4.9.0
     #   django-countries
     #   drf-spectacular
     #   edx-opaque-keys
-    #   faker
     #   fastapi
     #   grimp
     #   import-linter
