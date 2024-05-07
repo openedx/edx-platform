@@ -93,7 +93,7 @@ bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 camel-converter[pydantic]==3.1.1
     # via meilisearch
-celery==5.3.6
+celery==5.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
