@@ -8,7 +8,7 @@
     # via -r requirements/edx/github.in
 acid-xblock==0.3.1
     # via -r requirements/edx/kernel.in
-aiohttp==3.9.3
+aiohttp==3.9.5
     # via
     #   geoip2
     #   openai

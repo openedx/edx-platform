@@ -10,7 +10,7 @@ accessible-pygments==0.0.4
     # via pydata-sphinx-theme
 acid-xblock==0.3.1
     # via -r requirements/edx/base.txt
-aiohttp==3.9.3
+aiohttp==3.9.5
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
