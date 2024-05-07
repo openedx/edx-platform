@@ -98,7 +98,7 @@ attrs==23.2.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.14.0
+babel==2.15.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
