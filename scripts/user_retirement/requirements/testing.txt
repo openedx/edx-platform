@@ -50,7 +50,7 @@ click==8.1.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-cryptography==38.0.4
+cryptography==42.0.7
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto

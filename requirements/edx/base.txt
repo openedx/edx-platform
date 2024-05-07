@@ -156,9 +156,8 @@ coreschema==0.0.4
     #   drf-yasg
 crowdsourcehinter-xblock==0.7
     # via -r requirements/edx/bundled.in
-cryptography==38.0.4
+cryptography==41.0.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-fernet-fields-v2
     #   edx-enterprise
@@ -912,9 +911,8 @@ pynacl==1.5.0
     # via edx-django-utils
 pynliner==0.8.0
     # via -r requirements/edx/kernel.in
-pyopenssl==22.0.0
+pyopenssl==23.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   optimizely-sdk
     #   snowflake-connector-python
 pyparsing==3.1.1

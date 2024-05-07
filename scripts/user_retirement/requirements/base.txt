@@ -38,10 +38,8 @@ click==8.1.6
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==38.0.4
-    # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
-    #   simple-salesforce
+cryptography==42.0.7
+    # via simple-salesforce
 django==4.2.9
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt

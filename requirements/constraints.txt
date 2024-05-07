@@ -60,14 +60,6 @@ markdown<3.4.0
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
 
-# pyopenssl>22.0.0 requires cryptography>=38.0 && conflicts with snowflak-connector-python requires cryptography<37
-# which causes the requirements upgrade job to fail due to constraint conflict
-# This constraint can be removed once https://github.com/snowflakedb/snowflake-connector-python/issues/1259 is resolved
-# and snowflake-connector-python>2.8.0 is released.
-pyopenssl==22.0.0
-
-cryptography==38.0.4 # greater version has some issues with openssl.
-
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
 
 # adding these constraints to minimize boto3 and botocore changeset
