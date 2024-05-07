@@ -903,7 +903,6 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
     def test_course_catalog_access_num_queries_enterprise(self, user_attr_name, course_attr_name):
         """
         Similar to test_course_catalog_access_num_queries_no_enterprise, except enable enterprise features and make the

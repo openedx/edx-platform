@@ -749,6 +749,11 @@ urlpatterns += [
         courseware_views.courseware_mfe_search_enabled,
         name='courseware_search_enabled_view',
     ),
+    re_path(
+        fr'^courses/{settings.COURSE_ID_PATTERN}/courseware-navigation-sidebar/toggles/$',
+        courseware_views.courseware_mfe_navigation_sidebar_toggles,
+        name='courseware_navigation_sidebar_toggles_view',
+    ),
 ]
 
 urlpatterns += [

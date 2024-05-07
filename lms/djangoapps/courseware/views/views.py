@@ -88,7 +88,12 @@ from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_stu
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
-from lms.djangoapps.courseware.toggles import course_is_invitation_only, courseware_mfe_search_is_enabled
+from lms.djangoapps.courseware.toggles import (
+    course_is_invitation_only,
+    courseware_mfe_search_is_enabled,
+    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
+    COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
+)
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -2282,3 +2287,19 @@ def courseware_mfe_search_enabled(request, course_id=None):
 
     payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
     return JsonResponse(payload)
+
+
+@api_view(['GET'])
+def courseware_mfe_navigation_sidebar_toggles(request, course_id=None):
+    """
+    GET endpoint to return navigation sidebar toggles.
+    """
+    try:
+        course_key = CourseKey.from_string(course_id) if course_id else None
+    except InvalidKeyError:
+        return JsonResponse({"error": "Invalid course_id"})
+
+    return JsonResponse({
+        "enable_navigation_sidebar": COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR.is_enabled(course_key),
+        "always_open_auxiliary_sidebar": COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR.is_enabled(course_key),
+    })

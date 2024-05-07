@@ -12,11 +12,11 @@ accessible-pygments==0.0.4
     # via
     #   -r requirements/edx/doc.txt
     #   pydata-sphinx-theme
-acid-xblock==0.3.0
+acid-xblock==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-aiohttp==3.9.3
+aiohttp==3.9.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -111,8 +111,9 @@ backoff==1.10.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
-backports-zoneinfo[tzdata]==0.2.1
+backports-zoneinfo[tzdata]==0.2.1 ; python_version < "3.9"
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   celery
@@ -753,7 +754,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.17.0
+edx-enterprise==4.17.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -894,7 +895,7 @@ execnet==2.0.2
     #   pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.txt
-faker==24.14.0
+faker==25.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1129,7 +1130,7 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.10.0
+lti-consumer-xblock==9.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1246,7 +1247,7 @@ nodeenv==1.8.0
     #   -r requirements/edx/assets.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1326,7 +1327,7 @@ optimizely-sdk==4.1.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==6.7.0
+ora2==6.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1797,9 +1798,8 @@ sailthru-client==2.2.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-ace
-scipy==1.7.3
+scipy==1.10.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1959,7 +1959,7 @@ sphinxcontrib-serializinghtml==1.1.5
     #   sphinx
 sphinxext-rediraffe==0.2.7
     # via -r requirements/edx/doc.txt
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2062,7 +2062,6 @@ typing-extensions==4.9.0
     #   djangorestframework-stubs
     #   drf-spectacular
     #   edx-opaque-keys
-    #   faker
     #   fastapi
     #   grimp
     #   import-linter

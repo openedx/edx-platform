@@ -9,12 +9,14 @@ on:
 
 jobs:
   run-test:
+    name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
     if: (github.repository != 'openedx/edx-platform' && github.repository != 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == true))
     runs-on: ubuntu-20.04
     strategy:
-      fail-fast: false
       matrix:
-        python-version: [ '3.8' ]
+        python-version:
+          - "3.8"
+          - "3.11"
         django-version:
           - "pinned"
         # When updating the shards, remember to make the same changes in
@@ -39,7 +41,19 @@ jobs:
         mongo-version:
           - "4.4"
           - "7.0"
-    name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},mongo-${{ matrix.mongo-version }}${{ matrix.shard_name }}
+
+        # We only need to test Mongo 4.4 for modules that directly interface with Mongo (that is: xmodule.modulestore)
+        exclude:
+          - mongo-version: "4.4"
+        include:
+          - shard_name: "xmodule-with-cms"
+            python-version: "3.11"
+            django-version: "pinned"
+            mongo-version: "4.4"
+          - shard_name: "xmodule-with-lms"
+            python-version: "3.11"
+            django-version: "pinned"
+            mongo-version: "4.4"
     steps:
       - uses: actions/checkout@v2
 
@@ -87,7 +101,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: [ '3.8' ]
+        python-version: [ '3.11' ]
         django-version:
           - "pinned"
     steps:

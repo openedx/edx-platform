@@ -2812,7 +2812,8 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-
+    if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
+        CourseEnrollment.enroll(user, course_id)
     try:
         update_forum_role(course_id, user, rolename, action)
     except Role.DoesNotExist:

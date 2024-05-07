@@ -1928,7 +1928,7 @@ MANAGERS = ADMINS
 
 # Static content
 STATIC_URL = '/static/'
-STATIC_ROOT = ENV_ROOT / "staticfiles"
+STATIC_ROOT = os.environ.get('STATIC_ROOT_LMS', ENV_ROOT / "staticfiles")
 STATIC_URL_BASE = '/static/'
 
 STATICFILES_DIRS = [
@@ -2822,7 +2822,14 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
+
+# .. setting_name: WEBPACK_CONFIG_PATH
+# .. setting_default: "webpack.prod.config.js"
+# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
+# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
+#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
+#   see: https://github.com/openedx/edx-platform/issues/31895
+WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
@@ -3737,6 +3744,9 @@ REGISTRATION_FIELD_ORDER = [
 # that match a regex in this list. Set to None to allow any email (default).
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 
+# String length for the configurable part of the auto-generated username
+AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
+
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
@@ -4546,9 +4556,11 @@ SITE_ID = 1
 
 # .. setting_name: COMPREHENSIVE_THEME_DIRS
 # .. setting_default: []
-# .. setting_description: A list of directories containing themes folders,
-#   each entry should be a full path to the directory containing the theme folder.
-COMPREHENSIVE_THEME_DIRS = []
+# .. setting_description: A list of paths to directories, each of which will
+#   be searched for comprehensive themes. Do not override this Django setting directly.
+#   Instead, set the COMPREHENSIVE_THEME_DIRS environment variable, using colons (:) to
+#   separate paths.
+COMPREHENSIVE_THEME_DIRS = os.environ.get("COMPREHENSIVE_THEME_DIRS", "").split(":")
 
 # .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
 # .. setting_default: []
@@ -4727,19 +4739,6 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
-
-# .. toggle_name: COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR
-# .. toggle_implementation: SettingToggle
-# .. toggle_default: False
-# .. toggle_description: If disabled (False), this switch causes the CourseTabView API (or whatever else calls
-#    check_course_open_for_learner()) to always return the legacy `course_not_started` error code in ALL cases where the
-#    course has not started.  If enabled (True), the API will respond with `course_not_started_enterprise_learner` in a
-#    subset of cases where the learner is enrolled via subsidy, and `course_not_started` in all other cases.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-12-18
-# .. toggle_target_removal_date: 2023-12-19
-# .. toggle_tickets: ENT-8078
-COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR = False
 
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance

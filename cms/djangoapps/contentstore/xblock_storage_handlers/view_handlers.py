@@ -1244,7 +1244,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             # Don't show the "Manage Tags" option if the DISABLE_TAGGING_FEATURE waffle is true
             xblock_info["is_tagging_feature_disabled"] = is_tagging_feature_disabled()
             if not is_tagging_feature_disabled():
-                xblock_info["tag_counts_by_unit"] = _get_course_unit_tags(xblock.location.context_key)
+                xblock_info["course_tags_count"] = _get_course_tags_count(course.id)
+                xblock_info["tag_counts_by_block"] = _get_course_block_tags(xblock.location.context_key)
 
             xblock_info[
                 "has_partition_group_components"
@@ -1264,16 +1265,29 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
 
 @request_cached()
-def _get_course_unit_tags(course_key) -> dict:
+def _get_course_tags_count(course_key) -> dict:
     """
-    Get the count of tags that are applied to each unit (vertical) in this course, as a dict.
+    Get the count of tags that are applied to the course as a dict: {course_key: tags_count}
+    """
+    if not course_key.is_course:
+        return {}  # Unsupported key type
+
+    return get_object_tag_counts(str(course_key), count_implicit=True)
+
+
+@request_cached()
+def _get_course_block_tags(course_key) -> dict:
+    """
+    Get the count of tags that are applied to each block in this course, as a dict.
     """
     if not course_key.is_course:
         return {}  # Unsupported key type, e.g. a library
-    # Create a pattern to match the IDs of the units, e.g. "block-v1:org+course+run+type@vertical+block@*"
-    vertical_key = course_key.make_usage_key('vertical', 'x')
-    unit_key_pattern = str(vertical_key).rsplit("@", 1)[0] + "@*"
-    return get_object_tag_counts(unit_key_pattern, count_implicit=True)
+
+    # Create a pattern to match the IDs of all blocks, e.g. "block-v1:org+course+run+type@*"
+    catch_all_key = course_key.make_usage_key("*", "x")
+    catch_all_key_pattern = str(catch_all_key).rsplit("@*", 1)[0] + "@*"
+
+    return get_object_tag_counts(catch_all_key_pattern, count_implicit=True)
 
 
 def _was_xblock_ever_exam_linked_with_external(course, xblock):

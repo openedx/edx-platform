@@ -6,9 +6,9 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
-acid-xblock==0.3.0
+acid-xblock==0.3.1
     # via -r requirements/edx/base.txt
-aiohttp==3.9.3
+aiohttp==3.9.5
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -78,8 +78,9 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-backports-zoneinfo[tzdata]==0.2.1
+backports-zoneinfo[tzdata]==0.2.1 ; python_version < "3.9"
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   celery
     #   django
@@ -581,7 +582,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.17.0
+edx-enterprise==4.17.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -686,7 +687,7 @@ execnet==2.0.2
     # via pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.in
-faker==24.14.0
+faker==25.0.1
     # via factory-boy
 fastapi==0.109.2
     # via pact-python
@@ -854,7 +855,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.10.0
+lti-consumer-xblock==9.11.0
     # via -r requirements/edx/base.txt
 lxml==4.9.4
     # via
@@ -935,7 +936,7 @@ nltk==3.8.1
     #   chem
 nodeenv==1.8.0
     # via -r requirements/edx/base.txt
-numpy==1.22.4
+numpy==1.24.4
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -993,7 +994,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.7.0
+ora2==6.9.0
     # via -r requirements/edx/base.txt
 packaging==24.0
     # via
@@ -1360,9 +1361,8 @@ sailthru-client==2.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-scipy==1.7.3
+scipy==1.10.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   chem
     #   openedx-calc
@@ -1445,7 +1445,7 @@ soupsieve==2.5
     # via
     #   -r requirements/edx/base.txt
     #   beautifulsoup4
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via
     #   -r requirements/edx/base.txt
     #   django
@@ -1513,7 +1513,6 @@ typing-extensions==4.9.0
     #   django-countries
     #   drf-spectacular
     #   edx-opaque-keys
-    #   faker
     #   fastapi
     #   grimp
     #   import-linter

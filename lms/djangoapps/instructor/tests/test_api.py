@@ -2252,17 +2252,26 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         })
         assert response.status_code == 400
 
-    def test_modify_access_allow(self):
-        assert CourseEnrollment.is_enrolled(self.other_user, self.course.id) is False
-        url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, {
-            'unique_student_identifier': self.other_user.email,
-            'rolename': 'staff',
-            'action': 'allow',
-        })
-        assert response.status_code == 200
-        # User should be auto enrolled in the course
-        assert CourseEnrollment.is_enrolled(self.other_user, self.course.id)
+    def test_modify_access_api(self):
+        for rolename in ["staff", "limited_staff", "instructor", "data_researcher"]:
+            assert CourseEnrollment.is_enrolled(self.other_user, self.course.id) is False
+            url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
+            response = self.client.post(url, {
+                'unique_student_identifier': self.other_user.email,
+                'rolename': rolename,
+                'action': 'allow',
+            })
+            assert response.status_code == 200
+            # User should be auto enrolled in the course
+            assert CourseEnrollment.is_enrolled(self.other_user, self.course.id)
+            # Test role revoke action
+            response = self.client.post(url, {
+                'unique_student_identifier': self.other_user.email,
+                'rolename': rolename,
+                'action': 'revoke',
+            })
+            assert response.status_code == 200
+            CourseEnrollment.unenroll(self.other_user, self.course.id)
 
     def test_modify_access_allow_with_uname(self):
         url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
@@ -2270,15 +2279,6 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'unique_student_identifier': self.other_instructor.username,
             'rolename': 'staff',
             'action': 'allow',
-        })
-        assert response.status_code == 200
-
-    def test_modify_access_revoke(self):
-        url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, {
-            'unique_student_identifier': self.other_staff.email,
-            'rolename': 'staff',
-            'action': 'revoke',
         })
         assert response.status_code == 200
 
@@ -2442,6 +2442,19 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             assert rolename in user_roles
         elif action == 'revoke':
             assert rolename not in user_roles
+
+    def test_autoenroll_on_forum_role_add(self):
+        """
+        Test forum role modification auto enrolls user.
+        """
+        seed_permissions_roles(self.course.id)
+        user = UserFactory()
+        for rolename in ["Administrator", "Moderator", "Community TA"]:
+            assert CourseEnrollment.is_enrolled(user, self.course.id) is False
+            self.assert_update_forum_role_membership(user, user.email, rolename, "allow")
+            assert CourseEnrollment.is_enrolled(user, self.course.id)
+            self.assert_update_forum_role_membership(user, user.email, rolename, "revoke")
+            CourseEnrollment.unenroll(user, self.course.id)
 
 
 @ddt.ddt
