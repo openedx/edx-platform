@@ -167,7 +167,7 @@ build==1.0.3
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools
-cachetools==5.3.2
+cachetools==5.3.3
     # via
     #   -r requirements/edx/testing.txt
     #   tox
