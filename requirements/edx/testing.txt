@@ -1445,7 +1445,7 @@ soupsieve==2.5
     # via
     #   -r requirements/edx/base.txt
     #   beautifulsoup4
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via
     #   -r requirements/edx/base.txt
     #   django

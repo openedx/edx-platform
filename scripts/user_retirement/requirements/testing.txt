@@ -268,7 +268,7 @@ slumber==0.7.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django

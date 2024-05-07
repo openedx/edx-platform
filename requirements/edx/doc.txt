@@ -1359,7 +1359,7 @@ sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 sphinxext-rediraffe==0.2.7
     # via -r requirements/edx/doc.in
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via
     #   -r requirements/edx/base.txt
     #   django

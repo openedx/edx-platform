@@ -1118,9 +1118,8 @@ sortedcontainers==2.4.0
     #   snowflake-connector-python
 soupsieve==2.5
     # via beautifulsoup4
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via
-    #   -r requirements/edx/kernel.in
     #   django
     #   openedx-blockstore
 staff-graded-xblock==2.3.0
