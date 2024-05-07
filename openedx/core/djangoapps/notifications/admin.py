@@ -73,6 +73,27 @@ class CourseNotificationPreferenceAdmin(admin.ModelAdmin):
     def get_username(self, obj):
         return obj.user.username
 
+    def get_search_fields(self, request):
+        if 'q' in request.GET:
+            search_term = str(request.GET['q'])
+            if search_term.startswith('user_id:'):
+                return []
+        return super().get_search_fields(request)
+
+    def get_search_results(
+        self, request, queryset, search_term
+    ):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        if search_term.startswith('user_id:'):
+            search_term = search_term.split('user_id:')[1]
+            queryset = queryset.filter(user_id=search_term)
+        return queryset, use_distinct
+
+    def get_changelist_instance(self, request):
+        change_list = super().get_changelist_instance(request)
+        change_list.search_fields = self.search_fields
+        return change_list
+
 
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(CourseNotificationPreference, CourseNotificationPreferenceAdmin)
