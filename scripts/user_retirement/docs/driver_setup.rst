@@ -5,7 +5,7 @@ Setting Up the User Retirement Driver Scripts
 #############################################
 
 `scripts/user_retirement <https://github.com/openedx/edx-platform/tree/master/scripts/user_retirement>`_
-is a directory of Python 3 scripts designed to plug into various automation
+is a directory of Python scripts designed to plug into various automation
 tooling. It also contains readme file having details of how to run the scripts.
 Included in this directory are two scripts intended to drive the user
 retirement workflow.
