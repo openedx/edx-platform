@@ -33,6 +33,9 @@ function(
         },
 
         renderTagCount: function() {
+            if (this.model.get('is_tagging_feature_disabled')) {
+                return; // Tagging feature is disabled; don't initialize the tag count view.
+            }
             const contentId = this.model.get('id');
             // Skip the course block since that is handled elsewhere in course_manage_tags
             if (contentId.includes('@course')) {

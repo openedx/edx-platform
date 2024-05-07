@@ -1218,6 +1218,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock_info["ancestor_has_staff_lock"] = False
         if tags is not None:
             xblock_info["tags"] = tags
+
+        # Don't show the "Manage Tags" option and tag counts if the DISABLE_TAGGING_FEATURE waffle is true
+        xblock_info["is_tagging_feature_disabled"] = is_tagging_feature_disabled()
         if not is_tagging_feature_disabled():
             xblock_info["taxonomy_tags_widget_url"] = get_taxonomy_tags_widget_url()
             xblock_info["course_authoring_url"] = settings.COURSE_AUTHORING_MICROFRONTEND_URL
@@ -1241,8 +1244,6 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             else:
                 xblock_info["hide_from_toc_message"] = False
 
-            # Don't show the "Manage Tags" option if the DISABLE_TAGGING_FEATURE waffle is true
-            xblock_info["is_tagging_feature_disabled"] = is_tagging_feature_disabled()
             if not is_tagging_feature_disabled():
                 xblock_info["course_tags_count"] = _get_course_tags_count(course.id)
                 xblock_info["tag_counts_by_block"] = _get_course_block_tags(xblock.location.context_key)
