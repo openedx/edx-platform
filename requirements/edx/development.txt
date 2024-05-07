@@ -12,7 +12,7 @@ accessible-pygments==0.0.4
     # via
     #   -r requirements/edx/doc.txt
     #   pydata-sphinx-theme
-acid-xblock==0.3.0
+acid-xblock==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
