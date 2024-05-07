@@ -150,7 +150,7 @@ class CoursePassingStatusEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTest
                 "signal": COURSE_PASSING_STATUS_UPDATED,
                 "sender": None,
                 "course_passing_status": CoursePassingStatusData(
-                    status=CoursePassingStatusData.PASSING,
+                    is_passing=True,
                     user=UserData(
                         pii=UserPersonalData(
                             username=self.user.username,
@@ -217,7 +217,7 @@ class CCXCoursePassingStatusEventsTest(  # pylint: disable=missing-class-docstri
                 "signal": CCX_COURSE_PASSING_STATUS_UPDATED,
                 "sender": None,
                 "course_passing_status": CcxCoursePassingStatusData(
-                    status=CcxCoursePassingStatusData.PASSING,
+                    is_passing=True,
                     user=UserData(
                         pii=UserPersonalData(
                             username=self.user.username,
