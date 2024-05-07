@@ -169,7 +169,10 @@ from openedx.core.djangolib.markup import HTML
         var disabled = $submitBtn.is(':disabled')
         var shouldEnableSubmitButton = data.shouldEnableSubmitButton;
         if ((!(shouldEnableSubmitButton == 'True')) && disabled) {
-            $problem.find('input').attr({disabled: 'disabled'});
+            $problem.find('input,textarea').attr({disabled: 'disabled'});
+        }
+        if (shouldEnableSubmitButton == 'True') {
+            $submitBtn.removeAttr('disabled');
         }
     })
 </script>
