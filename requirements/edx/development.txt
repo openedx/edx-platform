@@ -16,7 +16,7 @@ acid-xblock==0.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-aiohttp==3.9.3
+aiohttp==3.9.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
