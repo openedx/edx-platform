@@ -221,9 +221,8 @@ coverage[toml]==7.4.1
     #   pytest-cov
 crowdsourcehinter-xblock==0.7
     # via -r requirements/edx/base.txt
-cryptography==38.0.4
+cryptography==41.0.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-fernet-fields-v2
     #   edx-enterprise
@@ -1171,9 +1170,8 @@ pynacl==1.5.0
     #   edx-django-utils
 pynliner==0.8.0
     # via -r requirements/edx/base.txt
-pyopenssl==22.0.0
+pyopenssl==23.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   optimizely-sdk
     #   snowflake-connector-python
