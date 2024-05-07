@@ -4,22 +4,23 @@
 Setting Up the User Retirement Driver Scripts
 #############################################
 
-Tubular (`edx/tubular on github <https://github.com/openedx/tubular>`_) is a
-repository of Python 3 scripts designed to plug into various automation
-tooling. Included in Tubular are two scripts intended to drive the user 
+`scripts/user_retirement <https://github.com/openedx/edx-platform/tree/master/scripts/user_retirement>`_
+is a directory of Python 3 scripts designed to plug into various automation
+tooling. It also contains readme file having details of how to run the scripts.
+Included in this directory are two scripts intended to drive the user
 retirement workflow.
 
-``scripts/get_learners_to_retire.py``
+``get_learners_to_retire.py``
     Generates a list of users that are ready for immediate retirement.  Users
     are "ready" after a certain number of days spent in the ``PENDING`` state,
     specified by the ``--cool_off_days`` argument. Produces an output intended
     for consumption by Jenkins in order to spawn separate downstream builds for
     each user.
-``scripts/retire_one_learner.py``
+``retire_one_learner.py``
     Retires the user specified by the ``--username`` argument.
 
 These two scripts share a required ``--config_file`` argument, which specifies
-the driver configuration file for your environment (for example, production).  
+the driver configuration file for your environment (for example, production).
 This configuration file is a YAML file that contains LMS auth secrets, API URLs,
 and retirement pipeline stages specific to that environment. Here is an example
 of a driver configuration file.
@@ -40,9 +41,9 @@ of a driver configuration file.
        - ['RETIRING_LMS_MISC', 'LMS_MISC_COMPLETE', 'LMS', 'retirement_lms_retire_misc']
        - ['RETIRING_LMS', 'LMS_COMPLETE', 'LMS', 'retirement_lms_retire']
 
-The ``client_id`` and ``client_secret`` keys contain the oauth credentials. 
-These credentials are simply copied from the output of the 
-``create_dot_application`` management command described in 
+The ``client_id`` and ``client_secret`` keys contain the oauth credentials.
+These credentials are simply copied from the output of the
+``create_dot_application`` management command described in
 :ref:`retirement-service-user`.
 
 The ``base_urls`` section in the configuration file defines the mappings of
@@ -56,8 +57,8 @@ of execution for each environment. Each item is a list in the form of:
 #. Start state name
 #. End state name
 #. IDA to call against (LMS, ECOMMERCE, or CREDENTIALS currently)
-#. Method name to call in Tubular's
-   `edx_api.py <https://github.com/openedx/tubular/blob/master/tubular/edx_api.py>`_
+#. Method name to call in
+   `edx_api.py <https://github.com/openedx/edx-platform/blob/master/scripts/user_retirement/utils/edx_api.py>`_
 
 For example: ``['RETIRING_CREDENTIALS', 'CREDENTIALS_COMPLETE', 'CREDENTIALS',
 'retire_learner']`` will set the user's state to ``RETIRING_CREDENTIALS``, call
@@ -74,14 +75,7 @@ The following are some examples of how to use the driver scripts.
 Set Up Environment
 ==================
 
-Set up your execution environment.
-
-.. code-block:: bash
-
-   git clone https://github.com/openedx/tubular.git
-   cd tubular
-   virtualenv --python=`which python3` venv
-   source venv/bin/activate
+Follow this `readme <https://github.com/openedx/edx-platform/tree/master/scripts/user_retirement#readme>`_ to set up your execution environment.
 
 =========================
 List of Targeted Learners
@@ -94,7 +88,7 @@ state for the time specified ``cool_off_days``).
 .. code-block:: bash
 
    mkdir learners_to_retire
-   scripts/get_learners_to_retire.py \
+   get_learners_to_retire.py \
        --config_file=path/to/config.yml \
        --output_dir=learners_to_retire \
        --cool_off_days=5
@@ -110,7 +104,7 @@ several INI files, each containing a single line in the form of ``USERNAME
 
 .. code-block:: bash
 
-   scripts/retire_one_learner.py \
+   retire_one_learner.py \
        --config_file=path/to/config.yml \
        --username=<username-of-learner-to-retire>
 
