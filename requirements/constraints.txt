@@ -23,7 +23,7 @@ click>=8.0,<9.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.17.0
+edx-enterprise==4.17.1
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -117,7 +117,7 @@ openai<=0.28.1
 optimizely-sdk<5.0
 
 # lxml>=5.0 introduced breaking changes related to system dependencies
-# lxml==5.2.1 introduced new extra so we'll nee to rename lxml --> lxml[html-clean] 
+# lxml==5.2.1 introduced new extra so we'll nee to rename lxml --> lxml[html-clean]
 # This constraint can be removed once we upgrade to Python 3.11
 lxml<5.0
 
