@@ -37,7 +37,7 @@
                 <table width="100%" border="0" cellpadding="0">
                     <tbody>
                         <tr>
-                            {% for update in updates %}
+                            {% for update in email_digest_updates %}
                                 <td width="50%">
                                     <p style="
                                         {% if not forloop.last %}padding-right: 0.5rem{% endif %}
@@ -58,7 +58,7 @@
                                                 </tr>
                                                 <tr align="center">
                                                     <td style="font-weight: 600; font-size: 0.875rem; line-height: 20px; padding: 0">
-                                                        {{update.type}}
+                                                        {{update.title}}
                                                     </td>
                                                 </tr>
                                             </tbody>
