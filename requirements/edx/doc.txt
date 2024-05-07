@@ -1398,7 +1398,7 @@ tomlkit==0.12.3
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-tqdm==4.66.2
+tqdm==4.66.4
     # via
     #   -r requirements/edx/base.txt
     #   nltk
