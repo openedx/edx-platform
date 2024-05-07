@@ -163,7 +163,7 @@ bridgekeeper==0.9
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-build==1.0.3
+build==1.2.1
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools
