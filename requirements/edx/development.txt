@@ -1092,7 +1092,7 @@ jsonschema-specifications==2023.12.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   jsonschema
-jwcrypto==1.5.4
+jwcrypto==1.5.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
