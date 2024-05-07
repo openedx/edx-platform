@@ -11,14 +11,16 @@ Overview
 Status
 ******
 
-**Accepted**
+**Provisional**
 
-This was `originally authored <https://github.com/openedx/edx-platform/pull/31790>`_ in March 2023. We `modified it in July 2023 <https://github.com/openedx/edx-platform/pull/32804>`_ based on learnings from the implementation process, and then `modified and it again in May 2024 <https://github.com/openedx/edx-platform/pull/34554>`_ to make the migration easier for operators to understand.
+This was `originally authored <https://github.com/openedx/edx-platform/pull/31790>`_ in March 2023. We `modified it in July 2023 <https://github.com/openedx/edx-platform/pull/32804>`_ based on learnings from the implementation process.
 
-Related deprecation tickets:
+The status will be moved to *Accepted* upon completion of reimplementation. Related work:
 
 * `[DEPR]: Asset processing in Paver <https://github.com/openedx/edx-platform/issues/31895>`_
-* `[DEPR]: Paver <https://github.com/openedx/edx-platform/issues/34467>`_
+* `Process edx-platform assets without Paver <https://github.com/openedx/edx-platform/issues/31798>`_
+* `Process edx-platform assets without Python <https://github.com/openedx/edx-platform/issues/31800>`_
+
 
 Context
 *******
@@ -90,6 +92,7 @@ Three particular issues have surfaced in Developer Experience Working Group disc
 
 All of these potential solutions would involve refactoring or entirely replacing parts of the current asset processing system.
 
+
 Decision
 ********
 
@@ -110,9 +113,6 @@ Reimplementation Specification
 
 Commands and stages
 -------------------
-
-**May 2024 update:** See the `static assets reference <../references/static-assets.rst>`_ for
-the latest commands.
 
 The three top-level edx-platform asset processing actions are *build*, *collect*, and *watch*. The build action can be further broken down into five stages. Here is how those actions and stages will be reimplemented:
 
@@ -226,9 +226,6 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 Build Configuration
 -------------------
 
-**May 2024 update:** See the `static assets reference <../references/static-assets.rst>`_ for
-the latest configuration settings.
-
 To facilitate a generally Python-free build reimplementation, we will require that certain Django settings now be specified as environment variables, which can be passed to the build like so::
 
   MY_ENV_VAR="my value" npm run build    # Set for the whole build.
@@ -269,7 +266,7 @@ Some of these options will remain as Django settings because they are used in ed
    * - ``COMPREHENSIVE_THEME_DIRS``
      - Directories that will be searched when compiling themes.
      - ``COMPREHENSIVE_THEME_DIRS``
-     - ``COMPREHENSIVE_THEME_DIRS``
+     - ``EDX_PLATFORM_THEME_DIRS``
 
 Migration
 =========
@@ -288,16 +285,37 @@ As a consequence of this ADR, Tutor will either need to:
 * reimplement the script as a thin wrapper around the new asset processing commands, or
 * deprecate and remove the script.
 
-**May 2024 update:** The ``openedx-assets`` script will be removed from Tutor,
-with migration instructions documented in
-`Tutor's changelog <https://github.com/overhangio/tutor/blob/master/CHANGELOG.md>`_.
+Either way, the migration path is straightforward:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Existing Tutor-provided command
+     - New upstream command
+   * - ``openedx-assets build``
+     - ``npm run build``
+   * - ``openedx-assets npm``
+     - ``scripts/copy-node-modules.sh  # (automatically invoked by 'npm install'!)``
+   * - ``openedx-assets xmodule``
+     - (no longer needed)
+   * - ``openedx-assets common``
+     - ``npm run compile-sass -- --skip-themes``
+   * - ``openedx-assets themes``
+     - ``npm run compile-sass -- --skip-default``
+   * - ``openedx-assets webpack``
+     - ``npm run webpack``
+   * - ``openedx-assets collect``
+     - ``./manage.py [lms|cms] collectstatic --noinput``
+   * - ``openedx-assets watch-themes``
+     - ``npm run watch``
+
+The options accepted by ``openedx-assets`` will all be valid inputs to ``scripts/build-assets.sh``.
 
 non-Tutor migration guide
 -------------------------
 
-A migration guide for site operators who are directly referencing Paver will be
-included in the
-`Paver deprecation ticket <https://github.com/openedx/edx-platform/issues/34467>`_.
+Operators using distributions other than Tutor should refer to the upstream edx-platform changes described above in **Reimplementation Specification**, and adapt them accordingly to their distribution.
+
 
 See also
 ********
