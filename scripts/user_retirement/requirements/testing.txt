@@ -207,7 +207,7 @@ python-dateutil==2.8.2
     #   moto
     #   pendulum
     #   time-machine
-pytz==2023.3.post1
+pytz==2024.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi
