@@ -63,7 +63,7 @@ appdirs==1.4.4
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   fs
-asgiref==3.7.2
+asgiref==3.8.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
