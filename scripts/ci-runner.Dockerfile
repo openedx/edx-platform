@@ -45,6 +45,8 @@ COPY setup.py setup.py
 COPY openedx/core/lib openedx/core/lib
 COPY lms lms
 COPY cms cms
+COPY common common
+COPY xmodule xmodule
 COPY requirements/pip.txt requirements/pip.txt
 COPY requirements/pip-tools.txt requirements/pip-tools.txt
 COPY requirements/edx/testing.txt requirements/edx/testing.txt
