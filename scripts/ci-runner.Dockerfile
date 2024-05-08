@@ -1,4 +1,4 @@
-FROM summerwind/actions-runner:v2.288.1-ubuntu-20.04-c221b6e as base
+FROM summerwind/actions-runner:v2.316.0-ubuntu-20.04-49490c4 as base
 
 USER root
 
