@@ -13,7 +13,6 @@ from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
 from pytz import UTC
 
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -82,6 +81,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 from xmodule.course_block import CourseBlock
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
 
@@ -130,7 +130,6 @@ from .utils import (
     set_attribute,
     is_posting_allowed
 )
-
 
 User = get_user_model()
 
@@ -418,6 +417,7 @@ def get_courseware_topics(
         Required arguments:
         category_list -- list of categories.
         """
+
         def convert(text):
             if text.isdigit():
                 return int(text)
@@ -697,11 +697,18 @@ def get_course_topics_v2(
             FORUM_ROLE_ADMINISTRATOR,
         ]
     ).exists()
-    course_blocks = get_course_blocks(user, store.make_course_usage_key(course_key))
-    accessible_vertical_keys = [
-        block for block in course_blocks.get_block_keys()
-        if block.block_type == 'vertical'
-    ] + [None]
+
+    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+        blocks = store.get_items(
+            course_key,
+            qualifiers={'category': 'vertical'},
+            fields=['usage_key', 'discussion_enabled', 'display_name'],
+        )
+        accessible_vertical_keys = [
+            block.usage_key for block in blocks
+            if block.discussion_enabled
+        ] + [None]
+
     topics_query = DiscussionTopicLink.objects.filter(
         context_key=course_key,
         provider_id=provider_type,
