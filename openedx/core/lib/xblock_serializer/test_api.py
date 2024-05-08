@@ -240,17 +240,17 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
             ),
         ])
 
-    def test_html_with_static_asset_blockstore(self):
+    def test_html_with_static_asset_learning_core(self):
         """
-        Test the blockstore-specific serialization of an HTML block
+        Test the learning-core-specific serialization of an HTML block
         """
         block_id = self.course.id.make_usage_key('html', 'just_img')  # see sample_courses.py
         html_block = modulestore().get_item(block_id)
         serialized = api.serialize_xblock_to_olx(html_block)
-        serialized_blockstore = api.serialize_modulestore_block_for_blockstore(html_block)
+        serialized_learning_core = api.serialize_modulestore_block_for_learning_core(html_block)
         self.assertXmlEqual(
-            serialized_blockstore.olx_str,
-            # For blockstore, OLX should never contain "url_name" as that ID is specified by the filename:
+            serialized_learning_core.olx_str,
+            # For learning core, OLX should never contain "url_name" as that ID is specified by the filename:
             """
             <html display_name="Text"><![CDATA[
                 <img src="/static/foo_bar.jpg" />
@@ -259,9 +259,9 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         )
         self.assertIn("CDATA", serialized.olx_str)
         # Static files should be identical:
-        self.assertEqual(serialized.static_files, serialized_blockstore.static_files)
-        # This is the only other difference - an extra field with the blockstore-specific definition ID:
-        self.assertEqual(serialized_blockstore.def_id, "html/just_img")
+        self.assertEqual(serialized.static_files, serialized_learning_core.static_files)
+        # This is the only other difference - an extra field with the learning-core-specific definition ID:
+        self.assertEqual(serialized_learning_core.def_id, "html/just_img")
 
     def test_html_with_fields(self):
         """ Test an HTML Block with non-default fields like editor='raw' """
@@ -299,13 +299,13 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         self.assertXmlEqual(serialized.olx_str, EXPECTED_SEQUENTIAL_OLX)
 
-    def test_export_sequential_blockstore(self):
+    def test_export_sequential_learning_core(self):
         """
-        Export a sequential from the toy course, formatted for blockstore.
+        Export a sequential from the toy course, formatted for learning core.
         """
         sequential_id = self.course.id.make_usage_key('sequential', 'Toy_Videos')  # see sample_courses.py
         sequential = modulestore().get_item(sequential_id)
-        serialized = api.serialize_modulestore_block_for_blockstore(sequential)
+        serialized = api.serialize_modulestore_block_for_learning_core(sequential)
 
         self.assertXmlEqual(serialized.olx_str, """
             <sequential display_name="Toy Videos" format="Lecture Sequence">

@@ -516,11 +516,6 @@ MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', '')  # django default is ''
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', '')  # django default is ''
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
-# Configure an API auth token at (blockstore URL)/admin/authtoken/token/
-BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
-
 # Analytics API
 ANALYTICS_API_KEY = AUTH_TOKENS.get("ANALYTICS_API_KEY", ANALYTICS_API_KEY)
 ANALYTICS_API_URL = ENV_TOKENS.get("ANALYTICS_API_URL", ANALYTICS_API_URL)

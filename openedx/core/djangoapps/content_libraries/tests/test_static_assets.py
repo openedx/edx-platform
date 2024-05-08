@@ -1,5 +1,5 @@
 """
-Tests for static asset files in Blockstore-based Content Libraries
+Tests for static asset files in Learning-Core-based Content Libraries
 """
 from unittest import skip
 
@@ -26,7 +26,7 @@ I'm Anant Agarwal, I'm the president of edX,
 @skip("Assets are being reimplemented in Learning Core. Disable until that's ready.")
 class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
     """
-    Tests for static asset files in Blockstore-based Content Libraries
+    Tests for static asset files in Learning-Core-based Content Libraries
 
     WARNING: every test should have a unique library slug, because even though
     the django/mysql database gets reset for each test case, the lookup between
@@ -65,7 +65,7 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
 
     def test_video_transcripts(self):
         """
-        Test that video blocks can read transcript files out of blockstore.
+        Test that video blocks can read transcript files out of learning core.
         """
         library = self._create_library(slug="transcript-test-lib", title="Transcripts Test Library")
         block = self._add_block_to_library(library["id"], "video", "video1")
@@ -104,7 +104,7 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
         check_sjson()
         check_download()
         # Publish the OLX and the transcript file, since published data gets
-        # served differently by Blockstore and we should test that too.
+        # served differently by Learning Core and we should test that too.
         self._commit_library_changes(library["id"])
         check_sjson()
         check_download()

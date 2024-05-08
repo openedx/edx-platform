@@ -4,11 +4,11 @@ Celery tasks for Content Libraries.
 Architecture note:
 
     Several functions in this file manage the copying/updating of blocks in modulestore
-    and blockstore. These operations should only be performed within the context of CMS.
+    and learning core. These operations should only be performed within the context of CMS.
     However, due to existing edx-platform code structure, we've had to define the functions
     in shared source tree (openedx/) and the tasks are registered in both LMS and CMS.
 
-    To ensure that we're not accidentally importing things from blockstore in the LMS context,
+    To ensure that we're not accidentally importing things from learning core in the LMS context,
     we use ensure_cms throughout this module.
 
     A longer-term solution to this issue would be to move the content_libraries app to cms:
@@ -39,7 +39,7 @@ from common.djangoapps.student.auth import has_studio_write_access
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
-from openedx.core.lib import ensure_cms, blockstore_api
+from openedx.core.lib import ensure_cms
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
@@ -86,7 +86,7 @@ def import_blocks_from_course(import_task_id, course_key_str, use_course_key_as_
 
 def _import_block(store, user_id, source_block, dest_parent_key):
     """
-    Recursively import a blockstore block and its children.`
+    Recursively import a learning core block and its children.`
     """
     def generate_block_key(source_key, dest_parent_key):
         """
@@ -127,7 +127,7 @@ def _import_block(store, user_id, source_block, dest_parent_key):
 
     # Prepare a list of this block's static assets; any assets that are referenced as /static/{path} (the
     # recommended way for referencing them) will stop working, and so we rewrite the url when importing.
-    # Copying assets not advised because modulestore doesn't namespace assets to each block like blockstore, which
+    # Copying assets not advised because modulestore doesn't namespace assets to each block like learning core, which
     # might cause conflicts when the same filename is used across imported blocks.
     if isinstance(source_key, LibraryUsageLocatorV2):
         all_assets = library_api.get_library_block_static_asset_files(source_key)
@@ -139,12 +139,6 @@ def _import_block(store, user_id, source_block, dest_parent_key):
             continue  # Only copy authored field data
         if field.is_set_on(source_block) or field.is_set_on(new_block):
             field_value = getattr(source_block, field_name)
-            if isinstance(field_value, str):
-                # If string field (which may also be JSON/XML data), rewrite /static/... URLs to point to blockstore
-                for asset in all_assets:
-                    field_value = field_value.replace(f'/static/{asset.path}', asset.url)
-                    # Make sure the URL is one that will work from the user's browser when using the docker devstack
-                    field_value = blockstore_api.force_browser_url(field_value)
             setattr(new_block, field_name, field_value)
     new_block.save()
     store.update_item(new_block, user_id)
@@ -178,9 +172,9 @@ def _problem_type_filter(store, library, capa_type):
     return [key for key in library.children if _filter_child(store, key, capa_type)]
 
 
-def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
+def _import_from_learning_core(user_id, store, dest_block, source_block_ids):
     """
-    Imports a block from a blockstore-based learning context (usually a
+    Imports a block from a learning-core-based learning context (usually a
     content library) into modulestore, as a new child of dest_block.
     Any existing children of dest_block are replaced.
     """
@@ -190,7 +184,7 @@ def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
     if user_id is None:
         raise ValueError("Cannot check user permissions - LibraryTools user_id is None")
 
-    if len(set(blockstore_block_ids)) != len(blockstore_block_ids):
+    if len(set(source_block_ids)) != len(source_block_ids):
         # We don't support importing the exact same block twice because it would break the way we generate new IDs
         # for each block and then overwrite existing copies of blocks when re-importing the same blocks.
         raise ValueError("One or more library component IDs is a duplicate.")
@@ -204,7 +198,7 @@ def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
     # (This could be slow and use lots of memory, except for the fact that LibraryContentBlock which calls this
     # should be limiting the number of blocks to a reasonable limit. We load them all now instead of one at a
     # time in order to raise any errors before we start actually copying blocks over.)
-    orig_blocks = [load_block(UsageKey.from_string(key), user) for key in blockstore_block_ids]
+    orig_blocks = [load_block(UsageKey.from_string(key), user) for key in source_block_ids]
 
     with store.bulk_operations(dest_course_key):
         child_ids_updated = set()
@@ -347,7 +341,7 @@ def _sync_children(
                 str(library_api.LibraryXBlockMetadata.from_component(library_key, component).usage_key)
                 for component in library_api.get_library_components(library_key)
             ]
-            _import_from_blockstore(user_id, store, dest_block, source_block_ids)
+            _import_from_learning_core(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)
         except Exception as exception:  # pylint: disable=broad-except

@@ -115,9 +115,6 @@ from lms.envs.common import (
     ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET,
     ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
 
-    # Blockstore
-    BUNDLE_ASSET_STORAGE_SETTINGS,
-
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
@@ -444,7 +441,7 @@ FEATURES = {
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_target_removal_date: 2020-12-31
-    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
+    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4106944527/Libraries+Relaunch+Proposal+For+Product+Review
     # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
@@ -1032,6 +1029,11 @@ XBLOCK_EXTRA_MIXINS = ()
 
 # Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
+
+# .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
+# .. setting_default: default
+# .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ############################ ORA 2 ############################################
 
@@ -1690,7 +1692,7 @@ INSTALLED_APPS = [
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
     'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
 
-    # New (Blockstore-based) XBlock runtime
+    # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
     # Maintenance tools
@@ -1872,9 +1874,6 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
-
-    # Blockstore
-    'blockstore.apps.bundles',
 
     # alternative swagger generator for CMS API
     'drf_spectacular',
@@ -2243,25 +2242,11 @@ CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
-    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
 ]
 
 ############################ Cache Configuration ###############################
 
 CACHES = {
-    'blockstore': {
-        'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
@@ -2698,22 +2683,6 @@ PROCTORING_BACKENDS = {
 }
 
 PROCTORING_SETTINGS = {}
-
-################## BLOCKSTORE RELATED SETTINGS  #########################
-
-# Which of django's caches to use for storing anonymous user state for XBlocks
-# in the blockstore-based XBlock runtime
-XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
-
-# .. setting_name: BLOCKSTORE_BUNDLE_CACHE_TIMEOUT
-# .. setting_default: 3000
-# .. setting_description: Maximum time-to-live of cached Bundles fetched from
-#     Blockstore, in seconds. When the values returned from Blockstore have
-#     TTLs of their own (such as signed S3 URLs), the maximum TTL of this cache
-#     must be lower than the minimum TTL of those values.
-#     We use a default of 3000s (50mins) because temporary URLs are often
-#     configured to expire after one hour.
-BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
