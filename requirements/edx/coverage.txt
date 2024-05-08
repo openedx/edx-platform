@@ -6,7 +6,7 @@
 #
 chardet==5.2.0
     # via diff-cover
-coverage==7.4.1
+coverage==7.5.1
     # via -r requirements/edx/coverage.in
 diff-cover==9.0.0
     # via -r requirements/edx/coverage.in
@@ -14,7 +14,7 @@ jinja2==3.1.4
     # via diff-cover
 markupsafe==2.1.5
     # via jinja2
-pluggy==1.4.0
+pluggy==1.5.0
     # via diff-cover
-pygments==2.17.2
+pygments==2.18.0
     # via diff-cover
