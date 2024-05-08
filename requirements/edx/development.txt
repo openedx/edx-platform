@@ -2030,7 +2030,7 @@ tomlkit==0.12.3
     #   snowflake-connector-python
 tox==4.11.4
     # via -r requirements/edx/testing.txt
-tqdm==4.66.2
+tqdm==4.66.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

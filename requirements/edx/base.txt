@@ -1143,7 +1143,7 @@ tinycss2==1.2.1
     # via bleach
 tomlkit==0.12.3
     # via snowflake-connector-python
-tqdm==4.66.2
+tqdm==4.66.4
     # via
     #   nltk
     #   openai

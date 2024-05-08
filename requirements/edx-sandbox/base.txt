@@ -87,7 +87,7 @@ sympy==1.12
     # via
     #   -r requirements/edx-sandbox/base.in
     #   openedx-calc
-tqdm==4.66.2
+tqdm==4.66.4
     # via nltk
 zipp==3.17.0
     # via importlib-resources
