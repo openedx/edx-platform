@@ -826,7 +826,7 @@ jsonschema-specifications==2023.12.1
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-jwcrypto==1.5.4
+jwcrypto==1.5.6
     # via
     #   -r requirements/edx/base.txt
     #   django-oauth-toolkit
