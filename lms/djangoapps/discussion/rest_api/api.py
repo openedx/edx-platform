@@ -33,7 +33,6 @@ from common.djangoapps.student.roles import (
 )
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
