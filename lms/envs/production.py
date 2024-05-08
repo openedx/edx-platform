@@ -22,7 +22,6 @@ import datetime
 import os
 
 import yaml
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
@@ -382,9 +381,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
 
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
-    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
-    )
 
     # If setting a cross-domain cookie, it's really important to choose
     # a name for the cookie that is DIFFERENT than the cookies used

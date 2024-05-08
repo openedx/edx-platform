@@ -2575,11 +2575,15 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
     CORS_ALLOW_INSECURE = False
-    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
-        'content-range',
-        'content-disposition',
-    )
+
+# Set CORS_ALLOW_HEADERS regardless of whether we've enabled ENABLE_CORS_HEADERS
+# because that decision might happen in a later config file. (The headers to
+# allow is an application logic, and not site policy.)
+CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'use-jwt-cookie',
+    'content-range',
+    'content-disposition',
+)
 
 LOGIN_REDIRECT_WHITELIST = []
 
