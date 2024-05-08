@@ -57,7 +57,7 @@ cryptography==42.0.7
     #   simple-salesforce
 ddt==1.7.1
     # via -r scripts/user_retirement/requirements/testing.in
-django==4.2.9
+django==4.2.13
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django-crum
