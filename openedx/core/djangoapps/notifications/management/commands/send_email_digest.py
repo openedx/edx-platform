@@ -23,10 +23,10 @@ class Command(BaseCommand):
         Adds management commands parser arguments
         """
         cadence_type_choices = [EmailCadence.DAILY, EmailCadence.WEEKLY]
-        parser.add_argument('cadence_type', choices=cadence_type_choices, required=True)
+        parser.add_argument('cadence_type', choices=cadence_type_choices)
 
     def handle(self, *args, **kwargs):
         """
         Start task to send email digest to users
         """
-        send_digest_email_to_all_users.delay(args=(kwargs['cadence_type'],))
+        send_digest_email_to_all_users.delay(kwargs['cadence_type'])
