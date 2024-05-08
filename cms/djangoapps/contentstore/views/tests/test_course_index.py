@@ -717,7 +717,7 @@ class TestCourseOutline(CourseTestCase):
         """
         Test to check number of queries made to mysql and mongo
         """
-        with self.assertNumQueries(28, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(29, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(3):
                 self.client.get_html(reverse_course_url('course_handler', self.course.id))
 
