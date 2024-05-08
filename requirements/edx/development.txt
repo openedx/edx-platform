@@ -583,7 +583,7 @@ django-stubs==1.16.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
     #   djangorestframework-stubs
-django-stubs-ext==4.2.7
+django-stubs-ext==5.0.0
     # via django-stubs
 django-user-tasks==3.2.0
     # via
