@@ -13,7 +13,6 @@ import os
 import warnings
 import yaml
 
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
@@ -598,11 +597,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
-    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
-        'content-range',
-        'content-disposition',
-    )
 
 ################# Settings for brand logos. #################
 LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)
