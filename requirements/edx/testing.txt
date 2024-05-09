@@ -68,7 +68,6 @@ attrs==23.2.0
     #   edx-ace
     #   jsonschema
     #   lti-consumer-xblock
-    #   openedx-blockstore
     #   openedx-events
     #   openedx-learning
     #   referencing
@@ -291,7 +290,6 @@ django==4.2.13
     #   djangorestframework
     #   done-xblock
     #   drf-jwt
-    #   drf-nested-routers
     #   drf-spectacular
     #   drf-yasg
     #   edx-ace
@@ -325,7 +323,6 @@ django==4.2.13
     #   help-tokens
     #   jsonfield
     #   lti-consumer-xblock
-    #   openedx-blockstore
     #   openedx-django-pyfs
     #   openedx-django-wiki
     #   openedx-events
@@ -370,10 +367,6 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-environ==0.11.2
-    # via
-    #   -r requirements/edx/base.txt
-    #   openedx-blockstore
 django-fernet-fields-v2==0.9
     # via
     #   -r requirements/edx/base.txt
@@ -383,7 +376,6 @@ django-filter==24.2
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   lti-consumer-xblock
-    #   openedx-blockstore
 django-ipware==7.0.1
     # via
     #   -r requirements/edx/base.txt
@@ -470,7 +462,6 @@ django-waffle==4.1.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-toggles
-    #   openedx-blockstore
 django-webpack-loader==0.7.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -483,7 +474,6 @@ djangorestframework==3.14.0
     #   django-config-models
     #   django-user-tasks
     #   drf-jwt
-    #   drf-nested-routers
     #   drf-spectacular
     #   drf-yasg
     #   edx-api-doc-tools
@@ -494,7 +484,6 @@ djangorestframework==3.14.0
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
-    #   openedx-blockstore
     #   openedx-learning
     #   ora2
     #   super-csv
@@ -510,10 +499,6 @@ drf-jwt==1.19.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
-drf-nested-routers==0.93.5
-    # via
-    #   -r requirements/edx/base.txt
-    #   openedx-blockstore
 drf-spectacular==0.27.2
     # via -r requirements/edx/base.txt
 drf-yasg==1.21.5
@@ -528,11 +513,8 @@ edx-api-doc-tools==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
-    #   openedx-blockstore
 edx-auth-backends==4.3.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   openedx-blockstore
+    # via -r requirements/edx/base.txt
 edx-braze-client==0.2.5
     # via
     #   -r requirements/edx/base.txt
@@ -559,7 +541,6 @@ edx-django-release-util==1.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-    #   openedx-blockstore
 edx-django-sites-extensions==4.2.0
     # via -r requirements/edx/base.txt
 edx-django-utils==5.13.0
@@ -575,7 +556,6 @@ edx-django-utils==5.13.0
     #   edx-toggles
     #   edx-when
     #   event-tracking
-    #   openedx-blockstore
     #   openedx-events
     #   ora2
     #   super-csv
@@ -954,9 +934,7 @@ multidict==6.0.5
     #   aiohttp
     #   yarl
 mysqlclient==2.2.4
-    # via
-    #   -r requirements/edx/base.txt
-    #   openedx-blockstore
+    # via -r requirements/edx/base.txt
 newrelic==9.9.0
     # via
     #   -r requirements/edx/base.txt
@@ -989,8 +967,6 @@ openai==0.28.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 openedx-atlas==0.6.0
-    # via -r requirements/edx/base.txt
-openedx-blockstore==1.4.0
     # via -r requirements/edx/base.txt
 openedx-calc==3.1.0
     # via -r requirements/edx/base.txt
@@ -1310,7 +1286,6 @@ pytz==2024.1
     #   icalendar
     #   interchange
     #   olxcleaner
-    #   openedx-blockstore
     #   ora2
     #   snowflake-connector-python
     #   xblock
@@ -1493,7 +1468,6 @@ sqlparse==0.5.0
     # via
     #   -r requirements/edx/base.txt
     #   django
-    #   openedx-blockstore
 staff-graded-xblock==2.3.0
     # via -r requirements/edx/base.txt
 starlette==0.37.2
