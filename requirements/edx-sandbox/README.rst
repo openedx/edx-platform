@@ -54,7 +54,7 @@ releases/quince.txt
 * Frozen between the Quince and Redwood releases
 * Supports only Python 3.8
 
-releases/redwood.txt (FUTURE PLAN)
+releases/redwood.txt
 ----------------------------------
 
 * Frozen at the time of the Redwood release
