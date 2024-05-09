@@ -558,7 +558,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.17.4
+edx-enterprise==4.17.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
