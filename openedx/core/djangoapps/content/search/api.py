@@ -401,6 +401,8 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
     if xblock_type in EXCLUDED_XBLOCK_TYPES:
         return
 
+    print("\n\n\n\n\n ========== the actual xblock", xblock)
+
     docs = []
 
     def add_with_children(block):
