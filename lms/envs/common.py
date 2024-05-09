@@ -5542,7 +5542,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     },
     "org.openedx.learning.ccx.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
-            "event_key_field": "course_passing_status.course.course_key",
+            "event_key_field": "course_passing_status.course.ccx_course_key",
             "enabled": _should_send_learning_badge_events,
         },
     },
