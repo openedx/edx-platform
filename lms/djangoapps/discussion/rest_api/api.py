@@ -698,15 +698,16 @@ def get_course_topics_v2(
     ).exists()
 
     with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
-        blocks = store.get_items(
+        blocks = [block for block in store.get_items(
             course_key,
             qualifiers={'category': 'vertical'},
             fields=['usage_key', 'discussion_enabled', 'display_name'],
-        )
-        accessible_vertical_keys = [
-            block.usage_key for block in blocks
-            if block.discussion_enabled
-        ] + [None]
+        )]
+        accessible_vertical_keys = []
+        for block in blocks:
+            if block.discussion_enabled and (not block.visible_to_staff_only or user_is_privileged):
+                accessible_vertical_keys.append(block.usage_key)
+        accessible_vertical_keys.append(None)
 
     topics_query = DiscussionTopicLink.objects.filter(
         context_key=course_key,
