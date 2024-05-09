@@ -1492,7 +1492,8 @@ def get_course_grading(course_key):
         'grading_url': reverse_course_url('grading_handler', course_key),
         'is_credit_course': is_credit_course(course_key),
         'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
-        'course_assignment_lists': dict(course_assignment_lists)
+        'course_assignment_lists': dict(course_assignment_lists),
+        'default_grade_designations': settings.DEFAULT_GRADE_DESIGNATIONS
     }
 
     return grading_context

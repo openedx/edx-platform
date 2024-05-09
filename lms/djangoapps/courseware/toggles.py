@@ -85,7 +85,7 @@ COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING = CourseWaffl
 
 # .. toggle_name: courseware.enable_navigation_sidebar
 # .. toggle_implementation: WaffleFlag
-# .. toggle_default: True
+# .. toggle_default: False
 # .. toggle_description: Enable navigation sidebar on Learning MFE
 # .. toggle_use_cases: opt_out, open_edx
 # .. toggle_creation_date: 2024-03-07

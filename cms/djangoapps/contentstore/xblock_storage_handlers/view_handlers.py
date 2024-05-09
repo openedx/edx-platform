@@ -33,7 +33,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.static_replace import replace_static_urls
@@ -1256,8 +1255,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         )
 
         if course_outline or is_xblock_unit:
-            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
-            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
+            # Previously, ENABLE_COPY_PASTE_UNITS was a feature flag; now it's always on.
+            xblock_info["enable_copy_paste_units"] = True
 
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])

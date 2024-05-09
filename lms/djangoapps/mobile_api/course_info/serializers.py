@@ -82,7 +82,7 @@ class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        fields = ('created', 'mode', 'is_active')
+        fields = ('created', 'mode', 'is_active', 'upgrade_deadline')
         model = CourseEnrollment
         lookup_field = 'username'
 
