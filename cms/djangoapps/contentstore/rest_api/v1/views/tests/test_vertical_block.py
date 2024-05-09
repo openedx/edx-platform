@@ -8,7 +8,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from xblock.validation import ValidationMessage
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.toggles import ENABLE_TAGGING_TAXONOMY_LIST_PAGE
+from openedx.core.djangoapps.content_tagging.toggles import DISABLE_TAGGING_FEATURE
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
     Group,
@@ -164,7 +164,6 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         self.assertTrue(response.data["is_published"])
 
-    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, True)
     def test_children_content(self):
         """
         Check that returns valid response with children of vertical container.
@@ -238,7 +237,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, False)
+    @override_waffle_flag(DISABLE_TAGGING_FEATURE, True)
     def test_actions_with_turned_off_taxonomy_flag(self):
         """
         Check that action manage_tags for each child item has the same value as taxonomy flag.

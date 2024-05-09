@@ -138,7 +138,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
             }
 
             // if tagging enabled
-            if (this.model.get('use_tagging_taxonomy_list_page')) {
+            if (!this.model.get('is_tagging_feature_disabled')) {
                 this.courseManageTagsView = new CourseManageTagsView({
                     el: this.$('.status-manage-tags'),
                     model: this.model

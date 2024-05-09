@@ -33,13 +33,16 @@ function(
         },
 
         renderTagCount: function() {
+            if (this.model.get('is_tagging_feature_disabled')) {
+                return; // Tagging feature is disabled; don't initialize the tag count view.
+            }
             const contentId = this.model.get('id');
-            const tagCountsByBlock = this.model.get('tag_counts_by_block')
             // Skip the course block since that is handled elsewhere in course_manage_tags
             if (contentId.includes('@course')) {
-                return
+                return;
             }
-            const tagsCount = tagCountsByBlock !== undefined ? tagCountsByBlock[contentId] : 0
+            const tagCountsByBlock = this.model.get('tag_counts_by_block');
+            const tagsCount = tagCountsByBlock !== undefined ? tagCountsByBlock[contentId] : 0;
             const tagCountElem = this.$(`.tag-count[data-locator="${contentId}"]`);
             var countModel = new TagCountModel({
                 content_id: contentId,

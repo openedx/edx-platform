@@ -5,11 +5,11 @@ API Serializers for unit page
 from django.urls import reverse
 from rest_framework import serializers
 
-from cms.djangoapps.contentstore.toggles import use_tagging_taxonomy_list_page
 from cms.djangoapps.contentstore.helpers import (
     xblock_studio_url,
     xblock_type_display_name,
 )
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 
 
 class MessageValidation(serializers.Serializer):
@@ -122,7 +122,7 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
         Method to get actions for each child xlock of the unit.
         """
 
-        can_manage_tags = use_tagging_taxonomy_list_page()
+        can_manage_tags = not is_tagging_feature_disabled()
         xblock = obj["xblock"]
         is_course = xblock.scope_ids.usage_id.context_key.is_course
         xblock_url = xblock_studio_url(xblock)
