@@ -2888,6 +2888,7 @@ SIMPLE_HISTORY_DATE_INDEX = False
 def _should_send_xblock_events(settings):
     return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
 
+
 def _should_send_learning_badge_events(settings):
     return settings.FEATURES['BADGES_ENABLED']
 
