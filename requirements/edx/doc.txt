@@ -230,8 +230,9 @@ deprecated==1.2.14
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
-django==4.2.10
+django==4.2.11
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
     #   django-celery-results
@@ -711,6 +712,7 @@ imagesize==1.4.1
     # via sphinx
 importlib-metadata==6.8.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   markdown
     #   sphinx
