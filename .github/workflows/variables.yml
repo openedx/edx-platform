@@ -14,7 +14,7 @@ on:
       code:
         description: "Code of the EOL project taken from the project name"
         value: ${{ jobs.obtain.outputs.CODE }}
-      is-release:
+      is-prod:
         description: "Flag to indicate if the branch is a production branch"
         value: ${{ jobs.obtain.outputs.IS-RELEASE }}
       is-pr:

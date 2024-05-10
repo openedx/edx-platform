@@ -9,7 +9,7 @@ on:
       release-name:
         required: true
         type: string
-      is-release:
+      is-prod:
         required: true
         type: string
     secrets:
@@ -31,18 +31,18 @@ jobs:
           RELEASE_NAME=${RELEASE_NAME:-koa};
           echo "RELEASE_NAME=${RELEASE_NAME}" >> $GITHUB_OUTPUT
       - name: Trigger edx-staging repository branch eol
-        if: ${{ ( inputs.is-release == 'false' && inputs.code == 'eol' ) || ( github.event.client_payload.staging && github.event.client_payload.debug == 'eol' ) }}
+        if: ${{ ( inputs.is-prod == 'false' && inputs.code == 'eol' ) || ( github.event.client_payload.staging && github.event.client_payload.debug == 'eol' ) }}
         run: |
           curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ steps.release.outputs.RELEASE_NAME }}\", \"project\": \"eol\", \"code\": \"eol\"}}"
       - name: Trigger edx-staging repository branch openuchile
-        if: ${{ ( inputs.is-release == 'false' && inputs.code == 'ou' ) || ( github.event.client_payload.staging && github.event.client_payload.debug == 'ou' ) }}
+        if: ${{ ( inputs.is-prod == 'false' && inputs.code == 'ou' ) || ( github.event.client_payload.staging && github.event.client_payload.debug == 'ou' ) }}
         run: |
           curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-staging/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ steps.release.outputs.RELEASE_NAME }}\", \"project\": \"openuchile\", \"code\": \"ou\"}}"
       - name: Trigger edx-eol repository
-        if: ${{ ( inputs.is-release == 'true' && inputs.code == 'eol' ) || ( github.event.client_payload.production && github.event.client_payload.debug == 'eol' ) }}
+        if: ${{ ( inputs.is-prod == 'true' && inputs.code == 'eol' ) || ( github.event.client_payload.production && github.event.client_payload.debug == 'eol' ) }}
         run: |
           curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/eol-edx/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ steps.release.outputs.RELEASE_NAME }}\", \"project\": \"eol\", \"code\": \"eol\"}}"
       - name: Trigger edx-openuchile repository
-        if: ${{ ( inputs.is-release == 'true' && inputs.code == 'ou' ) || ( github.event.client_payload.production && github.event.client_payload.debug == 'ou' ) }}
+        if: ${{ ( inputs.is-prod == 'true' && inputs.code == 'ou' ) || ( github.event.client_payload.production && github.event.client_payload.debug == 'ou' ) }}
         run: |
           curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-openuchile/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ steps.release.outputs.RELEASE_NAME }}\", \"project\": \"openuchile\", \"code\": \"ou\"}}"
