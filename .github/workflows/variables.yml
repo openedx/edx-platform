@@ -42,10 +42,14 @@ jobs:
         with:
           result-encoding: string
           script: |
-            if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/) ) { // push to development branch case
+            if ("${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/) ) { // push to development branch case
               return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/,'$2')
             } else if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/) ) { // push to production branch case
               return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/,'$2')
+            } else if ("${{ github.ref }}".match(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)\/(\w+)(\.master)?\/pr-\d+-\w+$/)) { // merge queue to development branch case
+              return "${{ github.ref }}".replace(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)\/(\w+)(\.master)?\/pr-\d+-\w+$/, '$2');
+            } else if ("${{ github.ref }}".match(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?\/pr-\d+-\w+$/)) { // merge queue to production branch case
+              return "${{ github.ref }}".replace(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?\/pr-\d+-\w+$/, '$2');
             } else if ( "${{ github.event.pull_request.base.ref }}".match(/^(eol|openuchile|vlabx)\/(\w+)(\.master)?$/) ) { // pr to development branch case
               return "${{ github.event.pull_request.base.ref }}".replace(/^(eol|openuchile|vlabx)\/(\w+)(\.master)?$/,'$2')
             } else if ( "${{ github.event.pull_request.base.ref }}".match(/^(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/) ) { // pr to production branch case
@@ -62,6 +66,10 @@ jobs:
               return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/.+$/,'$1')
             } else if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)-release\//) ) { // push to production branch case
               return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)-release\/.+$/,'$1')
+            } else if ("${{ github.ref }}".match(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)\/pr-\d+-\w+$/)) { // merge queue to development branch case
+              return "${{ github.ref }}".replace(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)\/pr-\d+-\w+$/, '$1');
+            } else if ("${{ github.ref }}".match(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)-release\/(\w+)\/pr-\d+-\w+$/)) { // merge queue to production branch case
+              return "${{ github.ref }}".replace(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)-release\/(\w+)\/pr-\d+-\w+$/, '$1');
             } else if ( "${{ github.event.pull_request.base.ref }}".match(/^(eol|openuchile|vlabx)\//) ) { // pr to development branch case
               return "${{ github.event.pull_request.base.ref }}".replace(/^(eol|openuchile|vlabx)\/.+$/,'$1')
             } else if ( "${{ github.event.pull_request.base.ref }}".match(/^(eol|openuchile|vlabx)-release\//) ) { // pr to production branch case
@@ -99,6 +107,8 @@ jobs:
           result-encoding: string
           script: |
             if ( "${{ github.event.pull_request.base.ref }}".match(/^(eol|openuchile|vlabx)(-release)?\/(\w+)(\.master)?$/) ) { // pr to image generation branch case
+              return true
+            } else if ("${{ github.ref }}".match(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)-release\/\w+\/pr-\d+-\w+$/)) { // merge queue to production branch case
               return true
             } else return false
 
