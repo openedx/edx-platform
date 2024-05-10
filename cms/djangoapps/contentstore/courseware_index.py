@@ -541,11 +541,19 @@ class AboutInfo:
 
         return [mode.slug for mode in CourseMode.modes_for_course(course.id)]
 
+    def from_course_category(self, **kwargs):
+        """ fetches the available course categories from the CourseOverview model """
+        course = kwargs.get('course', None)
+        if not course:
+            raise ValueError("Context dictionary does not contain expected argument 'course'")
+
+        return CourseOverview.objects.get(id=course.id).get_course_categories()
+
     # Source location options - either from the course or the about info
     FROM_ABOUT_INFO = from_about_dictionary
     FROM_COURSE_PROPERTY = from_course_property
     FROM_COURSE_MODE = from_course_mode
-
+    FROM_COURSE_CATEGORY = from_course_category
 
 class CourseAboutSearchIndexer(CoursewareSearchIndexer):
     """
@@ -589,6 +597,7 @@ class CourseAboutSearchIndexer(CoursewareSearchIndexer):
         AboutInfo("language", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
         AboutInfo("invitation_only", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
         AboutInfo("catalog_visibility", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_PROPERTY),
+        AboutInfo("categories", AboutInfo.PROPERTY, AboutInfo.FROM_COURSE_CATEGORY),
     ]
 
     @classmethod

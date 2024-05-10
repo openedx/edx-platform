@@ -118,6 +118,9 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     # 'course_id' is a deprecated field, please use 'id' instead.
     course_id = serializers.CharField(source='id', read_only=True)
 
+    # Course categorization
+    categories = serializers.ListField(source='get_course_categories', child=serializers.CharField())
+
     def get_hidden(self, course_overview):
         """
         Get the representation for SerializerMethodField `hidden`

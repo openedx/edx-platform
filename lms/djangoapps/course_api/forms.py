@@ -56,12 +56,15 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     username = CharField(required=False)
     org = CharField(required=False)
 
+    # Customization: Add filter by category name
     # white list of all supported filter fields
     filter_type = namedtuple('filter_type', ['param_name', 'field_name'])
     supported_filters = [
         filter_type(param_name='mobile', field_name='mobile_available'),
+        filter_type(param_name='category', field_name='category__name'),
     ]
     mobile = ExtendedNullBooleanField(required=False)
+    category = CharField(required=False)
     active_only = ExtendedNullBooleanField(required=False)
     permissions = MultiValueField(required=False)
     course_keys = MultiValueField(required=False)

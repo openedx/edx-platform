@@ -943,6 +943,13 @@ class CourseOverview(TimeStampedModel):
         """Represent ourselves with the course key."""
         return str(self.id)
 
+    # Course categorization
+        """Return course associated categories"""
+        categories = self.category_set.all()
+        if categories:
+            return [category.name for category in categories]
+        return []
+
 
 class CourseOverviewTab(models.Model):
     """
