@@ -56,10 +56,9 @@
                             </td>
                             {% if forloop.counter|divisibleby:3 %}
                             </tr><tr> <!-- Close the row after every third td -->
-                            {% elif forloop.last %}
-                            </tr>
                             {% endif %}
                         {% endfor %}
+                        </tr>
                     </tbody>
                 </table>
             </td>
