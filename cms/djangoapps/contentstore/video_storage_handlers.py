@@ -173,9 +173,8 @@ class StatusDisplayStrings:
 
     @staticmethod
     def get(val_status):
-        """Map a VAL status string to a localized display string"""
-        # pylint: disable=translation-of-non-string
-        return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
+        """Map a VAL status string to a display string"""
+        return StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN)
 
 
 def handle_videos(request, course_key_string, edx_video_id=None):
@@ -657,7 +656,10 @@ def _get_videos(course, pagination_conf=None):
                 language_code=language_code,
             )
         # Convert the video status.
-        video['status'] = convert_video_status(video, is_video_encodes_ready)
+        # Legacy frontend expects the status to be translated unlike MFEs which handle translation themselves.
+        video['status_nontranslated'] = convert_video_status(video, is_video_encodes_ready)
+        # pylint: disable=translation-of-non-string
+        video['status'] = _(video['status_nontranslated'])
 
     return videos, pagination_context
 
@@ -675,7 +677,7 @@ def _get_index_videos(course, pagination_conf=None):
     """
     course_id = str(course.id)
     attrs = [
-        'edx_video_id', 'client_video_id', 'created', 'duration',
+        'edx_video_id', 'client_video_id', 'created', 'duration', 'status_nontranslated',
         'status', 'courses', 'encoded_videos', 'transcripts', 'transcription_status',
         'transcript_urls', 'error_description'
     ]
