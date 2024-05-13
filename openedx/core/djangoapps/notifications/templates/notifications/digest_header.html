@@ -38,34 +38,26 @@
                     <tbody>
                         <tr>
                             {% for update in email_digest_updates %}
-                                <td width="50%">
-                                    <p style="
-                                        {% if not forloop.last %}padding-right: 0.5rem{% endif %}
-                                        {% if not forloop.first %}padding-left: 0.5rem{% endif %}"
-                                    >
-                                        <table
-                                            width="100%"
-                                            cellpadding="0"
-                                            cellspacing="0"
-                                            style="background: #1b3b40; color: white; border-radius: 8px;
-                                            padding: 1.25rem 1rem;"
-                                        >
-                                            <tbody>
-                                                <tr align="center">
-                                                    <td style="font-weight: 700; font-size: 32px; line-height: 44px; padding: 0">
-                                                        {{update.count}}
-                                                    </td>
-                                                </tr>
-                                                <tr align="center">
-                                                    <td style="font-weight: 600; font-size: 0.875rem; line-height: 20px; padding: 0">
-                                                        {{update.title}}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </p>
-                                </td>
-                            {% endfor %}
+                            <td width="33.33%" style="padding: 0.5rem;">
+                                    <table width="100%" cellpadding="0" cellspacing="0" style="background: #1b3b40; color: white; border-radius: 8px; padding: 1.25rem 1rem;">
+                                        <tbody>
+                                            <tr align="center">
+                                                <td style="font-weight: 700; font-size: 32px; line-height: 44px; padding: 0">
+                                                    {{update.count}}
+                                                </td>
+                                            </tr>
+                                            <tr align="center">
+                                                <td style="font-weight: 600; font-size: 0.875rem; line-height: 20px; padding: 0">
+                                                    {{update.title}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </td>
+                            {% if forloop.counter|divisibleby:3 %}
+                            </tr><tr> <!-- Close the row after every third td -->
+                            {% endif %}
+                        {% endfor %}
                         </tr>
                     </tbody>
                 </table>
