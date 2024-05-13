@@ -15,7 +15,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from openedx.core.djangoapps.content_libraries.api import create_library, create_library_block, delete_library_block
-from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 
 from .. import api
 from ..models.base import TaxonomyOrg
@@ -59,7 +58,6 @@ class LanguageTaxonomyTestMixin:
 class TestAutoTagging(  # type: ignore[misc]
     LanguageTaxonomyTestMixin,
     ModuleStoreTestCase,
-    BlockstoreAppTestMixin,
     LiveServerTestCase
 ):
     """

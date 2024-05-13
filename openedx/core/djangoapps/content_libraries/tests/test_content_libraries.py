@@ -1,5 +1,5 @@
 """
-Tests for Blockstore-based Content Libraries
+Tests for Learning-Core-based Content Libraries
 """
 from unittest.mock import Mock, patch
 from unittest import skip
@@ -37,7 +37,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 @ddt.ddt
 class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
     """
-    General tests for Blockstore-based Content Libraries
+    General tests for Learning-Core-based Content Libraries
 
     These tests use the REST API, which in turn relies on the Python API.
     Some tests may use the python API directly if necessary to provide
@@ -278,7 +278,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -300,7 +300,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         # Now view the XBlock's student_view (including draft changes):
         fragment = self._render_block_view(block_id, "student_view")
         assert 'resources' in fragment
-        assert 'Blockstore is designed to store.' in fragment['content']
+        assert 'Learning Core is designed to store.' in fragment['content']
 
         # Also call a handler to make sure that's working:
         handler_url = self._get_block_handler_url(block_id, "xmodule_handler") + "problem_get"
@@ -806,7 +806,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -956,7 +956,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
-    """Tests only focused on service validation, no Blockstore needed."""
+    """Tests only focused on service validation, no Learning Core interactions here."""
 
     @ddt.data(
         (URL_BLOCK_METADATA_URL, dict(block_key='totally_invalid_key')),

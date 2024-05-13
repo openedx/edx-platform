@@ -219,14 +219,14 @@ class XBlockRuntime(RuntimeShim, Runtime):
 
     def parse_xml_file(self, fileobj):
         # Deny access to the inherited method
-        raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+        raise NotImplementedError("XML Serialization is only supported with LearningCoreXBlockRuntime")
 
     def add_node_as_child(self, block, node):
         """
         Called by XBlock.parse_xml to treat a child node as a child block.
         """
         # Deny access to the inherited method
-        raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+        raise NotImplementedError("XML Serialization is only supported with LearningCoreXBlockRuntime")
 
     def service(self, block: XBlock, service_name: str):
         """
@@ -261,8 +261,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
 
             return DjangoXBlockUserService(
                 self.user,
-                # The value should be updated to whether the user is staff in the context when Blockstore runtime adds
-                # support for courses.
+                # The value should be updated to whether the user is staff in the context when Learning Core runtime
+                # adds support for courses.
                 user_is_staff=self.user.is_staff,  # type: ignore
                 anonymous_user_id=self.anonymous_student_id,
                 # See the docstring of `DjangoXBlockUserService`.
@@ -437,7 +437,7 @@ class XBlockRuntimeSystem:
             student_data_mode: Specifies whether student data should be kept
                 in a temporary in-memory store (e.g. Studio) or persisted
                 forever in the database.
-            runtime_class: What runtime to use, e.g. BlockstoreXBlockRuntime
+            runtime_class: What runtime to use, e.g. LearningCoreXBlockRuntime
         """
         self.handler_url = handler_url
         self.id_reader = id_reader or OpaqueKeyReader()

@@ -44,7 +44,6 @@ attrs==23.2.0
     #   edx-ace
     #   jsonschema
     #   lti-consumer-xblock
-    #   openedx-blockstore
     #   openedx-events
     #   openedx-learning
     #   referencing
@@ -205,7 +204,6 @@ django==4.2.13
     #   djangorestframework
     #   done-xblock
     #   drf-jwt
-    #   drf-nested-routers
     #   drf-spectacular
     #   drf-yasg
     #   edx-ace
@@ -239,7 +237,6 @@ django==4.2.13
     #   help-tokens
     #   jsonfield
     #   lti-consumer-xblock
-    #   openedx-blockstore
     #   openedx-django-pyfs
     #   openedx-django-wiki
     #   openedx-events
@@ -278,8 +275,6 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-environ==0.11.2
-    # via openedx-blockstore
 django-fernet-fields-v2==0.9
     # via edx-enterprise
 django-filter==24.2
@@ -287,7 +282,6 @@ django-filter==24.2
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   lti-consumer-xblock
-    #   openedx-blockstore
 django-ipware==7.0.1
     # via
     #   -r requirements/edx/kernel.in
@@ -368,7 +362,6 @@ django-waffle==4.1.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-toggles
-    #   openedx-blockstore
 django-webpack-loader==0.7.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -381,7 +374,6 @@ djangorestframework==3.14.0
     #   django-config-models
     #   django-user-tasks
     #   drf-jwt
-    #   drf-nested-routers
     #   drf-spectacular
     #   drf-yasg
     #   edx-api-doc-tools
@@ -392,7 +384,6 @@ djangorestframework==3.14.0
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
-    #   openedx-blockstore
     #   openedx-learning
     #   ora2
     #   super-csv
@@ -402,8 +393,6 @@ done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
     # via edx-drf-extensions
-drf-nested-routers==0.93.5
-    # via openedx-blockstore
 drf-spectacular==0.27.2
     # via -r requirements/edx/kernel.in
 drf-yasg==1.21.5
@@ -417,11 +406,8 @@ edx-api-doc-tools==1.8.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
-    #   openedx-blockstore
 edx-auth-backends==4.3.0
-    # via
-    #   -r requirements/edx/kernel.in
-    #   openedx-blockstore
+    # via -r requirements/edx/kernel.in
 edx-braze-client==0.2.5
     # via
     #   -r requirements/edx/bundled.in
@@ -448,7 +434,6 @@ edx-django-release-util==1.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   edxval
-    #   openedx-blockstore
 edx-django-sites-extensions==4.2.0
     # via -r requirements/edx/kernel.in
 edx-django-utils==5.13.0
@@ -464,7 +449,6 @@ edx-django-utils==5.13.0
     #   edx-toggles
     #   edx-when
     #   event-tracking
-    #   openedx-blockstore
     #   openedx-events
     #   ora2
     #   super-csv
@@ -738,9 +722,7 @@ multidict==6.0.5
     #   aiohttp
     #   yarl
 mysqlclient==2.2.4
-    # via
-    #   -r requirements/edx/kernel.in
-    #   openedx-blockstore
+    # via -r requirements/edx/kernel.in
 newrelic==9.9.0
     # via
     #   -r requirements/edx/bundled.in
@@ -769,8 +751,6 @@ openai==0.28.1
     #   -c requirements/edx/../constraints.txt
     #   edx-enterprise
 openedx-atlas==0.6.0
-    # via -r requirements/edx/kernel.in
-openedx-blockstore==1.4.0
     # via -r requirements/edx/kernel.in
 openedx-calc==3.1.0
     # via -r requirements/edx/kernel.in
@@ -971,7 +951,6 @@ pytz==2024.1
     #   icalendar
     #   interchange
     #   olxcleaner
-    #   openedx-blockstore
     #   ora2
     #   snowflake-connector-python
     #   xblock
@@ -1119,9 +1098,7 @@ sortedcontainers==2.4.0
 soupsieve==2.5
     # via beautifulsoup4
 sqlparse==0.5.0
-    # via
-    #   django
-    #   openedx-blockstore
+    # via django
 staff-graded-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 stevedore==5.2.0

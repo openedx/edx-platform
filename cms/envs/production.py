@@ -405,11 +405,6 @@ XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
-# Configure an API auth token at (blockstore URL)/admin/authtoken/token/
-BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
-
 # Celery Broker
 CELERY_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")

@@ -35,7 +35,7 @@ SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=togg
 # .. toggle_creation_date: 2020-08-03
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and ENABLE_LIBRARY_AUTHORING_MICROFRONTEND.
-# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
+# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4106944527/Libraries+Relaunch+Proposal+For+Product+Review
 REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
     f'{WAFFLE_NAMESPACE}.library_authoring_mfe', __name__, LOG_PREFIX
 )

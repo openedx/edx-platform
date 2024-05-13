@@ -262,9 +262,6 @@ TOKEN_SIGNING.update({
     )
 })
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
-
 ########################## PROGRAMS LEARNER PORTAL ##############################
 LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 

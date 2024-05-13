@@ -120,7 +120,6 @@ openedx-filters                     # Open edX Filters from Hooks Extension Fram
 openedx-learning                    # Open edX Learning core (experimental)
 openedx-mongodbproxy
 openedx-django-wiki
-openedx-blockstore
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
