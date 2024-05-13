@@ -5,7 +5,7 @@ courseware.
 
 import logging
 from collections import defaultdict, namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import six
 import pytz
@@ -587,7 +587,7 @@ def get_course_blocks_completion_summary(course_key, user):
 
 
 @request_cached()
-def get_course_assignments(course_key, user, include_access=False):  # lint-amnesty, pylint: disable=too-many-statements
+def get_course_assignments(course_key, user, include_access=False, include_without_due=False,):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
 
@@ -607,6 +607,10 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
         for subsection_key in block_data.get_children(section_key):
             due = block_data.get_xblock_field(subsection_key, 'due')
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
+
+            if not due and include_without_due:
+                due = now + timedelta(days=1000)
+
             if due and graded:
                 first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(

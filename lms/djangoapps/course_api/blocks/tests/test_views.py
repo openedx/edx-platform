@@ -3,7 +3,7 @@ Tests for Blocks Views
 """
 from datetime import datetime
 from unittest import mock
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 from urllib.parse import urlencode, urlunparse
 
 import ddt
@@ -209,8 +209,9 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.query_params['all_blocks'] = True
         self.verify_response(403)
 
+    @mock.patch('lms.djangoapps.mobile_api.course_info.serializers.get_course_assignments', return_value=[])
     @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
-    def test_not_authenticated_public_course_with_blank_username(self):
+    def test_not_authenticated_public_course_with_blank_username(self, get_course_assignment_mock: MagicMock) -> None:
         """
         Verify behaviour when accessing course blocks of a public course for anonymous user anonymously.
         """
@@ -368,7 +369,8 @@ class TestBlocksView(SharedModuleStoreTestCase):
                 block_data['type'] == 'course'
             )
 
-    def test_data_researcher_access(self):
+    @mock.patch('lms.djangoapps.mobile_api.course_info.serializers.get_course_assignments', return_value=[])
+    def test_data_researcher_access(self, get_course_assignment_mock: MagicMock) -> None:
         """
         Test if data researcher has access to the api endpoint
         """

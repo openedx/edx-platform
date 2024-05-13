@@ -271,6 +271,11 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             course, chapter, sequential, vertical, html, problem, video, and
             discussion.
         display_name: (str) The display name of the block.
+        course_progress: (dict) Contains information about how many assignments are in the course
+            and how many assignments the student has completed.
+            Included here:
+                * total_assignments_count: (int) Total course's assignments count.
+                * assignments_completed: (int) Assignments witch the student has completed.
 
     **Returns**
 
@@ -366,7 +371,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                 )
 
                 course_info_context = {
-                    'user': requested_user
+                    'user': requested_user,
                 }
                 user_enrollment = CourseEnrollment.get_enrollment(user=requested_user, course_key=course_key)
                 course_data.update({

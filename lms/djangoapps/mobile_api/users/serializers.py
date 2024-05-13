@@ -5,7 +5,6 @@ Serializer for user API
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
-from django.core.cache import cache
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from opaque_keys import InvalidKeyError
@@ -19,10 +18,9 @@ from common.djangoapps.util.course import get_encoded_course_sharing_utm_params,
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
-from lms.djangoapps.courseware.courses import get_course_assignment_date_blocks
+from lms.djangoapps.courseware.courses import get_course_assignment_date_blocks, get_course_assignments
 from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
-from lms.djangoapps.grades.api import CourseGradeFactory
-from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
+from lms.djangoapps.mobile_api.utils import API_V4
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -107,8 +105,6 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     audit_access_expires = serializers.SerializerMethodField()
     course_modes = serializers.SerializerMethodField()
 
-    BLOCK_STRUCTURE_CACHE_TIMEOUT = 60 * 60  # 1 hour
-
     def get_audit_access_expires(self, model):
         """
         Returns expiration date for a course audit expiration, if any or null
@@ -140,38 +136,37 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
             for mode in course_modes
         ]
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: CourseEnrollment) -> 'OrderedDict':  # noqa: F821
         """
         Override the to_representation method to add the course_status field to the serialized data.
         """
         data = super().to_representation(instance)
-        if 'progress' in self.context.get('requested_fields', []):
-            data['progress'] = self.calculate_progress(instance)
+
+        if 'course_progress' in self.context.get('requested_fields', []) and self.context.get('api_version') == API_V4:
+            data['course_progress'] = self.calculate_progress(instance)
 
         return data
 
     def calculate_progress(self, model: CourseEnrollment) -> Dict[str, int]:
         """
         Calculate the progress of the user in the course.
-        :param model:
-        :return:
         """
-        is_staff = bool(has_access(model.user, 'staff', model.course.id))
+        course_assignments = get_course_assignments(
+            model.course_id,
+            model.user,
+            include_without_due=True,
+        )
 
-        cache_key = f'course_block_structure_{str(model.course.id)}_{model.user.id}'
-        collected_block_structure = cache.get(cache_key)
-        if not collected_block_structure:
-            collected_block_structure = get_block_structure_manager(model.course.id).get_collected()
-            cache.set(cache_key, collected_block_structure, self.BLOCK_STRUCTURE_CACHE_TIMEOUT)
+        total_assignments_count = 0
+        assignments_completed = 0
 
-        course_grade = CourseGradeFactory().read(model.user, collected_block_structure=collected_block_structure)
+        if course_assignments:
+            total_assignments_count = len(course_assignments)
+            assignments_completed = len([assignment for assignment in course_assignments if assignment.complete])
 
-        # recalculate course grade from visible grades (stored grade was calculated over all grades, visible or not)
-        course_grade.update(visible_grades_only=True, has_staff_access=is_staff)
-        subsection_grades = list(course_grade.subsection_grades.values())
         return {
-            'num_points_earned': sum(map(lambda x: x.graded_total.earned if x.graded else 0, subsection_grades)),
-            'num_points_possible': sum(map(lambda x: x.graded_total.possible if x.graded else 0, subsection_grades)),
+            'total_assignments_count': total_assignments_count,
+            'assignments_completed': assignments_completed,
         }
 
     class Meta:
@@ -199,7 +194,7 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
     """
 
     course_status = serializers.SerializerMethodField()
-    progress = serializers.SerializerMethodField()
+    course_progress = serializers.SerializerMethodField()
     course_assignments = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
@@ -213,7 +208,7 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
         try:
             block_id = str(get_key_to_last_completed_block(model.user, model.course.id))
         except UnavailableCompletionData:
-            block_id = ""
+            block_id = ''
 
         if not block_id:
             return None
@@ -251,7 +246,7 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
 
         return path, vertical.display_name
 
-    def get_progress(self, model: CourseEnrollment) -> Dict[str, int]:
+    def get_course_progress(self, model: CourseEnrollment) -> Dict[str, int]:
         """
         Returns the progress of the user in the course.
         """
@@ -302,7 +297,7 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
             'certificate',
             'course_modes',
             'course_status',
-            'progress',
+            'course_progress',
             'course_assignments',
         )
         lookup_field = 'username'

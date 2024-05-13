@@ -4,7 +4,7 @@ Tests for users API
 
 
 import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 from urllib.parse import parse_qs
 
 import ddt
@@ -436,8 +436,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertDictEqual(expected_result, response.data)
         self.assertNotIn('primary', response.data)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_student_have_one_enrollment(self, cache_mock: MagicMock):
+    def test_student_have_one_enrollment(self):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -461,8 +460,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(str(course.id), response.data['primary']['course']['id'])
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_student_have_two_enrollments(self, cache_mock: MagicMock):
+    def test_student_have_two_enrollments(self):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -481,8 +479,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(course_second.id))
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_student_have_more_then_ten_enrollments(self, cache_mock: MagicMock):
+    def test_student_have_more_then_ten_enrollments(self):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -502,8 +499,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(latest_enrolment.id))
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_student_have_progress_in_old_course_and_enroll_newest_course(self, cache_mock: MagicMock):
+    def test_student_have_progress_in_old_course_and_enroll_newest_course(self):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -583,8 +579,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertDictEqual(expected_result, response.data)
         self.assertNotIn('primary', response.data)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_do_progress_in_not_mobile_available_course(self, cache_mock: MagicMock):
+    def test_do_progress_in_not_mobile_available_course(self):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -621,8 +616,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('primary', response.data)
         self.assertEqual(response.data['primary']['course']['id'], str(new_course.id))
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_pagination_for_user_enrollments_api_v4(self, cache_mock: MagicMock):
+    def test_pagination_for_user_enrollments_api_v4(self):
         """
         Tests `UserCourseEnrollmentsV4Pagination`, api_version == v4.
         """
@@ -641,8 +635,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('previous', response.data['enrollments'])
         self.assertIn('primary', response.data)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_course_status_in_primary_obj_when_student_doesnt_have_progress(self, cache_mock: MagicMock):
+    def test_course_status_in_primary_obj_when_student_doesnt_have_progress(self):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
         """
@@ -655,12 +648,10 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['primary']['course_status'], None)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
     @patch('lms.djangoapps.mobile_api.users.serializers.get_key_to_last_completed_block')
     def test_course_status_in_primary_obj_when_student_have_progress(
         self,
         get_last_completed_block_mock: MagicMock,
-        cache_mock: MagicMock
     ):
         """
         Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
@@ -707,8 +698,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(response.data['primary']['course_status'], expected_course_status)
         get_last_completed_block_mock.assert_called_once_with(self.user, course.id)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_user_enrollment_api_v4_in_progress_status(self, cache_mock: MagicMock):
+    def test_user_enrollment_api_v4_in_progress_status(self):
         """
         Testing
         """
@@ -902,8 +892,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(enrollments['results'][2]['course']['id'], str(old_course.id))
         self.assertNotIn('primary', response.data)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.cache.set', return_value=None)
-    def test_response_contains_primary_enrollment_assignments_info(self, cache_mock: MagicMock):
+    def test_response_contains_primary_enrollment_assignments_info(self):
         self.login()
         course = CourseFactory.create(org='edx', mobile_available=True)
         self.enroll(course.id)
@@ -916,6 +905,119 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('future_assignments', response.data['primary']['course_assignments'])
         self.assertListEqual(response.data['primary']['course_assignments']['past_assignments'], [])
         self.assertListEqual(response.data['primary']['course_assignments']['future_assignments'], [])
+
+    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments', return_value=[])
+    def test_course_progress_in_primary_enrollment_with_no_assignments(
+        self,
+        get_course_assignment_mock: MagicMock,
+    ) -> None:
+        self.login()
+        course = CourseFactory.create(org='edx', mobile_available=True)
+        self.enroll(course.id)
+        expected_course_progress = {'total_assignments_count': 0, 'assignments_completed': 0}
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_progress', response.data['primary'])
+        self.assertDictEqual(response.data['primary']['course_progress'], expected_course_progress)
+
+    @patch(
+        'lms.djangoapps.mobile_api.users.serializers.CourseEnrollmentSerializerModifiedForPrimary'
+        '.get_course_assignments'
+    )
+    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    def test_course_progress_in_primary_enrollment_with_assignments(
+        self,
+        get_course_assignment_mock: MagicMock,
+        assignments_mock: MagicMock,
+    ) -> None:
+        self.login()
+        course = CourseFactory.create(org='edx', mobile_available=True)
+        self.enroll(course.id)
+        course_assignments_mock = [
+            Mock(complete=False), Mock(complete=False), Mock(complete=True), Mock(complete=True), Mock(complete=True)
+        ]
+        get_course_assignment_mock.return_value = course_assignments_mock
+        student_assignments_mock = {
+            'future_assignments': [],
+            'past_assignments': [],
+        }
+        assignments_mock.return_value = student_assignments_mock
+        expected_course_progress = {'total_assignments_count': 5, 'assignments_completed': 3}
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_progress', response.data['primary'])
+        self.assertDictEqual(response.data['primary']['course_progress'], expected_course_progress)
+
+    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    def test_course_progress_for_secondary_enrollments_no_query_param(
+        self,
+        get_course_assignment_mock: MagicMock,
+    ) -> None:
+        self.login()
+        courses = [CourseFactory.create(org='edx', mobile_available=True) for _ in range(5)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for enrollment in response.data['enrollments']['results']:
+            self.assertNotIn('course_progress', enrollment)
+
+    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    def test_course_progress_for_secondary_enrollments_with_query_param(
+        self,
+        get_course_assignment_mock: MagicMock,
+    ) -> None:
+        self.login()
+        courses = [CourseFactory.create(org='edx', mobile_available=True) for _ in range(5)]
+        for course in courses:
+            self.enroll(course.id)
+        expected_course_progress = {'total_assignments_count': 0, 'assignments_completed': 0}
+
+        response = self.api_response(api_version=API_V4, data={'requested_fields': 'course_progress'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for enrollment in response.data['enrollments']['results']:
+            self.assertIn('course_progress', enrollment)
+            self.assertDictEqual(enrollment['course_progress'], expected_course_progress)
+
+    @patch(
+        'lms.djangoapps.mobile_api.users.serializers.CourseEnrollmentSerializerModifiedForPrimary'
+        '.get_course_assignments'
+    )
+    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    def test_course_progress_for_secondary_enrollments_with_query_param_and_assignments(
+        self,
+        get_course_assignment_mock: MagicMock,
+        assignments_mock: MagicMock,
+    ) -> None:
+        self.login()
+        courses = [CourseFactory.create(org='edx', mobile_available=True) for _ in range(2)]
+        for course in courses:
+            self.enroll(course.id)
+        course_assignments_mock = [
+            Mock(complete=False), Mock(complete=False), Mock(complete=True), Mock(complete=True), Mock(complete=True)
+        ]
+        get_course_assignment_mock.return_value = course_assignments_mock
+        student_assignments_mock = {
+            'future_assignments': [],
+            'past_assignments': [],
+        }
+        assignments_mock.return_value = student_assignments_mock
+        expected_course_progress = {'total_assignments_count': 5, 'assignments_completed': 3}
+
+        response = self.api_response(api_version=API_V4, data={'requested_fields': 'course_progress'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_progress', response.data['primary'])
+        self.assertDictEqual(response.data['primary']['course_progress'], expected_course_progress)
+        self.assertIn('course_progress', response.data['enrollments']['results'][0])
+        self.assertDictEqual(response.data['enrollments']['results'][0]['course_progress'], expected_course_progress)
 
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})

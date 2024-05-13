@@ -326,6 +326,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         * mode: The type of certificate registration for this course (honor or
           certified).
         * url: URL to the downloadable version of the certificate, if exists.
+        * course_progress: Contains information about how many assignments are in the course
+          and how many assignments the student has completed.
+        * total_assignments_count: Total course's assignments count.
+        * assignments_completed: Assignments witch the student has completed.
     """
 
     lookup_field = 'username'
