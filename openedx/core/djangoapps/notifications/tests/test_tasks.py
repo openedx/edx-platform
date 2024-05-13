@@ -433,3 +433,67 @@ class TestDeleteNotificationTask(ModuleStoreTestCase):
         delete_notifications({'course_id': self.course_1.id})
         assert not Notification.objects.filter(course_id=self.course_1.id)
         assert Notification.objects.filter(course_id=self.course_2.id)
+
+
+@ddt.ddt
+class NotificationCreationOnChannelsTests(ModuleStoreTestCase):
+    """
+    Tests for notification creation and channels value.
+    """
+
+    def setUp(self):
+        """
+        Create a course and users for tests.
+        """
+
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(
+            org='testorg',
+            number='testcourse',
+            run='testrun'
+        )
+
+        self.preference = CourseNotificationPreference.objects.create(
+            user_id=self.user.id,
+            course_id=self.course.id,
+            config_version=0,
+        )
+
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @ddt.data(
+        (False, False, 0),
+        (False, True, 1),
+        (True, False, 1),
+        (True, True, 1),
+    )
+    @ddt.unpack
+    def test_notification_is_created_when_any_channel_is_enabled(self, web_value, email_value, generated_count):
+        """
+        Tests if notification is created if any preference is enabled
+        """
+        app_name = 'discussion'
+        notification_type = 'new_discussion_post'
+        app_prefs = self.preference.notification_preference_config[app_name]
+        app_prefs['notification_types'][notification_type]['web'] = web_value
+        app_prefs['notification_types'][notification_type]['email'] = email_value
+        kwargs = {
+            'user_ids': [self.user.id],
+            'course_key': str(self.course.id),
+            'app_name': app_name,
+            'notification_type': notification_type,
+            'content_url': 'https://example.com/',
+            'context': {
+                'post_title': 'Post title',
+                'username': 'user name',
+            },
+        }
+        self.preference.save()
+        with patch('openedx.core.djangoapps.notifications.tasks.notification_generated_event') as event_mock:
+            send_notifications(**kwargs)
+            notifications = Notification.objects.all()
+            assert len(notifications) == generated_count
+            if notifications:
+                notification = Notification.objects.all()[0]
+                assert notification.web == web_value
+                assert notification.email == email_value

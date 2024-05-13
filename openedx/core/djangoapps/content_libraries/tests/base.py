@@ -1,5 +1,5 @@
 """
-Tests for Blockstore-based Content Libraries
+Tests for Learning-Core-based Content Libraries
 """
 import uuid
 from contextlib import contextmanager
@@ -12,9 +12,6 @@ from rest_framework.test import APITransactionTestCase, APIClient
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.core.lib.blockstore_api.tests.base import (
-    BlockstoreAppTestMixin,
-)
 
 # Define the URLs here - don't use reverse() because we want to detect
 # backwards-incompatible changes like changed URLs.
@@ -46,9 +43,9 @@ URL_BLOCK_XBLOCK_HANDLER = '/api/xblock/v2/xblocks/{block_key}/handler/{user_id}
 
 
 @skip_unless_cms  # Content Libraries REST API is only available in Studio
-class ContentLibrariesRestApiTest(BlockstoreAppTestMixin, APITransactionTestCase):
+class ContentLibrariesRestApiTest(APITransactionTestCase):
     """
-    Base class for Blockstore-based Content Libraries test that use the REST API
+    Base class for Learning-Core-based Content Libraries test that use the REST API
 
     These tests use the REST API, which in turn relies on the Python API.
     Some tests may use the python API directly if necessary to provide

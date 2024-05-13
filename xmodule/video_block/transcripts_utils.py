@@ -15,7 +15,7 @@ import requests
 import simplejson as json
 from django.conf import settings
 from lxml import etree
-from opaque_keys.edx.locator import BundleDefinitionLocator
+from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 
@@ -856,15 +856,19 @@ class VideoTranscriptsMixin:
         # to clean redundant language codes.
         return list(set(translations))
 
-    def get_default_transcript_language(self, transcripts):
+    def get_default_transcript_language(self, transcripts, dest_lang=None):
         """
         Returns the default transcript language for this video block.
 
         Args:
             transcripts (dict): A dict with all transcripts and a sub.
+            dest_lang (unicode): language coming from unit translation language selector.
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
-        if self.transcript_language in other_lang:
+
+        if dest_lang and dest_lang in other_lang.keys():
+            transcript_language = dest_lang
+        elif self.transcript_language in other_lang:
             transcript_language = self.transcript_language
         elif sub:
             transcript_language = 'en'
@@ -941,7 +945,7 @@ def get_transcript_for_video(video_location, subs_id, file_name, language):
     """
     Get video transcript from content store. This is a lower level function and is used by
     `get_transcript_from_contentstore`. Prefer that function instead where possible. If you
-    need to support getting transcripts from VAL or Blockstore as well, use the `get_transcript`
+    need to support getting transcripts from VAL or Learning Core as well, use the `get_transcript`
     function instead.
 
     NOTE: Transcripts can be searched from content store by two ways:
@@ -1029,29 +1033,31 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
 
 
-def get_transcript_from_blockstore(video_block, language, output_format, transcripts_info):
+def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
     """
-    Get video transcript from Blockstore.
+    Get video transcript from Learning Core.
 
-    Blockstore expects video transcripts to be placed into the 'static/'
-    subfolder of the XBlock's folder in a Blockstore bundle. For example, if the
-    video XBlock's definition is in the standard location of
-        video/video1/definition.xml
-    Then the .srt files should be placed at e.g.
-        video/video1/static/video1-en.srt
-    This is the same place where other public static files are placed for other
-    XBlocks, such as image files used by HTML blocks.
+    HISTORIC INFORMATION FROM WHEN THIS FUNCTION WAS `get_transcript_from_blockstore`:
 
-    Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
-    JSON dictionary listing the filename of the transcript for each language:
-        <video
-            youtube_id_1_0="3_yD_cEKoCk"
-            transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
-            display_name="Welcome Video with Transcript"
-            download_track="true"
-        />
+      Blockstore expects video transcripts to be placed into the 'static/'
+      subfolder of the XBlock's folder in a Blockstore bundle. For example, if the
+      video XBlock's definition is in the standard location of
+          video/video1/definition.xml
+      Then the .srt files should be placed at e.g.
+          video/video1/static/video1-en.srt
+      This is the same place where other public static files are placed for other
+      XBlocks, such as image files used by HTML blocks.
 
-    This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
+      Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
+      JSON dictionary listing the filename of the transcript for each language:
+          <video
+              youtube_id_1_0="3_yD_cEKoCk"
+              transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
+              display_name="Welcome Video with Transcript"
+              download_track="true"
+          />
+
+      This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
 
     Arguments:
         video_block (Video XBlock): The video XBlock
@@ -1084,11 +1090,9 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     if not lang:
         lang = video.get_default_transcript_language(transcripts_info)
 
-    if isinstance(video.scope_ids.def_id, BundleDefinitionLocator):
-        # This block is in Blockstore.
-        # For Blockstore, VAL is considered deprecated and we can load the transcript file
-        # directly using the Blockstore API:
-        return get_transcript_from_blockstore(video, lang, output_format, transcripts_info)
+    if isinstance(video.scope_ids.usage_id, UsageKeyV2):
+        # This block is in Learning Core.
+        return get_transcript_from_learning_core(video, lang, output_format, transcripts_info)
 
     try:
         edx_video_id = clean_video_id(video.edx_video_id)

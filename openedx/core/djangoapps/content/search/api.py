@@ -55,6 +55,8 @@ LOCK_EXPIRE = 24 * 60 * 60  # Lock expires in 24 hours
 MAX_ACCESS_IDS_IN_FILTER = 1_000
 MAX_ORGS_IN_FILTER = 1_000
 
+EXCLUDED_XBLOCK_TYPES = ['course', 'course_info']
+
 
 @contextmanager
 def _index_rebuild_lock() -> Generator[str, None, None]:
@@ -372,6 +374,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 docs.append(doc)  # pylint: disable=cell-var-from-loop
                 _recurse_children(block, add_with_children)  # pylint: disable=cell-var-from-loop
 
+            # Index course children
             _recurse_children(course, add_with_children)
 
             if docs:
@@ -393,6 +396,10 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
         recursive (bool): If True, also index all children of the XBlock
     """
     xblock = modulestore().get_item(usage_key)
+    xblock_type = xblock.scope_ids.block_type
+
+    if xblock_type in EXCLUDED_XBLOCK_TYPES:
+        return
 
     docs = []
 

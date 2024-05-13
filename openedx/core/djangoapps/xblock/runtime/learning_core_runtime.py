@@ -21,7 +21,7 @@ from xblock.exceptions import NoSuchUsage
 from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import FieldData
 
-from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
+from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
 
@@ -234,11 +234,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 log.warning("User %s does not have permission to edit %s", self.user.username, block.scope_ids.usage_id)
                 raise RuntimeError("You do not have permission to edit this XBlock")
 
-        # We need Blockstore's serialization so we don't have `url_name` showing
-        # up in all the OLX. TODO: Rename this later, after we figure out what
-        # other changes we need to make in the serialization as part of the
-        # Blockstore -> Learning Core conversion.
-        serialized = serialize_modulestore_block_for_blockstore(block)
+        serialized = serialize_modulestore_block_for_learning_core(block)
         now = datetime.now(tz=timezone.utc)
         usage_key = block.scope_ids.usage_id
         with atomic():

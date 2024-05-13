@@ -39,6 +39,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 # pylint: disable=unused-import, useless-suppression, wrong-import-order, wrong-import-position
 
 import importlib.util
+import json
 import os
 import sys
 
@@ -113,9 +114,6 @@ from lms.envs.common import (
     ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY,
     ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET,
     ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
-
-    # Blockstore
-    BUNDLE_ASSET_STORAGE_SETTINGS,
 
     # Methods to derive settings
     _make_mako_template_dirs,
@@ -443,7 +441,7 @@ FEATURES = {
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_target_removal_date: 2020-12-31
-    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
+    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4106944527/Libraries+Relaunch+Proposal+For+Product+Review
     # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
@@ -582,6 +580,14 @@ FEATURES = {
 
     # See annotations in lms/envs/common.py for details.
     'ENABLE_BLAKE2B_HASHING': False,
+
+    # .. toggle_name: FEATURES['BADGES_ENABLED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable the Badges feature.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-04-10
+    'BADGES_ENABLED': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -1024,6 +1030,11 @@ XBLOCK_EXTRA_MIXINS = ()
 # Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
 
+# .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
+# .. setting_default: default
+# .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
+
 ############################ ORA 2 ############################################
 
 # By default, don't use a file prefix
@@ -1275,14 +1286,11 @@ EDX_PLATFORM_REVISION = 'release'
 
 # Static content
 STATIC_URL = '/static/studio/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" / 'studio'
+STATIC_ROOT = os.environ.get('STATIC_ROOT_CMS', ENV_ROOT / 'staticfiles' / 'studio')
 
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-
-    # This is how you would use the textbook images locally
-    # ("book", ENV_ROOT / "book_images"),
 ]
 
 # Locale/Internationalization
@@ -1322,11 +1330,16 @@ COURSE_METADATA_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
 EMBARGO_SITE_REDIRECT_URL = None
 
 ##### custom vendor plugin variables #####
-# JavaScript code can access this data using `process.env.JS_ENV_EXTRA_CONFIG`
-# One of the current use cases for this is enabling custom TinyMCE plugins
-# (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration
-# (TINYMCE_CONFIG_OVERRIDES).
-JS_ENV_EXTRA_CONFIG = {}
+
+# .. setting_name: JS_ENV_EXTRA_CONFIG
+# .. setting_default: {}
+# .. setting_description: JavaScript code can access this dictionary using `process.env.JS_ENV_EXTRA_CONFIG`
+#   One of the current use cases for this is enabling custom TinyMCE plugins
+#   (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration (TINYMCE_CONFIG_OVERRIDES).
+# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
+#   use Django settings. Please set the JS_ENV_EXTRA_CONFIG environment variable to an equivalent JSON
+#   string instead. For details, see: https://github.com/openedx/edx-platform/issues/31895
+JS_ENV_EXTRA_CONFIG = json.loads(os.environ.get('JS_ENV_EXTRA_CONFIG', '{}'))
 
 ############################### PIPELINE #######################################
 
@@ -1503,7 +1516,14 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
+
+# .. setting_name: WEBPACK_CONFIG_PATH
+# .. setting_default: "webpack.prod.config.js"
+# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
+# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
+#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
+#   see: https://github.com/openedx/edx-platform/issues/31895
+WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
 
 
 ############################ SERVICE_VARIANT ##################################
@@ -1672,7 +1692,7 @@ INSTALLED_APPS = [
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
     'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
 
-    # New (Blockstore-based) XBlock runtime
+    # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
     # Maintenance tools
@@ -1854,9 +1874,6 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
-
-    # Blockstore
-    'blockstore.apps.bundles',
 
     # alternative swagger generator for CMS API
     'drf_spectacular',
@@ -2180,8 +2197,11 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 
 # .. setting_name: COMPREHENSIVE_THEME_DIRS
 # .. setting_default: []
-# .. setting_description: See LMS annotation.
-COMPREHENSIVE_THEME_DIRS = []
+# .. setting_description: A list of paths to directories, each of which will
+#   be searched for comprehensive themes. Do not override this Django setting directly.
+#   Instead, set the COMPREHENSIVE_THEME_DIRS environment variable, using colons (:) to
+#   separate paths.
+COMPREHENSIVE_THEME_DIRS = os.environ.get("COMPREHENSIVE_THEME_DIRS", "").split(":")
 
 # .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
 # .. setting_default: []
@@ -2222,25 +2242,11 @@ CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
-    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
 ]
 
 ############################ Cache Configuration ###############################
 
 CACHES = {
-    'blockstore': {
-        'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': ['localhost:11211'],
-        'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'OPTIONS': {
-            'no_delay': True,
-            'ignore_exc': True,
-            'use_pooling': True,
-            'connect_timeout': 0.5
-        }
-    },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
@@ -2426,6 +2432,15 @@ SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
+# .. setting_name: DEFAULT_GRADE_DESIGNATIONS
+# .. setting_default: ['A', 'B', 'C', 'D']
+# .. setting_description: The default 'pass' grade cutoff designations to be used. The failure grade
+#     is always 'F' and should not be included in this list.
+# .. setting_warning: The DEFAULT_GRADE_DESIGNATIONS list must have more than one designation,
+#     or else ['A', 'B', 'C', 'D'] will be used as the default grade designations. Also, only the first
+#     11 grade designations are used by the UI, so it's advisable to restrict the list to 11 items.
+DEFAULT_GRADE_DESIGNATIONS = ['A', 'B', 'C', 'D']
+
 ############## Settings for CourseGraph ############################
 
 # .. setting_name: COURSEGRAPH_JOB_QUEUE
@@ -2553,11 +2568,15 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
     CORS_ALLOW_INSECURE = False
-    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
-        'content-range',
-        'content-disposition',
-    )
+
+# Set CORS_ALLOW_HEADERS regardless of whether we've enabled ENABLE_CORS_HEADERS
+# because that decision might happen in a later config file. (The headers to
+# allow is an application logic, and not site policy.)
+CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'use-jwt-cookie',
+    'content-range',
+    'content-disposition',
+)
 
 LOGIN_REDIRECT_WHITELIST = []
 
@@ -2664,22 +2683,6 @@ PROCTORING_BACKENDS = {
 }
 
 PROCTORING_SETTINGS = {}
-
-################## BLOCKSTORE RELATED SETTINGS  #########################
-
-# Which of django's caches to use for storing anonymous user state for XBlocks
-# in the blockstore-based XBlock runtime
-XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
-
-# .. setting_name: BLOCKSTORE_BUNDLE_CACHE_TIMEOUT
-# .. setting_default: 3000
-# .. setting_description: Maximum time-to-live of cached Bundles fetched from
-#     Blockstore, in seconds. When the values returned from Blockstore have
-#     TTLs of their own (such as signed S3 URLs), the maximum TTL of this cache
-#     must be lower than the minimum TTL of those values.
-#     We use a default of 3000s (50mins) because temporary URLs are often
-#     configured to expire after one hour.
-BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
@@ -2831,6 +2834,9 @@ INACTIVE_USER_LOGIN = True
 # Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
 INACTIVE_USER_URL = f'http://{CMS_BASE}'
 
+# String length for the configurable part of the auto-generated username
+AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
+
 ######################## BRAZE API SETTINGS ########################
 
 EDX_BRAZE_API_KEY = None
@@ -2850,6 +2856,10 @@ SIMPLE_HISTORY_DATE_INDEX = False
 
 def _should_send_xblock_events(settings):
     return settings.FEATURES['ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS']
+
+
+def _should_send_learning_badge_events(settings):
+    return settings.FEATURES['BADGES_ENABLED']
 
 
 # .. setting_name: EVENT_BUS_PRODUCER_CONFIG
@@ -2901,6 +2911,18 @@ EVENT_BUS_PRODUCER_CONFIG = {
         'learning-certificate-lifecycle':
             {'event_key_field': 'certificate.course.course_key', 'enabled': False},
     },
+    "org.openedx.learning.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
+    "org.openedx.learning.ccx.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.ccx_course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
 }
 
 
@@ -2911,6 +2933,18 @@ derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_autho
 derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.deleted.v1',
                          'course-authoring-xblock-lifecycle', 'enabled')
 
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.ccx.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)
 
 ################### Authoring API ######################
 

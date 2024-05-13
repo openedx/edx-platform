@@ -29,7 +29,7 @@ from openedx.core.lib.xblock_utils import (
 from xmodule.modulestore.django import (
     modulestore,
 )  # lint-amnesty, pylint: disable=wrong-import-order
-from cms.djangoapps.contentstore.toggles import use_tagging_taxonomy_list_page
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 
 from xmodule.x_module import (
     AUTHOR_VIEW,
@@ -242,7 +242,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             # Fetch tags of children components
             tags_count_map = {}
-            if use_tagging_taxonomy_list_page():
+            if not is_tagging_feature_disabled():
                 tags_count_map = get_children_tags_count(xblock)
 
             # Set up the context to be passed to each XBlock's render method.

@@ -7,8 +7,6 @@ Specific overrides to the base prod settings to make development easier.
 import logging
 from os.path import abspath, dirname, join
 
-from corsheaders.defaults import default_headers as corsheaders_default_headers
-
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 #####################################################################
 from edx_django_utils.plugins import add_plugins
@@ -264,9 +262,6 @@ TOKEN_SIGNING.update({
     )
 })
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
-
 ########################## PROGRAMS LEARNER PORTAL ##############################
 LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 
@@ -295,9 +290,6 @@ FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-    'use-jwt-cookie',
-)
 
 LOGIN_REDIRECT_WHITELIST.extend([
     CMS_BASE,

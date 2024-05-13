@@ -9,7 +9,6 @@ from organizations.tests.factories import OrganizationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 
@@ -25,11 +24,7 @@ except RuntimeError:
 @patch("openedx.core.djangoapps.content.search.api.MeilisearchClient")
 @override_settings(MEILISEARCH_ENABLED=True)
 @skip_unless_cms
-class TestUpdateIndexHandlers(
-    ModuleStoreTestCase,
-    BlockstoreAppTestMixin,
-    LiveServerTestCase,
-):
+class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
     """
     Test that the search index is updated when XBlocks and Library Blocks are modified
     """

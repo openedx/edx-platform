@@ -6,6 +6,7 @@ from __future__ import annotations
 import copy
 
 from unittest.mock import MagicMock, call, patch
+from opaque_keys.edx.keys import UsageKey
 
 import ddt
 from django.test import override_settings
@@ -62,6 +63,7 @@ class TestSearchApi(ModuleStoreTestCase):
             fields={"display_name": "Test Course"},
         )
         course_access, _ = SearchAccess.objects.get_or_create(context_key=self.course.id)
+        self.course_block_key = "block-v1:org1+test_course+test_run+type@course+block@course"
 
         # Create XBlocks
         self.sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
@@ -183,6 +185,12 @@ class TestSearchApi(ModuleStoreTestCase):
             expected_docs = [self.doc_sequential]
 
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with(expected_docs)
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_no_index_excluded_xblocks(self, mock_meilisearch):
+        api.upsert_xblock_index_doc(UsageKey.from_string(self.course_block_key))
+
+        mock_meilisearch.return_value.index.return_value.update_document.assert_not_called()
 
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_index_xblock_tags(self, mock_meilisearch):

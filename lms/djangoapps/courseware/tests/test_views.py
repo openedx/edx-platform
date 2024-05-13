@@ -78,6 +78,8 @@ from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
+    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
     COURSEWARE_MICROFRONTEND_SEARCH_ENABLED,
     COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
 )
@@ -3262,7 +3264,6 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
     def test_is_course_open_for_learner(
         self,
         start_date_modifier,
@@ -3812,3 +3813,68 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body, {'enabled': False})
+
+
+class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
+    """
+    Tests the endpoint to fetch the Courseware Navigation Sidebar waffle flags status.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.course = CourseFactory.create()
+
+        self.client = APIClient()
+        self.apiUrl = reverse('courseware_navigation_sidebar_toggles_view', kwargs={'course_id': str(self.course.id)})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
+    def test_courseware_mfe_navigation_sidebar_enabled_aux_disabled(self):
+        """
+        Getter to check if it is allowed to show the Courseware navigation sidebar to a user
+        and auxiliary sidebar doesn't open.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': False})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
+    def test_courseware_mfe_navigation_sidebar_enabled_aux_enabled(self):
+        """
+        Getter to check if it is allowed to show the Courseware navigation sidebar to a user
+        and auxiliary sidebar should always open.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': True})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
+    def test_courseware_mfe_navigation_sidebar_disabled_aux_enabled(self):
+        """
+        Getter to check if the Courseware navigation sidebar shouldn't be shown to a user
+        and auxiliary sidebar should always open.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': True})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
+    def test_courseware_mfe_navigation_sidebar_toggles_disabled(self):
+        """
+        Getter to check if neither navigation sidebar nor auxiliary sidebar is shown.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': False})
