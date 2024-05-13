@@ -17,9 +17,6 @@ on:
       is-prod:
         description: "Flag to indicate if the branch is a production branch"
         value: ${{ jobs.obtain.outputs.IS-RELEASE }}
-      is-pr:
-        description: "Flag to indicate if the workflow is part of a pull request"
-        value: ${{ jobs.obtain.outputs.IS-PR }}
 
 jobs:
   obtain:
@@ -30,7 +27,6 @@ jobs:
       PROJECT: ${{ steps.project.outputs.result }}
       CODE: ${{ steps.code.outputs.result }}
       IS-RELEASE: ${{ steps.is_release.outputs.result }}
-      IS-PR: ${{ steps.is_pr.outputs.result }}
     steps:
       - name: Take current date
         id: ts
@@ -100,18 +96,6 @@ jobs:
               return true
             } else return false
 
-      - name: Define pull request flag
-        id: is_pr
-        uses: actions/script@v7
-        with:
-          result-encoding: string
-          script: |
-            if ( "${{ github.event.pull_request.base.ref }}".match(/^(eol|openuchile|vlabx)(-release)?\/(\w+)(\.master)?$/) ) { // pr to image generation branch case
-              return true
-            } else if ("${{ github.ref }}".match(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)-release\/\w+\/pr-\d+-\w+$/)) { // merge queue to production branch case
-              return true
-            } else return false
-
   validate:
     needs: [ obtain ]
     runs-on: ubuntu-latest
@@ -123,8 +107,7 @@ jobs:
           echo PROJECT=${{ needs.obtain.outputs.PROJECT }}
           echo CODE=${{ needs.obtain.outputs.CODE }}
           echo IS-RELEASE=${{ needs.obtain.outputs.IS-RELEASE }}
-          echo IS-PR=${{ needs.obtain.outputs.IS-PR }}
 
       - name: Fail on empty values
-        if: ${{ needs.obtain.outputs.TIMESTAMP == '' || needs.obtain.outputs.RELEASE-NAME == '' || needs.obtain.outputs.PROJECT == '' || needs.obtain.outputs.CODE == '' || needs.obtain.outputs.IS-RELEASE == '' || needs.obtain.outputs.IS-PR == '' }}
+        if: ${{ needs.obtain.outputs.TIMESTAMP == '' || needs.obtain.outputs.RELEASE-NAME == '' || needs.obtain.outputs.PROJECT == '' || needs.obtain.outputs.CODE == '' || needs.obtain.outputs.IS-RELEASE == '' }}
         run: exit 1
