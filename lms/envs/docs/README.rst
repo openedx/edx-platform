@@ -2,15 +2,10 @@ LMS Configuration Settings
 ==========================
 
 The lms.envs module contains project-wide settings, defined in python modules
-using the standard `Django Settings`_ mechanism.
+using the standard `Django Settings`_ mechanism, plus some Open edX
+particularities, which we describe below.
 
-.. _Django Settings: https://docs.djangoproject.com/en/2.2/topics/settings/
-
-Different python modules are used for different setting configuration options.
-To prevent duplication of settings, modules import values from other modules,
-as shown in the diagram below.
-
-.. image:: images/lms_settings.png
+.. _Django Settings: https://docs.djangoproject.com/en/dev/topics/settings/
 
 
 YAML Configuration Files
