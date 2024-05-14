@@ -106,13 +106,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.101
+boto3==1.34.104
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.101
+botocore==1.34.104
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -213,7 +213,7 @@ cryptography==42.0.7
     #   pyopenssl
     #   snowflake-connector-python
     #   social-auth-core
-cssutils==2.10.2
+cssutils==2.10.3
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
@@ -388,7 +388,7 @@ django-object-actions==4.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-pipeline==3.0.0
+django-pipeline==3.1.0
     # via -r requirements/edx/base.txt
 django-ratelimit==4.1.0
     # via -r requirements/edx/base.txt
@@ -800,7 +800,7 @@ lxml==4.9.4
     #   xmlsec
 mailsnake==1.6.4
     # via -r requirements/edx/base.txt
-mako==1.3.3
+mako==1.3.4
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
@@ -850,7 +850,7 @@ multidict==6.0.5
     #   yarl
 mysqlclient==2.2.4
     # via -r requirements/edx/base.txt
-newrelic==9.9.0
+newrelic==9.9.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -916,7 +916,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.9.0
+ora2==6.11.0
     # via -r requirements/edx/base.txt
 packaging==24.0
     # via
@@ -1154,7 +1154,7 @@ referencing==0.35.1
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.4.28
+regex==2024.5.10
     # via
     #   -r requirements/edx/base.txt
     #   nltk
