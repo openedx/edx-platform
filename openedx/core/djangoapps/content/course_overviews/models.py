@@ -944,6 +944,7 @@ class CourseOverview(TimeStampedModel):
         return str(self.id)
 
     # Course categorization
+    def get_course_categories(self):
         """Return course associated categories"""
         categories = self.category_set.all()
         if categories:
