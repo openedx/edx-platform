@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-python@v4
         if: ${{ env.RELEVANT == 'true' }}
         with:
-          python-version: '3.11'
+          python-version: '3.8'
 
       - name: "Recompile requirements"
         if: ${{ env.RELEVANT == 'true' }}
