@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
 
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
@@ -542,7 +543,7 @@ class AboutInfo:
         return [mode.slug for mode in CourseMode.modes_for_course(course.id)]
 
     def from_course_category(self, **kwargs):
-        """ fetches the available course categories from the CourseOverview model """
+        """ Fetches the available course categories from the CourseOverview model """
         course = kwargs.get('course', None)
         if not course:
             raise ValueError("Context dictionary does not contain expected argument 'course'")
