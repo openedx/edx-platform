@@ -15,7 +15,6 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.8"
           - "3.11"
         django-version:
           - "pinned"
@@ -39,21 +38,23 @@ jobs:
           - "xmodule-with-lms"
           - "xmodule-with-cms"
         mongo-version:
-          - "4.4"
           - "7.0"
 
-        # We only need to test Mongo 4.4 for modules that directly interface with Mongo (that is: xmodule.modulestore)
-        exclude:
-          - mongo-version: "4.4"
-        include:
-          - shard_name: "xmodule-with-cms"
-            python-version: "3.11"
-            django-version: "pinned"
-            mongo-version: "4.4"
-          - shard_name: "xmodule-with-lms"
-            python-version: "3.11"
-            django-version: "pinned"
-            mongo-version: "4.4"
+        # We only need to test older versions of Mongo with modules that directly interface with Mongo (that is: xmodule.modulestore)
+        # This code is left here as an example for future refernce in case we need to reduce the number of shards we're
+        # testing but still have good confidence with older versions of mongo.  We use Mongo 4.4 in the example.
+        #
+        # exclude:
+        #   - mongo-version: "4.4"
+        # include:
+        #   - shard_name: "xmodule-with-cms"
+        #     python-version: "3.11"
+        #     django-version: "pinned"
+        #     mongo-version: "4.4"
+        #   - shard_name: "xmodule-with-lms"
+        #     python-version: "3.11"
+        #     django-version: "pinned"
+        #     mongo-version: "4.4"
     steps:
       - uses: actions/checkout@v2
 

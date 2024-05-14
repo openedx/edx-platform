@@ -14,7 +14,8 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         node-version: [ 18 ]
-        python-version: [ '3.8', '3.11' ]
+        python-version:
+          - '3.11'
 
     steps:
 
