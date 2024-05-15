@@ -93,7 +93,7 @@ start_sass_watch "default theme" \
 # Watch each theme's Sass.
 # If it changes, only recompile that theme.
 export IFS=":"
-for theme_dir in ${EDX_PLATFORM_THEME_DIRS:-} ; do
+for theme_dir in ${COMPREHENSIVE_THEME_DIRS:-} ; do
     for theme_path in "$theme_dir"/* ; do
         theme_name="${theme_path#"$theme_dir/"}"
         lms_sass="$theme_path/lms/static/sass"
