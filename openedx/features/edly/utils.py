@@ -1,6 +1,7 @@
 """
 Utilities for edly app.
 """
+import json
 import logging
 from functools import partial
 from datetime import datetime
@@ -8,6 +9,7 @@ from urllib.parse import urljoin, urlparse
 
 import jwt
 import waffle
+from cryptography.fernet import Fernet
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -25,6 +27,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
+from lms.envs.common import PANEL_ADMIN_LOGOUT_REDIRECT_URL
 from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
@@ -751,3 +754,57 @@ def toggle_lti_user_parameters(course_id, enable_lti_parameters, user):
         CourseEditLTIFieldsEnabledFlag.objects.create(
             course_id=course_id, enabled=enable_lti_parameters["value"], changed_by=user
         )
+
+def has_not_unsubscribe_user_email(site, email):
+    """
+    Check if the User has unsubscribe email.
+    """
+    try:
+        edly_sub_org = site.edly_sub_org_for_lms
+    except EdlySubOrganization.DoesNotExist:
+        edly_sub_org = site.edly_sub_org_for_studio
+
+    return not EdlyMultiSiteAccess.objects.get(sub_org=edly_sub_org, user__email=email).has_unsubscribed_email
+
+
+def create_user_unsubscribe_url(email, site):
+    """
+    Create user unsubscribe email url.
+    Arguments:
+        organization_slug (str): Organization slug
+        panel_backend_url (str): Panel backend URL
+        email (str): User email
+    """
+    if not site:
+        return None
+    
+    try:
+        edly_sub_org = site.edly_sub_org_for_lms
+    except EdlySubOrganization.DoesNotExist:
+        edly_sub_org = site.edly_sub_org_for_studio
+
+    panel_backend_url = site.configuration.site_values.get('PANEL_NOTIFICATIONS_BASE_URL')
+    
+    if not panel_backend_url:
+        return None
+
+    fernet = Fernet(settings.EMAIL_UNSUBSCRIPTION_ENCRYPTION_KEY)
+    encrypted_user_data = fernet.encrypt(
+        json.dumps(
+            {
+                "email": email,
+                "sub_org": edly_sub_org.slug,
+            }
+        ).encode()
+    ).decode()
+
+    url = "{base_url}{sub_url}?param={param}".format(
+        base_url=panel_backend_url,
+        sub_url='/unsubscribe_email/',
+        param=encrypted_user_data,
+    )
+
+    if not url.startswith('https://'):
+            url = 'https://' + url
+
+    return url

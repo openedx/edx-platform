@@ -135,6 +135,11 @@ class EdlyMultiSiteAccess(TimeStampedModel):
         help_text=_('Block/Unblock user from logging in to the platform.')
     )
     course_activity_date = models.DateTimeField(blank=True, null=True)
+    has_unsubscribed_email = models.BooleanField(
+        default=False,
+        verbose_name=_('Unsubscribe Email'),
+        help_text=_('Unsubscribe system generated emails.')
+    )
 
     class Meta(object):
         unique_together = (('user', 'sub_org'),)

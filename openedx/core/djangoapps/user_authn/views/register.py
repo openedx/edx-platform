@@ -64,6 +64,8 @@ from openedx.features.edly.validators import get_subscription_limit, handle_subs
 from openedx.features.edly.utils import (
     create_edly_access_role,
     create_learner_link_with_permission_groups,
+    create_user_unsubscribe_url,
+    has_not_unsubscribe_user_email,
     is_config_enabled,
     get_edly_sub_org_from_request,
     get_username_and_name_by_email
@@ -241,8 +243,9 @@ def create_account_with_params(request, params):
 
     if skip_email:
         registration.activate()
-    elif is_config_enabled(request.site, ACTIVATION_EMAIL):
-        compose_and_send_activation_email(user, profile, registration)
+    elif is_config_enabled(request.site, ACTIVATION_EMAIL) and has_not_unsubscribe_user_email(request.site, user.email):
+        unsubscribe_url = create_user_unsubscribe_url(user.email, request.site)
+        compose_and_send_activation_email(user, profile, registration, unsubscribe_url)
     else:
         # Send custom email e.g; your account is being reviewed, contact support.
         pass

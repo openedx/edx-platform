@@ -53,6 +53,7 @@ from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
+from openedx.features.edly.utils import create_user_unsubscribe_url, has_not_unsubscribe_user_email
 from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
@@ -449,6 +450,7 @@ class DeactivateLogoutView(APIView):
                     site = Site.objects.get_current(request)
                     notification_context = get_base_template_context(site)
                     notification_context.update({'full_name': request.user.profile.name})
+                    notification_context['unsubscribe_url'] = create_user_unsubscribe_url(user_email, site)
                     language_code = request.user.preferences.model.get_value(
                         request.user,
                         LANGUAGE_KEY,
@@ -459,7 +461,8 @@ class DeactivateLogoutView(APIView):
                         language=language_code,
                         user_context=notification_context,
                     )
-                    ace.send(notification)
+                    if has_not_unsubscribe_user_email(site, user_email):
+                        ace.send(notification)
                 except Exception as exc:
                     log.exception('Error sending out deletion notification email')
                     raise

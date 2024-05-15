@@ -30,6 +30,7 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import DiscussionsIdMapping
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from openedx.features.edly.utils import create_user_unsubscribe_url, has_not_unsubscribe_user_email
 from common.djangoapps.track import segment
 
 log = logging.getLogger(__name__)
@@ -68,6 +69,12 @@ def send_ace_message(context):
     if _should_send_message(context):
         context['site'] = Site.objects.get(id=context['site_id'])
         thread_author = User.objects.get(id=context['thread_author_id'])
+
+        if not has_not_unsubscribe_user_email(context['site'], thread_author.email):
+            return
+
+        context['unsubscribe_url'] = create_user_unsubscribe_url(thread_author.email, context['site'])
+
         with emulate_http_request(site=context['site'], user=thread_author):
             message_context = _build_message_context(context)
             message = ResponseNotification().personalize(

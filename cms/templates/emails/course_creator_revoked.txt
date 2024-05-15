@@ -1,3 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-${_("Your course creation rights to {studio_name} have been revoked. If you believe this was in error, please contact {email}").format(studio_name=settings.STUDIO_NAME, email=studio_request_email)}
+${_("Your course creation rights to {studio_name} have been revoked. If you believe this was in error, please contact {email}\n\n\nIf you no longer wish to receive these emails, please unsubscribe here\n{unsubscribe_url}").format(
+    studio_name=settings.STUDIO_NAME,
+    email=studio_request_email,
+    unsubscribe_url=unsubscribe_url,
+    )}
+.

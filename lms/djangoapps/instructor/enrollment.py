@@ -23,7 +23,7 @@ from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from six import text_type
 from openedx.features.edly.constants import COURSE_ENROLLMENT
-from openedx.features.edly.utils import is_config_enabled
+from openedx.features.edly.utils import create_user_unsubscribe_url, has_not_unsubscribe_user_email, is_config_enabled
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
 
@@ -506,6 +506,8 @@ def send_mail_to_student(student, param_dict, language=None, context_vars=None, 
         'remove_beta_tester': RemoveBetaTester,
     }
 
+    param_dict['unsubscribe_url'] = create_user_unsubscribe_url(student, site)
+
     message_class = ace_emails_dict[message_type]
     message = message_class().personalize(
         recipient=Recipient(username='', email_address=student),
@@ -515,7 +517,9 @@ def send_mail_to_student(student, param_dict, language=None, context_vars=None, 
     if from_email:
         message.options.update({'from_address': from_email})
 
-    if is_config_enabled(site, COURSE_ENROLLMENT):
+    if is_config_enabled(site, COURSE_ENROLLMENT) and has_not_unsubscribe_user_email(
+        site=site, email=student
+    ):
         ace.send(message)
 
 

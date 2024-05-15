@@ -21,7 +21,7 @@ from cms.djangoapps.course_creators.models import (
 from cms.djangoapps.course_creators.views import update_course_creator_group
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.features.edly.constants import ROLE_ASSIGNED, ROLE_REVOKED
-from openedx.features.edly.utils import is_config_enabled
+from openedx.features.edly.utils import create_user_unsubscribe_url, has_not_unsubscribe_user_email, is_config_enabled
 
 log = logging.getLogger("studio.coursecreatoradmin")
 
@@ -103,6 +103,7 @@ def send_user_notification_callback(sender, **kwargs):
     studio_request_email = settings.FEATURES.get('STUDIO_REQUEST_EMAIL', '')
     context = {'studio_request_email': studio_request_email}
 
+    context['unsubscribe_url']= create_user_unsubscribe_url(user.email, get_current_request().site)
     subject = render_to_string('emails/course_creator_subject.txt', context)
     subject = ''.join(subject.splitlines())
     if updated_state == CourseCreator.GRANTED:
@@ -117,7 +118,7 @@ def send_user_notification_callback(sender, **kwargs):
     config_key = ROLE_ASSIGNED if updated_state == CourseCreator.GRANTED else ROLE_REVOKED
     try:
         site = get_current_request().site
-        if is_config_enabled(site, config_key):
+        if is_config_enabled(site, config_key) and has_not_unsubscribe_user_email(site, user.email):
             user.email_user(subject, message, studio_request_email)
     except:
         log.warning(u"Unable to send course creator status e-mail to %s", user.email)

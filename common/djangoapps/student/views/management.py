@@ -162,7 +162,14 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-def compose_activation_email(root_url, user, user_registration=None, route_enabled=False, profile_name=''):
+def compose_activation_email(
+    root_url,
+    user,
+    user_registration=None,
+    route_enabled=False,
+    profile_name="",
+    unsubscribe_url=None,
+):
     """
     Construct all the required params for the activation email
     through celery task
@@ -183,6 +190,9 @@ def compose_activation_email(root_url, user, user_registration=None, route_enabl
         'routed_profile_name': profile_name,
     })
 
+    if unsubscribe_url:
+        message_context['unsubscribe_url'] = unsubscribe_url
+
     if route_enabled:
         dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
     else:
@@ -197,7 +207,7 @@ def compose_activation_email(root_url, user, user_registration=None, route_enabl
     return msg
 
 
-def compose_and_send_activation_email(user, profile, user_registration=None):
+def compose_and_send_activation_email(user, profile, user_registration=None, unsubscribe_url=None):
     """
     Construct all the required params and send the activation email
     through celery task
@@ -210,7 +220,7 @@ def compose_and_send_activation_email(user, profile, user_registration=None):
     route_enabled = settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL')
 
     root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-    msg = compose_activation_email(root_url, user, user_registration, route_enabled, profile.name)
+    msg = compose_activation_email(root_url, user, user_registration, route_enabled, profile.name, unsubscribe_url)
     site = theming_helpers.get_current_site()
     from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS') or (
         configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
