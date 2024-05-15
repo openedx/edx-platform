@@ -67,7 +67,7 @@ urlpatterns = [
     re_path(
         fr"^v2/courses/{settings.COURSE_ID_PATTERN}",
         CourseTopicsViewV2.as_view(),
-        name="discussion_course"
+        name="discussion_course_v2"
     ),
     re_path(r'^v1/accounts/retire_forum/?$', RetireUserView.as_view(), name="retire_discussion_user"),
     path('v1/accounts/replace_username', ReplaceUsernamesView.as_view(), name="replace_discussion_username"),
