@@ -758,15 +758,19 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         modulestore = self._verify_modulestore_support(course_key, 'create_item')
         xblock = modulestore.create_item(user_id, course_key, block_type, block_id=block_id, fields=fields, **kwargs)
-        # .. event_implemented_name: XBLOCK_CREATED
-        XBLOCK_CREATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=XBlockData(
-                usage_key=xblock.location.for_branch(None),
-                block_type=block_type,
-                version=xblock.location
+
+        def send_created_event():
+            # .. event_implemented_name: XBLOCK_CREATED
+            XBLOCK_CREATED.send_event(
+                time=datetime.now(timezone.utc),
+                xblock_info=XBlockData(
+                    usage_key=xblock.location.for_branch(None),
+                    block_type=block_type,
+                    version=xblock.location
+                )
             )
-        )
+
+        modulestore.on_commit_changes_to(course_key, send_created_event)
         return xblock
 
     @strip_key
