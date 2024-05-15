@@ -18,7 +18,7 @@ class InstructorInfoSerializer(serializers.Serializer):
 
 class InstructorsSerializer(serializers.Serializer):
     """ Serializer for instructors """
-    instructors = InstructorInfoSerializer(many=True, allow_empty=True, required=False)
+    instructors = InstructorInfoSerializer(many=True, allow_empty=True, allow_blank=True, allow_null=True, required=False)
 
 
 class CourseDetailsSerializer(serializers.Serializer):
@@ -40,7 +40,7 @@ class CourseDetailsSerializer(serializers.Serializer):
     entrance_exam_enabled = serializers.CharField(allow_blank=True)
     entrance_exam_id = serializers.CharField(allow_blank=True)
     entrance_exam_minimum_score_pct = serializers.CharField(allow_blank=True)
-    instructor_info = InstructorsSerializer(allow_null=True)
+    instructor_info = InstructorsSerializer()
     intro_video = serializers.CharField(allow_null=True)
     language = serializers.CharField(allow_null=True)
     learning_info = serializers.ListField(child=serializers.CharField(allow_blank=True))
