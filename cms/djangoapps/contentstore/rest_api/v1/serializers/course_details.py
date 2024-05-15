@@ -7,6 +7,20 @@ from rest_framework import serializers
 from openedx.core.lib.api.serializers import CourseKeyField
 
 
+class InstructorInfoSerializer(serializers.Serializer):
+    """ Serializer for instructor info """
+    name = serializers.CharField(allow_blank=True, required=False)
+    title = serializers.CharField(allow_blank=True, required=False)
+    organization = serializers.CharField(allow_blank=True, required=False)
+    image = serializers.CharField(allow_blank=True, required=False)
+    bio = serializers.CharField(allow_blank=True, required=False)
+
+
+class InstructorsSerializer(serializers.Serializer):
+    """ Serializer for instructors """
+    instructors = InstructorInfoSerializer(many=True, allow_empty=True, required=False)
+
+
 class CourseDetailsSerializer(serializers.Serializer):
     """ Serializer for course details """
     about_sidebar_html = serializers.CharField(allow_null=True, allow_blank=True)
@@ -26,7 +40,7 @@ class CourseDetailsSerializer(serializers.Serializer):
     entrance_exam_enabled = serializers.CharField(allow_blank=True)
     entrance_exam_id = serializers.CharField(allow_blank=True)
     entrance_exam_minimum_score_pct = serializers.CharField(allow_blank=True)
-    instructor_info = serializers.DictField(allow_empty=True)
+    instructor_info = InstructorsSerializer(allow_empty=True, allow_null=True)
     intro_video = serializers.CharField(allow_null=True)
     language = serializers.CharField(allow_null=True)
     learning_info = serializers.ListField(child=serializers.CharField(allow_blank=True))
