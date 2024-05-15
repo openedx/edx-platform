@@ -224,7 +224,7 @@ def get_enabled_notification_types_for_cadence(preferences, cadence_type=EmailCa
         config = preference.notification_preference_config
         for app_data in config.values():
             for notification_type, type_dict in app_data['notification_types'].items():
-                if type_dict['email_cadence'] == cadence_type:
+                if (type_dict['email_cadence'] == cadence_type) and type_dict['email']:
                     value.append(notification_type)
             if 'core' in value:
                 value.remove('core')

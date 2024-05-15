@@ -153,6 +153,7 @@ class TestEmailDigestAudience(ModuleStoreTestCase):
             assert mock_func.called is email_value
 
 
+@ddt.ddt
 class TestPreferences(ModuleStoreTestCase):
     """
     Tests preferences
@@ -176,10 +177,26 @@ class TestPreferences(ModuleStoreTestCase):
         config = self.preference.notification_preference_config
         types = config['discussion']['notification_types']
         types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
+        types['new_discussion_post']['email'] = True
         self.preference.save()
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY)
         assert mock_func.called
+
+    @ddt.data(True, False)
+    @patch('edx_ace.ace.send')
+    def test_email_send_for_email_preference_value(self, pref_value, mock_func):
+        """
+        Tests email is sent iff preference value is True
+        """
+        config = self.preference.notification_preference_config
+        types = config['discussion']['notification_types']
+        types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
+        types['new_discussion_post']['email'] = pref_value
+        self.preference.save()
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY)
+        assert mock_func.called is pref_value
 
     @patch('edx_ace.ace.send')
     def test_email_not_send_if_different_digest_preference(self, mock_func):
