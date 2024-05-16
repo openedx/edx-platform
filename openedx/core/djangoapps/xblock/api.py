@@ -15,12 +15,10 @@ import threading
 
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from openedx_learning.core.components import api as components_api
-from openedx_learning.core.components.models import Component
-from openedx_learning.core.publishing import api as publishing_api
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import Component
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
-
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchViewError
@@ -28,13 +26,10 @@ from xblock.plugin import PluginMissingError
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
-
 from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreFieldData,
     LearningCoreXBlockRuntime,
 )
-
-
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
@@ -192,10 +187,10 @@ def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
     This is a lower-level function that will return a Component even if there is
     no current draft version of that Component (because it's been soft-deleted).
     """
-    learning_package = publishing_api.get_learning_package_by_key(
+    learning_package = authoring_api.get_learning_package_by_key(
         str(usage_key.context_key)
     )
-    return components_api.get_component_by_key(
+    return authoring_api.get_component_by_key(
         learning_package.id,
         namespace='xblock.v1',
         type_name=usage_key.block_type,
