@@ -89,6 +89,88 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     margin: 1em 0 0;
   }
 
+  .wrapper-social-share {
+    .social-toggle-btn {
+      background: $primary;
+      font-size: 13px;
+      font-weight: 700;
+      padding: ($baseline * .35) ($baseline * .9);
+      border: 1px solid #d2c9c9;
+      border-radius: 0;
+      color: $white;
+      box-shadow: none;
+      text-shadow: none;
+
+      &:hover {
+        background: $link-hover;
+      }
+
+      .fa {
+        @include margin-right($baseline * .4);
+      }
+    }
+
+    .close-btn {
+      color: $black;
+    }
+
+    .container-social-share {
+      @include padding($baseline * .4);
+
+      width: 300px;
+      border-radius: 6px;
+      background-color: $white;
+      box-shadow: rgba($black, .15) 0 .5rem 1rem, rgba($black, .15) 0 .25rem .625rem;
+
+      .close-btn {
+        float: right;
+        cursor: pointer;
+      }
+
+      .social-share-link {
+        @include margin-right($baseline * .2);
+
+        font-size: 24px;
+        text-decoration: none;
+        display: inline-flex;
+      }
+
+      .public-video-url-container {
+        @include padding($baseline * .4);
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f2f0ef;
+      }
+
+      .public-video-url-link {
+        color: $black;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        white-space: nowrap;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .public-video-copy-btn {
+        @include margin-left($baseline * .7);
+
+        flex-shrink: 0;
+        color: $primary;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: none;
+          color: $link-hover;
+        }
+      }
+    }
+  }
+
   .wrapper-downloads {
     @include media-breakpoint-up(md) {
       display: flex;
