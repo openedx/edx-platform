@@ -14,6 +14,8 @@
     #   edx-search
 -e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
     # via -r requirements/edx/base.txt
+acid-xblock==0.3.1
+    # via -r requirements/edx/base.txt
 aiohttp==3.9.5
     # via
     #   -r requirements/edx/base.txt
@@ -115,13 +117,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.104
+boto3==1.34.106
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.104
+botocore==1.34.106
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -134,7 +136,7 @@ camel-converter[pydantic]==3.1.2
     # via
     #   -r requirements/edx/base.txt
     #   meilisearch
-celery==5.4.0
+celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -249,7 +251,7 @@ cssselect==1.2.0
     # via
     #   -r requirements/edx/testing.in
     #   pyquery
-cssutils==2.10.3
+cssutils==2.11.0
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
@@ -498,7 +500,10 @@ djangorestframework-xml==2.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 dnspython==2.6.1
-    # via email-validator
+    # via
+    #   -r requirements/edx/base.txt
+    #   email-validator
+    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/base.txt
 drf-jwt==1.19.2
@@ -585,7 +590,7 @@ edx-event-bus-kafka==5.7.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.5.0
     # via -r requirements/edx/base.txt
-edx-i18n-tools==1.6.0
+edx-i18n-tools==1.5.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -675,6 +680,7 @@ exceptiongroup==1.2.1
     # via
     #   anyio
     #   pytest
+execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.in
@@ -863,7 +869,7 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.11.0
     # via -r requirements/edx/base.txt
-lxml[html-clean]==4.9.4
+lxml==4.9.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1052,7 +1058,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==4.2.1
+platformdirs==4.2.2
     # via
     #   -r requirements/edx/base.txt
     #   pylint
@@ -1310,7 +1316,7 @@ referencing==0.35.1
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-
+regex==2024.5.15
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1511,7 +1517,9 @@ tomlkit==0.12.5
     #   -r requirements/edx/base.txt
     #   pylint
     #   snowflake-connector-python
+tox==4.15.0
     # via -r requirements/edx/testing.in
+tqdm==4.66.4
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1666,7 +1674,7 @@ yarl==1.9.4
     #   -r requirements/edx/base.txt
     #   aiohttp
     #   pact-python
-zipp==3.18.1
+zipp==3.18.2
     # via
     #   -r requirements/edx/base.txt
     #   importlib-metadata

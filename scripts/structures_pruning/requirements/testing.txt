@@ -12,6 +12,10 @@ click-log==0.4.0
     # via -r scripts/structures_pruning/requirements/base.txt
 ddt==1.7.2
     # via -r scripts/structures_pruning/requirements/testing.in
+dnspython==2.6.1
+    # via
+    #   -r scripts/structures_pruning/requirements/base.txt
+    #   pymongo
 edx-opaque-keys==2.9.0
     # via -r scripts/structures_pruning/requirements/base.txt
 exceptiongroup==1.2.1
