@@ -38,7 +38,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            if ("${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/) ) { // push to development branch case
+            if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/) ) { // push to development branch case
               return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)\/(\w+)(\.master)?$/,'$2')
             } else if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/) ) { // push to production branch case
               return "${{ github.ref }}".replace(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/,'$2')
