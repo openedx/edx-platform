@@ -18,7 +18,7 @@ class InstructorInfoSerializer(serializers.Serializer):
 
 class InstructorsSerializer(serializers.Serializer):
     """ Serializer for instructors """
-    instructors = InstructorInfoSerializer(many=True, allow_empty=True, allow_blank=True, allow_null=True, required=False)
+    instructors = InstructorInfoSerializer(many=True, allow_empty=True, allow_null=True, required=False)
 
 
 class CourseDetailsSerializer(serializers.Serializer):
