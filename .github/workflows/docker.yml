@@ -44,11 +44,11 @@ jobs:
       - name: Define testing prefix
         id: prefix
         run: |
-          if [[ "${{ needs.variables.outputs.is-prod }}" = "false" ]]
+          if [[ "${{ needs.variables.outputs.is-prod }}" = "true" ]]
           then
-            echo "PREFIX=testing-" >> $GITHUB_OUTPUT
-          else
             echo "PREFIX=" >> $GITHUB_OUTPUT
+          else
+            echo "PREFIX=testing-" >> $GITHUB_OUTPUT
           fi
 
       - uses: actions/checkout@v4
