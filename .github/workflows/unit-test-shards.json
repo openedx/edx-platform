@@ -255,15 +255,13 @@
   "common-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
-      "common/djangoapps/",
-      "pavelib/"
+      "common/djangoapps/"
     ]
   },
   "common-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
-      "common/djangoapps/",
-      "pavelib/"
+      "common/djangoapps/"
     ]
   },
   "xmodule-with-lms": {
