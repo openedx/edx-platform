@@ -37,7 +37,8 @@ class TestPaverPIICheck(unittest.TestCase):
 
         mock_needs.return_value = 0
         call_task('pavelib.quality.run_pii_check', options={"report_dir": str(self.report_dir)})
-        mock_calls = [str(call) for call in mock_paver_sh.mock_calls]
+        mock_pip_call, *mock_calls = [str(call) for call in mock_paver_sh.mock_calls]
+        assert 'pip install' in mock_pip_call
         assert len(mock_calls) == 2
         assert any('lms.envs.test' in call for call in mock_calls)
         assert any('cms.envs.test' in call for call in mock_calls)
@@ -70,7 +71,8 @@ class TestPaverPIICheck(unittest.TestCase):
             # This is not good, but these tests weren't even running for years, and we're removing this whole test
             # suite soon anyway.
             pass
-        mock_calls = [str(call) for call in mock_paver_sh.mock_calls]
+        mock_pip_call, *mock_calls = [str(call) for call in mock_paver_sh.mock_calls]
+        assert 'pip install' in mock_pip_call
         assert len(mock_calls) == 2
         assert any('lms.envs.test' in call for call in mock_calls)
         assert any('cms.envs.test' in call for call in mock_calls)

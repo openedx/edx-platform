@@ -16,6 +16,7 @@
 
 -r base.txt               # Core edx-platform production dependencies
 -r coverage.txt           # Utilities for calculating test coverage
+-r paver.txt              # Quality and JS testing, for now (https://github.com/openedx/edx-platform/issues/34845)
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
 code-annotations          # Perform code annotation checking, such as for PII annotations
