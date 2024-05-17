@@ -166,7 +166,7 @@ class AuthenticateLtiUserTest(TestCase):
         create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
 
         users.authenticate_lti_user(request, self.lti_user_id, self.auto_linking_consumer)
-        create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, self.old_user.email.upper())
+        create_user.assert_called_with(self.lti_user_id, self.auto_linking_consumer, request.user.email)
 
     def test_raise_exception_trying_to_auto_link_unauthenticate_user(self, create_user, switch_user):
         request = RequestFactory().post("/")
