@@ -322,8 +322,13 @@ class BulkOperationsMixin:
         """
         Call some callback when the currently active bulk operation has saved
         """
-        bulk_ops_record = self._get_bulk_ops_record(course_key)
-        if bulk_ops_record.active:
+        # Check if a bulk op is active. If so, defer fn(); otherwise call it immediately.
+        # Note: calling _get_bulk_ops_record() here and then checking .active can have side-effects in some cases
+        # because it creates an entry in the defaultdict if none exists, so we check if the record is active using
+        # the same code as _clear_bulk_ops_record(), which doesn't modify the defaultdict.
+        # so we check it this way:
+        if course_key and course_key.for_branch(None) in self._active_bulk_ops.records:
+            bulk_ops_record = self._active_bulk_ops.records[course_key.for_branch(None)]
             bulk_ops_record.defer_until_commit(fn)
         else:
             fn()  # There is no active bulk operation - call fn() now.

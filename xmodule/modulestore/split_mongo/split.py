@@ -233,13 +233,11 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             raise TypeError(f'{course_key!r} is not a CourseLocator or LibraryLocator')
 
         if course_key.org and get_library_or_course_attribute(course_key) and course_key.run:
-            if course_key.replace(branch=None, version_guid=None) in self._active_bulk_ops.records:
-                del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
+            del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
         else:
-            if course_key.replace(org=None, course=None, run=None, branch=None) in self._active_bulk_ops.records:
-                del self._active_bulk_ops.records[
-                    course_key.replace(org=None, course=None, run=None, branch=None)
-                ]
+            del self._active_bulk_ops.records[
+                course_key.replace(org=None, course=None, run=None, branch=None)
+            ]
 
     def _start_outermost_bulk_operation(self, bulk_write_record, course_key, ignore_case=False):  # lint-amnesty, pylint: disable=arguments-differ
         """
