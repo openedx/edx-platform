@@ -13,7 +13,6 @@ import os
 import warnings
 import yaml
 
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
@@ -406,11 +405,6 @@ XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
-# Configure an API auth token at (blockstore URL)/admin/authtoken/token/
-BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
-
 # Celery Broker
 CELERY_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
@@ -598,11 +592,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
-    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
-        'content-range',
-        'content-disposition',
-    )
 
 ################# Settings for brand logos. #################
 LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)

@@ -33,7 +33,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS, use_tagging_taxonomy_list_page
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.static_replace import replace_static_urls
@@ -44,6 +43,7 @@ from common.djangoapps.student.auth import (
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
@@ -1217,7 +1217,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock_info["ancestor_has_staff_lock"] = False
         if tags is not None:
             xblock_info["tags"] = tags
-        if use_tagging_taxonomy_list_page():
+
+        # Don't show the "Manage Tags" option and tag counts if the DISABLE_TAGGING_FEATURE waffle is true
+        xblock_info["is_tagging_feature_disabled"] = is_tagging_feature_disabled()
+        if not is_tagging_feature_disabled():
             xblock_info["taxonomy_tags_widget_url"] = get_taxonomy_tags_widget_url()
             xblock_info["course_authoring_url"] = settings.COURSE_AUTHORING_MICROFRONTEND_URL
 
@@ -1240,10 +1243,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             else:
                 xblock_info["hide_from_toc_message"] = False
 
-            # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
-            if use_tagging_taxonomy_list_page():
-                xblock_info["use_tagging_taxonomy_list_page"] = True
-                xblock_info["tag_counts_by_unit"] = _get_course_unit_tags(xblock.location.context_key)
+            if not is_tagging_feature_disabled():
+                xblock_info["course_tags_count"] = _get_course_tags_count(course.id)
+                xblock_info["tag_counts_by_block"] = _get_course_block_tags(xblock.location.context_key)
 
             xblock_info[
                 "has_partition_group_components"
@@ -1253,8 +1255,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         )
 
         if course_outline or is_xblock_unit:
-            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
-            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
+            # Previously, ENABLE_COPY_PASTE_UNITS was a feature flag; now it's always on.
+            xblock_info["enable_copy_paste_units"] = True
 
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
@@ -1263,16 +1265,29 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
 
 @request_cached()
-def _get_course_unit_tags(course_key) -> dict:
+def _get_course_tags_count(course_key) -> dict:
     """
-    Get the count of tags that are applied to each unit (vertical) in this course, as a dict.
+    Get the count of tags that are applied to the course as a dict: {course_key: tags_count}
+    """
+    if not course_key.is_course:
+        return {}  # Unsupported key type
+
+    return get_object_tag_counts(str(course_key), count_implicit=True)
+
+
+@request_cached()
+def _get_course_block_tags(course_key) -> dict:
+    """
+    Get the count of tags that are applied to each block in this course, as a dict.
     """
     if not course_key.is_course:
         return {}  # Unsupported key type, e.g. a library
-    # Create a pattern to match the IDs of the units, e.g. "block-v1:org+course+run+type@vertical+block@*"
-    vertical_key = course_key.make_usage_key('vertical', 'x')
-    unit_key_pattern = str(vertical_key).rsplit("@", 1)[0] + "@*"
-    return get_object_tag_counts(unit_key_pattern, count_implicit=True)
+
+    # Create a pattern to match the IDs of all blocks, e.g. "block-v1:org+course+run+type@*"
+    catch_all_key = course_key.make_usage_key("*", "x")
+    catch_all_key_pattern = str(catch_all_key).rsplit("@*", 1)[0] + "@*"
+
+    return get_object_tag_counts(catch_all_key_pattern, count_implicit=True)
 
 
 def _was_xblock_ever_exam_linked_with_external(course, xblock):

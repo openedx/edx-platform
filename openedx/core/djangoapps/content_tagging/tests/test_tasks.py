@@ -8,14 +8,13 @@ from unittest.mock import patch
 from django.test import override_settings, LiveServerTestCase
 from django.http import HttpRequest
 from edx_toggles.toggles.testutils import override_waffle_flag
-from openedx_tagging.core.tagging.models import Tag, Taxonomy
+from openedx_tagging.core.tagging.models import Tag, Taxonomy, ObjectTag
 from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from openedx.core.djangoapps.content_libraries.api import create_library, create_library_block, delete_library_block
-from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 
 from .. import api
 from ..models.base import TaxonomyOrg
@@ -59,7 +58,6 @@ class LanguageTaxonomyTestMixin:
 class TestAutoTagging(  # type: ignore[misc]
     LanguageTaxonomyTestMixin,
     ModuleStoreTestCase,
-    BlockstoreAppTestMixin,
     LiveServerTestCase
 ):
     """
@@ -110,6 +108,23 @@ class TestAutoTagging(  # type: ignore[misc]
 
         # Check if the tags are created in the Course
         assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Polski")
+
+    def test_only_tag_course_id(self):
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "pl"},
+        )
+        object_id = str(course.id).replace('course-v1:', '')
+
+        # Check that only one object tag is created for the course
+        tags = ObjectTag.objects.filter(object_id__contains=object_id)
+        assert len(tags) == 1
+        assert tags[0].value == "Polski"
+        assert tags[0].object_id == str(course.id)
 
     @override_settings(LANGUAGE_CODE='pt-br')
     def test_create_course_invalid_language(self):

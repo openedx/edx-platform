@@ -40,6 +40,7 @@ from lms.djangoapps.certificates.api import (
     can_show_certificate_message,
     certificate_status_for_student,
     certificate_downloadable_status,
+    clear_pii_from_certificate_records_for_user,
     create_certificate_invalidation_entry,
     create_or_update_certificate_allowlist_entry,
     display_date_for_certificate,
@@ -76,6 +77,9 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_regular_certificate'
+BETA_TESTER_METHOD = 'lms.djangoapps.certificates.api.access.is_beta_tester'
+CERTS_VIEWABLE_METHOD = 'lms.djangoapps.certificates.api.certificates_viewable_for_course'
+PASSED_OR_ALLOWLISTED_METHOD = 'lms.djangoapps.certificates.api._has_passed_or_is_allowlisted'
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
@@ -1120,10 +1124,6 @@ class CertificateInvalidationTests(ModuleStoreTestCase):
         for index, message in enumerate(expected_messages):
             assert message in log.records[index].getMessage()
 
-BETA_TESTER_METHOD = 'lms.djangoapps.certificates.api.access.is_beta_tester'
-CERTS_VIEWABLE_METHOD = 'lms.djangoapps.certificates.api.certificates_viewable_for_course'
-PASSED_OR_ALLOWLISTED_METHOD = 'lms.djangoapps.certificates.api._has_passed_or_is_allowlisted'
-
 
 class MockGeneratedCertificate:
     """
@@ -1268,3 +1268,42 @@ class CertificatesMessagingTestCase(ModuleStoreTestCase):
 
                 with patch(BETA_TESTER_METHOD, return_value=True):
                     assert not can_show_certificate_message(self.course, self.user, grade, certs_enabled)
+
+
+class CertificatesLearnerRetirementFunctionality(ModuleStoreTestCase):
+    """
+    API tests for utility functions used as part of the learner retirement pipeline to remove PII from certificate
+    records.
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.user_full_name = "Maeby Funke"
+        self.course1 = CourseOverviewFactory()
+        self.course2 = CourseOverviewFactory()
+        GeneratedCertificateFactory(
+            course_id=self.course1.id,
+            name=self.user_full_name,
+            user=self.user,
+        )
+        GeneratedCertificateFactory(
+            course_id=self.course2.id,
+            name=self.user_full_name,
+            user=self.user,
+        )
+
+    def test_clear_pii_from_certificate_records(self):
+        """
+        Unit test for the `clear_pii_from_certificate_records` utility function, used to wipe PII from certificate
+        records when a learner's account is being retired.
+        """
+        cert_course1 = GeneratedCertificate.objects.get(user=self.user, course_id=self.course1.id)
+        cert_course2 = GeneratedCertificate.objects.get(user=self.user, course_id=self.course2.id)
+        assert cert_course1.name == self.user_full_name
+        assert cert_course2.name == self.user_full_name
+
+        clear_pii_from_certificate_records_for_user(self.user)
+        cert_course1 = GeneratedCertificate.objects.get(user=self.user, course_id=self.course1.id)
+        cert_course2 = GeneratedCertificate.objects.get(user=self.user, course_id=self.course2.id)
+        assert cert_course1.name == ""
+        assert cert_course2.name == ""

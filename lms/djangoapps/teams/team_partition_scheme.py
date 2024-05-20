@@ -64,6 +64,8 @@ class TeamPartitionScheme:
     - A user is assigned to a group if they are a member of the team.
     """
 
+    read_only = True
+
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition):
         """Get the (Content) Group from the specified user partition for the user.

@@ -94,7 +94,7 @@ from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key, xblock_type_display_name
-from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
+from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -336,6 +336,7 @@ def get_library(library_key):
     # something that we should remove. It exists to accomodate some complexities
     # with how Blockstore staged changes, but Learning Core works differently,
     # and has_unpublished_changes should be sufficient.
+    # Ref: https://github.com/openedx/edx-platform/issues/34283
     has_unpublished_deletes = publishing_api.get_entities_with_unpublished_deletes(learning_package.id) \
                                             .exists()
 
@@ -1012,10 +1013,10 @@ def get_v1_or_v2_library(
             library = get_library(library_key)
             if v2_version is not None and library.version != v2_version:
                 raise NotImplementedError(
-                    f"Tried to load version {v2_version} of blockstore-based library {library_key}. "
+                    f"Tried to load version {v2_version} of learning_core-based library {library_key}. "
                     f"Currently, only the latest version ({library.version}) may be loaded. "
                     "This is a known issue. "
-                    "It will be fixed before the production release of blockstore-based (V2) content libraries. "
+                    "It will be fixed before the production release of learning_core-based (V2) content libraries. "
                 )
             return library
         except ContentLibrary.DoesNotExist:
@@ -1121,35 +1122,34 @@ class BaseEdxImportClient(abc.ABC):
                 modulestore_key.block_type,
                 block_id,
             )
-            blockstore_key = library_block.usage_key
+            dest_key = library_block.usage_key
         except LibraryBlockAlreadyExists:
-            blockstore_key = LibraryUsageLocatorV2(
+            dest_key = LibraryUsageLocatorV2(
                 lib_key=self.library.library_key,
                 block_type=modulestore_key.block_type,
                 usage_id=block_id,
             )
-            get_library_block(blockstore_key)
+            get_library_block(dest_key)
             log.warning('Library block already exists: Appending static files '
-                        'and overwriting OLX: %s', str(blockstore_key))
+                        'and overwriting OLX: %s', str(dest_key))
 
         # Handle static files.
 
         files = [
             f.path for f in
-            get_library_block_static_asset_files(blockstore_key)
+            get_library_block_static_asset_files(dest_key)
         ]
         for filename, static_file in block_data.get('static_files', {}).items():
             if filename in files:
                 # Files already added, move on.
                 continue
             file_content = self.get_block_static_data(static_file)
-            add_library_block_static_asset_file(
-                blockstore_key, filename, file_content)
+            add_library_block_static_asset_file(dest_key, filename, file_content)
             files.append(filename)
 
         # Import OLX.
 
-        set_library_block_olx(blockstore_key, block_data['olx'])
+        set_library_block_olx(dest_key, block_data['olx'])
 
     def import_blocks_from_course(self, course_key, progress_callback):
         """
@@ -1200,7 +1200,7 @@ class EdxModulestoreImportClient(BaseEdxImportClient):
         Get block OLX by serializing it from modulestore directly.
         """
         block = self.modulestore.get_item(block_key)
-        data = serialize_modulestore_block_for_blockstore(block)
+        data = serialize_modulestore_block_for_learning_core(block)
         return {'olx': data.olx_str,
                 'static_files': {s.name: s for s in data.static_files}}
 

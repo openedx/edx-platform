@@ -1,17 +1,24 @@
 """
 User Auth Views Utils
 """
+import logging
+import re
 from django.conf import settings
 from django.contrib import messages
 from django.utils.translation import gettext as _
 from ipware.ip import get_client_ip
+from text_unidecode import unidecode
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.models import clean_username
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+import random
+import string
+from datetime import datetime
 
+log = logging.getLogger(__name__)
 API_V1 = 'v1'
 UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 ENTERPRISE_ENROLLMENT_URL_REGEX = fr'/enterprise/{UUID4_REGEX}/course/{settings.COURSE_KEY_REGEX}/enroll'
@@ -108,3 +115,56 @@ def get_mfe_context(request, redirect_to, tpa_hint=None):
         'countryCode': country_code,
     })
     return context
+
+
+def _get_username_prefix(data):
+    """
+    Get the username prefix (name initials) based on the provided data.
+
+    Args:
+    - data (dict):  Registration payload.
+
+    Returns:
+    - str: Name initials or None.
+    """
+    username_regex_partial = settings.USERNAME_REGEX_PARTIAL
+    full_name = ''
+    if data.get('first_name', '').strip() and data.get('last_name', '').strip():
+        full_name = f"{unidecode(data.get('first_name', ''))} {unidecode(data.get('last_name', ''))}"
+    elif data.get('name', '').strip():
+        full_name = unidecode(data['name'])
+
+    if full_name.strip():
+        full_name = re.findall(username_regex_partial, full_name)[0]
+        name_initials = "".join([name_part[0] for name_part in full_name.split()[:2]])
+        return name_initials.upper() if name_initials else None
+
+    return None
+
+
+def get_auto_generated_username(data):
+    """
+    Generate username based on learner's name initials, current date and configurable random string.
+
+    This function creates a username in the format <name_initials>_<YYMM>_<configurable_random_string>
+
+    The length of random string is determined by AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH setting.
+
+     Args:
+    - data (dict):  Registration payload.
+
+    Returns:
+    - str: username.
+    """
+    current_year, current_month = datetime.now().strftime('%y %m').split()
+
+    random_string = ''.join(random.choices(
+        string.ascii_uppercase + string.digits,
+        k=settings.AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH))
+
+    username_prefix = _get_username_prefix(data)
+    username_suffix = f"{current_year}{current_month}_{random_string}"
+
+    # We generate the username regardless of whether the name is empty or invalid. We do this
+    # because the name validations occur later, ensuring that users cannot create an account without a valid name.
+    return f"{username_prefix}_{username_suffix}" if username_prefix else username_suffix
