@@ -39,6 +39,7 @@ pytest-json-report        # Output json formatted warnings after running pytest
 pytest-metadata==1.8.0     # To prevent 'make upgrade' failure, dependency of pytest-json-report
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist[psutil]      # Parallel execution of tests on multiple CPU cores or hosts
+ruff                      # rust based linter
 singledispatch            # Backport of functools.singledispatch from Python 3.4+, used in tests of XBlock rendering
 testfixtures              # Provides a LogCapture utility used by several tests
 tox                       # virtualenv management for tests

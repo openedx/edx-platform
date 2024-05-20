@@ -206,7 +206,7 @@ class BulkOperationsMixin:
                 # Shortcut: check basic equivalence for cases where org/course/run might be None.
                 key_library = get_library_or_course_attribute(key)
                 course_library = get_library_or_course_attribute(course_key)
-                if (key == course_key) or (  # lint-amnesty, pylint: disable=too-many-boolean-expressions
+                if (key == course_key) or (  # lint-amnesty, pylint: disable=too-many-boolean-expressions   # noqa: PLR0916
                         (key.org and key.org.lower() == course_key.org.lower()) and
                         (key_library and key_library.lower() == course_library.lower()) and
                         (key.run and key.run.lower() == course_key.run.lower())

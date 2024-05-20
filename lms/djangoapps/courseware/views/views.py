@@ -601,9 +601,9 @@ class CourseTabView(EdxFragmentView):
         Handle exceptions raised when rendering a view.
         """
         if isinstance(exception, Redirect) or isinstance(exception, Http404):  # lint-amnesty, pylint: disable=consider-merging-isinstance
-            raise  # lint-amnesty, pylint: disable=misplaced-bare-raise
+            raise  # lint-amnesty, pylint: disable=misplaced-bare-raise # noqa: PLE0704
         if settings.DEBUG:
-            raise  # lint-amnesty, pylint: disable=misplaced-bare-raise
+            raise  # lint-amnesty, pylint: disable=misplaced-bare-raise # noqa: PLE0704
         user = request.user
         log.exception(
             "Error in %s: user=%s, effective_user=%s, course=%s",
