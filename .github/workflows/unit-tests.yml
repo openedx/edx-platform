@@ -56,14 +56,6 @@ jobs:
         #     mongo-version: "4.4"
 
     steps:
-      - name: deleting python 3.8 & installing python 3.11
-        run: |
-          sudo apt-get -y purge python3.8 && \
-          sudo apt-get -y autoremove && \
-          sudo apt-get install software-properties-common && \
-          sudo add-apt-repository ppa:deadsnakes/ppa -y && \
-          sudo apt-get install python3.11 python3.11-dev python3.11-distutils python3-pip -y
-
       - name: install mongo version
         run: |
           if [[ "${{ matrix.mongo-version }}" != "4.4" ]]; then
@@ -88,6 +80,7 @@ jobs:
 
       - name: install requirements
         run: |
+          sudo update-alternatives  --set python ${{ env.pythonLocation }}
           sudo apt-get remove python3-blinker python3-commandnotfound python3-entrypoints \
                               python3-parted python3-pexpect python3-pyasn1-modules \
                               python3-systemd ufw -y
