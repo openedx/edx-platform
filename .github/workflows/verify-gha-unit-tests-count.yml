@@ -20,7 +20,7 @@ jobs:
       - name: install requirements
         run: |
           sudo apt-get remove python3-blinker python3-commandnotfound python3-entrypoints
-                              python3-parted python-pexpect python3-pyasn1-modules
+                              python-parted python-pexpect python3-pyasn1-modules
                               python3-systemd -y
           sudo make test-requirements
 
