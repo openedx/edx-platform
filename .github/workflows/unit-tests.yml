@@ -64,6 +64,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - run: |
+          python --version
+          pip --version
+
       - name: install system requirements
         run: |
           make ubuntu-requirements
