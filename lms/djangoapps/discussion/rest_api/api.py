@@ -371,7 +371,7 @@ def get_course(request, course_key, check_tab=True):
             {"code": reason_code, "label": label}
             for (reason_code, label) in CLOSE_REASON_CODES.items()
         ],
-        'show_discussions': discussion_tab and discussion_tab.is_enabled(course, request.user),
+        'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
     }
 
 

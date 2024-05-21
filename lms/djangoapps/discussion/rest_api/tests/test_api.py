@@ -189,6 +189,10 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         with pytest.raises(DiscussionDisabledError):
             get_course(self.request, _discussion_disabled_course_for(self.user).id)
 
+    def test_discussions_disabled_v2(self):
+        data = get_course(self.request, _discussion_disabled_course_for(self.user).id, False)
+        assert data['show_discussions'] is False
+
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
