@@ -11,11 +11,17 @@ jobs:
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
     runs-on: ubuntu-20.04
     steps:
+      - name: deleting python 3.8 & installing python 3.11
+        run: |
+          sudo apt-get -y purge python3.8 && \
+          sudo apt-get -y autoremove && \
+          sudo add-apt-repository ppa:deadsnakes/ppa -y && \
+          sudo apt-get install python3.11 python3.11-dev python3.11-distutils -y
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - uses: actions/checkout@v2
       - name: install requirements

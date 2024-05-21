@@ -56,6 +56,13 @@ jobs:
         #     mongo-version: "4.4"
 
     steps:
+      - name: deleting python 3.8 & installing python 3.11
+        run: |
+          sudo apt-get -y purge python3.8 && \
+          sudo apt-get -y autoremove && \
+          sudo add-apt-repository ppa:deadsnakes/ppa -y && \
+          sudo apt-get install python3.11 python3.11-dev python3.11-distutils -y
+
       - name: install mongo version
         run: |
           if [[ "${{ matrix.mongo-version }}" != "4.4" ]]; then
@@ -74,7 +81,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
 
       - name: checkout repo
         uses: actions/checkout@v3
