@@ -80,6 +80,8 @@ jobs:
 
       - name: install requirements
         run: |
+          sudo update-alternatives --install /usr/bin/python python ${{ env.pythonLocation }}
+          sudo update-alternatives --config python
           sudo update-alternatives  --set python ${{ env.pythonLocation }}
           sudo apt-get remove python3-blinker python3-commandnotfound python3-entrypoints \
                               python3-parted python3-pexpect python3-pyasn1-modules \
