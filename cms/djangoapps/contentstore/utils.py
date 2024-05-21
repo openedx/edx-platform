@@ -2251,7 +2251,7 @@ def send_course_update_notification(course_key, content, user):
     notification_data = CourseNotificationData(
         course_key=course_key,
         content_context={
-            "course_update_content": text_content,
+            "course_update_content": text_content if len(text_content.strip()) < 10 else "Click here to view",
             **extra_context,
         },
         notification_type="course_update",
