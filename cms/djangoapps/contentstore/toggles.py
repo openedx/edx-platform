@@ -198,22 +198,6 @@ def individualize_anonymous_user_id(course_id):
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
 
 
-# .. toggle_name: contentstore.enable_copy_paste_units
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Moves most unit-level actions into a submenu and adds new "Copy Unit" and "Paste
-#   Unit" actions which can be used to copy units within or among courses.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-08-01
-# .. toggle_target_removal_date: 2023-10-01
-# .. toggle_tickets: https://github.com/openedx/modular-learning/issues/11 https://github.com/openedx/modular-learning/issues/50
-ENABLE_COPY_PASTE_UNITS = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.enable_copy_paste_units',
-    __name__,
-    CONTENTSTORE_LOG_PREFIX,
-)
-
-
 # .. toggle_name: contentstore.enable_studio_content_api
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -597,21 +581,3 @@ def default_enable_flexible_peer_openassessments(course_key):
     level to opt in/out of rolling forward this feature.
     """
     return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)
-
-
-# .. toggle_name: new_studio_mfe.use_tagging_taxonomy_list_page
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of the taxonomy list page.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-10-06
-# .. toggle_target_removal_date: TBA
-# .. toggle_warning:
-ENABLE_TAGGING_TAXONOMY_LIST_PAGE = WaffleFlag('new_studio_mfe.use_tagging_taxonomy_list_page', __name__)
-
-
-def use_tagging_taxonomy_list_page():
-    """
-    Returns a boolean if taxonomy list page is enabled
-    """
-    return ENABLE_TAGGING_TAXONOMY_LIST_PAGE.is_enabled()

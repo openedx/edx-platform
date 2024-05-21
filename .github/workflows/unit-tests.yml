@@ -8,13 +8,13 @@ on:
 
 jobs:
   run-tests:
-    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},mongo-${{ matrix.mongo-version }},${{ matrix.shard_name }}
+    name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
     runs-on: [ edx-platform-runner ]
     strategy:
       matrix:
         python-version:
-          - "3.8"
+          - "3.11"
         django-version:
           - "pinned"
         # When updating the shards, remember to make the same changes in
@@ -37,7 +37,6 @@ jobs:
           - "xmodule-with-lms"
           - "xmodule-with-cms"
         mongo-version:
-          - "4.4"
           - "7.0"
     # We expect Django 4.0 to fail, so don't stop when it fails.
     continue-on-error: ${{ matrix.django-version == 'pinned' }}
@@ -56,14 +55,19 @@ jobs:
             sudo apt-get update && sudo apt-get install -y mongodb-org="${{ matrix.mongo-version }}.*"
           fi
 
-      - name: checkout repo
-        uses: actions/checkout@v3
-
       - name: start mongod server for tests
         run: |
           sudo mkdir -p /data/db
           sudo chmod -R a+rw /data/db
           mongod &
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: checkout repo
+        uses: actions/checkout@v3
 
       - name: install requirements
         run: |
@@ -140,7 +144,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ 3.8 ]
+        python-version:
+          - 3.11
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3

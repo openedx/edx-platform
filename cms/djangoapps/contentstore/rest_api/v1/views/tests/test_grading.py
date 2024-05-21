@@ -42,10 +42,21 @@ class CourseGradingViewTest(CourseTestCase, PermissionAccessMixin):
             "course_details": grading_data.__dict__,
             "show_credit_eligibility": False,
             "is_credit_course": False,
+            "default_grade_designations": ['A', 'B', 'C', 'D'],
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
+
+    @patch("django.conf.settings.DEFAULT_GRADE_DESIGNATIONS", ['A', 'B'])
+    def test_default_grade_designations_setting(self):
+        """
+        Check that DEFAULT_GRADE_DESIGNATIONS setting reflects correctly in API.
+        """
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(['A', 'B'], response.data["default_grade_designations"])
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_CREDIT_ELIGIBILITY": True})
     def test_credit_eligibility_setting(self):
