@@ -21,6 +21,9 @@ jobs:
         run: |
           make ubuntu-requirements
 
+      - name: Install pip
+        run: python -m pip install -r requirements/pip.txt
+
       - name: install requirements
         run: |
           sudo make test-requirements
