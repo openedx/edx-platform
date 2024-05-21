@@ -759,7 +759,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-django-pyfs==3.2.1
     # via xblock
-openedx-events==8.3.0
+openedx-events==9.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in

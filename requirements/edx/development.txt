@@ -991,7 +991,7 @@ openedx-django-pyfs==3.2.1
     # via
     #   -r requirements/edx/testing.txt
     #   xblock
-openedx-events==8.3.0
+openedx-events==9.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
