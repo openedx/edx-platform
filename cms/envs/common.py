@@ -878,6 +878,7 @@ MIDDLEWARE = [
     # Various monitoring middleware
     'edx_django_utils.monitoring.CookieMonitoringMiddleware',
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
+    'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
     'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
     # Before anything that looks at cookies, especially the session middleware

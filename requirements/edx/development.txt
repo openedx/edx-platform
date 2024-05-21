@@ -719,7 +719,7 @@ edx-django-sites-extensions==4.0.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-django-utils==5.10.1
+git+https://github.com/openedx/edx-django-utils@iamsobanjaved/dd-rum-middleware
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

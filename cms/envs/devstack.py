@@ -368,3 +368,41 @@ SPECTACULAR_SETTINGS = {
         {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'Local'}
     ],
 }
+
+OPENEDX_TELEMETRY_FRONTEND_SCRIPTS = """
+<script
+    src="https://www.datadoghq-browser-agent.com/us1/v5/datadog-rum.js"
+    type="text/javascript">
+</script>
+<script>
+    window.DD_RUM && window.DD_RUM.init({
+    clientToken: 'pubf2e79d946cec4c4413965620ba0e0b72',
+    applicationId: 'a3f99dcb-4955-4baa-8341-39a88603ab08',
+    // `site` refers to the Datadog site parameter of your organization
+    // see https://docs.datadoghq.com/getting_started/site/
+    site: 'datadoghq.com',
+    service: 'edx-edxapp-cms',
+    env: 'dev',
+    // Specify a version number to identify the deployed version of your application in Datadog
+    // version: '1.0.0', 
+    sessionSampleRate: 100,
+    sessionReplaySampleRate: 20,
+    trackUserInteractions: true,
+    trackResources: true,
+    trackLongTasks: true,
+    defaultPrivacyLevel: 'mask-user-input',
+    });
+</script>
+<script type="text/javascript" src="https://www.datadoghq-browser-agent.com/us1/v5/datadog-logs.js"></script>
+<script>
+    window.DD_LOGS &&
+    window.DD_LOGS.init({
+        clientToken: 'pubf2e79d946cec4c4413965620ba0e0b72',
+        site: 'datadoghq.com',
+        forwardErrorsToLogs: true,
+        sessionSampleRate: 100,
+        service: 'edx-edxapp-cms',
+        env: 'dev',
+    })
+</script>
+"""
