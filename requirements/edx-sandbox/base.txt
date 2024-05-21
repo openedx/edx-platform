@@ -29,7 +29,9 @@ joblib==1.4.2
 kiwisolver==1.4.5
     # via matplotlib
 lxml==4.9.4
-    # via openedx-calc
+    # via
+    #   -c requirements/edx-sandbox/../constraints.txt
+    #   openedx-calc
 markupsafe==2.1.5
     # via
     #   chem
@@ -69,7 +71,7 @@ python-dateutil==2.9.0.post0
     # via matplotlib
 random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
-regex==2024.5.10
+regex==2024.5.15
     # via nltk
 scipy==1.10.1
     # via
@@ -86,5 +88,5 @@ sympy==1.12
     #   openedx-calc
 tqdm==4.66.4
     # via nltk
-zipp==3.18.1
+zipp==3.18.2
     # via importlib-resources
