@@ -17,7 +17,7 @@ jobs:
           sudo apt-get -y autoremove && \
           sudo apt-get install software-properties-common && \
           sudo add-apt-repository ppa:deadsnakes/ppa -y && \
-          sudo apt-get install python3.11 python3.11-dev python3.11-distutils -y
+          sudo apt-get install python3.11 python3.11-dev python3.11-distutils python3-pip -y
 
       - name: Setup Python
         uses: actions/setup-python@v4
