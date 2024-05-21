@@ -60,6 +60,7 @@ jobs:
         run: |
           sudo apt-get -y purge python3.8 && \
           sudo apt-get -y autoremove && \
+          sudo apt-get install software-properties-common && \
           sudo add-apt-repository ppa:deadsnakes/ppa -y && \
           sudo apt-get install python3.11 python3.11-dev python3.11-distutils -y
 
