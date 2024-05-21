@@ -73,10 +73,11 @@ jobs:
 
     - name: Save Job Artifacts
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Build-Artifacts
         path: |
           **/reports/**/*
           test_root/log/**/*.log
           *.log
+        overwrite: true
