@@ -794,7 +794,7 @@ openedx-filters==1.8.1
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.9.3
+openedx-learning==0.9.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
