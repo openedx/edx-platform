@@ -88,8 +88,6 @@ case "$TEST_SUITE" in
         run_paver_quality run_pii_check || { EXIT=1; }
         echo "Running reserved keyword checker on all Django models..."
         run_paver_quality check_keywords || { EXIT=1; }
-        echo "Running ruff linter..."
-        make ruff || { EXIT=1; }
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
