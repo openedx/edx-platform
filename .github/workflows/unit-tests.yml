@@ -61,7 +61,7 @@ jobs:
 
       - name: install system requirements
         run: |
-          make ubuntu-requirements
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
 
       - name: install mongo version
         run: |
