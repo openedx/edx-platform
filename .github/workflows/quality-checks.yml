@@ -82,6 +82,7 @@ jobs:
           *.log
 
     - name: Run quality tests
+      id: run-ruff
       run: |
         ruff check lms/djangoapps/ lms/envs/ lms/lib/ lms/tests.py \
           openedx/core/djangoapps/ openedx/core/djangolib/ openedx/core/lib/ openedx/core/tests/ \
