@@ -115,7 +115,6 @@ ignore = [
     "E712",  # singleton-comparison
     "E721",  # unidiomatic-typecheck
     "E722",  # bare-except
-    "F401",  # unused-import
     "F403",  # wildcard-import
     "F811",  # function-redefined
     "F811",  # reimported
@@ -129,3 +128,7 @@ ignore = [
     "PLW0602",  # global-variable-not-assigned
     "SIM118",  # consider-iterating-dictionary
 ]
+
+[lint.extend-per-file-ignores]
+# Also ignore `E402` in all `__init__.py` files.
+"__init__.py" = ["E402"]

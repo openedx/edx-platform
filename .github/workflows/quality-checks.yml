@@ -87,5 +87,5 @@ jobs:
         ruff check lms/djangoapps/ lms/envs/ lms/lib/ lms/tests.py \
           openedx/core/djangoapps/ openedx/core/djangolib/ openedx/core/lib/ openedx/core/tests/ \
           openedx/core/tests/ openedx/core/types/ openedx/features/ openedx/testing/ openedx/tests/ \
-          cms common xmodule --preview
+          cms common xmodule --preview --verbose
 
