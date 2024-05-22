@@ -64,18 +64,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - run: |
-          python --version
-          pip --version
-
       - name: install system requirements
         run: |
           make ubuntu-requirements
-          pip --version
 
       - name: install mongo version
         run: |
-          pip --version
           if [[ "${{ matrix.mongo-version }}" != "4.4" ]]; then
             wget -qO - https://www.mongodb.org/static/pgp/server-${{ matrix.mongo-version }}.asc | sudo apt-key add -
             echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${{ matrix.mongo-version }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ matrix.mongo-version }}.list
@@ -84,23 +78,21 @@ jobs:
 
       - name: start mongod server for tests
         run: |
-          pip --version
           sudo mkdir -p /data/db
           sudo chmod -R a+rw /data/db
           mongod &
 
       - name: install requirements
         run: |
-          pip --version
-          sudo make test-requirements
+          make test-requirements
           if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-            sudo pip install "django~=${{ matrix.django-version }}.0"
-            sudo pip check # fail if this test-reqs/Django combination is broken
+            pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
           fi
 
       - name: list installed package versions
         run: |
-          sudo pip freeze
+          pip freeze
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
