@@ -84,15 +84,15 @@ jobs:
 
       - name: install requirements
         run: |
-          sudo env "PATH=$PATH" make test-requirements
+          make test-requirements
           if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-            sudo env "PATH=$PATH" pip install "django~=${{ matrix.django-version }}.0"
-            sudo env "PATH=$PATH" pip check # fail if this test-reqs/Django combination is broken
+            pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
           fi
 
       - name: list installed package versions
         run: |
-          sudo env "PATH=$PATH" pip freeze
+          pip freeze
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests

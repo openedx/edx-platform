@@ -23,7 +23,7 @@ jobs:
 
       - name: install requirements
         run: |
-          sudo env "PATH=$PATH" make test-requirements
+          make test-requirements
 
       - name: verify unit tests count
         uses: ./.github/actions/verify-tests-count
