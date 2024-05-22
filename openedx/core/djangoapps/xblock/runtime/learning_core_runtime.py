@@ -10,9 +10,7 @@ from datetime import datetime, timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.transaction import atomic
 
-from openedx_learning.core.components import api as components_api
-from openedx_learning.core.contents import api as contents_api
-from openedx_learning.core.publishing import api as publishing_api
+from openedx_learning.api import authoring as authoring_api
 
 from lxml import etree
 
@@ -239,16 +237,16 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         usage_key = block.scope_ids.usage_id
         with atomic():
             component = self._get_component_from_usage_key(usage_key)
-            block_media_type = contents_api.get_or_create_media_type(
+            block_media_type = authoring_api.get_or_create_media_type(
                 f"application/vnd.openedx.xblock.v1.{usage_key.block_type}+xml"
             )
-            content = contents_api.get_or_create_text_content(
+            content = authoring_api.get_or_create_text_content(
                 component.learning_package_id,
                 block_media_type.id,
                 text=serialized.olx_str,
                 created=now,
             )
-            components_api.create_next_version(
+            authoring_api.create_next_version(
                 component.pk,
                 title=block.display_name,
                 content_to_replace={
@@ -267,9 +265,9 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         TODO: This is the third place where we're implementing this. Figure out
         where the definitive place should be and have everything else call that.
         """
-        learning_package = publishing_api.get_learning_package_by_key(str(usage_key.lib_key))
+        learning_package = authoring_api.get_learning_package_by_key(str(usage_key.lib_key))
         try:
-            component = components_api.get_component_by_key(
+            component = authoring_api.get_component_by_key(
                 learning_package.id,
                 namespace='xblock.v1',
                 type_name=usage_key.block_type,

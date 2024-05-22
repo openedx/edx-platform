@@ -1881,9 +1881,9 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
-    "openedx_learning.core.components",
-    "openedx_learning.core.contents",
-    "openedx_learning.core.publishing",
+    "openedx_learning.apps.authoring.components",
+    "openedx_learning.apps.authoring.contents",
+    "openedx_learning.apps.authoring.publishing",
 ]
 
 
