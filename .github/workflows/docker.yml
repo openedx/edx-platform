@@ -1,16 +1,8 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches:
-      - 'eol/**'
-      - 'openuchile/**'
-      - 'vlabx/**'
-      - 'eol-release/**'
-      - 'openuchile-release/**'
-      - 'vlabx-release/**'
-    paths-ignore:
-      - '.github/workflows/**'
+  merge_group:
+    types: [checks_requested]
   pull_request:
     types:
       - opened
@@ -25,6 +17,10 @@ on:
       - 'vlabx-release/**'
     paths-ignore:
       - '.github/workflows/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   variables:
