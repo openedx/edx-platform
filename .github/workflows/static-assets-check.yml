@@ -68,9 +68,9 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
         restore-keys: ${{ runner.os }}-pip-
 
-    - name: Install Required Python Dependencies
+    - name: Install Limited Python Deps for Build
       run: |
-        make base-requirements
+        pip install -r requirements/edx/assets.txt
 
     - name: Initiate Mongo DB Service
       run: sudo systemctl start mongod
@@ -78,11 +78,29 @@ jobs:
     - name: Add node_modules bin to $Path
       run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
 
-    - name: Run Static Assets Check
+    - name: Check Dev Assets Build
+      env:
+        COMPREHENSIVE_THEMES_DIR: ./themes
+      run: |
+        npm clean-install --dev
+        npm run build-dev
+
+    - name: Check Prod Assets Build
+      env:
+        COMPREHENSIVE_THEMES_DIR: ./themes
+      run: |
+        npm clean-install
+        npm run build
+
+    - name: Install Full Python Deps for Collection
+      run: |
+        pip install -r requirements/edx/base.txt -e .
+
+    - name: Check Assets Collection
       env:
         LMS_CFG: lms/envs/minimal.yml
         CMS_CFG: lms/envs/minimal.yml
-
+        DJANGO_SETTINGS_MODULE: lms.envs.production
       run: |
-        paver update_assets lms --theme-dirs ./themes
-        paver update_assets cms --theme-dirs ./themes
+        ./manage.py lms collectstatic --noinput
+        ./manage.py cms collectstatic --noinput
