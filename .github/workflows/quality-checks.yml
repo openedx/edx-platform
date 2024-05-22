@@ -81,7 +81,7 @@ jobs:
           test_root/log/**/*.log
           *.log
 
-    - name: Run quality tests
+    - name: Run ruff quality tests
       id: run-ruff
       run: |
         ruff check lms/djangoapps/ lms/envs/ lms/lib/ lms/tests.py \
