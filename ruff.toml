@@ -127,6 +127,7 @@ ignore = [
     "PLR0915",  # too-many-statements
     "PLW0602",  # global-variable-not-assigned
     "SIM118",  # consider-iterating-dictionary
+    "F401",  # unused-import
 ]
 
 [lint.extend-per-file-ignores]
