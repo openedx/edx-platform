@@ -18,11 +18,11 @@ backports-zoneinfo==0.2.1 ; python_version < "3.9"
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-boto3==1.34.104
+boto3==1.34.112
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.34.104
+botocore==1.34.112
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -82,7 +82,7 @@ google-api-core==2.19.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.129.0
+google-api-python-client==2.130.0
     # via -r scripts/user_retirement/requirements/base.txt
 google-auth==2.29.0
     # via
@@ -148,7 +148,7 @@ pbr==6.0.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   stevedore
-platformdirs==4.2.1
+platformdirs==4.2.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
@@ -194,7 +194,7 @@ pyparsing==3.1.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
-pytest==8.2.0
+pytest==8.2.1
     # via -r scripts/user_retirement/requirements/testing.in
 python-dateutil==2.9.0.post0
     # via
@@ -224,7 +224,7 @@ requests==2.31.0
     #   simple-salesforce
     #   slumber
     #   zeep
-requests-file==2.0.0
+requests-file==2.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep

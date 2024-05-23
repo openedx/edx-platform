@@ -64,7 +64,7 @@ referencing==0.35.1
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.31.0
+requests==2.32.2
     # via semgrep
 rich==13.7.1
     # via semgrep
@@ -89,7 +89,7 @@ urllib3==1.26.18
     #   -c requirements/edx/../constraints.txt
     #   requests
     #   semgrep
-wcmatch==8.5.1
+wcmatch==8.5.2
     # via semgrep
-zipp==3.18.1
+zipp==3.18.2
     # via importlib-resources
