@@ -549,7 +549,9 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
         self.user_1 = UserFactory.create()
         CourseEnrollment.enroll(self.user_1, self.course.id)
         self.user_2 = UserFactory.create()
+        self.user_3 = UserFactory.create()
         CourseEnrollment.enroll(self.user_2, self.course.id)
+        CourseEnrollment.enroll(self.user_3, self.course.id)
 
     def test_basic(self):
         """
@@ -565,7 +567,6 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
         """
         Tests response endorsed notifications
         """
-
         thread = ThreadMock(thread_id=1, creator=self.user_1, title='test thread')
         response = ThreadMock(thread_id=2, creator=self.user_2, title='test response')
         self.register_get_thread_response({
@@ -578,34 +579,38 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             "title": thread.title,
         })
         self.register_get_comment_response({
-            'id': response.id,
+            'id': 1,
+            'thread_id': thread.id,
+            'user_id': response.user_id
+        })
+        self.register_get_comment_response({
+            'id': 2,
             'thread_id': thread.id,
             'user_id': response.user_id
         })
         handler = mock.Mock()
         USER_NOTIFICATION_REQUESTED.connect(handler)
-        send_response_endorsed_notifications(thread.id, str(self.course.id), self.user_2.id)
+        send_response_endorsed_notifications(thread.id, response.id, str(self.course.id), self.user_3.id)
         self.assertEqual(handler.call_count, 2)
 
-        #Test response endorsed on thread notification
+        # Test response endorsed on thread notification
         notification_data = handler.call_args_list[0][1]['notification_data']
         # Target only the thread author
         self.assertEqual([int(user_id) for user_id in notification_data.user_ids], [int(thread.user_id)])
         self.assertEqual(notification_data.notification_type, 'response_endorsed_on_thread')
 
         expected_context = {
-            'replier_name': response.username,
+            'replier_name': self.user_3.username,
             'post_title': 'test thread',
             'course_name': self.course.display_name,
-            'sender_id': int(response.user_id),
-            'username': response.username,
+            'sender_id': int(self.user_3.id),
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
         self.assertEqual(notification_data.app_name, 'discussion')
         self.assertEqual('response_endorsed_on_thread', notification_data.notification_type)
 
-        #Test response endorsed notification
+        # Test response endorsed notification
         notification_data = handler.call_args_list[1][1]['notification_data']
         # Target only the response author
         self.assertEqual([int(user_id) for user_id in notification_data.user_ids], [int(response.user_id)])

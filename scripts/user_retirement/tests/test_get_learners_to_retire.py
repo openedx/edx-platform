@@ -1,11 +1,11 @@
 """
 Test the get_learners_to_retire.py script
 """
+from unittest.mock import DEFAULT, patch
 
 import os
 
 from click.testing import CliRunner
-from mock import DEFAULT, patch
 from requests.exceptions import HTTPError
 
 from scripts.user_retirement.get_learners_to_retire import get_learners_to_retire

@@ -66,6 +66,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import handle_retirement_ca
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
+from lms.djangoapps.certificates.api import clear_pii_from_certificate_records_for_user
 
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
 from ..message_types import DeletionNotificationMessage
@@ -1144,9 +1145,8 @@ class AccountRetirementView(ViewSet):
         }
         ```
 
-        Retires the user with the given username.  This includes
-        retiring this username, the associated email address, and
-        any other PII associated with this user.
+        Retires the user with the given username.  This includes retiring this username, the associated email address,
+        and any other PII associated with this user.
         """
         username = request.data['username']
 
@@ -1161,6 +1161,9 @@ class AccountRetirementView(ViewSet):
             self.clear_pii_from_userprofile(user)
             self.delete_users_profile_images(user)
             self.delete_users_country_cache(user)
+
+            # Retire user information from any certificate records associated with the learner
+            self.clear_pii_from_certificate_records(user)
 
             # Retire data from Enterprise models
             self.retire_users_data_sharing_consent(username, retired_username)
@@ -1197,8 +1200,8 @@ class AccountRetirementView(ViewSet):
     @staticmethod
     def clear_pii_from_userprofile(user):
         """
-        For the given user, sets all of the user's profile fields to some retired value.
-        This also deletes all ``SocialLink`` objects associated with this user's profile.
+        For the given user, sets all of the user's profile fields to some retired value. This also deletes all
+        ``SocialLink`` objects associated with this user's profile.
         """
         for model_field, value_to_assign in USER_PROFILE_PII.items():
             setattr(user.profile, model_field, value_to_assign)
@@ -1250,11 +1253,18 @@ class AccountRetirementView(ViewSet):
     @staticmethod
     def retire_entitlement_support_detail(user):
         """
-        Updates all CourseEntitleSupportDetail records for the given
-        user to have an empty ``comments`` field.
+        Updates all CourseEntitleSupportDetail records for the given user to have an empty ``comments`` field.
         """
         for entitlement in CourseEntitlement.objects.filter(user_id=user.id):
             entitlement.courseentitlementsupportdetail_set.all().update(comments='')
+
+    @staticmethod
+    def clear_pii_from_certificate_records(user):
+        """
+        Calls a utility function in the `certificates` Django app responsible for removing PII (name) from any
+        certificate records associated with the learner being retired.
+        """
+        clear_pii_from_certificate_records_for_user(user)
 
 
 class UsernameReplacementView(APIView):

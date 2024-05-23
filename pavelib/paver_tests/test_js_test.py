@@ -18,7 +18,6 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
     """
 
     EXPECTED_DELETE_JAVASCRIPT_REPORT_COMMAND = 'find {platform_root}/reports/javascript -type f -delete'
-    EXPECTED_INSTALL_NPM_ASSETS_COMMAND = 'install npm_assets'
     EXPECTED_KARMA_OPTIONS = (
         "{config_file} "
         "--single-run={single_run} "
@@ -116,7 +115,6 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
             expected_messages.append(self.EXPECTED_DELETE_JAVASCRIPT_REPORT_COMMAND.format(
                 platform_root=self.platform_root
             ))
-        expected_messages.append(self.EXPECTED_INSTALL_NPM_ASSETS_COMMAND)
 
         command_template = (
             'node --max_old_space_size=4096 node_modules/.bin/karma start {options}'

@@ -137,10 +137,10 @@ class XBlockSerializer:
         return olx_node
 
 
-class XBlockSerializerForBlockstore(XBlockSerializer):
+class XBlockSerializerForLearningCore(XBlockSerializer):
     """
     This class will serialize an XBlock, producing:
-        (1) A new definition ID for use in Blockstore
+        (1) A new definition ID for use in Learning Core
         (2) an XML string defining the XBlock and referencing the IDs of its
             children using <xblock-include /> syntax (which doesn't actually
             contain the OLX of its children, just refers to them, so you have to
@@ -154,7 +154,7 @@ class XBlockSerializerForBlockstore(XBlockSerializer):
         resulting data in this object.
         """
         super().__init__(block)
-        self.def_id = utils.blockstore_def_key_from_modulestore_usage_key(self.orig_block_key)
+        self.def_id = utils.learning_core_def_key_from_modulestore_usage_key(self.orig_block_key)
 
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
@@ -174,12 +174,12 @@ class XBlockSerializerForBlockstore(XBlockSerializer):
             # the same block to be used in many places (each with a unique
             # usage key). However, that functionality is not exposed in
             # Studio (other than via content libraries). So when we import
-            # into Blockstore, we assume that each usage is unique, don't
+            # into Learning Core, we assume that each usage is unique, don't
             # generate a usage key, and create a new "definition key" from
             # the original usage key.
             # So modulestore usage key
             #     block-v1:A+B+C+type@html+block@introduction
-            # will become Blockstore definition key
+            # will become Learning Core definition key
             #     html+introduction
             #
             # If we needed the real definition key, we could get it via
@@ -187,7 +187,7 @@ class XBlockSerializerForBlockstore(XBlockSerializer):
             #     child_def_id = str(child.scope_ids.def_id)
             # and then use
             #     <xblock-include definition={child_def_id} usage={child_id.block_id} />
-            def_id = utils.blockstore_def_key_from_modulestore_usage_key(child_id)
+            def_id = utils.learning_core_def_key_from_modulestore_usage_key(child_id)
             parent_olx_node.append(parent_olx_node.makeelement("xblock-include", {"definition": def_id}))
 
     def _transform_olx(self, olx_node, usage_id):

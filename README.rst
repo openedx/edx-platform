@@ -33,41 +33,119 @@ Documentation can be found at https://docs.openedx.org/projects/edx-platform.
 Getting Started
 ***************
 
+For Production
+==============
+
 Installing and running an Open edX instance is not simple.  We strongly
 recommend that you use a service provider to run the software for you.  They
 have free trials that make it easy to get started:
 https://openedx.org/get-started/
 
-If you will be modifying edx-platform code, `Tutor`_ is
-the community-supported Docker-based Open edX distribution, both for production and
-local development. The goal of Tutor is to make it easy to deploy, customise,
-upgrade and scale your Open edX installation.
+However, if you have the time and expertise, then it is is possible to
+self-manage a production Open edX instance. To help you build, customize,
+upgrade, and scale your instance, we recommend using `Tutor`_, the
+community-supported, Docker-based Open edX distribution.
 
 You can read more about getting up and running with a Tutor deployment
 at the `Site Ops home on docs.openedx.org`_.
 
-.. _Tutor: https://github.com/overhangio/tutor
-.. _Site Ops home on docs.openedx.org: https://docs.openedx.org/en/latest/site_ops/index.html
+For Development
+===============
 
-Dependencies
-============
+Tutor also features a `development mode`_ which will also help you modify,
+test, and extend edx-platform. We recommend this method for all Open edX
+developers.
 
-In order to build and run this code you'll need the following available on your
-system:
+Bare Metal (Advanced)
+=====================
+
+It is also possible to spin up an Open edX platform directly on a Linux host.
+This method is less common and mostly undocumented. The Open edX community will
+only be able to provided limited support for it.
+
+Running "bare metal" is only advisable for (a) developers seeking an
+adventure and (b) experienced system administrators who are willing to take the
+complexity of Open edX configuration and deployment into their own hands.
+
+System Dependencies
+-------------------
 
 Interperters/Tools:
 
-* Python 3.8
+* Python 3.11 (preferred) or 3.8 (compatible, for now)
 
-* Node 16
+* Node 18
 
 Services:
 
-* MySQL 5.7
+* MySQL 8.0
 
 * Mongo 7.x
 
 * Memcached
+
+Language Packages:
+
+* Frontend:
+
+  - ``npm clean-install`` (production)
+  - ``npm clean-install --dev`` (development)
+
+* Backend build:
+
+  - ``pip install -r requirements/edx/assets.txt``
+
+* Backend application:
+
+  - ``pip install -r requirements/edx/base.txt`` (production)
+  - ``pip install -r requirements/edx/dev.txt`` (development)
+
+Build Steps
+-----------
+
+Create a MySQL database and a MySQL user with write permissions, and configure
+Django to use them. Then, run migrations::
+
+  ./manage.py lms migrate
+  ./manage.py cms migrate
+
+Build static assets (for more details, see `building static
+assets`_)::
+
+  npm run build  # or, 'build-dev'
+
+Download locales and collect static assets (can be skipped for development
+sites)::
+
+  make pull_translations
+  ./manage.py lms collectstatic
+  ./manage.py cms collectstatic
+
+Run the Platform
+----------------
+
+First, ensure MySQL, Mongo, and Memcached are running.
+
+Start the LMS::
+
+  ./manage.py lms runserver
+
+Start the CMS::
+
+  ./manage.py cms runserver
+
+This will give you a mostly-headless Open edX platform. Most frontends have
+been migrated to "Micro-Frontends (MFEs)" which need to be installed and run
+separately. At a bare minimum, you will need to run the `Authentication MFE`_,
+`Learner Home MFE`_, and `Learning MFE`_ in order meaningfully navigate the UI.
+
+.. _Tutor: https://github.com/overhangio/tutor
+.. _Site Ops home on docs.openedx.org: https://docs.openedx.org/en/latest/site_ops/index.html
+.. _development mode: https://docs.tutor.edly.io/dev.html
+.. _building static assets: ./docs/references/static-assets.rst
+.. _Authentication MFE: https://github.com/openedx/frontend-app-authn/
+.. _Learner Home MFE: https://github.com/openedx/frontend-app-learner-dashboard
+.. _Learning MFE: https://github.com/openedx/frontend-app-learning/
 
 License
 *******

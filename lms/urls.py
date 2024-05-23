@@ -336,7 +336,7 @@ urlpatterns += [
         name='xblock_resource_url',
     ),
 
-    # New (Blockstore-based) XBlock REST API
+    # New (Learning-Core-based) XBlock REST API
     path('', include(('openedx.core.djangoapps.xblock.rest_api.urls', 'openedx.core.djangoapps.xblock'),
                      namespace='xblock_api')),
 
@@ -748,6 +748,11 @@ urlpatterns += [
         ),
         courseware_views.courseware_mfe_search_enabled,
         name='courseware_search_enabled_view',
+    ),
+    re_path(
+        fr'^courses/{settings.COURSE_ID_PATTERN}/courseware-navigation-sidebar/toggles/$',
+        courseware_views.courseware_mfe_navigation_sidebar_toggles,
+        name='courseware_navigation_sidebar_toggles_view',
     ),
 ]
 

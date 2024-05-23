@@ -6,6 +6,7 @@ var Merge = require('webpack-merge');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var _ = require('underscore');
+const TerserPlugin = require("terser-webpack-plugin");
 
 var commonConfig = require('./webpack.common.config.js');
 
@@ -22,16 +23,14 @@ var optimizedConfig = Merge.smart(commonConfig, {
             }),
             new webpack.LoaderOptionsPlugin({ // This may not be needed; legacy option for loaders written for webpack 1
                 minimize: true
-            }),
-            new webpack.optimize.UglifyJsPlugin(),
-            new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.[chunkhash].js',
-                minChunks: 3
             })
-        ]
+        ],
+        optimization: {
+            minimize: true,
+            minimizer: [
+                new TerserPlugin(),
+            ],
+        }
     }
 });
 
@@ -52,16 +51,7 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
     web: {
         output: {
             filename: '[name].js'
-        },
-        plugins: [
-            new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.js',
-                minChunks: 3
-            })
-        ]
+        }
     }
 });
 

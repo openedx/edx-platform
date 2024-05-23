@@ -9,16 +9,16 @@ from openedx.core.lib.api.serializers import CourseKeyField
 
 class InstructorInfoSerializer(serializers.Serializer):
     """ Serializer for instructor info """
-    name = serializers.CharField(allow_blank=True)
-    title = serializers.CharField(allow_blank=True)
-    organization = serializers.CharField(allow_blank=True)
-    image = serializers.CharField(allow_blank=True)
-    bio = serializers.CharField(allow_blank=True)
+    name = serializers.CharField(allow_blank=True, required=False)
+    title = serializers.CharField(allow_blank=True, required=False)
+    organization = serializers.CharField(allow_blank=True, required=False)
+    image = serializers.CharField(allow_blank=True, required=False)
+    bio = serializers.CharField(allow_blank=True, required=False)
 
 
 class InstructorsSerializer(serializers.Serializer):
     """ Serializer for instructors """
-    instructors = InstructorInfoSerializer(many=True, allow_empty=True)
+    instructors = InstructorInfoSerializer(many=True, allow_empty=True, allow_null=True, required=False)
 
 
 class CourseDetailsSerializer(serializers.Serializer):

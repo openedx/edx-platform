@@ -9,10 +9,10 @@ import textwrap
 import unittest
 import zipfile
 from datetime import datetime
+from unittest import mock
 
 import pytest
 import calc
-import mock
 import pyparsing
 import random2 as random
 import requests

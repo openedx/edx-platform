@@ -320,7 +320,8 @@ class TeamsConfigurationTestCase(unittest.TestCase):
             "description": description,
             "id": topic_id,
             "type": "open",
-            "max_team_size": None
+            "max_team_size": None,
+            "user_partition_id": None,
         }
 
     def test_teams_enabled_new_course(self):

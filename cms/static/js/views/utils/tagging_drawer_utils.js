@@ -25,11 +25,6 @@ function($) {
         const drawer = document.querySelector("#manage-tags-drawer");
         const drawerCover = document.querySelector(".drawer-cover");
 
-        // Add handler to close drawer when dark background is clicked
-        $(drawerCover).click(function() {
-            closeDrawer(drawer, drawerCover);
-        }.bind(this));
-
         // Add event listen to close drawer when close button is clicked from within the Iframe
         window.addEventListener("message", function (event) {
             if (event.data === 'closeManageTagsDrawer') {

@@ -78,6 +78,8 @@ from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
+    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
     COURSEWARE_MICROFRONTEND_SEARCH_ENABLED,
     COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
 )
@@ -365,7 +367,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(178, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(177, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -1496,8 +1498,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "earned a certificate for this course.")
 
     @ddt.data(
-        (True, 54),
-        (False, 54),
+        (True, 53),
+        (False, 53),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1512,7 +1514,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with self.assertNumQueries(
-            54, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+            53, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
         ), check_mongo_calls(2):
             self._get_progress_page()
 
@@ -3262,7 +3264,6 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
     def test_is_course_open_for_learner(
         self,
         start_date_modifier,
@@ -3748,6 +3749,8 @@ class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
             assert context['course'] == self.course
 
 
+@ddt.ddt
+@override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=True)
 class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
     """
     Tests the endpoint to fetch the Courseware Search waffle flag enabled status.
@@ -3761,12 +3764,36 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.client = APIClient()
         self.apiUrl = reverse('courseware_search_enabled_view', kwargs={'course_id': str(self.course.id)})
 
-    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=True)
-    def test_courseware_mfe_search_enabled(self):
+    @ddt.data(
+        (CourseMode.AUDIT, False),
+        (CourseMode.VERIFIED, True),
+        (CourseMode.MASTERS, True),
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': True})
+    def test_courseware_mfe_search_verified_only(self, mode, expected_enabled):
         """
-        Getter to check if user is allowed to use Courseware Search.
+        Only verified enrollees may use Courseware Search if ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED
+        is enabled.
         """
+        user = UserFactory()
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
 
+        self.client.login(username=user.username, password=TEST_PASSWORD)
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': expected_enabled})
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': True})
+    def test_courseware_mfe_search_staff_access(self):
+        """
+        Staff users may use Courseware Search regardless of their enrollment status.
+        """
+        user_staff = UserFactory(is_staff=True)  # not enrolled
+
+        self.client.login(username=user_staff.username, password=TEST_PASSWORD)
         response = self.client.get(self.apiUrl, content_type='application/json')
         body = json.loads(response.content.decode('utf-8'))
 
@@ -3774,13 +3801,80 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.assertEqual(body, {'enabled': True})
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
-    def test_is_mfe_search_disabled(self):
+    def test_is_mfe_search_waffle_disabled(self):
         """
-        Getter to check if user is allowed to use Courseware Search.
+        Courseware search is only available when the waffle flag is enabled.
         """
-
+        user_admin = UserFactory(is_staff=True, is_superuser=True)
+        CourseEnrollmentFactory.create(user=user_admin, course_id=self.course.id, mode=CourseMode.VERIFIED)
+        self.client.login(username=user_admin.username, password=TEST_PASSWORD)
         response = self.client.get(self.apiUrl, content_type='application/json')
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body, {'enabled': False})
+
+
+class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
+    """
+    Tests the endpoint to fetch the Courseware Navigation Sidebar waffle flags status.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.course = CourseFactory.create()
+
+        self.client = APIClient()
+        self.apiUrl = reverse('courseware_navigation_sidebar_toggles_view', kwargs={'course_id': str(self.course.id)})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
+    def test_courseware_mfe_navigation_sidebar_enabled_aux_disabled(self):
+        """
+        Getter to check if it is allowed to show the Courseware navigation sidebar to a user
+        and auxiliary sidebar doesn't open.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': False})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
+    def test_courseware_mfe_navigation_sidebar_enabled_aux_enabled(self):
+        """
+        Getter to check if it is allowed to show the Courseware navigation sidebar to a user
+        and auxiliary sidebar should always open.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': True})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
+    def test_courseware_mfe_navigation_sidebar_disabled_aux_enabled(self):
+        """
+        Getter to check if the Courseware navigation sidebar shouldn't be shown to a user
+        and auxiliary sidebar should always open.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': True})
+
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
+    def test_courseware_mfe_navigation_sidebar_toggles_disabled(self):
+        """
+        Getter to check if neither navigation sidebar nor auxiliary sidebar is shown.
+        """
+        response = self.client.get(self.apiUrl, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': False})

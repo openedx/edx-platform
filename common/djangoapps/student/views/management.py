@@ -434,6 +434,7 @@ def change_enrollment(request, check_access=True):
         except UnenrollmentNotAllowed as exc:
             return HttpResponseBadRequest(str(exc))
 
+        log.info("User %s unenrolled from %s; sending REFUND_ORDER", user.username, course_id)
         REFUND_ORDER.send(sender=None, course_enrollment=enrollment)
         return HttpResponse()
     else:

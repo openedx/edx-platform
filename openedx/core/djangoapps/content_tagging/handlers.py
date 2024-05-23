@@ -67,9 +67,14 @@ def auto_tag_xblock(**kwargs):
     if not CONTENT_TAGGING_AUTO.is_enabled(xblock_info.usage_key.course_key):
         return
 
+    if xblock_info.block_type == 'course_info':
+        # We want to add tags only to the course id, not with its XBlock
+        return
+
     if xblock_info.block_type == "course":
         # Course update is handled by XBlock of course type
         update_course_tags.delay(str(xblock_info.usage_key.course_key))
+        return
 
     update_xblock_tags.delay(str(xblock_info.usage_key))
 

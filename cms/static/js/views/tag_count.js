@@ -21,15 +21,14 @@ function($, _, BaseView, HtmlUtils) {
                 'message', (event) => {
                     // Listen any message from Manage tags drawer.
                     var data = event.data;
-                    var courseAuthoringUrl = this.model.get("course_authoring_url")
+                    var courseAuthoringUrl = new URL(this.model.get("course_authoring_url")).origin;
                     if (event.origin == courseAuthoringUrl
-                        && data.includes('[Manage tags drawer] Count updated:')) {
+                        && data.type == 'authoring.events.tags.count.updated') {
                         // This message arrives when there is a change in the tag list.
                         // The message contains the new count of tags.
-                        let jsonData = data.replace(/\[Manage tags drawer\] Count updated: /g, "");
-                        jsonData = JSON.parse(jsonData);
-                        if (jsonData.contentId == this.model.get("content_id")) {
-                            this.model.set('tags_count', jsonData.count);
+                        data = data.data
+                        if (data.contentId == this.model.get("content_id")) {
+                            this.model.set('tags_count', data.count);
                             this.render();
                         }
                     }

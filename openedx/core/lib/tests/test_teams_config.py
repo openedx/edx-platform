@@ -83,6 +83,7 @@ class TeamsConfigTests(TestCase):
                 "description": "",
                 "max_team_size": 10,
                 "type": "private_managed",
+                "user_partition_id": None,
             },
             {
                 "id": "bokonism",
@@ -90,6 +91,7 @@ class TeamsConfigTests(TestCase):
                 "description": "Busy busy busy",
                 "max_team_size": 2,
                 "type": "open",
+                "user_partition_id": None,
             },
         ]
     }
@@ -137,6 +139,7 @@ class TeamsConfigTests(TestCase):
                 "description": "",
                 "max_team_size": None,
                 "type": "open",
+                "user_partition_id": None,
             },
         ],
     }
@@ -156,7 +159,16 @@ class TeamsConfigTests(TestCase):
         # teams should be considered enabled, and the "enabled" field should be set to True.
         "enabled": True,
         "max_team_size": DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
-        "team_sets": [dict(id="test-teamset", name="test", description="test", type="open", max_team_size=None)],
+        "team_sets": [
+            dict(
+                id="test-teamset",
+                name="test",
+                description="test",
+                type="open",
+                max_team_size=None,
+                user_partition_id=None
+            ),
+        ],
     }
 
     @ddt.data(

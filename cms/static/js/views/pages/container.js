@@ -107,12 +107,14 @@ function($, _, Backbone, gettext, BasePage,
                 });
                 this.viewLiveActions.render();
 
-                this.tagListView = new ContainerSubviews.TagList({
-                    el: this.$('.unit-tags'),
-                    model: this.model
-                });
-                this.tagListView.setupMessageListener();
-                this.tagListView.render();
+                if (!this.model.get('is_tagging_feature_disabled')) {
+                    this.tagListView = new ContainerSubviews.TagList({
+                        el: this.$('.unit-tags'),
+                        model: this.model
+                    });
+                    this.tagListView.setupMessageListener();
+                    this.tagListView.render();
+                }
 
                 this.unitOutlineView = new UnitOutlineView({
                     el: this.$('.wrapper-unit-overview'),

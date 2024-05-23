@@ -58,7 +58,8 @@ the api module instead.
     block.
 
     Historical note: These views used to be wrapped with @atomic because we
-    wanted to make all views that operated on Blockstore data atomic:
+    wanted to make all views that operated on Blockstore (the predecessor
+    to Learning Core) atomic:
         https://github.com/openedx/edx-platform/pull/30456
 """
 
@@ -258,6 +259,7 @@ class LibraryRootView(APIView):
         # Learning Core. TODO: This can be removed once the frontend stops
         # sending it to us. This whole bit of deserialization is kind of weird
         # though, with the renames and such. Look into this later for clennup.
+        # Ref: https://github.com/openedx/edx-platform/issues/34283
         data.pop("collection_uuid", None)
 
         try:
@@ -708,9 +710,12 @@ class LibraryBlockAssetView(APIView):
         )
         file_wrapper = request.data['content']
         if file_wrapper.size > 20 * 1024 * 1024:  # > 20 MiB
-            # In the future, we need a way to use file_wrapper.chunks() to read
-            # the file in chunks and stream that to Blockstore, but Blockstore
-            # currently lacks an API for streaming file uploads.
+            # TODO: This check was written when V2 Libraries were backed by the Blockstore micro-service.
+            #       Now that we're on Learning Core, do we still need it? Here's the original comment:
+            #         In the future, we need a way to use file_wrapper.chunks() to read
+            #         the file in chunks and stream that to Blockstore, but Blockstore
+            #         currently lacks an API for streaming file uploads.
+            #       Ref:  https://github.com/openedx/edx-platform/issues/34737
             raise ValidationError("File too big")
         file_content = file_wrapper.read()
         try:

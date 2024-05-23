@@ -3,7 +3,7 @@ Utils function for notifications app
 """
 from typing import Dict, List
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment, CourseAccessRole
 from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.lib.cache_utils import request_cached
@@ -110,7 +110,8 @@ def get_notification_types_with_visibility_settings() -> Dict[str, List[str]]:
 def filter_out_visible_notifications(
     user_preferences: dict,
     notifications_with_visibility: Dict[str, List[str]],
-    user_forum_roles: List[str]
+    user_forum_roles: List[str],
+    user_course_roles: List[str]
 ) -> dict:
     """
     Filter out notifications visible to forum roles from user preferences.
@@ -119,21 +120,22 @@ def filter_out_visible_notifications(
     :param notifications_with_visibility: List of dictionaries with notification type names and
     corresponding visibility settings
     :param user_forum_roles: List of forum roles for the user
+    :param user_course_roles: List of course roles for the user
     :return: Updated user preferences dictionary
     """
-    discussion_user_preferences = user_preferences.get('discussion', {})
-    if 'notification_types' in discussion_user_preferences:
-        # Iterate over the types to remove and pop them from the dictionary
-        for notification_type, is_visible_to in notifications_with_visibility.items():
-            is_visible = False
-            for role in is_visible_to:
-                if role in user_forum_roles:
-                    is_visible = True
-                    break
-            if is_visible:
-                continue
-
-            discussion_user_preferences['notification_types'].pop(notification_type)
+    for user_preferences_app, app_config in user_preferences.items():
+        if 'notification_types' in app_config:
+            # Iterate over the types to remove and pop them from the dictionary
+            for notification_type, is_visible_to in notifications_with_visibility.items():
+                is_visible = False
+                for role in is_visible_to:
+                    if role in user_forum_roles or role in user_course_roles:
+                        is_visible = True
+                        break
+                if is_visible:
+                    continue
+                if notification_type in user_preferences[user_preferences_app]['notification_types']:
+                    user_preferences[user_preferences_app]['notification_types'].pop(notification_type)
     return user_preferences
 
 
@@ -148,10 +150,15 @@ def remove_preferences_with_no_access(preferences: dict, user) -> dict:
     user_preferences = preferences['notification_preference_config']
     user_forum_roles = get_user_forum_roles(user.id, preferences['course_id'])
     notifications_with_visibility_settings = get_notification_types_with_visibility_settings()
+    user_course_roles = CourseAccessRole.objects.filter(
+        user=user,
+        course_id=preferences['course_id']
+    ).values_list('role', flat=True)
     preferences['notification_preference_config'] = filter_out_visible_notifications(
         user_preferences,
         notifications_with_visibility_settings,
-        user_forum_roles
+        user_forum_roles,
+        user_course_roles
     )
     return preferences
 

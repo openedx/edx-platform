@@ -3,10 +3,14 @@ Tests for memcache in util app
 """
 
 
+from django.conf import settings
 from django.core.cache import caches
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from common.djangoapps.util.memcache import safe_key
+
+BLAKE2B_ENABLED_FEATURES = settings.FEATURES.copy()
+BLAKE2B_ENABLED_FEATURES["ENABLE_BLAKE2B_HASHING"] = True
 
 
 class MemcacheTest(TestCase):
@@ -51,7 +55,36 @@ class MemcacheTest(TestCase):
             # The key should now be valid
             assert self._is_valid_key(key), f'Failed for key length {length}'
 
+    @override_settings(FEATURES=BLAKE2B_ENABLED_FEATURES)
+    def test_safe_key_long_with_blake2b_enabled(self):
+        # Choose lengths close to memcached's cutoff (250)
+        for length in [248, 249, 250, 251, 252]:
+
+            # Generate a key of that length
+            key = 'a' * length
+
+            # Make the key safe
+            key = safe_key(key, '', '')
+
+            # The key should now be valid
+            assert self._is_valid_key(key), f'Failed for key length {length}'
+
     def test_long_key_prefix_version(self):
+
+        # Long key
+        key = safe_key('a' * 300, 'prefix', 'version')
+        assert self._is_valid_key(key)
+
+        # Long prefix
+        key = safe_key('key', 'a' * 300, 'version')
+        assert self._is_valid_key(key)
+
+        # Long version
+        key = safe_key('key', 'prefix', 'a' * 300)
+        assert self._is_valid_key(key)
+
+    @override_settings(FEATURES=BLAKE2B_ENABLED_FEATURES)
+    def test_long_key_prefix_version_with_blake2b_enabled(self):
 
         # Long key
         key = safe_key('a' * 300, 'prefix', 'version')

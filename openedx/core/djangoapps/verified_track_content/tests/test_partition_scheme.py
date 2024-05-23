@@ -12,7 +12,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition, ReadOnlyUserPartitionError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID, UserPartition, ReadOnlyUserPartitionError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..partition_scheme import ENROLLMENT_GROUP_IDS, EnrollmentTrackPartitionScheme, EnrollmentTrackUserPartition
 
@@ -63,11 +63,11 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
 
     def test_group_ids(self):
         """
-        Test that group IDs are all less than MINIMUM_STATIC_PARTITION_ID (to avoid overlapping
+        Test that group IDs are all less than MINIMUM_UNUSED_PARTITION_ID (to avoid overlapping
         with group IDs associated with cohort and random user partitions).
         """
         for mode in ENROLLMENT_GROUP_IDS:
-            assert ENROLLMENT_GROUP_IDS[mode]['id'] < MINIMUM_STATIC_PARTITION_ID
+            assert ENROLLMENT_GROUP_IDS[mode]['id'] < MINIMUM_UNUSED_PARTITION_ID
 
     @staticmethod
     def get_group_by_name(partition, name):

@@ -173,22 +173,7 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
-    'blockstore': {
-        'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': 'edx_loc_mem_cache',
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    },
 }
-
-############################### BLOCKSTORE #####################################
-BUNDLE_ASSET_STORAGE_SETTINGS = dict(
-    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
-    STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
-    ),
-)
 
 ################################# CELERY ######################################
 

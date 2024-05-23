@@ -953,3 +953,21 @@ def invalidate_certificate(user_id, course_key_or_id, source):
         return False
 
     return True
+
+
+def clear_pii_from_certificate_records_for_user(user):
+    """
+    Utility function to remove PII from certificate records when a learner's account is being retired. Used by the
+    `AccountRetirementView` in the `user_api` Django app (invoked by the /api/user/v1/accounts/retire endpoint).
+
+    The update is performed using a bulk SQL update via the Django ORM. This will not trigger the GeneratedCertificate
+    model's custom `save()` function, nor fire any Django signals (which is desired at the time of writing). There is
+    nothing to update in our external systems by this update.
+
+    Args:
+        user (User): The User instance of the learner actively being retired.
+
+    Returns:
+        None
+    """
+    GeneratedCertificate.objects.filter(user=user).update(name="")

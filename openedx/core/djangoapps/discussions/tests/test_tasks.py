@@ -1,8 +1,9 @@
 """
 Tests for discussions tasks.
 """
+from unittest import mock
+
 import ddt
-import mock
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import DiscussionTopicContext
 

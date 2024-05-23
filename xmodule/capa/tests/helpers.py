@@ -6,10 +6,10 @@ import io
 import os
 import os.path
 import xml.sax.saxutils as saxutils
+from unittest.mock import MagicMock, Mock
 
 import fs.osfs
 from mako.lookup import TemplateLookup
-from mock import MagicMock, Mock
 from path import Path
 
 from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem

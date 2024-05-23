@@ -2,8 +2,8 @@
 Tests for the Segment API functionality
 """
 import json
+from unittest import mock
 
-import mock
 import pytest
 import requests
 from six import text_type

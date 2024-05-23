@@ -713,7 +713,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Try uploading some non-CSV file and verify that it is rejected
         """
-        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \xC3\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
@@ -920,15 +920,16 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 2
 
-    @patch('lms.djangoapps.instructor.views.api', 'generate_random_string',
-           Mock(side_effect=['first', 'first', 'second']))
     def test_generate_unique_password_no_reuse(self):
         """
         generate_unique_password should generate a unique password string that hasn't been generated before.
         """
-        generated_password = ['first']
-        password = generate_unique_password(generated_password, 12)
-        assert password != 'first'
+        with patch('lms.djangoapps.instructor.views.api.generate_random_string') as mock:
+            mock.side_effect = ['first', 'first', 'second']
+
+            generated_password = ['first']
+            password = generate_unique_password(generated_password, 12)
+            assert password != 'first'
 
     @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
     def test_allow_automated_signups_flag_not_set(self):
@@ -2251,14 +2252,26 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         })
         assert response.status_code == 400
 
-    def test_modify_access_allow(self):
-        url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, {
-            'unique_student_identifier': self.other_user.email,
-            'rolename': 'staff',
-            'action': 'allow',
-        })
-        assert response.status_code == 200
+    def test_modify_access_api(self):
+        for rolename in ["staff", "limited_staff", "instructor", "data_researcher"]:
+            assert CourseEnrollment.is_enrolled(self.other_user, self.course.id) is False
+            url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
+            response = self.client.post(url, {
+                'unique_student_identifier': self.other_user.email,
+                'rolename': rolename,
+                'action': 'allow',
+            })
+            assert response.status_code == 200
+            # User should be auto enrolled in the course
+            assert CourseEnrollment.is_enrolled(self.other_user, self.course.id)
+            # Test role revoke action
+            response = self.client.post(url, {
+                'unique_student_identifier': self.other_user.email,
+                'rolename': rolename,
+                'action': 'revoke',
+            })
+            assert response.status_code == 200
+            CourseEnrollment.unenroll(self.other_user, self.course.id)
 
     def test_modify_access_allow_with_uname(self):
         url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
@@ -2266,15 +2279,6 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'unique_student_identifier': self.other_instructor.username,
             'rolename': 'staff',
             'action': 'allow',
-        })
-        assert response.status_code == 200
-
-    def test_modify_access_revoke(self):
-        url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, {
-            'unique_student_identifier': self.other_staff.email,
-            'rolename': 'staff',
-            'action': 'revoke',
         })
         assert response.status_code == 200
 
@@ -2438,6 +2442,19 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             assert rolename in user_roles
         elif action == 'revoke':
             assert rolename not in user_roles
+
+    def test_autoenroll_on_forum_role_add(self):
+        """
+        Test forum role modification auto enrolls user.
+        """
+        seed_permissions_roles(self.course.id)
+        user = UserFactory()
+        for rolename in ["Administrator", "Moderator", "Community TA"]:
+            assert CourseEnrollment.is_enrolled(user, self.course.id) is False
+            self.assert_update_forum_role_membership(user, user.email, rolename, "allow")
+            assert CourseEnrollment.is_enrolled(user, self.course.id)
+            self.assert_update_forum_role_membership(user, user.email, rolename, "revoke")
+            CourseEnrollment.unenroll(user, self.course.id)
 
 
 @ddt.ddt

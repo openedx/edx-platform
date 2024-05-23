@@ -54,7 +54,7 @@ from six.moves.urllib.parse import quote
       <article class="content-primary" role="main">
 
         % for config in all_group_configurations:
-          <div class="wrapper-groups content-groups ${config['scheme']}">
+          <div class="wrapper-groups content-groups ${config['scheme']} ${config['id']}">
             <h3 class="title">${config['name']}</h3>
               <div class="ui-loading">
                   <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>

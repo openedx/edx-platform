@@ -14,12 +14,14 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
-        python-version: [ 3.8 ]
+        python-version:
+          - '3.11'
         # 'pinned' is used to install the latest patch version of Django
         # within the global constraint i.e. Django==4.2.8 in current case
-        # because we have global constraint of Django<4.2 
+        # because we have global constraint of Django<4.2
         django-version: ["pinned"]
-        mongo-version: ["4", "7"]
+        mongo-version:
+          - "7"
         mysql-version: ["8"]
     services:
       mongo:
@@ -115,7 +117,7 @@ jobs:
         ./manage.py lms migrate
         echo "Running the CMS migrations."
         ./manage.py cms migrate
-  
+
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
   # https://github.com/orgs/community/discussions/33579

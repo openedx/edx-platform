@@ -15,7 +15,7 @@ from xblock.test.tools import TestRuntime
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 
-class TestXBlock:
+class TestXBlock(XBlock):
     """
     An empty Xblock, to be used, when creating a block with mixins.
     """

@@ -28,7 +28,7 @@ jobs:
           echo $'Paths touched in PR:\n'"$paths"
 
           # The ^"? is because git may quote weird file paths
-          matched="$(echo "$paths" | grep -P '^"?requirements/' || true)"
+          matched="$(echo "$paths" | grep -P '^"?((requirements/)|(scripts/.*?/requirements/))' || true)"
           echo $'Relevant paths:\n'"$matched"
           if [[ -n "$matched" ]]; then
               echo "RELEVANT=true" >> "$GITHUB_ENV"

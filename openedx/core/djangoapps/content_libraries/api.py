@@ -85,16 +85,14 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
 )
-from openedx_learning.core.publishing import api as publishing_api
-from openedx_learning.core.contents import api as contents_api
-from openedx_learning.core.components import api as components_api
-from openedx_learning.core.components.models import Component
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import Component, MediaType
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key, xblock_type_display_name
-from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
+from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -327,17 +325,18 @@ def get_library(library_key):
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
     learning_package = ref.learning_package
-    num_blocks = publishing_api.get_all_drafts(learning_package.id).count()
-    last_publish_log = publishing_api.get_last_publish(learning_package.id)
-    has_unpublished_changes = publishing_api.get_entities_with_unpublished_changes(learning_package.id) \
-                                            .exists()
+    num_blocks = authoring_api.get_all_drafts(learning_package.id).count()
+    last_publish_log = authoring_api.get_last_publish(learning_package.id)
+    has_unpublished_changes = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
+                                           .exists()
 
     # TODO: I'm doing this one to match already-existing behavior, but this is
     # something that we should remove. It exists to accomodate some complexities
     # with how Blockstore staged changes, but Learning Core works differently,
     # and has_unpublished_changes should be sufficient.
-    has_unpublished_deletes = publishing_api.get_entities_with_unpublished_deletes(learning_package.id) \
-                                            .exists()
+    # Ref: https://github.com/openedx/edx-platform/issues/34283
+    has_unpublished_deletes = authoring_api.get_entities_with_unpublished_deletes(learning_package.id) \
+                                           .exists()
 
     # Learning Core doesn't really have a notion of a global version number,but
     # we can sort of approximate it by using the primary key of the last publish
@@ -414,7 +413,7 @@ def create_library(
                 allow_public_read=allow_public_read,
                 license=library_license,
             )
-            learning_package = publishing_api.create_learning_package(
+            learning_package = authoring_api.create_learning_package(
                 key=str(ref.library_key),
                 title=title,
                 description=description,
@@ -555,7 +554,7 @@ def update_library(
             content_lib.save()
 
         if learning_pkg_changed:
-            publishing_api.update_learning_package(
+            authoring_api.update_learning_package(
                 content_lib.learning_package_id,
                 title=title,
                 description=description,
@@ -613,7 +612,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
     """
     lib = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     learning_package = lib.learning_package
-    components = components_api.get_components(
+    components = authoring_api.get_components(
         learning_package.id,
         draft=True,
         namespace='xblock.v1',
@@ -692,13 +691,13 @@ def set_library_block_olx(usage_key, new_olx_str):
     now = datetime.now(tz=timezone.utc)
 
     with transaction.atomic():
-        new_content = contents_api.get_or_create_text_content(
+        new_content = authoring_api.get_or_create_text_content(
             component.learning_package_id,
             get_or_create_olx_media_type(usage_key.block_type).id,
             text=new_olx_str,
             created=now,
         )
-        components_api.create_next_version(
+        authoring_api.create_next_version(
             component.pk,
             title=new_title,
             content_to_replace={
@@ -735,7 +734,7 @@ def create_library_block(library_key, block_type, definition_id):
             )
 
     # If adding a component would take us over our max, return an error.
-    component_count = publishing_api.get_all_drafts(ref.learning_package.id).count()
+    component_count = authoring_api.get_all_drafts(ref.learning_package.id).count()
     if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
             _("Library cannot have more than {} Components").format(
@@ -784,14 +783,14 @@ def _component_exists(usage_key: UsageKeyV2) -> bool:
     return True
 
 
-def get_or_create_olx_media_type(block_type: str) -> contents_api.MediaType:
+def get_or_create_olx_media_type(block_type: str) -> MediaType:
     """
     Get or create a MediaType for the block type.
 
     Learning Core stores all Content with a Media Type (a.k.a. MIME type). For
     OLX, we use the "application/vnd.*" convention, per RFC 6838.
     """
-    return contents_api.get_or_create_media_type(
+    return authoring_api.get_or_create_media_type(
         f"application/vnd.openedx.xblock.v1.{block_type}+xml"
     )
 
@@ -818,10 +817,10 @@ def _create_component_for_block(content_lib, usage_key):
     learning_package = content_lib.learning_package
 
     with transaction.atomic():
-        component_type = components_api.get_or_create_component_type(
+        component_type = authoring_api.get_or_create_component_type(
             "xblock.v1", usage_key.block_type
         )
-        component, component_version = components_api.create_component_and_version(
+        component, component_version = authoring_api.create_component_and_version(
             learning_package.id,
             component_type=component_type,
             local_key=usage_key.block_id,
@@ -829,13 +828,13 @@ def _create_component_for_block(content_lib, usage_key):
             created=now,
             created_by=None,
         )
-        content = contents_api.get_or_create_text_content(
+        content = authoring_api.get_or_create_text_content(
             learning_package.id,
             get_or_create_olx_media_type(usage_key.block_type).id,
             text=xml_text,
             created=now,
         )
-        components_api.create_component_version_content(
+        authoring_api.create_component_version_content(
             component_version.pk,
             content.id,
             key="block.xml",
@@ -848,7 +847,7 @@ def delete_library_block(usage_key, remove_from_parent=True):
     Delete the specified block from this library (soft delete).
     """
     component = get_component_from_usage_key(usage_key)
-    publishing_api.soft_delete_draft(component.pk)
+    authoring_api.soft_delete_draft(component.pk)
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
@@ -937,7 +936,7 @@ def publish_changes(library_key):
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
 
-    publishing_api.publish_all_drafts(learning_package.id)
+    authoring_api.publish_all_drafts(learning_package.id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
@@ -953,7 +952,7 @@ def revert_changes(library_key):
     last published version.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
-    publishing_api.reset_drafts_to_published(learning_package.id)
+    authoring_api.reset_drafts_to_published(learning_package.id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
@@ -1012,10 +1011,10 @@ def get_v1_or_v2_library(
             library = get_library(library_key)
             if v2_version is not None and library.version != v2_version:
                 raise NotImplementedError(
-                    f"Tried to load version {v2_version} of blockstore-based library {library_key}. "
+                    f"Tried to load version {v2_version} of learning_core-based library {library_key}. "
                     f"Currently, only the latest version ({library.version}) may be loaded. "
                     "This is a known issue. "
-                    "It will be fixed before the production release of blockstore-based (V2) content libraries. "
+                    "It will be fixed before the production release of learning_core-based (V2) content libraries. "
                 )
             return library
         except ContentLibrary.DoesNotExist:
@@ -1121,35 +1120,34 @@ class BaseEdxImportClient(abc.ABC):
                 modulestore_key.block_type,
                 block_id,
             )
-            blockstore_key = library_block.usage_key
+            dest_key = library_block.usage_key
         except LibraryBlockAlreadyExists:
-            blockstore_key = LibraryUsageLocatorV2(
+            dest_key = LibraryUsageLocatorV2(
                 lib_key=self.library.library_key,
                 block_type=modulestore_key.block_type,
                 usage_id=block_id,
             )
-            get_library_block(blockstore_key)
+            get_library_block(dest_key)
             log.warning('Library block already exists: Appending static files '
-                        'and overwriting OLX: %s', str(blockstore_key))
+                        'and overwriting OLX: %s', str(dest_key))
 
         # Handle static files.
 
         files = [
             f.path for f in
-            get_library_block_static_asset_files(blockstore_key)
+            get_library_block_static_asset_files(dest_key)
         ]
         for filename, static_file in block_data.get('static_files', {}).items():
             if filename in files:
                 # Files already added, move on.
                 continue
             file_content = self.get_block_static_data(static_file)
-            add_library_block_static_asset_file(
-                blockstore_key, filename, file_content)
+            add_library_block_static_asset_file(dest_key, filename, file_content)
             files.append(filename)
 
         # Import OLX.
 
-        set_library_block_olx(blockstore_key, block_data['olx'])
+        set_library_block_olx(dest_key, block_data['olx'])
 
     def import_blocks_from_course(self, course_key, progress_callback):
         """
@@ -1200,7 +1198,7 @@ class EdxModulestoreImportClient(BaseEdxImportClient):
         Get block OLX by serializing it from modulestore directly.
         """
         block = self.modulestore.get_item(block_key)
-        data = serialize_modulestore_block_for_blockstore(block)
+        data = serialize_modulestore_block_for_learning_core(block)
         return {'olx': data.olx_str,
                 'static_files': {s.name: s for s in data.static_files}}
 

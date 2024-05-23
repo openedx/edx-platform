@@ -191,8 +191,7 @@ def create_response_endorsed_on_thread_notification(*args, **kwargs):
     and another notification for response author when response is endorsed
     """
     comment = kwargs['post']
-    comment_author_id = comment.attributes['user_id']
     thread_id = comment.attributes['thread_id']
     course_key_str = comment.attributes['course_id']
-
-    send_response_endorsed_notifications.apply_async(args=[thread_id, course_key_str, comment_author_id])
+    endorsed_by = kwargs['user'].id
+    send_response_endorsed_notifications.apply_async(args=[thread_id, kwargs['post'].id, course_key_str, endorsed_by])

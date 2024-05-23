@@ -1,10 +1,11 @@
 """
 Unit tests for course settings views.
 """
+from unittest.mock import patch
+
 import ddt
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase

@@ -1,9 +1,9 @@
 """
 Test the retirement_bulk_status_update.py script
 """
+from unittest.mock import DEFAULT, patch
 
 from click.testing import CliRunner
-from mock import DEFAULT, patch
 
 from scripts.user_retirement.retirement_bulk_status_update import (
     ERR_BAD_CONFIG,

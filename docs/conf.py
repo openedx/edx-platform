@@ -23,6 +23,7 @@ root = Path('..').abspath()
 sys.path.insert(0, root)
 sys.path.append(root / "docs")
 
+from repository_docs import RepositoryDocs
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -57,6 +58,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
+    'sphinx.ext.graphviz',
     'sphinx.ext.ifconfig',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
@@ -307,6 +309,9 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
     Read the Docs won't run tox or custom shell commands, so we need this to
     avoid checking in the generated reStructuredText files.
     """
+    repo_docs_build_path = f'{root}/docs/references/docs'
+    RepositoryDocs(root, repo_docs_build_path).build_rst_docs()
+
     docs_path = root / 'docs'
     apidoc_path = 'sphinx-apidoc'
     if hasattr(sys, 'real_prefix'):  # Check to see if we are in a virtualenv

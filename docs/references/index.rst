@@ -7,4 +7,5 @@ References
     :caption: Table of Contents
 
     *
+    docs/index
     docstrings/index

@@ -4,16 +4,29 @@ Test that various events are fired for models in the grades app.
 
 from unittest import mock
 
+from ccx_keys.locator import CCXLocator
 from django.utils.timezone import now
 from openedx_events.learning.data import (
+    CcxCourseData,
+    CcxCoursePassingStatusData,
     CourseData,
-    PersistentCourseGradeData
+    CoursePassingStatusData,
+    PersistentCourseGradeData,
+    UserData,
+    UserPersonalData
 )
-from openedx_events.learning.signals import PERSISTENT_GRADE_SUMMARY_CHANGED
+from openedx_events.learning.signals import (
+    CCX_COURSE_PASSING_STATUS_UPDATED,
+    COURSE_PASSING_STATUS_UPDATED,
+    PERSISTENT_GRADE_SUMMARY_CHANGED
+)
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -94,5 +107,148 @@ class PersistentGradeEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixi
                     passed_timestamp=grade.passed_timestamp
                 )
             },
-            event_receiver.call_args.kwargs
+            event_receiver.call_args.kwargs,
+        )
+
+
+class CoursePassingStatusEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
+    """
+    Tests for Open edX passing status update event.
+    """
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.learning.course.passing.status.updated.v1",
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        self.receiver_called = False
+
+    def _event_receiver_side_effect(self, **kwargs):
+        """
+        Used show that the Open edX Event was called by the Django signal handler.
+        """
+        self.receiver_called = True
+
+    def test_course_passing_status_updated_emitted(self):
+        """
+        Test whether passing status updated event is sent after the grade is being updated for a user.
+        """
+        event_receiver = mock.Mock(side_effect=self._event_receiver_side_effect)
+        COURSE_PASSING_STATUS_UPDATED.connect(event_receiver)
+        grade_factory = CourseGradeFactory()
+
+        with mock_passing_grade():
+            grade_factory.update(self.user, self.course)
+
+        self.assertTrue(self.receiver_called)
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_PASSING_STATUS_UPDATED,
+                "sender": None,
+                "course_passing_status": CoursePassingStatusData(
+                    is_passing=True,
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.get_full_name(),
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CourseData(
+                        course_key=self.course.id,
+                    ),
+                ),
+            },
+            event_receiver.call_args.kwargs,
+        )
+
+
+class CCXCoursePassingStatusEventsTest(
+    SharedModuleStoreTestCase, OpenEdxEventsTestMixin
+):
+    """
+    Tests for Open edX passing status update event in a CCX course.
+    """
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.learning.ccx.course.passing.status.updated.v1",
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        self.coach = AdminFactory.create()
+        self.ccx = ccx = CustomCourseForEdX(
+            course_id=self.course.id, display_name="Test CCX", coach=self.coach
+        )
+        ccx.save()
+        self.ccx_locator = CCXLocator.from_course_locator(self.course.id, ccx.id)
+
+        self.receiver_called = False
+
+    def _event_receiver_side_effect(self, **kwargs):
+        """
+        Used show that the Open edX Event was called by the Django signal handler.
+        """
+        self.receiver_called = True
+
+    def test_ccx_course_passing_status_updated_emitted(self):
+        """
+        Test whether passing status updated event is sent after the grade is being updated in CCX course.
+        """
+        event_receiver = mock.Mock(side_effect=self._event_receiver_side_effect)
+        CCX_COURSE_PASSING_STATUS_UPDATED.connect(event_receiver)
+        grade_factory = CourseGradeFactory()
+
+        with mock_passing_grade():
+            grade_factory.update(self.user, self.store.get_course(self.ccx_locator))
+
+        self.assertTrue(self.receiver_called)
+        self.assertDictContainsSubset(
+            {
+                "signal": CCX_COURSE_PASSING_STATUS_UPDATED,
+                "sender": None,
+                "course_passing_status": CcxCoursePassingStatusData(
+                    is_passing=True,
+                    user=UserData(
+                        pii=UserPersonalData(
+                            username=self.user.username,
+                            email=self.user.email,
+                            name=self.user.get_full_name(),
+                        ),
+                        id=self.user.id,
+                        is_active=self.user.is_active,
+                    ),
+                    course=CcxCourseData(
+                        ccx_course_key=self.ccx_locator,
+                        master_course_key=self.course.id,
+                        display_name="",
+                        coach_email="",
+                        start=None,
+                        end=None,
+                        max_students_allowed=self.ccx.max_student_enrollments_allowed,
+                    ),
+                ),
+            },
+            event_receiver.call_args.kwargs,
         )

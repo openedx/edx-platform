@@ -4,10 +4,12 @@
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views/utils/xblock_utils',
     'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
-    'common/js/components/views/feedback_notification', 'js/views/course_highlights_enable', 'js/views/course_video_sharing_enable'],
+    'common/js/components/views/feedback_notification', 'js/views/course_highlights_enable', 'js/views/course_video_sharing_enable',
+    'js/views/course_manage_tags'],
 function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView,
     CourseHighlightsEnableView,
-    CourseVideoSharingEnableView
+    CourseVideoSharingEnableView,
+    CourseManageTagsView
 ) {
     'use strict';
 
@@ -133,6 +135,15 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
                     model: this.model
                 });
                 this.highlightsEnableView.render();
+            }
+
+            // if tagging enabled
+            if (!this.model.get('is_tagging_feature_disabled')) {
+                this.courseManageTagsView = new CourseManageTagsView({
+                    el: this.$('.status-manage-tags'),
+                    model: this.model
+                });
+                this.courseManageTagsView.render();
             }
 
             // if video sharing enable

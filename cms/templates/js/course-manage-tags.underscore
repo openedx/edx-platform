@@ -1,0 +1,8 @@
+<div class="course-manage-tags-container">
+<h2 class="status-course-manage-tags-label">
+  <%- gettext('Course tags') %>
+</h2>
+<br>
+<span class="status-course-manage-tags-value tag-count" data-locator="<%- course.id %>"></span>
+<a class="status-course-manage-tags-info manage-tags-button" href="#"><%- gettext('Manage tags') %></a>
+</div>

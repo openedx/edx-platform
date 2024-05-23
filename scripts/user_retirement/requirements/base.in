@@ -1,3 +1,5 @@
+-c ../../../requirements/constraints.txt
+
 boto3
 click
 pyyaml

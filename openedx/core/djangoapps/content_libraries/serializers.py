@@ -14,7 +14,6 @@ from openedx.core.djangoapps.content_libraries.constants import (
 from openedx.core.djangoapps.content_libraries.models import (
     ContentLibraryPermission, ContentLibraryBlockImportTask
 )
-from openedx.core.lib import blockstore_api
 from openedx.core.lib.api.serializers import CourseKeyField
 
 
@@ -174,16 +173,6 @@ class LibraryXBlockStaticFileSerializer(serializers.Serializer):
     # Must be an absolute URL.
     url = serializers.URLField()
     size = serializers.IntegerField(min_value=0)
-
-    def to_representation(self, instance):
-        """
-        Generate the serialized representation of this static asset file.
-        """
-        result = super().to_representation(instance)
-        # Make sure the URL is one that will work from the user's browser,
-        # not one that only works from within a docker container:
-        result['url'] = blockstore_api.force_browser_url(result['url'])
-        return result
 
 
 class LibraryXBlockStaticFilesSerializer(serializers.Serializer):

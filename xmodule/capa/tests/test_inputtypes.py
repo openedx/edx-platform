@@ -23,12 +23,12 @@ import textwrap
 import unittest
 import xml.sax.saxutils as saxutils
 from collections import OrderedDict
+from unittest.mock import ANY, patch
 
 import pytest
 import six
 from lxml import etree
 from lxml.html import fromstring
-from mock import ANY, patch
 from pyparsing import ParseException
 from six.moves import zip
 

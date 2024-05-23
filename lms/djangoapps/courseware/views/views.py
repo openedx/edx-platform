@@ -53,6 +53,8 @@ from xmodule.x_module import STUDENT_VIEW
 
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.course import course_location_from_key
@@ -86,7 +88,12 @@ from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_stu
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
-from lms.djangoapps.courseware.toggles import course_is_invitation_only, courseware_mfe_search_is_enabled
+from lms.djangoapps.courseware.toggles import (
+    course_is_invitation_only,
+    courseware_mfe_search_is_enabled,
+    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
+    COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
+)
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -2261,10 +2268,38 @@ def get_learner_username(learner_identifier):
 @api_view(['GET'])
 def courseware_mfe_search_enabled(request, course_id=None):
     """
-    Simple GET endpoint to expose whether the course may use Courseware Search.
+    Simple GET endpoint to expose whether the user may use Courseware Search
+    for a given course.
     """
-
+    enabled = False
     course_key = CourseKey.from_string(course_id) if course_id else None
+    user = request.user
 
-    payload = {"enabled": courseware_mfe_search_is_enabled(course_key)}
+    if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED'):
+        enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+        if (
+            auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+            or (enrollment_mode in CourseMode.VERIFIED_MODES)
+        ):
+            enabled = True
+    else:
+        enabled = True
+
+    payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
     return JsonResponse(payload)
+
+
+@api_view(['GET'])
+def courseware_mfe_navigation_sidebar_toggles(request, course_id=None):
+    """
+    GET endpoint to return navigation sidebar toggles.
+    """
+    try:
+        course_key = CourseKey.from_string(course_id) if course_id else None
+    except InvalidKeyError:
+        return JsonResponse({"error": "Invalid course_id"})
+
+    return JsonResponse({
+        "enable_navigation_sidebar": COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR.is_enabled(course_key),
+        "always_open_auxiliary_sidebar": COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR.is_enabled(course_key),
+    })

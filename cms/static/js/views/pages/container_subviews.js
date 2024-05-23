@@ -376,15 +376,14 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 "message", (event) => {
                     // Listen any message from Manage tags drawer.
                     var data = event.data;
-                    var courseAuthoringUrl = this.model.get("course_authoring_url")
+                    var courseAuthoringUrl = new URL(this.model.get("course_authoring_url")).origin;
                     if (event.origin == courseAuthoringUrl
-                        && data.includes('[Manage tags drawer] Tags updated:')) {
+                        && data.type == 'authoring.events.tags.updated') {
                         // This message arrives when there is a change in the tag list.
                         // The message contains the new list of tags.
-                        let jsonData = data.replace(/\[Manage tags drawer\] Tags updated: /g, "");
-                        jsonData = JSON.parse(jsonData);
-                        if (jsonData.contentId == this.model.id) {
-                            this.model.set('tags', this.buildTaxonomyTree(jsonData));
+                        data = data.data
+                        if (data.contentId == this.model.id) {
+                            this.model.set('tags', this.buildTaxonomyTree(data));
                             this.render();
                         }
                     }

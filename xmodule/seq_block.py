@@ -12,6 +12,7 @@ from datetime import datetime
 from functools import reduce
 from django.conf import settings
 
+from edx_django_utils.monitoring import set_custom_attribute
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
@@ -42,11 +43,6 @@ from .xml_block import XmlMixin
 
 
 log = logging.getLogger(__name__)
-
-try:
-    import newrelic.agent
-except ImportError:
-    newrelic = None  # pylint: disable=invalid-name
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -839,58 +835,52 @@ class SequenceBlock(
 
     def _capture_basic_metrics(self):
         """
-        Capture basic information about this sequence in New Relic.
+        Capture basic information about this sequence in telemetry.
         """
-        if not newrelic:
-            return
-        newrelic.agent.add_custom_attribute('seq.block_id', str(self.location))
-        newrelic.agent.add_custom_attribute('seq.display_name', self.display_name or '')
-        newrelic.agent.add_custom_attribute('seq.position', self.position)
-        newrelic.agent.add_custom_attribute('seq.is_time_limited', self.is_time_limited)
+        set_custom_attribute('seq.block_id', str(self.location))
+        set_custom_attribute('seq.display_name', self.display_name or '')
+        set_custom_attribute('seq.position', self.position)
+        set_custom_attribute('seq.is_time_limited', self.is_time_limited)
 
     def _capture_full_seq_item_metrics(self, children):
         """
         Capture information about the number and types of XBlock content in
-        the sequence as a whole. We send this information to New Relic so that
+        the sequence as a whole. We record this information in telemetry so that
         we can do better performance analysis of courseware.
         """
-        if not newrelic:
-            return
         # Basic count of the number of Units (a.k.a. VerticalBlocks) we have in
         # this learning sequence
-        newrelic.agent.add_custom_attribute('seq.num_units', len(children))
+        set_custom_attribute('seq.num_units', len(children))
 
         # Count of all modules (leaf nodes) in this sequence (e.g. videos,
         # problems, etc.) The units (verticals) themselves are not counted.
         all_item_keys = self._locations_in_subtree(self)
-        newrelic.agent.add_custom_attribute('seq.num_items', len(all_item_keys))
+        set_custom_attribute('seq.num_items', len(all_item_keys))
 
         # Count of all modules by block_type (e.g. "video": 2, "discussion": 4)
         block_counts = collections.Counter(usage_key.block_type for usage_key in all_item_keys)
         for block_type, count in block_counts.items():
-            newrelic.agent.add_custom_attribute(f'seq.block_counts.{block_type}', count)
+            set_custom_attribute(f'seq.block_counts.{block_type}', count)
 
     def _capture_current_unit_metrics(self, children):
         """
         Capture information about the current selected Unit within the Sequence.
         """
-        if not newrelic:
-            return
         # Positions are stored with indexing starting at 1. If we get into a
         # weird state where the saved position is out of bounds (e.g. the
         # content was changed), avoid going into any details about this unit.
         if 1 <= self.position <= len(children):
             # Basic info about the Unit...
             current = children[self.position - 1]
-            newrelic.agent.add_custom_attribute('seq.current.block_id', str(current.location))
-            newrelic.agent.add_custom_attribute('seq.current.display_name', current.display_name or '')
+            set_custom_attribute('seq.current.block_id', str(current.location))
+            set_custom_attribute('seq.current.display_name', current.display_name or '')
 
             # Examining all blocks inside the Unit (or split_test, conditional, etc.)
             child_locs = self._locations_in_subtree(current)
-            newrelic.agent.add_custom_attribute('seq.current.num_items', len(child_locs))
+            set_custom_attribute('seq.current.num_items', len(child_locs))
             curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
             for block_type, count in curr_block_counts.items():
-                newrelic.agent.add_custom_attribute(f'seq.current.block_counts.{block_type}', count)
+                set_custom_attribute(f'seq.current.block_counts.{block_type}', count)
 
     def _time_limited_student_view(self):
         """

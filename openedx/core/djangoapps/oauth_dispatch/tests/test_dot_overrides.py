@@ -81,7 +81,6 @@ class CustomValidationTestCase(TestCase):
         request = self.request_factory.get('/')
         assert self.validator.validate_user('darkhelmet', self.TEST_PASSWORD, client=None, request=request)
 
-    @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=True)
     def test_get_default_scopes_with_user_id(self):
         """
         Test that get_default_scopes returns the default scopes plus the user_id scope if it's available.
@@ -93,20 +92,6 @@ class CustomValidationTestCase(TestCase):
 
         self.assertEqual(overriden_default_scopes, self.default_scopes + ['user_id'])
 
-    @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=False)
-    def test_get_default_scopes_without_user_id(self):
-        """
-        Test that if `ENABLE_USER_ID_SCOPE` flag is turned off, the get_default_scopes returns
-        the default scopes without `user_id` even if it's allowed.
-        """
-        application_access = ApplicationAccessFactory(scopes=['user_id'])
-
-        request = mock.Mock(grant_type='client_credentials', client=application_access.application, scopes=None)
-        overriden_default_scopes = self.validator.get_default_scopes(request=request, client_id='client_id')
-
-        self.assertEqual(overriden_default_scopes, self.default_scopes)
-
-    @mock.patch.dict(settings.FEATURES, ENABLE_USER_ID_SCOPE=True)
     def test_get_default_scopes(self):
         """
         Test that get_default_scopes returns the default scopes if user_id scope is not available.
