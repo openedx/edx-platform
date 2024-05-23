@@ -462,9 +462,9 @@ class CourseNavigationBlocksView(RetrieveAPIView):
             is_masquerading=user_is_masquerading,
         )
         if navigation_sidebar_caching_is_disabled := courseware_disable_navigation_sidebar_blocks_caching():
-            course_blocks = cache.get(cache_key)
-        else:
             course_blocks = None
+        else:
+            course_blocks = cache.get(cache_key)
 
         if not course_blocks:
             if getattr(enrollment, 'is_active', False) or bool(staff_access):
@@ -533,6 +533,11 @@ class CourseNavigationBlocksView(RetrieveAPIView):
     def get_block_completion_stat(self, block, completable_children):
         """
         Get the completion status of a block.
+
+        Returns dictionary with the completion status and the number
+        of completable children of a block.
+        Completion is the value from 0 to 1 meaning the percentage of completion for lower-level blocks,
+        and sum of the completion status of the completable children.
         """
         block_type = block['type']
         completable_children_num = len(completable_children)
