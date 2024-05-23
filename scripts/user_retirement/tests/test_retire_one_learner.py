@@ -1,9 +1,9 @@
 """
 Test the retire_one_learner.py script
 """
+from unittest.mock import DEFAULT, patch
 
 from click.testing import CliRunner
-from mock import DEFAULT, patch
 
 from scripts.user_retirement.retire_one_learner import (
     END_STATES,

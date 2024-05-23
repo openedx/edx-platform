@@ -57,7 +57,7 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
     ALL_RIGHTS_RESERVED,
 )
-from openedx_learning.core.publishing.models import LearningPackage
+from openedx_learning.api.authoring_models import LearningPackage
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .apps import ContentLibrariesConfig

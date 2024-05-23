@@ -48,7 +48,7 @@ from xmodule.modulestore.tests.factories import (
 )
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
+    MINIMUM_UNUSED_PARTITION_ID,
     Group,
     UserPartition,
 )
@@ -421,16 +421,16 @@ class GetItemTest(ItemTest):
         # by dynamic user partitions.
         self.course.user_partitions = [
             UserPartition(
-                id=MINIMUM_STATIC_PARTITION_ID,
+                id=MINIMUM_UNUSED_PARTITION_ID,
                 name="Random user partition",
                 scheme=UserPartition.get_scheme("random"),
                 description="Random user partition",
                 groups=[
                     Group(
-                        id=MINIMUM_STATIC_PARTITION_ID + 1, name="Group A"
+                        id=MINIMUM_UNUSED_PARTITION_ID + 1, name="Group A"
                     ),  # See note above.
                     Group(
-                        id=MINIMUM_STATIC_PARTITION_ID + 2, name="Group B"
+                        id=MINIMUM_UNUSED_PARTITION_ID + 2, name="Group B"
                     ),  # See note above.
                 ],
             ),
@@ -462,18 +462,18 @@ class GetItemTest(ItemTest):
                     ],
                 },
                 {
-                    "id": MINIMUM_STATIC_PARTITION_ID,
+                    "id": MINIMUM_UNUSED_PARTITION_ID,
                     "name": "Random user partition",
                     "scheme": "random",
                     "groups": [
                         {
-                            "id": MINIMUM_STATIC_PARTITION_ID + 1,
+                            "id": MINIMUM_UNUSED_PARTITION_ID + 1,
                             "name": "Group A",
                             "selected": False,
                             "deleted": False,
                         },
                         {
-                            "id": MINIMUM_STATIC_PARTITION_ID + 2,
+                            "id": MINIMUM_UNUSED_PARTITION_ID + 2,
                             "name": "Group B",
                             "selected": False,
                             "deleted": False,
@@ -2443,13 +2443,13 @@ class TestEditSplitModule(ItemTest):
         self.user = UserFactory()
 
         self.first_user_partition_group_1 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 1), "alpha"
+            str(MINIMUM_UNUSED_PARTITION_ID + 1), "alpha"
         )
         self.first_user_partition_group_2 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 2), "beta"
+            str(MINIMUM_UNUSED_PARTITION_ID + 2), "beta"
         )
         self.first_user_partition = UserPartition(
-            MINIMUM_STATIC_PARTITION_ID,
+            MINIMUM_UNUSED_PARTITION_ID,
             "first_partition",
             "First Partition",
             [self.first_user_partition_group_1, self.first_user_partition_group_2],
@@ -2458,16 +2458,16 @@ class TestEditSplitModule(ItemTest):
         # There is a test point below (test_create_groups) that purposefully wants the group IDs
         # of the 2 partitions to overlap (which is not something that normally happens).
         self.second_user_partition_group_1 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 1), "Group 1"
+            str(MINIMUM_UNUSED_PARTITION_ID + 1), "Group 1"
         )
         self.second_user_partition_group_2 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 2), "Group 2"
+            str(MINIMUM_UNUSED_PARTITION_ID + 2), "Group 2"
         )
         self.second_user_partition_group_3 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 3), "Group 3"
+            str(MINIMUM_UNUSED_PARTITION_ID + 3), "Group 3"
         )
         self.second_user_partition = UserPartition(
-            MINIMUM_STATIC_PARTITION_ID + 10,
+            MINIMUM_UNUSED_PARTITION_ID + 10,
             "second_partition",
             "Second Partition",
             [
@@ -2540,10 +2540,10 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
         self.assertEqual(
-            "Group ID " + str(MINIMUM_STATIC_PARTITION_ID + 1), vertical_0.display_name
+            "Group ID " + str(MINIMUM_UNUSED_PARTITION_ID + 1), vertical_0.display_name
         )
         self.assertEqual(
-            "Group ID " + str(MINIMUM_STATIC_PARTITION_ID + 2), vertical_1.display_name
+            "Group ID " + str(MINIMUM_UNUSED_PARTITION_ID + 2), vertical_1.display_name
         )
 
         # Verify that the group_id_to_child mapping is correct.

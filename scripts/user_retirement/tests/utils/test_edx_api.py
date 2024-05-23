@@ -2,12 +2,12 @@
 Tests for edX API calls.
 """
 import unittest
+from unittest.mock import DEFAULT, patch
 from urllib.parse import urljoin
 
 import requests
 import responses
 from ddt import data, ddt, unpack
-from mock import DEFAULT, patch
 from requests.exceptions import ConnectionError, HTTPError
 from responses import GET, PATCH, POST, matchers
 from responses.registries import OrderedRegistry

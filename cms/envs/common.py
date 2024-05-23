@@ -1881,9 +1881,9 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
-    "openedx_learning.core.components",
-    "openedx_learning.core.contents",
-    "openedx_learning.core.publishing",
+    "openedx_learning.apps.authoring.components",
+    "openedx_learning.apps.authoring.contents",
+    "openedx_learning.apps.authoring.publishing",
 ]
 
 
@@ -2339,7 +2339,6 @@ CACHES = {
 
 ############################ OAUTH2 Provider ###################################
 
-
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
 
@@ -2354,6 +2353,12 @@ API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
+EDX_DRF_EXTENSIONS = {
+    # Set this value to an empty dict in order to prevent automatically updating
+    # user data from values in (possibly stale) JWTs.
+    'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
+}
 
 ############## Settings for Studio Context Sensitive Help ##############
 
@@ -2953,13 +2958,13 @@ REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
 
 BEAMER_PRODUCT_ID = ""
 
-################### Studio Search (alpha, using Meilisearch) ###################
+################### Studio Search (beta), using Meilisearch ###################
 
 # Enable Studio search features (powered by Meilisearch) (beta, off by default)
 MEILISEARCH_ENABLED = False
 # Meilisearch URL that the python backend can use. Often points to another docker container or k8s service.
 MEILISEARCH_URL = "http://meilisearch"
-# URL that browsers (end users) can user to reach Meilisearch. Should be HTTPS in production.
+# URL that browsers (end users) can use to reach Meilisearch. Should be HTTPS in production.
 MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 # To support multi-tenancy, you can prefix all indexes with a common key like "sandbox7-"
 # and use a restricted tenant token in place of an API key, so that this Open edX instance
