@@ -1379,9 +1379,9 @@ tqdm==4.66.4
     #   openai
 typing-extensions==4.11.0
     # via
+    #   -r requirements/edx/base.txt
     #   annotated-types
     #   asgiref
-    #   -r requirements/edx/base.txt
     #   django-countries
     #   drf-spectacular
     #   edx-opaque-keys

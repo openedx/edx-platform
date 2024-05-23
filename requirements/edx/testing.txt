@@ -1272,8 +1272,8 @@ python3-saml==1.16.0
 pytz==2024.1
     # via
     #   -r requirements/edx/base.txt
-    #   django-ses
     #   babel
+    #   django-ses
     #   djangorestframework
     #   drf-yasg
     #   edx-completion
