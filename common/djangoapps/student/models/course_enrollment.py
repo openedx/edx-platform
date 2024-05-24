@@ -1681,7 +1681,7 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
 
 class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
     """
-
+    config model for the bulk_unenroll_csv command
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],

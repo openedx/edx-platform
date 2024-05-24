@@ -76,7 +76,6 @@ case "$TEST_SUITE" in
         EXIT=0
 
         mkdir -p reports
-
         echo "Finding pycodestyle violations and storing report..."
         run_paver_quality run_pep8 || { EXIT=1; }
         echo "Finding ESLint violations and storing report..."

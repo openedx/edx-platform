@@ -207,3 +207,8 @@ migrate: migrate-lms migrate-cms
 # Part of https://github.com/openedx/wg-developer-experience/issues/136
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
+ruff: ## Run ruff
+	ruff check lms/djangoapps/ lms/envs/ lms/lib/ lms/tests.py \
+    openedx/core/djangoapps/ openedx/core/djangolib/ openedx/core/lib/ openedx/core/tests/ \
+    openedx/core/tests/ openedx/core/types/ openedx/features/ openedx/testing/ openedx/tests/ \
+    cms common xmodule --preview

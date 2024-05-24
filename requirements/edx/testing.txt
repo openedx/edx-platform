@@ -1676,6 +1676,7 @@ zipp==3.18.1
     #   -r requirements/edx/base.txt
     #   importlib-metadata
     #   importlib-resources
-
+ruff==0.1.3
+    # via -r requirements/edx/testing.in
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

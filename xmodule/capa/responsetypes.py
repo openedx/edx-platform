@@ -3900,7 +3900,7 @@ class ChoiceTextResponse(LoncapaResponse):
 # FIXME: To be replaced by auto-registration
 
 # pylint: disable=invalid-all-object
-__all__ = [
+__all__ = [     # noqa: PLE0604
     CodeResponse,
     NumericalResponse,
     FormulaResponse,
