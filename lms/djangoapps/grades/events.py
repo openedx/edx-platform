@@ -16,6 +16,7 @@ from common.djangoapps.track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
+from lms.djangoapps.grades.event_utils import emit_course_passing_status_update
 from lms.djangoapps.grades.signals.signals import SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.enterprise_support.context import get_enterprise_event_context
@@ -190,6 +191,8 @@ def course_grade_now_passed(user, course_id):
             }
         )
 
+    emit_course_passing_status_update(user, course_id, is_passing=True)
+
 
 def course_grade_now_failed(user, course_id):
     """
@@ -208,6 +211,8 @@ def course_grade_now_failed(user, course_id):
                 'event_transaction_type': str(get_event_transaction_type())
             }
         )
+
+    emit_course_passing_status_update(user, course_id, is_passing=False)
 
 
 def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator):
