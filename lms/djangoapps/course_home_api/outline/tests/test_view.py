@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-imp
 
 import ddt  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
+from completion.models import BlockCompletion
 from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
 from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
@@ -489,7 +490,7 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
                 parent_location=self.chapter.location
             )
             self.vertical = BlockFactory.create(
-                category='problem',
+                category='vertical',
                 graded=True,
                 has_score=True,
                 parent_location=self.sequential.location
@@ -500,10 +501,19 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
                 parent_location=self.chapter.location
             )
             self.ungraded_vertical = BlockFactory.create(
-                category='problem',
+                category='vertical',
                 parent_location=self.ungraded_sequential.location
             )
         update_outline_from_modulestore(self.course.id)
+
+    def create_completion(self, problem, completion):
+        return BlockCompletion.objects.create(
+            user=self.user,
+            context_key=problem.context_key,
+            block_type='problem',
+            block_key=problem.location,
+            completion=completion,
+        )
 
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
@@ -594,6 +604,18 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
             hide_after_due=False,
             is_onboarding_exam=False,
         )
+        vertical = BlockFactory.create(
+            parent=sequence,
+            category='vertical',
+            graded=True,
+            has_score=True,
+        )
+        BlockFactory.create(
+            parent=vertical,
+            category='problem',
+            graded=True,
+            has_score=True,
+        )
         sequence.is_proctored_exam = True
         update_outline_from_modulestore(course.id)
         CourseEnrollment.enroll(self.user, course.id)
@@ -608,7 +630,7 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
 
         exam_data = response.data['blocks'][str(sequence.location)]
         assert not exam_data['complete']
-        assert exam_data['display_name'] == 'Test Proctored Exam'
+        assert exam_data['display_name'] == 'Test Proctored Exam (1 Question)'
         assert exam_data['special_exam_info'] == 'My Exam'
         assert exam_data['due'] is not None
 
@@ -623,8 +645,8 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         assert response.status_code == 200
 
         exam_data = response.data['blocks'][str(self.sequential.location)]
-        assert exam_data['display_name'] == 'Test (1 Question)'
-        assert exam_data['icon'] == 'fa-pencil-square-o'
+        assert exam_data['display_name'] == 'Test'
+        assert exam_data['icon'] is None
         assert str(self.vertical.location) in exam_data['children']
 
         ungraded_data = response.data['blocks'][str(self.ungraded_sequential.location)]
@@ -686,3 +708,91 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         replace_course_outline(new_learning_seq_outline)
         blocks = self.client.get(self.url).data['blocks']
         assert seq_block_id not in blocks
+
+    def test_empty_blocks_complete(self):
+        """
+        Test that the API returns the correct complete state for empty blocks.
+        """
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+        url = reverse('course-home:course-navigation', args=[self.course.id])
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+        assert sequence_data['complete']
+        assert vertical_data['complete']
+
+    @ddt.data(True, False)
+    def test_blocks_complete_with_problem(self, problem_complete):
+        self.add_blocks_to_course()
+        problem = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(problem, int(problem_complete))
+
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert sequence_data['complete'] == problem_complete
+        assert vertical_data['complete'] == problem_complete
+
+    def test_blocks_completion_stat(self):
+        """
+        Test that the API returns the correct completion statistics for the blocks.
+        """
+        self.add_blocks_to_course()
+        completed_problem = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        uncompleted_problem = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        update_outline_from_modulestore(self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(completed_problem, 1)
+        self.create_completion(uncompleted_problem, 0)
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        expected_sequence_completion_stat = {
+            'completion': 0,
+            'completable_children': 1,
+        }
+        expected_vertical_completion_stat = {
+            'completion': 1,
+            'completable_children': 2,
+        }
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert not sequence_data['complete']
+        assert not vertical_data['complete']
+        assert sequence_data['completion_stat'] == expected_sequence_completion_stat
+        assert vertical_data['completion_stat'] == expected_vertical_completion_stat
+
+    def test_blocks_completion_stat_all_problem_completed(self):
+        """
+        Test that the API returns the correct completion statistics for the blocks when all problems are completed.
+        """
+        self.add_blocks_to_course()
+        problem1 = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        problem2 = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        update_outline_from_modulestore(self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(problem1, 1)
+        self.create_completion(problem2, 1)
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        expected_sequence_completion_stat = {
+            'completion': 1,
+            'completable_children': 1,
+        }
+        expected_vertical_completion_stat = {
+            'completion': 2,
+            'completable_children': 2,
+        }
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert sequence_data['complete']
+        assert vertical_data['complete']
+        assert sequence_data['completion_stat'] == expected_sequence_completion_stat
+        assert vertical_data['completion_stat'] == expected_vertical_completion_stat
