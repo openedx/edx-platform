@@ -1,6 +1,8 @@
 """
 Unit tests for course settings views.
 """
+from unittest.mock import patch
+
 import ddt
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -12,7 +14,6 @@ from edxval.api import (
     get_transcript_credentials_state_for_org,
     get_transcript_preferences,
 )
-from mock import patch
 from rest_framework import status
 
 from cms.djangoapps.contentstore.video_storage_handlers import get_all_transcript_languages

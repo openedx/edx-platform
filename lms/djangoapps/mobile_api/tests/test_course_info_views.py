@@ -1,6 +1,7 @@
 """
 Tests for course_info
 """
+from unittest.mock import patch
 
 
 import ddt
@@ -11,7 +12,6 @@ from django.test import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import patch
 from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
