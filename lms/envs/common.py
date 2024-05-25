@@ -3183,9 +3183,13 @@ INSTALLED_APPS = [
     # Notes
     'lms.djangoapps.edxnotes',
 
-    # User API
+    # Django Rest Framework
     'rest_framework',
 
+    # REST framework JWT Auth
+    'rest_framework_jwt',
+
+    # User API
     'openedx.core.djangoapps.user_api',
 
     # Different Course Modes
@@ -3351,7 +3355,6 @@ INSTALLED_APPS = [
 
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
-    'rest_framework_jwt',
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
