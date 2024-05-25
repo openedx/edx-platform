@@ -10,6 +10,8 @@ charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
+dnspython==2.6.1
+    # via pymongo
 edx-opaque-keys==2.9.0
     # via -r requirements/edx/paver.in
 idna==3.7
@@ -36,14 +38,14 @@ psutil==5.9.8
     # via -r requirements/edx/paver.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.in
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
 python-memcached==1.62
     # via -r requirements/edx/paver.in
-requests==2.31.0
+requests==2.32.1
     # via -r requirements/edx/paver.in
 six==1.16.0
     # via

@@ -561,7 +561,6 @@ class MongoPersistenceBackend:
         Closes any open connections to the underlying databases
         """
         RequestCache(namespace="course_index_cache").clear()
-        self.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -590,7 +589,7 @@ class MongoPersistenceBackend:
             self.definitions.remove({})
 
         if connections:
-            connection.close()
+            pass
 
 
 class DjangoFlexPersistenceBackend(MongoPersistenceBackend):

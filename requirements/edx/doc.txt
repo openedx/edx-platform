@@ -6,6 +6,14 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
+-e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
+-e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
+    # via -r requirements/edx/base.txt
 accessible-pygments==0.0.4
     # via pydata-sphinx-theme
 acid-xblock==0.3.1
@@ -33,7 +41,7 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
-annotated-types==0.6.0
+annotated-types==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
@@ -106,13 +114,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.104
+boto3==1.34.109
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.104
+botocore==1.34.109
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -123,7 +131,7 @@ camel-converter[pydantic]==3.1.2
     # via
     #   -r requirements/edx/base.txt
     #   meilisearch
-celery==5.4.0
+celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -213,7 +221,7 @@ cryptography==42.0.7
     #   pyopenssl
     #   snowflake-connector-python
     #   social-auth-core
-cssutils==2.10.3
+cssutils==2.11.0
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
@@ -228,7 +236,6 @@ defusedxml==0.7.1
     #   social-auth-core
 django==4.2.13
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
@@ -455,6 +462,10 @@ djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
+dnspython==2.6.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   pymongo
 docutils==0.19
     # via
     #   pydata-sphinx-theme
@@ -580,7 +591,7 @@ edx-rbac==1.9.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-rest-api-client==5.7.0
+edx-rest-api-client==5.6.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -617,9 +628,8 @@ edx-when==2.5.0
     #   edx-proctoring
 edxval==2.5.0
     # via -r requirements/edx/base.txt
-elasticsearch==7.13.4
+elasticsearch==7.17.9
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-search
 enmerkar==0.7.1
@@ -628,12 +638,6 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/base.txt
-event-tracking==2.4.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
 fastavro==1.9.4
     # via
     #   -r requirements/edx/base.txt
@@ -688,9 +692,8 @@ idna==3.7
     #   yarl
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==6.11.0
+importlib-metadata==7.1.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   markdown
     #   sphinx
@@ -785,7 +788,7 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.11.0
     # via -r requirements/edx/base.txt
-lxml==4.9.4
+lxml[html-clean]==4.9.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -910,8 +913,6 @@ openedx-learning==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-openedx-mongodbproxy==0.2.0
-    # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -967,7 +968,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==4.2.1
+platformdirs==4.2.2
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -1045,7 +1046,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/base.txt
 pymemcache==4.0.0
     # via -r requirements/edx/base.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1154,11 +1155,11 @@ referencing==0.35.1
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.5.10
+regex==2024.5.15
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-requests==2.31.0
+requests==2.32.1
     # via
     #   -r requirements/edx/base.txt
     #   algoliasearch
@@ -1201,7 +1202,7 @@ ruamel-yaml-clib==0.2.8
     # via
     #   -r requirements/edx/base.txt
     #   ruamel-yaml
-rules==3.3
+rules==3.4
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1304,6 +1305,7 @@ sphinx==6.2.1
     #   pydata-sphinx-theme
     #   sphinx-book-theme
     #   sphinx-design
+    #   sphinx-mdinclude
     #   sphinx-reredirects
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
@@ -1312,7 +1314,7 @@ sphinx-book-theme==1.0.1
     # via -r requirements/edx/doc.in
 sphinx-design==0.5.0
     # via -r requirements/edx/doc.in
-sphinx-mdinclude==0.6.0
+sphinx-mdinclude==0.6.1
     # via sphinxcontrib-openapi
 sphinx-reredirects==0.1.3
     # via -r requirements/edx/doc.in
@@ -1495,7 +1497,7 @@ yarl==1.9.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-zipp==3.18.1
+zipp==3.18.2
     # via
     #   -r requirements/edx/base.txt
     #   importlib-metadata

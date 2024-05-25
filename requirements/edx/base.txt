@@ -6,6 +6,17 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/github.in
+-e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/github.in
+    #   -r requirements/edx/kernel.in
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
+-e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
+    # via
+    #   -r requirements/edx/github.in
+    #   -r requirements/edx/kernel.in
 acid-xblock==0.3.1
     # via -r requirements/edx/kernel.in
 aiohttp==3.9.5
@@ -22,7 +33,7 @@ analytics-python==1.4.post1
     # via -r requirements/edx/kernel.in
 aniso8601==9.0.1
     # via edx-tincan-py35
-annotated-types==0.6.0
+annotated-types==0.7.0
     # via pydantic
 appdirs==1.4.4
     # via fs
@@ -77,13 +88,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.34.104
+boto3==1.34.109
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.104
+botocore==1.34.109
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -92,7 +103,7 @@ bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 camel-converter[pydantic]==3.1.2
     # via meilisearch
-celery==5.4.0
+celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -167,7 +178,7 @@ cryptography==42.0.7
     #   pyopenssl
     #   snowflake-connector-python
     #   social-auth-core
-cssutils==2.10.3
+cssutils==2.11.0
     # via pynliner
 defusedxml==0.7.1
     # via
@@ -178,7 +189,6 @@ defusedxml==0.7.1
     #   social-auth-core
 django==4.2.13
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-appconf
@@ -389,6 +399,10 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+dnspython==2.6.1
+    # via
+    #   -r requirements/edx/paver.txt
+    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
@@ -505,7 +519,7 @@ edx-proctoring==4.17.0
     #   edx-proctoring-proctortrack
 edx-rbac==1.9.0
     # via edx-enterprise
-edx-rest-api-client==5.7.0
+edx-rest-api-client==5.6.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -540,20 +554,12 @@ edx-when==2.5.0
     #   edx-proctoring
 edxval==2.5.0
     # via -r requirements/edx/kernel.in
-elasticsearch==7.13.4
-    # via
-    #   -c requirements/edx/../common_constraints.txt
-    #   edx-search
+elasticsearch==7.17.9
+    # via edx-search
 enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
-event-tracking==2.4.0
-    # via
-    #   -r requirements/edx/kernel.in
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
 fastavro==1.9.4
     # via openedx-events
 filelock==3.14.0
@@ -595,11 +601,8 @@ idna==3.7
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.11.0
-    # via
-    #   -c requirements/edx/../common_constraints.txt
-    #   -r requirements/edx/kernel.in
-    #   markdown
+importlib-metadata==7.1.0
+    # via markdown
 importlib-resources==5.13.0
     # via
     #   jsonschema
@@ -667,7 +670,7 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.11.0
     # via -r requirements/edx/kernel.in
-lxml==4.9.4
+lxml[html-clean,html_clean]==4.9.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -779,8 +782,6 @@ openedx-learning==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-openedx-mongodbproxy==0.2.0
-    # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -825,7 +826,7 @@ pillow==10.3.0
     #   edxval
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==4.2.1
+platformdirs==4.2.2
     # via snowflake-connector-python
 polib==1.2.0
     # via edx-i18n-tools
@@ -881,7 +882,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -977,9 +978,9 @@ referencing==0.35.1
     # via
     #   jsonschema
     #   jsonschema-specifications
-regex==2024.5.10
+regex==2024.5.15
     # via nltk
-requests==2.31.0
+requests==2.32.1
     # via
     #   -r requirements/edx/paver.txt
     #   algoliasearch
@@ -1016,7 +1017,7 @@ ruamel-yaml==0.18.6
     # via drf-yasg
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
-rules==3.3
+rules==3.4
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -1229,7 +1230,7 @@ xss-utils==0.6.0
     # via -r requirements/edx/kernel.in
 yarl==1.9.4
     # via aiohttp
-zipp==3.18.1
+zipp==3.18.2
     # via
     #   importlib-metadata
     #   importlib-resources

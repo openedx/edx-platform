@@ -1,8 +1,10 @@
+
 """
 MongoDB/GridFS-level code for the contentstore.
 """
 
 
+import hashlib
 import json
 import os
 
@@ -57,6 +59,14 @@ class MongoContentStore(ContentStore):
         """
         self.fs_files.database.client.close()
 
+    def check_connection(self):
+        connection = self.fs_files.database.client
+        try:
+            connection.admin.command("ping")
+            return True
+        except pymongo.errors.InvalidOperation:
+            return False
+
     def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
@@ -69,8 +79,10 @@ class MongoContentStore(ContentStore):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.fs_files.database.client
+        if not self.check_connection():
+            return
 
+        connection = self.fs_files.database.client
         if database:
             connection.drop_database(self.fs_files.database.name)
         elif collections:
@@ -142,12 +154,17 @@ class MongoContentStore(ContentStore):
                         'thumbnail',
                         thumbnail_location[4]
                     )
+
+                md5 = getattr(fp, 'md5', None)
+                if md5 is None:
+                    md5 = hashlib.md5().hexdigest()
+
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
                     import_path=getattr(fp, 'import_path', None),
                     length=fp.length, locked=getattr(fp, 'locked', False),
-                    content_digest=getattr(fp, 'md5', None),
+                    content_digest=md5,
                 )
             else:
                 with self.fs.get(content_id) as fp:
@@ -161,12 +178,17 @@ class MongoContentStore(ContentStore):
                             'thumbnail',
                             thumbnail_location[4]
                         )
+
+                    md5 = getattr(fp, 'md5', None)
+                    if md5 is None:
+                        md5 = hashlib.md5().hexdigest()
+
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,
                         import_path=getattr(fp, 'import_path', None),
                         length=fp.length, locked=getattr(fp, 'locked', False),
-                        content_digest=getattr(fp, 'md5', None),
+                        content_digest=md5,
                     )
         except NoFile:
             if throw_on_not_found:  # lint-amnesty, pylint: disable=no-else-raise

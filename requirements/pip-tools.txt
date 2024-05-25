@@ -10,10 +10,8 @@ click==8.1.6
     # via
     #   -c requirements/constraints.txt
     #   pip-tools
-importlib-metadata==6.11.0
-    # via
-    #   -c requirements/common_constraints.txt
-    #   build
+importlib-metadata==7.1.0
+    # via build
 packaging==24.0
     # via build
 pip-tools==7.4.1
@@ -28,7 +26,7 @@ tomli==2.0.1
     #   pip-tools
 wheel==0.43.0
     # via pip-tools
-zipp==3.18.1
+zipp==3.18.2
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

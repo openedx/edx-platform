@@ -676,7 +676,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         return subtask_status, None
     finally:
         # Clean up at the end.
-        connection.close()
+        pass
 
 
 def _get_current_task():

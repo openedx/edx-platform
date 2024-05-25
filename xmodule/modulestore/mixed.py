@@ -907,8 +907,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         Close all db connections
         """
-        for modulestore in self.modulestores:
-            modulestore.close_connections()
+        # for modulestore in self.modulestores:
+        #     modulestore.close_connections()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """

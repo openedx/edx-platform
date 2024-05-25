@@ -554,7 +554,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             self.collection.delete_many({})
 
         if connections:
-            connection.close()
+            pass
 
     @autoretry_read()
     def fill_in_run(self, course_key):
