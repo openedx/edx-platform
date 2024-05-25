@@ -1,6 +1,6 @@
-#################
+################
 MixedModuleStore
-#################
+################
 
 MixedModuleStore provides a common API for all modulestore functions.
 
