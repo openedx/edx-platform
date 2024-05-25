@@ -135,7 +135,7 @@ REQUIRE_DEBUG = DEBUG
 
 PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
-# Load development webpack donfiguration
+# Load development webpack configuration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################

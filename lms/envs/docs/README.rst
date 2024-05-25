@@ -13,7 +13,7 @@ YAML Configuration Files
 
 In addition, there is a mechanism for reading and overriding configuration settings from YAML files on-disk. The :file:`/lms/envs/production.py` module loads settings from a YAML file.  The location of the YAML file is pulled from the value of the ``LMS_CFG`` environment variable.  Except for a limited set of exceptions, if a key exists in the YAML file, it will be injected into the settings module as it is defined in the YAML file.
 
-The YAML file allow open edX operators to configure the Django runtime
+The YAML file allow Open edX operators to configure the Django runtime
 without needing to make any changes to source-controlled python files in
 edx-platform. Therefore, they are not checked into the edx-platform repo.
 Rather, they are generated from the `edxapp playbook in the configuration
