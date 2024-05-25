@@ -8,9 +8,8 @@ Use conventional commits to separate and summarize commits logically:
 https://open-edx-proposals.readthedocs.io/en/latest/oep-0051-bp-conventional-commits.html
 
 Use this template as a guide. Omit sections that don't apply.
-You may link to information rather than copy it, but only if the link is publicly
-readable.  If you must linked information must be private (because it has secrets),
-clearly label the link as private.
+You may link to information rather than copy it, but only if the link is publicly readable.
+If the linked information must be private (because it contains secrets), clearly label the link as private.
 
 -->
 
