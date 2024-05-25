@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Target branch to create requirements PR against'
+        description: "Target branch to create requirements PR against"
         required: true
-        default: 'master'
+        default: "master"
         type: string
 
 defaults:

@@ -6,18 +6,18 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Target branch against which to create PR'
+        description: "Target branch against which to create PR"
         required: false
-        default: 'master'
+        default: "master"
 
 env:
-  MAXMIND_URL: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${{ secrets.MAXMIND_LICENSE_KEY }}&suffix=tar.gz'
-  MAXMIND_SHA256_URL: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${{ secrets.MAXMIND_LICENSE_KEY }}&suffix=tar.gz.sha256'
-  TAR_FILE_NAME: 'GeoLite2-Country.tar.gz'
-  TAR_SHA256_FILE_NAME: 'GeoLite2-Country.tar.gz.sha256'
-  TAR_UNZIPPED_ROOT_PATTERN: 'GeoLite2-Country_*'
-  DB_FILE: 'GeoLite2-Country.mmdb'
-  DB_DESTINATION_PATH: 'common/static/data/geoip'
+  MAXMIND_URL: "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${{ secrets.MAXMIND_LICENSE_KEY }}&suffix=tar.gz"
+  MAXMIND_SHA256_URL: "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${{ secrets.MAXMIND_LICENSE_KEY }}&suffix=tar.gz.sha256"
+  TAR_FILE_NAME: "GeoLite2-Country.tar.gz"
+  TAR_SHA256_FILE_NAME: "GeoLite2-Country.tar.gz.sha256"
+  TAR_UNZIPPED_ROOT_PATTERN: "GeoLite2-Country_*"
+  DB_FILE: "GeoLite2-Country.mmdb"
+  DB_DESTINATION_PATH: "common/static/data/geoip"
 
 jobs:
   download-and-replace:

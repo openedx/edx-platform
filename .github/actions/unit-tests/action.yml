@@ -1,5 +1,5 @@
-name: 'Run unit tests'
-description: 'shared steps to run unit tests on both Github hosted and self hosted runners.'
+name: "Run unit tests"
+description: "shared steps to run unit tests on both Github hosted and self hosted runners."
 runs:
   using: "composite"
   steps:

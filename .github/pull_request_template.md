@@ -21,6 +21,7 @@ Design decisions and their rationales should be documented in the repo (docstrin
 linked here.
 
 Useful information to include:
+
 - Which edX user roles will this change impact? Common user roles are "Learner", "Course Author",
 "Developer", and "Operator".
 - Include screenshots for changes to the UI (ideally, both "before" and "after" screenshots, if applicable).
@@ -43,6 +44,7 @@ Please provide detailed step-by-step instructions for testing this change.
 ## Other information
 
 Include anything else that will help reviewers and consumers understand the change.
+
 - Does this change depend on other changes elsewhere?
 - Any special concerns or limitations? For example: deprecations, migrations, security, or accessibility.
 - If your [database migration](https://openedx.atlassian.net/wiki/spaces/AC/pages/23003228/Everything+About+Database+Migrations) can't be rolled back easily.
