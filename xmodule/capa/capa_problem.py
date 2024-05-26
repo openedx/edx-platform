@@ -109,7 +109,6 @@ class LoncapaSystem(object):
         resources_fs,
         seed,      # Why do we do this if we have self.seed?
         xqueue,
-        matlab_api_key=None
     ):
         self.ajax_url = ajax_url
         self.anonymous_student_id = anonymous_student_id
@@ -123,7 +122,6 @@ class LoncapaSystem(object):
         self.seed = seed                     # Why do we do this if we have self.seed?
         self.STATIC_URL = settings.STATIC_URL           # pylint: disable=invalid-name
         self.xqueue = xqueue
-        self.matlab_api_key = matlab_api_key
 
 
 class LoncapaProblem(object):
