@@ -19,6 +19,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
