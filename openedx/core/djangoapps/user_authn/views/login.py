@@ -199,7 +199,6 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         tracker.emit(
             PASSWORD_RESET_INITIATED,
             {
-                "email": user.email,
                 "user_id": user.id,
                 "source": "Policy Compliance",
             }

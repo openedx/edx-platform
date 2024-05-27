@@ -89,9 +89,7 @@ class Command(BaseCommand):
                 tracker.emit(
                     PASSWORD_RESET_INITIATED,
                     {
-                        "email": user.email,
                         "user_id": user.id,
-                        "old_email": current_email,
                         "source": "Account Recovery Management Command",
                     }
                 )

@@ -293,7 +293,6 @@ def password_reset(request):
     tracker.emit(
         PASSWORD_RESET_INITIATED,
         {
-            "email": email,
             "user_id": user.id,
             "source": "Logistration Page",
         }
@@ -620,7 +619,6 @@ def password_change_request_handler(request):
     tracker.emit(
         PASSWORD_RESET_INITIATED,
         {
-            "email": email,
             "user_id": user.id,
             "source": "Account API",
         }
