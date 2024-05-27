@@ -62,7 +62,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libxmlsec1-dev lynx
 
       - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.7.0
+        uses: supercharge/mongodb-github-action@1.11.0
         with:
           mongodb-version: ${{ matrix.mongo-version}}
 
