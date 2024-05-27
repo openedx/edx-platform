@@ -209,6 +209,7 @@ div.problem {
 // Choice Group - silent class
 %choicegroup-base {
   @include clearfix();
+  @include margin($baseline, 0 0 0);
 
   min-width: 100px;
   width: auto !important;
@@ -307,7 +308,7 @@ div.problem {
       @include left(em(9));
 
       position: absolute;
-      top: 0.35em;
+      top: .43em;
       width: $baseline*1.1;
       height: $baseline*1.1;
       z-index: 1;
@@ -572,10 +573,10 @@ div.problem {
       }
 
       .grading {
-        margin: 0px 7px 0 0;
+        margin: 0 7px 0 0;
         padding-left: 25px;
         background: url('#{$static-path}/images/info-icon.png') left center no-repeat;
-        text-indent: 0px;
+        text-indent: 0;
       }
 
       p {
@@ -646,7 +647,7 @@ div.problem {
     }
 
     .submit-message-container {
-      margin: $baseline 0px ;
+      margin: $baseline 0;
     }
   }
 
@@ -780,7 +781,10 @@ div.problem {
 // +Problem - Text Input, Numerical Input
 // ====================
 .problem {
-  .capa_inputtype.textline, .inputtype.formulaequationinput {
+  .capa_inputtype.textline,
+  .inputtype.formulaequationinput {
+    @include margin($baseline, 0 0 0);
+
     input {
       box-sizing: border-box;
 
@@ -879,7 +883,7 @@ div.problem {
 // ====================
 .problem {
   .inputtype.option-input {
-    margin: 0 0 0 0 !important;
+    margin: $baseline 0 0 0 !important;
 
     .indicator-container {
       display: inline-block;
@@ -946,7 +950,7 @@ div.problem {
   }
 
   .CodeMirror-scroll {
-    margin-right: 0px;
+    margin-right: 0;
   }
 }
 
