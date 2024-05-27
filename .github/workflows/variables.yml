@@ -94,6 +94,8 @@ jobs:
           script: |
             if ( "${{ github.ref }}".match(/^refs\/heads\/(eol|openuchile|vlabx)-release\/(\w+)(\.master)?$/) ) { // push to production branch case
               return true
+            } else if ( "${{ github.ref }}".match(/^refs\/heads\/gh-readonly-queue\/(eol|openuchile|vlabx)-release\/\w+\/pr-\d+-\w+$/) ) { // push to merge queue to production branch
+              return true
             } else return false
 
   validate:
