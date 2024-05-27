@@ -5,7 +5,7 @@ Views for user API
 
 import datetime
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import pytz
 from completion.exceptions import UnavailableCompletionData
