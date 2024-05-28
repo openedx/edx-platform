@@ -37,7 +37,7 @@ class AuthoringGradingView(DeveloperErrorViewMixin, APIView):
 
         **Example Request**
 
-            POST /api/contentstore/v1/course_grading/{course_id}
+            POST /api/contentstore/v0/course_grading/{course_id}
 
         **POST Parameters**
 
