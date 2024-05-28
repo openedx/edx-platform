@@ -28,7 +28,7 @@ tomli==2.0.1
     #   pip-tools
 wheel==0.43.0
     # via pip-tools
-zipp==3.18.1
+zipp==3.19.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
