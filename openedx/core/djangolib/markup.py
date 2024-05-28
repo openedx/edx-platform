@@ -4,7 +4,7 @@ Utilities for use in Mako markup.
 
 
 import markupsafe
-import bleach
+import nh3
 from lxml.html.clean import Cleaner
 from mako.filters import decode
 
@@ -53,7 +53,7 @@ def strip_all_tags_but_br(string_to_strip):
         string_to_strip = ""
 
     string_to_strip = decode.utf8(string_to_strip)
-    string_to_strip = bleach.clean(string_to_strip, tags={'br'}, strip=True)
+    string_to_strip = nh3.clean(string_to_strip, tags={'br'})
 
     return HTML(string_to_strip)
 

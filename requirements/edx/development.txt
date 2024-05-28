@@ -1259,6 +1259,10 @@ newrelic==9.9.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
+nh3==0.2.17
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 nltk==3.8.1
     # via
     #   -r requirements/edx/doc.txt
