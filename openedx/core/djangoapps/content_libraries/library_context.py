@@ -10,7 +10,7 @@ from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.xblock.api import LearningContext
 
-from openedx_learning.core.components import api as components_api
+from openedx_learning.api import authoring as authoring_api
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class LibraryContextImpl(LearningContext):
         if learning_package is None:
             return False
 
-        return components_api.component_exists_by_key(
+        return authoring_api.component_exists_by_key(
             learning_package.id,
             namespace='xblock.v1',
             type_name=usage_key.block_type,

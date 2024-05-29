@@ -915,6 +915,7 @@ MIDDLEWARE = [
     # Various monitoring middleware
     'edx_django_utils.monitoring.CookieMonitoringMiddleware',
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
+    'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
     'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
     # Before anything that looks at cookies, especially the session middleware
@@ -1755,9 +1756,6 @@ INSTALLED_APPS = [
     # edx-milestones service
     'milestones',
 
-    # Coursegraph
-    'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
-
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
 
@@ -1881,9 +1879,9 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
-    "openedx_learning.core.components",
-    "openedx_learning.core.contents",
-    "openedx_learning.core.publishing",
+    "openedx_learning.apps.authoring.components",
+    "openedx_learning.apps.authoring.contents",
+    "openedx_learning.apps.authoring.publishing",
 ]
 
 
@@ -2446,40 +2444,6 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 #     11 grade designations are used by the UI, so it's advisable to restrict the list to 11 items.
 DEFAULT_GRADE_DESIGNATIONS = ['A', 'B', 'C', 'D']
 
-############## Settings for CourseGraph ############################
-
-# .. setting_name: COURSEGRAPH_JOB_QUEUE
-# .. setting_default: value of LOW_PRIORITY_QUEUE
-# .. setting_description: The name of the Celery queue to which CourseGraph refresh
-#      tasks will be sent
-COURSEGRAPH_JOB_QUEUE: str = LOW_PRIORITY_QUEUE
-
-# .. setting_name: COURSEGRAPH_CONNECTION
-# .. setting_default: 'bolt+s://localhost:7687', in dictionary form.
-# .. setting_description: Dictionary specifying Neo4j connection parameters for
-#      CourseGraph refresh. Accepted keys are protocol ('bolt' or 'http'),
-#      secure (bool), host (str), port (int), user (str), and password (str).
-#      See https://py2neo.org/2021.1/profiles.html#individual-settings for a
-#      a description of each of those keys.
-COURSEGRAPH_CONNECTION: dict = {
-    "protocol": "bolt",
-    "secure": True,
-    "host": "localhost",
-    "port": 7687,
-    "user": "neo4j",
-    "password": None,
-}
-
-# .. toggle_name: COURSEGRAPH_DUMP_COURSE_ON_PUBLISH
-# .. toggle_implementation: DjangoSetting
-# .. toggle_creation_date: 2022-01-27
-# .. toggle_use_cases: open_edx
-# .. toggle_default: False
-# .. toggle_description: Whether, upon publish, a course should automatically
-#      be exported to Neo4j via the connection parameters specified in
-#      `COURSEGRAPH_CONNECTION`.
-COURSEGRAPH_DUMP_COURSE_ON_PUBLISH: bool = False
-
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
@@ -2958,13 +2922,13 @@ REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
 
 BEAMER_PRODUCT_ID = ""
 
-################### Studio Search (alpha, using Meilisearch) ###################
+################### Studio Search (beta), using Meilisearch ###################
 
 # Enable Studio search features (powered by Meilisearch) (beta, off by default)
 MEILISEARCH_ENABLED = False
 # Meilisearch URL that the python backend can use. Often points to another docker container or k8s service.
 MEILISEARCH_URL = "http://meilisearch"
-# URL that browsers (end users) can user to reach Meilisearch. Should be HTTPS in production.
+# URL that browsers (end users) can use to reach Meilisearch. Should be HTTPS in production.
 MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 # To support multi-tenancy, you can prefix all indexes with a common key like "sandbox7-"
 # and use a restricted tenant token in place of an API key, so that this Open edX instance

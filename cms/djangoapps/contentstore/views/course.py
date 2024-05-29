@@ -52,7 +52,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
     GlobalStaff,
     UserBasedRole,
-    OrgStaffRole
+    OrgStaffRole,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters

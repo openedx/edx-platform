@@ -1,11 +1,7 @@
 <!--
 
-🌳🌳
-🌳🌳🌳🌳         🌳 Note: Quince is in support. Fixes you make on master may still be needed on Quince.
-    🌳🌳🌳🌳     If so, make another pull request against the open-release/quince.master branch,
-🌳🌳🌳🌳         or ask in the #wg-build-test-release Slack channel if you have any questions or need help.
-🌳🌳
-
+Note: Please refer to the Support Development Guidelines on the wiki page to consider backporting to active releases:
+https://openedx.atlassian.net/wiki/spaces/COMM/pages/4248436737/Support+Guidelines+for+active+releases
 
 Please give your pull request a short but descriptive title.
 Use conventional commits to separate and summarize commits logically:

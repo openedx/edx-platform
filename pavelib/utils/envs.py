@@ -7,7 +7,6 @@ import os
 import sys
 from time import sleep
 
-import memcache
 from lazy import lazy
 from path import Path as path
 from paver.easy import BuildFailure, sh

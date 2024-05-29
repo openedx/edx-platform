@@ -2256,6 +2256,7 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.CodeOwnerMonitoringMiddleware',
     'edx_django_utils.monitoring.CookieMonitoringMiddleware',
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
+    'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
 
     # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
@@ -3385,9 +3386,9 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
-    "openedx_learning.core.components",
-    "openedx_learning.core.contents",
-    "openedx_learning.core.publishing",
+    "openedx_learning.apps.authoring.components",
+    "openedx_learning.apps.authoring.contents",
+    "openedx_learning.apps.authoring.publishing",
 ]
 
 

@@ -22,7 +22,7 @@ from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_F
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 LOGGER = logging.getLogger(__name__)
@@ -316,7 +316,7 @@ class CourseMetadata:
             if not team_set.user_partition_id:
                 team_set.user_partition_id = cls.get_user_partition_id(
                     block,
-                    MINIMUM_STATIC_PARTITION_ID,
+                    MINIMUM_UNUSED_PARTITION_ID,
                     MYSQL_MAX_INT,
                 )
         return TeamsConfig(

@@ -3,6 +3,7 @@ Test capa problem.
 """
 import textwrap
 import unittest
+from unittest.mock import patch, MagicMock
 
 from django.conf import settings
 from django.test import override_settings
@@ -10,7 +11,6 @@ import pytest
 import ddt
 from lxml import etree
 from markupsafe import Markup
-from mock import patch, MagicMock
 
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError

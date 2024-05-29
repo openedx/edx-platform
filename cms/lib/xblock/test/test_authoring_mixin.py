@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
+    MINIMUM_UNUSED_PARTITION_ID,
     Group,
     UserPartition
 )
@@ -78,7 +78,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         """
         # pylint: disable=attribute-defined-outside-init
         self.content_partition = UserPartition(
-            MINIMUM_STATIC_PARTITION_ID,
+            MINIMUM_UNUSED_PARTITION_ID,
             self.CONTENT_GROUPS_TITLE,
             'Contains Groups for Cohorted Courseware',
             content_groups,
