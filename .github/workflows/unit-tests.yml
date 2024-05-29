@@ -118,7 +118,7 @@ jobs:
 
       - name: install system requirements
         run: |
-          make ubuntu-requirements
+          sudo apt-get update && sudo apt-get install libxmlsec1-dev
 
       - name: install requirements
         run: |
