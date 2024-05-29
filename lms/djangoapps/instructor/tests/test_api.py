@@ -164,6 +164,7 @@ INSTRUCTOR_POST_ENDPOINTS = {
     'get_proctored_exam_results',
     'get_student_enrollment_status',
     'get_student_progress_url',
+    'get_student_progress_url_v2',
     'get_students_features',
     'get_students_who_may_enroll',
     'list_background_email_tasks',
@@ -418,6 +419,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_grading_config', {}),
             ('get_students_features', {}),
             ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
+            ('get_student_progress_url_v2', {'unique_student_identifier': self.user.username}),
             ('update_forum_role_membership',
              {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
@@ -2938,33 +2940,37 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         self.assertContains(response, already_running_status, status_code=400)
 
-    def test_get_student_progress_url(self):
+    @ddt.data('get_student_progress_url', 'get_student_progress_url_v2')
+    def test_get_student_progress_url(self, url):
         """ Test that progress_url is in the successful response. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        url = reverse(url, kwargs={'course_id': str(self.course.id)})
         data = {'unique_student_identifier': self.students[0].email}
         response = self.client.post(url, data)
         assert response.status_code == 200
         res_json = json.loads(response.content.decode('utf-8'))
         assert 'progress_url' in res_json
 
-    def test_get_student_progress_url_from_uname(self):
+    @ddt.data('get_student_progress_url', 'get_student_progress_url_v2')
+    def test_get_student_progress_url_from_uname(self, url):
         """ Test that progress_url is in the successful response. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        url = reverse(url, kwargs={'course_id': str(self.course.id)})
         data = {'unique_student_identifier': self.students[0].username}
         response = self.client.post(url, data)
         assert response.status_code == 200
         res_json = json.loads(response.content.decode('utf-8'))
         assert 'progress_url' in res_json
 
-    def test_get_student_progress_url_noparams(self):
+    @ddt.data('get_student_progress_url', 'get_student_progress_url_v2')
+    def test_get_student_progress_url_noparams(self, url):
         """ Test that the endpoint 404's without the required query params. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        url = reverse(url, kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url)
         assert response.status_code == 400
 
-    def test_get_student_progress_url_nostudent(self):
+    @ddt.data('get_student_progress_url', 'get_student_progress_url_v2')
+    def test_get_student_progress_url_nostudent(self, url):
         """ Test that the endpoint 400's when requesting an unknown email. """
-        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        url = reverse(url, kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url)
         assert response.status_code == 400
 
