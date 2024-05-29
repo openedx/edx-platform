@@ -572,10 +572,10 @@ div.problem {
       }
 
       .grading {
-        margin: 0px 7px 0 0;
+        margin: 0 7px 0 0;
         padding-left: 25px;
         background: url('#{$static-path}/images/info-icon.png') left center no-repeat;
-        text-indent: 0px;
+        text-indent: 0;
       }
 
       p {
@@ -646,7 +646,7 @@ div.problem {
     }
 
     .submit-message-container {
-      margin: $baseline 0px ;
+      margin: $baseline 0;
     }
   }
 
@@ -657,6 +657,7 @@ div.problem {
   }
 
   ul {
+    padding-left: 1em;
     margin-bottom: lh();
     margin-left: .75em;
     margin-left: .75rem;
@@ -664,6 +665,7 @@ div.problem {
   }
 
   ol {
+    padding-left: 1em;
     margin-bottom: lh();
     margin-left: .75em;
     margin-left: .75rem;
@@ -705,6 +707,8 @@ div.problem {
     margin: lh() 0;
     border-collapse: collapse;
     table-layout: auto;
+    max-width: 100%;
+    border: 1px solid;
 
     td, th {
       &.cont-justified-left {
@@ -745,6 +749,7 @@ div.problem {
 
     tr, td, th {
       vertical-align: middle;
+      border: 1px solid;
     }
   }
 
@@ -1155,10 +1160,10 @@ div.problem {
         color: $uxpl-gray-dark;
       }
 
-      li {
+      li[class*="hint-index-"] {
         color: $uxpl-gray-base;
 
-        strong {
+        & > strong {
           color: $uxpl-gray-dark;
         }
       }
@@ -1186,6 +1191,16 @@ div.problem {
         li:not(:last-child) {
           margin-bottom: $baseline / 4;
         }
+      }
+
+      li[class*="hint-index-"] ul,
+      li[class*="hint-index-"] ol {
+        padding: 0 0 0 1em;
+        margin-left: .75rem;
+      }
+
+      li[class*="hint-index-"] ol {
+        list-style: decimal outside none;
       }
     }
 
