@@ -60,7 +60,7 @@ ENV NO_PYTHON_UNINSTALL 1
 RUN pip install pip==20.3.4 \
   && pip install --src ../venv/src -r requirements/edx/base.txt \
   && pip install boto==2.49.0 \
-  && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@c43347d36d5a20590a2e2f91e31d5270934ee993#egg=edx_s3_compatiblity
+  && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@ad317969c073f8348da719cdda7b430bcfafb706#egg=edx_s3_compatiblity
 
 # Manually update pytz (Timezones)
 RUN pip install pytz --upgrade
