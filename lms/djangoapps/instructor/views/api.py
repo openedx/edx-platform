@@ -38,7 +38,10 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.permissions import (  # lint-amnesty, pylint: disable=wrong-import-order
+    IsAdminUser,
+    IsAuthenticated
+)
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from submissions import api as sub_api  # installed from the edx-submissions repository  # lint-amnesty, pylint: disable=wrong-import-order
@@ -122,6 +125,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
+from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
     dump_block_extensions,
@@ -1715,6 +1719,61 @@ def get_student_enrollment_status(request, course_id):
     }
 
     return JsonResponse(response_payload)
+
+
+class StudentProgressUrlSerializer(serializers.Serializer):
+    """Serializer for course renders"""
+    unique_student_identifier = serializers.CharField(write_only=True)
+    course_id = CourseKeyField(required=False)
+    progress_url = serializers.SerializerMethodField()
+
+    def get_progress_url(self, obj):    # pylint: disable=unused-argument
+        """
+        Return the progress URL for the student.
+
+        Args:
+            obj (dict): The dictionary containing data for the serializer.
+
+        Returns:
+            str: The URL for the progress of the student in the course.
+        """
+        user = get_student_from_identifier(obj.get('unique_student_identifier'))
+        course_id = obj.get('course_id')  # Adjust based on your data structure
+
+        if course_home_mfe_progress_tab_is_active(course_id):
+            progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
+            if user is not None:
+                progress_url += '/{}/'.format(user.id)
+        else:
+            progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
+
+        return progress_url
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class StudentProgressUrl(APIView):
+    """
+    Get the progress url of a student.
+    Limited to staff access.
+    Takes query parameter unique_student_identifier and if the student exists
+    returns e.g. {
+        'progress_url': '/../...'
+    }
+    """
+    permission_classes = [IsAuthenticated, permissions.InstructorPermission]
+    serializer_class = StudentProgressUrlSerializer
+    custom_permission = permissions.ENROLLMENT_REPORT
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """Post method for validating incoming data and generating progress URL"""
+        data = {
+            'course_id': course_id,
+            'unique_student_identifier': request.data.get('unique_student_identifier')
+        }
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
 
 
 @require_POST
