@@ -6,10 +6,13 @@ on:
     branches:
       - master
 
+env:
+  RUNNER: "ubuntu-20.04"
+
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
-    runs-on: [ "ubuntu-20.04" ]
+    runs-on: ${{ env.RUNNER }}
     strategy:
       matrix:
         python-version:
@@ -97,12 +100,10 @@ jobs:
         uses: ./.github/actions/unit-tests
 
       - name: Renaming coverage data file
-        if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
         run: |
           mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
 
       - name: Upload coverage
-        if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
         uses: actions/upload-artifact@v4
         with:
           name: coverage
@@ -114,8 +115,7 @@ jobs:
   # https://github.com/orgs/community/discussions/33579
   success:
     name: Unit tests successful
-    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    runs-on: [ "ubuntu-20.04" ]
+    runs-on: ${{ env.RUNNER }}
     needs: [ run-tests ]
     steps:
       - name: Decide whether the needed jobs succeeded or failed
@@ -125,8 +125,7 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
   compile-warnings-report:
-    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    runs-on: [ "ubuntu-20.04" ]
+    runs-on: ${{ env.RUNNER }}
     needs: [ run-tests ]
     steps:
       - uses: actions/checkout@v4
@@ -155,7 +154,7 @@ jobs:
   # Combine and upload coverage reports.
   coverage:
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    runs-on: [ "ubuntu-20.04" ]
+    runs-on: ${{ env.RUNNER }}
     needs: [ run-tests ]
     strategy:
       matrix:
