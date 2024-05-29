@@ -19,7 +19,6 @@ from django.urls import reverse_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
 
-
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 from .common import *
@@ -84,6 +83,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
         'REST_FRAMEWORK',
+        'EVENT_BUS_PRODUCER_CONFIG',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
