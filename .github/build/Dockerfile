@@ -59,8 +59,7 @@ ADD . /openedx/edx-platform
 ENV NO_PYTHON_UNINSTALL 1
 RUN pip install pip==20.3.4 \
   && pip install --src ../venv/src -r requirements/edx/base.txt \
-  && pip install boto==2.49.0 \
-  && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@02399a43c7c3e3bef2041bf9ac997c8820be7e7c#egg=edx_s3_compatiblity
+  && pip install boto==2.49.0
 
 # Manually update pytz (Timezones)
 RUN pip install pytz --upgrade
