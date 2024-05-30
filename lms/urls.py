@@ -38,7 +38,7 @@ from lms.djangoapps.staticbook import views as staticbook_views
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.common_views.xblock import xblock_resource
+from openedx.core.djangoapps.common_views.xblock import xblock_resource, xblock_resource_v2
 from openedx.core.djangoapps.cors_csrf import views as cors_csrf_views
 from openedx.core.djangoapps.course_groups import views as course_groups_views
 from openedx.core.djangoapps.debug import views as openedx_debug_views
@@ -345,6 +345,11 @@ urlpatterns += [
         r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
         xblock_resource,
         name='xblock_resource_url',
+    ),
+    re_path(
+        r'xblock/resource-v2/(?P<block_type>[^/]+)/(?P<uri>.*)$',
+        xblock_resource_v2,
+        name='xblock_resource_url_v2',
     ),
 
     # New (Learning-Core-based) XBlock REST API

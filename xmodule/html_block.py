@@ -364,6 +364,7 @@ class HtmlBlockV2(XBlock2Mixin, HtmlBlockMixin):
     """
     The new version of the HTML block.
     """
+    resources_dir = "assets/html"
 
 
 class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
