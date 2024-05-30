@@ -1,6 +1,13 @@
 name: Docker Image CI
 
 on:
+  push:
+    branches:
+      - 'eol-release/**'
+      - 'openuchile-release/**'
+      - 'vlabx-release/**'
+    paths-ignore:
+      - '.github/workflows/**'
   merge_group:
     types: [checks_requested]
   pull_request:
@@ -12,9 +19,6 @@ on:
       - 'eol/**'
       - 'openuchile/**'
       - 'vlabx/**'
-      - 'eol-release/**'
-      - 'openuchile-release/**'
-      - 'vlabx-release/**'
     paths-ignore:
       - '.github/workflows/**'
 
@@ -94,7 +98,7 @@ jobs:
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh
 
       - name: Push the image to the registry
-        if: ${{ github.event_name == 'merge_group' }}
+        if: ${{ github.event_name == 'merge_group' || github.event_name == 'push' }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username ${{ github.actor }} --password-stdin
           docker push ghcr.io/eol-uchile/edx-platform:${{ steps.prefix.outputs.PREFIX }}${GITHUB_SHA}
@@ -108,7 +112,7 @@ jobs:
 
   webhook:
     needs: [ variables, build ]
-    if: ${{ github.event_name == 'merge_group' }}
+    if: ${{ github.event_name == 'merge_group' || github.event_name == 'push' }}
     uses: ./.github/workflows/webhook.yml
     with:
       code: ${{ needs.variables.outputs.code }}
