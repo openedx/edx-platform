@@ -516,6 +516,14 @@ FEATURES = {
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
     'DISABLE_UNENROLLMENT': False,
+
+    # .. toggle_name: FEATURES['BADGES_ENABLED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable the Badges feature.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-04-10
+    'BADGES_ENABLED': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -2696,3 +2704,49 @@ INACTIVE_USER_LOGIN = True
 
 # Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
 INACTIVE_USER_URL = f'http://{CMS_BASE}'
+
+#### Event bus producing ####
+
+
+def _should_send_learning_badge_events(settings):
+    return settings.FEATURES['BADGES_ENABLED']
+
+
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: all events disabled
+# .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
+#    Each topic configuration dictionary contains
+#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
+#       according to
+#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
+#    Note: The topic names should not include environment prefix as it will be dynamically added based on
+#    EVENT_BUS_TOPIC_PREFIX setting.
+
+EVENT_BUS_PRODUCER_CONFIG = {
+    "org.openedx.learning.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
+    "org.openedx.learning.ccx.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.ccx_course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
+}
+
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.ccx.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)

@@ -25,6 +25,7 @@ import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
+from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -83,6 +84,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
         'REST_FRAMEWORK',
+        'EVENT_BUS_PRODUCER_CONFIG',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -1080,3 +1082,7 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
     "SECRET": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET', None),
     "URL": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL', None),
 }
+
+############## Event bus producer ##############
+EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
+                                                   ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))

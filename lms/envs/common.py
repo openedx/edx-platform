@@ -1018,6 +1018,15 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1458'
     'ENABLE_CERTIFICATES_IDV_REQUIREMENT': False,
+
+    # .. toggle_name: FEATURES['BADGES_ENABLED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable badges functionality.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-04-02
+    # .. toggle_target_removal_date: None
+    'BADGES_ENABLED': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -3256,6 +3265,8 @@ INSTALLED_APPS = [
 
     # MFE API
     'lms.djangoapps.mfe_config_api',
+
+    'openedx_events',
 ]
 
 ######################### CSRF #########################################
@@ -5259,3 +5270,45 @@ URLS_2U_LOBS = {
     'bachelors_degree': 'https://www.edx.org/bachelors',
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
+
+#### Event bus producing ####
+
+def _should_send_learning_badge_events(settings):
+    return settings.FEATURES['BADGES_ENABLED']
+
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: all events disabled
+# .. setting_description: Dictionary of event_types mapped to dictionaries of topic to topic-related configuration.
+#    Each topic configuration dictionary contains
+#    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
+#       according to
+#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
+#    Note: The topic names should not include environment prefix as it will be dynamically added based on
+#    EVENT_BUS_TOPIC_PREFIX setting.
+EVENT_BUS_PRODUCER_CONFIG = {
+    "org.openedx.learning.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
+    "org.openedx.learning.ccx.course.passing.status.updated.v1": {
+        "learning-badges-lifecycle": {
+            "event_key_field": "course_passing_status.course.ccx_course_key",
+            "enabled": _should_send_learning_badge_events,
+        },
+    },
+}
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)
+derived_collection_entry(
+    "EVENT_BUS_PRODUCER_CONFIG",
+    "org.openedx.learning.ccx.course.passing.status.updated.v1",
+    "learning-badges-lifecycle",
+    "enabled",
+)
