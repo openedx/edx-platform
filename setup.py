@@ -38,6 +38,9 @@ XBLOCKS = [
     "word_cloud = xmodule.word_cloud_block:WordCloudBlock",
     "wrapper = xmodule.wrapper_block:WrapperBlock",
 ]
+XBLOCKS_V2 = [
+    "html = xmodule.html_block:HtmlBlockV2",
+]
 XBLOCKS_ASIDES = [
     'tagging_aside = cms.lib.xblock.tagging:StructuredTagsAside',
 ]
@@ -186,6 +189,7 @@ setup(
             'team = openedx.core.lib.teams_config:create_team_set_partition',
         ],
         'xblock.v1': XBLOCKS,
+        'xblock.v2': XBLOCKS_V2,
         'xblock_asides.v1': XBLOCKS_ASIDES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',

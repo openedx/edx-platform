@@ -13,7 +13,7 @@ from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
 from web_fragments.fragment import Fragment
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlock2Mixin
 from xblock.fields import Boolean, List, Scope, String
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
@@ -357,6 +357,12 @@ class HtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-metho
     """
     This is the actual HTML XBlock.
     Nothing extra is required; this is just a wrapper to include edxnotes support.
+    """
+
+
+class HtmlBlockV2(XBlock2Mixin, HtmlBlockMixin):
+    """
+    The new version of the HTML block.
     """
 
 
