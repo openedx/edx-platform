@@ -131,7 +131,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             # We're not actually using this value any more, but we're keeping it
             # in the API testing for backwards compatibility for just a little
             # longer. TODO: Remove this once the frontend stops sending it.
-            "collection_uuid": uuid.uuid4(),
+            # "collection_uuid": uuid.uuid4(),
         }, expect_response)
 
     def _list_libraries(self, query_params_dict=None, expect_response=200):

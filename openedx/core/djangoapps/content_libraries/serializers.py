@@ -34,7 +34,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     org = serializers.SlugField(source="key.org")
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
-    collection_uuid = serializers.UUIDField(format='hex_verbose', write_only=True)
+    #collection_uuid = serializers.UUIDField(format='hex_verbose', write_only=True)
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     num_blocks = serializers.IntegerField(read_only=True)

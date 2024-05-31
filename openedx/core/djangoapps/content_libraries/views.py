@@ -260,7 +260,7 @@ class LibraryRootView(APIView):
         # sending it to us. This whole bit of deserialization is kind of weird
         # though, with the renames and such. Look into this later for clennup.
         # Ref: https://github.com/openedx/edx-platform/issues/34283
-        data.pop("collection_uuid", None)
+        # data.pop("collection_uuid", None)
 
         try:
             with atomic():
