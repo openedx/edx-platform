@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import UsageKey
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from xblock.fields import Scope
-from xblock.core import XBlock2
+from xblock.core import XBlock, XBlock2Mixin
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.models import StudentModule, XModuleUserStateSummaryField
@@ -66,11 +66,10 @@ def get_unit_blocks(request, usage_id):
                 "block_type": usage_key.block_type,
             }
             try:
-                block_class = XBlock2.load_class(usage_key.block_type, fallback_to_v1=True)
-                if issubclass(block_class, XBlock2):
+                block_class = XBlock.load_class(usage_key.block_type)
+                if issubclass(block_class, XBlock2Mixin):
                     block_data_out["xblock_api_version"] = 2
                     block_data_out["content_fields"] = {}
-                    block_data_out["system_fields"] = {}
                     block_data_out["user_fields"] = {}
 
                     def add_field(field_name, value):

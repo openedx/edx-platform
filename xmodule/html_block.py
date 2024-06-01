@@ -353,16 +353,10 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
 
 
 @edxnotes
-class HtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class HtmlBlock(XBlock2Mixin, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     This is the actual HTML XBlock.
     Nothing extra is required; this is just a wrapper to include edxnotes support.
-    """
-
-
-class HtmlBlockV2(XBlock2Mixin, HtmlBlockMixin):
-    """
-    The new version of the HTML block.
     """
     resources_dir = "assets/html"
 
