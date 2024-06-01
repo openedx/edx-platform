@@ -9,10 +9,11 @@ from django.urls import reverse
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
+from xblock.fields import Scope
 from xblock.core import XBlock2
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule, XModuleUserStateSummaryField
 from openedx.core.lib.api.view_utils import view_auth_classes
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore import ModuleStoreEnum
@@ -76,12 +77,13 @@ def get_unit_blocks(request, usage_id):
                         field = block_class.fields.get(field_name)
                         if field:  # TODO: and not field.private
                             block_data_out["content_fields"][field_name] = field.to_json(value)
-                        else:
-                            for mixin in store.xblock_mixins:
-                                field = mixin.fields.get(field_name)
-                                if field:
-                                    block_data_out["system_fields"][field_name] = field.to_json(value)
-                                    return
+                        # Do we even need to share these "system fields" with the frontend? probably not...
+                        # else:
+                        #     for mixin in store.xblock_mixins:
+                        #         field = mixin.fields.get(field_name)
+                        #         if field:
+                        #             block_data_out["system_fields"][field_name] = field.to_json(value)
+                        #             return
 
                     # We cannot get ALL of the field data from the block transfomers API(s), because they only support a
                     # small subset of fields defined in course_api.blocks.serializers.SUPPORTED_FIELDS. However, all the
@@ -92,7 +94,7 @@ def get_unit_blocks(request, usage_id):
                         # and "category" will be silently dropped here since they're in the block transformer data but
                         # they aren't actual XBlock fields. (Except lti_block.has_score which is actually a field.)
 
-                    # TODO: load additional fields from split modulestore if needed.
+                    # Load additional fields from split modulestore if needed.
                     block_data = store._get_block_from_structure(
                         structure_data.structure,
                         BlockKey.from_usage_key(usage_key),
@@ -103,11 +105,25 @@ def get_unit_blocks(request, usage_id):
 
                     # Get the user-specific field data:
                     sm = next((sm for sm in student_modules if sm.module_state_key == usage_key), None)
-                    if sm:
-                        for field_name, value in json.loads(sm.state).items():
-                            field = block_class.fields.get(field_name)
-                            if field:  # TODO: and not field.private
-                                block_data_out["user_fields"][field_name] = value  # value is already in JSON format
+                    user_state_data = json.loads(sm.state) if sm else {}
+
+                    for field_name, field in block_class.fields.items():
+                        if field.scope == Scope.user_state:
+                            if field_name in user_state_data:
+                                # Note: this value is already in a JSON-compatible format
+                                block_data_out["user_fields"][field_name] = user_state_data[field_name]
+                            else:
+                                block_data_out["user_fields"][field_name] = field.to_json(field.default)
+                        elif field.scope == Scope.user_state_summary:
+                            try:
+                                uss = XModuleUserStateSummaryField.objects.get(
+                                    usage_id=usage_key,
+                                    field_name=field_name,
+                                )
+                                block_data_out["user_fields"][field_name] = json.loads(uss.value)
+                            except XModuleUserStateSummaryField.DoesNotExist:
+                                block_data_out["user_fields"][field_name] = field.to_json(field.default)
+
                 else:
                     block_data_out["xblock_api_version"] = 1
                     block_data_out["embed_uri"] = request.build_absolute_uri(
