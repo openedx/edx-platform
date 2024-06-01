@@ -289,6 +289,14 @@ urlpatterns += [
         name='xblock_handler',
     ),
     re_path(
+        r'^xblock/{usage_key}/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(
+            usage_key=settings.USAGE_ID_PATTERN,
+        ),
+        handle_xblock_callback,
+        {"course_id": None},
+        name='xblock_handler_no_course',
+    ),
+    re_path(
         r'^courses/{course_key}/xblock/{usage_key}/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
