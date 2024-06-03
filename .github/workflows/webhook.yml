@@ -42,6 +42,10 @@ jobs:
         if: ${{ ( inputs.is-prod == 'true' && inputs.code == 'eol' ) || ( github.event.client_payload.production && github.event.client_payload.debug == 'eol' ) }}
         run: |
           curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/eol-edx/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ steps.release.outputs.RELEASE_NAME }}\", \"project\": \"eol\", \"code\": \"eol\"}}"
+      - name: Trigger edx-uabierta repository
+        if: ${{ ( inputs.is-prod == 'true' && inputs.code == 'eol' ) || ( github.event.client_payload.production && github.event.client_payload.debug == 'eol' ) }}
+        run: |
+          curl --fail-with-body -X POST -H "Authorization: Bearer ${{ secrets.WEBHOOK_SECRET }}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" https://api.github.com/repos/eol-uchile/edx-uabierta/dispatches --data "{\"event_type\": \"update-image\", \"client_payload\": {\"version\": \"${{ steps.release.outputs.RELEASE_NAME }}\", \"project\": \"eol\", \"code\": \"eol\"}}"
       - name: Trigger edx-openuchile repository
         if: ${{ ( inputs.is-prod == 'true' && inputs.code == 'ou' ) || ( github.event.client_payload.production && github.event.client_payload.debug == 'ou' ) }}
         run: |
