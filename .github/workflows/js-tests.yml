@@ -19,7 +19,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Fetch master to compare coverage
       run: git fetch --depth=1 origin master
 
@@ -43,7 +43,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install libxmlsec1-dev ubuntu-restricted-extras xvfb
 
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -54,7 +54,7 @@ jobs:
 
     - name: Cache pip dependencies
       id: cache-dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ steps.pip-cache-dir.outputs.dir }}
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/base.txt') }}
@@ -74,7 +74,7 @@ jobs:
         xvfb-run --auto-servernum ./scripts/all-tests.sh
 
     - name: Save Job Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Build-Artifacts
         path: |
@@ -82,3 +82,4 @@ jobs:
           test_root/log/*.png
           test_root/log/*.log
           **/TEST-*.xml
+        overwrite: true
