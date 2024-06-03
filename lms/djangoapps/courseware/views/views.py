@@ -37,7 +37,7 @@ from lms.djangoapps.static_template_view.views import render_500
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_filters.learning.filters import CourseAboutRenderStarted, RenderXBlockCompleted
+from openedx_filters.learning.filters import CourseAboutRenderStarted, RenderXBlockStarted
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from pytz import UTC
 from rest_framework import status
@@ -1674,10 +1674,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         try:
             # .. filter_implemented_name: RenderXBlockStarted
             # .. filter_type: org.openedx.learning.xblock.render.started.v1
-            context, student_view_context = RenderXBlockCompleted.run_filter(
+            context, student_view_context = RenderXBlockStarted.run_filter(
                 context=context, student_view_context=student_view_context
             )
-        except RenderXBlockCompleted.PreventXBlockBlockRender as exc:
+        except RenderXBlockStarted.PreventXBlockBlockRender as exc:
             log.info("Skipping rendering block %s. Reason: %s", usage_key_string, exc.message)
             return render_500()
 
