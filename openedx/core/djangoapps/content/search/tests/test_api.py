@@ -15,6 +15,7 @@ from organizations.tests.factories import OrganizationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
+from openedx.core.djangoapps.content.course_overviews.api import CourseOverview
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
@@ -106,6 +107,8 @@ class TestSearchApi(ModuleStoreTestCase):
             "content": {},
             "access_id": course_access.id,
         }
+        # Make sure the CourseOverview for the course is created:
+        CourseOverview.get_from_id(self.course.id)
 
         # Create a content library:
         self.library = library_api.create_library(
