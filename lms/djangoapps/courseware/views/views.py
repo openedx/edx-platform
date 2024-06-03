@@ -1642,11 +1642,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
                 if not _check_sequence_exam_access(request, seq_block.location):
                     return HttpResponseForbidden("Access to exam content is restricted")
 
-        fragment = block.render(requested_view, context=student_view_context)
-        optimization_flags = get_optimization_flags_for_content(block, fragment)
-
         context = {
-            'fragment': fragment,
             'course': course,
             'block': block,
             'disable_accordion': True,
@@ -1667,8 +1663,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_mobile_app,
             'render_course_wide_assets': True,
-
-            **optimization_flags,
         }
 
         try:
@@ -1680,6 +1674,14 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         except RenderXBlockStarted.PreventXBlockBlockRender as exc:
             log.info("Skipping rendering block %s. Reason: %s", usage_key_string, exc.message)
             return render_500()
+
+        fragment = block.render(requested_view, context=student_view_context)
+        optimization_flags = get_optimization_flags_for_content(block, fragment)
+
+        context.update({
+            'fragment': fragment,
+            **optimization_flags,
+        })
 
         return render_to_response('courseware/courseware-chromeless.html', context, request=request)
 
