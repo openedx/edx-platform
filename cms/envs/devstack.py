@@ -261,17 +261,6 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-############## CourseGraph devstack settings ############################
-
-COURSEGRAPH_CONNECTION: dict = {
-    "protocol": "bolt",
-    "secure": False,
-    "host": "edx.devstack.coursegraph",
-    "port": 7687,
-    "user": "neo4j",
-    "password": "edx",
-}
-
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 

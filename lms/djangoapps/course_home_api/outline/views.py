@@ -462,11 +462,9 @@ class CourseNavigationBlocksView(RetrieveAPIView):
             is_masquerading=user_is_masquerading,
         )
         if navigation_sidebar_caching_is_disabled := courseware_disable_navigation_sidebar_blocks_caching():
-            cached = False
             course_blocks = None
         else:
             course_blocks = cache.get(cache_key)
-            cached = course_blocks is not None
 
         if not course_blocks:
             if getattr(enrollment, 'is_active', False) or bool(staff_access):
@@ -478,17 +476,12 @@ class CourseNavigationBlocksView(RetrieveAPIView):
                 cache.set(cache_key, course_blocks, self.COURSE_BLOCKS_CACHE_TIMEOUT)
 
         course_blocks = self.filter_inaccessible_blocks(course_blocks, course_key)
-
-        if cached:
-            # Note: The course_blocks received from get_course_outline_block_tree already has completion data,
-            # but since the course_blocks can be cached, and this status can change quite often,
-            # we need to update it every time if the data has not been cached.
-            course_blocks = self.mark_complete_recursive(course_blocks)
+        course_blocks = self.mark_complete_recursive(course_blocks)
 
         context = self.get_serializer_context()
         context.update({
             'include_vertical': True,
-            'extra_fields': ['special_exam_info'],
+            'extra_fields': ['special_exam_info', 'completion_stat'],
             'enable_prerequisite_block_type': True,
         })
 
@@ -508,7 +501,7 @@ class CourseNavigationBlocksView(RetrieveAPIView):
             for section_data in course_sections:
                 section_data['children'] = self.get_accessible_sequences(
                     user_course_outline,
-                    section_data.get('children', [])
+                    section_data.get('children', ['completion'])
                 )
                 accessible_sequence_ids = {str(usage_key) for usage_key in user_course_outline.accessible_sequences}
                 for sequence_data in section_data['children']:
@@ -520,14 +513,59 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         """
         Mark blocks as complete or not complete based on the completions_dict.
         """
+        if not block:
+            return block
+
         if 'children' in block:
-            block['children'] = [self.mark_complete_recursive(child) for child in block['children']]
-            block['complete'] = all(
-                child['complete'] for child in block['children'] if child['type'] in self.completable_block_types
-            )
+            block['children'] = [self.mark_complete_recursive(child) for child in block['children'] if child]
+            completable_children = self.get_completable_children(block)
+            block['complete'] = all(child['complete'] for child in completable_children)
+            block['completion_stat'] = self.get_block_completion_stat(block, completable_children)
         else:
-            block['complete'] = self.completions_dict.get(block['id'], False)
+            # If the block is a course, chapter, sequential, or vertical, without children,
+            # it should be completed by default.
+            completion = self.completions_dict.get(block['id'], 0)
+            block['complete'] = bool(completion) or block['type'] in ['course', 'chapter', 'sequential', 'vertical']
+            block['completion_stat'] = self.get_block_completion_stat(block, completable_children=[])
+
         return block
+
+    def get_block_completion_stat(self, block, completable_children):
+        """
+        Get the completion status of a block.
+
+        Returns dictionary with the completion status and the number
+        of completable children of a block.
+        Completion is the value from 0 to 1 meaning the percentage of completion for lower-level blocks,
+        and sum of the completion status of the completable children.
+        """
+        block_type = block['type']
+        completable_children_num = len(completable_children)
+
+        if block_type in ['course', 'sequential']:
+            completion = sum(child['complete'] for child in completable_children)
+        elif block_type == 'chapter':
+            # For sections, we have to count the status on the number of completed units
+            # and, accordingly, the number of units in it.
+            completion = sum(child['completion_stat']['completion'] for child in completable_children)
+            completable_children_num = sum(
+                child['completion_stat']['completable_children'] for child in completable_children
+            )
+        elif block_type == 'vertical':
+            completion = sum(child['completion_stat']['completion'] for child in completable_children)
+        else:
+            completion = self.completions_dict.get(block['id'], 0)
+
+        return {
+            'completion': completion,
+            'completable_children': completable_children_num,
+        }
+
+    def get_completable_children(self, block):
+        """
+        Get the completable children of a block.
+        """
+        return [child for child in block.get('children', []) if child['type'] in self.completable_block_types]
 
     @staticmethod
     def get_accessible_sections(user_course_outline, course_sections):
@@ -573,11 +611,17 @@ class CourseNavigationBlocksView(RetrieveAPIView):
     @cached_property
     def completable_block_types(self):
         """
-        Return a set of block types that are completable.
+        Returns a set of block types that can be marked as completed.
+
+        In addition to the lower-level x-blocks, it also includes blocks
+        that belong to XBlockCompletionMode.AGGREGATOR, because they can also be marked as complete.
         """
         return {
             block_type for (block_type, block_cls) in XBlock.load_classes()
-            if XBlockCompletionMode.get_mode(block_cls) == XBlockCompletionMode.COMPLETABLE
+            if XBlockCompletionMode.get_mode(block_cls) in (
+                XBlockCompletionMode.COMPLETABLE,
+                XBlockCompletionMode.AGGREGATOR
+            )
         }
 
 

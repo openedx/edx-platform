@@ -13,6 +13,8 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from cms.djangoapps.contentstore.helpers import xblock_studio_url, xblock_type_display_name
+from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow
+from cms.djangoapps.contentstore.utils import get_editor_page_base_url
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
@@ -111,6 +113,13 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%block name="content">
 
+<%
+use_new_editor_text = use_new_text_editor()
+use_new_editor_video = use_new_video_editor()
+use_new_editor_problem = use_new_problem_editor()
+use_new_video_gallery_flow = use_video_gallery_flow()
+%>
+
 <script type="text/javascript">
     window.STUDIO_FRONTEND_IN_CONTEXT_IMAGE_SELECTION = true;
 </script>
@@ -161,7 +170,15 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
         </div>
 
-        <nav class="nav-actions" aria-label="${_('Page Actions')}">
+        <nav class="nav-actions" aria-label="${_('Page Actions')}"
+        use-new-editor-text = ${use_new_editor_text}
+        use-new-editor-video = ${use_new_editor_video}
+        use-new-editor-problem = ${use_new_editor_problem}
+        use-video-gallery-flow = ${use_new_video_gallery_flow}
+        authoring_MFE_base_url = ${get_editor_page_base_url(xblock_locator.course_key)}
+        data-block-type = ${xblock.scope_ids.block_type}
+        data-usage-id = ${xblock.scope_ids.usage_id}
+        >
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 ## Hide the sequence navigation when we've browsed into a child of the unit, e.g. showing the child blocks of a problem-builder xblock

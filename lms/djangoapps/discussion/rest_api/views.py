@@ -120,6 +120,36 @@ class CourseView(DeveloperErrorViewMixin, APIView):
 
 
 @view_auth_classes()
+class CourseViewV2(DeveloperErrorViewMixin, APIView):
+    """
+    General discussion metadata API v2.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID")
+        ],
+        responses={
+            200: CourseMetadataSerailizer(read_only=True, required=False),
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        }
+    )
+    def get(self, request, course_id):
+        """
+        Retrieve general discussion metadata for a course.
+
+        **Example Requests**:
+            GET /api/discussion/v2/courses/course-v1:ExampleX+Subject101+2015
+        """
+        course_key = CourseKey.from_string(course_id)
+        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+        UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
+        return Response(get_course(request, course_key, False))
+
+
+@view_auth_classes()
 class CourseActivityStatsView(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**

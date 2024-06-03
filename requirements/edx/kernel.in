@@ -68,8 +68,8 @@ edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
 edx-codejail
-# edx-django-utils 5.4.0 adds CSP middleware
-edx-django-utils>=5.4.0             # Utilities for cache, monitoring, and plugins
+# edx-django-utils 5.14.1 adds FrontendMonitoringMiddleware
+edx-django-utils>=5.14.1             # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
 # edx-event-bus-kafka 5.6.0 adds support for putting client ids on event producers/consumers

@@ -66,6 +66,8 @@ class CourseBlockSerializer(serializers.Serializer):
         }
         if 'special_exam_info' in self.context.get('extra_fields', []) and block.get('special_exam_info'):
             serialized[block_key]['special_exam_info'] = block.get('special_exam_info').get('short_description')
+        if 'completion_stat' in self.context.get('extra_fields', []):
+            serialized[block_key]['completion_stat'] = block.get('completion_stat', {})
 
         for child in children:
             serialized.update(self.get_blocks(child))

@@ -690,7 +690,10 @@ def _get_index_videos(course, pagination_conf=None):
         for attr in attrs:
             if attr == 'courses':
                 current_course = [c for c in video['courses'] if course_id in c]
-                (__, values['course_video_image_url']), = list(current_course[0].items())
+                if current_course:
+                    values['course_video_image_url'] = current_course[0][course_id]
+                else:
+                    values['course_video_image_url'] = None
             elif attr == 'encoded_videos':
                 values['download_link'] = ''
                 values['file_size'] = 0

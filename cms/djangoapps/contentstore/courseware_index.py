@@ -278,7 +278,7 @@ class SearchIndexerBase(metaclass=ABCMeta):
         (Re)index all content within the given structure (course or library),
         tracking the fact that a full reindex has taken place
         """
-        indexed_count = cls.index(modulestore, structure_key)
+        indexed_count = cls.index(modulestore, structure_key, timeout=180)
         if indexed_count:
             cls._track_index_request(cls.INDEX_EVENT['name'], cls.INDEX_EVENT['category'], indexed_count)
         return indexed_count

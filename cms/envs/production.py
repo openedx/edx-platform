@@ -517,9 +517,6 @@ JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
-############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
-
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
@@ -616,8 +613,6 @@ EXPLICIT_QUEUES = {
         'queue': SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY},
     'cms.djangoapps.contentstore.tasks.update_search_index': {
         'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
-    'cms.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
-        'queue': COURSEGRAPH_JOB_QUEUE},
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
