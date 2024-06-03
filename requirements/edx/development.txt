@@ -743,7 +743,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.19.4
+edx-enterprise==4.19.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1147,6 +1147,7 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.11.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 lxml==4.9.4
