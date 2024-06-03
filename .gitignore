@@ -102,11 +102,11 @@ bin/
 
 ### Static assets pipeline artifacts
 *.scssc
-lms/static/css/
-lms/static/certificates/css/
-cms/static/css/
-common/static/common/js/vendor/
-common/static/common/css/vendor/
+lms/static/css
+lms/static/certificates/css
+cms/static/css
+common/static/common/js/vendor
+common/static/common/css/vendor
 common/static/bundles
 webpack-stats.json
 
@@ -115,7 +115,6 @@ lms/static/sass/*.css
 lms/static/sass/*.css.map
 lms/static/certificates/sass/*.css
 lms/static/themed_sass/
-cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
 cms/static/themed_sass/
