@@ -26,7 +26,7 @@
     "@edx/frontend-component-cookie-policy-banner": "2.2.0",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "^2.1.0",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "babel-loader": "^9.1.3",
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-polyfill": "6.26.0",
