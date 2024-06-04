@@ -28,7 +28,7 @@ user interacts with the overall application, the user's experience may lead them
 each accessing APIs on various backends. Stateless authentication (via self-contained JWTs) would allow scalable
 interactions between microfrontends and microservices.
 
-Note: User authentication for open edX mobile apps is outside the scope of this decision record. As a brief note, we
+Note: User authentication for Open edX mobile apps is outside the scope of this decision record. As a brief note, we
 believe any decisions in this record will neither affect the current authentication mechanisms used for mobile
 apps nor impact forward compatibility when/if mobile apps are consolidated to use a similar (if not the same)
 authentication mechanism as outlined here for web apps.
@@ -69,7 +69,7 @@ Login -> Cookie -> API
        recombined JWT in a temporary cookie specified by JWT_AUTH_COOKIE_.
      * The `Django Rest Framework JWT`_ library we use makes use of the JWT_AUTH_COOKIE_ configuration setting.
        When set, the JSONWebTokenAuthentication_ class `automatically extracts the JWT from the cookie`_. Since all
-       open edX REST endpoints that support JWT-based authentication derive from this base class, their authentication
+       Open edX REST endpoints that support JWT-based authentication derive from this base class, their authentication
        checks will make use of the JWTs provided in the JWT-related cookies.
 
 #. **Introduce forgiving JWTs for backward compatibility.**
@@ -121,7 +121,7 @@ JWT Cookie Lifetime
    * For simplicity and consistency, the cookies and their containing JWT will expire at the same time. There's
      no need to have these be different values.
 
-   * Given this, JWT cookies will always have expiration values, unlike `current open edX session cookies that may
+   * Given this, JWT cookies will always have expiration values, unlike `current Open edX session cookies that may
      have no expiration`_.
 
    * A configuration setting, JWT_AUTH_COOKIE_EXPIRATION, will specify the expiration duration for JWTs and their
@@ -141,7 +141,7 @@ JWT Cookie Lifetime
    which will remove them from the user's browser cookie jar. Thus, the user will be logged out of all the
    microfrontends.
 
-.. _`current open edX session cookies that may have no expiration`: https://github.com/openedx/edx-platform/blob/92030ea15216a6641c83dd7bb38a9b65112bf31a/common/djangoapps/student/cookies.py#L25-L27
+.. _`current Open edX session cookies that may have no expiration`: https://github.com/openedx/edx-platform/blob/92030ea15216a6641c83dd7bb38a9b65112bf31a/common/djangoapps/student/cookies.py#L25-L27
 .. _JWT blacklist: https://auth0.com/blog/blacklist-json-web-token-api-keys/
 .. _`JWT ID (jti)`: http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#jtiDef
 
