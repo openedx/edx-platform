@@ -36,7 +36,8 @@ from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.views import require_global_staff
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
-from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
+from lms.djangoapps.verify_student.api import send_approval_email
+from lms.djangoapps.verify_student.emails import send_verification_confirmation_email
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
@@ -1117,24 +1118,7 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         log.info("[COSMO-184] Approved verification for receipt_id={receipt_id}.".format(receipt_id=receipt_id))
         attempt.approve()
 
-        expiration_datetime = attempt.expiration_datetime.date()
-        if settings.VERIFY_STUDENT.get('USE_DJANGO_MAIL'):
-            verification_status_email_vars['expiration_datetime'] = expiration_datetime.strftime("%m/%d/%Y")
-            verification_status_email_vars['full_name'] = user.profile.name
-            subject = _("Your {platform_name} ID verification was approved!").format(
-                platform_name=settings.PLATFORM_NAME
-            )
-            context = {
-                'subject': subject,
-                'template': 'emails/passed_verification_email.txt',
-                'email': user.email,
-                'email_vars': verification_status_email_vars
-            }
-            send_verification_status_email.delay(context)
-        else:
-            email_context = {'user': user, 'expiration_datetime': expiration_datetime.strftime("%m/%d/%Y")}
-            send_verification_approved_email(context=email_context)
-
+        send_approval_email(attempt)
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
 
