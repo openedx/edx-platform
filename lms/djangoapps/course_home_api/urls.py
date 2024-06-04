@@ -18,7 +18,7 @@ from lms.djangoapps.course_home_api.outline.views import (
 from lms.djangoapps.course_home_api.progress.views import ProgressTabView
 
 # This API is a BFF ("backend for frontend") designed for the learning MFE. It's not versioned because there is no
-# guarantee of stability over time. It may change from one open edx release to another. Don't write any scripts
+# guarantee of stability over time. It may change from one Open edX release to another. Don't write any scripts
 # that depend on it.
 
 urlpatterns = []
