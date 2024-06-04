@@ -1,11 +1,34 @@
 {
   "extends": [
     "config:base",
-    "schedule:weekdays",
-    ":preserveSemverRanges"
+    "schedule:weekly",
+    ":automergeLinters",
+    ":automergeMinor",
+    ":automergeTesters",
+    ":enableVulnerabilityAlerts",
+    ":semanticCommits",
+    ":updateNotScheduled"
   ],
-  "prConcurrentLimit": 5,
-  "includePaths": [
-    "package.json"
-  ]
+  "packageRules": [
+    {
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "lockFileMaintenance",
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["@edx", "@openedx"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ],
+  "timezone": "America/New_York",
+  "prConcurrentLimit": 3,
+  "enabledManagers": ["npm"]
 }
