@@ -1,5 +1,5 @@
-name: 'Verify unit tests count'
-description: 'shared steps to verify unit tests count on both Github hosted and self hosted runners.'
+name: "Verify unit tests count"
+description: "shared steps to verify unit tests count on both Github hosted and self hosted runners."
 runs:
   using: "composite"
   steps:
@@ -15,13 +15,11 @@ runs:
         echo "cms_unit_test_paths=$(python scripts/gha_unit_tests_collector.py --cms-only)" >> $GITHUB_ENV
         echo "lms_unit_test_paths=$(python scripts/gha_unit_tests_collector.py --lms-only)" >> $GITHUB_ENV
 
-
     - name: collect tests from GHA unit test shards
       shell: bash
       run: |
         echo "cms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=cms.envs.test ${{ env.cms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
         echo "lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test ${{ env.lms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-
 
     - name: add unit tests count
       shell: bash
