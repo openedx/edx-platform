@@ -6,6 +6,12 @@ on:
     branches:
       - master
 
+concurrency:
+  # We only need to be running tests for the latest commit on each PR
+  # (however, we fully test every commit on master, even as new ones land).
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
