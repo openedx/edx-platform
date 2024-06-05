@@ -1418,6 +1418,16 @@ class ProblemBlock(
         hint_index = int(data['hint_index'])
         return self.get_demand_hint(hint_index)
 
+    def course_is_archived(self):
+        from xmodule.modulestore.django import modulestore
+        course = modulestore().get_course(self.course_id)
+        try:
+            if course.has_ended():
+                return True
+        except:
+            pass
+        return False
+
     def used_all_attempts(self):
         """ All attempts have been used """
         return self.max_attempts is not None and self.attempts >= self.max_attempts
@@ -1433,9 +1443,7 @@ class ProblemBlock(
         """
         Is the student still allowed to submit answers?
         """
-        from xmodule.modulestore.django import modulestore
-        course = modulestore().get_course(self.course_id)
-        if course.has_ended():
+        if self.course_is_archived():
             return True
         if self.used_all_attempts():
             return True
