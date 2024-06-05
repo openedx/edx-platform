@@ -114,8 +114,8 @@ REQ_FILES = \
 	requirements/edx/base \
 	requirements/edx/doc \
 	requirements/edx/testing \
-	requirements/edx/development \
 	requirements/edx/assets \
+	requirements/edx/development \
 	requirements/edx/semgrep \
 	scripts/xblock/requirements \
 	scripts/user_retirement/requirements/base \

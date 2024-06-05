@@ -133,6 +133,7 @@ jobs:
   success:
     name: Unit tests successful
     runs-on: ubuntu-20.04
+    if: always()
     needs: [run-tests]
     steps:
       - name: Decide whether the needed jobs succeeded or failed
