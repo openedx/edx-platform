@@ -7,14 +7,18 @@ import datetime
 import logging
 import urllib.parse
 import uuid
-from collections import namedtuple
+import requests
+import json
 
+from collections import namedtuple
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.validators import ValidationError, validate_email
+from django.core.cache import cache
+
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver  # lint-amnesty, pylint: disable=unused-import
@@ -960,3 +964,121 @@ def change_email_settings(request):
         )
 
     return JsonResponse({"success": True})
+
+
+
+def _get_delimiter(index):
+	try:
+		unicodes = [u'\u2016', u'\u2191', u'\u2193', u'\u219f', u'\u21c8', u'\u21ca', u'\u21e1', u'\u21a5', u'\u21e3', u'\u21be'] 
+		return unicodes[index]	
+	except Exception as err:
+		log.error("Zoom unicode error : " + str(err))
+		return "|"
+
+
+def _get_zoom_auth_token():
+    session_key = "zoom-auth-token" + configuration_helpers.get_value("ZOOM_ACCOUNT_ID", "mRKuJqD7TgWa6Avp6E9v9Q")
+    if cache.get(session_key, ""):
+        return cache.get(session_key, "")
+
+    zoom_oauth_url = "https://zoom.us/oauth/token"
+    zoom_token = configuration_helpers.get_value("ZOOM_API_KEY", "")
+    data={'grant_type': 'account_credentials', 'account_id': configuration_helpers.get_value("ZOOM_ACCOUNT_ID", "mRKuJqD7TgWa6Avp6E9v9Q")}
+    response = requests.post(zoom_oauth_url, data=data, headers={"Authorization" : zoom_token})
+    log.info(response.text)
+    r_data = json.loads(response.text)
+    if response.status_code != 200:
+        return ""
+
+    cache.set(session_key, "{0} {1}".format(r_data["token_type"], r_data["access_token"]), 3300)
+    return cache.get(session_key, "")
+
+def get_zoom_link(meeting_id, webinar_id, data):
+    user = User.objects.get(email = data["email"]) 
+    session_key = str(meeting_id) + "-" + str(user.id)
+    MEMCACHE_TIMEOUT = 28800
+    join_url = cache.get(session_key, None)
+    space_unicode = u'\u0020'
+    r_data = {}
+    if join_url is not None:
+        log.info("Key exists in the session")
+        r_data["join_url"] = join_url
+    else:
+        log.info("Registering user in zoom " + data["email"])
+        zoom_data = {"email" : data["email"]}
+        if meeting_id != "0":
+            delimiter = _get_delimiter(int(meeting_id[-1]))
+            zoom_url = "https://api.zoom.us/v2/meetings/" + meeting_id +"/registrants"
+        elif webinar_id != "0":
+            delimiter = _get_delimiter(int(webinar_id[-1]))
+            zoom_url = "https://api.zoom.us/v2/webinars/" + webinar_id +"/registrants"
+        if "@talentsprint.com" in data["email"]:
+            first_name = data["first_name"] + " " + delimiter + space_unicode
+            last_name = "TS"
+        elif "@email.iimcal.ac.in" in data["email"] or data["username"].startswith("dp-"):
+            first_name = data["first_name"] + " " + delimiter + " "
+            if "-" in data["username"]:
+                last_name = "-".join(data["username"].split("-")[1:]) 
+            else:
+                last_name = data["username"]
+        elif "@iimcal.ac.in" in data["email"]:
+            full_name = data["first_name"] + " " + data["last_name"] 
+            first_name = full_name + " " + delimiter + " "
+            last_name = "IIM Calcutta" 
+            
+        elif "@iitjammu.ac.in" in data["email"] and data["username"].startswith("20"):
+            full_name =  data["first_name"] + " " + data["last_name"]
+            first_name = full_name + " " + delimiter + " "
+            last_name = data["username"]
+        else:
+            if data["last_name"]:
+                first_name = data["first_name"] + " " + delimiter + " "
+                last_name = data["last_name"]
+            else:
+                first_name = data["first_name"]
+                last_name = "|"
+        zoom_data = {"email" : data["email"], "first_name" : first_name, "last_name" : last_name}
+        log.error(zoom_data)
+        
+        zoom_token = _get_zoom_auth_token()
+        if zoom_token:
+            headers = {"Authorization" : zoom_token, "Content-Type" : "application/json"}
+            response = requests.post(zoom_url, data=json.dumps(zoom_data), headers=headers)
+            log.info(response.text)
+            r_data = json.loads(response.text)
+            if "join_url" in r_data:
+                cache.set(session_key, r_data["join_url"], MEMCACHE_TIMEOUT) 
+    return r_data
+
+@csrf_exempt
+@login_required
+def extras_join_zoom(request, course_id):
+	try:
+		course_key = CourseKey.from_string(course_id)
+		cdn_data = {"org" : [str(course_key.org)], "course_id" : course_id}
+		r = requests.post("https://cdn.exec.talentsprint.com/app/getMeetingRooms", headers = {'content-type': 'application/json'}, data = json.dumps(cdn_data))
+		r_data = json.loads(r.text)
+		log.error(r_data)
+		meeting_id = r_data["meeting_id"]
+		data = {"email" : request.user.email, "username" : request.user.username, "first_name" : request.user.first_name, "last_name" : request.user.last_name}
+		zoom_data = get_zoom_link(meeting_id, "0", data)
+		log.error(zoom_data)
+		return redirect(zoom_data["join_url"])
+	except Exception as err:
+		log.error("ZOOM Error: " + str(err))
+		return HttpResponse("Please contact support")
+
+
+@login_required
+def join_zoom_meeting(request):
+	try:
+		meeting_id = request.GET["meeting_id"]
+		data = {"email" : request.user.email, "username" : request.user.username, "first_name" : request.user.first_name, "last_name" : request.user.last_name} 
+
+		r_data = get_zoom_link(meeting_id, "0", data)
+		log.error(r_data)
+		return redirect(r_data["join_url"])
+	except Exception as err:
+		log.error("ZOOM Error: " + str(err))
+		return HttpResponse("Please contact support")
+

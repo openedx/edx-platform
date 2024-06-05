@@ -10,6 +10,9 @@ from . import views
 
 urlpatterns = [
 
+    re_path(r'^extras/join_zoom_meeting$', views.join_zoom_meeting, name = "join_zoom_meeting"),
+    re_path(r'^extras/{}/join_zoom'.format(settings.COURSE_ID_PATTERN), views.extras_join_zoom, name = 'extras_join_zoom'),
+
     re_path(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 
     re_path(r'^activate/(?P<key>[^/]*)$', views.activate_account, name="activate"),
