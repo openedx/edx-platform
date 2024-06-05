@@ -1,0 +1,24 @@
+name: Fast-Forward PR
+
+on:
+  issue_comment:
+    types: [created, edited]
+jobs:
+  fast_forward_job:
+    name: Fast Forward
+    if: github.event.issue.pull_request != '' && contains(github.event.comment.body, '/ff')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fast Forward PR
+        id: ff-action
+        uses: endre-spotlab/fast-forward-js-action@2.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          success_message: 'Success! Fast forwarded source_head to target_base!'
+          failure_message: 'Failed! Cannot do fast forward!'
+          update_status: true
+          failure_message_same_stage_and_prod: 'Failed! Possible reasons: 1) Your feature branch is outdated. You need to rebase and push --force. 2) Review required, pull-request is not approved. 3) Checks were not successful.'
+          failure_message_diff_stage_and_prod: 'Failed! Possible reasons: 1) Stage branch is currently in use. Another feature validation is ongoing. You need to wait and rebase later. 2) Review required, pull-request is not approved. 3) Checks were not successful.'
