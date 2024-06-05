@@ -1419,12 +1419,13 @@ class ProblemBlock(
         return self.get_demand_hint(hint_index)
 
     def course_is_archived(self):
+        """ Is the course archived? """
         from xmodule.modulestore.django import modulestore
-        course = modulestore().get_course(self.course_id)
         try:
+            course = modulestore().get_course(self.course_id)
             if course.has_ended():
                 return True
-        except:
+        except (AssertionError, AttributeError):
             pass
         return False
 
