@@ -1016,18 +1016,22 @@ class CourseEnrollment(models.Model):
             self.course_id
         )
         if certificate and not CertificateStatuses.is_refundable_status(certificate.status):
+            log.info(f"{self.user} has already been given a certificate therefore cannot be refunded.")
             return False
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
         # `refund_cuttoff_date` will be `None` if there is no order. If there is no order return `False`.
         if refund_cutoff_date is None:
+            log.info("Refund cutoff date is null")
             return False
         if datetime.now(UTC) > refund_cutoff_date:
+            log.info(f"Refund cutoff date: {refund_cutoff_date} has passed")
             return False
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified', include_expired=True)
         if course_mode is None:
+            log.info(f"Course mode for {self.course_id} doesn't exist.")
             return False
         else:
             return True
