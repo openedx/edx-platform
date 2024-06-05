@@ -1433,6 +1433,10 @@ class ProblemBlock(
         """
         Is the student still allowed to submit answers?
         """
+        from xmodule.modulestore.django import modulestore
+        course = modulestore().get_course(self.course_id)
+        if course.has_ended():
+            return True
         if self.used_all_attempts():
             return True
         if self.is_past_due():
