@@ -143,8 +143,8 @@ if STATIC_URL_BASE:
 REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PROFILE)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
-# values when the varibale is an empty string. Therefore, setting these variable as empty text in related
-# json files will make the system reads thier values from django translation files
+# values when the variable is an empty string. Therefore, setting these variable as empty text in related
+# json files will make the system reads their values from django translation files
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME') or PLATFORM_NAME
 PLATFORM_DESCRIPTION = ENV_TOKENS.get('PLATFORM_DESCRIPTION') or PLATFORM_DESCRIPTION
 
@@ -362,7 +362,7 @@ VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
 # Determines whether the CSRF token can be transported on
 # unencrypted channels. It is set to False here for backward compatibility,
-# but it is highly recommended that this is True for enviroments accessed
+# but it is highly recommended that this is True for environments accessed
 # by end users.
 CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
@@ -502,9 +502,9 @@ MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTOR
 
 # After conversion above, the modulestore will have a "stores" list with all defined stores, for all stores, add the
 # fs_root entry to derived collection so that if it's a callable it can be resolved.  We need to do this because the
-# `derived_collection_entry` takes an exact index value but the config file might have overidden the number of stores
+# `derived_collection_entry` takes an exact index value but the config file might have overridden the number of stores
 # and so we can't be sure that the 2 we define in common.py will be there when we try to derive settings.  This could
-# lead to execptions being thrown when the `derive_settings` call later in this file tries to update settings.  We call
+# lead to exceptions being thrown when the `derive_settings` call later in this file tries to update settings.  We call
 # the derived_collection_entry function here to ensure that we update the fs_root for any callables that remain after
 # we've updated the MODULESTORE setting from our config file.
 for idx, store in enumerate(MODULESTORE['default']['OPTIONS']['stores']):

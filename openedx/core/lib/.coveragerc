@@ -8,7 +8,7 @@ parallel = true
 ignore_errors = True
 
 [html]
-title = Open edx Core Lib Python Test Coverage Report
+title = Open edX Core Lib Python Test Coverage Report
 directory = reports/openedx/core/lib/cover
 
 [xml]

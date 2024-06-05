@@ -9,8 +9,8 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - '3.11'
-        os: ['ubuntu-20.04']
+          - "3.11"
+        os: ["ubuntu-20.04"]
 
     steps:
       - uses: actions/checkout@v4
