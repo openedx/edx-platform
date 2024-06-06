@@ -137,7 +137,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         }
 
     @skip("This endpoint shouldn't support num_blocks and has_unpublished_*.")
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootView._DEFAULT_PAGE_SIZE", new=2)
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootView.pagination_class.page_size", new=2)
     def test_list_library(self):
         """
         Test the /libraries API and its pagination
@@ -374,7 +374,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert 'resources' in fragment
         assert 'Hello world!' in fragment['content']
 
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryBlocksView._DEFAULT_PAGE_SIZE", new=2)
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryBlocksView.pagination_class.page_size", new=2)
     def test_list_library_blocks(self):
         """
         Test the /libraries/{lib_key_str}/blocks API and its pagination

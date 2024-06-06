@@ -183,8 +183,6 @@ class LibraryRootView(GenericAPIView):
     Views to list, search for, and create content libraries.
     """
 
-    _DEFAULT_PAGE_SIZE = 50
-
     @apidocs.schema(
         parameters=[
             *LibraryApiPaginationDocs.apidoc_params,
@@ -209,9 +207,6 @@ class LibraryRootView(GenericAPIView):
         org = serializer.validated_data['org']
         library_type = serializer.validated_data['type']
         text_search = serializer.validated_data['text_search']
-
-        # Set default page size to 50
-        self.pagination_class.page_size = self._DEFAULT_PAGE_SIZE
 
         queryset = api.get_libraries_for_user(
             request.user,
@@ -512,8 +507,6 @@ class LibraryBlocksView(GenericAPIView):
     Views to work with XBlocks in a specific content library.
     """
 
-    _DEFAULT_PAGE_SIZE = 50
-
     @apidocs.schema(
         parameters=[
             *LibraryApiPaginationDocs.apidoc_params,
@@ -541,9 +534,6 @@ class LibraryBlocksView(GenericAPIView):
 
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         components = api.get_library_components(key, text_search=text_search, block_types=block_types)
-
-        # Set default page size to 50
-        self.pagination_class.page_size = self._DEFAULT_PAGE_SIZE
 
         paginated_xblock_metadata = [
             api.LibraryXBlockMetadata.from_component(key, component)
@@ -753,8 +743,6 @@ class LibraryImportTaskViewSet(GenericViewSet):
     Import blocks from Courseware through modulestore.
     """
 
-    _DEFAULT_PAGE_SIZE = 50
-
     @convert_exceptions
     def list(self, request, lib_key_str):
         """
@@ -768,9 +756,6 @@ class LibraryImportTaskViewSet(GenericViewSet):
         )
         queryset = api.ContentLibrary.objects.get_by_key(library_key).import_tasks
         result = ContentLibraryBlockImportTaskSerializer(queryset, many=True).data
-
-        # Set default page size to 50
-        self.pagination_class.page_size = self._DEFAULT_PAGE_SIZE
 
         return self.get_paginated_response(
             self.paginate_queryset(result)
