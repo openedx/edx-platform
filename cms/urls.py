@@ -24,8 +24,8 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
 
-from common.djangoapps.student.views.management import extras_course_enroll_user, extras_add_user_social_auth, extras_update_user_details
-from cms.djangoapps.contentstore.views.course import extras_create_course, extras_get_moodle_login_url
+from common.djangoapps.student.views.management import extras_course_enroll_user
+from cms.djangoapps.contentstore.views.course import extras_create_course
 
 
 django_autodiscover()
