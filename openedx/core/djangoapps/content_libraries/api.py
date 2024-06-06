@@ -167,6 +167,7 @@ class ContentLibraryMetadata:
     # Allow any user with Studio access to view this library's content in
     # Studio, use it in their courses, and copy content out of this library.
     allow_public_read = attr.ib(False)
+    can_edit_library = attr.ib(False)
     license = attr.ib("")
 
 
@@ -316,7 +317,7 @@ def require_permission_for_library_key(library_key, user, permission):
         raise PermissionDenied
 
 
-def get_library(library_key):
+def get_library(library_key, user=None):
     """
     Get the library with the specified key. Does not check permissions.
     returns a ContentLibraryMetadata instance.
@@ -355,6 +356,11 @@ def get_library(library_key):
     # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
 
+    can_edit_library = False
+
+    if user:
+        can_edit_library = user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=ref)
+
     return ContentLibraryMetadata(
         key=library_key,
         title=learning_package.title,
@@ -368,6 +374,7 @@ def get_library(library_key):
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
         has_unpublished_deletes=has_unpublished_deletes,
+        can_edit_library=can_edit_library,
         license=ref.license,
     )
 

@@ -286,7 +286,7 @@ class LibraryDetailsView(APIView):
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_library(key)
+        result = api.get_library(key, user=request.user)
         return Response(ContentLibraryMetadataSerializer(result).data)
 
     @convert_exceptions

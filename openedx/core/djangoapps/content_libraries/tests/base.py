@@ -1,7 +1,6 @@
 """
 Tests for Learning-Core-based Content Libraries
 """
-import uuid
 from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
