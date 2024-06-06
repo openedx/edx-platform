@@ -1984,7 +1984,7 @@ FINANCIAL_ASSISTANCE_HEADER = _(
     '(based on 12-month period from you first approval). \nTo apply for financial assistance: '
     '\n1. Enroll in the audit track for an eligible course that offers Verified Certificates. '
     '\n2. Complete this application. '
-    '\n3. Check your email, please allow 4-weeks for your application to be processed.'
+    '\n3. Check your email, please allow 4 weeks for your application to be processed.'
 )
 
 
