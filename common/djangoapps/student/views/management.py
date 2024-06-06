@@ -8,6 +8,7 @@ import logging
 import urllib.parse
 import uuid
 from collections import namedtuple
+import re
 
 from django.conf import settings
 from django.contrib import messages
@@ -55,7 +56,10 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.tasks import send_activation_email
-from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
+from openedx.core.djangoapps.user_authn.toggles import (
+    should_redirect_to_authn_microfrontend,
+    is_auto_generated_username_enabled
+)
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.enterprise_support.utils import is_enterprise_learner
@@ -172,6 +176,23 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
+def show_auto_generated_username(username):
+    """
+    Check if the auto-generated username is valid based on the specified pattern.
+
+    Parameters:
+    - username (str): The username to be checked.
+
+    Returns:
+    - bool: True if the username is valid and the auto-generated username check is enabled, False otherwise.
+    """
+    if not is_auto_generated_username_enabled():
+        return False
+
+    pattern = r'^[A-Z]{1,2}_\d{4}_[A-Z0-9]+$'
+    return bool(re.match(pattern, username))
+
+
 def compose_activation_email(
     user, user_registration=None, route_enabled=False, profile_name='', redirect_url=None, registration_flow=False
 ):
@@ -191,6 +212,7 @@ def compose_activation_email(
         'routed_profile_name': profile_name,
         'registration_flow': registration_flow,
         'is_enterprise_learner': is_enterprise_learner(user),
+        'show_auto_generated_username': show_auto_generated_username(user.username),
     })
 
     if route_enabled:
