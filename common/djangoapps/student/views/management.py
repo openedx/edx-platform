@@ -20,6 +20,9 @@ from django.core.validators import ValidationError, validate_email
 from django.core.cache import cache
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, do_create_account
+from django.core.exceptions import ObjectDoesNotExist
+from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
+from django.shortcuts import redirect, render
 
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -970,6 +973,8 @@ def change_email_settings(request):
 
 @csrf_exempt
 def extras_course_enroll_user(request):
+    #print(f"request  {request.body}")
+
     data = json.loads(request.body)
     log.info(data)
 

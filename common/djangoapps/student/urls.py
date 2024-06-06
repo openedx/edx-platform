@@ -14,7 +14,7 @@ urlpatterns = [
     re_path(r'^extras/join_zoom_meeting$', views.join_zoom_meeting, name = "join_zoom_meeting"),
     re_path(r'^extras/{}/join_zoom'.format(settings.COURSE_ID_PATTERN), views.extras_join_zoom, name = 'extras_join_zoom'),
 
-    re_path(r'^extras/extras_course_enroll_user/', csrf_exempt(views.extras_course_enroll_user), name = 'extras_course_enroll_user'),
+    re_path(r'^extras/course_enroll_user/', csrf_exempt(views.extras_course_enroll_user), name = 'extras_course_enroll_user'),
 
     re_path(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 
