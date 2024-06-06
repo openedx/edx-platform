@@ -24,6 +24,9 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
 
+from common.djangoapps.student.views.management import extras_course_enroll_user, extras_add_user_social_auth, extras_update_user_details
+from cms.djangoapps.contentstore.views.course import extras_create_course, extras_get_moodle_login_url
+
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -187,6 +190,10 @@ urlpatterns = oauth2_urlpatterns + [
     re_path(r'^group_configurations/{}/(?P<group_configuration_id>\d+)(/)?(?P<group_id>\d+)?$'.format(
         settings.COURSE_KEY_PATTERN), contentstore_views.group_configurations_detail_handler,
         name='group_configurations_detail_handler'),
+
+    re_path(r'^extras/create_course', extras_create_course, name = 'extras_create_course'),
+    re_path(r'^extras/course_enroll_user', extras_course_enroll_user, name = 'extras_course_enroll_user'),
+
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
