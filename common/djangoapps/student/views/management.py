@@ -18,6 +18,8 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.contrib.sites.models import Site
 from django.core.validators import ValidationError, validate_email
 from django.core.cache import cache
+from openedx.core.djangoapps.enrollments.api import add_enrollment
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, do_create_account
 
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -966,6 +968,111 @@ def change_email_settings(request):
     return JsonResponse({"success": True})
 
 
+@csrf_exempt
+def extras_course_enroll_user(request):
+    data = json.loads(request.body)
+    log.info(data)
+
+    try:
+        username = data["other"]["username"]
+        first_name = data["other"]["first_name"]
+        last_name = data["other"]["last_name"]
+        email = data["other"]["email"]
+        password = data["other"]["password"] 
+        role = data["other"]["role"]
+        unenroll = data["other"]["unenroll"]
+	
+        course = data['other']['course_number_run'].split("|")[0]
+        run = data['other']['course_number_run'].split("|")[1]
+        org = data['other']["site_id"]
+        
+        course_id = "course-v1:{0}+{1}+{2}".format(org, course, run)
+        #hash_key = request.GET["hk"]
+    except MultiValueDictKeyError:
+        return render(request, 'blank.html', {"message": "Invalid Options"})
+
+    username = username.replace(".", "_")
+    username = username.replace(" ", "_")
+
+    if (len(username) > 30):
+        username = username[0:30]
+
+    try:
+        user = User.objects.get(email = email)
+    except ObjectDoesNotExist:
+        user = _create_user(username, email, first_name, last_name, password)
+
+    user = User.objects.get(email = email)
+
+    if unenroll:
+        _extras_deactivate_enrollments(user, course_id)
+        context = {"message": "Removed user %s from course %s"%(user, course_id)}
+    else:
+        add_enrollment(user, course_id)
+        context = {"message": "Added user %s to course %s"%(user, course_id)}
+    if org == "DLT":
+        _create_soical_auth_record(email, "azuread-oauth2")
+    elif org in ["GIAP", "eMBA"]:
+        _create_soical_auth_record(email, "google-oauth2")
+
+    #if role == "editingteacher":
+    #requesting_user =  User.objects.get(email = data['other']['requesting_user'])
+    #course_key = CourseKey.from_string(course_id)
+    #add_instructor(course_key, requesting_user, user)
+    
+    log.error(context)
+    return render(request, "blank.html", context)
+
+
+def _create_soical_auth_record(user_email, provider_name):
+    user = User.objects.get(email = user_email)
+    try:
+        record = UserSocialAuth.objects.filter(user = user, provider = provider_name)
+        if not record:
+            UserSocialAuth.objects.create(
+                    user = user,
+                    uid = user.email,
+                    provider = provider_name
+                    )
+            log.info("Created social auth record for %s "%(user))
+        else:
+            log.error("Social auth record already exists for user %s"%(user))
+    except Exception as err:
+        log.error("Exception occured while creating social auth record. Error Details: %s"%(str(err)))
+
+
+
+def _create_user(username, email, first_name, last_name, password):
+
+    f = AccountCreationForm(
+        data={
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': first_name + " " + last_name
+
+        },
+        tos_required=False
+    )
+
+    (user, _, _) = do_create_account(f)
+    user.first_name = first_name
+    user.last_name = last_name
+    user.is_active = True
+    user.save()
+
+
+
+def _extras_deactivate_enrollments(user, ckey = None):
+    if ckey != None:
+        es = CourseEnrollment.objects.filter(user = user).filter(course_id = CourseKey.from_string(ckey))
+    else:
+        es = CourseEnrollment.objects.filter(user = user)
+
+    for e in es:
+        e.is_active = False
+        e.save()
+
 
 def _get_delimiter(index):
 	try:
@@ -974,7 +1081,6 @@ def _get_delimiter(index):
 	except Exception as err:
 		log.error("Zoom unicode error : " + str(err))
 		return "|"
-
 
 def _get_zoom_auth_token():
     session_key = "zoom-auth-token" + configuration_helpers.get_value("ZOOM_ACCOUNT_ID", "mRKuJqD7TgWa6Avp6E9v9Q")
