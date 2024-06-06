@@ -28,6 +28,7 @@
       "automerge": true
     }
   ],
+  "ignoreDeps": ["moment-timezone"],
   "timezone": "America/New_York",
   "prConcurrentLimit": 3,
   "enabledManagers": ["npm"]
