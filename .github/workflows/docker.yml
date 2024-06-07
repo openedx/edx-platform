@@ -6,8 +6,6 @@ on:
       - 'eol-release/**'
       - 'openuchile-release/**'
       - 'vlabx-release/**'
-    paths-ignore:
-      - '.github/workflows/**'
   merge_group:
     types: [checks_requested]
   pull_request:
@@ -19,8 +17,6 @@ on:
       - 'eol/**'
       - 'openuchile/**'
       - 'vlabx/**'
-    paths-ignore:
-      - '.github/workflows/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
