@@ -4005,7 +4005,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
             ))
             assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())
 
-class ProblemBlockModuleStoreTest(ModuleStoreTestCase):        
+class ProblemBlockModuleStoreTest(ModuleStoreTestCase): # lint-amnesty, pylint: disable=missing-class-docstring
     def test_closed_for_archive(self):
         test_user = ModuleStoreEnum.UserID.test
         test_course = CourseFactory.create(
@@ -4025,7 +4025,7 @@ class ProblemBlockModuleStoreTest(ModuleStoreTestCase):
         )
 
         course = self.store.get_course(problem.course_id)
-        
+
         # For active courses without grace period
         course.end = datetime.datetime.now(UTC) + datetime.timedelta(days=1)
         self.update_course(course, test_user)
