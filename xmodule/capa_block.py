@@ -50,6 +50,7 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ID,
 )
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.markup import HTML, Text
 from .capa.xqueue_interface import XQueueService
 
@@ -1418,17 +1419,6 @@ class ProblemBlock(
         hint_index = int(data['hint_index'])
         return self.get_demand_hint(hint_index)
 
-    def course_is_archived(self):
-        """ Is the course archived? """
-        from xmodule.modulestore.django import modulestore
-        try:
-            course = modulestore().get_course(self.course_id)
-            if course.has_ended():
-                return True
-        except (AssertionError, AttributeError):
-            pass
-        return False
-
     def used_all_attempts(self):
         """ All attempts have been used """
         return self.max_attempts is not None and self.attempts >= self.max_attempts
@@ -1444,8 +1434,19 @@ class ProblemBlock(
         """
         Is the student still allowed to submit answers?
         """
-        if self.course_is_archived():
-            return True
+        # Checking if the course is archived
+        from xmodule.modulestore.django import modulestore
+        try:
+            if isinstance(self.course_id, CourseKey):
+                course = modulestore().get_course(self.course_id)
+                closed_date = (
+                    course.end + self.graceperiod if self.graceperiod is not None else course.end
+                )
+                if datetime.datetime.now(utc) > closed_date:
+                    return True
+        except AttributeError:
+            pass
+
         if self.used_all_attempts():
             return True
         if self.is_past_due():
