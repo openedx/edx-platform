@@ -1442,7 +1442,7 @@ class ProblemBlock(
                 closed_date = (
                     course.end + self.graceperiod if self.graceperiod is not None else course.end
                 )
-                if datetime.datetime.now(utc) > closed_date:
+                if closed_date and datetime.datetime.now(utc) > closed_date:
                     return True
         except AttributeError:
             pass
