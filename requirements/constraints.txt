@@ -76,9 +76,6 @@ social-auth-app-django==5.0.0
 urllib3<2.0.0
 
 
-# greater version has dropped few dependencies. Fix this in other ticket.
-drf-yasg<1.21.6
-
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
 
