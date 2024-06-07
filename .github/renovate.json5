@@ -1,3 +1,4 @@
+// This file is written in "JSON5" (https://json5.org/) so that we can use comments.
 {
   "extends": [
     "config:base",
@@ -28,11 +29,13 @@
       "automerge": true
     }
   ],
-  "ignoreDeps": ["moment-timezone"],
-  "__Open_edX_ignoreDeps_reasons__": {
-    "__note__": "When you add a package to ignoreDeps, add a comment to this object, using the package name as the key, and the comment as the value.",
-    "moment-timezone": "Broke legacy programs dashboard, which is deprecated and soon to be removed. See https://github.com/openedx/edx-platform/pull/34928"
-  },
+  // When adding an ignoreDep, please include a reason and a public link that we can use to follow up and ensure
+  // that the ignoreDep is removed.
+  "ignoreDeps": [
+    // Latest moment-timezone version broke the legacy programs dashboard, which is deprecated and soon to be removed.
+    // https://github.com/openedx/edx-platform/pull/34928"
+    "moment-timezone",
+  ],
   "timezone": "America/New_York",
   "prConcurrentLimit": 3,
   "enabledManagers": ["npm"]
