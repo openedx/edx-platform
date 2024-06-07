@@ -310,7 +310,7 @@ def _section_special_exams(course, access):
         # Dashboard should always appear with LTI proctoring
         show_dashboard = True
     else:
-        # Only call does_backend_support_onboarding if  not using an LTI proctoring provider
+        # Only call does_backend_support_onboarding if not using an LTI proctoring provider
         show_onboarding = does_backend_support_onboarding(course.proctoring_provider)
         if proctoring_provider == 'proctortrack':
             escalation_email = course.proctoring_escalation_email

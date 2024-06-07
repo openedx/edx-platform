@@ -1146,7 +1146,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                     "online_proctoring_rules", ""
                 )
 
-                # Only call does_backend_support_onboarding if  not using an LTI proctoring provider
+                # Only call does_backend_support_onboarding if not using an LTI proctoring provider
+                print("course.proctoring_provider:",course.proctoring_provider)
                 if course.proctoring_provider != 'lti_external':
                     supports_onboarding = does_backend_support_onboarding(
                         course.proctoring_provider
