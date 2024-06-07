@@ -39,6 +39,10 @@ def register_special_exams(course_key):
         # if feature is not enabled then do a quick exit
         return
 
+
+    ### TODO: Go through this and figure out what calls "get_backend_provider" in edx-proctoring
+    ### And ideally surround those parts with an "if lti_external" filter
+
     course = modulestore().get_course(course_key)
     if course is None:
         raise ItemNotFoundError("Course {} does not exist", str(course_key))  # lint-amnesty, pylint: disable=raising-format-tuple
@@ -85,14 +89,17 @@ def register_special_exams(course_key):
             'is_practice_exam': timed_exam.is_practice_exam or timed_exam.is_onboarding_exam,
             'is_active': True,
             'hide_after_due': timed_exam.hide_after_due,
+            # TODO: See if this matters for the noisy log
             'backend': course.proctoring_provider,
         }
 
         try:
+            # TODO: See if this matters for the noisy log
             exam = get_exam_by_content_id(str(course_key), str(timed_exam.location))
             # update case, make sure everything is synced
             exam_metadata['exam_id'] = exam['id']
 
+            # TODO: See if this matters for the noisy log
             exam_id = update_exam(**exam_metadata)
             msg = 'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
             log.info(msg)
@@ -100,7 +107,7 @@ def register_special_exams(course_key):
         except ProctoredExamNotFoundException:
             exam_metadata['course_id'] = str(course_key)
             exam_metadata['content_id'] = str(timed_exam.location)
-
+            # TODO: See if this matters for the noisy log
             exam_id = create_exam(**exam_metadata)
             msg = f'Created new timed exam {exam_id}'
             log.info(msg)
@@ -114,21 +121,25 @@ def register_special_exams(course_key):
         # only create/update exam policy for the proctored exams
         if timed_exam.is_proctored_exam and not timed_exam.is_practice_exam and not timed_exam.is_onboarding_exam:
             try:
+                # TODO: See if this matters for the noisy log
                 update_review_policy(**exam_review_policy_metadata)
             except ProctoredExamReviewPolicyNotFoundException:
                 if timed_exam.exam_review_rules:  # won't save an empty rule.
+                    # TODO: See if this matters for the noisy log
                     create_exam_review_policy(**exam_review_policy_metadata)
                     msg = f'Created new exam review policy with exam_id {exam_id}'
                     log.info(msg)
         else:
             try:
                 # remove any associated review policy
+                # TODO: See if this matters for the noisy log
                 remove_review_policy(exam_id=exam_id)
             except ProctoredExamReviewPolicyNotFoundException:
                 pass
 
     # then see which exams we have in edx-proctoring that are not in
     # our current list. That means the the user has disabled it
+    # TODO: See if this matters for the noisy log
     exams = get_all_exams_for_course(course_key)
 
     for exam in exams:
@@ -144,6 +155,7 @@ def register_special_exams(course_key):
                 # the exam as inactive (we don't delete!)
                 msg = 'Disabling timed exam {exam_id}'.format(exam_id=exam['id'])
                 log.info(msg)
+                # TODO: See if this matters for the noisy log
                 update_exam(
                     exam_id=exam['id'],
                     is_proctored=False,
