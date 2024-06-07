@@ -325,11 +325,20 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
         ])
         # Mark which attributes are used for keyword search, in order of importance:
         client.index(temp_index_name).update_searchable_attributes([
+            # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
             Fields.display_name,
             Fields.block_id,
             Fields.content,
             Fields.tags,
-            # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
+            # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
+            # are searchable only if at least one document in the index has a value. If we didn't list them here and,
+            # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
+            # these sub-fields: "Attribute `tags.level3` is not searchable."
+            Fields.tags + "." + Fields.tags_taxonomy,
+            Fields.tags + "." + Fields.tags_level0,
+            Fields.tags + "." + Fields.tags_level1,
+            Fields.tags + "." + Fields.tags_level2,
+            Fields.tags + "." + Fields.tags_level3,
         ])
 
         ############## Libraries ##############
