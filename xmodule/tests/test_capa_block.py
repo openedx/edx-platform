@@ -36,6 +36,9 @@ from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tests import DATA_DIR
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
@@ -4001,3 +4004,48 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
                 )
             ))
             assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())
+
+class ProblemBlockModuleStoreTest(ModuleStoreTestCase):        
+    def test_closed_for_archive(self):
+        test_user = ModuleStoreEnum.UserID.test
+        test_course = CourseFactory.create(
+            course='course', run='2014', org='testx',
+            display_name='fun test course', user_id=test_user,
+        )
+
+        test_chapter = self.store.create_xblock(
+            test_course.runtime, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
+            parent_xblock=test_course
+        )
+
+        test_def_content = '<problem>boo</problem>'
+        problem = self.store.create_xblock(
+            test_course.runtime, test_course.id, 'problem', fields={'data': test_def_content},
+            parent_xblock=test_chapter
+        )
+
+        course = self.store.get_course(problem.course_id)
+        
+        # For active courses without grace period
+        course.end = datetime.datetime.now(UTC) + datetime.timedelta(days=1)
+        self.update_course(course, test_user)
+        assert not problem.closed()
+
+        # For archived courses without grace period
+        course.end = datetime.datetime.now(UTC) - datetime.timedelta(days=1)
+        self.update_course(course, test_user)
+        assert problem.closed()
+
+        # For active courses with grace period
+        course.end = datetime.datetime.now(UTC) - datetime.timedelta(days=1)
+        self.update_course(course, test_user)
+        problem.graceperiod = datetime.timedelta(days=2)
+        # self.store.update_item(problem, test_user)
+        assert not problem.closed()
+
+        # For archived courses with grace period
+        course.end = datetime.datetime.now(UTC) - datetime.timedelta(days=2)
+        self.update_course(course, test_user)
+        problem.graceperiod = datetime.timedelta(days=1)
+        # self.store.update_item(problem, test_user)
+        assert problem.closed()
