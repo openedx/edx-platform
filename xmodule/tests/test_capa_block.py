@@ -4005,7 +4005,8 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
             ))
             assert 'Python Error: No Answer Retrieved' in list(report_data[0][1].values())
 
-class ProblemBlockModuleStoreTest(ModuleStoreTestCase): # lint-amnesty, pylint: disable=missing-class-docstring
+
+class ProblemBlockModuleStoreTest(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_closed_for_archive(self):
         test_user = ModuleStoreEnum.UserID.test
         test_course = CourseFactory.create(
