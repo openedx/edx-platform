@@ -23,7 +23,7 @@ from common.djangoapps.student.roles import (
     OrgContentCreatorRole,
     OrgInstructorRole,
     OrgLibraryUserRole,
-    OrgStaffRole
+    OrgStaffRole,
 )
 
 # Studio permissions:
@@ -106,6 +106,7 @@ def get_user_permissions(user, course_key, org=None):
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
+
     # Otherwise, for libraries, users can view only:
     if course_key and isinstance(course_key, LibraryLocator):
         if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):

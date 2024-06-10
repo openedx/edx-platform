@@ -215,4 +215,5 @@ class HomePageLibrariesView(APIView):
 
         library_context = get_library_context(request)
         serializer = LibraryTabSerializer(library_context)
+
         return Response(serializer.data)
