@@ -577,7 +577,6 @@ django-storages==1.14.3
     #   edxval
 django-stubs==1.16.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
     #   djangorestframework-stubs
 django-stubs-ext==5.0.0
@@ -623,9 +622,7 @@ djangorestframework==3.14.0
     #   ora2
     #   super-csv
 djangorestframework-stubs==3.14.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/development.in
+    # via -r requirements/edx/development.in
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/doc.txt
