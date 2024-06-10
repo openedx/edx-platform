@@ -26,6 +26,9 @@ jobs:
       
       - name: Install repo-tools
         run: pip install edx-repo-tools[find_dependencies]
+
+      - name: Install setuptool
+        run: pip install setuptools  
       
       - name: Run Python script
         run: |
