@@ -4,11 +4,11 @@ $(document).ready(function(){
       // If you want to do something after the slide-up, do it here.
       // For example, you can hide the entire div:
       // $(this).hide();
-      var userId = document.getElementById('userIdSurvey').value;
+      let userId = document.getElementById('userIdSurvey').value;
       // Store the dismissal time in milliseconds
-      var dismissalTime = new Date().getTime();
+      let dismissalTime = new Date().getTime();
       // Calculate the expiration time (1 month in milliseconds)
-      var expirationTime = dismissalTime + (30 * 24 * 60 * 60 * 1000); // 30 days
+      let expirationTime = dismissalTime + (30 * 24 * 60 * 60 * 1000); // 30 days
       // Store the dismissal time in the browser's local storage
       localStorage.setItem('bannerDismissalTime_' + userId, dismissalTime);
       localStorage.setItem('bannerExpirationTime_' + userId, expirationTime);
@@ -16,13 +16,21 @@ $(document).ready(function(){
   });
 
     // Check if the banner should be shown or hidden on page load
-  var userId = document.getElementById('userIdSurvey').value;
-  var bannerDismissalTime = localStorage.getItem('bannerDismissalTime_' + userId);
-  var bannerExpirationTime = localStorage.getItem('bannerExpirationTime_' + userId);
-  var currentTime = new Date().getTime();
-  if (bannerDismissalTime && bannerExpirationTime && currentTime < bannerExpirationTime) {
-    // Banner was dismissed and it's still within the expiration period, so hide it
+  let userId = document.getElementById('userIdSurvey').value;
+  let bannerDismissalTime = localStorage.getItem('bannerDismissalTime_' + userId);
+  let bannerExpirationTime = localStorage.getItem('bannerExpirationTime_' + userId);
+  let currentTime = new Date().getTime();
+  if (bannerDismissalTime && bannerExpirationTime && currentTime > bannerExpirationTime) {
+    // Banner was dismissed and it's not within the expiration period, so show it
+    $('#originalContent').show();
+  }
+  else if (bannerDismissalTime && bannerExpirationTime && currentTime < bannerExpirationTime) {
+    // Banner was dismissed and it's within the expiration period, so hide it
     $('#originalContent').hide();
+  }
+  else{
+    // Banner has not been dimissed ever
+        $('#originalContent').show();
   }
   // When the form is submitted
   $("#survey_report_form").submit(function(event){
