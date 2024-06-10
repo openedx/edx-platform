@@ -420,6 +420,7 @@ django==4.2.14
     #   openedx-filters
     #   openedx-learning
     #   ora2
+    #   social-auth-app-django
     #   super-csv
     #   xblock-google-drive
     #   xss-utils
@@ -1945,15 +1946,13 @@ snowflake-connector-python==3.10.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-social-auth-app-django==5.0.0
+social-auth-app-django==5.4.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
-social-auth-core==4.3.0
+social-auth-core==4.5.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
