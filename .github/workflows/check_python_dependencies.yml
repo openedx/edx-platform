@@ -3,10 +3,6 @@ name: Check Python Dependencies
 on:
   pull_request:
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   check_dependencies:
     runs-on: ubuntu-latest
