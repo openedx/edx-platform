@@ -10,6 +10,7 @@ import uuid
 import requests
 import json
 
+
 from collections import namedtuple
 from django.conf import settings
 from django.contrib import messages
@@ -23,6 +24,11 @@ from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert
 from django.core.exceptions import ObjectDoesNotExist
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from django.shortcuts import redirect, render
+
+from openedx.core.djangoapps.enrollments.api import add_enrollment
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
 
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -1192,4 +1198,111 @@ def join_zoom_meeting(request):
 	except Exception as err:
 		log.error("ZOOM Error: " + str(err))
 		return HttpResponse("Please contact support")
+
+
+@xframe_options_exempt
+@csrf_exempt
+@login_required
+def  extras_get_moodle_grades(request):
+        user_email = request.user.email
+        multiple_moodle = configuration_helpers.get_value("MULTIPLE_MOODLE", False)
+        if multiple_moodle:
+            moodle_base_url = configuration_helpers.get_value("MULTIPLE_MOODLE_URLS","")
+        else:
+            moodle_base_url = [configuration_helpers.get_value("MOODLE_URL", "")]
+
+        moodle_wstoken = configuration_helpers.get_value("MOODLE_TOKEN", "")
+        overall_scores_function = "gradereport_overview_get_course_grades"
+        course_scores_function = "gradereport_user_get_grade_items"
+        headers = {  'content-type': "text/plain" }
+        #Fetch cumulative scores for all enrolled courses from moodle
+        querystring = {"wstoken" : moodle_wstoken, "wsfunction" : overall_scores_function, "moodlewsrestformat" : "json", "user_email" : user_email, "site_name" : configuration_helpers.get_value("course_org_filter", "")}
+        responses = {}
+        for index_no , api_url in enumerate(moodle_base_url):
+            moodle_service_url = api_url + "/webservice/rest/server.php"
+            response = requests.request("POST", moodle_service_url, headers = headers, params = querystring)
+
+            log.info("API call response for Course {0} url is {1}".format(api_url, response.status_code))
+
+            context = json.loads(response.text)
+            if "message" in context or not context["grades"]:
+                continue
+            grades_querystring = {"wstoken" : moodle_wstoken, "wsfunction" : course_scores_function, "moodlewsrestformat" : "json", "user_email" : user_email, "site_name" : configuration_helpers.get_value("course_org_filter", ""), "custom_request" : "Gradebook", "courseid" : 0}
+            grades_response = requests.request("POST", moodle_service_url, headers = headers, params = grades_querystring)
+            log.info("API call response for Grades {0} url is {1}".format(api_url, response.status_code))
+
+            data = json.loads(grades_response.text)
+            for i in range(len(context["grades"])):
+                for grades in data["usergrades"]:
+                    if grades["gradeitems"]:
+                        if context["grades"][i]["courseid"] == grades["courseid"]:
+                            context["grades"][i]["individual_scores"] = grades["gradeitems"]
+                            break
+
+                    else:
+                        context["grades"][i]["individual_scores"] = []
+
+            if "Response" + str(index_no) not in responses:
+                responses["Response" + str(index_no)] = context
+
+        final_response = merge_grades(responses) if len(responses) > 1 else responses.get(list(responses.keys())[0]) if len(responses) == 1 else {}
+        final_response.update({"studentid" : request.user.last_name, "studentname" : request.user.first_name})
+
+        if configuration_helpers.get_value('EXTRAS_GRADES_MOODLE_GRADEBOOK_TEMPLATE'):
+            return render(request, configuration_helpers.get_value('EXTRAS_GRADES_MOODLE_GRADEBOOK_TEMPLATE'), context = final_response)
+        else:
+            return render(request, "gradebook.html", context = final_response)
+
+
+
+def merge_grades(responses):
+    mergeddata = {}
+    for key,value in responses.items():
+        for grade_keys, grade_report in value.items():
+            if isinstance(grade_report, list):
+                mergeddata[grade_keys] = grade_report if grade_keys not in mergeddata else mergeddata[grade_keys] + grade_report
+                continue
+            if grade_keys not in ["userid"]:
+                mergeddata[grade_keys] = grade_report if grade_keys not in mergeddata else float(mergeddata[grade_keys]) + float(grade_report)
+
+
+    mergeddata["total_submissions_in_percentage"] = 0 if mergeddata["total_submissions"] == 0 else (mergeddata["user_submissions"] / mergeddata["total_submissions"]) * 100 
+    mergeddata["overall_percentage"] = 0 if mergeddata["total_scores"] == 0 else (mergeddata["user_scores"] / mergeddata["total_scores"]) * 100
+    return mergeddata
+
+
+
+@xframe_options_exempt
+@csrf_exempt
+@login_required
+def extras_get_attendance(request):
+	data  = {"email" : request.user.email,"role" :  request.GET["role"]}
+	context = {"user_attendance" : _get_dashboard_attendance(data), "header_logo" : marketing_link('HEADER_LOGO')}
+	return render(request, "attendance.html", context = context)
+
+
+
+def _get_dashboard_scores(data):
+	try:
+		r = requests.post("https://dashboard.talentsprint.com/aiml/scores.html", data = data)
+		scores =  json.loads(r.content)
+	except Exception as err:
+		scores = {"total" : "", "scores" : [], "percentage" : ""}
+	return scores
+
+
+
+@csrf_exempt
+def extras_reset_password_link(request):
+	email = request.POST.get("email")
+	domain = request.POST.get("domain")
+	try:
+		user = User.objects.get(email__iexact=email.strip())
+	except Exception as err:
+		log.error("Reset Password Error: "+ str(err) + " Email:" + email)
+		return HttpResponse("")
+	uid = int_to_base36(user.id)
+	token = PasswordResetTokenGenerator().make_token(user)
+	url = "https://{0}/password_reset_confirm/{1}-{2}".format(domain, uid, token)	
+	return HttpResponse(url)
 

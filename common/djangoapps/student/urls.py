@@ -16,6 +16,11 @@ urlpatterns = [
 
     re_path(r'^extras/course_enroll_user/', csrf_exempt(views.extras_course_enroll_user), name = 'extras_course_enroll_user'),
 
+    re_path(r'^extras/gradebook$', views.extras_get_moodle_grades, name = "extras_get_moodle_grades"),
+    re_path(r'^extras/attendance$', views.extras_get_attendance, name = "extras_get_attendance"),
+
+    re_path(r'^extras/reset_password_link', views.extras_reset_password_link, name = "extras_reset_password_link"),
+
     re_path(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 
     re_path(r'^activate/(?P<key>[^/]*)$', views.activate_account, name="activate"),
