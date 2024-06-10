@@ -4,22 +4,22 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Target branch to create requirements PR against'
+        description: "Target branch to create requirements PR against"
         required: true
-        default: 'master'
+        default: "master"
         type: string
       package:
-        description: 'Name of package to upgrade'
+        description: "Name of package to upgrade"
         required: true
         type: string
       version:
-        description: 'Version number to upgrade to in constraints.txt (only needed if pinned)'
-        default: ''
+        description: "Version number to upgrade to in constraints.txt (only needed if pinned)"
+        default: ""
         type: string
       change_desc:
         description: |
           Description of change, for commit message and PR. (What does the new version add or fix?)
-        default: ''
+        default: ""
         type: string
 
 defaults:
@@ -32,12 +32,12 @@ jobs:
 
     steps:
       - name: Check out target branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: "${{ inputs.branch }}"
 
       - name: Set up Python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 

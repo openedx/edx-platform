@@ -11,6 +11,6 @@ metadata:
       title: "Documentation"
       icon: "Web"
 spec:
-  owner: group:2u-arch-bom
+  owner: group:wg-maintenance-edx-platform
   type: 'service'
   lifecycle: 'production'

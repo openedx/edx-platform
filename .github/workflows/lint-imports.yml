@@ -7,19 +7,18 @@ on:
       - master
 
 jobs:
-
   lint-imports:
     name: Lint Python Imports
     runs-on: ubuntu-20.04
 
     steps:
       - name: Check out branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install system requirements
         run: sudo apt update && sudo apt install -y libxmlsec1-dev
@@ -33,7 +32,7 @@ jobs:
 
       - name: Cache pip dependencies
         id: cache-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.pip-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}

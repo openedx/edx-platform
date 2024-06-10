@@ -12,73 +12,73 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
-        node-version: [ 18 ]
+        os: [ubuntu-20.04]
+        node-version: [18]
         python-version:
-          - '3.11'
+          - "3.11"
 
     steps:
+      - uses: actions/checkout@v4
+      - name: Fetch master to compare coverage
+        run: git fetch --depth=1 origin master
 
-    - uses: actions/checkout@v2
-    - name: Fetch master to compare coverage
-      run: git fetch --depth=1 origin master
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Setup npm
+        run: npm i -g npm@10.5.x
 
-    - name: Setup npm
-      run: npm i -g npm@10.5.x
+      - name: Install Firefox 123.0
+        run: |
+          sudo apt-get purge firefox
+          wget "https://ftp.mozilla.org/pub/firefox/releases/123.0/linux-x86_64/en-US/firefox-123.0.tar.bz2"
+          tar -xjf firefox-123.0.tar.bz2
+          sudo mv firefox /opt/firefox
+          sudo ln -s /opt/firefox/firefox /usr/bin/firefox
 
-    - name: Install Firefox 123.0
-      run: |
-        sudo apt-get purge firefox
-        wget "https://ftp.mozilla.org/pub/firefox/releases/123.0/linux-x86_64/en-US/firefox-123.0.tar.bz2"
-        tar -xjf firefox-123.0.tar.bz2
-        sudo mv firefox /opt/firefox
-        sudo ln -s /opt/firefox/firefox /usr/bin/firefox
+      - name: Install Required System Packages
+        run: sudo apt-get update && sudo apt-get install libxmlsec1-dev ubuntu-restricted-extras xvfb
 
-    - name: Install Required System Packages
-      run: sudo apt-get update && sudo apt-get install libxmlsec1-dev ubuntu-restricted-extras xvfb
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
 
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/base.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
 
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/base.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
+      - name: Install Required Python Dependencies
+        run: |
+          make base-requirements
 
-    - name: Install Required Python Dependencies
-      run: |
-        make base-requirements
+      - uses: c-hive/gha-npm-cache@v1
+      - name: Run JS Tests
+        env:
+          TEST_SUITE: js-unit
+          SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
+        run: |
+          npm install -g jest
+          xvfb-run --auto-servernum ./scripts/all-tests.sh
 
-    - uses: c-hive/gha-npm-cache@v1
-    - name: Run JS Tests
-      env:
-        TEST_SUITE: js-unit
-        SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
-      run: |
-        npm install -g jest
-        xvfb-run --auto-servernum ./scripts/all-tests.sh
-
-    - name: Save Job Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: Build-Artifacts
-        path: |
-          reports/**/*
-          test_root/log/*.png
-          test_root/log/*.log
-          **/TEST-*.xml
+      - name: Save Job Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-Artifacts
+          path: |
+            reports/**/*
+            test_root/log/*.png
+            test_root/log/*.log
+            **/TEST-*.xml
+          overwrite: true

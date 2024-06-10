@@ -1977,13 +1977,14 @@ class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    'We plan to use this information to evaluate your application for financial assistance and to further develop our'
-    ' financial assistance program. Please note that while \nassistance is available in most courses that offer'
-    ' verified certificates, a few courses and programs are not eligible. You must complete a separate application'
-    ' \nfor each course you take. You may be approved for financial assistance five (5) times each year'
-    ' (based on 12-month period from you first approval). \nTo apply for financial assistance: \n'
-    '1. Enroll in the audit track for an eligible course that offers Verified Certificates \n2. Complete this'
-    '  application \n3. Check your email, your application will be reviewed in 3-4 business days'
+    'We plan to use this information to evaluate your application for financial assistance and to further develop our '
+    'financial assistance program. \nPlease note that while assistance is available in most courses that offer '
+    'verified certificates, a few courses and programs are not eligible. You must complete a separate application '
+    'for each course you take. You may be approved for financial assistance five (5) times each year '
+    '(based on 12-month period from you first approval). \nTo apply for financial assistance: '
+    '\n1. Enroll in the audit track for an eligible course that offers Verified Certificates. '
+    '\n2. Complete this application. '
+    '\n3. Check your email, please allow 4 weeks for your application to be processed.'
 )
 
 

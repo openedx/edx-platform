@@ -1,0 +1,42 @@
+// This file is written in "JSON5" (https://json5.org/) so that we can use comments.
+{
+  "extends": [
+    "config:base",
+    "schedule:weekly",
+    ":automergeLinters",
+    ":automergeMinor",
+    ":automergeTesters",
+    ":enableVulnerabilityAlerts",
+    ":semanticCommits",
+    ":updateNotScheduled"
+  ],
+  "packageRules": [
+    {
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "lockFileMaintenance",
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["@edx", "@openedx"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ],
+  // When adding an ignoreDep, please include a reason and a public link that we can use to follow up and ensure
+  // that the ignoreDep is removed.
+  "ignoreDeps": [
+    // Latest moment-timezone version broke the legacy programs dashboard, which is deprecated and soon to be removed.
+    // https://github.com/openedx/edx-platform/pull/34928"
+    "moment-timezone",
+  ],
+  "timezone": "America/New_York",
+  "prConcurrentLimit": 3,
+  "enabledManagers": ["npm"]
+}

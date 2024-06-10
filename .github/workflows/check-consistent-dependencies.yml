@@ -34,13 +34,13 @@ jobs:
               echo "RELEVANT=true" >> "$GITHUB_ENV"
           fi
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ env.RELEVANT == 'true' }}
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         if: ${{ env.RELEVANT == 'true' }}
         with:
-          python-version: '3.8'
+          python-version: "3.8"
 
       - name: "Recompile requirements"
         if: ${{ env.RELEVANT == 'true' }}

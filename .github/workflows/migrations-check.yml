@@ -13,9 +13,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ubuntu-20.04]
         python-version:
-          - '3.11'
+          - "3.11"
         # 'pinned' is used to install the latest patch version of Django
         # within the global constraint i.e. Django==4.2.8 in current case
         # because we have global constraint of Django<4.2
@@ -50,73 +50,73 @@ jobs:
           --health-timeout 5s
           --health-retries 3
     steps:
-    - name: Setup mongodb user
-      run: |
-        mongosh edxapp --eval '
-          db.createUser(
-            {
-              user: "edxapp",
-              pwd:  "password",
-              roles: [
-                   { role: "readWrite", db: "edxapp" },
-              ]
-            }
-          );
-        '
+      - name: Setup mongodb user
+        run: |
+          mongosh edxapp --eval '
+            db.createUser(
+              {
+                user: "edxapp",
+                pwd:  "password",
+                roles: [
+                     { role: "readWrite", db: "edxapp" },
+                ]
+              }
+            );
+          '
 
-    - name: Verify mongo and mysql db credentials
-      run: |
-        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
-        mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
+      - name: Verify mongo and mysql db credentials
+        run: |
+          mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
+          mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
 
-    - name: Checkout repo
-      uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install system Packages
-      run: |
-        sudo apt-get update
-        make ubuntu-requirements
+      - name: Install system Packages
+        run: |
+          sudo apt-get update
+          make ubuntu-requirements
 
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
 
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
 
-    - name: Install Python dependencies
-      run: |
-        make dev-requirements
-        if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-          pip install "django~=${{ matrix.django-version }}.0"
-          pip check # fail if this test-reqs/Django combination is broken
-        fi
+      - name: Install Python dependencies
+        run: |
+          make dev-requirements
+          if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+            pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
+          fi
 
-    - name: list installed package versions
-      run: |
-        sudo pip freeze
+      - name: list installed package versions
+        run: |
+          sudo pip freeze
 
-    - name: Run Tests
-      env:
-        LMS_CFG: lms/envs/minimal.yml
-        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
-        STUDIO_CFG: lms/envs/minimal.yml
-      run: |
-        echo "Running the LMS migrations."
-        ./manage.py lms migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms migrate
+      - name: Run Tests
+        env:
+          LMS_CFG: lms/envs/minimal.yml
+          # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
+          STUDIO_CFG: lms/envs/minimal.yml
+        run: |
+          echo "Running the LMS migrations."
+          ./manage.py lms migrate
+          echo "Running the CMS migrations."
+          ./manage.py cms migrate
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why

@@ -6,11 +6,16 @@ on:
     branches:
       - master
 
+concurrency:
+  # We only need to be running tests for the latest commit on each PR
+  # (however, we fully test every commit on master, even as new ones land).
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
-    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    runs-on: [ edx-platform-runner ]
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version:
@@ -56,14 +61,16 @@ jobs:
         #     mongo-version: "4.4"
 
     steps:
-      - name: sync directory owner
-        run: sudo chown runner:runner -R .*
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: install system requirements
+        run: |
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
 
       - name: install mongo version
         run: |
           if [[ "${{ matrix.mongo-version }}" != "4.4" ]]; then
-            sudo apt-get purge -y "mongodb-org*"
-            sudo apt-get remove -y mongodb-org
             wget -qO - https://www.mongodb.org/static/pgp/server-${{ matrix.mongo-version }}.asc | sudo apt-key add -
             echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${{ matrix.mongo-version }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ matrix.mongo-version }}.list
             sudo apt-get update && sudo apt-get install -y mongodb-org="${{ matrix.mongo-version }}.*"
@@ -76,24 +83,21 @@ jobs:
           mongod &
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: checkout repo
-        uses: actions/checkout@v3
-
       - name: install requirements
         run: |
-          sudo make test-requirements
+          make test-requirements
           if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
-            sudo pip install "django~=${{ matrix.django-version }}.0"
-            sudo pip check # fail if this test-reqs/Django combination is broken
+            pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
           fi
 
       - name: list installed package versions
         run: |
-          sudo pip freeze
+          pip freeze
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
@@ -103,20 +107,40 @@ jobs:
           mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: reports/${{matrix.shard_name}}.coverage
+          overwrite: true
+
+  collect-and-verify:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: install system requirements
+        run: |
+          sudo apt-get update && sudo apt-get install libxmlsec1-dev
+
+      - name: install requirements
+        run: |
+          make test-requirements
+
+      - name: verify unit tests count
+        uses: ./.github/actions/verify-tests-count
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
   # https://github.com/orgs/community/discussions/33579
   success:
     name: Unit tests successful
-    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    needs:
-      - run-tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    if: always()
+    needs: [run-tests]
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1
@@ -125,14 +149,12 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
   compile-warnings-report:
-    runs-on: [ edx-platform-runner ]
-    needs: [ run-tests ]
+    runs-on: ubuntu-20.04
+    needs: [run-tests]
     steps:
-      - name: sync directory owner
-        run: sudo chown runner:runner -R .*
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: collect pytest warnings files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: pytest-warnings-json
           path: test_root/log
@@ -146,31 +168,33 @@ jobs:
 
       - name: save warning report
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pytest-warning-report-html
           path: |
             reports/pytest_warnings/warning_report_all.html
+          overwrite: true
 
   # Combine and upload coverage reports.
   coverage:
-    needs: run-tests
-    runs-on: ubuntu-latest
+    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
+    runs-on: ubuntu-20.04
+    needs: [run-tests]
     strategy:
       matrix:
         python-version:
           - 3.11
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: coverage
           path: reports
@@ -184,4 +208,4 @@ jobs:
           coverage combine reports/*
           coverage report
           coverage xml
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
