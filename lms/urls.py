@@ -111,6 +111,9 @@ urlpatterns = [
 
     path('i18n/', include('django.conf.urls.i18n')),
 
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
+
     # Enrollment API RESTful endpoints
     path('api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
