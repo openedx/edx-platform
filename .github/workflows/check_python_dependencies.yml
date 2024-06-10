@@ -25,14 +25,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       
       - name: Install repo-tools
-        run: pip install git+https://github.com/salman2013/repo-tools.git@salman/add-script-for-python-dependencies
+        run: pip install edx-repo-tools[find_dependencies]
       
-      - name: Install requirements parser module
-        run: pip install requirements-parser  
-      
-      - name: Install setuptool
-        run: pip install setuptools  
-
       - name: Run Python script
         run: |
           find_python_dependencies \
