@@ -1282,14 +1282,14 @@ def extras_get_attendance(request):
 
 
 
-def _get_dashboard_scores(data):
+def _get_dashboard_attendance(data):
 	try:
-		r = requests.post("https://dashboard.talentsprint.com/aiml/scores.html", data = data)
-		scores =  json.loads(r.content)
+		r = requests.post("https://dashboard.talentsprint.com/aiml/attendance.html", data = data)
+		attendance = json.loads(r.content)
 	except Exception as err:
-		scores = {"total" : "", "scores" : [], "percentage" : ""}
-	return scores
-
+		log.info(err)
+		attendance = {"attended" : "","conducted" : "", "attendance" : []}
+		return attendance
 
 
 @csrf_exempt
