@@ -1672,8 +1672,14 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
                 context=context, student_view_context=student_view_context
             )
         except RenderXBlockStarted.PreventXBlockBlockRender as exc:
-            log.info("Skipping rendering block %s. Reason: %s", usage_key_string, exc.message)
+            log.info("Halted rendering block %s. Reason: %s", usage_key_string, exc.message)
             return render_500()
+        except RenderXBlockStarted.RenderCustomResponse as exc:
+            log.info("Rendering custom exception for block %s. Reason: %s", usage_key_string, exc.message)
+            context.update({
+                'fragment': Fragment(exc.response)
+            })
+            return render_to_response('courseware/courseware-chromeless.html', context, request=request)
 
         fragment = block.render(requested_view, context=student_view_context)
         optimization_flags = get_optimization_flags_for_content(block, fragment)
