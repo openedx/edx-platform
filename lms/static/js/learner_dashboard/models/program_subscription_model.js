@@ -42,10 +42,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
             data.current_period_end,
             userPreferences
         );
-        const [trialEndDate, trialEndTime] = ProgramSubscriptionModel.formatDate(
-            data.trial_end,
-            userPreferences
-        );
+        const [trialEndDate, trialEndTime] = ['', ''];
 
         super(
             {
@@ -69,7 +66,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
         }
 
         const userTimezone = (
-            userPreferences.time_zone || moment.tz.guess() || 'UTC'
+            userPreferences.time_zone || moment?.tz?.guess?.() || 'UTC'
         );
         const userLanguage = userPreferences['pref-lang'] || 'en';
         const context = {
@@ -80,10 +77,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
         };
 
         const localDate = DateUtils.localize(context);
-        const localTime = DateUtils.localizeTime(
-            DateUtils.stringToMoment(date),
-            userTimezone
-        ).format('HH:mm (z)');
+        const localTime = '';
 
         return [localDate, localTime];
     }
