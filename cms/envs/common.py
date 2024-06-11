@@ -41,11 +41,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import json
 import os
-import sys
-import re
-
-from django.http.request import HttpRequest
-from django.http.response import HttpResponse
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
@@ -128,7 +123,6 @@ from lms.envs.common import (
 )
 from path import Path as path
 from django.urls import reverse_lazy
-from django.middleware.clickjacking import XFrameOptionsMiddleware
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
@@ -140,14 +134,6 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
-
-class EdxXFrameOptionsMiddleware(XFrameOptionsMiddleware):
-    def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
-        response = super().process_response(request, response)
-        pathh = request.path
-        if re.search('.*/media/scorm/.*', pathh):
-            response['X-Frame-Options'] = 'SAMEORIGIN'
-        return response
 
 # pylint: enable=useless-suppression
 
@@ -985,8 +971,8 @@ MIDDLEWARE = [
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
-    # use Django built in clickjacking protection
-    'cms.envs.common.EdxXFrameOptionsMiddleware',
+    # use custom extension of Django built in clickjacking protection
+    'edx_django_utils.security.clickjacking.middleware.EdxXFrameOptionsMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 
@@ -1007,8 +993,14 @@ MIDDLEWARE = [
 
 EXTRA_MIDDLEWARE_CLASSES = []
 
-# Clickjacking protection can be disabled by setting this to 'ALLOW'
+# Clickjacking protection can be disabled by setting this to 'ALLOW' or adjusted by setting this to 'SAMEORIGIN'.
+# It is not advised to set this to 'ALLOW' without a Content Security Policy header.
 X_FRAME_OPTIONS = 'DENY'
+# You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
+# Content Security Policy in place.
+# SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
+X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']]
+
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
@@ -1260,8 +1252,6 @@ COURSE_METADATA_EXPORT_BUCKET = ''
 ALTERNATE_WORKER_QUEUES = 'lms'
 
 STATIC_URL_BASE = '/static/'
-
-X_FRAME_OPTIONS = 'DENY'
 
 # .. setting_name: GIT_REPO_EXPORT_DIR
 # .. setting_default: '/edx/var/edxapp/export_course_repos'
