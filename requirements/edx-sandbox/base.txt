@@ -16,11 +16,11 @@ codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/base.in
 contourpy==1.1.1
     # via matplotlib
-cryptography==42.0.7
+cryptography==42.0.8
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.51.0
+fonttools==4.53.0
     # via matplotlib
 importlib-resources==6.4.0
     # via matplotlib
@@ -56,7 +56,7 @@ numpy==1.24.4
     #   scipy
 openedx-calc==3.1.0
     # via -r requirements/edx-sandbox/base.in
-packaging==24.0
+packaging==24.1
     # via matplotlib
 pillow==10.3.0
     # via matplotlib
@@ -72,7 +72,7 @@ python-dateutil==2.9.0.post0
     # via matplotlib
 random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
-regex==2024.5.10
+regex==2024.5.15
     # via nltk
 scipy==1.10.1
     # via
@@ -83,11 +83,11 @@ six==1.16.0
     # via
     #   codejail-includes
     #   python-dateutil
-sympy==1.12
+sympy==1.12.1
     # via
     #   -r requirements/edx-sandbox/base.in
     #   openedx-calc
 tqdm==4.66.4
     # via nltk
-zipp==3.18.1
+zipp==3.19.2
     # via importlib-resources

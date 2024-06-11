@@ -17,7 +17,7 @@ boltons==21.0.0
     #   semgrep
 bracex==2.4
     # via wcmatch
-certifi==2024.2.2
+certifi==2024.6.2
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -52,7 +52,7 @@ markdown-it-py==3.0.0
     # via rich
 mdurl==0.1.2
     # via markdown-it-py
-packaging==24.0
+packaging==24.1
     # via semgrep
 peewee==3.17.5
     # via semgrep
@@ -64,7 +64,7 @@ referencing==0.35.1
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.31.0
+requests==2.32.3
     # via semgrep
 rich==13.7.1
     # via semgrep
@@ -80,7 +80,7 @@ semgrep==1.52.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.1
     # via semgrep
-typing-extensions==4.11.0
+typing-extensions==4.12.2
     # via
     #   rich
     #   semgrep
@@ -89,7 +89,7 @@ urllib3==1.26.18
     #   -c requirements/edx/../constraints.txt
     #   requests
     #   semgrep
-wcmatch==8.5.1
+wcmatch==8.5.2
     # via semgrep
-zipp==3.18.1
+zipp==3.19.2
     # via importlib-resources

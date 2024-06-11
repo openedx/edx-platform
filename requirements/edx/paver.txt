@@ -4,13 +4,13 @@
 #
 #    make upgrade
 #
-certifi==2024.2.2
+certifi==2024.6.2
     # via requests
 charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-edx-opaque-keys==2.9.0
+edx-opaque-keys==2.10.0
     # via -r requirements/edx/paver.in
 idna==3.7
     # via requests
@@ -43,7 +43,7 @@ pymongo==3.13.0
     #   edx-opaque-keys
 python-memcached==1.62
     # via -r requirements/edx/paver.in
-requests==2.31.0
+requests==2.32.3
     # via -r requirements/edx/paver.in
 six==1.16.0
     # via
@@ -53,13 +53,13 @@ stevedore==5.2.0
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
-typing-extensions==4.11.0
+typing-extensions==4.12.2
     # via edx-opaque-keys
 urllib3==1.26.18
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-watchdog==4.0.0
+watchdog==4.0.1
     # via -r requirements/edx/paver.in
 wrapt==1.16.0
     # via -r requirements/edx/paver.in
