@@ -9,6 +9,7 @@ import re
 import string
 from collections import defaultdict
 from typing import Dict
+from six import text_type
 
 import django.utils
 from ccx_keys.locator import CCXLocator
@@ -30,6 +31,9 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
+
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import create_xblock_info
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
@@ -1738,6 +1742,74 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
+
+
+
+@require_http_methods(['POST'])
+@csrf_exempt
+def extras_create_course(request):
+    data = json.loads(request.body)
+    log.info(data)
+    display_name = data['other']['display_name']
+    course = data['other']['course_number_run'].split("|")[0]
+    run = data['other']['course_number_run'].split("|")[1]
+    course_creator = data['other']["email"]
+    org = data['other']["site_id"]
+
+    try:
+
+        user = User.objects.get(email = course_creator)
+    except User.DoesNotExist:
+        return JsonResponse({"error" : "Invalid access"})
+
+    if user:
+
+        # force the start date for reruns and allow us to override start via the client
+        start = request.POST.get('start', CourseFields.start.default)
+
+
+
+        fields = {'start': start}
+        if display_name is not None:
+            fields['display_name'] = display_name
+
+        # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
+        # existing xml courses this cannot be changed in CourseDescriptor.
+        # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
+        # w/ xmodule.course_module.CourseDescriptor.__init__
+        wiki_slug = u"{0}.{1}.{2}".format(org, course, run)
+        definition_data = {'wiki_slug': wiki_slug}
+        fields.update(definition_data)
+
+
+    try:
+        new_course = create_new_course(user, org, course, run, fields)
+        return JsonResponse({'course_url' : reverse_course_url('course_handler', new_course.id), 'course_key': str(new_course.id),})
+    except ValidationError as ex:
+        return JsonResponse({'error': text_type(ex)})
+    else:
+        return JsonResponse({"error" : "Invalid access"})
+
+
+def create_new_course(user, org, number, run, fields):
+    """
+    Create a new course run.
+
+    Raises:
+        DuplicateCourseError: Course run already exists.
+    """
+    try:
+        org_data = ensure_organization(org)
+    except InvalidOrganizationException:
+        raise ValidationError(_(  # lint-amnesty, pylint: disable=raise-missing-from
+            'You must link this course to an organization in order to continue. Organization '
+            'you selected does not exist in the system, you will need to add it to the system'
+        ))
+    store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
+    new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
+    add_organization_course(org_data, new_course.id)
+    return new_course
+
 
 
 def get_allowed_organizations(user):

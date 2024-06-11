@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <!-- <link rel="stylesheet" href="https://cdn.exec.talentsprint.com/edx_styles/gradebook.css" /> -->
+		<link rel="stylesheet" href="https://static.talentsprint.com/edx_styles/staging_gradebook.css">
+        <style></style>
+    </head>
+    <body>
+        <h3 class="title">Gradebook</h3>
+		<div id="details_bar">
+	   <div>
+                    <span> Student ID : {{studentid}} </span>
+	    </div>
+	    <div>
+			<span> Student Name : {{studentname}} </span>
+                    <!-- <span>Total Score : {{overall_percentage}}%</span>
+		    <span>Total Submissions : {{total_submissions_in_percentage}}%</span> -->
+	    </div>
+        </div>
+
+		<br />
+		<div id="parent_table_div">
+			<table class="fold-table parent_table">
+				<thead class="main_thead">
+					<tr  id="heading_thead_1">
+						<th class = "course_heading">Course</th>
+						<th class = "total_grade_heading"colspan="7">% Score</th>
+						<th class = "total_submissions_prcnt_heading">% Submissions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for record in grades %}
+						{% if record.grade != "-" and record.total_course_submissions != 0 and record.individual_scores.0.itemtype != "course" %}
+					<tr class="view">
+						<td>{{record.course_name}}</td>
+						<td colspan="7">{{record.coursewise_percentage}}%</td>
+						<td>{{record.coursewise_submissions_in_percentage}}%</td>
+					</tr>
+					<tr class="fold">
+						<td colspan="10">
+							<div class="fold-content">
+								<table>
+									<thead>
+										<tr style="border-bottom: 1px solid #eee;">
+											<th class = "grade_item_heading">Grade item</th>
+											<!-- <th>Contribution to course total</th> -->
+											<!--	<th>Range</th> -->
+											<!--  <th>Calculated weight</th> -->
+											<th class = "score_heading">Score</th>
+											<th class = "max_score_heading">Maximum Score</th>
+											<th class = "percentage_heading">Percentage</th>
+											<th class = "average_heading">Average</th>
+                                                                                        <th class = "highest_heading">Highest</th>
+											<th class = "feedback_heading">Feedback</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for assignment in record.individual_scores %} {% if not assignment.gradeishidden %} {% if assignment.itemtype == "course" %}
+										<tr style="background-color: rgba(0, 0, 0, 0.05);">
+											<th style="color: #111;">
+												<!-- <img src="/static/images/attendance-total.png" style="display: none;" /> -->
+												Course Total</th>
+											{% else %}
+										</tr>
+
+										<tr>
+											<th>
+												<!-- <img src="/static/images/attendance-{{assignment.itemmodule}}.png" alt="{{assignment.itemmodule}}" style="display: none;" /> -->
+												{{assignment.itemname}}</th>
+											{% endif %} {% if assignment.itemtype != "course" %} {% if assignment.gradecontribution %}
+											<!-- <td>{{assignment.gradecontribution}} % </td> -->
+											{% else %}
+											<!-- <td>-</td> -->
+											{% endif %} {% else %}
+											<!-- <td></td> -->
+											{% endif %}
+											<!-- <td></td> -->
+											<!--	<td>{{assignment.rangeformatted | safe}}</td>	-->
+											<!-- <td>{{assignment.weightformatted}}</td> -->
+											{% if assignment.itemtype != "course" %}
+                                                                                        <td>{{assignment.gradeformatted}}</td>
+                                                                                        {%else %}
+                                                                                                <td>{{record.coursewise_score}}</td>
+                                                                                        {%endif%}
+											{% if assignment.itemtype != "course" %}
+											 {% if assignment.grademax %}
+                                                                                        <td>{{assignment.grademax}}</td>
+                                                                                        {%else%}
+                                                                                        <td>-</td>
+                                                                                        {%endif%}
+											{%else %}
+												<td>{{record.total_grade}}</td>
+											{%endif%}
+                                                                                        {% if assignment.itemtype == "course" %}
+											<td>{{record.coursewise_percentage}}%</td>
+											{%else%}
+											<td>{{assignment.percentageformatted}}</td>
+											{%endif%}
+											{% if assignment.averageformatted %}
+											<td>{{assignment.averageformatted}}</td>
+											{%else%}
+											<td>-</td>
+											{%endif%}
+											{% if assignment.highest %}
+                                                                                        <td>{{assignment.highest}}</td>
+                                                                                        {%else%}
+                                                                                        <td>-</td>
+                                                                                        {%endif%} 
+											{% if assignment.feedback%}
+											<td class="feedback">{{assignment.feedback|safe}}</td>
+											{%else%}
+											<td>-</td>
+											{%endif%}
+										</tr>
+										{% endif %} {% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</td>
+					{%endif%}{% endfor %}
+					</tr>
+				</tbody>
+			</table>
+		</div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script>
+            $(function () {
+                $(".fold-table tr.view").on("click", function () {
+                    if (!$(this).hasClass("open")) {
+                        $(this).siblings("tr").removeClass("open");
+                        $(this).toggleClass("open").next(".fold").toggleClass("open");
+                    } else {
+                        $(this).removeClass("open");
+                        $(this).next(".fold").removeClass("open");
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
