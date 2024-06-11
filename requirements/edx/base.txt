@@ -135,12 +135,6 @@ code-annotations==1.8.0
     #   edx-toggles
 codejail-includes==1.0.0
     # via -r requirements/edx/kernel.in
-coreapi==2.3.3
-    # via drf-yasg
-coreschema==0.0.4
-    # via
-    #   coreapi
-    #   drf-yasg
 crowdsourcehinter-xblock==0.7
     # via -r requirements/edx/bundled.in
 cryptography==42.0.8
@@ -384,9 +378,8 @@ drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-spectacular==0.27.2
     # via -r requirements/edx/kernel.in
-drf-yasg==1.21.5
+drf-yasg==1.21.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   django-user-tasks
     #   edx-api-doc-tools
 edx-ace==1.8.0
@@ -599,12 +592,8 @@ ipaddress==1.0.23
     # via -r requirements/edx/kernel.in
 isodate==0.6.1
     # via python3-saml
-itypes==1.2.0
-    # via coreapi
 jinja2==3.1.4
-    # via
-    #   code-annotations
-    #   coreschema
+    # via code-annotations
 jmespath==1.0.1
     # via
     #   boto3
@@ -945,6 +934,7 @@ pyyaml==6.0.1
     #   -r requirements/edx/kernel.in
     #   code-annotations
     #   drf-spectacular
+    #   drf-yasg
     #   edx-django-release-util
     #   edx-i18n-tools
     #   xblock
@@ -967,7 +957,6 @@ requests==2.32.3
     #   -r requirements/edx/paver.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -995,10 +984,6 @@ rpds-py==0.18.1
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.6
-    # via drf-yasg
-ruamel-yaml-clib==0.2.8
-    # via ruamel-yaml
 rules==3.4
     # via
     #   -r requirements/edx/kernel.in
@@ -1128,7 +1113,6 @@ unicodecsv==0.14.1
     #   edx-enterprise
 uritemplate==4.1.1
     # via
-    #   coreapi
     #   drf-spectacular
     #   drf-yasg
 urllib3==1.26.18

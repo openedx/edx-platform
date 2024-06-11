@@ -265,17 +265,6 @@ colorama==0.4.6
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-coreapi==2.3.3
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   drf-yasg
-coreschema==0.0.4
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   coreapi
-    #   drf-yasg
 coverage[toml]==7.5.3
     # via
     #   -r requirements/edx/testing.txt
@@ -639,9 +628,8 @@ drf-spectacular==0.27.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-drf-yasg==1.21.5
+drf-yasg==1.21.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-user-tasks
@@ -1023,17 +1011,11 @@ isort==5.13.2
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-itypes==1.2.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   coreapi
 jinja2==3.1.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   code-annotations
-    #   coreschema
     #   diff-cover
     #   fastapi
     #   sphinx
@@ -1699,6 +1681,7 @@ pyyaml==6.0.1
     #   -r requirements/edx/testing.txt
     #   code-annotations
     #   drf-spectacular
+    #   drf-yasg
     #   edx-django-release-util
     #   edx-i18n-tools
     #   sphinxcontrib-openapi
@@ -1734,7 +1717,6 @@ requests==2.32.3
     #   -r requirements/edx/testing.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   djangorestframework-stubs
     #   edx-bulk-grades
@@ -1772,16 +1754,6 @@ rpds-py==0.18.1
     #   -r requirements/edx/testing.txt
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.6
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   drf-yasg
-ruamel-yaml-clib==0.2.8
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   ruamel-yaml
 rules==3.4
     # via
     #   -r requirements/edx/doc.txt
@@ -2084,7 +2056,6 @@ uritemplate==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   coreapi
     #   drf-spectacular
     #   drf-yasg
 urllib3==1.26.18
