@@ -36,10 +36,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
 
         const hasActiveTrial = false;
 
-        const remainingDays = ProgramSubscriptionModel.getRemainingDays(
-            data.trial_end,
-            userPreferences
-        );
+        const remainingDays = 0;
 
         const [currentPeriodEnd] = ProgramSubscriptionModel.formatDate(
             data.current_period_end,
@@ -89,30 +86,6 @@ class ProgramSubscriptionModel extends Backbone.Model {
         ).format('HH:mm (z)');
 
         return [localDate, localTime];
-    }
-
-    static getRemainingDays(trialEndDate, userPreferences) {
-        if (!trialEndDate) {
-            return 0;
-        }
-
-        const userTimezone = (
-            userPreferences.time_zone || moment.tz.guess() || 'UTC'
-        );
-        const trialEndTime = DateUtils.localizeTime(
-            DateUtils.stringToMoment(trialEndDate),
-            userTimezone
-        );
-        const currentTime = DateUtils.localizeTime(
-            moment.utc(),
-            userTimezone
-        );
-
-        return trialEndTime.diff(currentTime, 'days') < 1
-            ? // 0 if trial end time is less than 24 hrs
-              0
-            : // else return actual difference in days
-              trialEndTime.startOf('day').diff(currentTime.startOf('day'), 'days');
     }
 }
 
