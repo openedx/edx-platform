@@ -16,6 +16,7 @@ from django.http import (
 )
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import WaffleFlag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
 
@@ -32,6 +33,18 @@ from .models import CdnUserAgentsConfig, CourseAssetCacheTtlConfig
 
 log = logging.getLogger(__name__)
 
+# .. toggle_name: content_server.use_view
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Deployment flag for switching asset serving from a middleware
+#   to a view. Intended to be used once in each environment to test the cutover and
+#   ensure there are no errors or changes in behavior. Once this has been tested,
+#   the middleware can be fully converted to a view.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-05-02
+# .. toggle_target_removal_date: 2024-07-01
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/34702
+CONTENT_SERVER_USE_VIEW = WaffleFlag('content_server.use_view', module_name=__name__)
 
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
@@ -39,12 +52,26 @@ log = logging.getLogger(__name__)
 HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
-class StaticContentServer(MiddlewareMixin):
+class StaticContentServerMiddleware(MiddlewareMixin):
+    """
+    Shim to maintain old pattern of serving course assets from a middleware. See views.py.
+    """
+    def process_request(self, request):
+        """Intercept asset request or allow view to handle it, depending on config."""
+        if CONTENT_SERVER_USE_VIEW.is_enabled():
+            return
+        else:
+            set_custom_attribute('content_server.handled_by.middleware', True)
+            return IMPL.process_request(request)
+
+
+class StaticContentServer():
     """
     Serves course assets to end users.  Colloquially referred to as "contentserver."
     """
     def is_asset_request(self, request):
         """Determines whether the given request is an asset request"""
+        # Don't change this without updating urls.py! See docstring of views.py.
         return (
             request.path.startswith('/' + XASSET_LOCATION_TAG + '/')
             or
@@ -293,6 +320,9 @@ class StaticContentServer(MiddlewareMixin):
                 set_cached_content(content)
 
         return content
+
+
+IMPL = StaticContentServer()
 
 
 def parse_range_header(header_value, content_length):
