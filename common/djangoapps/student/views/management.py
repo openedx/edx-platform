@@ -28,6 +28,7 @@ from django.shortcuts import redirect, render
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import int_to_base36
 
 
 from django.db import transaction
@@ -1222,7 +1223,7 @@ def  extras_get_moodle_grades(request):
             moodle_service_url = api_url + "/webservice/rest/server.php"
             response = requests.request("POST", moodle_service_url, headers = headers, params = querystring)
 
-            log.info("API call response for Course {0} url is {1}".format(api_url, response.status_code))
+            log.info("API call response for Course {0} url is {1} ".format(api_url, response.status_code))
 
             context = json.loads(response.text)
             if "message" in context or not context["grades"]:
@@ -1271,25 +1272,28 @@ def merge_grades(responses):
     return mergeddata
 
 
-
-@xframe_options_exempt
-@csrf_exempt
 @login_required
-def extras_get_attendance(request):
-	data  = {"email" : request.user.email,"role" :  request.GET["role"]}
-	context = {"user_attendance" : _get_dashboard_attendance(data), "header_logo" : marketing_link('HEADER_LOGO')}
-	return render(request, "attendance.html", context = context)
-
-
-
-def _get_dashboard_attendance(data):
-	try:
-		r = requests.post("https://dashboard.talentsprint.com/aiml/attendance.html", data = data)
-		attendance = json.loads(r.content)
-	except Exception as err:
-		log.info(err)
-		attendance = {"attended" : "","conducted" : "", "attendance" : []}
-		return attendance
+def attendance_report(request):
+    try:
+        moodle_base_url = configuration_helpers.get_value("MOODLE_URL", "")
+        moodle_service_url = moodle_base_url + "/webservice/rest/server.php"
+        moodle_wstoken = configuration_helpers.get_value("MOODLE_TOKEN", "")
+        course_attendance_function = "mod_wsattendance_get_attendance"
+        if "site" in request.GET:
+            site = request.GET["site"]
+        else:
+            site = ""
+        headers = {'content-type': "text/plain"}
+        querystring = {"wstoken" : moodle_wstoken, "wsfunction" : course_attendance_function, "moodlewsrestformat" : "json", "user_email":request.user.email, "site_name" :  site }
+        response = requests.request("POST", moodle_service_url, headers = headers, params = querystring)
+        context = {'attendance_report' : json.loads(response.text), 'cohort_name' : request.GET["cohort_name"]}
+        if configuration_helpers.get_value('ATTENDANCE_TEMPLATE'):
+            return render(request, configuration_helpers.get_value('ATTENDANCE_TEMPLATE'), context = context)
+        else :
+            return render(request, 'attendance_report.html', context = context)
+    except Exception as e:
+        log.info(e)
+        return {}
 
 
 @csrf_exempt
@@ -1297,12 +1301,12 @@ def extras_reset_password_link(request):
 	email = request.POST.get("email")
 	domain = request.POST.get("domain")
 	try:
-		user = User.objects.get(email__iexact=email.strip())
+            user = User.objects.get(email__iexact=email.strip())
 	except Exception as err:
-		log.error("Reset Password Error: "+ str(err) + " Email:" + email)
-		return HttpResponse("")
+            log.error("Reset Password Error: "+ str(err) + " Email:" + email)
+            return HttpResponse("")
 	uid = int_to_base36(user.id)
 	token = PasswordResetTokenGenerator().make_token(user)
-	url = "https://{0}/password_reset_confirm/{1}-{2}".format(domain, uid, token)	
+	url = "https://{0}/password_reset_confirm/{1}-{2}".format(domain, uid, token)
 	return HttpResponse(url)
 
