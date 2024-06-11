@@ -53,7 +53,7 @@
     "js-cookie": "3.0.5",
     "jwt-decode": "^3.1.2",
     "moment": "2.30.1",
-    "moment-timezone": "0.5.37",
+    "moment-timezone": "0.5.45",
     "node-gyp": "10.0.1",
     "picturefill": "3.0.3",
     "popper.js": "1.12.9",
