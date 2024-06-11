@@ -5,16 +5,19 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import generics, status
+from rest_framework.decorators import api_view
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     get_course_notification_preference_config_version
@@ -479,3 +482,13 @@ class NotificationReadAPIView(APIView):
             return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
 
         return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST'])
+def preference_update_from_encrypted_username_view(request, username, patch):
+    """
+    View to update user preferences from encrypted username and patch.
+    username and patch must be string
+    """
+    update_user_preferences_from_patch(username, patch)
+    return HttpResponse("<!DOCTYPE html><html><body>Success</body></html>", status=status.HTTP_200_OK)

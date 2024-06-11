@@ -2,14 +2,22 @@
 Email Notifications Utils
 """
 import datetime
+import json
 
 from django.conf import settings
+from django.urls import reverse
 from pytz import utc
 from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
 
 from lms.djangoapps.branding.api import get_logo_url_for_email
+from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
+from openedx.core.djangoapps.notifications.base_notification import (
+    COURSE_NOTIFICATION_APPS,
+    COURSE_NOTIFICATION_TYPES,
+)
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
@@ -51,7 +59,21 @@ def get_icon_url_for_notification_type(notification_type):
     return NotificationTypeIcons.get_icon_url_for_notification_type(notification_type)
 
 
-def create_email_template_context():
+def get_unsubscribe_link(username, patch):
+    """
+    Returns unsubscribe url for username with patch preferences
+    """
+    encrypted_username = encrypt_string(username)
+    encrypted_patch = encrypt_object(patch)
+    kwargs = {
+        'username': encrypted_username,
+        'patch': encrypted_patch
+    }
+    relative_url = reverse('preference_update_from_encrypted_username_view', kwargs=kwargs)
+    return f"{settings.LMS_BASE}{relative_url}"
+
+
+def create_email_template_context(username):
     """
     Creates email context for header and footer
     """
@@ -65,16 +87,21 @@ def create_email_template_context():
         for social_platform in social_media_urls.keys()
         if social_media_icons.get(social_platform)
     }
+    patch = {
+        'channel': 'email',
+        'value': False
+    }
     return {
         "platform_name": settings.PLATFORM_NAME,
         "mailing_address": settings.CONTACT_MAILING_ADDRESS,
         "logo_url": get_logo_url_for_email(),
         "social_media": social_media_info,
         "notification_settings_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/notifications",
+        "unsubscribe_url": get_unsubscribe_link(username, patch)
     }
 
 
-def create_email_digest_context(app_notifications_dict, start_date, end_date=None, digest_frequency="Daily",
+def create_email_digest_context(app_notifications_dict, username, start_date, end_date=None, digest_frequency="Daily",
                                 courses_data=None):
     """
     Creates email context based on content
@@ -84,7 +111,7 @@ def create_email_digest_context(app_notifications_dict, start_date, end_date=Non
     digest_frequency: EmailCadence.DAILY or EmailCadence.WEEKLY
     courses_data: Dictionary to cache course info (avoid additional db calls)
     """
-    context = create_email_template_context()
+    context = create_email_template_context(username)
     start_date_str = create_datetime_string(start_date)
     end_date_str = create_datetime_string(end_date if end_date else start_date)
     email_digest_updates = [{
@@ -243,3 +270,93 @@ def filter_notification_with_email_enabled_preferences(notifications, preference
         if notification.notification_type in enabled_course_prefs[notification.course_id]:
             filtered_notifications.append(notification)
     return filtered_notifications
+
+
+def encrypt_string(string):
+    """
+    Encrypts input string
+    """
+    return UsernameCipher.encrypt(string)
+
+
+def decrypt_string(string):
+    """
+    Decrypts input string
+    """
+    return UsernameCipher.decrypt(string).decode()
+
+
+def encrypt_object(obj):
+    """
+    Returns hashed string of object
+    """
+    string = json.dumps(obj)
+    return encrypt_string(string)
+
+
+def decrypt_object(string):
+    """
+    Decrypts input string and returns an object
+    """
+    decoded = decrypt_string(string)
+    return json.loads(decoded)
+
+
+def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
+    """
+    Decrypt username and patch and updates user preferences
+    """
+    username = decrypt_string(encrypted_username)
+    patch = decrypt_object(encrypted_patch)
+
+    app_value = patch.get("app_name")
+    type_value = patch.get("notification_type")
+    channel_value = patch.get("channel")
+    pref_value = bool(patch.get("value", False))
+
+    kwargs = {'user__username': username}
+    if 'course_id' in patch.keys():
+        kwargs['course_id'] = patch['course_id']
+
+    def is_name_match(name, param_name):
+        """
+        Name is match if strings are equal or param_name is None
+        """
+        return True if param_name is None else name == param_name
+
+    def is_editable(app_name, notification_type, channel):
+        """
+        Returns if notification type channel is editable
+        """
+        if notification_type == 'core':
+            return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
+        return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
+
+    def get_default_cadence_value(app_name, notification_type):
+        """
+        Returns default email cadence value
+        """
+        if notification_type == 'core':
+            return COURSE_NOTIFICATION_APPS[app_name]['core_email_cadence']
+        return COURSE_NOTIFICATION_TYPES[notification_type]['email_cadence']
+
+    preferences = CourseNotificationPreference.objects.filter(**kwargs)
+    # pylint: disable=too-many-nested-blocks
+    for preference in preferences:
+        preference_json = preference.notification_preference_config
+        for app_name, app_prefs in preference_json.items():
+            if not is_name_match(app_name, app_value):
+                continue
+            for noti_type, type_prefs in app_prefs['notification_types'].items():
+                if not is_name_match(noti_type, type_value):
+                    continue
+                for channel in ['web', 'email', 'push']:
+                    if not is_name_match(channel, channel_value):
+                        continue
+                    if is_editable(app_name, noti_type, channel):
+                        type_prefs[channel] = pref_value
+                        if channel == 'email':
+                            cadence_value = get_default_cadence_value(app_name, noti_type)\
+                                if pref_value else EmailCadence.NEVER
+                            type_prefs['email_cadence'] = cadence_value
+        preference.save()

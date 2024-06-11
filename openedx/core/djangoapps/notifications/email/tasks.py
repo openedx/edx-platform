@@ -92,8 +92,8 @@ def send_digest_email_to_user(user, cadence_type, course_language='en', courses_
         logger.info(f'<Email Cadence> No filtered notification for {user.username} ==Temp Log==')
         return
     apps_dict = create_app_notifications_dict(notifications)
-    message_context = create_email_digest_context(apps_dict, start_date, end_date, cadence_type,
-                                                  courses_data=courses_data)
+    message_context = create_email_digest_context(apps_dict, user.username, start_date, end_date,
+                                                  cadence_type, courses_data=courses_data)
     recipient = Recipient(user.id, user.email)
     message = EmailNotificationMessageType(
         app_label="notifications", name="email_digest"
