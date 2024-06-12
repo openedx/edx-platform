@@ -52,12 +52,12 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         python3 \
         python3-venv \
-        python3.8 \
-        python3.8-minimal \
+        python3.11 \
+        python3.11-minimal \
         # python3-dev: required for building mysqlclient python package version 2.2.0
         python3-dev \
-        libpython3.8 \
-        libpython3.8-stdlib \
+        libpython3.11 \
+        libpython3.11-stdlib \
         libmysqlclient21 \
         # libmysqlclient-dev: required for building mysqlclient python package version 2.2.0
         libmysqlclient-dev \
@@ -105,7 +105,7 @@ RUN apt-get update && \
 
 # Setup python virtual environment
 # It is already 'activated' because $VIRTUAL_ENV/bin was put on $PATH
-RUN python3.8 -m venv "${VIRTUAL_ENV}"
+RUN python3.11 -m venv "${VIRTUAL_ENV}"
 
 # Install python requirements
 # Requires copying over requirements files, but not entire repository
