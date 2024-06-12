@@ -5,7 +5,6 @@ from typing import Dict, List
 
 from common.djangoapps.student.models import CourseAccessRole
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.lib.cache_utils import request_cached
 
 
