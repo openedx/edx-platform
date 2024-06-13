@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>      
+<link rel="stylesheet" href = "https://cdn.exec.talentsprint.com/edx_styles/gradebook.css">
+<style>
+</style>
+
+
+</head>
+<body>
+<h3 class = "title" style="  text-align: center;">Gradebook</h3>
+<table>
+<thead>
+                <tr>
+                	<th>Student Name : {{studentname}}</th>
+                        <th>Student ID : {{studentid}}</th>
+		</tr>
+</thead>
+</table>
+<table class="fold-table">
+	<thead>
+	    <tr style="background: #0075bb; color: #fff">
+        	<th>Course</th>
+	    </tr>
+	</thead>
+	<tbody>
+	{% for record in grades %}
+	    {% if record.grade != "-" and record.total_course_submissions != 0 and record.individual_scores.0.itemtype != "course" %}
+		<tr class="view">
+			<td >{{record.course_name}}</td>
+        </tr>
+		<tr class="fold">
+		      <td colspan="7">
+		     	     <div class="fold-content">
+			          <table>
+				         <thead>
+					        <tr style="border-bottom: 1px solid #eee;">
+							<th>Grade item</th>
+							<!-- <th>Contribution to course total</th> -->
+						<!--	<th>Range</th> -->
+                           <!--  <th>Calculated weight</th> -->
+                            <th>Score</th>
+                            <th>Percentage</th>
+                            <th>Feedback</th>        
+						</tr>    
+					</thead>
+					<tbody>
+						{% for assignment in record.individual_scores %}
+						    {% if not assignment.gradeishidden %}
+							{% if assignment.itemtype == "course" %}
+		        			                <tr style="background-color: rgba(0,0,0,.05);">
+                		                		<th style="color: #111;">
+													<!-- <img src="/static/images/attendance-total.png" style = "display:none;"> -->
+													Course Total</th>
+				                        {% else %}
+                					        <tr>
+                                				<th>
+													<!-- <img src="/static/images/attendance-{{assignment.itemmodule}}.png" alt="{{assignment.itemmodule}}" style = "display:none;"> -->
+													{{assignment.itemname}}</th>
+				                        {% endif %}
+	                   			        {% if assignment.itemtype != "course" %}
+                                                              {% if assignment.gradecontribution %}
+                                                                        <!-- <td>{{assignment.gradecontribution}} % </td> -->
+                                                                {% else %}
+                                                                        <!-- <td>-</td> -->
+                                                                {% endif %}
+                                                        {% else %}
+                                                                <!-- <td></td> -->
+                                                        {% endif %}
+						<!--	<td>{{assignment.rangeformatted | safe}}</td>	-->
+		                                        <!-- <td>{{assignment.weightformatted}}</td> -->
+        		        		        <td>{{assignment.gradeformatted}}</td> 
+				                        <td>{{assignment.percentageformatted}}</td>
+							{% if assignment.feedback%}
+	                				        <td class="feedback">{{assignment.feedback | safe}}</td>
+							{%else%}                                                                                                                                                           <td>-</td>  
+							{%endif%}
+		
+							</tr>
+			         	       {% endif %}
+	
+				            {% endfor %}
+				    </tbody>
+          			</table>          
+		        </div>
+	      </td>
+   {% endif %}
+{% endfor %}
+</table>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>    
+<script>
+$(function(){
+  $(".fold-table tr.view").on("click", function(){
+    $(this).toggleClass("open").next(".fold").toggleClass("open");
+  });
+});
+</script> 
+</body>

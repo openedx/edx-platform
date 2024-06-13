@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://static.talentsprint.com/edx_styles/staging_attendance_chart.css" />
+  <link rel="stylesheet" href="https://www.talentsprint.com/misc/attendance.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>    -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body class="fintech_table attendance_chart_body">
+<!-- Button trigger modal -->
+        <div class="flex-container chart_flex_container">
+		<div id="container-{{cohort_name}}" class="chart_container"></div>
+            <div id="percentage_div">
+                {%for session in attendance_report.session_summary%}
+                        <h2>{{session.overall_percentage}}%</h2>
+                         <p id = "total_days" style = "display:none;">{{session.total_sessions}}</p>
+                        <span>Overall Attendance</span>
+                {%endfor%}
+            </div>
+        </div>
+
+        <div id="percentage_div_mobile">
+          <p class="att_percentage_mobile">Overall Attendance :
+            {%for session in attendance_report.session_summary%}<span>{{session.overall_percentage}}%</span></p>
+            <p id = "total_days_test" style = "display:none;">{{session.total_sessions}}</p>
+            {%endfor%}
+        </div>
+
+        <div class="table-responsive chart_table">
+          <table class="table table-bordered outer_table" style="border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th class="theader">Course</th>
+                    <th class="theader">Attendance</th>
+                    <th class="theader"> </th>
+                </tr>
+            </thead>
+            <tbody>
+
+
+
+                {%for i in attendance_report.percentage%}
+          {%if attendance_report.percentage|length != 1%}
+	  <tr data-toggle="collapse" data-target="#{{i.course_id}}{{cohort_name}}" class="accordion-toggle outer_row">
+          {%else%}
+	  <tr data-toggle="collapse" data-target="#{{i.course_id}}{{cohort_name}}" class="accordion-toggle visible_now outer_row" aria-expanded="true">
+          {%endif%}
+                        <td>{{i.course | safe}}</td>
+			<td>{{i.percentagesessionscompleted}}</td>
+                        <td><i class="fa fa-caret-down" aria-hidden="true"></i></td>
+                </tr>
+                <tr >
+                  <td colspan="4" class="hiddenRow">
+                  {%if attendance_report.percentage|length != 1%}
+		  <div class="accordian-body collapse" id="{{i.course_id}}{{cohort_name}}">
+                  {%else%}
+		  <div class="accordian-body visible_now collapse in" id="{{i.course_id}}{{cohort_name}}" aria-expanded="true">
+                  {%endif%}
+                          <div class="table-responsive">
+                             <table class="table inner_table table-bordered">
+                              <tr class="theader1">
+                                <th class="attendance_dot"></th>
+                                <th>Date</th>
+                                  <th>Session</th>
+                                  <th>Status</th>
+                                </tr>
+                                {% for j in attendance_report.attendance %}
+                                                          <tr>
+                                                                  {% if i.course_id == j.course_id %}
+
+                                                                        <td class="attendance_dot"><span class="{{j.status_description.split|join:"" | safe | lower}}_dot">&bull;</span></td>
+                                                                          <td>{{j.session_created}}</td>
+                                                                          {% if j.absenteereport == "0" %}
+                                                                                  <td class = "optional">{{j.session_name | striptags }} *</td>
+                                                                          {%else%}
+                                                                                  <td>{{j.session_name | striptags }}</td>
+                                                                          {%endif%}
+                                                                          <td>{{j.status_description | safe}}</td>
+                                    {% endif %}
+                                 </tr>
+                              {% endfor %}
+
+                              </table>
+                            </div>
+                     </div>
+                   </td>
+                </tr>
+           {% endfor %}
+            </tbody>
+        </table>
+        <div id = "status_summary" style = "display:none;">
+                {%for i in attendance_report.status_summary%}
+                        <p id ="{{i.status}}">["{{i.status}}", {{i.count}}]</p>
+                {%endfor%}
+        </div>
+        <!-- <p style = "position : fixed; bottom : 0px;">Note: Only those participants who have attended more than 70% of the session duration will be considered Present</p> -->
+      </div>
+
+
+
+      <script type="text/javascript">
+$(document).ready(function() {
+  total_days = $("#total_days").text()
+  console.log(total_days)
+  $( ".accordian-body" ).each(function() {
+    $.fn.test = function() {
+          return this.each(function(){
+            var new_id = $(this).attr("id").replace(/ /g,'');
+            $(this).attr('id',   ""  + new_id);
+            $(this).closest("tr").prev().attr('data-target',   "#" + new_id);
+          });
+        };
+    $(this).test()
+  });
+/*  $('.accordian-body').on('show.bs.collapse', function () {
+    $(this).toggleClass('bgcolor').closest("table")
+        .find(".collapse.in")
+        .not(this)
+        .collapse('toggle');
+    $(".accordion-toggle").removeClass("visible_now");
+    $(this).closest("tr").prev().addClass("visible_now");
+   });
+  $('.accordian-body').on('hide.bs.collapse', function () {
+    $(this).closest("tr").prev().removeClass("visible_now");
+   }) */
+
+//Warning note CSS issue
+
+$(".accordian-body").on("show.bs.collapse", function () {
+        $(this).toggleClass("bgcolor").closest("table").find(".collapse.in").not(this).collapse("toggle");
+        $("#bottom_note").css({
+            position: "inherit",
+            bottom: "0px",
+        });
+        $(".accordion-toggle").removeClass("visible_now");
+        $(this).closest("tr").prev().addClass("visible_now");
+    });
+
+ $(".accordian-body").on("hide.bs.collapse", function () {
+	         $(this).closest("tr").prev().removeClass("visible_now");
+        $("#bottom_note").css({
+            position: "fixed",
+            bottom: "0px",
+        });
+    });
+});
+</script>
+<script>
+  var status = "[";
+  var status_color = { Present: "#7bd500", Late: "#f7a701", Absent: "#d2000d", Excused: "#00a4b4" };
+  console.log(typeof status_color);
+  var distinct_colors = anychart.palettes.pastel;
+  var custom_json = [];
+  $("div#status_summary")
+      .children("p")
+      .each(function () {
+          status = status + $(this).text() + ",";
+  });
+
+  if($("div#status_summary").children("p").length == 0) {
+      summary_status = {}
+  }
+  else{
+      status = status.slice(0, -1) + "]";
+      summary_status = JSON.parse(status);
+  }
+
+  var attendance_summary = { };
+  for (i = 0; i < summary_status.length; i++) {
+      attendance_summary[summary_status[i][0]] = summary_status[i][1];
+  }
+  var result = Object.keys(attendance_summary).map((key) => [key, attendance_summary[key]]);
+  summary_status = result;
+
+  console.log(summary_status)
+
+  var final_summary_status = [];
+  var distinct_color_count = 0;
+  for (var i in summary_status) {
+      // if (summary_status[i][1] != "") {
+          final_summary_status.push([summary_status[i][0], summary_status[i][1]]);
+          attendance_status = summary_status[i][0];
+
+          if(attendance_status in status_color) {
+              custom_json.push( { color: status_color[attendance_status] });
+          }
+          else {
+              custom_json.push( { color: distinct_colors[distinct_color_count] });
+              $(`.${attendance_status.replaceAll(" ", "").toLowerCase()}_dot`).css({"color": distinct_colors[distinct_color_count]})
+              distinct_color_count += 1;
+          }
+      // }
+  }
+anychart.onDocumentReady(function () {
+      // add data
+      var data = anychart.data.set(final_summary_status);
+
+      // create a pie chart with the data
+      var chart = anychart.pie(data);
+
+      // set the chart radius making a donut chart
+      chart.innerRadius("65%");
+	if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        chart.width("340px");
+      }else{
+        chart.width("315px");
+      }
+      chart.height("315px");
+
+      // create a color palette
+      var palette = anychart.palettes.distinctColors();
+
+      // set the colors according to the brands
+      palette.items(custom_json);
+
+      // apply the donut chart color palette
+      chart.palette(palette);
+
+      // configure labels
+      chart.labels(true);
+      chart.labels().rotation(-13);
+      chart.labels().position("center");
+      chart.labels().anchor("center");
+      chart.labels().fontSize(12);
+      chart.labels().fontWeight(600);
+      chart.labels().fontColor("black");
+      chart.hovered().labels(false);
+
+      // configure the legend
+      chart.legend(true);
+      chart.legend().positionMode("outside");
+      chart.legend().position("bottom");
+      chart.legend().align("center");
+      chart.legend().itemsLayout("horizontalExpandable");
+      chart.legend().title().fontSize(9);
+
+      // disabling explode
+      // chart.selected().explode("0%");
+      // chart.hovered().explode("0%");
+
+      // format the donut chart tooltip
+      chart.tooltip().useHtml(true);
+      chart.tooltip().format("Count: {%y} <br> Percentage: {%yPercentOfTotal}{decimalsCount:1}");
+
+      // create a standalone label
+      var label = anychart.standalones.label();
+
+      // configure the label settings
+      label
+          .useHtml(true)
+          .text("<span style='font-weight:600;font-size: 15px'>" + total_days + "</span>" + " <br> #Sessions")
+          .position("center")
+          .anchor("center")
+          .hAlign("center")
+          .vAlign("middle");
+
+      // set the label as the center content
+      chart.center().content(label);
+
+      // set container id for the chart
+      chart.container("container-{{cohort_name}}");
+
+      // initiate chart drawing
+      chart.draw();
+  });
+$(".chart_container div").css({ "position": "relative", "left": "0px", "top": "0px", "overflow": "hidden", "width": "100%", "height": "100%" });
+
+</script>
+
+<script>
+$(document).ready(function(){
+    if($("#percentage_div h2").text() == "nan%"){
+      $(".chart_flex_container").hide();
+      $(".chart_table").css({"margin-top":"10px"})
+    }
+
+    $(".attendance_report .modal_close, #lean_overlay").click(function(){
+                        $("body").css("overflow","scroll");
+                })
+	//dynamic id for accordion
+	 //let id_accordion = Math.round((Math.random())*10);
+         //console.log(id_accordion);
+	//$('.accordion-toggle').attr('data-target', "#" + id_accordion);
+	//$('.accordian-body').attr('id', id_accordion);
+})
+//toggle arrow start 
+        $('.accordion-toggle').on('click', function() {
+	 $('.fa').removeClass('fa-caret-up').addClass('fa-caret-down');
+            if ($(this).hasClass('visible_now')) {
+                 $(this).find('.fa').removeClass('fa-caret-up').addClass('fa-caret-down');
+            } else {
+                $(this).find('.fa').removeClass('fa-caret-down').addClass('fa-caret-up');
+	    }
+        });
+// toggle arrow end
+</script>
+
+</body>
+</html>

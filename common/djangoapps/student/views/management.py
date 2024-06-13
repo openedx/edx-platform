@@ -7,14 +7,30 @@ import datetime
 import logging
 import urllib.parse
 import uuid
-from collections import namedtuple
+import requests
+import json
 
+
+from collections import namedtuple
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.validators import ValidationError, validate_email
+from django.core.cache import cache
+from openedx.core.djangoapps.enrollments.api import add_enrollment
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, do_create_account
+from django.core.exceptions import ObjectDoesNotExist
+from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
+from django.shortcuts import redirect, render
+
+from openedx.core.djangoapps.enrollments.api import add_enrollment
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import int_to_base36
+
+
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver  # lint-amnesty, pylint: disable=unused-import
@@ -960,3 +976,337 @@ def change_email_settings(request):
         )
 
     return JsonResponse({"success": True})
+
+
+@csrf_exempt
+def extras_course_enroll_user(request):
+    #print(f"request  {request.body}")
+
+    data = json.loads(request.body)
+    log.info(data)
+
+    try:
+        username = data["other"]["username"]
+        first_name = data["other"]["first_name"]
+        last_name = data["other"]["last_name"]
+        email = data["other"]["email"]
+        password = data["other"]["password"] 
+        role = data["other"]["role"]
+        unenroll = data["other"]["unenroll"]
+	
+        course = data['other']['course_number_run'].split("|")[0]
+        run = data['other']['course_number_run'].split("|")[1]
+        org = data['other']["site_id"]
+        
+        course_id = "course-v1:{0}+{1}+{2}".format(org, course, run)
+        #hash_key = request.GET["hk"]
+    except MultiValueDictKeyError:
+        return render(request, 'blank.html', {"message": "Invalid Options"})
+
+    username = username.replace(".", "_")
+    username = username.replace(" ", "_")
+
+    if (len(username) > 30):
+        username = username[0:30]
+
+    try:
+        user = User.objects.get(email = email)
+    except ObjectDoesNotExist:
+        user = _create_user(username, email, first_name, last_name, password)
+
+    user = User.objects.get(email = email)
+
+    if unenroll:
+        _extras_deactivate_enrollments(user, course_id)
+        context = {"message": "Removed user %s from course %s"%(user, course_id)}
+    else:
+        add_enrollment(user, course_id)
+        context = {"message": "Added user %s to course %s"%(user, course_id)}
+    if org == "DLT":
+        _create_soical_auth_record(email, "azuread-oauth2")
+    elif org in ["GIAP", "eMBA"]:
+        _create_soical_auth_record(email, "google-oauth2")
+
+    #if role == "editingteacher":
+    #requesting_user =  User.objects.get(email = data['other']['requesting_user'])
+    #course_key = CourseKey.from_string(course_id)
+    #add_instructor(course_key, requesting_user, user)
+    
+    log.error(context)
+    return render(request, "blank.html", context)
+
+
+def _create_soical_auth_record(user_email, provider_name):
+    user = User.objects.get(email = user_email)
+    try:
+        record = UserSocialAuth.objects.filter(user = user, provider = provider_name)
+        if not record:
+            UserSocialAuth.objects.create(
+                    user = user,
+                    uid = user.email,
+                    provider = provider_name
+                    )
+            log.info("Created social auth record for %s "%(user))
+        else:
+            log.error("Social auth record already exists for user %s"%(user))
+    except Exception as err:
+        log.error("Exception occured while creating social auth record. Error Details: %s"%(str(err)))
+
+
+
+def _create_user(username, email, first_name, last_name, password):
+
+    f = AccountCreationForm(
+        data={
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': first_name + " " + last_name
+
+        },
+        tos_required=False
+    )
+
+    (user, _, _) = do_create_account(f)
+    user.first_name = first_name
+    user.last_name = last_name
+    user.is_active = True
+    user.save()
+
+
+
+def _extras_deactivate_enrollments(user, ckey = None):
+    if ckey != None:
+        es = CourseEnrollment.objects.filter(user = user).filter(course_id = CourseKey.from_string(ckey))
+    else:
+        es = CourseEnrollment.objects.filter(user = user)
+
+    for e in es:
+        e.is_active = False
+        e.save()
+
+
+def _get_delimiter(index):
+	try:
+		unicodes = [u'\u2016', u'\u2191', u'\u2193', u'\u219f', u'\u21c8', u'\u21ca', u'\u21e1', u'\u21a5', u'\u21e3', u'\u21be'] 
+		return unicodes[index]	
+	except Exception as err:
+		log.error("Zoom unicode error : " + str(err))
+		return "|"
+
+def _get_zoom_auth_token():
+    session_key = "zoom-auth-token" + configuration_helpers.get_value("ZOOM_ACCOUNT_ID", "mRKuJqD7TgWa6Avp6E9v9Q")
+    if cache.get(session_key, ""):
+        return cache.get(session_key, "")
+
+    zoom_oauth_url = "https://zoom.us/oauth/token"
+    zoom_token = configuration_helpers.get_value("ZOOM_API_KEY", "")
+    data={'grant_type': 'account_credentials', 'account_id': configuration_helpers.get_value("ZOOM_ACCOUNT_ID", "mRKuJqD7TgWa6Avp6E9v9Q")}
+    response = requests.post(zoom_oauth_url, data=data, headers={"Authorization" : zoom_token})
+    log.info(response.text)
+    r_data = json.loads(response.text)
+    if response.status_code != 200:
+        return ""
+
+    cache.set(session_key, "{0} {1}".format(r_data["token_type"], r_data["access_token"]), 3300)
+    return cache.get(session_key, "")
+
+def get_zoom_link(meeting_id, webinar_id, data):
+    user = User.objects.get(email = data["email"]) 
+    session_key = str(meeting_id) + "-" + str(user.id)
+    MEMCACHE_TIMEOUT = 28800
+    join_url = cache.get(session_key, None)
+    space_unicode = u'\u0020'
+    r_data = {}
+    if join_url is not None:
+        log.info("Key exists in the session")
+        r_data["join_url"] = join_url
+    else:
+        log.info("Registering user in zoom " + data["email"])
+        zoom_data = {"email" : data["email"]}
+        if meeting_id != "0":
+            delimiter = _get_delimiter(int(meeting_id[-1]))
+            zoom_url = "https://api.zoom.us/v2/meetings/" + meeting_id +"/registrants"
+        elif webinar_id != "0":
+            delimiter = _get_delimiter(int(webinar_id[-1]))
+            zoom_url = "https://api.zoom.us/v2/webinars/" + webinar_id +"/registrants"
+        if "@talentsprint.com" in data["email"]:
+            first_name = data["first_name"] + " " + delimiter + space_unicode
+            last_name = "TS"
+        elif "@email.iimcal.ac.in" in data["email"] or data["username"].startswith("dp-"):
+            first_name = data["first_name"] + " " + delimiter + " "
+            if "-" in data["username"]:
+                last_name = "-".join(data["username"].split("-")[1:]) 
+            else:
+                last_name = data["username"]
+        elif "@iimcal.ac.in" in data["email"]:
+            full_name = data["first_name"] + " " + data["last_name"] 
+            first_name = full_name + " " + delimiter + " "
+            last_name = "IIM Calcutta" 
+            
+        elif "@iitjammu.ac.in" in data["email"] and data["username"].startswith("20"):
+            full_name =  data["first_name"] + " " + data["last_name"]
+            first_name = full_name + " " + delimiter + " "
+            last_name = data["username"]
+        else:
+            if data["last_name"]:
+                first_name = data["first_name"] + " " + delimiter + " "
+                last_name = data["last_name"]
+            else:
+                first_name = data["first_name"]
+                last_name = "|"
+        zoom_data = {"email" : data["email"], "first_name" : first_name, "last_name" : last_name}
+        log.error(zoom_data)
+        
+        zoom_token = _get_zoom_auth_token()
+        if zoom_token:
+            headers = {"Authorization" : zoom_token, "Content-Type" : "application/json"}
+            response = requests.post(zoom_url, data=json.dumps(zoom_data), headers=headers)
+            log.info(response.text)
+            r_data = json.loads(response.text)
+            if "join_url" in r_data:
+                cache.set(session_key, r_data["join_url"], MEMCACHE_TIMEOUT) 
+    return r_data
+
+@csrf_exempt
+@login_required
+def extras_join_zoom(request, course_id):
+	try:
+		course_key = CourseKey.from_string(course_id)
+		cdn_data = {"org" : [str(course_key.org)], "course_id" : course_id}
+		r = requests.post("https://cdn.exec.talentsprint.com/app/getMeetingRooms", headers = {'content-type': 'application/json'}, data = json.dumps(cdn_data))
+		r_data = json.loads(r.text)
+		log.error(r_data)
+		meeting_id = r_data["meeting_id"]
+		data = {"email" : request.user.email, "username" : request.user.username, "first_name" : request.user.first_name, "last_name" : request.user.last_name}
+		zoom_data = get_zoom_link(meeting_id, "0", data)
+		log.error(zoom_data)
+		return redirect(zoom_data["join_url"])
+	except Exception as err:
+		log.error("ZOOM Error: " + str(err))
+		return HttpResponse("Please contact support")
+
+
+@login_required
+def join_zoom_meeting(request):
+	try:
+		meeting_id = request.GET["meeting_id"]
+		data = {"email" : request.user.email, "username" : request.user.username, "first_name" : request.user.first_name, "last_name" : request.user.last_name} 
+
+		r_data = get_zoom_link(meeting_id, "0", data)
+		log.error(r_data)
+		return redirect(r_data["join_url"])
+	except Exception as err:
+		log.error("ZOOM Error: " + str(err))
+		return HttpResponse("Please contact support")
+
+
+@xframe_options_exempt
+@csrf_exempt
+@login_required
+def  extras_get_moodle_grades(request):
+        user_email = request.user.email
+        multiple_moodle = configuration_helpers.get_value("MULTIPLE_MOODLE", False)
+        if multiple_moodle:
+            moodle_base_url = configuration_helpers.get_value("MULTIPLE_MOODLE_URLS","")
+        else:
+            moodle_base_url = [configuration_helpers.get_value("MOODLE_URL", "")]
+
+        moodle_wstoken = configuration_helpers.get_value("MOODLE_TOKEN", "")
+        overall_scores_function = "gradereport_overview_get_course_grades"
+        course_scores_function = "gradereport_user_get_grade_items"
+        headers = {  'content-type': "text/plain" }
+        #Fetch cumulative scores for all enrolled courses from moodle
+        querystring = {"wstoken" : moodle_wstoken, "wsfunction" : overall_scores_function, "moodlewsrestformat" : "json", "user_email" : user_email, "site_name" : configuration_helpers.get_value("course_org_filter", "")}
+        responses = {}
+        for index_no , api_url in enumerate(moodle_base_url):
+            moodle_service_url = api_url + "/webservice/rest/server.php"
+            response = requests.request("POST", moodle_service_url, headers = headers, params = querystring)
+
+            log.info("API call response for Course {0} url is {1} ".format(api_url, response.status_code))
+
+            context = json.loads(response.text)
+            if "message" in context or not context["grades"]:
+                continue
+            grades_querystring = {"wstoken" : moodle_wstoken, "wsfunction" : course_scores_function, "moodlewsrestformat" : "json", "user_email" : user_email, "site_name" : configuration_helpers.get_value("course_org_filter", ""), "custom_request" : "Gradebook", "courseid" : 0}
+            grades_response = requests.request("POST", moodle_service_url, headers = headers, params = grades_querystring)
+            log.info("API call response for Grades {0} url is {1}".format(api_url, response.status_code))
+
+            data = json.loads(grades_response.text)
+            for i in range(len(context["grades"])):
+                for grades in data["usergrades"]:
+                    if grades["gradeitems"]:
+                        if context["grades"][i]["courseid"] == grades["courseid"]:
+                            context["grades"][i]["individual_scores"] = grades["gradeitems"]
+                            break
+
+                    else:
+                        context["grades"][i]["individual_scores"] = []
+
+            if "Response" + str(index_no) not in responses:
+                responses["Response" + str(index_no)] = context
+
+        final_response = merge_grades(responses) if len(responses) > 1 else responses.get(list(responses.keys())[0]) if len(responses) == 1 else {}
+        final_response.update({"studentid" : request.user.last_name, "studentname" : request.user.first_name})
+
+        if configuration_helpers.get_value('EXTRAS_GRADES_MOODLE_GRADEBOOK_TEMPLATE'):
+            return render(request, configuration_helpers.get_value('EXTRAS_GRADES_MOODLE_GRADEBOOK_TEMPLATE'), context = final_response)
+        else:
+            return render(request, "gradebook.html", context = final_response)
+
+
+
+def merge_grades(responses):
+    mergeddata = {}
+    for key,value in responses.items():
+        for grade_keys, grade_report in value.items():
+            if isinstance(grade_report, list):
+                mergeddata[grade_keys] = grade_report if grade_keys not in mergeddata else mergeddata[grade_keys] + grade_report
+                continue
+            if grade_keys not in ["userid"]:
+                mergeddata[grade_keys] = grade_report if grade_keys not in mergeddata else float(mergeddata[grade_keys]) + float(grade_report)
+
+
+    mergeddata["total_submissions_in_percentage"] = 0 if mergeddata["total_submissions"] == 0 else (mergeddata["user_submissions"] / mergeddata["total_submissions"]) * 100 
+    mergeddata["overall_percentage"] = 0 if mergeddata["total_scores"] == 0 else (mergeddata["user_scores"] / mergeddata["total_scores"]) * 100
+    return mergeddata
+
+
+@login_required
+def attendance_report(request):
+    try:
+        moodle_base_url = configuration_helpers.get_value("MOODLE_URL", "")
+        moodle_service_url = moodle_base_url + "/webservice/rest/server.php"
+        moodle_wstoken = configuration_helpers.get_value("MOODLE_TOKEN", "")
+        course_attendance_function = "mod_wsattendance_get_attendance"
+        if "site" in request.GET:
+            site = request.GET["site"]
+        else:
+            site = ""
+        headers = {'content-type': "text/plain"}
+        querystring = {"wstoken" : moodle_wstoken, "wsfunction" : course_attendance_function, "moodlewsrestformat" : "json", "user_email":request.user.email, "site_name" :  site }
+        response = requests.request("POST", moodle_service_url, headers = headers, params = querystring)
+        context = {'attendance_report' : json.loads(response.text), 'cohort_name' : request.GET["cohort_name"]}
+        if configuration_helpers.get_value('ATTENDANCE_TEMPLATE'):
+            return render(request, configuration_helpers.get_value('ATTENDANCE_TEMPLATE'), context = context)
+        else :
+            return render(request, 'attendance_report.html', context = context)
+    except Exception as e:
+        log.info(e)
+        return {}
+
+
+@csrf_exempt
+def extras_reset_password_link(request):
+	email = request.POST.get("email")
+	domain = request.POST.get("domain")
+	try:
+            user = User.objects.get(email__iexact=email.strip())
+	except Exception as err:
+            log.error("Reset Password Error: "+ str(err) + " Email:" + email)
+            return HttpResponse("")
+	uid = int_to_base36(user.id)
+	token = PasswordResetTokenGenerator().make_token(user)
+	url = "https://{0}/password_reset_confirm/{1}-{2}".format(domain, uid, token)
+	return HttpResponse(url)
+
