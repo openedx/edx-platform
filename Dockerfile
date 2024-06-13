@@ -13,7 +13,6 @@ FROM ubuntu:focal as minimal-system
 ARG DEBIAN_FRONTEND=noninteractive
 ARG SERVICE_VARIANT
 ARG SERVICE_PORT
-ARG PYTHON_VERSION=3.11
 
 # Env vars: paver
 # We intentionally don't use paver in this Dockerfile, but Devstack may invoke paver commands
@@ -51,10 +50,10 @@ RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8"
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \
-        python$PYTHON_VERSION \
-        python$PYTHON_VERSION-pip \
-        python$PYTHON_VERSION-dev \
-        python$PYTHON_VERSION-venv \
+        python3.11 \
+        python3.11-pip \
+        python3.11-dev \
+        python3.11-venv \
         libpython$PYTHON_VERSION \
         libpython$PYTHON_VERSION-stdlib \
         libmysqlclient21 \
