@@ -26,6 +26,7 @@ from openedx.core import toggles as core_toggles
 
 from common.djangoapps.student.views.management import extras_course_enroll_user
 from cms.djangoapps.contentstore.views.course import extras_create_course
+from cms.djangoapps.contentstore.views.course import extras_get_moodle_login_url
 
 
 django_autodiscover()
