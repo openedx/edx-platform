@@ -1866,3 +1866,20 @@ def get_organizations(user):
         organizations = course_creator.organizations.all().values_list('short_name', flat=True)
 
     return organizations
+
+
+@csrf_exempt
+@login_required
+def extras_get_moodle_login_url(request):
+    log.info("The user is requesting a moodle login url")
+    moodle_url = configuration_helpers.get_value("MOODLE_URL", "")
+    wstoken = configuration_helpers.get_value("MOODLE_LOGIN_TOKEN", "")
+    username = request.user.username.lower()
+    moodle_api_url  = "{0}/webservice/rest/server.php?wstoken={1}&wsfunction=auth_userkey_request_login_url&moodlewsrestformat=json&user[username]={2}".format(moodle_url, wstoken, username)
+    log.info(moodle_api_url)
+    log.info(username)
+    response = requests.post(moodle_api_url)
+    login_link = json.loads(response.text)["loginurl"]
+    log.info(login_link)
+    return redirect(login_link)
+
