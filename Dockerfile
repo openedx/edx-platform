@@ -57,6 +57,7 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         python3-pip \
         python3.11 \
+        # python3-dev: required for building mysqlclient python package
         python3.11-dev \
         python3.11-venv \
         libpython3.11 \
