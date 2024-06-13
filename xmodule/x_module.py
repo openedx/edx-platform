@@ -17,7 +17,7 @@ from pkg_resources import resource_isdir, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
-from xblock.core import XBlock, XBlockAside
+from xblock.core import XBlock, XBlock2Mixin, XBlockAside
 from xblock.fields import (
     Dict,
     Float,
@@ -586,28 +586,34 @@ class XModuleMixin(XModuleFields, XBlock):
             if getattr(self.runtime, 'position', None):
                 self.position = self.runtime.position   # update the position of the tab
             return
+        
+        if isinstance(self, XBlock2Mixin):
+            if self.scope_ids.user_id is not None:
+                raise RuntimeError("v2 XBlocks cannot be rebound to a different user")
+            # Update scope_ids to point to the new user.
+            self.scope_ids = self.scope_ids._replace(user_id=user_id)
+        else:
+            # If we are switching users mid-request, save the data from the old user.
+            self.save()
 
-        # If we are switching users mid-request, save the data from the old user.
-        self.save()
+            # Update scope_ids to point to the new user.
+            self.scope_ids = self.scope_ids._replace(user_id=user_id)
 
-        # Update scope_ids to point to the new user.
-        self.scope_ids = self.scope_ids._replace(user_id=user_id)
+            # Clear out any cached instantiated children.
+            self.clear_child_cache()
 
-        # Clear out any cached instantiated children.
-        self.clear_child_cache()
+            # Clear out any cached field data scoped to the old user.
+            for field in self.fields.values():  # lint-amnesty, pylint: disable=no-member
+                if field.scope in (Scope.parent, Scope.children):
+                    continue
 
-        # Clear out any cached field data scoped to the old user.
-        for field in self.fields.values():  # lint-amnesty, pylint: disable=no-member
-            if field.scope in (Scope.parent, Scope.children):
-                continue
-
-            if field.scope.user == UserScope.ONE:
-                field._del_cached_value(self)  # pylint: disable=protected-access
-                # not the most elegant way of doing this, but if we're removing
-                # a field from the module's field_data_cache, we should also
-                # remove it from its _dirty_fields
-                if field in self._dirty_fields:
-                    del self._dirty_fields[field]
+                if field.scope.user == UserScope.ONE:
+                    field._del_cached_value(self)  # pylint: disable=protected-access
+                    # not the most elegant way of doing this, but if we're removing
+                    # a field from the module's field_data_cache, we should also
+                    # remove it from its _dirty_fields
+                    if field in self._dirty_fields:
+                        del self._dirty_fields[field]
 
         if wrappers:
             # Put user-specific wrappers around the field-data service for this block.

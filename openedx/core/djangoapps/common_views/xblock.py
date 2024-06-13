@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 from django.http import Http404, HttpResponse
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlock2
 
 log = logging.getLogger(__name__)
 
