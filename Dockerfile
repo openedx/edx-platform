@@ -13,6 +13,7 @@ FROM ubuntu:focal as minimal-system
 ARG DEBIAN_FRONTEND=noninteractive
 ARG SERVICE_VARIANT
 ARG SERVICE_PORT
+ARG PYTHON_VERSION=3.11
 
 # Env vars: paver
 # We intentionally don't use paver in this Dockerfile, but Devstack may invoke paver commands
@@ -50,16 +51,13 @@ RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8"
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \
-        python3 \
-        python3-venv \
-        python3.8 \
-        python3.8-minimal \
-        # python3-dev: required for building mysqlclient python package version 2.2.0
-        python3-dev \
-        libpython3.8 \
-        libpython3.8-stdlib \
+        python$PYTHON_VERSION \
+        python$PYTHON_VERSION-pip \
+        python$PYTHON_VERSION-dev \
+        python$PYTHON_VERSION-venv \
+        libpython$PYTHON_VERSION \
+        libpython$PYTHON_VERSION-stdlib \
         libmysqlclient21 \
-        # libmysqlclient-dev: required for building mysqlclient python package version 2.2.0
         libmysqlclient-dev \
         pkg-config \
         libssl1.1 \
@@ -105,7 +103,7 @@ RUN apt-get update && \
 
 # Setup python virtual environment
 # It is already 'activated' because $VIRTUAL_ENV/bin was put on $PATH
-RUN python3.8 -m venv "${VIRTUAL_ENV}"
+RUN python$PYTHON_VERSION -m venv "${VIRTUAL_ENV}"
 
 # Install python requirements
 # Requires copying over requirements files, but not entire repository

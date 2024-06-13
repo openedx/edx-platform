@@ -4,12 +4,13 @@ on:
   push:
     branches:
       - master
+      - edxapp-docker-python311-upgrade
+
 jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     strategy:
       matrix:
