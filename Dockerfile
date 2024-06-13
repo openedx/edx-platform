@@ -62,6 +62,7 @@ RUN apt-get update && \
         libpython3.11 \
         libpython3.11-stdlib \
         libmysqlclient21 \
+        # libmysqlclient-dev: required for building mysqlclient python package
         libmysqlclient-dev \
         pkg-config \
         libssl1.1 \
