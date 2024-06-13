@@ -56,7 +56,6 @@ billiard==4.2.0
     # via celery
 bleach[css]==6.1.0
     # via
-    #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   lti-consumer-xblock
     #   openedx-django-wiki
@@ -714,6 +713,8 @@ newrelic==9.10.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
+nh3==0.2.17
+    # via -r requirements/edx/kernel.in
 nltk==3.8.1
     # via chem
 nodeenv==1.9.1

@@ -9,7 +9,7 @@ import random
 from copy import copy
 from gettext import ngettext, gettext
 
-import bleach
+import nh3
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.functional import classproperty
@@ -731,7 +731,7 @@ class LibraryContentBlock(
         lib_tools = self.get_tools()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
-            (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
+            (key, nh3.clean(name)) for key, name in lib_tools.list_available_libraries()
             if user_perms.can_read(key) or self.source_library_id == str(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name

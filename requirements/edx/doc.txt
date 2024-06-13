@@ -838,6 +838,8 @@ newrelic==9.10.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
+nh3==0.2.17
+    # via -r requirements/edx/base.txt
 nltk==3.8.1
     # via
     #   -r requirements/edx/base.txt
