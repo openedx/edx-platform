@@ -249,13 +249,18 @@ class StaticContentServer(MiddlewareMixin):
         """
         Determines whether or not the given content is locked.
         """
+        log.info("Content is locked: %s", getattr(content, "locked", False))
         return bool(getattr(content, "locked", False))
 
     def is_user_authorized(self, request, content, location):
         """
         Determines whether or not the user for this request is authorized to view the given asset.
         """
-        if not self.is_content_locked(content):
+        user = request.user if hasattr(request, "user") else ""
+        locked = self.is_content_locked(content)
+        log.info(f"Content lock: {locked} for user {user} at location {location}")
+
+        if not locked:
             return True
 
         if not hasattr(request, "user") or not request.user.is_authenticated:
@@ -267,6 +272,8 @@ class StaticContentServer(MiddlewareMixin):
                 return False
             if not deprecated and not CourseEnrollment.is_enrolled(request.user, location.course_key):
                 return False
+
+        log.info(f"user {user} is authorized by default for content at location {location}")
 
         return True
 
