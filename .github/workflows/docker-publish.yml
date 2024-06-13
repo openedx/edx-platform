@@ -11,6 +11,14 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/
   push:
     runs-on: ubuntu-latest
+  
+    strategy:
+      matrix:
+        variant:
+          - "lms_dev"
+          - "cms_dev"
+          - "cms"
+          - "lms"
 
     steps:
       - name: Checkout
@@ -32,4 +40,4 @@ jobs:
         env:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: make docker_build
+        run: make docker_tag_build_push_${{matrix.variant}}

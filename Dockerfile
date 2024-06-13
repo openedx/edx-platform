@@ -46,16 +46,21 @@ RUN useradd -m --shell /bin/false app
 RUN echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections
 RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | debconf-set-selections
 
+# Setting up ppa deadsnakes to get python 3.11
+RUN apt-get update && \
+  apt-get install -y software-properties-common && \
+  apt-add-repository -y ppa:deadsnakes/ppa
+
 # Install requirements that are absolutely necessary
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \
+        python3-pip \
         python3.11 \
-        python3.11-pip \
         python3.11-dev \
         python3.11-venv \
-        libpython$PYTHON_VERSION \
-        libpython$PYTHON_VERSION-stdlib \
+        libpython3.11 \
+        libpython3.11-stdlib \
         libmysqlclient21 \
         libmysqlclient-dev \
         pkg-config \
@@ -102,7 +107,7 @@ RUN apt-get update && \
 
 # Setup python virtual environment
 # It is already 'activated' because $VIRTUAL_ENV/bin was put on $PATH
-RUN python$PYTHON_VERSION -m venv "${VIRTUAL_ENV}"
+RUN python3.11 -m venv "${VIRTUAL_ENV}"
 
 # Install python requirements
 # Requires copying over requirements files, but not entire repository
