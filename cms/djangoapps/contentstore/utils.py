@@ -102,7 +102,12 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import SettingsService, ConfigurationService, TeamsConfigurationService
+from xmodule.services import (
+    SettingsService,
+    ConfigurationService,
+    TeamsConfigurationService,
+    ProblemFeedbackService
+)
 
 
 IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
@@ -1262,7 +1267,8 @@ def load_services_for_studio(runtime, user):
         "settings": SettingsService(),
         "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
         "teams_configuration": TeamsConfigurationService(),
-        "library_tools": LibraryToolsService(modulestore(), user.id)
+        "library_tools": LibraryToolsService(modulestore(), user.id),
+        "problem_feedback": ProblemFeedbackService,
     }
 
     runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access

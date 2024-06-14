@@ -10,7 +10,7 @@ from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from xmodule.capa_block import SHOWANSWER  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.graders import ShowAnswer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -41,27 +41,27 @@ class ShowAnswerFieldOverrideTest(ModuleStoreTestCase):
             # Instructor paced course will just have the default value
             ip_course = self.setup_course()
             course_block = self.get_course_block(ip_course)
-            assert course_block.showanswer == SHOWANSWER.FINISHED
+            assert course_block.showanswer == ShowAnswer.FINISHED
 
             # This should be updated to not explicitly add in the showanswer so it can test the
             # default case of never touching showanswer. Reference ticket AA-307 (if that's closed,
             # this can be updated!)
-            sp_course = self.setup_course(self_paced=True, showanswer=SHOWANSWER.FINISHED)
+            sp_course = self.setup_course(self_paced=True, showanswer=ShowAnswer.FINISHED)
             course_block = self.get_course_block(sp_course)
             if active:
-                assert course_block.showanswer == SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT
+                assert course_block.showanswer == ShowAnswer.AFTER_ALL_ATTEMPTS_OR_CORRECT
             else:
-                assert course_block.showanswer == SHOWANSWER.FINISHED
+                assert course_block.showanswer == ShowAnswer.FINISHED
 
     @ddt.data(
-        (SHOWANSWER.ATTEMPTED, SHOWANSWER.ATTEMPTED_NO_PAST_DUE),
-        (SHOWANSWER.CLOSED, SHOWANSWER.AFTER_ALL_ATTEMPTS),
-        (SHOWANSWER.CORRECT_OR_PAST_DUE, SHOWANSWER.ANSWERED),
-        (SHOWANSWER.FINISHED, SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT),
-        (SHOWANSWER.PAST_DUE, SHOWANSWER.NEVER),
-        (SHOWANSWER.NEVER, SHOWANSWER.NEVER),
-        (SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS, SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS),
-        (SHOWANSWER.ALWAYS, SHOWANSWER.ALWAYS),
+        (ShowAnswer.ATTEMPTED, ShowAnswer.ATTEMPTED_NO_PAST_DUE),
+        (ShowAnswer.CLOSED, ShowAnswer.AFTER_ALL_ATTEMPTS),
+        (ShowAnswer.CORRECT_OR_PAST_DUE, ShowAnswer.ANSWERED),
+        (ShowAnswer.FINISHED, ShowAnswer.AFTER_ALL_ATTEMPTS_OR_CORRECT),
+        (ShowAnswer.PAST_DUE, ShowAnswer.NEVER),
+        (ShowAnswer.NEVER, ShowAnswer.NEVER),
+        (ShowAnswer.AFTER_SOME_NUMBER_OF_ATTEMPTS, ShowAnswer.AFTER_SOME_NUMBER_OF_ATTEMPTS),
+        (ShowAnswer.ALWAYS, ShowAnswer.ALWAYS),
     )
     @ddt.unpack
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
