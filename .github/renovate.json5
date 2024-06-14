@@ -1,3 +1,4 @@
+// This file is written in "JSON5" (https://json5.org/) so that we can use comments.
 {
   "extends": [
     "config:base",
@@ -28,6 +29,10 @@
       "automerge": true
     }
   ],
+  // When adding an ignoreDep, please include a reason and a public link that we can use to follow up and ensure
+  // that the ignoreDep is removed.
+  // This can be done as a comment within the ignoreDeps list.
+  "ignoreDeps": [],
   "timezone": "America/New_York",
   "prConcurrentLimit": 3,
   "enabledManagers": ["npm"]
