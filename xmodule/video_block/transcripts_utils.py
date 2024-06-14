@@ -916,6 +916,22 @@ class VideoTranscriptsMixin:
             "transcripts": transcripts,
         }
 
+    def add_or_update_transcripts(self, edx_video_id, language_code, new_language_code):
+        """
+        Method to add or update transcripts for a specific video.
+
+        If a new transcript is added, then both new_language_code and
+        language_code fields will have the same value.
+
+        Arguments:
+            edx_video_id(unicode): edx-val's video identifier.
+            language_code(str): Current language code of the transcript.
+            new_language_code(str): New selected language code.
+        """
+        if language_code != new_language_code:
+            self.transcripts.pop(language_code, None)
+        self.transcripts[new_language_code] = f'{edx_video_id}-{new_language_code}.srt'
+
 
 @exception_decorator
 def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SRT):
