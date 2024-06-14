@@ -483,22 +483,23 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     # If EMAIL_USE_COURSE_ID_FROM_FOR_BULK is False, use the default email from address.
     # Otherwise compute a custom from address
-    if not is_email_use_course_id_from_for_bulk_enabled():
-        from_addr = settings.BULK_EMAIL_DEFAULT_FROM_EMAIL or settings.DEFAULT_FROM_EMAIL
-    else:
-        # use the email from address in the CourseEmail, if it is present, otherwise compute it.
-        from_addr = course_email.from_addr or _get_source_address(course_email.course_id, course_title, course_language)
+    #if not is_email_use_course_id_from_for_bulk_enabled():
+    #from_addr = settings.BULK_EMAIL_DEFAULT_FROM_EMAIL or settings.DEFAULT_FROM_EMAIL
+    #else:
+    # use the email from address in the CourseEmail, if it is present, otherwise compute it.
+    from_addr = course_email.from_addr or _get_source_address(course_email.course_id, course_title, course_language)
 
-    site = Site.objects.get_current()
+    #site = Site.objects.get_current()
+
     try:
         connection = get_connection()
         connection.open()
 
         # Define context values to use in all course emails:
         email_context = {'name': '', 'email': '', 'course_email': course_email, 'from_address': from_addr}
-        template_context = get_base_template_context(site)
+        #template_context = get_base_template_context(site)
         email_context.update(global_email_context)
-        email_context.update(template_context)
+        #email_context.update(template_context)
 
         start_time = time.time()
         while to_list:
@@ -530,6 +531,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                                                                       str(course_email.course_id))
 
             if is_bulk_email_edx_ace_enabled():
+                site = Site.objects.get_current()
                 message = ACEEmail(site, email_context)
             else:
                 message = DjangoEmail(connection, course_email, email_context)
