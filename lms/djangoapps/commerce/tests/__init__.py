@@ -28,7 +28,6 @@ TRACKING_CONTEXT = {'foo': 'bar'}
 ACCESS_TOKEN = 'abc123'
 JWT = 'abc.123.doremi'
 JSON = 'application/json'
-TEST_PUBLIC_URL_ROOT = 'http://www.example.com'
 TEST_API_URL = 'http://www-internal.example.com/api'
 TEST_BASKET_ID = 7
 TEST_ORDER_NUMBER = '100004'
