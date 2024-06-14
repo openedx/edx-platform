@@ -3669,8 +3669,8 @@ class TestSpecialExamXBlockInfo(ItemTest):
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_success
     @ddt.data(
-        ("lti_external", True),
-        ("other_proctoring_backend", False),
+        ("lti_external", False),
+        ("other_proctoring_backend", True),
     )
     @ddt.unpack
     def test_support_onboarding_is_correct_depending_on_lti_external(
@@ -3690,10 +3690,11 @@ class TestSpecialExamXBlockInfo(ItemTest):
             is_time_limited=False,
             is_onboarding_exam=False,
         )
+
         # set course.proctoring_provider to lti_external
         self.course.proctoring_provider = external_id
-        print({self.course.proctoring_provider})
         mock_get_exam_by_content_id.return_value = {"external_id": external_id}
+
         # mock_does_backend_support_onboarding returns True
         mock_does_backend_support_onboarding.return_value = True
         sequential = modulestore().get_item(sequential.location)
@@ -3701,6 +3702,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             sequential,
             include_child_info=True,
             include_children_predicate=ALWAYS,
+            course=self.course,
         )
         assert xblock_info["supports_onboarding"] is expected_value
 
