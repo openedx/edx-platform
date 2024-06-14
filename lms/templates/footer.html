@@ -5,6 +5,8 @@
   from django.utils.translation import gettext as _
   from lms.djangoapps.branding.api import get_footer
   from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
+  from common.djangoapps.edxmako.shortcuts import marketing_link
+
 %>
 <% footer = get_footer(is_secure=is_secure) %>
 <% icp_license_info = getattr(settings, 'ICP_LICENSE_INFO', {})%>
@@ -33,7 +35,7 @@
                 ## can be included in the footer on other sites
                 ## (e.g. a blog or marketing front-end) to provide a consistent
                 ## user experience.  See the branding app for details.
-                <img alt="${_('organization logo')}" src="${footer['logo_image']}">
+                <img alt="${_('organization logo')}" style="height: 60px;" src="${marketing_link('FOOTER_LOGO')}">
               </a>
             </p>
           </div>  
@@ -90,7 +92,7 @@
     >
       <div class="colophon">
         <nav class="nav-colophon" aria-label="${_('About')}">
-          <ol>
+          <ol style = "display:none;">
               % for item_num, link in enumerate(footer['navigation_links'], start=1):
               <li class="nav-colophon-0${item_num}">
                 <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
@@ -110,7 +112,7 @@
               ## can be included in the footer on other sites
               ## (e.g. a blog or marketing front-end) to provide a consistent
               ## user experience.  See the branding app for details.
-              <img alt="${_('organization logo')}" src="${footer['logo_image']}">
+	      <img alt="${_('organization logo')}" style="height: 60px;" src="${marketing_link('FOOTER_LOGO')}"> 
             </a>
           </p>
         </div>
@@ -131,7 +133,7 @@
                 <a href="${link['url']}">${link['title']}</a>
               </li>
             % endfor
-            <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
+            <li style = "display:none;"><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
           </ul>
         </nav>
       </div>

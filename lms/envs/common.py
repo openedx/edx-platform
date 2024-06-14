@@ -777,7 +777,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-04-12
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
-    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+    'ALLOW_PUBLIC_ACCOUNT_CREATION': False,
 
     # .. toggle_name: FEATURES['SHOW_REGISTRATION_LINKS']
     # .. toggle_implementation: DjangoSetting
@@ -786,7 +786,7 @@ FEATURES = {
     #   the signup page.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2023-03-27
-    'SHOW_REGISTRATION_LINKS': True,
+    'SHOW_REGISTRATION_LINKS': False,
 
     # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
     # .. toggle_implementation: DjangoSetting

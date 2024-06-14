@@ -22,7 +22,7 @@ from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_
   should_redirect_to_authn_mfe = should_redirect_to_authn_microfrontend()
 %>
 <nav class="nav-links" aria-label=${_("Supplemental Links")}>
-  <div class="main">
+  <div class="main" style = "display:none;">
   % if mktg_site_enabled:
     <div class="mobile-nav-item hidden-mobile nav-item">
       <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
