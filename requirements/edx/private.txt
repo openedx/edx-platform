@@ -1,0 +1,3 @@
+git+https://oauth2:glpat-nceYnoxpMuf2-CGdGkLs@gitlab.com/vamsi.k1/encryptplayerXBlock.git@quince.master
+git+https://oauth2:glpat-nceYnoxpMuf2-CGdGkLs@gitlab.com/vamsi.k1/xblock-pdf.git@quince.master
+git+https://github.com/ts-tech-repo/xblock-lti-consumer-9.6.1.git
