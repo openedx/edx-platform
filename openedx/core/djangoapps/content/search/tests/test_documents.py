@@ -120,6 +120,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             # and https://www.algolia.com/doc/api-reference/widgets/hierarchical-menu/js/
             # For details on why the hierarchical tag data is in this format.
             "tags": {
+                "implicit_count": 1,
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Easy"],
             },
@@ -162,6 +163,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 ),
             },
             "tags": {
+                "implicit_count": 6,
                 "taxonomy": ["Difficulty", "Subject"],
                 "level0": ["Difficulty > Normal", "Subject > Hypertext", "Subject > Linguistics"],
                 "level1": ["Subject > Hypertext > Jump Links", "Subject > Linguistics > Asian Languages"],

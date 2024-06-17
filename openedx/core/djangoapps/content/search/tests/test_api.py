@@ -209,6 +209,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_sequential_with_tags1 = {
             "id": self.doc_sequential["id"],
             "tags": {
+                'implicit_count': 2,
                 'taxonomy': ['A'],
                 'level0': ['A > one', 'A > two']
             }
@@ -216,6 +217,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_sequential_with_tags2 = {
             "id": self.doc_sequential["id"],
             "tags": {
+                'implicit_count': 4,
                 'taxonomy': ['A', 'B'],
                 'level0': ['A > one', 'A > two', 'B > four', 'B > three']
             }
@@ -263,6 +265,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem_with_tags1 = {
             "id": self.doc_problem["id"],
             "tags": {
+                'implicit_count': 2,
                 'taxonomy': ['A'],
                 'level0': ['A > one', 'A > two']
             }
@@ -270,6 +273,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem_with_tags2 = {
             "id": self.doc_problem["id"],
             "tags": {
+                'implicit_count': 4,
                 'taxonomy': ['A', 'B'],
                 'level0': ['A > one', 'A > two', 'B > four', 'B > three']
             }
