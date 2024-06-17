@@ -41,6 +41,7 @@ class Fields:
     # For details on the format of the hierarchical tag data.
     # We currently have a hard-coded limit of 4 levels of tags in the search index (level0..level3).
     tags = "tags"
+    tags_count = "implicit_count"
     tags_taxonomy = "taxonomy"  # subfield of tags, i.e. tags.taxonomy
     tags_level0 = "level0"  # subfield of tags, i.e. tags.level0
     tags_level1 = "level1"
@@ -183,9 +184,14 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
         # Clear out tags in the index when unselecting all tags for the block, otherwise
         # it would remain the last value if a cleared Fields.tags field is not included
         return {Fields.tags: {}}
+    tags_count = tagging_api.get_object_tag_counts(str(object_id), count_implicit=True)
+    tag_count = 0
+    if str(object_id) in tags_count:
+        tag_count = tags_count[str(object_id)]
     result = {
         Fields.tags_taxonomy: [],
         Fields.tags_level0: [],
+        Fields.tags_count: tag_count,
         # ... other levels added as needed
     }
     for obj_tag in all_tags:
