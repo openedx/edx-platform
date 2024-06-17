@@ -1041,14 +1041,17 @@ class CourseEnrollment(models.Model):
         # NOTE: This is here to avoid circular references
         from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
         date_placed = self.get_order_attribute_value('date_placed')
+        log.info(f"Successfully retrieved date_placed: {date_placed} from order")
 
         if not date_placed:
             order_number = self.get_order_attribute_value('order_number')
             if not order_number:
+                log.info("Failed to get order number")
                 return None
 
             date_placed = self.get_order_attribute_from_ecommerce('date_placed')
             if not date_placed:
+                log.info("Failed to get date_placed attribute")
                 return None
 
             # also save the attribute so that we don't need to call ecommerce again.
