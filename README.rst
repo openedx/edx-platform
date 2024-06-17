@@ -72,7 +72,7 @@ System Dependencies
 
 Interperters/Tools:
 
-* Python 3.11 (preferred) or 3.8 (compatible, for now)
+* Python 3.11
 
 * Node 18
 
