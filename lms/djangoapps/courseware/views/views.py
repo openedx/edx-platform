@@ -10,7 +10,7 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime
 from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse
 
-import bleach
+import nh3
 import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -1550,7 +1550,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
         return HttpResponseBadRequest(
-            f"Rendering of the xblock view '{bleach.clean(requested_view, strip=True)}' is not supported."
+            f"Rendering of the xblock view '{nh3.clean(requested_view)}' is not supported."
         )
 
     staff_access = has_access(request.user, 'staff', course_key)

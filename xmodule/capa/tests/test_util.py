@@ -121,7 +121,7 @@ class UtilTest(unittest.TestCase):
 
     def test_sanitize_html(self):
         """
-        Test for html sanitization with bleach.
+        Test for html sanitization with nh3.
         """
         allowed_tags = ['div', 'p', 'audio', 'pre', 'span']
         for tag in allowed_tags:
@@ -130,7 +130,7 @@ class UtilTest(unittest.TestCase):
 
         not_allowed_tag = 'script'
         queue_msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
-        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        expected = ""
         assert sanitize_html(queue_msg) == expected
 
     def test_get_inner_html_from_xpath(self):
@@ -142,7 +142,7 @@ class UtilTest(unittest.TestCase):
 
     def test_remove_markup(self):
         """
-        Test for markup removal with bleach.
+        Test for markup removal with nh3.
         """
         assert remove_markup('The <mark>Truth</mark> is <em>Out There</em> & you need to <strong>find</strong> it') ==\
                'The Truth is Out There &amp; you need to find it'

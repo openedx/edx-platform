@@ -916,7 +916,7 @@ class MatlabTest(unittest.TestCase):
         }
         elt = etree.fromstring(self.xml)
         the_input = self.input_class(test_capa_system(), elt, state)
-        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        expected = ""
         assert the_input.queue_msg == expected
 
     def test_matlab_sanitize_msg(self):
@@ -925,7 +925,7 @@ class MatlabTest(unittest.TestCase):
         """
         not_allowed_tag = 'script'
         self.the_input.msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
-        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        expected = ""
         assert self.the_input._get_render_context()['msg'] == expected  # pylint: disable=protected-access
 
 

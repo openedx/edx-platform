@@ -31,11 +31,8 @@
   ],
   // When adding an ignoreDep, please include a reason and a public link that we can use to follow up and ensure
   // that the ignoreDep is removed.
-  "ignoreDeps": [
-    // Latest moment-timezone version broke the legacy programs dashboard, which is deprecated and soon to be removed.
-    // https://github.com/openedx/edx-platform/pull/34928"
-    "moment-timezone",
-  ],
+  // This can be done as a comment within the ignoreDeps list.
+  "ignoreDeps": [],
   "timezone": "America/New_York",
   "prConcurrentLimit": 3,
   "enabledManagers": ["npm"]
