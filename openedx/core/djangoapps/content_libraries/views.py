@@ -196,6 +196,11 @@ class LibraryRootView(GenericAPIView):
                 str,
                 description="The string used to filter libraries by searching in title, id, org, or description",
             ),
+            apidocs.query_parameter(
+                'order',
+                str,
+                description="The order in which the libraries are sorted",
+            ),
         ],
     )
     def get(self, request):
@@ -207,12 +212,14 @@ class LibraryRootView(GenericAPIView):
         org = serializer.validated_data['org']
         library_type = serializer.validated_data['type']
         text_search = serializer.validated_data['text_search']
+        order = serializer.validated_data['order']
 
         queryset = api.get_libraries_for_user(
             request.user,
             org=org,
             library_type=library_type,
             text_search=text_search,
+            order=order,
         )
         paginated_qs = self.paginate_queryset(queryset)
         result = api.get_metadata(paginated_qs)

@@ -62,7 +62,7 @@ import requests
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, FieldError
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
@@ -242,7 +242,7 @@ class LibraryXBlockType:
 # ============
 
 
-def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
+def get_libraries_for_user(user, org=None, library_type=None, text_search=None, order=None):
     """
     Return content libraries that the user has permission to view.
     """
@@ -263,7 +263,25 @@ def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
             Q(learning_package__description__icontains=text_search)
         )
 
-    return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+
+    if order:
+        order_query = 'learning_package__'
+        if '-' in order:
+            order_query = f"-{order_query}"
+            order = order.replace("-", "")
+
+        try:
+            filtered_ordered = filtered.order_by(f"{order_query}{order}")
+            # Evaluate the queryset to check if order field is a valid,
+            # otherwise if it is invalid and the queryset gets evaluated downstream
+            # the exception raised will not be handled here
+            if str(filtered_ordered.query):
+                return filtered_ordered
+        except FieldError as e:
+            log.exception(f"Error ordering libraries by {order}: {e}")
+
+    return filtered
 
 
 def get_metadata(queryset, text_search=None):
