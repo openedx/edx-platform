@@ -51,7 +51,13 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     can_edit_library = serializers.SerializerMethodField()
 
     def get_can_edit_library(self, obj):
+        """
+        Verifies if the user in request has permission
+        to edit a library.
+        """
         request = self.context.get('request', None)
+        if request is None:
+            return False
         user = request.user
         can_edit_library = False
         library_obj = ContentLibrary.objects.get_by_key(obj.key)
@@ -60,6 +66,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
             can_edit_library = user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
 
         return can_edit_library
+
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):
     """
