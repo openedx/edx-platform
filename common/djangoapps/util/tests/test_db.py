@@ -121,9 +121,6 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip(
-        "Temporary skip for ENT-9003 while the career_engagement_network_message column is renamed."
-    )
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
