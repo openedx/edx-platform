@@ -12,9 +12,11 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LICENSE_OPTIONS,
 )
 from openedx.core.djangoapps.content_libraries.models import (
-    ContentLibraryPermission, ContentLibraryBlockImportTask
+    ContentLibraryPermission, ContentLibraryBlockImportTask,
+    ContentLibrary
 )
 from openedx.core.lib.api.serializers import CourseKeyField
+from . import permissions
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
@@ -46,8 +48,18 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     has_unpublished_changes = serializers.BooleanField(read_only=True)
     has_unpublished_deletes = serializers.BooleanField(read_only=True)
     license = serializers.ChoiceField(choices=LICENSE_OPTIONS, default=ALL_RIGHTS_RESERVED)
-    can_edit_library = serializers.BooleanField(read_only=True, default=False)
+    can_edit_library = serializers.SerializerMethodField()
 
+    def get_can_edit_library(self, obj):
+        request = self.context.get('request', None)
+        user = request.user
+        can_edit_library = False
+        library_obj = ContentLibrary.objects.get_by_key(obj.key)
+
+        if user:
+            can_edit_library = user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
+
+        return can_edit_library
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):
     """
