@@ -2,7 +2,6 @@
 Tests for programs celery tasks.
 """
 
-
 import json
 import logging
 from datetime import datetime, timedelta
@@ -22,21 +21,13 @@ from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.tests.factories import (
-    CertificateDateOverrideFactory,
-    GeneratedCertificateFactory,
-)
+from lms.djangoapps.certificates.tests.factories import CertificateDateOverrideFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.content.course_overviews.tests.factories import (
-    CourseOverviewFactory,
-)
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.programs import tasks
-from openedx.core.djangoapps.site_configuration.tests.factories import (
-    SiteConfigurationFactory,
-    SiteFactory,
-)
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.data import CertificatesDisplayBehaviors
 
@@ -311,7 +302,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
                 tasks.award_program_certificates.delay(self.student.username).get()
 
         assert mock_exception.called
-        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
+        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES)
         assert not mock_award_program_certificate.called
 
     def _make_side_effect(self, side_effects):
@@ -922,7 +913,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
             with pytest.raises(MaxRetriesExceededError):
                 tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
         assert mock_exception.called
-        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
+        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES)
         assert not mock_revoke_program_certificate.called
 
 
@@ -1249,5 +1240,5 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             tasks.update_certificate_available_date_on_course_update(bad_course_run_key)  # pylint: disable=no-value-for-parameter
 
         log_capture.check_present(
-            ('openedx.core.djangoapps.programs.tasks', 'WARNING', expected_message),
+            ("openedx.core.djangoapps.programs.tasks", "WARNING", expected_message),
         )
