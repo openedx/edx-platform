@@ -252,6 +252,7 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     response.raise_for_status()
 
 
+# pylint: disable=W0613
 @shared_task(
     bind=True,
     ignore_result=True,
@@ -367,7 +368,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                 elif exc.response.status_code == 429:
                     # Let celery handle retry attempts and backoff
                     error_msg = (
-                        f"Rate limited attempting to award certificate to user {student} in program {program_uuid}."
+                        f"Rate limited. Attempting to award certificate to user {student} in program {program_uuid}."
                     )
                     LOGGER.warning(error_msg)
                     raise MaxRetriesExceededError(
@@ -681,7 +682,10 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
                     )
                 elif exc.response.status_code == 429:
                     # Let celery handle retry attempts and backoff
-                    error_msg = f"Rate limited attempting to revoke a program certificate from user {student} in program {program_uuid}."
+                    error_msg = (
+                        f"Rate limited. Attempting to revoke a program certificate from user {student} in program "
+                        f"{program_uuid}."
+                    )
                     LOGGER.warning(error_msg)
                     raise MaxRetriesExceededError(
                         f"Failed to revoke program certificate for user {username}. Reason: {error_msg}"
