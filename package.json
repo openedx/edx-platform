@@ -111,7 +111,7 @@
     "plato": "1.7.0",
     "react-test-renderer": "16.4.0",
     "selenium-webdriver": "3.4.0",
-    "sinon": "2.3.5",
+    "sinon": "2.4.1",
     "squirejs": "0.1.0",
     "string-replace-loader": "^3.1.0",
     "stylelint-formatter-pretty": "1.0.3",
