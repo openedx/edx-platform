@@ -1,5 +1,5 @@
 """ Code to allow module store to interface with courseware index """
-
+import json
 import logging
 import re
 from abc import ABCMeta, abstractmethod
@@ -110,7 +110,10 @@ class SearchIndexerBase(metaclass=ABCMeta):
             field_dictionary=cls._get_location_info(structure_key),
             exclude_dictionary={"id": list(exclude_items)}
         )
-        result_ids = [result["data"]["id"] for result in response["results"]]
+        if searcher.backend_name == 'elasticsearch':
+            result_ids = [result["data"]["id"] for result in response["results"]]
+        else:
+            result_ids = [result["id"] for result in response["results"]]
         searcher.remove(result_ids)
 
     @classmethod
