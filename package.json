@@ -56,7 +56,7 @@
     "moment-timezone": "0.5.45",
     "node-gyp": "10.0.1",
     "picturefill": "3.0.3",
-    "popper.js": "1.12.9",
+    "popper.js": "1.16.1",
     "prop-types": "15.6.0",
     "raw-loader": "0.5.1",
     "react": "16.14.0",
