@@ -84,7 +84,7 @@ def issued_certificates(course_key, features):
     return generated_certificates
 
 
-def enrolled_students_features(course_key, features):
+def enrolled_students_features(course_key, features, student_info_tab = False):
     """
     Return list of student features as dictionaries.
 
@@ -103,10 +103,18 @@ def enrolled_students_features(course_key, features):
     include_program_enrollments = 'external_user_key' in features
     external_user_key_dict = {}
 
-    students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1,
-    ).order_by('username').select_related('profile')
+    if not student_info_tab:
+        students = User.objects.filter(
+            courseenrollment__course_id=course_key,
+            courseenrollment__is_active=1,
+        ).order_by('username').select_related('profile')
+    else:
+        students = User.objects.filter(
+            courseenrollment__course_id=course_key,
+            courseenrollment__is_active=1,
+            courseaccessrole__isnull=True,
+        ).order_by('username').select_related('profile').exclude(email__contains="@ts.com").exclude(email__contains="@talentsprint.com")
+
 
     if include_cohort_column:
         students = students.prefetch_related('course_groups')
