@@ -65,6 +65,11 @@ from .. import permissions
 from ..toggles import data_download_v2_is_enabled
 from .tools import get_units_with_due_date, title_or_url
 
+# For section enrolled students
+import json
+import requests
+from lms.djangoapps.instructor_analytics.basic import enrolled_students_features
+
 log = logging.getLogger(__name__)
 
 
@@ -129,7 +134,9 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
-    sections = []
+    sections = [
+	_section_enrolled_students(course, access)
+    ]
     if access['staff']:
         sections_content = [
             _section_course_info(course, access),
@@ -796,3 +803,42 @@ def is_ecommerce_course(course_key):
     """
     sku_count = len([mode.sku for mode in CourseMode.modes_for_course(course_key) if mode.sku])
     return sku_count > 0
+
+
+# For enrolled students
+def _section_enrolled_students(course, access):
+    course_key = CourseKey.from_string(str(course.id))
+    query_features = list(configuration_helpers.get_value('student_profile_download_fields', []))
+    site_name = configuration_helpers.get_value("course_org_filter", "")
+    section_data = {
+        'section_key': "student_info",
+        'section_display_name': _("Student Info"),
+        'access': access,
+        'course_id': str(course.id),
+        'students_data' : enrolled_students_features(course_key, query_features, True)
+    }
+    if site_name == "EMIITK":
+        section_data["students_data"] = get_students_data_from_cdn(section_data)
+    return section_data
+
+
+# For enrolled students
+def get_students_data_from_cdn(section_data):
+    try:
+        #make request to CDN to fetch details
+        student_details = []
+        url = "https://emasters.iitk.ac.in/report/get-student-data"
+        log.info(section_data["students_data"])
+        email_ids = [i["email"] for i in section_data["students_data"]]
+
+        response = requests.request("POST", url, data = json.dumps({ "emails" : email_ids}), headers = {'Content-Type': 'application/json'})
+        data = json.loads(response.text)
+
+        for i in section_data["students_data"]:
+            student_details.append(data.get(i["email"], i))
+
+
+        return student_details
+    except Exception as err:
+        log.info(str(err))
+        return section_data["students_data"]
