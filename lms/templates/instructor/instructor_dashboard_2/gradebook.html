@@ -1,0 +1,167 @@
+<%page args="section_data" expression_filter="h"/>
+
+<style>
+div.dt-buttons { position: relative; float: none; display: inline-block; }
+
+</style>
+<script>
+        var current_course_id = "${section_data['course_id']}"
+</script>
+
+<div>
+
+		<input class="gradebook_summary" onclick="gradebook_summary_func()" type="button" value="Open Summary" style = "display:none;"/>
+
+		<table class = "gradebook-report" id = "gradebook-statistics" style = "display:none">
+			<thead>
+				<th>Assessment</th>
+				 <th>Participation</th>
+				<th>Average Grade</th>
+				<th>Median Grade</th>
+				<th>Highest Grade</th>
+			</thead>
+			<tbody>
+				%if 'usergrades' in section_data['grade_log']  and section_data['grade_log']['usergrades'] :
+					% for i in section_data['grade_log']['usergrades'][0]['gradeitems']:
+					<tr>
+									%if i['itemname']:
+											<td>${i['itemname']}</td>
+											 %if "participants_count" in i and i['participants_count']:
+                                                        <td>${i['participants_count']}</td>
+                                                %else:
+                                                        <td>-</td>
+                                                %endif
+
+						%if "averageformatted" in i and i['averageformatted']:
+							<td>${i['averageformatted']}</td>
+						%else:
+							<td>-</td>
+						%endif
+						%if "median" in i and i['median']:
+													<td>${i['median']}</td>
+											%else:
+													<td>-</td>
+											%endif
+						%if "highest" in i and i['highest']:
+													<td>${i['highest']}</td>
+											%else:
+													<td>-</td>
+											%endif
+											%endif
+					</tr>
+
+					%endfor
+				%else:
+					<tr>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+				%endif
+			</tbody>
+		</table>
+		<table id = 'gradebook-report' class = 'gradebook-report'>
+			<thead>
+				<th>S.No</th>
+				<th>Name</th>
+				<th>Email</th>
+				%if "grade_log" in section_data and 'usergrades' in section_data['grade_log']   and section_data['grade_log']['usergrades']:
+					<%
+                                                        gradebook_count = 1
+                                        %>
+					% for i in section_data['grade_log']['usergrades'][0]['gradeitems']:
+								%if i['itemname']:
+										<th>${i['itemname']}</th>
+								%else:
+										<!-- <th>Average Grade</th>
+						<th>Median Grade</th>
+						<th>Highest Grade</th> -->
+						<th>Total</th>
+
+								%endif
+					%endfor
+				%endif
+			</thead>
+			<tbody>
+					
+				%if 'usergrades' in section_data['grade_log']:
+					% for i in section_data['grade_log']['usergrades']:
+							<tr>	
+								<td>${gradebook_count}</td>
+								<td>${i['userfullname']}</td>
+								<td>${i['email']}</td>
+								<%
+                                                                 gradebook_count = gradebook_count + 1
+                                                                %>
+								% for j in i['gradeitems']:
+									%if 'gradeformatted' in j and j['gradeformatted']:
+										<td>${j['gradeformatted']}</td>
+									%elif 'gradeformatted' in j and j['gradeformatted'] == 0:
+										<td>${j['gradeformatted']}</td>
+									%else:
+										<td>-</td>
+									%endif
+
+									% endfor
+
+
+
+							</tr>
+					% endfor
+				%endif
+			</tbody>
+		</table>
+</div>
+
+
+
+<script>
+function formatGradeReport() {
+$('#gradebook-report td').each(function () {
+	 if ($(this).text().length > 23) {
+                      $(this).html($(this).text().replace(/^(.{23})/, '$1<br>'));
+}
+})                    
+}
+
+        $(document).ready(function() {
+
+		var course_id_name = current_course_id.replaceAll("+", "-")
+                course_id_name = course_id_name.replaceAll(":", "-")
+                var gradebook_file_name = "gradebook_" + Math.floor(new Date() / 1000) 
+
+		$('table#gradebook-report').DataTable({
+		'dom': 'Bfrtip',
+		'buttons': [{'extend': 'excel', 'text': '<i class="fa fa-download" aria-hidden="true"></i>', 'title': gradebook_file_name}],
+		'search' : false,
+		'pageLength' : 50,
+		'lengthChange': false,
+		'info': false,
+		'paging': true,
+		'iDisplaylength': 25,
+		"aLengthMenu": [[25, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+		"language": { search: '', searchPlaceholder: "Search"}
+		//'scrollX': true,
+
+	});
+	var intervalId_table = setInterval(function () {
+                        $('#gradebook-report_wrapper table').wrap('<div class="wrapper_table"></div>');
+                        clearInterval(intervalId_table);
+                }, 100);
+
+	//$("input[type=search]").attr("placeholder", "Search"); //13-04-2022
+        //$(".dataTables_filter label").contents().first()[0].textContent='';//13-04-2022
+        $(".dt-button").text("Download");
+        $(".dt-button").css("width","100px");
+
+               //email field in 2 lines
+	       formatGradeReport();
+	       $('.paginate_button').on('click', function () {
+                    formatGradeReport();
+               });
+	       $('.gradebook-report th').on('click', function () {
+                    formatGradeReport();
+               });
+        });
+</script>

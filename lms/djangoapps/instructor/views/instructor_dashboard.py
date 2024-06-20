@@ -135,7 +135,9 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         raise Http404()
 
     sections = [
-	_section_enrolled_students(course, access)
+	_section_enrolled_students(course, access),
+	_section_gradebook(course, access, course_id),
+	_section_attendance(course, access, course_id)
     ]
     if access['staff']:
         sections_content = [
@@ -842,3 +844,101 @@ def get_students_data_from_cdn(section_data):
     except Exception as err:
         log.info(str(err))
         return section_data["students_data"]
+
+
+# For student gradebook
+def _section_gradebook(course, access, course_id):
+    section_data = {
+        'section_key': 'gradebook',
+        'section_display_name': _('Gradebook'),
+        'access': access,
+        'course_id': str(course.id),
+        'grade_log' : get_gradebook(course_id)
+    }
+    return section_data
+
+
+# For student gradebook
+def get_gradebook(course_id):
+    try:
+        moodle_wstoken = configuration_helpers.get_value("MOODLE_TOKEN", "")
+        multiple_moodle = configuration_helpers.get_value("MULTIPLE_MOODLE", False)
+        course_id_function = "core_course_get_courses_by_field"
+        course_scores_function = "gradereport_user_get_grade_items"
+
+        headers = { 'content-type': "text/plain" }
+        course_key = CourseKey.from_string(course_id)
+        moodle_shortname = course_key.course+"|"+ course_key.run
+        querystring = {"wstoken" : moodle_wstoken, "wsfunction" : course_id_function, "moodlewsrestformat" : "json", "field": "shortname", "value" : moodle_shortname}
+
+        if multiple_moodle:
+            api_url = configuration_helpers.get_value("MULTIPLE_MOODLE_URLS",[])
+        else:
+            api_url = [configuration_helpers.get_value("MOODLE_URL", "")]
+
+        for moodle_base_url in reversed(api_url):
+            moodle_service_url = moodle_base_url + "/webservice/rest/server.php"
+            response = requests.request("POST", moodle_service_url, headers = headers, params = querystring)
+            context = json.loads(response.text)
+
+            if context["courses"]:
+                break
+
+        moodle_course_id = context['courses'][0]['id']
+        querystring = {"wstoken" : moodle_wstoken, "wsfunction" : course_scores_function, "moodlewsrestformat" : "json", "courseid": moodle_course_id}
+        response = requests.request("POST", moodle_service_url, headers = headers, params = querystring, timeout=30)
+        context = json.loads(response.text)
+        return context
+    except Exception as e:
+        log.info(e)
+        return {}
+
+
+# For student attendace
+def _section_attendance(course, access, course_id):
+    section_data = {
+        'section_key': 'attendance',
+        'section_display_name': _('Attendance'),
+        'access': access,
+        'course_id': str(course.id),
+        'attendance_link' : get_attendance(str(course.id), "attendance_view")
+    }
+    return section_data
+
+
+# For student attendance
+def get_attendance(course_id, category):
+    try:
+        multiple_moodle = configuration_helpers.get_value("MULTIPLE_MOODLE", False)
+        moodle_wstoken = configuration_helpers.get_value("MOODLE_TOKEN", "")
+        attendance_function = "mod_wsattendance_get_attendance"
+        headers = { 'content-type': "text/plain" }
+        course_key = CourseKey.from_string(course_id)
+        course_shortname = course_key.course+"|"+ course_key.run
+        log.info(course_shortname)
+        querystring = {"wstoken" : moodle_wstoken, "wsfunction" : attendance_function, "moodlewsrestformat" : "json", "course_shortname" : course_shortname, "site_name" : configuration_helpers.get_value("course_org_filter", "")}
+        log.info({"querystring attendance" : querystring})
+
+        if multiple_moodle:
+            api_url = configuration_helpers.get_value("MULTIPLE_MOODLE_URLS",[])
+        else:
+            api_url = [configuration_helpers.get_value("MOODLE_URL", "")]
+        log.info({"api_url" : api_url})
+        for moodle_base_url in reversed(api_url):
+            moodle_service_url = moodle_base_url + "/webservice/rest/server.php"
+            log.info({"moodle url" : moodle_service_url})
+            response = requests.request("POST", moodle_service_url, headers = headers, params = querystring)
+            context = json.loads(response.text)
+            log.info({"cone2" : context})
+
+            if "message" in context or not context["user_info"]:
+                continue
+            if context["user_info"]:
+                break
+
+        log.info({"conext 1" : context})
+        return context
+
+    except Exception as e:
+        log.info(e)
+        return ""
