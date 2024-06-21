@@ -241,6 +241,8 @@ class TestSubmissionMetadataSerializer(TestCase):
             "submissionUuid": "a",
             "username": "foo",
             "teamName": "",
+            'email': "jondoes@example.com",
+            'fullname': "",
             "dateSubmitted": "1969-07-16 13:32:00",
             "dateGraded": "None",
             "gradedBy": "",
@@ -251,6 +253,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         "b": {
             "submissionUuid": "b",
             "username": "",
+            'email': "jondoes@example.com",
+            'fullname': "Jhon Does",
             "teamName": "bar",
             "dateSubmitted": "1969-07-20 20:17:40",
             "dateGraded": "None",
@@ -262,6 +266,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         "c": {
             "submissionUuid": "c",
             "username": "baz",
+            'email': "jondoes@example.com",
+            'fullname': "Jhon Does",
             "teamName": "",
             "dateSubmitted": "1969-07-21 21:35:00",
             "dateGraded": "1969-07-24 16:44:00",
@@ -293,6 +299,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         submission = {
             "submissionUuid": "empty-score",
             "username": "WOPR",
+            'email': "jhondoes@example.com",
+            'fullname': "",
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
             "gradedBy": None,
@@ -304,6 +312,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         expected_output = {
             "submissionUUID": "empty-score",
             "username": "WOPR",
+            'email': "jhondoes@example.com",
+            'fullname': "",
             "teamName": None,
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
@@ -487,6 +497,24 @@ class TestUploadedFileSerializer(TestCase):
 
         expected_value = {
             "downloadUrl": input_data["download_url"],
+            "description": input_data["description"],
+            "name": input_data["name"],
+            "size": input_data["size"],
+        }
+        assert data == expected_value
+
+    def test_no_download_url(self):
+        """Test UploadedFileSerializer in the case where a URL was not found"""
+        input_data = {
+            "download_url": "",
+            "description": "Test description",
+            "name": "Test name",
+            "size": 78222,
+        }
+
+        data = UploadedFileSerializer(input_data).data
+        expected_value = {
+            "downloadUrl": "",
             "description": input_data["description"],
             "name": input_data["name"],
             "size": input_data["size"],

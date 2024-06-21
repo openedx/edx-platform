@@ -1,21 +1,17 @@
 """
-Tests for Blockstore-based Content Libraries
+Tests for Learning-Core-based Content Libraries
 """
+import uuid
 from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
 
-from django.test import LiveServerTestCase
 from organizations.models import Organization
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITransactionTestCase, APIClient
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.core.lib import blockstore_api
-from openedx.core.lib.blockstore_api.tests.base import (
-    BlockstoreAppTestMixin,
-)
 
 # Define the URLs here - don't use reverse() because we want to detect
 # backwards-incompatible changes like changed URLs.
@@ -47,9 +43,9 @@ URL_BLOCK_XBLOCK_HANDLER = '/api/xblock/v2/xblocks/{block_key}/handler/{user_id}
 
 
 @skip_unless_cms  # Content Libraries REST API is only available in Studio
-class _ContentLibrariesRestApiTestMixin:
+class ContentLibrariesRestApiTest(APITransactionTestCase):
     """
-    Base class for Blockstore-based Content Libraries test that use the REST API
+    Base class for Learning-Core-based Content Libraries test that use the REST API
 
     These tests use the REST API, which in turn relies on the Python API.
     Some tests may use the python API directly if necessary to provide
@@ -71,21 +67,14 @@ class _ContentLibrariesRestApiTestMixin:
     and cached forever.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
-        # Create a collection using Blockstore API directly only because there
-        # is not yet any Studio REST API for doing so:
-        cls.collection = blockstore_api.create_collection("Content Library Test Collection")
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         # Create an organization
-        cls.organization, _ = Organization.objects.get_or_create(
+        self.organization, _ = Organization.objects.get_or_create(
             short_name="CL-TEST",
             defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
         )
-
-    def setUp(self):
-        super().setUp()
         self.clients_by_user = {}
         self.client.login(username=self.user.username, password="edx")
 
@@ -139,7 +128,10 @@ class _ContentLibrariesRestApiTestMixin:
             "description": description,
             "type": library_type,
             "license": license_type,
-            "collection_uuid": str(self.collection.uuid),
+            # We're not actually using this value any more, but we're keeping it
+            # in the API testing for backwards compatibility for just a little
+            # longer. TODO: Remove this once the frontend stops sending it.
+            "collection_uuid": uuid.uuid4(),
         }, expect_response)
 
     def _list_libraries(self, query_params_dict=None, expect_response=200):
@@ -307,17 +299,3 @@ class _ContentLibrariesRestApiTestMixin:
         """
         url = URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name=handler_name)
         return self._api('get', url, None, expect_response=200)["handler_url"]
-
-
-class ContentLibrariesRestApiTest(
-    _ContentLibrariesRestApiTestMixin,
-    BlockstoreAppTestMixin,
-    APITestCase,
-    LiveServerTestCase,
-):
-    """
-    Base class for Blockstore-based Content Libraries test that use the REST API
-    and the installed Blockstore app.
-
-    We run this test with a live server, so that the blockstore asset files can be served.
-    """

@@ -73,7 +73,7 @@ from common.djangoapps.util.file import (
     store_uploaded_file,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
-from common.djangoapps.util.views import require_global_staff
+from common.djangoapps.util.views import require_global_staff  # pylint: disable=unused-import
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled, create_course_email
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -1005,11 +1005,12 @@ def modify_access(request, course_id):
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
+    unique_student_identifier = request.POST.get('unique_student_identifier')
     try:
-        user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
+        user = get_student_from_identifier(unique_student_identifier)
     except User.DoesNotExist:
         response_payload = {
-            'unique_student_identifier': request.POST.get('unique_student_identifier'),
+            'unique_student_identifier': unique_student_identifier,
             'userDoesNotExist': True,
         }
         return JsonResponse(response_payload)
@@ -1044,6 +1045,8 @@ def modify_access(request, course_id):
 
     if action == 'allow':
         allow_access(course, user, rolename)
+        if not is_user_enrolled_in_course(user, course_id):
+            CourseEnrollment.enroll(user, course_id)
     elif action == 'revoke':
         revoke_access(course, user, rolename)
     else:
@@ -2809,7 +2812,8 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-
+    if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
+        CourseEnrollment.enroll(user, course_id)
     try:
         update_forum_role(course_id, user, rolename, action)
     except Role.DoesNotExist:
@@ -3019,7 +3023,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.START_CERTIFICATE_GENERATION)
 @require_POST
 @common_exceptions_400
 def start_certificate_generation(request, course_id):
@@ -3041,7 +3045,7 @@ def start_certificate_generation(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.START_CERTIFICATE_REGENERATION)
 @require_POST
 @common_exceptions_400
 def start_certificate_regeneration(request, course_id):
@@ -3083,7 +3087,7 @@ def start_certificate_regeneration(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.CERTIFICATE_EXCEPTION_VIEW)
 @require_http_methods(['POST', 'DELETE'])
 def certificate_exception_view(request, course_id):
     """
@@ -3394,7 +3398,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.CERTIFICATE_INVALIDATION_VIEW)
 @require_http_methods(['POST', 'DELETE'])
 def certificate_invalidation_view(request, course_id):
     """

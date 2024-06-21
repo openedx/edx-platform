@@ -7,7 +7,7 @@ import os
 
 from lxml import etree
 
-from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
+from openedx.core.djangoapps.content_tagging.api import get_all_object_tags, TagValuesByObjectIdDict
 
 from .data import StaticFile
 from . import utils
@@ -20,6 +20,7 @@ class XBlockSerializer:
     A class that can serialize an XBlock to OLX.
     """
     static_files: list[StaticFile]
+    tags: TagValuesByObjectIdDict
 
     def __init__(self, block):
         """
@@ -28,6 +29,7 @@ class XBlockSerializer:
         """
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
+        self.tags = {}
         olx_node = self._serialize_block(block)
         self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
 
@@ -52,9 +54,17 @@ class XBlockSerializer:
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
         if block.scope_ids.usage_id.block_type == 'html':
-            return self._serialize_html_block(block)
+            olx = self._serialize_html_block(block)
         else:
-            return self._serialize_normal_block(block)
+            olx = self._serialize_normal_block(block)
+
+        # Store the block's tags
+        block_key = block.scope_ids.usage_id
+        block_id = str(block_key)
+        object_tags, _ = get_all_object_tags(content_key=block_key)
+        self.tags[block_id] = object_tags.get(block_id, {})
+
+        return olx
 
     def _serialize_normal_block(self, block) -> etree.Element:
         """
@@ -89,8 +99,14 @@ class XBlockSerializer:
                     with filesystem.open(file_path, 'rb') as fh:
                         data = fh.read()
                     self.static_files.append(StaticFile(name=unit_file.name, data=data, url=None))
+
         if block.has_children:
             self._serialize_children(block, olx_node)
+
+        # Ensure there's a url_name attribute, so we can resurrect child usage keys.
+        if "url_name" not in olx_node.attrib:
+            olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
+
         return olx_node
 
     def _serialize_children(self, block, parent_olx_node):
@@ -115,20 +131,16 @@ class XBlockSerializer:
         if block.use_latex_compiler:
             olx_node.attrib["use_latex_compiler"] = "true"
 
-        # Serialize and add tag data if any
-        if isinstance(block, TaggedBlockMixin):
-            block.add_tags_to_node(olx_node)
-
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")
         olx_node.text = etree.CDATA("\n" + escaped_block_data + "\n")
         return olx_node
 
 
-class XBlockSerializerForBlockstore(XBlockSerializer):
+class XBlockSerializerForLearningCore(XBlockSerializer):
     """
     This class will serialize an XBlock, producing:
-        (1) A new definition ID for use in Blockstore
+        (1) A new definition ID for use in Learning Core
         (2) an XML string defining the XBlock and referencing the IDs of its
             children using <xblock-include /> syntax (which doesn't actually
             contain the OLX of its children, just refers to them, so you have to
@@ -142,7 +154,7 @@ class XBlockSerializerForBlockstore(XBlockSerializer):
         resulting data in this object.
         """
         super().__init__(block)
-        self.def_id = utils.blockstore_def_key_from_modulestore_usage_key(self.orig_block_key)
+        self.def_id = utils.learning_core_def_key_from_modulestore_usage_key(self.orig_block_key)
 
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
@@ -162,12 +174,12 @@ class XBlockSerializerForBlockstore(XBlockSerializer):
             # the same block to be used in many places (each with a unique
             # usage key). However, that functionality is not exposed in
             # Studio (other than via content libraries). So when we import
-            # into Blockstore, we assume that each usage is unique, don't
+            # into Learning Core, we assume that each usage is unique, don't
             # generate a usage key, and create a new "definition key" from
             # the original usage key.
             # So modulestore usage key
             #     block-v1:A+B+C+type@html+block@introduction
-            # will become Blockstore definition key
+            # will become Learning Core definition key
             #     html+introduction
             #
             # If we needed the real definition key, we could get it via
@@ -175,7 +187,7 @@ class XBlockSerializerForBlockstore(XBlockSerializer):
             #     child_def_id = str(child.scope_ids.def_id)
             # and then use
             #     <xblock-include definition={child_def_id} usage={child_id.block_id} />
-            def_id = utils.blockstore_def_key_from_modulestore_usage_key(child_id)
+            def_id = utils.learning_core_def_key_from_modulestore_usage_key(child_id)
             parent_olx_node.append(parent_olx_node.makeelement("xblock-include", {"definition": def_id}))
 
     def _transform_olx(self, olx_node, usage_id):

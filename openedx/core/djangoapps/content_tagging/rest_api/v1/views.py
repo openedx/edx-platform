@@ -3,13 +3,8 @@ Tagging Org API Views
 """
 from __future__ import annotations
 
-import csv
-from typing import Iterator
-
 from django.db.models import Count
 from django.http import StreamingHttpResponse
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
@@ -18,10 +13,13 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from openedx_events.content_authoring.data import ContentObjectData
+from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
 
+from ...auth import has_view_object_tags_access
 from ...api import (
     create_taxonomy,
-    get_all_object_tags,
+    generate_csv_rows,
     get_taxonomies,
     get_taxonomies_for_org,
     get_taxonomy,
@@ -30,7 +28,6 @@ from ...api import (
 )
 from ...rules import get_admin_orgs
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
-from .objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
 from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 
 
@@ -143,11 +140,24 @@ class TaxonomyOrgView(TaxonomyView):
 class ObjectTagOrgView(ObjectTagView):
     """
     View to create and retrieve ObjectTags for a provided Object ID (object_id).
-    This view extends the ObjectTagView to add Organization filters for the results.
+    This view extends the ObjectTagView to add Organization filters for the results,
+    and fires events when the tags are updated.
 
     Refer to ObjectTagView docstring for usage details.
     """
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
+
+    def update(self, request, *args, **kwargs) -> Response:
+        """
+        Extend the update method to fire CONTENT_OBJECT_TAGS_CHANGED event
+        """
+        response = super().update(request, *args, **kwargs)
+        if response.status_code == 200:
+            object_id = kwargs.get('object_id')
+            CONTENT_OBJECT_TAGS_CHANGED.send_event(
+                content_object=ContentObjectData(object_id=object_id)
+            )
+        return response
 
 
 class ObjectTagExportView(APIView):
@@ -167,64 +177,22 @@ class ObjectTagExportView(APIView):
             def write(self, value):
                 return value
 
-        def _generate_csv_rows() -> Iterator[str]:
-            """
-            Receives the blocks, tags and taxonomies and returns a CSV string
-            """
-
-            header = {"name": "Name", "type": "Type", "id": "ID"}
-
-            # Prepare the header for the taxonomies
-            for taxonomy_id, taxonomy in taxonomies.items():
-                header[f"taxonomy_{taxonomy_id}"] = taxonomy.export_id
-
-            csv_writer = csv.DictWriter(pseudo_buffer, fieldnames=header.keys(), quoting=csv.QUOTE_NONNUMERIC)
-            yield csv_writer.writerow(header)
-
-            # Iterate over the blocks and yield the rows
-            for item, level in iterate_with_level(tagged_content):
-                block_data = {
-                    "name": level * "  " + item.display_name,
-                    "type": item.category,
-                    "id": item.block_id,
-                }
-
-                # Add the tags for each taxonomy
-                for taxonomy_id in taxonomies:
-                    if taxonomy_id in item.object_tags:
-                        block_data[f"taxonomy_{taxonomy_id}"] = ", ".join([
-                            object_tag.value
-                            for object_tag in item.object_tags[taxonomy_id]
-                        ])
-
-                yield csv_writer.writerow(block_data)
-
         object_id: str = kwargs.get('context_id', None)
-
-        try:
-            content_key = CourseKey.from_string(object_id)
-        except InvalidKeyError as e:
-            raise ValidationError("context_id is not a valid course key.") from e
-
-        # Check if the user has permission to view object tags for this object_id
-        try:
-            if not self.request.user.has_perm(
-                "oel_tagging.view_objecttag",
-                # The obj arg expects a model, but we are passing an object
-                oel_tagging_rules.ObjectTagPermissionItem(taxonomy=None, object_id=object_id),  # type: ignore[arg-type]
-            ):
-                raise PermissionDenied(
-                    "You do not have permission to view object tags for this object_id."
-                )
-        except ValueError as e:
-            raise ValidationError from e
-
-        all_object_tags, taxonomies = get_all_object_tags(content_key)
-        tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
         pseudo_buffer = Echo()
 
-        return StreamingHttpResponse(
-            streaming_content=_generate_csv_rows(),
-            content_type="text/csv",
-            headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
-        )
+        if not has_view_object_tags_access(self.request.user, object_id):
+            raise PermissionDenied(
+                "You do not have permission to view object tags for this object_id."
+            )
+
+        try:
+            return StreamingHttpResponse(
+                streaming_content=generate_csv_rows(
+                    object_id,
+                    pseudo_buffer,
+                ),
+                content_type="text/csv",
+                headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
+            )
+        except ValueError as e:
+            raise ValidationError from e

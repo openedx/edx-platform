@@ -5,7 +5,6 @@ Specific overrides to the base prod settings to make development easier.
 
 import logging
 from os.path import abspath, dirname, join
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -219,9 +218,6 @@ IDA_LOGOUT_URI_LIST = [
 
 ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms/oauth2"
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
-
 #####################################################################
 
 # pylint: disable=wrong-import-order, wrong-import-position
@@ -256,11 +252,6 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-    'use-jwt-cookie',
-    'content-range',
-    'content-disposition',
-)
 
 ################### Special Exams (Proctoring) and Prereqs ###################
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
@@ -269,17 +260,6 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
-
-############## CourseGraph devstack settings ############################
-
-COURSEGRAPH_CONNECTION: dict = {
-    "protocol": "bolt",
-    "secure": False,
-    "host": "edx.devstack.coursegraph",
-    "port": 7687,
-    "user": "neo4j",
-    "password": "edx",
-}
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
@@ -314,6 +294,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3001',  # frontend-app-library-authoring
     'http://localhost:2001',  # frontend-app-course-authoring
     'http://localhost:1992',  # frontend-app-ora
+    'http://localhost:1999',  # frontend-app-authn
 ]
 
 #################### Event bus backend ########################

@@ -104,10 +104,9 @@ class TestCourseListing(ModuleStoreTestCase):
         dest_course_key = CourseKey.from_string(data['destination_course_key'])
 
         self.assertEqual(dest_course_key.run, 'copy')
-        source_course = self.store.get_course(self.source_course_key)
         dest_course = self.store.get_course(dest_course_key)
         self.assertEqual(dest_course.start, CourseFields.start.default)
-        self.assertEqual(dest_course.end, source_course.end)
+        self.assertEqual(dest_course.end, None)
         self.assertEqual(dest_course.enrollment_start, None)
         self.assertEqual(dest_course.enrollment_end, None)
         course_orgs = get_course_organizations(dest_course_key)

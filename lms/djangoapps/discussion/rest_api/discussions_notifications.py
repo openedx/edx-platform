@@ -240,10 +240,8 @@ class DiscussionNotificationSender:
         Sends a notification to the author of the thread
         response on his thread has been endorsed
         """
-        context = {
-            "username": self.creator.username,
-        }
-        self._send_notification([self.thread.user_id], "response_endorsed_on_thread", context)
+        if self.creator.id != int(self.thread.user_id):
+            self._send_notification([self.thread.user_id], "response_endorsed_on_thread")
 
     def send_response_endorsed_notification(self):
         """
@@ -306,10 +304,9 @@ class DiscussionNotificationSender:
             'content_type': content_type,
             'content': thread_body
         }
-        audience_filters = self._create_cohort_course_audience()
-        audience_filters['discussion_roles'] = [
+        audience_filters = {'discussion_roles': [
             FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-        ]
+        ]}
         self._send_course_wide_notification("content_reported", audience_filters, context)
 
 

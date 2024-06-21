@@ -12,7 +12,19 @@
         <%- gettext('Topics for unpublished units would not be created') %>
     </p>
     <p class="graded-tip tip tip-inline">
-        <%- gettext('Please enable discussions for graded units from course authoring app') %>
+        <span>
+            <%- gettext('Please enable discussions for graded units from the') %>
+            <a
+                id="discussion_configuration_url"
+                name="discussion_configuration_url"
+                rel="noreferrer noopener"
+                target="_blank"
+                href="<%- discussion_configuration_url %>"
+            >
+                <%- gettext('Discussion Configuration') %>
+                <i class="fa fa-share-square-o" aria-hidden="true"></i>
+            </a>
+        </span>
     </p>
 </div>
 </div>

@@ -285,7 +285,7 @@ class XmlMixin:
                 metadata[attr] = value
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):  # pylint: disable=too-many-statements
+    def parse_xml(cls, node, runtime, keys):  # pylint: disable=too-many-statements
         """
         Use `node` to construct a new block.
 
@@ -297,20 +297,15 @@ class XmlMixin:
             keys (:class:`.ScopeIds`): The keys identifying where this block
                 will store its data.
 
-            id_generator (:class:`.IdGenerator`): An object that will allow the
-                runtime to generate correct definition and usage ids for
-                children of this block.
-
         Returns (XBlock): The newly parsed XBlock
 
         """
         from xmodule.modulestore.xml import ImportSystem  # done here to avoid circular import
-        if id_generator is None:
-            id_generator = runtime.id_generator
+
         if keys is None:
             # Passing keys=None is against the XBlock API but some platform tests do it.
-            def_id = id_generator.create_definition(node.tag, node.get('url_name'))
-            keys = ScopeIds(None, node.tag, def_id, id_generator.create_usage(def_id))
+            def_id = runtime.id_generator.create_definition(node.tag, node.get('url_name'))
+            keys = ScopeIds(None, node.tag, def_id, runtime.id_generator.create_usage(def_id))
         aside_children = []
 
         # VS[compat]
@@ -324,13 +319,13 @@ class XmlMixin:
             # new style:
             # read the actual definition file--named using url_name.replace(':','/')
             definition_xml, filepath = cls.load_definition_xml(node, runtime, keys.def_id)
-            aside_children = runtime.parse_asides(definition_xml, keys.def_id, keys.usage_id, id_generator)
+            aside_children = runtime.parse_asides(definition_xml, keys.def_id, keys.usage_id, runtime.id_generator)
         else:
             filepath = None
             definition_xml = node
 
         # Note: removes metadata.
-        definition, children = cls.load_definition(definition_xml, runtime, keys.def_id, id_generator)
+        definition, children = cls.load_definition(definition_xml, runtime, keys.def_id, runtime.id_generator)
 
         # VS[compat]
         # Make Ike's github preview links work in both old and new file layouts.
@@ -393,13 +388,13 @@ class XmlMixin:
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
         """
-        This XML lives within Blockstore and the new runtime doesn't need this
+        This XML lives within Learning Core and the new runtime doesn't need this
         legacy XModule code. Use the "normal" XBlock parsing code.
         """
         try:
             return super().parse_xml_new_runtime(node, runtime, keys)
         except AttributeError:
-            return super().parse_xml(node, runtime, keys, id_generator=None)
+            return super().parse_xml(node, runtime, keys)
 
     @classmethod
     def load_definition_xml(cls, node, runtime, def_id):
@@ -428,8 +423,6 @@ class XmlMixin:
         """
         For exporting, set data on `node` from ourselves.
         """
-        # Importing here to avoid circular import
-        from cms.lib.xblock.tagging.tagged_block_mixin import TaggedBlockMixin
         # Get the definition
         xml_object = self.definition_to_xml(self.runtime.export_fs)
 
@@ -499,10 +492,6 @@ class XmlMixin:
             # add org and course attributes on the pointer tag
             node.set('org', self.location.org)
             node.set('course', self.location.course)
-
-        # Serialize and add tag data if any
-        if isinstance(self, TaggedBlockMixin):
-            self.add_tags_to_node(node)
 
     def definition_to_xml(self, resource_fs):
         """

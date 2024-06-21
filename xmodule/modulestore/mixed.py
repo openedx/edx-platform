@@ -758,15 +758,19 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         modulestore = self._verify_modulestore_support(course_key, 'create_item')
         xblock = modulestore.create_item(user_id, course_key, block_type, block_id=block_id, fields=fields, **kwargs)
-        # .. event_implemented_name: XBLOCK_CREATED
-        XBLOCK_CREATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=XBlockData(
-                usage_key=xblock.location.for_branch(None),
-                block_type=block_type,
-                version=xblock.location
+
+        def send_created_event():
+            # .. event_implemented_name: XBLOCK_CREATED
+            XBLOCK_CREATED.send_event(
+                time=datetime.now(timezone.utc),
+                xblock_info=XBlockData(
+                    usage_key=xblock.location.for_branch(None),
+                    block_type=block_type,
+                    version=xblock.location
+                )
             )
-        )
+
+        modulestore.on_commit_changes_to(course_key, send_created_event)
         return xblock
 
     @strip_key
@@ -787,19 +791,24 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             fields (dict): A dictionary specifying initial values for some or all fields
                 in the newly created block
         """
-        modulestore = self._verify_modulestore_support(parent_usage_key.course_key, 'create_child')
-        xblock = modulestore.create_child(
+        course_key = parent_usage_key.course_key
+        store = self._verify_modulestore_support(course_key, 'create_child')
+        xblock = store.create_child(
             user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs
         )
-        # .. event_implemented_name: XBLOCK_CREATED
-        XBLOCK_CREATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=XBlockData(
-                usage_key=xblock.location.for_branch(None),
-                block_type=block_type,
-                version=xblock.location
+
+        def send_created_event():
+            # .. event_implemented_name: XBLOCK_CREATED
+            XBLOCK_CREATED.send_event(
+                time=datetime.now(timezone.utc),
+                xblock_info=XBlockData(
+                    usage_key=xblock.location.for_branch(None),
+                    block_type=block_type,
+                    version=xblock.location
+                )
             )
-        )
+
+        store.on_commit_changes_to(course_key, send_created_event)
         return xblock
 
     @strip_key
@@ -828,17 +837,22 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Update the xblock persisted to be the same as the given for all types of fields
         (content, children, and metadata) attribute the change to the given user.
         """
-        store = self._verify_modulestore_support(xblock.location.course_key, 'update_item')
+        course_key = xblock.location.course_key
+        store = self._verify_modulestore_support(course_key, 'update_item')
         xblock = store.update_item(xblock, user_id, allow_not_found, **kwargs)
-        # .. event_implemented_name: XBLOCK_UPDATED
-        XBLOCK_UPDATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=XBlockData(
-                usage_key=xblock.location.for_branch(None),
-                block_type=xblock.location.block_type,
-                version=xblock.location
+
+        def send_updated_event():
+            # .. event_implemented_name: XBLOCK_UPDATED
+            XBLOCK_UPDATED.send_event(
+                time=datetime.now(timezone.utc),
+                xblock_info=XBlockData(
+                    usage_key=xblock.location.for_branch(None),
+                    block_type=xblock.location.block_type,
+                    version=xblock.location
+                )
             )
-        )
+
+        store.on_commit_changes_to(course_key, send_updated_event)
         return xblock
 
     @strip_key
@@ -846,16 +860,21 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """
-        store = self._verify_modulestore_support(location.course_key, 'delete_item')
+        course_key = location.course_key
+        store = self._verify_modulestore_support(course_key, 'delete_item')
         item = store.delete_item(location, user_id=user_id, **kwargs)
-        # .. event_implemented_name: XBLOCK_DELETED
-        XBLOCK_DELETED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=XBlockData(
-                usage_key=location,
-                block_type=location.block_type,
+
+        def send_deleted_event():
+            # .. event_implemented_name: XBLOCK_DELETED
+            XBLOCK_DELETED.send_event(
+                time=datetime.now(timezone.utc),
+                xblock_info=XBlockData(
+                    usage_key=location,
+                    block_type=location.block_type,
+                )
             )
-        )
+
+        store.on_commit_changes_to(course_key, send_deleted_event)
         return item
 
     def revert_to_published(self, location, user_id):

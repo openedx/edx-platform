@@ -189,6 +189,10 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         with pytest.raises(DiscussionDisabledError):
             get_course(self.request, _discussion_disabled_course_for(self.user).id)
 
+    def test_discussions_disabled_v2(self):
+        data = get_course(self.request, _discussion_disabled_course_for(self.user).id, False)
+        assert data['show_discussions'] is False
+
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
@@ -211,6 +215,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'user_roles': {'Student'},
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
+            'show_discussions': True,
         }
 
     @ddt.data(
@@ -1260,13 +1265,15 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         overrides.setdefault("course_id", str(self.course.id))
         return make_minimal_cs_thread(overrides)
 
-    def get_comment_list(self, thread, endorsed=None, page=1, page_size=1):
+    def get_comment_list(self, thread, endorsed=None, page=1, page_size=1,
+                         merge_question_type_responses=False):
         """
         Register the appropriate comments service response, then call
         get_comment_list and return the result.
         """
         self.register_get_thread_response(thread)
-        return get_comment_list(self.request, thread["id"], endorsed, page, page_size)
+        return get_comment_list(self.request, thread["id"], endorsed, page, page_size,
+                                merge_question_type_responses=merge_question_type_responses)
 
     def test_nonexistent_thread(self):
         thread_id = "nonexistent_thread"
@@ -1398,10 +1405,14 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "resp_limit": ["14"],
                 "with_responses": ["True"],
                 "reverse_order": ["False"],
+                "merge_question_type_responses": ["False"],
             }
         )
 
-    def test_discussion_content(self):
+    def get_source_and_expected_comments(self):
+        """
+        Returns the source comments and expected comments for testing purposes.
+        """
         source_comments = [
             {
                 "type": "comment",
@@ -1414,7 +1425,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "created_at": "2015-05-11T00:00:00Z",
                 "updated_at": "2015-05-11T11:11:11Z",
                 "body": "Test body",
-                "endorsed": False,
+                "endorsed": True,
                 "abuse_flaggers": [],
                 "votes": {"up_count": 4},
                 "child_count": 0,
@@ -1449,7 +1460,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "updated_at": "2015-05-11T11:11:11Z",
                 "raw_body": "Test body",
                 "rendered_body": "<p>Test body</p>",
-                "endorsed": False,
+                "endorsed": True,
                 "endorsed_by": None,
                 "endorsed_by_label": None,
                 "endorsed_at": None,
@@ -1508,12 +1519,26 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 },
             },
         ]
+        return source_comments, expected_comments
+
+    def test_discussion_content(self):
+        source_comments, expected_comments = self.get_source_and_expected_comments()
         actual_comments = self.get_comment_list(
             self.make_minimal_cs_thread({"children": source_comments})
         ).data["results"]
         assert actual_comments == expected_comments
 
-    def test_question_content(self):
+    def test_question_content_with_merge_question_type_responses(self):
+        source_comments, expected_comments = self.get_source_and_expected_comments()
+        actual_comments = self.get_comment_list(
+            self.make_minimal_cs_thread({
+                "thread_type": "question",
+                "children": source_comments,
+                "resp_total": len(source_comments)
+            }), merge_question_type_responses=True).data["results"]
+        assert actual_comments == expected_comments
+
+    def test_question_content_(self):
         thread = self.make_minimal_cs_thread({
             "thread_type": "question",
             "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment", "username": self.user.username})],
@@ -1547,11 +1572,13 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         assert actual_comments[0]['endorsed_by'] is None
 
     @ddt.data(
-        ("discussion", None, "children", "resp_total"),
-        ("question", False, "non_endorsed_responses", "non_endorsed_resp_total"),
+        ("discussion", None, "children", "resp_total", False),
+        ("question", False, "non_endorsed_responses", "non_endorsed_resp_total", False),
+        ("question", None, "children", "resp_total", True),
     )
     @ddt.unpack
-    def test_cs_pagination(self, thread_type, endorsed_arg, response_field, response_total_field):
+    def test_cs_pagination(self, thread_type, endorsed_arg, response_field,
+                           response_total_field, merge_question_type_responses):
         """
         Test cases in which pagination is done by the comments service.
 
@@ -1571,22 +1598,26 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         })
 
         # Only page
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=5).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=5,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] is None
         assert actual['pagination']['previous'] is None
 
         # First page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=2).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=2,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] == 'http://testserver/test_path?page=2'
         assert actual['pagination']['previous'] is None
 
         # Middle page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=2).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=2,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] == 'http://testserver/test_path?page=3'
         assert actual['pagination']['previous'] == 'http://testserver/test_path?page=1'
 
         # Last page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=3, page_size=2).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=3, page_size=2,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] is None
         assert actual['pagination']['previous'] == 'http://testserver/test_path?page=2'
 
@@ -1597,7 +1628,8 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             response_total_field: 5
         })
         with pytest.raises(PageNotFoundError):
-            self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=5)
+            self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=5,
+                                  merge_question_type_responses=merge_question_type_responses)
 
     def test_question_endorsed_pagination(self):
         thread = self.make_minimal_cs_thread({
@@ -4078,6 +4110,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
     """
     Tests for discussions topic API v2 code.
     """
+
     def setUp(self) -> None:
         super().setUp()
         self.course = CourseFactory.create(

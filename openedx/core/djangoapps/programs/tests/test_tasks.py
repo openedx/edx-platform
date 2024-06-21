@@ -250,7 +250,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         Checks that the task will be aborted and not retried if the username
         passed was not found, and that an exception is logged.
         """
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             tasks.award_program_certificates.delay("nonexistent-username").get()
             assert mock_exception.called
         for mock_helper in mock_helpers:
@@ -355,15 +355,12 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
             TASKS_MODULE + ".LOGGER.exception"
         ) as mock_warning:
             tasks.award_program_certificates.delay(self.student.username).get()
-
         assert mock_award_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            "Failed to award certificate for program {uuid} to user {username}.".format(
-                uuid=1, username=self.student.username
-            )
+            f"Failed to award program certificate to user {self.student} in program 1: boom"
         )
-        mock_info.assert_any_call(f"Awarded certificate for program {1} to user {self.student.username}")
-        mock_info.assert_any_call(f"Awarded certificate for program {2} to user {self.student.username}")
+        mock_info.assert_any_call(f"Awarded program certificate to user {self.student} in program 1")
+        mock_info.assert_any_call(f"Awarded program certificate to user {self.student} in program 2")
 
     def test_retry_on_programs_api_errors(self, mock_get_completed_programs, *_mock_helpers):
         """
@@ -608,7 +605,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         """
         Test that the post method is never called if the user isn't found by username
         """
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             # Use a random username here since this user won't be found in the DB
             tasks.award_course_certificate.delay("random_username", str(self.course.id)).get()
         assert mock_exception.called
@@ -619,7 +616,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         Test that the post method is never called if the certificate doesn't exist for the user and course
         """
         self.certificate.delete()
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         assert mock_exception.called
         assert not mock_post_course_certificate.called
@@ -629,7 +626,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         Test that the post method is never called if the CourseOverview isn't found
         """
         self.course.delete()
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             # Use the certificate course id here since the course will be deleted
             tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
         assert mock_exception.called
@@ -780,7 +777,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         Checks that the task will be aborted and not retried if the username
         passed was not found, and that an exception is logged.
         """
-        with mock.patch(TASKS_MODULE + ".LOGGER.exception") as mock_exception:
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
             tasks.revoke_program_certificates.delay("nonexistent-username", self.course_key).get()
             assert mock_exception.called
         for mock_helper in mock_helpers:
@@ -819,18 +816,16 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         mock_revoke_program_certificate.side_effect = self._make_side_effect([Exception("boom"), None])
 
         with mock.patch(TASKS_MODULE + ".LOGGER.info") as mock_info, mock.patch(
-            TASKS_MODULE + ".LOGGER.warning"
+            TASKS_MODULE + ".LOGGER.exception"
         ) as mock_warning:
             tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
         assert mock_revoke_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            "Failed to revoke certificate for program {uuid} of user {username}.".format(
-                uuid=1, username=self.student.username
-            )
+            f"Failed to revoke program certificate from user {self.student} in program 1: boom"
         )
-        mock_info.assert_any_call(f"Revoked certificate for program {1} for user {self.student.username}")
-        mock_info.assert_any_call(f"Revoked certificate for program {2} for user {self.student.username}")
+        mock_info.assert_any_call(f"Revoked program certificate from user {self.student} in program 1")
+        mock_info.assert_any_call(f"Revoked program certificate from user {self.student} in program 2")
 
     def test_retry_on_credentials_api_errors(
         self,
@@ -1083,94 +1078,176 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
 
     def setUp(self):
         super().setUp()
+        self.end_date = datetime.now(pytz.UTC) + timedelta(days=90)
         self.credentials_api_config = self.create_credentials_config(enabled=False)
 
     def tearDown(self):
         super().tearDown()
         self.credentials_api_config = self.create_credentials_config(enabled=False)
 
-    def test_update_certificate_available_date_but_credentials_config_disabled(self):
+    def _create_course_overview(self, self_paced, display_behavior, available_date, end):
         """
-        This test verifies the behavior of the `UpdateCertificateAvailableDateOnCourseUpdateTestCase` task when the
-        CredentialsApiConfig is disabled.
+        Utility function to generate a CourseOverview with required settings for functions under test.
+        """
+        return CourseOverviewFactory.create(
+            self_paced=self_paced,
+            end=end,
+            certificate_available_date=available_date,
+            certificates_display_behavior=display_behavior,
+        )
 
-        If the system is configured to _not_ use the Credentials IDA, we should expect this task to eventually throw an
-        exception when the max number of retries has reached.
+    def _update_credentials_api_config(self, is_enabled):
         """
-        course = CourseOverviewFactory.create()
+        Utility function to enable or disable use of the Credentials IDA in our test environment for the functions
+        under test.
+        """
+        self.credentials_api_config.enabled = True
+        self.credentials_api_config.enable_learner_issuance = True
+
+    def test_update_certificate_available_date_credentials_config_disabled(self):
+        """
+        A test that verifies we do not queue any subtasks to update a certificate available date if use of the
+        Credentials is disabled in config.
+        """
+        course_overview = self._create_course_overview(
+            False,
+            CertificatesDisplayBehaviors.EARLY_NO_INFO,
+            None,
+            self.end_date,
+        )
 
         with pytest.raises(MaxRetriesExceededError):
-            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
 
-    def test_update_certificate_available_date_with_self_paced_course(self):
+    @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
+    def test_update_certificate_available_date_instructor_paced_cdb_early_no_info(self, mock_update):
         """
-        Happy path test.
+        This test checks that we enqueue an `update_credentials_course_certificate_configuration_available_date` celery
+        task with values we would expect.
 
-        This test verifies that we are queueing a `update_credentials_course_certificate_configuration_available_date`
-        task with the expected arguments when removing a "certificate available date" from a course cert config in
-        Credentials.
+        In this scenario, we have a course overview that...
+            - is instructor-paced
+            - has a certificates display behavior of "EARLY NO INFO" (certificates are visible immediately after
+              generation)
+            - has no certificate available date
+
+        We expect that the task enqueued has a certificate available date of `None`, as the certificates should have no
+        visibility restrictions.
         """
-        self.credentials_api_config.enabled = True
-        self.credentials_api_config.enable_learner_issuance = True
+        self._update_credentials_api_config(True)
 
-        course = CourseOverviewFactory.create(self_paced=True, certificate_available_date=None)
-
-        with mock.patch(
-            f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay"
-        ) as update_credentials_course_cert_config:
-            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
-
-        update_credentials_course_cert_config.assert_called_once_with(str(course.id), None)
-
-    def test_update_certificate_available_date_with_instructor_paced_course(self):
-        """
-        Happy path test.
-
-        This test verifies that we are queueing a `update_credentials_course_certificate_configuration_available_date`
-        task with the expected arguments when updating a "certificate available date" from a course cert config in
-        Credentials.
-        """
-        self.credentials_api_config.enabled = True
-        self.credentials_api_config.enable_learner_issuance = True
-
-        available_date = datetime.now(pytz.UTC) + timedelta(days=1)
-
-        course = CourseOverviewFactory.create(
-            self_paced=False,
-            certificate_available_date=available_date,
-            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
+        course_overview = self._create_course_overview(
+            False,
+            CertificatesDisplayBehaviors.EARLY_NO_INFO,
+            None,
+            self.end_date,
         )
 
-        with mock.patch(
-            f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay"
-        ) as update_credentials_course_cert_config:
-            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        mock_update.assert_called_once_with(str(course_overview.id), None)
 
-        update_credentials_course_cert_config.assert_called_once_with(str(course.id), str(available_date))
-
-    def test_update_certificate_available_date_with_expect_no_update(self):
+    @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
+    def test_update_certificate_available_date_instructor_paced_cdb_end(self, mock_update):
         """
-        This test verifies that we do _not_ queue a task to update the course certificate configuration in Credentials
-        if the course-run does not meet the required criteria.
+        This test checks that we enqueue an `update_credentials_course_certificate_configuration_available_date` celery
+        task with values we would expect.
+
+        In this scenario, we have a course overview that...
+            - is instructor-paced
+            - has a certificates display behavior of "END" ("End of the course")
+            - has no certificate available date
+
+        We expect that the task enqueued has a certificate available date that matches the end date of the course.
         """
-        self.credentials_api_config.enabled = True
-        self.credentials_api_config.enable_learner_issuance = True
+        self._update_credentials_api_config(True)
 
-        available_date = datetime.now(pytz.UTC) + timedelta(days=1)
-
-        course = CourseOverviewFactory.create(
-            self_paced=False,
-            certificate_available_date=available_date,
-            certificates_display_behavior=CertificatesDisplayBehaviors.EARLY_NO_INFO,
+        course_overview = self._create_course_overview(
+            False,
+            CertificatesDisplayBehaviors.END,
+            None,
+            self.end_date,
         )
 
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        mock_update.assert_called_once_with(str(course_overview.id), str(self.end_date))
+
+    @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
+    def test_update_certificate_available_date_instructor_paced_cdb_end_with_date(self, mock_update):
+        """
+        This test checks that we enqueue an `update_credentials_course_certificate_configuration_available_date` celery
+        task with values we would expect.
+
+        In this scenario, we have a course overview that...
+            - is instructor-paced
+            - has a certificates display behavior of "END WITH DATE" ("A date after the course ends")
+            - has an end date set to 90 days from today
+            - has a certificate available date set to 120 days from today
+
+        We expect that the task enqueued has a certificate available date that matches the certificate available date
+        explicitly set as part of the course overview.
+        """
+        self._update_credentials_api_config(True)
+        certificate_available_date = datetime.now(pytz.UTC) + timedelta(days=120)
+
+        course_overview = self._create_course_overview(
+            False,
+            CertificatesDisplayBehaviors.END_WITH_DATE,
+            certificate_available_date,
+            self.end_date,
+        )
+
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        mock_update.assert_called_once_with(str(course_overview.id), str(certificate_available_date))
+
+    @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
+    def test_update_certificate_available_date_self_paced(self, mock_update):
+        """
+        This test checks that we enqueue an `update_credentials_course_certificate_configuration_available_date` celery
+        task with values we would expect.
+
+        In this scenario, we have a course overview that...
+            - is self-paced
+            - has a certificates display behavior of "END WITH DATE" ("A date after the course ends")
+            - has an end date set to 90 days from today
+            - has a cerificate available date set 120 days from today
+
+        We expect that the task enqueued has a certificate available date that matches the certificate available date
+        explicitly set as part of the course overview.
+
+        This test case also verifies a change in recent behavior. There is a product defect that allows a self-paced
+        course to sometimes pass a certificate available date to Credentials. This test case also verifies that, if
+        invalid data is set in a course overview, we don't pass it to Credentials.
+        """
+        self._update_credentials_api_config(True)
+        certificate_available_date = datetime.now(pytz.UTC) + timedelta(days=120)
+
+        course_overview = self._create_course_overview(
+            True,
+            None,
+            certificate_available_date,
+            self.end_date,
+        )
+
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        mock_update.assert_called_once_with(str(course_overview.id), None)
+
+    def test_update_certificate_available_date_no_course_overview(self):
+        """
+        A test case that verifies some logging if the
+        `update_credentials_course_certificate_configuration_available_date` task is queued with an invalid course run
+        id.
+        """
+        bad_course_run_key = "course-v1:OpenEdx+MtG101x+1T2024"
         expected_message = (
-            f"Skipping update of the `certificate_available_date` for course {course.id} in the Credentials service. "
-            "This course-run does not meet the required criteria for an update."
+            f"Unable to send the updated certificate available date of course run [{bad_course_run_key}] to "
+            "Credentials. A course overview for this course run could not be found"
         )
+
+        self._update_credentials_api_config(True)
 
         with LogCapture(level=logging.WARNING) as log_capture:
-            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_available_date_on_course_update(bad_course_run_key)  # pylint: disable=no-value-for-parameter
 
-        assert len(log_capture.records) == 1
-        assert log_capture.records[0].getMessage() == expected_message
+        log_capture.check_present(
+            ('openedx.core.djangoapps.programs.tasks', 'WARNING', expected_message),
+        )

@@ -17,13 +17,10 @@
 celery>=5.2.2,<6.0.0
 
 
-# required for celery>=5.2.0;<5.3.0
-click>=8.0,<9.0
-
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.12.1
+edx-enterprise==4.20.6
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -48,9 +45,6 @@ django-webpack-loader==0.7.0
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
 
-# scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
-scipy<1.8.0
-
 # edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
 # Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
 charset-normalizer<2.1.0
@@ -62,14 +56,6 @@ markdown<3.4.0
 # pycodestyle==2.9.0 generates false positive error E275.
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
-
-# pyopenssl>22.0.0 requires cryptography>=38.0 && conflicts with snowflak-connector-python requires cryptography<37
-# which causes the requirements upgrade job to fail due to constraint conflict
-# This constraint can be removed once https://github.com/snowflakedb/snowflake-connector-python/issues/1259 is resolved
-# and snowflake-connector-python>2.8.0 is released.
-pyopenssl==22.0.0
-
-cryptography==38.0.4 # greater version has some issues with openssl.
 
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
 
@@ -86,9 +72,6 @@ social-auth-app-django==5.0.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
 urllib3<2.0.0
 
-
-# greater version has dropped few dependencies. Fix this in other ticket.
-drf-yasg<1.21.6
 
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
@@ -108,17 +91,35 @@ libsass==0.10.0
 click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.6.2
+openedx-learning==0.10.0
 
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
 openai<=0.28.1
 
 # optimizely-sdk 5.0.0 is breaking following test with segmentation fault
 # common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest::test_secure_key_configuration
-# needs to be fixed in the follow up issue 
+# needs to be fixed in the follow up issue
 # https://github.com/openedx/edx-platform/issues/34103
 optimizely-sdk<5.0
 
-# lxml 5.1.0 introduced a breaking change in unit test shards
-# This constraint can probably be removed once lxml==5.1.1 is released on PyPI
+# lxml>=5.0 introduced breaking changes related to system dependencies
+# lxml==5.2.1 introduced new extra so we'll nee to rename lxml --> lxml[html-clean]
+# This constraint can be removed once we upgrade to Python 3.11
 lxml<5.0
+# This has to be constrained as well because newer versions of edx-i18n-tools need the
+# newer version of lxml but that requirement was not made expilict in the 1.6.0 version
+# of the package.  This can be un-pinned when we're upgrading lxml.
+edx-i18n-tools<1.6.0
+
+# xmlsec==1.3.14 breaking tests for all builds, can be removed once a fix is available
+xmlsec<1.3.14
+
+# moto==5.0 contains breaking changes. Needs to be updated separately.
+moto<5.0
+
+# path==16.12.0 breaks the unit test collections check
+# needs to be investigated and fixed separately
+path<16.12.0
+
+# Temporary to Support the python 3.11 Upgrade
+backports.zoneinfo;python_version<"3.9"  # Newer versions have zoneinfo available in the standard library

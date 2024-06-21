@@ -77,3 +77,4 @@ class XblockSerializer(StrictSerializer):
     target_index = serializers.IntegerField(required=False, allow_null=True)
     boilerplate = serializers.JSONField(required=False, allow_null=True)
     staged_content = serializers.CharField(required=False, allow_null=True)
+    hide_from_toc = serializers.BooleanField(required=False, allow_null=True)

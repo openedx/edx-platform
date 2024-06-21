@@ -6,6 +6,7 @@ from functools import partial
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
@@ -28,7 +29,7 @@ from openedx.core.lib.xblock_utils import (
 from xmodule.modulestore.django import (
     modulestore,
 )  # lint-amnesty, pylint: disable=wrong-import-order
-from cms.djangoapps.contentstore.toggles import use_tagging_taxonomy_list_page
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 
 from xmodule.x_module import (
     AUTHOR_VIEW,
@@ -74,6 +75,12 @@ NEVER = lambda x: False
 ALWAYS = lambda x: True
 
 
+# Disable atomic requests so transactions made during the request commit immediately instead of waiting for the end of
+# the request transaction. This is necessary so the async tasks launched by the current process can see the changes made
+# during the request. One example is the async tasks launched when courses are published before the request
+# ends, which end up reading from an outdated state of the database. For more information see the discussion in the
+# following PR: https://github.com/openedx/edx-platform/pull/34020
+@transaction.non_atomic_requests
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
@@ -235,7 +242,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             # Fetch tags of children components
             tags_count_map = {}
-            if use_tagging_taxonomy_list_page():
+            if not is_tagging_feature_disabled():
                 tags_count_map = get_children_tags_count(xblock)
 
             # Set up the context to be passed to each XBlock's render method.

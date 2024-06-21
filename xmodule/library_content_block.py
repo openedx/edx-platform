@@ -9,7 +9,7 @@ import random
 from copy import copy
 from gettext import ngettext, gettext
 
-import bleach
+import nh3
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.functional import classproperty
@@ -221,7 +221,7 @@ class LibraryContentBlock(
         overlimit_block_keys = set()
         if len(selected_keys) > max_count:
             num_to_remove = len(selected_keys) - max_count
-            overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
+            overlimit_block_keys = set(rand.sample(list(selected_keys), num_to_remove))
             selected_keys -= overlimit_block_keys
 
         # Do we have enough blocks now?
@@ -233,7 +233,7 @@ class LibraryContentBlock(
             pool = valid_block_keys - selected_keys
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(rand.sample(pool, num_to_add))
+                added_block_keys = set(rand.sample(list(pool), num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
@@ -451,7 +451,12 @@ class LibraryContentBlock(
         context['is_loading'] = is_updating
 
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
+        if root_xblock and 'library' in root_xblock.category:
+            if root_xblock.source_library_id and len(root_xblock.children) > 0:
+                fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
+        else:
+            fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
+
         fragment.initialize_js('LibraryContentAuthorView')
         return fragment
 
@@ -593,9 +598,22 @@ class LibraryContentBlock(
 
         Otherwise we'll end up losing data on the next refresh.
         """
+        if hasattr(super(), 'studio_post_duplicate'):
+            super().studio_post_duplicate(store, source_block)
+
         self._validate_sync_permissions()
         self.get_tools(to_read_library_content=True).trigger_duplication(source_block=source_block, dest_block=self)
         return True  # Children have been handled.
+
+    def studio_post_paste(self, store, source_node) -> bool:
+        """
+        Pull the children from the library and let library_tools assign their IDs.
+        """
+        if hasattr(super(), 'studio_post_paste'):
+            super().studio_post_paste(store, source_node)
+
+        self.sync_from_library(upgrade_to_latest=False)
+        return True  # Children have been handled
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
@@ -713,7 +731,7 @@ class LibraryContentBlock(
         lib_tools = self.get_tools()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
-            (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
+            (key, nh3.clean(name)) for key, name in lib_tools.list_available_libraries()
             if user_perms.can_read(key) or self.source_library_id == str(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name

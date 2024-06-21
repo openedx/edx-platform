@@ -1041,6 +1041,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = "password"
+    REGISTER_INTENT = 'true'
 
     @classmethod
     def setUpClass(cls):
@@ -1117,6 +1118,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         data = {
             "email": self.EMAIL,
             "password": self.PASSWORD,
+            "register_intent": self.REGISTER_INTENT,
         }
         if include_analytics:
             track_label = "edX/DemoX/Fall"
@@ -1145,7 +1147,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         mock_segment.track.assert_called_once_with(
             expected_user_id,
             'edx.bi.user.account.authenticated',
-            {'category': 'conversion', 'provider': None, 'label': track_label}
+            {'category': 'conversion', 'provider': None, 'label': track_label, 'register_intent': True}
         )
 
     def test_login_with_username(self):

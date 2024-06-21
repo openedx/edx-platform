@@ -42,6 +42,7 @@ from edxval.api import (
     update_video_status
 )
 from fs.osfs import OSFS
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 from pytz import UTC
@@ -173,9 +174,8 @@ class StatusDisplayStrings:
 
     @staticmethod
     def get(val_status):
-        """Map a VAL status string to a localized display string"""
-        # pylint: disable=translation-of-non-string
-        return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
+        """Map a VAL status string to a display string"""
+        return StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN)
 
 
 def handle_videos(request, course_key_string, edx_video_id=None):
@@ -657,7 +657,10 @@ def _get_videos(course, pagination_conf=None):
                 language_code=language_code,
             )
         # Convert the video status.
-        video['status'] = convert_video_status(video, is_video_encodes_ready)
+        # Legacy frontend expects the status to be translated unlike MFEs which handle translation themselves.
+        video['status_nontranslated'] = convert_video_status(video, is_video_encodes_ready)
+        # pylint: disable=translation-of-non-string
+        video['status'] = _(video['status_nontranslated'])
 
     return videos, pagination_context
 
@@ -675,7 +678,7 @@ def _get_index_videos(course, pagination_conf=None):
     """
     course_id = str(course.id)
     attrs = [
-        'edx_video_id', 'client_video_id', 'created', 'duration',
+        'edx_video_id', 'client_video_id', 'created', 'duration', 'status_nontranslated',
         'status', 'courses', 'encoded_videos', 'transcripts', 'transcription_status',
         'transcript_urls', 'error_description'
     ]
@@ -688,7 +691,10 @@ def _get_index_videos(course, pagination_conf=None):
         for attr in attrs:
             if attr == 'courses':
                 current_course = [c for c in video['courses'] if course_id in c]
-                (__, values['course_video_image_url']), = list(current_course[0].items())
+                if current_course:
+                    values['course_video_image_url'] = current_course[0][course_id]
+                else:
+                    values['course_video_image_url'] = None
             elif attr == 'encoded_videos':
                 values['download_link'] = ''
                 values['file_size'] = 0
@@ -955,3 +961,32 @@ def _update_pagination_context(request):
 
     request.session['VIDEOS_PER_PAGE'] = videos_per_page
     return JsonResponse()
+
+
+def get_course_youtube_edx_video_ids(course_id):
+    """
+    Get a list of youtube edx_video_ids
+    """
+    error_msg = "Invalid course_key: '%s'." % course_id
+    try:
+        course_key = CourseKey.from_string(course_id)
+        course = modulestore().get_course(course_key)
+    except InvalidKeyError:
+        return JsonResponse({'error': error_msg}, status=500)
+    blocks = []
+    block_yt_field = 'youtube_id_1_0'
+    block_edx_id_field = 'edx_video_id'
+    if hasattr(course, 'get_children'):
+        for section in course.get_children():
+            for subsection in section.get_children():
+                for vertical in subsection.get_children():
+                    for block in vertical.get_children():
+                        blocks.append(block)
+
+    edx_video_ids = []
+    for block in blocks:
+        if hasattr(block, block_yt_field) and getattr(block, block_yt_field):
+            if getattr(block, block_edx_id_field):
+                edx_video_ids.append(getattr(block, block_edx_id_field))
+
+    return JsonResponse({'edx_video_ids': edx_video_ids}, status=200)

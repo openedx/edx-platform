@@ -17,7 +17,6 @@ from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -49,7 +48,7 @@ from xmodule.modulestore.tests.factories import (
 )
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
+    MINIMUM_UNUSED_PARTITION_ID,
     Group,
     UserPartition,
 )
@@ -73,6 +72,7 @@ from common.djangoapps.xblock_django.models import (
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 
 from ..component import component_handler, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
@@ -84,7 +84,6 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     add_container_page_publishing_info,
     create_xblock_info,
 )
-from cms.djangoapps.contentstore.toggles import ENABLE_TAGGING_TAXONOMY_LIST_PAGE
 
 
 class AsideTest(XBlockAside):
@@ -271,7 +270,6 @@ class GetItemTest(ItemTest):
             ),
         )
 
-    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, True)
     @patch("cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers.get_object_tag_counts")
     def test_tag_count_in_container_fragment(self, mock_get_object_tag_counts):
         root_usage_key = self._create_vertical()
@@ -423,16 +421,16 @@ class GetItemTest(ItemTest):
         # by dynamic user partitions.
         self.course.user_partitions = [
             UserPartition(
-                id=MINIMUM_STATIC_PARTITION_ID,
+                id=MINIMUM_UNUSED_PARTITION_ID,
                 name="Random user partition",
                 scheme=UserPartition.get_scheme("random"),
                 description="Random user partition",
                 groups=[
                     Group(
-                        id=MINIMUM_STATIC_PARTITION_ID + 1, name="Group A"
+                        id=MINIMUM_UNUSED_PARTITION_ID + 1, name="Group A"
                     ),  # See note above.
                     Group(
-                        id=MINIMUM_STATIC_PARTITION_ID + 2, name="Group B"
+                        id=MINIMUM_UNUSED_PARTITION_ID + 2, name="Group B"
                     ),  # See note above.
                 ],
             ),
@@ -464,18 +462,18 @@ class GetItemTest(ItemTest):
                     ],
                 },
                 {
-                    "id": MINIMUM_STATIC_PARTITION_ID,
+                    "id": MINIMUM_UNUSED_PARTITION_ID,
                     "name": "Random user partition",
                     "scheme": "random",
                     "groups": [
                         {
-                            "id": MINIMUM_STATIC_PARTITION_ID + 1,
+                            "id": MINIMUM_UNUSED_PARTITION_ID + 1,
                             "name": "Group A",
                             "selected": False,
                             "deleted": False,
                         },
                         {
-                            "id": MINIMUM_STATIC_PARTITION_ID + 2,
+                            "id": MINIMUM_UNUSED_PARTITION_ID + 2,
                             "name": "Group B",
                             "selected": False,
                             "deleted": False,
@@ -1105,6 +1103,59 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
         assert dupe_html_1.data == "HTML 1 Content (Lib Update)"
         assert dupe_html_2.display_name == "HTML 2 Title (Lib Update)"
         assert dupe_html_2.data == "HTML 2 Content (Lib Update)"
+
+    def test_duplicate_tags(self):
+        """
+        Test that duplicating a tagged XBlock also duplicates its content tags.
+        """
+        source_course = CourseFactory()
+        user = UserFactory.create()
+        source_chapter = BlockFactory(
+            parent=source_course, category="chapter", display_name="Source Chapter"
+        )
+        source_block = BlockFactory(parent=source_chapter, category="html", display_name="Child")
+
+        # Create a couple of taxonomies with tags
+        taxonomyA = tagging_api.create_taxonomy(name="A", export_id="A")
+        taxonomyB = tagging_api.create_taxonomy(name="B", export_id="B")
+        tagging_api.set_taxonomy_orgs(taxonomyA, all_orgs=True)
+        tagging_api.set_taxonomy_orgs(taxonomyB, all_orgs=True)
+        tagging_api.add_tag_to_taxonomy(taxonomyA, "one")
+        tagging_api.add_tag_to_taxonomy(taxonomyA, "two")
+        tagging_api.add_tag_to_taxonomy(taxonomyB, "three")
+        tagging_api.add_tag_to_taxonomy(taxonomyB, "four")
+
+        # Tag the chapter
+        tagging_api.tag_object(str(source_chapter.location), taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(source_chapter.location), taxonomyB, ["three", "four"])
+
+        # Tag the child block
+        tagging_api.tag_object(str(source_block.location), taxonomyA, ["two"],)
+
+        # Duplicate the chapter (and its children)
+        dupe_location = duplicate_block(
+            parent_usage_key=source_course.location,
+            duplicate_source_usage_key=source_chapter.location,
+            user=user,
+        )
+        dupe_chapter = self.store.get_item(dupe_location)
+        self.assertEqual(len(dupe_chapter.get_children()), 1)
+        dupe_block = dupe_chapter.get_children()[0]
+
+        # Check that the duplicated blocks also duplicated tags
+        expected_chapter_tags = [
+            f'<ObjectTag> {str(dupe_chapter.location)}: A=one',
+            f'<ObjectTag> {str(dupe_chapter.location)}: A=two',
+            f'<ObjectTag> {str(dupe_chapter.location)}: B=four',
+            f'<ObjectTag> {str(dupe_chapter.location)}: B=three',
+        ]
+        dupe_chapter_tags = [str(object_tag) for object_tag in tagging_api.get_object_tags(str(dupe_chapter.location))]
+        assert dupe_chapter_tags == expected_chapter_tags
+        expected_block_tags = [
+            f'<ObjectTag> {str(dupe_block.location)}: A=two',
+        ]
+        dupe_block_tags = [str(object_tag) for object_tag in tagging_api.get_object_tags(str(dupe_block.location))]
+        assert dupe_block_tags == expected_block_tags
 
 
 @ddt.ddt
@@ -2392,13 +2443,13 @@ class TestEditSplitModule(ItemTest):
         self.user = UserFactory()
 
         self.first_user_partition_group_1 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 1), "alpha"
+            str(MINIMUM_UNUSED_PARTITION_ID + 1), "alpha"
         )
         self.first_user_partition_group_2 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 2), "beta"
+            str(MINIMUM_UNUSED_PARTITION_ID + 2), "beta"
         )
         self.first_user_partition = UserPartition(
-            MINIMUM_STATIC_PARTITION_ID,
+            MINIMUM_UNUSED_PARTITION_ID,
             "first_partition",
             "First Partition",
             [self.first_user_partition_group_1, self.first_user_partition_group_2],
@@ -2407,16 +2458,16 @@ class TestEditSplitModule(ItemTest):
         # There is a test point below (test_create_groups) that purposefully wants the group IDs
         # of the 2 partitions to overlap (which is not something that normally happens).
         self.second_user_partition_group_1 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 1), "Group 1"
+            str(MINIMUM_UNUSED_PARTITION_ID + 1), "Group 1"
         )
         self.second_user_partition_group_2 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 2), "Group 2"
+            str(MINIMUM_UNUSED_PARTITION_ID + 2), "Group 2"
         )
         self.second_user_partition_group_3 = Group(
-            str(MINIMUM_STATIC_PARTITION_ID + 3), "Group 3"
+            str(MINIMUM_UNUSED_PARTITION_ID + 3), "Group 3"
         )
         self.second_user_partition = UserPartition(
-            MINIMUM_STATIC_PARTITION_ID + 10,
+            MINIMUM_UNUSED_PARTITION_ID + 10,
             "second_partition",
             "Second Partition",
             [
@@ -2489,10 +2540,10 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
         self.assertEqual(
-            "Group ID " + str(MINIMUM_STATIC_PARTITION_ID + 1), vertical_0.display_name
+            "Group ID " + str(MINIMUM_UNUSED_PARTITION_ID + 1), vertical_0.display_name
         )
         self.assertEqual(
-            "Group ID " + str(MINIMUM_STATIC_PARTITION_ID + 2), vertical_1.display_name
+            "Group ID " + str(MINIMUM_UNUSED_PARTITION_ID + 2), vertical_1.display_name
         )
 
         # Verify that the group_id_to_child mapping is correct.
@@ -3613,6 +3664,47 @@ class TestSpecialExamXBlockInfo(ItemTest):
         mock_get_exam_configuration_dashboard_url.assert_called_with(
             self.course.id, xblock_info["id"]
         )
+
+    @patch_get_exam_configuration_dashboard_url
+    @patch_does_backend_support_onboarding
+    @patch_get_exam_by_content_id_success
+    @ddt.data(
+        ("lti_external", False),
+        ("other_proctoring_backend", True),
+    )
+    @ddt.unpack
+    def test_support_onboarding_is_correct_depending_on_lti_external(
+        self,
+        external_id,
+        expected_value,
+        mock_get_exam_by_content_id,
+        mock_does_backend_support_onboarding,
+        _mock_get_exam_configuration_dashboard_url,
+    ):
+        sequential = BlockFactory.create(
+            parent_location=self.chapter.location,
+            category="sequential",
+            display_name="Test Lesson 1",
+            user_id=self.user.id,
+            is_proctored_enabled=False,
+            is_time_limited=False,
+            is_onboarding_exam=False,
+        )
+
+        # set course.proctoring_provider to lti_external
+        self.course.proctoring_provider = external_id
+        mock_get_exam_by_content_id.return_value = {"external_id": external_id}
+
+        # mock_does_backend_support_onboarding returns True
+        mock_does_backend_support_onboarding.return_value = True
+        sequential = modulestore().get_item(sequential.location)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            course=self.course,
+        )
+        assert xblock_info["supports_onboarding"] is expected_value
 
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding

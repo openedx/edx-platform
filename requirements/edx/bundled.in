@@ -26,6 +26,8 @@
 https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
 
 pygments                            # Used to support colors in paver command output
+# i18n_tool is needed at build time for pulling translations
+edx-i18n-tools>=0.4.6               # Commands for developers and translators to extract, compile and validate translations
 
 ## Third party integrations
 algoliasearch                       # Algolia’s API client for indexed searching

@@ -33,18 +33,26 @@ function(
         },
 
         renderTagCount: function() {
+            if (this.model.get('is_tagging_feature_disabled')) {
+                return; // Tagging feature is disabled; don't initialize the tag count view.
+            }
             const contentId = this.model.get('id');
-            const tagCountsByUnit = this.model.get('tag_counts_by_unit')
-            const tagsCount = tagCountsByUnit !== undefined ? tagCountsByUnit[contentId] : 0
+            // Skip the course block since that is handled elsewhere in course_manage_tags
+            if (contentId.includes('@course')) {
+                return;
+            }
+            const tagCountsByBlock = this.model.get('tag_counts_by_block');
+            const tagsCount = tagCountsByBlock !== undefined ? tagCountsByBlock[contentId] : 0;
+            const tagCountElem = this.$(`.tag-count[data-locator="${contentId}"]`);
             var countModel = new TagCountModel({
                 content_id: contentId,
                 tags_count: tagsCount,
                 course_authoring_url: this.model.get('course_authoring_url'),
             }, {parse: true});
-            var tagCountView = new TagCountView({el: this.$('.tag-count'), model: countModel});
+            var tagCountView = new TagCountView({el: tagCountElem, model: countModel});
             tagCountView.setupMessageListener();
             tagCountView.render();
-            this.$('.tag-count').click((event) => {
+            tagCountElem.click((event) => {
                 event.preventDefault();
                 this.openManageTagsDrawer();
             });
@@ -453,6 +461,19 @@ function(
             }
         },
 
+        subsectionShareLinkXBlock: function() {
+            var modal = CourseOutlineModalsFactory.getModal('subsection_share_link', this.model, {
+                onSave: this.refresh.bind(this),
+                xblockType: XBlockViewUtils.getXBlockType(
+                    this.model.get('category'), this.parentView.model, true
+                )
+            });
+
+            if (modal) {
+                modal.show();
+            }
+        },
+
         /**
          * If the new "Actions" menu is enabled, most actions like Configure,
          * Duplicate, Move, Delete, etc. are moved into this menu. For this
@@ -500,6 +521,10 @@ function(
                     event.preventDefault();
                     this.highlightsXBlock();
                 }
+            }.bind(this));
+            element.find('.subsection-share-link-button').click(function(event) {
+                event.preventDefault();
+                this.subsectionShareLinkXBlock();
             }.bind(this));
             element.find('.copy-button').click((event) => {
                 event.preventDefault();

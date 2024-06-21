@@ -19,7 +19,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
-from django.db.transaction import atomic
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from edx_django_utils.monitoring import (
@@ -31,7 +30,7 @@ from edx_django_utils.monitoring import (
 from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization, OrganizationCourse
@@ -47,8 +46,13 @@ from cms.djangoapps.contentstore.courseware_index import (
     SearchIndexingError
 )
 from cms.djangoapps.contentstore.storage import course_import_export_storage
-from cms.djangoapps.contentstore.utils import delete_course  # lint-amnesty, pylint: disable=wrong-import-order
-from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
+from cms.djangoapps.contentstore.utils import (
+    IMPORTABLE_FILE_TYPES,
+    initialize_permissions,
+    reverse_usage_url,
+    translation_language,
+    delete_course
+)
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
@@ -61,21 +65,15 @@ from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTU
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
-from openedx.core.lib.blockstore_api import get_collection
-from openedx.core.lib.extract_tar import safetar_extractall
-from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider
-from xmodule.modulestore.xml_exporter import export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_library_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml
-
+from openedx.core.lib.extract_archive import safe_extractall
+from xmodule.contentstore.django import contentstore
+from xmodule.course_block import CourseFields
+from xmodule.exceptions import SerializationError
+from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError
+from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
+from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
@@ -480,7 +478,7 @@ def sync_discussion_settings(course_key, user):
 # lint-amnesty, pylint: disable=too-many-statements
 def import_olx(self, user_id, course_key_string, archive_path, archive_name, language):
     """
-    Import a course or library from a provided OLX .tar.gz archive.
+    Import a course or library from a provided OLX .tar.gz or .zip archive.
     """
     set_code_owner_attribute_from_module(__name__)
     current_step = 'Unpacking'
@@ -517,7 +515,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
     def file_is_supported():
         """Check if it is a supported file."""
-        file_is_valid = archive_name.endswith('.tar.gz')
+        file_is_valid = archive_name.endswith(IMPORTABLE_FILE_TYPES)
 
         if not file_is_valid:
             message = f'Unsupported file {archive_name}'
@@ -647,17 +645,14 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
     # try-finally block for proper clean up after receiving file.
     try:
-        tar_file = tarfile.open(temp_filepath)  # lint-amnesty, pylint: disable=consider-using-with
         try:
-            safetar_extractall(tar_file, (course_dir + '/'))
+            safe_extractall(temp_filepath, course_dir)
         except SuspiciousOperation as exc:
             with translation_language(language):
-                self.status.fail(UserErrors.UNSAFE_TAR_FILE)
-            LOGGER.error(f'{log_prefix}: Unsafe tar file')
+                self.status.fail(UserErrors.UNSAFE_ARCHIVE_FILE)
+            LOGGER.error(f'{log_prefix}: Unsafe archive file')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
-        finally:
-            tar_file.close()
 
         current_step = 'Verifying'
         self.status.set_state(current_step)
@@ -901,116 +896,6 @@ def _create_copy_content_task(v2_library_key, v1_library_key):
         v2_library_key, v1_library_key,
         use_course_key_as_block_id_suffix=False
     )
-
-
-def _create_metadata(v1_library_key, collection_uuid):
-    """instansiate an index for the V2 lib in the collection"""
-
-    store = modulestore()
-    v1_library = store.get_library(v1_library_key)
-    collection = get_collection(collection_uuid).uuid
-    # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
-    library_type = 'complex'
-    org = _parse_organization(v1_library.location.library_key.org)
-    slug = v1_library.location.library_key.library
-    title = v1_library.display_name
-    #  V1 libraries do not have descriptions.
-    description = ''
-    #  permssions & license are most restrictive.
-    allow_public_learning = False
-    allow_public_read = False
-    library_license = ''  # '' = ALL_RIGHTS_RESERVED
-    with atomic():
-        return v2contentlib_api.create_library(
-            collection,
-            library_type,
-            org,
-            slug,
-            title,
-            description,
-            allow_public_learning,
-            allow_public_read,
-            library_license
-        )
-
-
-@shared_task(time_limit=30)
-@set_code_owner_attribute
-def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
-    """
-    For a V1 Library, delete the matching v2 library, where the library is the result of the copy operation
-    This method relys on _create_metadata failling for LibraryAlreadyExists in order to obtain the v2 slug.
-    """
-    v1_library_key = CourseKey.from_string(v1_library_key_string)
-    v2_library_key = LibraryLocatorV2.from_string('lib:' + v1_library_key.org + ':' + v1_library_key.course)
-
-    try:
-        v2contentlib_api.delete_library(v2_library_key)
-        return {
-            "v1_library_id": v1_library_key_string,
-            "v2_library_id": v2_library_key,
-            "status": "SUCCESS",
-            "msg": None
-        }
-    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
-        return {
-            "v1_library_id": v1_library_key_string,
-            "v2_library_id": v2_library_key,
-            "status": "FAILED",
-            "msg": f"Exception: {v2_library_key} did not delete: {error}"
-        }
-
-
-@shared_task(time_limit=30)
-@set_code_owner_attribute
-def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
-    """
-    write the metadata, permissions, and content of a v1 library into a v2 library in the given collection.
-    """
-
-    v1_library_key = CourseKey.from_string(v1_library_key_string)
-
-    LOGGER.info(f"Copy Library task created for library: {v1_library_key}")
-
-    try:
-        v2_library_metadata = _create_metadata(v1_library_key, collection_uuid)
-
-    except v2contentlib_api.LibraryAlreadyExists:
-        return {
-            "v1_library_id": v1_library_key_string,
-            "v2_library_id": None,
-            "status": "FAILED",
-            "msg": f"Exception: LibraryAlreadyExists {v1_library_key_string} aleady exists"
-        }
-
-    try:
-        _create_copy_content_task(v2_library_metadata.key, v1_library_key)
-    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
-        return {
-            "v1_library_id": v1_library_key_string,
-            "v2_library_id": str(v2_library_metadata.key),
-            "status": "FAILED",
-            "msg":
-            f"Could not import content from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
-        }
-
-    try:
-        copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library_key)
-    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
-        return {
-            "v1_library_id": v1_library_key_string,
-            "v2_library_id": str(v2_library_metadata.key),
-            "status": "FAILED",
-            "msg":
-            f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
-        }
-
-    return {
-        "v1_library_id": v1_library_key_string,
-        "v2_library_id": str(v2_library_metadata.key),
-        "status": "SUCCESS",
-        "msg": None
-    }
 
 
 @shared_task(time_limit=30)

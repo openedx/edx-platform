@@ -6,15 +6,15 @@ import pytest
 import json
 import logging
 from contextlib import contextmanager
+from unittest import mock
+from unittest.mock import ANY, Mock, patch
 
 import ddt
-import mock
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test.client import RequestFactory
 from django.urls import reverse
 from eventtracking.processors.exceptions import EventEmissionExit
-from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.signals import FORUM_THREAD_CREATED, FORUM_THREAD_RESPONSE_CREATED, FORUM_RESPONSE_COMMENT_CREATED
 
@@ -399,6 +399,7 @@ class ViewsQueryCountTestCase(
         Decorates test methods to count mongo and SQL calls for a
         particular modulestore.
         """
+
         def inner(self, default_store, block_count, mongo_calls, sql_queries, *args, **kwargs):
             with modulestore().default_store(default_store):
                 self.set_up_course(block_count=block_count)
@@ -409,7 +410,7 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 8, 43),
+        (ModuleStoreEnum.Type.split, 3, 8, 42),
     )
     @ddt.unpack
     @count_queries
@@ -417,7 +418,7 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 6, 42),
+        (ModuleStoreEnum.Type.split, 3, 6, 41),
     )
     @ddt.unpack
     @count_queries
@@ -794,7 +795,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -812,7 +814,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -871,7 +874,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -889,7 +893,8 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False,
+                               'merge_question_type_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }

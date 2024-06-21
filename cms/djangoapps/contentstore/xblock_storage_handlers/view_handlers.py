@@ -33,7 +33,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS, use_tagging_taxonomy_list_page
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.static_replace import replace_static_urls
@@ -44,10 +43,12 @@ from common.djangoapps.student.auth import (
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.xblock_utils import get_icon
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
@@ -78,6 +79,8 @@ from ..helpers import (
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
     is_unit,
+    xblock_embed_lms_url,
+    xblock_lms_url,
     xblock_primary_child_category,
     xblock_studio_url,
     xblock_type_display_name,
@@ -1070,6 +1073,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "published": published,
                 "published_on": published_on,
                 "studio_url": xblock_studio_url(xblock, parent_xblock),
+                "lms_url": xblock_lms_url(xblock),
+                "embed_lms_url": xblock_embed_lms_url(xblock),
                 "released_to_students": datetime.now(UTC) > xblock.start,
                 "release_date": release_date,
                 "visibility_state": visibility_state,
@@ -1089,6 +1094,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "group_access": xblock.group_access,
                 "user_partitions": user_partitions,
                 "show_correctness": xblock.show_correctness,
+                "hide_from_toc": xblock.hide_from_toc,
+                "enable_hide_from_toc_ui": settings.FEATURES.get("ENABLE_HIDE_FROM_TOC_UI", False),
+                "xblock_type": get_icon(xblock),
             }
         )
 
@@ -1137,9 +1145,15 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 rules_url = settings.PROCTORING_SETTINGS.get("LINK_URLS", {}).get(
                     "online_proctoring_rules", ""
                 )
-                supports_onboarding = does_backend_support_onboarding(
-                    course.proctoring_provider
-                )
+
+                # Only call does_backend_support_onboarding if not using an LTI proctoring provider
+                if course.proctoring_provider != 'lti_external':
+                    supports_onboarding = does_backend_support_onboarding(
+                        course.proctoring_provider
+                    )
+                # NOTE: LTI proctoring doesn't support onboarding. If that changes, this value should change to True.
+                else:
+                    supports_onboarding = False
 
                 proctoring_exam_configuration_link = None
                 if xblock.is_proctored_exam:
@@ -1203,7 +1217,10 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock_info["ancestor_has_staff_lock"] = False
         if tags is not None:
             xblock_info["tags"] = tags
-        if use_tagging_taxonomy_list_page():
+
+        # Don't show the "Manage Tags" option and tag counts if the DISABLE_TAGGING_FEATURE waffle is true
+        xblock_info["is_tagging_feature_disabled"] = is_tagging_feature_disabled()
+        if not is_tagging_feature_disabled():
             xblock_info["taxonomy_tags_widget_url"] = get_taxonomy_tags_widget_url()
             xblock_info["course_authoring_url"] = settings.COURSE_AUTHORING_MICROFRONTEND_URL
 
@@ -1217,10 +1234,18 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             else:
                 xblock_info["staff_only_message"] = False
 
-            # If the ENABLE_TAGGING_TAXONOMY_LIST_PAGE feature flag is enabled, we show the "Manage Tags" options
-            if use_tagging_taxonomy_list_page():
-                xblock_info["use_tagging_taxonomy_list_page"] = True
-                xblock_info["tag_counts_by_unit"] = _get_course_unit_tags(xblock.location.context_key)
+            if xblock_info["hide_from_toc"]:
+                xblock_info["hide_from_toc_message"] = True
+            elif child_info and child_info["children"]:
+                xblock_info["hide_from_toc_message"] = all(
+                    child["hide_from_toc_message"] for child in child_info["children"]
+                )
+            else:
+                xblock_info["hide_from_toc_message"] = False
+
+            if not is_tagging_feature_disabled():
+                xblock_info["course_tags_count"] = _get_course_tags_count(course.id)
+                xblock_info["tag_counts_by_block"] = _get_course_block_tags(xblock.location.context_key)
 
             xblock_info[
                 "has_partition_group_components"
@@ -1230,8 +1255,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         )
 
         if course_outline or is_xblock_unit:
-            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
-            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
+            # Previously, ENABLE_COPY_PASTE_UNITS was a feature flag; now it's always on.
+            xblock_info["enable_copy_paste_units"] = True
 
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
@@ -1240,16 +1265,29 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
 
 @request_cached()
-def _get_course_unit_tags(course_key) -> dict:
+def _get_course_tags_count(course_key) -> dict:
     """
-    Get the count of tags that are applied to each unit (vertical) in this course, as a dict.
+    Get the count of tags that are applied to the course as a dict: {course_key: tags_count}
+    """
+    if not course_key.is_course:
+        return {}  # Unsupported key type
+
+    return get_object_tag_counts(str(course_key), count_implicit=True)
+
+
+@request_cached()
+def _get_course_block_tags(course_key) -> dict:
+    """
+    Get the count of tags that are applied to each block in this course, as a dict.
     """
     if not course_key.is_course:
         return {}  # Unsupported key type, e.g. a library
-    # Create a pattern to match the IDs of the units, e.g. "block-v1:org+course+run+type@vertical+block@*"
-    vertical_key = course_key.make_usage_key('vertical', 'x')
-    unit_key_pattern = str(vertical_key).rsplit("@", 1)[0] + "@*"
-    return get_object_tag_counts(unit_key_pattern, count_implicit=True)
+
+    # Create a pattern to match the IDs of all blocks, e.g. "block-v1:org+course+run+type@*"
+    catch_all_key = course_key.make_usage_key("*", "x")
+    catch_all_key_pattern = str(catch_all_key).rsplit("@*", 1)[0] + "@*"
+
+    return get_object_tag_counts(catch_all_key_pattern, count_implicit=True)
 
 
 def _was_xblock_ever_exam_linked_with_external(course, xblock):
@@ -1345,6 +1383,7 @@ class VisibilityState:
     needs_attention = "needs_attention"
     staff_only = "staff_only"
     gated = "gated"
+    hide_from_toc = "hide_from_toc"
 
 
 def _compute_visibility_state(
@@ -1355,6 +1394,8 @@ def _compute_visibility_state(
     """
     if xblock.visible_to_staff_only:
         return VisibilityState.staff_only
+    elif xblock.hide_from_toc:
+        return VisibilityState.hide_from_toc
     elif is_unit_with_changes:
         # Note that a unit that has never been published will fall into this category,
         # as well as previously published units with draft content.
@@ -1362,22 +1403,27 @@ def _compute_visibility_state(
 
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = is_course_self_paced or datetime.now(UTC) > xblock.start
-    if child_info and child_info.get("children", []):
+    if child_info and child_info.get("children", []):  # pylint: disable=too-many-nested-blocks
         all_staff_only = True
         all_unscheduled = True
         all_live = True
+        all_hide_from_toc = True
         for child in child_info["children"]:
             child_state = child["visibility_state"]
             if child_state == VisibilityState.needs_attention:
                 return child_state
             elif not child_state == VisibilityState.staff_only:
                 all_staff_only = False
-                if not child_state == VisibilityState.unscheduled:
-                    all_unscheduled = False
-                    if not child_state == VisibilityState.live:
-                        all_live = False
+                if not child_state == VisibilityState.hide_from_toc:
+                    all_hide_from_toc = False
+                    if not child_state == VisibilityState.unscheduled:
+                        all_unscheduled = False
+                        if not child_state == VisibilityState.live:
+                            all_live = False
         if all_staff_only:
             return VisibilityState.staff_only
+        elif all_hide_from_toc:
+            return VisibilityState.hide_from_toc
         elif all_unscheduled:
             return (
                 VisibilityState.unscheduled

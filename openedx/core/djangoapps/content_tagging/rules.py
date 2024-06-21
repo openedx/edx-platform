@@ -10,6 +10,7 @@ import rules
 from organizations.models import Organization
 
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.role_helpers import get_course_roles, get_role_cache
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -20,10 +21,9 @@ from common.djangoapps.student.roles import (
 )
 
 from .models import TaxonomyOrg
-from .utils import get_context_key_from_key_string, TaggingRulesCache
+from .utils import check_taxonomy_context_key_org, get_context_key_from_key_string, rules_cache
 
 
-rules_cache = TaggingRulesCache()
 UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
 
 
@@ -80,17 +80,13 @@ def _get_course_user_orgs(user: UserType, orgs: list[Organization]) -> list[Orga
         """
         Returns True if the given user has the given role for the given org, OR for any courses in this org.
         """
-        # We use the user's RolesCache here to avoid re-querying.
-        # This cache gets populated the first time the user's permissions are checked (i.e when
-        # _get_content_creator_orgs is called).
-
-        # pylint: disable=protected-access
-        roles_cache = user._roles
-        assert roles_cache
+        # We use the user's RoleCache here to avoid re-querying.
+        roles_cache = get_role_cache(user)
+        course_roles = get_course_roles(user)
         return any(
             access_role.role in roles_cache.get_roles(role_name) and
             access_role.org == org_name
-            for access_role in roles_cache._roles
+            for access_role in course_roles
         )
 
     return [
@@ -278,6 +274,30 @@ def can_view_object_tag_objectid(user: UserType, object_id: str) -> bool:
 
 
 @rules.predicate
+def can_remove_object_tag_objectid(user: UserType, object_id: str) -> bool:
+    """
+    Everyone that has permission to edit the object should be able remove tags from it.
+    """
+    if not object_id:
+        raise ValueError("object_id must be provided")
+
+    if not user.is_authenticated:
+        return False
+
+    try:
+        context_key = get_context_key_from_key_string(object_id)
+        assert context_key.org
+    except (ValueError, AssertionError):
+        return False
+
+    if has_studio_write_access(user, context_key):
+        return True
+
+    object_org = rules_cache.get_orgs([context_key.org])
+    return bool(object_org) and is_org_admin(user, object_org)
+
+
+@rules.predicate
 def can_change_object_tag(
     user: UserType, perm_obj: oel_tagging.ObjectTagPermissionItem | None = None
 ) -> bool:
@@ -288,19 +308,12 @@ def can_change_object_tag(
     """
     if oel_tagging.can_change_object_tag(user, perm_obj):
         if perm_obj and perm_obj.taxonomy and perm_obj.object_id:
-            # can_change_object_tag_objectid already checked that object_id is valid and has an org,
-            # so these statements will not fail. But we need to assert to keep the type checker happy.
             try:
                 context_key = get_context_key_from_key_string(perm_obj.object_id)
-                assert context_key.org
-            except (ValueError, AssertionError):
+            except ValueError:
                 return False  # pragma: no cover
 
-            is_all_org, taxonomy_orgs = TaxonomyOrg.get_organizations(perm_obj.taxonomy)
-            if not is_all_org:
-                # Ensure the object_id's org is among the allowed taxonomy orgs
-                object_org = rules_cache.get_orgs([context_key.org])
-                return bool(object_org) and object_org[0] in taxonomy_orgs
+            return check_taxonomy_context_key_org(perm_obj.taxonomy, context_key)
 
         return True
     return False
@@ -347,3 +360,4 @@ rules.set_perm("oel_tagging.view_objecttag_taxonomy", can_view_object_tag_taxono
 rules.set_perm("oel_tagging.view_objecttag_objectid", can_view_object_tag_objectid)
 rules.set_perm("oel_tagging.change_objecttag_taxonomy", can_view_object_tag_taxonomy)
 rules.set_perm("oel_tagging.change_objecttag_objectid", can_change_object_tag_objectid)
+rules.set_perm("oel_tagging.remove_objecttag_objectid", can_remove_object_tag_objectid)

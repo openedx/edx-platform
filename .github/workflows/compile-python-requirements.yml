@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Target branch to create requirements PR against'
+        description: "Target branch to create requirements PR against"
         required: true
-        default: 'master'
+        default: "master"
         type: string
 
 defaults:
@@ -19,14 +19,14 @@ jobs:
 
     steps:
       - name: Check out target branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: "${{ inputs.branch }}"
 
       - name: Set up Python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.11"
 
       - name: Run make compile-requirements
         env:
@@ -44,7 +44,7 @@ jobs:
 
       - name: Make a PR
         id: make-pr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           branch: "${{ github.triggering_actor }}/compile-python-deps"
           branch-suffix: short-commit-hash

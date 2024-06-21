@@ -10,7 +10,7 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime
 from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse
 
-import bleach
+import nh3
 import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -53,6 +53,8 @@ from xmodule.x_module import STUDENT_VIEW
 
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.course import course_location_from_key
@@ -86,7 +88,12 @@ from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_stu
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
-from lms.djangoapps.courseware.toggles import course_is_invitation_only, courseware_mfe_search_is_enabled
+from lms.djangoapps.courseware.toggles import (
+    course_is_invitation_only,
+    courseware_mfe_search_is_enabled,
+    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
+    COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
+)
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -1543,7 +1550,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
         return HttpResponseBadRequest(
-            f"Rendering of the xblock view '{bleach.clean(requested_view, strip=True)}' is not supported."
+            f"Rendering of the xblock view '{nh3.clean(requested_view)}' is not supported."
         )
 
     staff_access = has_access(request.user, 'staff', course_key)
@@ -1970,13 +1977,14 @@ class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    'We plan to use this information to evaluate your application for financial assistance and to further develop our'
-    ' financial assistance program. Please note that while \nassistance is available in most courses that offer'
-    ' verified certificates, a few courses and programs are not eligible. You must complete a separate application'
-    ' \nfor each course you take. You may be approved for financial assistance five (5) times each year'
-    ' (based on 12-month period from you first approval). \nTo apply for financial assistance: \n'
-    '1. Enroll in the audit track for an eligible course that offers Verified Certificates \n2. Complete this'
-    '  application \n3. Check your email, your application will be reviewed in 3-4 business days'
+    'We plan to use this information to evaluate your application for financial assistance and to further develop our '
+    'financial assistance program. \nPlease note that while assistance is available in most courses that offer '
+    'verified certificates, a few courses and programs are not eligible. You must complete a separate application '
+    'for each course you take. You may be approved for financial assistance five (5) times each year '
+    '(based on 12-month period from you first approval). \nTo apply for financial assistance: '
+    '\n1. Enroll in the audit track for an eligible course that offers Verified Certificates. '
+    '\n2. Complete this application. '
+    '\n3. Check your email, please allow 4 weeks for your application to be processed.'
 )
 
 
@@ -2261,10 +2269,38 @@ def get_learner_username(learner_identifier):
 @api_view(['GET'])
 def courseware_mfe_search_enabled(request, course_id=None):
     """
-    Simple GET endpoint to expose whether the course may use Courseware Search.
+    Simple GET endpoint to expose whether the user may use Courseware Search
+    for a given course.
     """
-
+    enabled = False
     course_key = CourseKey.from_string(course_id) if course_id else None
+    user = request.user
 
-    payload = {"enabled": courseware_mfe_search_is_enabled(course_key)}
+    if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED'):
+        enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+        if (
+            auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
+            or (enrollment_mode in CourseMode.VERIFIED_MODES)
+        ):
+            enabled = True
+    else:
+        enabled = True
+
+    payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
     return JsonResponse(payload)
+
+
+@api_view(['GET'])
+def courseware_mfe_navigation_sidebar_toggles(request, course_id=None):
+    """
+    GET endpoint to return navigation sidebar toggles.
+    """
+    try:
+        course_key = CourseKey.from_string(course_id) if course_id else None
+    except InvalidKeyError:
+        return JsonResponse({"error": "Invalid course_id"})
+
+    return JsonResponse({
+        "enable_navigation_sidebar": COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR.is_enabled(course_key),
+        "always_open_auxiliary_sidebar": COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR.is_enabled(course_key),
+    })

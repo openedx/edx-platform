@@ -1,0 +1,8 @@
+-r base.txt
+
+moto<5.0   # moto==5.0 contains breaking changes. needs to be fixed separately.
+pytest
+requests_mock
+responses
+mock
+ddt

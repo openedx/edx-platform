@@ -10,7 +10,7 @@ from django.conf import settings
 
 def is_request_from_mobile_app(request):
     """
-    Returns whether the given request was made by an open edX mobile app,
+    Returns whether the given request was made by an Open edX mobile app,
     either natively or through the mobile web view.
 
     Args:

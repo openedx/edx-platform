@@ -8,15 +8,13 @@ from unittest.mock import patch
 from django.test import override_settings, LiveServerTestCase
 from django.http import HttpRequest
 from edx_toggles.toggles.testutils import override_waffle_flag
-from openedx_tagging.core.tagging.models import Tag, Taxonomy
+from openedx_tagging.core.tagging.models import Tag, Taxonomy, ObjectTag
 from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from openedx.core.lib.blockstore_api import create_collection
 from openedx.core.djangoapps.content_libraries.api import create_library, create_library_block, delete_library_block
-from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
 
 from .. import api
 from ..models.base import TaxonomyOrg
@@ -39,6 +37,7 @@ class LanguageTaxonomyTestMixin:
         create the taxonomy, simulating the effect of the following migrations:
             1. openedx_tagging.core.tagging.migrations.0012_language_taxonomy
             2. content_tagging.migrations.0007_system_defined_org_2
+            3. openedx_tagging.core.tagging.migrations.0015_taxonomy_export_id
         """
         super().setUp()
         Taxonomy.objects.get_or_create(id=-1, defaults={
@@ -48,6 +47,7 @@ class LanguageTaxonomyTestMixin:
             "allow_multiple": False,
             "allow_free_text": False,
             "visible_to_authors": True,
+            "export_id": "-1_languages",
             "_taxonomy_class": "openedx_tagging.core.tagging.models.system_defined.LanguageTaxonomy",
         })
         TaxonomyOrg.objects.get_or_create(taxonomy_id=-1, defaults={"org": None})
@@ -58,7 +58,6 @@ class LanguageTaxonomyTestMixin:
 class TestAutoTagging(  # type: ignore[misc]
     LanguageTaxonomyTestMixin,
     ModuleStoreTestCase,
-    BlockstoreAppTestMixin,
     LiveServerTestCase
 ):
     """
@@ -109,6 +108,23 @@ class TestAutoTagging(  # type: ignore[misc]
 
         # Check if the tags are created in the Course
         assert self._check_tag(course.id, LANGUAGE_TAXONOMY_ID, "Polski")
+
+    def test_only_tag_course_id(self):
+        # Create course
+        course = self.store.create_course(
+            self.orgA.short_name,
+            "test_course",
+            "test_run",
+            self.user_id,
+            fields={"language": "pl"},
+        )
+        object_id = str(course.id).replace('course-v1:', '')
+
+        # Check that only one object tag is created for the course
+        tags = ObjectTag.objects.filter(object_id__contains=object_id)
+        assert len(tags) == 1
+        assert tags[0].value == "Polski"
+        assert tags[0].object_id == str(course.id)
 
     @override_settings(LANGUAGE_CODE='pt-br')
     def test_create_course_invalid_language(self):
@@ -252,10 +268,8 @@ class TestAutoTagging(  # type: ignore[misc]
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
 
     def test_create_delete_library_block(self):
-        # Create collection and library
-        collection = create_collection("Test library collection")
+        # Create library
         library = create_library(
-            collection_uuid=collection.uuid,
             org=self.orgA,
             slug="lib_a",
             title="Library Org A",
@@ -281,10 +295,8 @@ class TestAutoTagging(  # type: ignore[misc]
 
     @override_waffle_flag(CONTENT_TAGGING_AUTO, active=False)
     def test_waffle_disabled_create_delete_library_block(self):
-        # Create collection and library
-        collection = create_collection("Test library collection 2")
+        # Create library
         library = create_library(
-            collection_uuid=collection.uuid,
             org=self.orgA,
             slug="lib_a2",
             title="Library Org A 2",
