@@ -44,12 +44,22 @@
       > div.table {
         display: table;
         width: 100%;
+
+        @include media-breakpoint-down(sm) {
+          display: flex;
+          flex-direction: column;
+        }
       }
 
       .intro {
         box-sizing: border-box;
 
         @include clearfix();
+
+        @include media-breakpoint-down(sm) {
+            width: auto;
+            order: 2;
+        }
 
         display: table-cell;
         vertical-align: middle;
@@ -127,6 +137,10 @@
           a.add-to-cart {
             @include button(shiny, $button-color);
 
+            @include media-breakpoint-down(md) {
+              width: 100%;
+            }
+
             box-sizing: border-box;
             border-radius: 3px;
             display: block;
@@ -189,6 +203,11 @@
             @include float(left);
             @include margin(1px, flex-gutter(8), 0, 0);
             @include transition(none);
+            @include media-breakpoint-down(md) {
+              width: 100%;
+              margin-right: 0;
+              margin-bottom: 10px;
+            }
 
             width: flex-grid(5, 8);
           }
@@ -212,6 +231,11 @@
         position: relative;
         width: flex-grid(4);
         z-index: 2;
+
+        @include media-breakpoint-down(sm) {
+          width: auto;
+          order: 1;
+        }
 
         .hero {
           border: 1px solid $border-color-3;
