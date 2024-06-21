@@ -121,7 +121,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
 
     is_author = _is_author(cc_content, context)
     editable_fields.update({
-        "voted": has_moderation_privilege or not is_author,
+        "voted": has_moderation_privilege or not is_author or is_staff_or_admin,
         "raw_body": has_moderation_privilege or is_author,
         "edit_reason_code": has_moderation_privilege and not is_author,
         "following": is_thread,
