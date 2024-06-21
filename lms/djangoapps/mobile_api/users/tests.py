@@ -773,7 +773,7 @@ class TestDiscussionCourseEnrollmentSerializer(UrlResetMixin, MobileAPITestCase,
 
 
 @ddt.ddt
-class UserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
+class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/{api_version}/users/<user_name>/enrollments_status/
     """

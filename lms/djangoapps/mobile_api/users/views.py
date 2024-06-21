@@ -14,7 +14,7 @@ from completion.utilities import get_key_to_last_completed_block
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in
 from django.db import transaction
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import dateparse
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
@@ -416,14 +416,6 @@ def my_user_info(request, api_version):
     return redirect("user-detail", api_version=api_version, username=request.user.username)
 
 
-class UserCourseEnrollmentsV4Pagination(DefaultPagination):
-    """
-    Pagination for `UserCourseEnrollments` API v4.
-    """
-    page_size = 5
-    max_page_size = 50
-
-
 @mobile_view(is_user=True)
 class UserEnrollmentsStatus(views.APIView):
     """
@@ -503,13 +495,11 @@ class UserEnrollmentsStatus(views.APIView):
         """
         Builds list with dictionaries with user's enrolments statuses.
         """
-        user_enrollments = CourseEnrollment.objects.filter(
-            user__username=username,
-            is_active=True,
-        )
+        user = get_object_or_404(User, username=username)
+        user_enrollments = CourseEnrollment.enrollments_for_user(user).select_related('course')
         mobile_available = [
             enrollment for enrollment in user_enrollments
-            if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
+            if is_mobile_available_for_user(user, enrollment.course_overview)
         ]
         enrollments_status = []
         for user_enrollment in mobile_available:
