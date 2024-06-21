@@ -176,15 +176,6 @@ code-annotations==1.8.0
     #   edx-toggles
 codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
-coreapi==2.3.3
-    # via
-    #   -r requirements/edx/base.txt
-    #   drf-yasg
-coreschema==0.0.4
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
-    #   drf-yasg
 crowdsourcehinter-xblock==0.7
     # via -r requirements/edx/base.txt
 cryptography==42.0.8
@@ -455,9 +446,8 @@ drf-jwt==1.19.2
     #   edx-drf-extensions
 drf-spectacular==0.27.2
     # via -r requirements/edx/base.txt
-drf-yasg==1.21.5
+drf-yasg==1.21.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-user-tasks
     #   edx-api-doc-tools
@@ -526,7 +516,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.20.2
+edx-enterprise==4.20.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -695,15 +685,10 @@ isodate==0.6.1
     # via
     #   -r requirements/edx/base.txt
     #   python3-saml
-itypes==1.2.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
 jinja2==3.1.4
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
-    #   coreschema
     #   sphinx
 jmespath==1.0.1
     # via
@@ -1118,6 +1103,7 @@ pyyaml==6.0.1
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   drf-spectacular
+    #   drf-yasg
     #   edx-django-release-util
     #   edx-i18n-tools
     #   sphinxcontrib-openapi
@@ -1144,7 +1130,6 @@ requests==2.32.3
     #   -r requirements/edx/base.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1174,14 +1159,6 @@ rpds-py==0.18.1
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.6
-    # via
-    #   -r requirements/edx/base.txt
-    #   drf-yasg
-ruamel-yaml-clib==0.2.8
-    # via
-    #   -r requirements/edx/base.txt
-    #   ruamel-yaml
 rules==3.4
     # via
     #   -r requirements/edx/base.txt
@@ -1381,7 +1358,6 @@ unicodecsv==0.14.1
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/base.txt
-    #   coreapi
     #   drf-spectacular
     #   drf-yasg
 urllib3==1.26.18

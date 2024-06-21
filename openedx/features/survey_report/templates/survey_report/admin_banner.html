@@ -1,7 +1,7 @@
 {% block survey_report_banner %}
 {% load static %}
 {% if show_survey_report_banner %}
-<div id="originalContent" style="border: 3px solid #06405d; margin-bottom: 50px; rgb(0 0 0 / 18%) 0px 3px 5px;">
+<div id="originalContent" style="border: 3px solid #06405d; margin-bottom: 50px; rgb(0 0 0 / 18%) 0px 3px 5px; display: none;">
   <div  style="background-color: #06405d;padding: 17px 37px;">
     <h1 style="margin: 0; color: #FFFF; font-weight: 600;">Join the Open edX Data Sharing Initiative and shape the future of learning</h1>
 </div>
@@ -15,6 +15,7 @@
    <button id="dismissButton" type="button" style="background-color:var(--close-button-bg); color: var(--button-fg); border: none; border-radius: 4px; padding: 10px 20px; margin-right: 10px; cursor: pointer;">Dismiss</button>
     <form id='survey_report_form' method="POST" action="/survey_report/generate_report" style="margin: 0; padding: 0;">
         {% csrf_token %}
+        <input type="hidden" id="userIdSurvey" value="{{ user.id }}">
         <button type="submit" style="background-color: #377D4D; color: var(--button-fg); border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">Send Report</button>
     </form>
 </div>
