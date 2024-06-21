@@ -1,0 +1,106 @@
+<%page args="section_data" expression_filter="h"/>
+
+<script>
+        var current_course_id = "${section_data['course_id']}"
+</script>
+
+
+        <div>
+
+		<table class = "attendance-report" id = "attendance-report">
+                                <thead>
+					<th>S.No</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+					%if 'session_records' in section_data['attendance_link'] and section_data['attendance_link']['session_records']:                        
+                                                %for i in section_data['attendance_link']['session_records']:
+                                                        <th>${i['description'] | n}</th>
+                                                %endfor
+					%endif
+                                </thead>
+                                <tbody>
+					<%
+                                            attendance_count = 1
+                                        %>
+                                        % if 'user_info' in section_data['attendance_link']: 
+                                        %for i in section_data['attendance_link']['user_info']:
+                                                %if i['sessions']:
+                                                        <%
+                                                                session_ids = [d['session_id'] for d in i['sessions'] if 'session_id' in d]
+                                                        %>
+                                                        <tr>    
+								<td>${attendance_count}</td>
+								<% attendance_count = attendance_count + 1 %>
+                                                                <td>${i['user_firstname']}</td>
+                                                                <td>${i['user_email']}</td>
+                                                               
+                                                                %for session_index in range(0, len(section_data['attendance_link']['session_records'])):
+                                                                                <%
+                                                                                try:
+                                                                                        current_session_id = section_data['attendance_link']['session_records'][session_index]['id']
+                                                                                        if current_session_id in session_ids:
+                                                                                                session_name = i['sessions'][session_ids.index(current_session_id)]['status_description']
+                                                                                        else:
+                                                                                                session_name = "-"
+                                                                                except Exception:
+                                                                                        session_name = "-"
+                                                                                %>
+                                                                        <td>${session_name}</td>
+                                                                %endfor
+                                                              
+                                                        </tr>
+                        	                %endif
+                                	%endfor
+					%endif
+                		</tbody>
+
+           		</table>
+	
+        </div>
+
+<script>
+function formatAttendanceReport() {
+  $('#attendance-report td').each(function () {
+    if ($(this).text().length > 23) {
+      $(this).html($(this).text().replace(/^(.{23})/, '$1<br>'));
+    }
+  });
+}
+$(document).ready(function() {
+	var course_id_name = current_course_id.replaceAll("+", "-")
+                course_id_name = course_id_name.replaceAll(":", "-")
+                var attendance_file_name = "attendance_" +  Math.floor(new Date() / 1000)
+
+	$('table#attendance-report').DataTable({
+                'dom': 'Bfrtip',
+		'buttons': [{'extend': 'excel', 'text': '<i class="fa fa-download" aria-hidden="true"></i>', 'title': attendance_file_name}],
+                'search' : false,
+		'pageLength' : 50,
+                'lengthChange': false,
+                'info': false,
+                'paging': true,
+                'iDisplaylength': 25,
+                'aLengthMenu': [[25, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+		'language': { search: '', searchPlaceholder: "Search" },
+		'bDestroy' : true
+                //'scrollX': true
+        });
+	var intervalId_table = setInterval(function () {
+                        $('#attendance-report_wrapper .dataTable').wrap('<div class="wrapper_table"></div>');
+                        clearInterval(intervalId_table);
+                }, 100);
+
+	$("input[type=search]").attr("placeholder", "Search"); //13-04-2022
+        $(".dataTables_filter label").contents().first()[0].textContent='';//13-04-2022
+        $(".dt-button").text("Download");
+        $(".dt-button").css("width","100px");
+	//email field in 2 lines
+		    formatAttendanceReport();
+                   $('.paginate_button').on('click', function () {
+                    formatAttendanceReport();
+                    });
+		    $('.attendance-report th').on('click', function () {
+                    formatAttendanceReport();
+                    });
+ });
+</script>

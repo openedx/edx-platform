@@ -1,0 +1,73 @@
+<%page args="section_data" expression_filter="h"/>
+<%
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+query_features = ['username', 'first_name', 'email'] 
+site_name = configuration_helpers.get_value("course_org_filter", "")
+if site_name == "EMIITK":
+	query_features = ["username", "first_name", "email", "designation", "organisation", "experience", "city", "country", "graduation", "graduation_stream", "post_graduation", "post_graduation_stream"]
+
+query_features_names = {'id': 'User ID', 'username': 'Student ID', 'name': 'Name', 'email': 'Email', 'first_name' :'Name', 'last_name' : 'Last Name', 'cohort' : "Cohort", "experience" : "Experience", "designation" : "Designation", "organisation" : "Organisation", "city" : "City", "country" : "Country", "graduation" : "Graduation", "graduation_stream" : "Graduation Stream", "post_graduation" : "Post Graduation", "post_graduation_stream" : "Post Graduation Stream"}
+%>
+
+
+<script>
+        var current_course_id = "${section_data['course_id']}"
+</script>
+
+%if section_data['students_data']:
+		<div class="running-tasks-container action-type-container" style="height:400px;">
+	
+				<table class='student_info_table' id='student_info_table'>
+					<thead>
+					<tr>
+				<th>S.No</th>
+							% for i in query_features:
+								<th> ${query_features_names[i]} </th>
+							% endfor
+					</tr>
+					</thead>
+			<tbody>
+			% for index, user in enumerate(section_data['students_data'], start = 1):
+				<tr>
+					<td>${index}</td>
+					% for i in query_features:
+						% if i in user and user[i] and user[i] != "None":
+							<td>${user[i]}</td>
+						% else:
+							<td>-</td>
+						% endif
+					% endfor
+				</tr>			
+			% endfor
+		</tbody>
+		</table>
+	<!-- </section> -->	
+	
+	</div>
+%else:
+	<p>Student data is not available</p>
+%endif
+
+<script>
+	$(document).ready(function() {
+		var course_id_name = current_course_id.replaceAll("+", "-")
+		course_id_name = course_id_name.replaceAll(":", "-")
+		var student_info_file_name = "student_info_"  +course_id_name + "_" + Math.floor(new Date() / 1000) 	
+		$('table#student_info_table').DataTable({
+			'dom': 'Bfrtip',
+			'buttons': [{'extend': 'excel', 'text': '<i class="fa fa-download" aria-hidden="true"></i>', 'title': student_info_file_name}],
+			'pageLength' : 50,
+			'search' : false,
+			'lengthChange': false,
+			'info': false,
+			'paging': true,
+			'iDisplaylength': 25,
+			'aLengthMenu': [[100, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+			//'scrollX': true
+		});
+		var intervalId_table = setInterval(function () {
+                        $('#student_info .dataTable').wrap('<div class="wrapper_table"></div>');
+                        clearInterval(intervalId_table);
+                }, 100);
+	}); 
+</script>
