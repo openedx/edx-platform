@@ -308,6 +308,9 @@ class RegisterAndEnrollStudents(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
+        """
+        Post method.
+        """
         if not configuration_helpers.get_value(
             'ALLOW_AUTOMATED_SIGNUPS',
             settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False),
@@ -348,12 +351,14 @@ class RegisterAndEnrollStudents(APIView):
                     general_errors.append({
                         'username': '', 'email': '',
                         'response': _(
-                            'Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
+                            'Make sure that the file you upload is in CSV format '
+                            'with no extraneous characters or rows.')
                     })
 
             except Exception:  # pylint: disable=broad-except
                 general_errors.append({
-                    'username': '', 'email': '', 'response': _('Could not read uploaded file.')
+                    'username': '', 'email': '',
+                    'response': _('Could not read uploaded file.')
                 })
             finally:
                 upload_file.close()
