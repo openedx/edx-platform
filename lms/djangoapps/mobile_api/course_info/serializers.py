@@ -13,7 +13,7 @@ from common.djangoapps.util.milestones_helpers import (
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
-from lms.djangoapps.courseware.courses import get_course_assignments
+from lms.djangoapps.courseware.courses import calculate_progress
 from lms.djangoapps.mobile_api.users.serializers import ModeSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
@@ -78,27 +78,11 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             for mode in course_modes
         ]
 
-    def get_course_progress(self, obj: 'CourseOverview') -> Dict[str, int]:  # noqa: F821  #here
+    def get_course_progress(self, obj: 'CourseOverview') -> Dict[str, int]:  # noqa: F821
         """
         Gets course progress calculated by course assignments.
         """
-        course_assignments = get_course_assignments(
-            obj.id,
-            self.context.get('user'),
-            include_without_due=True,
-        )
-
-        total_assignments_count = 0
-        assignments_completed = 0
-
-        if course_assignments:
-            total_assignments_count = len(course_assignments)
-            assignments_completed = len([assignment for assignment in course_assignments if assignment.complete])
-
-        return {
-            'total_assignments_count': total_assignments_count,
-            'assignments_completed': assignments_completed,
-        }
+        return calculate_progress(obj.id, self.context.get('user'))
 
 
 class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):

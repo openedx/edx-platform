@@ -906,7 +906,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertListEqual(response.data['primary']['course_assignments']['past_assignments'], [])
         self.assertListEqual(response.data['primary']['course_assignments']['future_assignments'], [])
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments', return_value=[])
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments', return_value=[])
     def test_course_progress_in_primary_enrollment_with_no_assignments(
         self,
         get_course_assignment_mock: MagicMock,
@@ -926,7 +926,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         'lms.djangoapps.mobile_api.users.serializers.CourseEnrollmentSerializerModifiedForPrimary'
         '.get_course_assignments'
     )
-    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
     def test_course_progress_in_primary_enrollment_with_assignments(
         self,
         get_course_assignment_mock: MagicMock,
@@ -952,7 +952,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('course_progress', response.data['primary'])
         self.assertDictEqual(response.data['primary']['course_progress'], expected_course_progress)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
     def test_course_progress_for_secondary_enrollments_no_query_param(
         self,
         get_course_assignment_mock: MagicMock,
@@ -968,7 +968,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for enrollment in response.data['enrollments']['results']:
             self.assertNotIn('course_progress', enrollment)
 
-    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
     def test_course_progress_for_secondary_enrollments_with_query_param(
         self,
         get_course_assignment_mock: MagicMock,
@@ -990,7 +990,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         'lms.djangoapps.mobile_api.users.serializers.CourseEnrollmentSerializerModifiedForPrimary'
         '.get_course_assignments'
     )
-    @patch('lms.djangoapps.mobile_api.users.serializers.get_course_assignments')
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
     def test_course_progress_for_secondary_enrollments_with_query_param_and_assignments(
         self,
         get_course_assignment_mock: MagicMock,

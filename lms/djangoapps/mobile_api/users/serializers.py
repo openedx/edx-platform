@@ -2,7 +2,6 @@
 Serializer for user API
 """
 
-from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
 from completion.exceptions import UnavailableCompletionData
@@ -17,8 +16,7 @@ from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
-from lms.djangoapps.courseware.courses import get_course_assignment_date_blocks, get_course_assignments
+from lms.djangoapps.courseware.courses import get_past_and_future_course_assignments, calculate_progress
 from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
 from lms.djangoapps.mobile_api.utils import API_V4
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
@@ -143,31 +141,9 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
 
         if 'course_progress' in self.context.get('requested_fields', []) and self.context.get('api_version') == API_V4:
-            data['course_progress'] = self.calculate_progress(instance)
+            data['course_progress'] = calculate_progress(instance.course_id, instance.user)
 
         return data
-
-    def calculate_progress(self, model: CourseEnrollment) -> Dict[str, int]:
-        """
-        Calculate the progress of the user in the course.
-        """
-        course_assignments = get_course_assignments(
-            model.course_id,
-            model.user,
-            include_without_due=True,
-        )
-
-        total_assignments_count = 0
-        assignments_completed = 0
-
-        if course_assignments:
-            total_assignments_count = len(course_assignments)
-            assignments_completed = len([assignment for assignment in course_assignments if assignment.complete])
-
-        return {
-            'total_assignments_count': total_assignments_count,
-            'assignments_completed': assignments_completed,
-        }
 
     class Meta:
         model = CourseEnrollment
@@ -250,37 +226,15 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
         """
         Returns the progress of the user in the course.
         """
-        return self.calculate_progress(model)
+        return calculate_progress(model.course_id, model.user)
 
     def get_course_assignments(self, model: CourseEnrollment) -> Dict[str, Optional[List[Dict[str, str]]]]:
         """
         Returns the future assignment data and past assignments data for the user in the course.
         """
-        assignments = get_course_assignment_date_blocks(
-            self.course,
-            model.user,
-            self.context.get('request'),
-            include_past_dates=True
+        next_assignments, past_assignments = get_past_and_future_course_assignments(
+            self.context.get('request'), model.user, self.course
         )
-        past_assignments = []
-        future_assignments = []
-
-        timezone = get_user_timezone_or_last_seen_timezone_or_utc(model.user)
-        for assignment in sorted(assignments, key=lambda x: x.date):
-            if assignment.date < datetime.now(timezone):
-                past_assignments.append(assignment)
-            else:
-                if not assignment.complete:
-                    future_assignments.append(assignment)
-
-        if future_assignments:
-            future_assignment_date = future_assignments[0].date.date()
-            next_assignments = [
-                assignment for assignment in future_assignments if assignment.date.date() == future_assignment_date
-            ]
-        else:
-            next_assignments = []
-
         return {
             'future_assignments': DateSummarySerializer(next_assignments, many=True).data,
             'past_assignments': DateSummarySerializer(past_assignments, many=True).data,
