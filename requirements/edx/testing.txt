@@ -6,6 +6,14 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
+-e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
+-e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
+    # via -r requirements/edx/base.txt
 acid-xblock==0.3.1
     # via -r requirements/edx/base.txt
 aiohttp==3.9.5
@@ -114,7 +122,7 @@ camel-converter[pydantic]==3.1.2
     # via
     #   -r requirements/edx/base.txt
     #   meilisearch
-celery==5.4.0
+celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -470,7 +478,10 @@ djangorestframework-xml==2.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 dnspython==2.6.1
-    # via email-validator
+    # via
+    #   -r requirements/edx/base.txt
+    #   email-validator
+    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/base.txt
 drf-jwt==1.19.2
@@ -643,12 +654,6 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/base.txt
-event-tracking==2.4.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
 execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.0
@@ -960,8 +965,6 @@ openedx-learning==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-openedx-mongodbproxy==0.2.0
-    # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1128,7 +1131,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/base.txt
 pymemcache==4.0.0
     # via -r requirements/edx/base.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

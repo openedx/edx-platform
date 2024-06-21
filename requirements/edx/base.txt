@@ -6,6 +6,17 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/github.in
+-e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/github.in
+    #   -r requirements/edx/kernel.in
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
+-e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
+    # via
+    #   -r requirements/edx/github.in
+    #   -r requirements/edx/kernel.in
 acid-xblock==0.3.1
     # via -r requirements/edx/kernel.in
 aiohttp==3.9.5
@@ -79,7 +90,7 @@ bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 camel-converter[pydantic]==3.1.2
     # via meilisearch
-celery==5.4.0
+celery==5.3.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -371,6 +382,10 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+dnspython==2.6.1
+    # via
+    #   -r requirements/edx/paver.txt
+    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
@@ -530,12 +545,6 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
-event-tracking==2.4.0
-    # via
-    #   -r requirements/edx/kernel.in
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
 fastavro==1.9.4
     # via openedx-events
 filelock==3.14.0
@@ -755,8 +764,6 @@ openedx-learning==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-openedx-mongodbproxy==0.2.0
-    # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -855,7 +862,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
