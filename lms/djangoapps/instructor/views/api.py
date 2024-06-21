@@ -1776,41 +1776,6 @@ class StudentProgressUrl(APIView):
         return Response(serializer.data)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@require_post_params(
-    unique_student_identifier="email or username of student for whom to get progress url"
-)
-@common_exceptions_400
-def get_student_progress_url(request, course_id):
-    """
-    Get the progress url of a student.
-    Limited to staff access.
-
-    Takes query parameter unique_student_identifier and if the student exists
-    returns e.g. {
-        'progress_url': '/../...'
-    }
-    """
-    course_id = CourseKey.from_string(course_id)
-    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
-
-    if course_home_mfe_progress_tab_is_active(course_id):
-        progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
-        if user is not None:
-            progress_url += '/{}/'.format(user.id)
-    else:
-        progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
-
-    response_payload = {
-        'course_id': str(course_id),
-        'progress_url': progress_url,
-    }
-    return JsonResponse(response_payload)
-
-
 @transaction.non_atomic_requests
 @require_POST
 @ensure_csrf_cookie
