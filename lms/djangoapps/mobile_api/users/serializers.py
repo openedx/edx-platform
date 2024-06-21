@@ -134,7 +134,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
             for mode in course_modes
         ]
 
-    def to_representation(self, instance: CourseEnrollment) -> 'OrderedDict':  # noqa: F821
+    def to_representation(self, instance: CourseEnrollment) -> 'OrderedDict':  # lint-amnesty, pylint: disable=unused-variable, line-too-long
         """
         Override the to_representation method to add the course_status field to the serialized data.
         """
@@ -205,7 +205,7 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
     @staticmethod
     def _get_last_visited_block_path_and_unit_name(
         block_id: str
-    ) -> Union[Tuple[None, None], Tuple[List['XBlock'], str]]:  # noqa: F821
+    ) -> Union[Tuple[None, None], Tuple[List['XBlock'], str]]:  # lint-amnesty, pylint: disable=unused-variable
         """
         Returns the path to the latest block and unit name visited by the current user.
         """

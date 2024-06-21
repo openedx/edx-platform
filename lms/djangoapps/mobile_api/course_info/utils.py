@@ -15,10 +15,10 @@ log = logging.getLogger(__name__)
 
 
 def calculate_progress(
-    user: 'User',  # noqa: F821
-    course_id: 'CourseLocator',  # noqa: F821
+    user: 'User',  # lint-amnesty, pylint: disable=unused-variable
+    course_id: 'CourseLocator',  # lint-amnesty, pylint: disable=unused-variable
     cache_timeout: int,
-) -> Optional[List[Union['ReadSubsectionGrade', 'ZeroSubsectionGrade']]]:  # noqa: F821
+) -> Optional[List[Union['ReadSubsectionGrade', 'ZeroSubsectionGrade']]]:  # lint-amnesty, pylint: disable=unused-variable, line-too-long
     """
     Calculate the progress of the user in the course.
     """

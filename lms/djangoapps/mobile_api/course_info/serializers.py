@@ -78,7 +78,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             for mode in course_modes
         ]
 
-    def get_course_progress(self, obj: 'CourseOverview') -> Dict[str, int]:  # noqa: F821
+    def get_course_progress(self, obj: CourseOverview) -> Dict[str, int]:
         """
         Gets course progress calculated by course assignments.
         """
