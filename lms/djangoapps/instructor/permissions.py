@@ -4,7 +4,7 @@ Permissions for the instructor dashboard and associated actions
 
 from bridgekeeper import perms
 from bridgekeeper.rules import is_staff
-from rest_framework.permissions import BasePermission # lint-amnesty, pylint:
+from rest_framework.permissions import BasePermission  # lint-amnesty, pylint:
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
 from openedx.core.lib.courses import get_course_by_id
@@ -74,6 +74,7 @@ perms[VIEW_DASHBOARD] = \
 ) | HasAccessRule('staff') | HasAccessRule('instructor')
 perms[VIEW_ENROLLMENTS] = HasAccessRule('staff')
 perms[VIEW_FORUM_MEMBERS] = HasAccessRule('staff')
+
 
 class InstructorPermission(BasePermission):
     """Generic permissions"""
