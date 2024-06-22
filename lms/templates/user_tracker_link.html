@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<link href="https://static.talentsprint.com/extras/table_template/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.jqueryui.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/scroller/2.2.0/css/scroller.jqueryui.min.css" rel="stylesheet">
+<style>
+table.dataTable>thead>tr>th{background-color:#0075bb;color: white;}
+h1{text-align: center;margin-top: 20px;font-size: 30px;font-weight: 700;margin-bottom: 50px;}
+h5{text-align: center;text-decoration: underline;font-weight: 700;color: #2b78e4;}
+img.logo{height: 60px;display: block;margin-top: 20px;margin-left: auto;margin-right: auto;}
+.dt-buttons {margin-bottom: 10px;}
+.dt-buttons.btn-group{float: left;margin-right: 2%;}
+.dataTables_filter {float: right!important;margin-top: 4px;margin-right: 0%;text-align: left;}
+.dataTables_wrapper .ui-toolbar {padding-right: 0px;}
+.dataTables_info {float: right;}
+.dataTables_length{float: right;margin-top: 4px;margin-left: 2%;}
+#example_info{display: none;}
+.ui-widget-header {border-bottom: none;background: none;color: black;border-left: none;border-top: none;border-right: none;}
+.table-striped>tbody>tr:nth-of-type(odd) {--bs-table-accent-bg: none;}
+.table-striped>tbody>tr:nth-of-type(odd) {background-color: white;}
+.table-striped>tbody>tr:nth-of-type(even){background-color: #eee;}
+.dataTables_wrapper .dataTables_filter input{outline-offset: 0px;width: 220px;border: 2px solid #aaa;}
+.dataTables_wrapper .dataTables_filter input {border-radius: 6px;}
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody{max-height: 360px!important;}
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody::-webkit-scrollbar {display: none;}
+div.dataTables_scrollHead table {border-top-left-radius: 10px;}
+div.dataTables_scrollHead th:first-child {border-top-left-radius: 10px;}
+div.dataTables_scrollHead th:last-child {border-top-right-radius: 10px;}
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody{border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;}
+table th, table td{text-align: center!important;}
+table th {vertical-align: middle;font-size: 17px}
+table td {font-size: 15px}
+button.btn.btn-success.dues{font-size: 12px;}
+td span svg{height: 20px;color: green;}
+table td:nth-child(4), table th:nth-child(4), table td:nth-child(5), table th:nth-child(5){
+  width: 169px;
+}
+.dataTables_scroll{
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-radius: 10px;
+}
+@media only screen and (max-width: 600px) {
+img.logo {height: 37px;display: block;margin-top: 20px;margin-left: auto;margin-right: auto;}
+div.container {width: 100%;max-width: 100%;}
+#myTable th{padding: 12px;}
+#myTable td {padding: 12px;}
+.table>thead {vertical-align: middle;}
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody{border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;border-bottom: none}
+table.dataTable>thead>tr>th, table.dataTable>thead>tr>td {padding: 8px 30px;font-size: 15px;}
+table.dataTable tbody th, table.dataTable tbody td {padding: 8px 5px;font-size: small;}
+h1{font-size: 20px;margin-bottom: 20px;}
+}
+#tableData td:nth-child(4), #tableData td:nth-child(5){
+    white-space: nowrap !important;
+}
+#tableData td:nth-child(1){
+    white-space: wrap !important;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <img class="logo" src="{% block program_image_url %}{{ program_image_url }}{% endblock program_image_url %}">
+  <h1>Assessment Tracker</h1>
+  {% block table %}
+<div
+    class="table-responsive table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl tableFixHead">
+    <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr class="header">
+                <th>Assessment</th>
+                <th>Module</th>
+                <th>Faculty</th>
+                <th>Release Date </th>
+                <th>Due Date </th>
+                <th>Submission Status</th>
+                <th>Evaluation Status</th>
+            </tr>
+        </thead>
+        <tbody id="tableData">
+            {% if data %}
+            {% for item in data %}
+	    {% if item.show_to_user %}
+            <tr>
+                <td>{{ item.assignment_name }}</td>
+                <td>{{ item.module }}</td>
+                <td>{{ item.faculty }}</td>
+                <td id="start_date_cell">{% if item.start_date == 'Jan 01, 1970 05:30 AM' or item.start_date == 'Jan 01, 1970 12:00 AM'%}-{% else %}{{ item.start_date }}{% endif %}</td>
+                <td id="due_date_cell">{% if item.due_date == 'Jan 01, 1970 05:30 AM' or item.due_date == 'Jan 01, 1970 12:00 AM'%}-{% else %}{{ item.due_date }}{% endif %}</td>
+                <td>{{ item.submission_status }}</td>
+                <td>{{ item.grade_status }}</td>
+            </tr>
+	    {% endif %}
+            {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock table %}
+</div>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.jqueryui.min.js"></script>
+<script src="https://cdn.datatables.net/scroller/2.2.0/js/dataTables.scroller.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script>
+        $(document).ready(function() {
+
+$.fn.dataTable.ext.type.order['moment-date-pre'] = function(data) {
+    if (data === '-') {
+        return ('1000-01-01T00:00:00');
+    } else {
+        return moment(data, 'MMM DD, YYYY h:mm A').format('YYYY-MM-DDTHH:mm:ss');
+    }
+};
+
+// Uncommented custom search functionality
+$.fn.dataTable.ext.search.push(function(settings, searchData, index, rowData, counter) {
+    var searchValue = settings.oPreviousSearch.sSearch.toLowerCase();
+
+    if (searchValue.includes(" ")) {
+        return searchData.join(' ').toLowerCase().includes(searchValue);
+    }
+
+    var searchTerms = searchValue.split(" ");
+    for (var i = 0; i < searchTerms.length; i++) {
+        var termFound = false;
+        for (var j = 0; j < searchData.length; j++) {
+            if (searchData[j].toLowerCase().includes(searchTerms[i])) {
+                termFound = true;
+                break;
+            }
+        }
+        if (!termFound) {
+            return false;
+        }
+    }
+    return true;
+});
+
+// DataTable initialization
+var table = new DataTable('#example', {
+    fixedHeader: true,
+    paging: false,
+    responsive: true,
+    deferRender: true,
+    scrollCollapse: false,
+    scroller: false,
+    scrollX: true,
+    language: {
+        search: "",
+        searchPlaceholder: "Search..."
+    },
+    columnDefs: [{
+        targets: 3,
+        type: 'moment-date',
+    }],
+    order: [[3, 'desc']]
+});
+
+// Search functionality on keyup
+$('#example_filter input').on('keyup', function() {
+    table.search(this.value).draw();
+});
+});
+var maxCharacters = 28;
+        $('table td:nth-child(1)').each(function () {
+            var text = $(this).text();
+            var words = text.split(' ');
+            for (var i = 0; i < words.length; i++) {
+                if (words[i].length > maxCharacters) {
+                    words[i] = words[i].substring(0, maxCharacters) + words[i].substring(maxCharacters);
+                    // Add a line break after every 28 characters
+                    words[i] = words[i].replace(/(.{28})/g, "$1<br>");
+                }
+            }
+            var wrappedText = words.join(' ');
+            $(this).html(wrappedText);
+        });
+</script>
+</body>
+</html>
+
+

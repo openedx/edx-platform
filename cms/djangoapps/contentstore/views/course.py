@@ -126,6 +126,8 @@ from ..utils import (
 )
 from .component import ADVANCED_COMPONENT_TYPES
 
+import requests
+
 log = logging.getLogger(__name__)
 User = get_user_model()
 

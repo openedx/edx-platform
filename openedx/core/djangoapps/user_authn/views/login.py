@@ -698,11 +698,11 @@ class LoginSessionView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
-    @method_decorator(ensure_csrf_cookie)
+    #@method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
-    @method_decorator(csrf_protect)
+    #@method_decorator(csrf_protect)
     def post(self, request, api_version):
         """Log in a user.
 
@@ -718,7 +718,7 @@ class LoginSessionView(APIView):
         """
         return login_user(request, api_version)
 
-    @method_decorator(sensitive_post_parameters("password"))
+    #@method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
