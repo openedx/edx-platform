@@ -125,7 +125,7 @@ class MasqueradeView(View):
             },
             'available': [
                 {
-                    'name': 'Staff',
+                    'name': 'Instructor',
                     'role': 'staff',
                 },
             ],
