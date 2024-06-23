@@ -62,7 +62,11 @@ import requests
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, FieldError
+from django.core.exceptions import (
+    ObjectDoesNotExist,
+    PermissionDenied,
+    FieldDoesNotExist,
+)
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
@@ -267,18 +271,21 @@ def get_libraries_for_user(user, org=None, library_type=None, text_search=None, 
 
     if order:
         order_query = 'learning_package__'
-        if '-' in order:
+        # If order starts with a -, that means order descending (default is ascending)
+        if order.startswith('-'):
             order_query = f"-{order_query}"
-            order = order.replace("-", "")
+            order = order[1:]
 
         try:
-            filtered_ordered = filtered.order_by(f"{order_query}{order}")
-            # Evaluate the queryset to check if order field is a valid,
-            # otherwise if it is invalid and the queryset gets evaluated downstream
-            # the exception raised will not be handled here
-            if str(filtered_ordered.query):
-                return filtered_ordered
-        except FieldError as e:
+            # Check if `order` passed in is a valid field. Since the queryset could be evaluated
+            # downstream (not here), adding a simple try/catch for the order_by wouldn't handle
+            # the error if it occured downstream. To prevent evaluating the queryset early just to check
+            # if it is valid, we perform the try/catch on the field itself instead
+
+            # lint-amnesty, pylint: disable=protected-access
+            ContentLibrary._meta.get_field('learning_package').related_model._meta.get_field(order)
+            return filtered.order_by(f"{order_query}{order}")
+        except FieldDoesNotExist as e:
             log.exception(f"Error ordering libraries by {order}: {e}")
 
     return filtered

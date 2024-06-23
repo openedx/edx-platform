@@ -199,7 +199,9 @@ class LibraryRootView(GenericAPIView):
             apidocs.query_parameter(
                 'order',
                 str,
-                description="The order in which the libraries are sorted",
+                description=(
+                    "Name of the content library field to sort the results by. Prefix with a '-' to sort descending."
+                ),
             ),
         ],
     )
