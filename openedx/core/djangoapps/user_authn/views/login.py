@@ -363,15 +363,13 @@ def _track_user_login(user, request):
             'MailChimp': False
         }
     )
-    register_intent = request.POST.get('register_intent') == 'true'
     segment.track(
         user.id,
         "edx.bi.user.account.authenticated",
         {
             'category': "conversion",
             'label': request.POST.get('course_id'),
-            'provider': None,
-            'register_intent': register_intent,
+            'provider': None
         },
     )
 
