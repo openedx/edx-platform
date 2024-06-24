@@ -1,10 +1,11 @@
 """
 Methods for exporting course data to XML
 """
-
+from __future__ import annotations
 
 import logging
 import os
+import typing as t
 from abc import abstractmethod
 from json import dumps
 
@@ -24,6 +25,7 @@ from xmodule.modulestore import LIBRARY_ROOT, EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+from xmodule.util.olx import write_xml_to_file
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -202,8 +204,8 @@ class CourseExportManager(ExportManager):
         return self.modulestore.get_course(self.courselike_key, depth=None, lazy=False)
 
     def process_root(self, root, export_fs):
-        with export_fs.open('course.xml', 'wb') as course_xml:
-            lxml.etree.ElementTree(root).write(course_xml, encoding='utf-8')
+        with export_fs.open('course.xml', 'w') as course_xml:
+            write_xml_to_file(root, course_xml)
 
     def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
         # Export the modulestore's asset metadata.
@@ -216,8 +218,8 @@ class CourseExportManager(ExportManager):
             # All asset types are exported using the "asset" tag - but their asset type is specified in each asset key.
             asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)
             asset_md.to_xml(asset)
-        with OSFS(asset_dir).open(AssetMetadata.EXPORTED_ASSET_FILENAME, 'wb') as asset_xml_file:
-            lxml.etree.ElementTree(asset_root).write(asset_xml_file, encoding='utf-8')
+        with OSFS(asset_dir).open(AssetMetadata.EXPORTED_ASSET_FILENAME, 'w') as asset_xml_file:
+            write_xml_to_file(asset_root, asset_xml_file)
 
         # export the static assets
         policies_dir = export_fs.makedir('policies', recreate=True)
@@ -344,9 +346,8 @@ class LibraryExportManager(ExportManager):
         called library.xml.
         """
         # Create the Library.xml file, which acts as the index of all library contents.
-        xml_file = export_fs.open(LIBRARY_ROOT, 'wb')
-        xml_file.write(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8'))
-        xml_file.close()
+        with export_fs.open(LIBRARY_ROOT, 'w') as xml_file:
+            write_xml_to_file(root, xml_file)
 
 
 def export_course_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
