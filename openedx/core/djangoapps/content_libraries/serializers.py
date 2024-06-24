@@ -58,14 +58,14 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
         request = self.context.get('request', None)
         if request is None:
             return False
+        
         user = request.user
-        can_edit_library = False
+
+        if not user:
+            return False
+
         library_obj = ContentLibrary.objects.get_by_key(obj.key)
-
-        if user:
-            can_edit_library = user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
-
-        return can_edit_library
+        return user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
 
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):
