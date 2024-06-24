@@ -370,7 +370,8 @@
         var RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$]*?)\$\$(.*)$/m,
             RE_INLINEMATH = /^([^\$]*?)\$([^\$]+?)\$(.*)$/m,
             ESCAPED_DOLLAR = '@@ESCAPED_D@@',
-            ESCAPED_BACKSLASH = '@@ESCAPED_B@@';
+            ESCAPED_BACKSLASH = '@@ESCAPED_B@@',
+            LATEX_SCRIPT = '\{javascript\:(.+?)\}';
 
         /**
          * Formats math and code chunks
@@ -417,6 +418,7 @@
                 return processor(('\\begin{' + $1 + '}') + $2 + ('\\end{' + $1 + '}'));
             });
             htmlString = htmlString.replace(new RegExp(ESCAPED_BACKSLASH, 'g'), '\\\\\\\\');
+            htmlString = htmlString.replace(new RegExp(LATEX_SCRIPT, 'g'), '{}');
             $div = edx.HtmlUtils.setHtml($('<div>'), edx.HtmlUtils.HTML(htmlString));
             $div.find('code').each(function(index, code) {
                 edx.HtmlUtils.setHtml(
