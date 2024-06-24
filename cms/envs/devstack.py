@@ -362,7 +362,7 @@ OPENEDX_TELEMETRY_FRONTEND_SCRIPTS = """
     // `site` refers to the Datadog site parameter of your organization
     // see https://docs.datadoghq.com/getting_started/site/
     site: 'datadoghq.com',
-    service: 'edx-edxapp-cms',
+    service: 'edx-edxapp-cms-sandbox',
     env: 'dev',
     // Specify a version number to identify the deployed version of your application in Datadog
     // version: '1.0.0', 
@@ -382,7 +382,7 @@ OPENEDX_TELEMETRY_FRONTEND_SCRIPTS = """
         site: 'datadoghq.com',
         forwardErrorsToLogs: true,
         sessionSampleRate: 100,
-        service: 'edx-edxapp-cms',
+        service: 'edx-edxapp-cms-sandbox',
         env: 'dev',
     })
 </script>
