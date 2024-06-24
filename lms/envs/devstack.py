@@ -580,7 +580,7 @@ OPENEDX_TELEMETRY_FRONTEND_SCRIPTS = """
     service: 'edx-edxapp-lms-sandbox',
     env: 'dev',
     // Specify a version number to identify the deployed version of your application in Datadog
-    // version: '1.0.0', 
+    version: '1.0.0', 
     sessionSampleRate: 100,
     sessionReplaySampleRate: 20,
     trackUserInteractions: true,
@@ -599,6 +599,7 @@ OPENEDX_TELEMETRY_FRONTEND_SCRIPTS = """
         sessionSampleRate: 100,
         service: 'edx-edxapp-lms-sandbox',
         env: 'dev',
+        version: '1.0.0', 
     })
 </script>
 """

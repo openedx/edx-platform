@@ -43,6 +43,7 @@ from common.djangoapps.student.models import CourseEnrollment
   <%static:js group='dashboard'/>
   <script type="text/javascript">
     $(document).ready(function() {
+      console.error('hahahahahahah!!!!');
       edx.dashboard.legacy.init({
         dashboard: "${reverse('dashboard') | n, js_escaped_string}",
         signInUser: "${reverse('signin_user') | n, js_escaped_string}",

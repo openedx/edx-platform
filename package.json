@@ -20,6 +20,7 @@
     "@babel/plugin-transform-object-assign": "^7.18.6",
     "@babel/preset-env": "^7.19.0",
     "@babel/preset-react": "7.18.6",
+    "@datadog/datadog-ci": "^2.38.1",
     "@edx/brand-edx.org": "^2.0.7",
     "@edx/edx-bootstrap": "1.0.4",
     "@edx/edx-proctoring": "^4.18.1",
