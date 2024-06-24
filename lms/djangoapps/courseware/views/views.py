@@ -1673,7 +1673,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             )
         except RenderXBlockStarted.PreventXBlockBlockRender as exc:
             log.info("Halted rendering block %s. Reason: %s", usage_key_string, exc.message)
-            return render_500()
+            return render_500(request)
         except RenderXBlockStarted.RenderCustomResponse as exc:
             log.info("Rendering custom exception for block %s. Reason: %s", usage_key_string, exc.message)
             context.update({
