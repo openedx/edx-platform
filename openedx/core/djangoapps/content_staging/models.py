@@ -8,11 +8,9 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.django.models import UsageKeyField
 from opaque_keys.edx.keys import LearningContextKey
+from opaque_keys.edx.django.models import UsageKeyField
 from openedx_learning.lib.fields import case_insensitive_char_field, MultiCollationTextField
-
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 from .data import CLIPBOARD_PURPOSE, StagedContentStatus
 
@@ -115,15 +113,6 @@ class UserClipboard(models.Model):
     def source_context_key(self) -> LearningContextKey:
         """ Get the context (course/library) that this was copied from """
         return self.source_usage_key.context_key
-
-    def get_source_context_title(self) -> str:
-        """ Get the title of the source context, if any """
-        if self.source_context_key.is_course:
-            course_overview = get_course_overview_or_none(self.source_context_key)
-            if course_overview:
-                return course_overview.display_name_with_default
-        # Just return the ID as the name, if it's empty or is not a course.
-        return str(self.source_context_key)
 
     def clean(self):
         """ Check that this model is being used correctly. """

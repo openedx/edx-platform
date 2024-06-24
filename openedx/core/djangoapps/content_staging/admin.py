@@ -28,7 +28,7 @@ class UserClipboardAdmin(admin.ModelAdmin):
     """ Admin config for UserClipboard """
     list_display = ('user', 'content_link', 'source_usage_key', 'get_source_context_title')
     search_fields = ('user__username', 'source_usage_key', 'content__display_name')
-    readonly_fields = ('source_context_key', 'get_source_context_title')
+    readonly_fields = ('source_context_key',)
 
     @admin.display(description='Content')
     def content_link(self, obj):
