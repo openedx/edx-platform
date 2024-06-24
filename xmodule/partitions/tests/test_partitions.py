@@ -14,7 +14,6 @@ from stevedore.extension import Extension, ExtensionManager
 
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from xmodule.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
     USER_PARTITION_SCHEME_NAMESPACE,
     Group,
     NoSuchUserPartitionGroupError,
