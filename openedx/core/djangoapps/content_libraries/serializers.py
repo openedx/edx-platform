@@ -58,7 +58,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
         request = self.context.get('request', None)
         if request is None:
             return False
-        
+
         user = request.user
 
         if not user:
