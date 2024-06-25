@@ -609,10 +609,7 @@ def get_course_assignments(course_key, user, include_access=False, include_witho
             due = block_data.get_xblock_field(subsection_key, 'due')
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
 
-            if not due and include_without_due:
-                due = now + timedelta(days=1000)
-
-            if due and graded:
+            if (due or include_without_due) and graded:
                 first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(
                     subsection_key, 'contains_gated_content', False)
@@ -629,7 +626,11 @@ def get_course_assignments(course_key, user, include_access=False, include_witho
                 else:
                     complete = False
 
-                past_due = not complete and due < now
+                if due:
+                    past_due = not complete and due < now
+                else:
+                    past_due = False
+                    due = None
                 assignments.append(_Assignment(
                     subsection_key, title, url, due, contains_gated_content,
                     complete, past_due, assignment_type, None, first_component_block_id
