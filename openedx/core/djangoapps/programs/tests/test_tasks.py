@@ -602,16 +602,6 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         assert mock_exception.called
         assert not mock_post_course_certificate.called
 
-    def test_award_course_cert_not_called_if_certificate_not_found(self, mock_post_course_certificate):
-        """
-        Test that the post method is never called if the certificate doesn't exist for the user and course
-        """
-        self.certificate.delete()
-        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
-            tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
-        assert mock_exception.called
-        assert not mock_post_course_certificate.called
-
     def test_award_course_cert_not_called_if_course_overview_not_found(self, mock_post_course_certificate):
         """
         Test that the post method is never called if the CourseOverview isn't found
@@ -622,6 +612,32 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
             tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
         assert mock_exception.called
         assert not mock_post_course_certificate.called
+
+    def test_award_course_cert_not_called_if_certificate_not_found(self, mock_post_course_certificate):
+        """
+        Test that the post method is never called if the certificate doesn't exist for the user and course
+        """
+        self.certificate.delete()
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
+            tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
+        assert mock_exception.called
+        assert not mock_post_course_certificate.called
+
+    def test_award_course_cert_not_called_if_course_run_key_is_bad(self, mock_post_course_certificate):
+        """
+        Test that the post method is never called if the course run key is invalid
+        """
+        bad_course_run_key = "I/Am/The/Keymaster"
+        expected_message = (
+            f"Failed to award course certificate for user {self.student.id} for course "
+            f"{bad_course_run_key}. Reason: Failed to determine course key"
+        )
+        with LogCapture(level=logging.WARNING) as log_capture:
+            tasks.award_course_certificate.delay(self.student.username, bad_course_run_key).get()
+            assert not mock_post_course_certificate.called
+            log_capture.check_present(
+                ("openedx.core.djangoapps.programs.tasks", "WARNING", expected_message),
+            )
 
     def test_award_course_cert_not_called_if_certificated_not_verified_mode(self, mock_post_course_certificate):
         """
@@ -1041,7 +1057,8 @@ class UpdateCertificateVisibleDatesOnCourseUpdateTestCase(CredentialsApiConfigMi
         exception when the max number of retries has reached.
         """
         with pytest.raises(MaxRetriesExceededError):
-            tasks.update_certificate_visible_date_on_course_update(self.course.id)  # pylint: disable=no-value-for-parameter
+            # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_visible_date_on_course_update(self.course.id)
 
     def test_update_visible_dates(self):
         """
@@ -1056,7 +1073,8 @@ class UpdateCertificateVisibleDatesOnCourseUpdateTestCase(CredentialsApiConfigMi
         self.credentials_api_config.enable_learner_issuance = True
 
         with mock.patch(f"{TASKS_MODULE}.award_course_certificate.delay") as award_course_cert:
-            tasks.update_certificate_visible_date_on_course_update(self.course.id)  # pylint: disable=no-value-for-parameter
+            # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_visible_date_on_course_update(self.course.id)
 
         assert award_course_cert.call_count == 3
 
@@ -1108,7 +1126,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
         )
 
         with pytest.raises(MaxRetriesExceededError):
-            tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+            # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_available_date_on_course_update(course_overview.id)
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
     def test_update_certificate_available_date_instructor_paced_cdb_early_no_info(self, mock_update):
@@ -1134,7 +1153,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), None)
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
@@ -1159,7 +1179,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), str(self.end_date))
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
@@ -1187,7 +1208,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), str(certificate_available_date))
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
@@ -1219,7 +1241,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), None)
 
     def test_update_certificate_available_date_no_course_overview(self):
@@ -1237,7 +1260,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
         self._update_credentials_api_config(True)
 
         with LogCapture(level=logging.WARNING) as log_capture:
-            tasks.update_certificate_available_date_on_course_update(bad_course_run_key)  # pylint: disable=no-value-for-parameter
+            # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_available_date_on_course_update(bad_course_run_key)
 
         log_capture.check_present(
             ("openedx.core.djangoapps.programs.tasks", "WARNING", expected_message),

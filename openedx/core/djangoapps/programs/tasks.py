@@ -290,7 +290,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
             "Task award_program_certificates cannot be executed, use of the Credentials service is disabled by config"
         )
         LOGGER.warning(error_msg)
-        raise MaxRetriesExceededError(f"Failed to award a program certificate to user {username}. Reason: {error_msg}")
+        raise MaxRetriesExceededError(f"Failed to award a program certificate. Reason: {error_msg}")
 
     try:
         student = User.objects.get(username=username)
@@ -492,9 +492,7 @@ def award_course_certificate(self, username, course_run_key):
             "Task award_course_certificate cannot be executed when credentials issuance is disabled in API config"
         )
         LOGGER.warning(error_msg)
-        raise MaxRetriesExceededError(
-            f"Failed to award course certificate for user {username} for course {course_run_key}. Reason: {error_msg}"
-        )
+        raise MaxRetriesExceededError(f"Failed to award course certificate. Reason: {error_msg}")
 
     try:
         user = User.objects.get(username=username)
@@ -510,9 +508,10 @@ def award_course_certificate(self, username, course_run_key):
         course_key = CourseKey.from_string(course_run_key)
     except InvalidKeyError as exc:
         error_msg = "Failed to determine course key"
-        raise MaxRetriesExceededError(
-            f"Failed to award course certificate for user {username} for course {course_run_key}. Reason: {error_msg}"
-        ) from exc
+        LOGGER.warning(
+            f"Failed to award course certificate for user {user.id} for course {course_run_key}. Reason: {error_msg}"
+        )
+        return
 
     # Get the cert for the course key and username if it's both passing and available in professional/verified
     try:
@@ -522,7 +521,7 @@ def award_course_certificate(self, username, course_run_key):
         )
     except GeneratedCertificate.DoesNotExist:
         LOGGER.warning(
-            f"Task award_course_certificate was called for user {user} in course run {course_key} but this learner "
+            f"Task award_course_certificate was called for user {user.id} in course run {course_key} but this learner "
             "has not earned a course certificate in this course run"
         )
         return
@@ -537,20 +536,20 @@ def award_course_certificate(self, username, course_run_key):
         error_msg = f"Failed to determine course mode certificate eligibility for {certificate}."
         LOGGER.error(error_msg)
         raise MaxRetriesExceededError(
-            f"Failed to award course certificate for user {username} for course {course_run_key}. Reason: {error_msg}"
+            f"Failed to award course certificate for user {user.id} for course {course_run_key}. Reason: {error_msg}"
         ) from exc
 
     course_overview = get_course_overview_or_none(course_key)
     if not course_overview:
         LOGGER.warning(
-            f"Task award_course_certificate was called for user {user} in course {course_key} but no course "
+            f"Task award_course_certificate was called for user {user.id} in course {course_key} but no course "
             "overview could be retrieved for the course run"
         )
         return
 
     visible_date = available_date_for_certificate(course_overview, certificate)
     LOGGER.info(
-        f"Task award_course_certificate will award a course certificate to user {user} in course run "
+        f"Task award_course_certificate will award a course certificate to user {user.id} in course run "
         f"{course_key} with a visible date of {visible_date}"
     )
 
@@ -558,7 +557,7 @@ def award_course_certificate(self, username, course_run_key):
     try:
         date_override = certificate.date_override.date
         LOGGER.info(
-            f"Task award_course_certificate will award a course certificate to user {user} in course run "
+            f"Task award_course_certificate will award a course certificate to user {user.id} in course run "
             f"{course_key} with an override date of {date_override}"
         )
     except ObjectDoesNotExist:
@@ -579,11 +578,11 @@ def award_course_certificate(self, username, course_run_key):
     except Exception as exc:
         error_msg = f"Failed to post course certificate to be awarded for user {user}."
         raise MaxRetriesExceededError(
-            f"Failed to award course certificate for user {username} for course {course_run_key}. Reason: {error_msg}"
+            f"Failed to award course certificate for user {user.id} for course {course_run_key}. Reason: {error_msg}"
         ) from exc
 
     # Successfully posted the cert to credentials
-    LOGGER.info(f"Awarded a course certificate to user {user} in course run {course_key}")
+    LOGGER.info(f"Awarded a course certificate to user {user.id} in course run {course_key}")
 
 
 @shared_task(
@@ -620,9 +619,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
             "Task revoke_program_certificates cannot be executed, use of the Credentials service is disabled by config"
         )
         LOGGER.warning(error_msg)
-        raise MaxRetriesExceededError(
-            f"Failed to revoke program certificate for user {username} for course {course_key}. Reason: {error_msg}"
-        )
+        raise MaxRetriesExceededError(f"Failed to revoke program certificate. Reason: {error_msg}")
 
     try:
         student = User.objects.get(username=username)
@@ -653,7 +650,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
         )
         LOGGER.exception(error_msg)
         raise MaxRetriesExceededError(
-            f"Failed to revoke program certificate for user {username} for course {course_key}. Reason: {error_msg}"
+            f"Failed to revoke program certificate for user {student.id} for course {course_key}. Reason: {error_msg}"
         ) from exc
 
     if program_uuids_to_revoke:
@@ -666,7 +663,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
             LOGGER.exception(error_msg)
             # Stil retryable because a misconfiguration could be fixed
             raise MaxRetriesExceededError(
-                f"Failed to revoke program certificate for user {username} for course {course_key}. Reason: {exc}"
+                f"Failed to revoke program certificate for user {student.id} for course {course_key}. Reason: {exc}"
             ) from exc
 
         failed_program_certificate_revoke_attempts = []
@@ -688,7 +685,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
                     )
                     LOGGER.warning(error_msg)
                     raise MaxRetriesExceededError(
-                        f"Failed to revoke program certificate for user {username}. Reason: {error_msg}"
+                        f"Failed to revoke program certificate for user {student.id} Reason: {error_msg}"
                     ) from exc
                 else:
                     LOGGER.warning(
@@ -712,7 +709,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
                 f"{failed_program_certificate_revoke_attempts}"
             )
             raise MaxRetriesExceededError(
-                f"Failed to revoke program certificate for user {username} for course {course_key}. Reason: {error_msg}"
+                f"Failed to revoke program certificate for user {student.id} for course {course_key}. Reason: {error_msg}"
             )
     else:
         LOGGER.info(f"No program certificates to revoke from user {student}")
