@@ -5,7 +5,7 @@ courseware.
 
 import logging
 from collections import defaultdict, namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import six
 import pytz
