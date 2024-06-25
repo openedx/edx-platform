@@ -531,6 +531,10 @@ def award_course_certificate(self, username, course_run_key):
             certificate.mode not in CourseMode.CERTIFICATE_RELEVANT_MODES
             and not CourseMode.is_eligible_for_certificate(certificate.mode)
         ):
+            LOGGER.warning(
+                f"Task award_course_certificate was called for user {user.id} in course run {course_key} but this course "
+                "has an ineligible mode of {certificate.mode} for a certificate on this instance."
+            )
             return
     except Exception as exc:
         error_msg = f"Failed to determine course mode certificate eligibility for {certificate}."
