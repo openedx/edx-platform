@@ -52,7 +52,8 @@ query_features_names = {'id': 'User ID', 'username': 'Student ID', 'name': 'Name
 	$(document).ready(function() {
 		var course_id_name = current_course_id.replaceAll("+", "-")
 		course_id_name = course_id_name.replaceAll(":", "-")
-		var student_info_file_name = "student_info_"  +course_id_name + "_" + Math.floor(new Date() / 1000) 	
+		//var student_info_file_name = "student_info_"  +course_id_name + "_" + Math.floor(new Date() / 1000) 	
+		var student_info_file_name = "student_info_" + Math.floor(new Date() / 1000) 	
 		$('table#student_info_table').DataTable({
 			'dom': 'Bfrtip',
 			'buttons': [{'extend': 'excel', 'text': '<i class="fa fa-download" aria-hidden="true"></i>', 'title': student_info_file_name}],
