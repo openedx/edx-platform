@@ -194,6 +194,7 @@ class LibraryXBlockMetadata:
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
+    version_num = attr.ib(type=int)
     display_name = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     tags_count = attr.ib(0)
@@ -210,7 +211,8 @@ class LibraryXBlockMetadata:
                 component.local_key,
             ),
             display_name=component.versioning.draft.title,
-            has_unpublished_changes=component.versioning.has_unpublished_changes
+            has_unpublished_changes=component.versioning.has_unpublished_changes,
+            version_num=component.versioning.draft.version_num,
         )
 
 
@@ -651,6 +653,7 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
         usage_key=usage_key,
         display_name=draft_version.title,
         has_unpublished_changes=(draft_version != published_version),
+        version_num=draft_version.version_num,
     )
 
 
