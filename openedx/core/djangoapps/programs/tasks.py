@@ -252,7 +252,7 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     response.raise_for_status()
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 @shared_task(
     bind=True,
     ignore_result=True,
@@ -326,7 +326,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
         error_msg = f"Failed to determine program certificates to be awarded for user {student}: {exc}"
         LOGGER.exception(error_msg)
         raise MaxRetriesExceededError(
-            f"Failed to award a program certificate to user {username}. Reason: {error_msg}"
+            f"Failed to award a program certificate to user {student.id}. Reason: {error_msg}"
         ) from exc
 
     # For each completed program for which the student doesn't already have a certificate, award one now.
@@ -345,7 +345,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
             LOGGER.exception(error_msg)
             # A misconfiguration could be fixed; let celery retry.
             raise MaxRetriesExceededError(
-                f"Failed to award a program certificate to user {username}. Reason: {error_msg}"
+                f"Failed to award a program certificate to user {student.id}. Reason: {error_msg}"
             ) from exc
 
         failed_program_certificate_award_attempts = []
@@ -372,7 +372,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                     )
                     LOGGER.warning(error_msg)
                     raise MaxRetriesExceededError(
-                        f"Failed to award a program certificate to user {username}. Reason: {error_msg}"
+                        f"Failed to award a program certificate to user {student.id}. Reason: {error_msg}"
                     ) from exc
                 else:
                     LOGGER.warning(
@@ -397,7 +397,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                 f"{failed_program_certificate_award_attempts}"
             )
             raise MaxRetriesExceededError(
-                f"Failed to award a program certificate to user {username}. Reason: {error_msg}"
+                f"Failed to award a program certificate to user {student.id}. Reason: {error_msg}"
             )
     else:
         LOGGER.warning(f"User {student} is not eligible for any new program certificates")
