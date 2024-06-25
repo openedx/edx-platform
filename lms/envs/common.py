@@ -93,6 +93,16 @@ LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
+# Clickjacking protection can be disabled by setting this to 'ALLOW' or adjusted by setting this to 'SAMEORIGIN'.
+# It is not advised to set this to 'ALLOW' without a Content Security Policy header.
+X_FRAME_OPTIONS = 'DENY'
+# You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
+# Content Security Policy in place.
+# SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
+X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'ALLOW'], ['.*/xblock/.*', 'ALLOW']]
+# X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'ALLOW']]
+
+
 # Features
 FEATURES = {
     # .. toggle_name: FEATURES['DISPLAY_DEBUG_INFO_TO_STAFF']
@@ -2249,10 +2259,121 @@ FOOTER_BROWSER_CACHE_MAX_AGE = 5 * 60
 CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 ################################# Middleware ###################################
+CSP_STATIC_ENFORCE = "default-src 'self' 'unsafe-inline'; style-src 'https://fonts.googleapis.com'; frame-ancestors 'self' http://localhost:2000"
+
+import re
+
+def _load_headers() -> dict:
+    from django.conf import settings
+    """
+    Return a dict of headers to append to every response, based on settings.
+    """
+    # .. setting_name: CSP_STATIC_ENFORCE
+    # .. setting_default: None
+    # .. setting_description: Content-Security-Policy header to attach to all responses.
+    #   This should include everything but the ``report-to`` or ``report-uri`` clauses; those
+    #   will be appended automatically according to the ``CSP_STATIC_REPORTING_NAME`` and
+    #   ``CSP_STATIC_REPORTING_URI`` settings. Newlines are permitted and will be replaced with spaces.
+    #   A trailing `;` is also permitted.
+    # .. setting_warning: Setting the CSP header to too strict a value can cause your pages to
+    #   break. It is strongly recommended that deployers start by using ``CSP_STATIC_REPORT_ONLY`` (along
+    #   with the reporting settings) and only move or copy the policies into ``CSP_STATIC_ENFORCE`` after
+    #   confirming that the received CSP reports only represent false positives. (The report-only
+    #   and enforcement headers may be used at the same time.)
+    enforce_policies = getattr(settings, 'CSP_STATIC_ENFORCE', None)
+
+    # .. setting_name: CSP_STATIC_REPORT_ONLY
+    # .. setting_default: None
+    # .. setting_description: Content-Security-Policy-Report-Only header to attach to
+    #   all responses. See ``CSP_STATIC_ENFORCE`` for details.
+    report_policies = getattr(settings, 'CSP_STATIC_REPORT_ONLY', None)
+
+    # .. setting_name: CSP_STATIC_REPORTING_URI
+    # .. setting_default: None
+    # .. setting_description: URL of reporting server. This will be used for both Level 2 and
+    #   Level 3 reports. If there are any semicolons or commas in the URL, they must be URL-encoded.
+    #   Level 3 reporting is only enabled if ``CSP_STATIC_REPORTING_NAME`` is also set.
+    reporting_uri = getattr(settings, 'CSP_STATIC_REPORTING_URI', None)
+
+    # .. setting_name: CSP_STATIC_REPORTING_NAME
+    # .. setting_default: None
+    # .. setting_description: Used for CSP Level 3 reporting. This sets the name to use in the
+    #   report-to CSP field and the Reporting-Endpoints header. If omitted, then Level 3 CSP
+    #   reporting will not be enabled. If present, this must be a string starting with an ASCII
+    #   letter and can contain ASCII letters, numbers, hyphen, underscore, and some other characters.
+    #   See https://www.rfc-editor.org/rfc/rfc8941.html#section-3.3.4 for full grammar.
+    reporting_endpoint_name = getattr(settings, 'CSP_STATIC_REPORTING_NAME', None)
+
+    if not enforce_policies and not report_policies:
+        return {}
+
+    headers = {}
+
+    reporting_suffix = ''
+    if reporting_uri:
+        reporting_suffix = f"; report-uri {reporting_uri}"
+        if reporting_endpoint_name:
+            headers['Reporting-Endpoints'] = f'{reporting_endpoint_name}="{reporting_uri}"'
+            reporting_suffix += f"; report-to {reporting_endpoint_name}"
+
+    def clean_header(value):
+        # Collapse any internal whitespace that contains a newline. This allows
+        # writing the setting value as a multi-line string, which is useful for
+        # CSP -- the values can be quite long.
+        value = re.sub("\\s*\n\\s*", " ", value).strip()
+        # Remove any trailing semicolon, which we allow (for convenience).
+        # The CSP spec does not allow trailing semicolons or empty directives.
+        value = re.sub("[;\\s]+$", "", value)
+        return value
+
+    if enforce_policies:
+        headers['Content-Security-Policy'] = clean_header(enforce_policies) + reporting_suffix
+
+    if report_policies:
+        headers['Content-Security-Policy-Report-Only'] = clean_header(report_policies) + reporting_suffix
+
+    return headers
+
+
+def _append_headers(response_headers, more_headers):
+    """
+    Append to the response headers. If a header already exists, assume it is
+    permitted to be multi-valued (comma-separated), and update the existing value.
+
+    Arguments:
+        response_headers: response.headers (or any dict-like object), to be modified
+        more_headers: Dict of header names to values
+    """
+    for k, v in more_headers.items():
+        if existing := response_headers.get(k):
+            response_headers[k] = f"{existing}, {v}"
+        else:
+            response_headers[k] = v
+
+
+class MiddlewareNotUsed(Exception):
+    """This middleware is not used in this server configuration"""
+    pass
+
+
+def conditional_content_security_policy_middleware(get_response):
+    csp_headers = _load_headers()
+    if not csp_headers:
+        raise MiddlewareNotUsed()  # tell Django to skip this middleware
+
+    def middleware_handler(request):
+        response = get_response(request)
+        # Reporting-Endpoints, CSP, and CSP-RO can all be multi-valued
+        # (comma-separated) headers, though the CSP spec says "SHOULD NOT"
+        # for the latter two.
+        _append_headers(response.headers, csp_headers)
+        return response
+
+    return middleware_handler
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+    'lms.envs.common.conditional_content_security_policy_middleware',
 
     'crum.CurrentRequestUserMiddleware',
 
@@ -2335,8 +2456,8 @@ MIDDLEWARE = [
     # for expiring inactive sessions
     'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
-    # use Django built in clickjacking protection
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # use custom extension of Django built in clickjacking protection
+    'openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
     'lms.djangoapps.courseware.middleware.CacheCourseIdMiddleware',
@@ -2363,8 +2484,8 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
-# Clickjacking protection can be disbaled by setting this to 'ALLOW'
-X_FRAME_OPTIONS = 'DENY'
+# # Clickjacking protection can be disbaled by setting this to 'ALLOW'
+# X_FRAME_OPTIONS = 'DENY'
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
