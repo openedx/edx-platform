@@ -10,7 +10,7 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime
 from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse
 
-import bleach
+import nh3
 import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -33,10 +33,11 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
+from lms.djangoapps.static_template_view.views import render_500
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_filters.learning.filters import CourseAboutRenderStarted
+from openedx_filters.learning.filters import CourseAboutRenderStarted, RenderXBlockStarted
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from pytz import UTC
 from rest_framework import status
@@ -1532,7 +1533,7 @@ def _check_sequence_exam_access(request, location):
 @xframe_options_exempt
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
-def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_staff_debug_info=False):
+def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_staff_debug_info=False):  # pylint: disable=too-many-statements
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
@@ -1550,7 +1551,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
         return HttpResponseBadRequest(
-            f"Rendering of the xblock view '{bleach.clean(requested_view, strip=True)}' is not supported."
+            f"Rendering of the xblock view '{nh3.clean(requested_view)}' is not supported."
         )
 
     staff_access = has_access(request.user, 'staff', course_key)
@@ -1641,11 +1642,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
                 if not _check_sequence_exam_access(request, seq_block.location):
                     return HttpResponseForbidden("Access to exam content is restricted")
 
-        fragment = block.render(requested_view, context=student_view_context)
-        optimization_flags = get_optimization_flags_for_content(block, fragment)
-
         context = {
-            'fragment': fragment,
             'course': course,
             'block': block,
             'disable_accordion': True,
@@ -1666,10 +1663,33 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_mobile_app,
             'render_course_wide_assets': True,
-
-            **optimization_flags,
         }
-        return render_to_response('courseware/courseware-chromeless.html', context)
+
+        try:
+            # .. filter_implemented_name: RenderXBlockStarted
+            # .. filter_type: org.openedx.learning.xblock.render.started.v1
+            context, student_view_context = RenderXBlockStarted.run_filter(
+                context=context, student_view_context=student_view_context
+            )
+        except RenderXBlockStarted.PreventXBlockBlockRender as exc:
+            log.info("Halted rendering block %s. Reason: %s", usage_key_string, exc.message)
+            return render_500(request)
+        except RenderXBlockStarted.RenderCustomResponse as exc:
+            log.info("Rendering custom exception for block %s. Reason: %s", usage_key_string, exc.message)
+            context.update({
+                'fragment': Fragment(exc.response)
+            })
+            return render_to_response('courseware/courseware-chromeless.html', context, request=request)
+
+        fragment = block.render(requested_view, context=student_view_context)
+        optimization_flags = get_optimization_flags_for_content(block, fragment)
+
+        context.update({
+            'fragment': fragment,
+            **optimization_flags,
+        })
+
+        return render_to_response('courseware/courseware-chromeless.html', context, request=request)
 
 
 def get_optimization_flags_for_content(block, fragment):
@@ -1977,13 +1997,14 @@ class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    'We plan to use this information to evaluate your application for financial assistance and to further develop our'
-    ' financial assistance program. Please note that while \nassistance is available in most courses that offer'
-    ' verified certificates, a few courses and programs are not eligible. You must complete a separate application'
-    ' \nfor each course you take. You may be approved for financial assistance five (5) times each year'
-    ' (based on 12-month period from you first approval). \nTo apply for financial assistance: \n'
-    '1. Enroll in the audit track for an eligible course that offers Verified Certificates \n2. Complete this'
-    '  application \n3. Check your email, your application will be reviewed in 3-4 business days'
+    'We plan to use this information to evaluate your application for financial assistance and to further develop our '
+    'financial assistance program. \nPlease note that while assistance is available in most courses that offer '
+    'verified certificates, a few courses and programs are not eligible. You must complete a separate application '
+    'for each course you take. You may be approved for financial assistance five (5) times each year '
+    '(based on 12-month period from you first approval). \nTo apply for financial assistance: '
+    '\n1. Enroll in the audit track for an eligible course that offers Verified Certificates. '
+    '\n2. Complete this application. '
+    '\n3. Check your email, please allow 4 weeks for your application to be processed.'
 )
 
 

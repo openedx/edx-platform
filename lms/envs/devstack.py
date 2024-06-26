@@ -135,7 +135,7 @@ REQUIRE_DEBUG = DEBUG
 
 PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
-# Load development webpack donfiguration
+# Load development webpack configuration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################
@@ -546,6 +546,7 @@ AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 # MFEs that will call this service in devstack
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:2000',  # frontend-app-learning
+    'http://localhost:2001',  # frontend-app-course-authoring
     'http://localhost:1997',  # frontend-app-account
     'http://localhost:1995',  # frontend-app-profile
     'http://localhost:1992',  # frontend-app-ora

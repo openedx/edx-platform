@@ -27,16 +27,11 @@ clean: ## archive and delete most git-ignored files
 
 SWAGGER = docs/lms-openapi.yaml
 
-docs: guides technical-docs ## build all the developer documentation for this repository
+docs: swagger guides technical-docs ## build the documentation for this repository
+	$(MAKE) -C docs html
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
-
-technical-docs:  ## build the technical docs
-	$(MAKE) -C docs/technical html
-
-guides:	swagger ## build the developer guide docs
-	cd docs/guides; make clean html
 
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract --no-segment -v
@@ -114,8 +109,8 @@ REQ_FILES = \
 	requirements/edx/base \
 	requirements/edx/doc \
 	requirements/edx/testing \
-	requirements/edx/development \
 	requirements/edx/assets \
+	requirements/edx/development \
 	requirements/edx/semgrep \
 	scripts/xblock/requirements \
 	scripts/user_retirement/requirements/base \

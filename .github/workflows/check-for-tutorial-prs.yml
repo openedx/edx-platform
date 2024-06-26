@@ -14,7 +14,7 @@ on:
   pull_request:
     types: [opened]
     paths:
-      - 'lms/templates/dashboard.html'
+      - "lms/templates/dashboard.html"
 
 jobs:
   # Provide helpful bot comment

@@ -290,7 +290,7 @@ FEATURES = {
     # sandbox, for testing whether it's enabled properly.
     'ENABLE_DEBUG_RUN_PYTHON': False,
 
-    # Enable URL that shows information about the status of variuous services
+    # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
 
     # Don't autoplay videos for students
@@ -458,7 +458,7 @@ FEATURES = {
     # .. toggle_name: FEATURES['ENABLE_THIRD_PARTY_AUTH']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Turn on third-party auth. Disabled for now because full mplementations are not yet
+    # .. toggle_description: Turn on third-party auth. Disabled for now because full implementations are not yet
     #   available. Remember to run migrations if you enable this; we don't create tables by default. This feature can
     #   be enabled on a per-site basis. When enabling this feature, remember to define the allowed authentication
     #   backends with the AUTHENTICATION_BACKENDS setting.
@@ -699,7 +699,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: When set to True, Open edX site can be used as an LTI Provider to other systems
     #    and applications.
-    # .. toggle_warning: After enabling this feature flag there are multiple steps invloved to configure edX
+    # .. toggle_warning: After enabling this feature flag there are multiple steps involved to configure edX
     #    as LTI provider. Full guide is available here:
     #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/index.html
     # .. toggle_use_cases: open_edx
@@ -983,7 +983,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: When true, replaces the bulk email tool found on the
     #   instructor dashboard with a link to the new communications MFE version instead.
-    #   Stting the tool to false will leave the old bulk email tool experience in place.
+    #   Setting the tool to false will leave the old bulk email tool experience in place.
     # .. toggle_use_cases: opt_in
     # .. toggle_creation_date: 2022-03-21
     # .. toggle_target_removal_date: None
@@ -1018,7 +1018,7 @@ FEATURES = {
     # .. toggle_name: FEATURES['ENABLE_CERTIFICATES_IDV_REQUIREMENT']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Whether to enforce ID Verification requirements for couse certificates generation
+    # .. toggle_description: Whether to enforce ID Verification requirements for course certificates generation
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-04-26
     # .. toggle_target_removal_date: None
@@ -1129,7 +1129,7 @@ MARKETING_EMAILS_OPT_IN = False
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When True, inforces COPPA compliance and removes YOB field from registration form and accounnt
+# .. toggle_description: When True, enforces COPPA compliance and removes YOB field from registration form and account
 # .. settings page. Also hide YOB banner from profile page.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-10-27
@@ -1367,7 +1367,7 @@ CONTEXT_PROCESSORS = [
     # Mobile App processor (Detects if request is from the mobile app)
     'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app',
 
-    # Context processor necesarry for the survey report message appear on the admin site
+    # Context processor necessary for the survey report message appear on the admin site
     'openedx.features.survey_report.context_processors.admin_extra_context'
 
 
@@ -1458,7 +1458,7 @@ SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
 
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
-# .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
+# .. setting_description: Specifies the prefix used when naming elasticsearch indexes related to edx-search.
 ELASTICSEARCH_INDEX_PREFIX = ""
 
 VIDEO_CDN_URL = {
@@ -1845,7 +1845,7 @@ CODE_JAIL = {
 #   ]
 COURSES_WITH_UNSAFE_CODE = []
 
-# Cojail REST service
+# Code jail REST service
 ENABLE_CODEJAIL_REST_SERVICE = False
 # .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
 # .. setting_default: 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
@@ -2287,7 +2287,7 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.safe_sessions.middleware.EmailChangeMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
-    'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
+    'openedx.core.djangoapps.contentserver.middleware.StaticContentServerMiddleware',
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
@@ -3183,9 +3183,13 @@ INSTALLED_APPS = [
     # Notes
     'lms.djangoapps.edxnotes',
 
-    # User API
+    # Django Rest Framework
     'rest_framework',
 
+    # REST framework JWT Auth
+    'rest_framework_jwt',
+
+    # User API
     'openedx.core.djangoapps.user_api',
 
     # Different Course Modes
@@ -3351,7 +3355,6 @@ INSTALLED_APPS = [
 
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
-    'rest_framework_jwt',
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
@@ -4523,7 +4526,7 @@ FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 REGISTRATION_EXTENSION_FORM = None
 
-# Identifier included in the User Agent from open edX mobile apps.
+# Identifier included in the User Agent from Open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]

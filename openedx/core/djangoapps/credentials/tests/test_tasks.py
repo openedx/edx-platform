@@ -2,8 +2,9 @@
 Test credentials tasks
 """
 
+import logging
 from unittest import mock
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 import ddt
 import pytest
@@ -13,6 +14,7 @@ from django.db import connection, reset_queries
 from django.test import TestCase, override_settings
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
+from testfixtures import LogCapture
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
@@ -23,14 +25,16 @@ from lms.djangoapps.grades.models_api import get_recently_modified_grades
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.certificates.tests.factories import CertificateDateOverrideFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled
+from openedx.core.djangoapps.credentials.tasks.v1 import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-
-from openedx.core.djangoapps.credentials.tasks.v1 import tasks
+from xmodule.data import CertificatesDisplayBehaviors
 
 
 User = get_user_model()
+LOGGER_NAME = "openedx.core.djangoapps.credentials.tasks.v1.tasks"
 TASKS_MODULE = 'openedx.core.djangoapps.credentials.tasks.v1.tasks'
 
 
@@ -757,3 +761,94 @@ class TestSendNotifications(TestCase):
         else:
             mock_revoked.assert_not_called()
             mock_awarded.assert_called_once_with(**expected_signal_args)
+
+
+@skip_unless_lms
+class TestBackfillDateForAllCourseRuns(TestCase):
+    """
+    Unit Tests for the `backfill_date_for_all_course_runs` Celery task.
+    """
+    def setUp(self):
+        super().setUp()
+        self.co_instructor_paced_cdb_early_no_info_key = "course-v1:OpenEdX+InstructorPacedEarly+Run1"
+        self.co_instructor_paced_cbd_end_key = "course-v1:OpenEdX+InstructorPacedEnd+Run1"
+        self.co_instructor_paced_cdb_end_with_date_key = "course-v1:OpenEdX+InstructorPacedCAD+Run1"
+        self.co_self_paced_key = "course-v1:OpenEdX+SelfPaced+Run1"
+        self.course_run_keys = [
+            self.co_instructor_paced_cdb_early_no_info_key,
+            self.co_instructor_paced_cbd_end_key,
+            self.co_instructor_paced_cdb_end_with_date_key,
+            self.co_self_paced_key,
+        ]
+        self.co_instructor_paced_cdb_early_no_info = CourseOverviewFactory(
+            certificate_available_date=None,
+            certificates_display_behavior=CertificatesDisplayBehaviors.EARLY_NO_INFO,
+            id=CourseKey.from_string(self.co_instructor_paced_cdb_early_no_info_key),
+            self_paced=False,
+        )
+        self.co_instructor_paced_cbd_end = CourseOverviewFactory(
+            certificate_available_date=None,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END,
+            id=CourseKey.from_string(self.co_instructor_paced_cbd_end_key),
+            self_paced=False,
+        )
+        self.co_instructor_paced_cdb_end_with_date = CourseOverviewFactory(
+            certificate_available_date=(datetime.now(timezone.utc) + timedelta(days=30)),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
+            id=CourseKey.from_string(self.co_instructor_paced_cdb_end_with_date_key),
+            self_paced=False,
+        )
+        self.co_self_paced = CourseOverviewFactory(
+            id=CourseKey.from_string(self.co_self_paced_key),
+            self_paced=True,
+        )
+
+    @mock.patch(
+        'openedx.core.djangoapps.credentials.tasks.v1.tasks.update_certificate_available_date_on_course_update.delay'
+    )
+    def test_backfill_dates(self, mock_update):
+        """
+        Tests that the `backfill_date_for_all_course_runs` task enqueues the expected number of
+        `update_certificate_available_date_on_course_update` subtasks. We also capture and verify the contents of the
+        logs to ensure debugging capabilities by humans.
+        """
+        expected_messages = [
+            # instructor-paced, cdb=early_no_info msg
+            "Enqueueing an `update_certificate_available_date_on_course_update` task for course run "
+            f"`{self.co_instructor_paced_cdb_early_no_info.id}`, "
+            f"self_paced={self.co_instructor_paced_cdb_early_no_info.self_paced}, "
+            f"end={self.co_instructor_paced_cdb_early_no_info.end}, "
+            f"available_date={self.co_instructor_paced_cdb_early_no_info.certificate_available_date}, and "
+            f"display_behavior={self.co_instructor_paced_cdb_early_no_info.certificates_display_behavior.value}",
+            # instructor-paced, cdb=end msg
+            "Enqueueing an `update_certificate_available_date_on_course_update` task for course run "
+            f"`{self.co_instructor_paced_cbd_end.id}`, "
+            f"self_paced={self.co_instructor_paced_cbd_end.self_paced}, "
+            f"end={self.co_instructor_paced_cbd_end.end}, "
+            f"available_date={self.co_instructor_paced_cbd_end.certificate_available_date}, and "
+            f"display_behavior={self.co_instructor_paced_cbd_end.certificates_display_behavior.value}",
+            # instructor-paced, cdb=end_with_date msg
+            "Enqueueing an `update_certificate_available_date_on_course_update` task for course run "
+            f"`{self.co_instructor_paced_cdb_end_with_date.id}`, "
+            f"self_paced={self.co_instructor_paced_cdb_end_with_date.self_paced}, "
+            f"end={self.co_instructor_paced_cdb_end_with_date.end}, "
+            f"available_date={self.co_instructor_paced_cdb_end_with_date.certificate_available_date}, and "
+            f"display_behavior={self.co_instructor_paced_cdb_end_with_date.certificates_display_behavior.value}",
+            # self-paced course run msg
+            "Enqueueing an `update_certificate_available_date_on_course_update` task for course run "
+            f"`{self.co_self_paced.id}`, self_paced={self.co_self_paced.self_paced}, end={self.co_self_paced.end}, "
+            f"available_date={self.co_self_paced.certificate_available_date}, and "
+            f"display_behavior={self.co_self_paced.certificates_display_behavior}",
+        ]
+
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as log:
+            tasks.backfill_date_for_all_course_runs.delay()
+
+        # verify the content of captured log messages
+        for message in expected_messages:
+            log.check_present((LOGGER_NAME, 'INFO', message))
+
+        # verify that our mocked function has the expected calls
+        assert mock_update.call_count == len(expected_messages)
+        for mock_call in mock_update.call_args_list:
+            assert mock_call.args[0] in self.course_run_keys

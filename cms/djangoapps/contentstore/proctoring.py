@@ -100,7 +100,6 @@ def register_special_exams(course_key):
         except ProctoredExamNotFoundException:
             exam_metadata['course_id'] = str(course_key)
             exam_metadata['content_id'] = str(timed_exam.location)
-
             exam_id = create_exam(**exam_metadata)
             msg = f'Created new timed exam {exam_id}'
             log.info(msg)

@@ -11,7 +11,7 @@
 # A. You don't *have* to, because settings in devstack.py
 #    override these settings. But, it doesn't harm to also make them
 #    here in order to quell confusion. The hope is that we'll
-#    adpot OEP-45 eventually, which recommends against having
+#    adopt OEP-45 eventually, which recommends against having
 #    a devstack.py at all.
 #
 # This is part of the effort to move our dev tools off of Ansible and

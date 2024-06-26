@@ -74,6 +74,9 @@ urlpatterns = oauth2_urlpatterns + [
     path('heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
 
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
+
     # User API endpoints
     path('api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
@@ -191,6 +194,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
+    re_path(fr'api/youtube/courses/{COURSELIKE_KEY_PATTERN}/edx-video-ids$',
+            contentstore_views.get_course_youtube_edx_videos_ids, name='youtube_edx_video_ids'),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:

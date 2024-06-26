@@ -72,7 +72,7 @@ System Dependencies
 
 Interperters/Tools:
 
-* Python 3.11 (preferred) or 3.8 (compatible, for now)
+* Python 3.11
 
 * Node 18
 
@@ -103,10 +103,13 @@ Language Packages:
 Build Steps
 -----------
 
-Create a MySQL database and a MySQL user with write permissions, and configure
-Django to use them. Then, run migrations::
+Create two MySQL databases and a MySQL user with write permissions to both, and configure
+Django to use them by updating the ``DATABASES`` setting.
+
+Then, run migrations::
 
   ./manage.py lms migrate
+  ./manage.py lms migrate --database=student_module_history
   ./manage.py cms migrate
 
 Build static assets (for more details, see `building static
