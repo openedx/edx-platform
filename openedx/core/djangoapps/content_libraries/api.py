@@ -62,11 +62,7 @@ import requests
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
-from django.core.exceptions import (
-    ObjectDoesNotExist,
-    PermissionDenied,
-    FieldDoesNotExist,
-)
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
@@ -271,22 +267,16 @@ def get_libraries_for_user(user, org=None, library_type=None, text_search=None, 
 
     if order:
         order_query = 'learning_package__'
+        valid_order_fields = ['title', 'created', 'updated']
         # If order starts with a -, that means order descending (default is ascending)
         if order.startswith('-'):
             order_query = f"-{order_query}"
             order = order[1:]
 
-        try:
-            # Check if `order` passed in is a valid field. Since the queryset could be evaluated
-            # downstream (not here), adding a simple try/catch for the order_by wouldn't handle
-            # the error if it occured downstream. To prevent evaluating the queryset early just to check
-            # if it is valid, we perform the try/catch on the field itself instead
-
-            # lint-amnesty, pylint: disable=protected-access
-            ContentLibrary._meta.get_field('learning_package').related_model._meta.get_field(order)
+        if order in valid_order_fields:
             return filtered.order_by(f"{order_query}{order}")
-        except FieldDoesNotExist as e:
-            log.exception(f"Error ordering libraries by {order}: {e}")
+        else:
+            log.exception(f"Error ordering libraries by {order}: Invalid order field")
 
     return filtered
 
