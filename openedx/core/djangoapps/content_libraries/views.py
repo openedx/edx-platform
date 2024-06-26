@@ -250,14 +250,6 @@ class LibraryRootView(GenericAPIView):
             )
         org = Organization.objects.get(short_name=org_name)
 
-        # Backwards compatibility: ignore the no-longer used "collection_uuid"
-        # parameter. This was necessary with Blockstore, but not used for
-        # Learning Core. TODO: This can be removed once the frontend stops
-        # sending it to us. This whole bit of deserialization is kind of weird
-        # though, with the renames and such. Look into this later for clennup.
-        # Ref: https://github.com/openedx/edx-platform/issues/34283
-        data.pop("collection_uuid", None)
-
         try:
             with atomic():
                 result = api.create_library(org=org, **data)
@@ -283,7 +275,8 @@ class LibraryDetailsView(APIView):
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_library(key)
-        return Response(ContentLibraryMetadataSerializer(result).data)
+        serializer = ContentLibraryMetadataSerializer(result, context={'request': self.request})
+        return Response(serializer.data)
 
     @convert_exceptions
     def patch(self, request, lib_key_str):

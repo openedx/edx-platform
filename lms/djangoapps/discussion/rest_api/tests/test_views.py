@@ -1456,7 +1456,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'preview_body': 'Edited body',
             'editable_fields': [
                 'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
-                'title', 'topic_id', 'type', 'voted'
+                'title', 'topic_id', 'type'
             ],
             'created_at': 'Test Created Date',
             'updated_at': 'Test Updated Date',
@@ -1540,7 +1540,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'read': True,
             'editable_fields': [
                 'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
-                'title', 'topic_id', 'type', 'voted'
+                'title', 'topic_id', 'type'
             ],
             'response_count': 2
         })
@@ -1647,7 +1647,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "key": "editable_fields",
                 "value": [
                     'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body',
-                    'read', 'title', 'topic_id', 'type', 'voted'
+                    'read', 'title', 'topic_id', 'type'
                 ]
             },
             {"key": "endorsed_comment_list_url", "value": None},
@@ -2444,7 +2444,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
             "child_count": 0,
             "can_delete": True,
             "anonymous": False,
@@ -2572,7 +2572,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         assert response_data == self.expected_response_data({
             'raw_body': 'Edited body',
             'rendered_body': '<p>Edited body</p>',
-            'editable_fields': ['abuse_flagged', 'anonymous', 'raw_body', 'voted'],
+            'editable_fields': ['abuse_flagged', 'anonymous', 'raw_body'],
             'created_at': 'Test Created Date',
             'updated_at': 'Test Updated Date'
         })
@@ -2743,7 +2743,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "vote_count": 0,
             "abuse_flagged": False,
             "abuse_flagged_any_user": None,
-            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
             "child_count": 0,
             "can_delete": True,
             "anonymous": False,

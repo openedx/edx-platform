@@ -446,7 +446,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.20.6
+edx-enterprise==4.20.8
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -746,7 +746,7 @@ openedx-events==9.10.0
     #   edx-event-bus-redis
     #   event-tracking
     #   ora2
-openedx-filters==1.8.1
+openedx-filters==1.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
