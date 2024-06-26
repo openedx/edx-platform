@@ -305,6 +305,12 @@ def decrypt_object(string):
 def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
     """
     Decrypt username and patch and updates user preferences
+    Allowed parameters for decrypted patch
+        app_name: name of app
+        notification_type: notification type name
+        channel: channel name ('web', 'push', 'email')
+        value: True or False
+        course_id: course key string
     """
     username = decrypt_string(encrypted_username)
     patch = decrypt_object(encrypted_patch)

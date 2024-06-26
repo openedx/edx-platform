@@ -421,3 +421,13 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
                             default_app_json = self.default_json[app_name]
                             default_notification_type_json = default_app_json['notification_types'][noti_type]
                             assert type_prefs[channel] == default_notification_type_json[channel]
+
+    def test_preference_not_updated_if_invalid_username(self):
+        """
+        Tests if no preference is updated when username is not valid
+        """
+        username = f"{self.user.username}-updated"
+        enc_username = encrypt_string(username)
+        enc_patch = encrypt_object({"value": True})
+        with self.assertNumQueries(1):
+            update_user_preferences_from_patch(enc_username, enc_patch)
