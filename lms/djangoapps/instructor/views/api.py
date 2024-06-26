@@ -1759,6 +1759,12 @@ class StudentProgressUrl(APIView):
         'progress_url': '/../...'
     }
     """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
     permission_classes = [IsAuthenticated, permissions.InstructorPermission]
     serializer_class = StudentProgressUrlSerializer
     custom_permission = permissions.ENROLLMENT_REPORT
