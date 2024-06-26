@@ -37,6 +37,7 @@ from .serializers import (
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateSerializer, UserNotificationChannelPreferenceUpdateSerializer,
 )
+from .utils import get_show_notifications_tray
 
 
 @allow_any_authenticated_user()
@@ -75,7 +76,7 @@ class CourseEnrollmentListView(generics.ListAPIView):
         Return a response given serialized page data with show_preferences flag.
         """
         response = super().get_paginated_response(data)
-        response.data["show_preferences"] = ENABLE_NOTIFICATIONS.is_enabled()
+        response.data["show_preferences"] = get_show_notifications_tray(self.request.user)
         return response
 
     def get_queryset(self):
@@ -101,7 +102,7 @@ class CourseEnrollmentListView(generics.ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         return Response({
-            "show_preferences": ENABLE_NOTIFICATIONS.is_enabled(),
+            "show_preferences": get_show_notifications_tray(request.user),
             "results": self.get_serializer(queryset, many=True).data
         })
 
@@ -374,7 +375,7 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
-        show_notifications_tray = ENABLE_NOTIFICATIONS.is_enabled()
+        show_notifications_tray = get_show_notifications_tray(self.request.user)
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
