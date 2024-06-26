@@ -1722,7 +1722,7 @@ def get_student_enrollment_status(request, course_id):
 
 
 class StudentProgressUrlSerializer(serializers.Serializer):
-    """Serializer for course renders"""
+    """Serializer for course renders."""
     unique_student_identifier = serializers.CharField(write_only=True)
     course_id = CourseKeyField(required=False)
     progress_url = serializers.SerializerMethodField()
