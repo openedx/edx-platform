@@ -1721,6 +1721,7 @@ def get_student_enrollment_status(request, course_id):
 
     return JsonResponse(response_payload)
 
+
 class StudentProgressUrlSerializer(serializers.Serializer):
     """Serializer for course renders"""
     unique_student_identifier = serializers.CharField(write_only=True)
