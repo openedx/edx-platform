@@ -713,7 +713,8 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
                 f"{failed_program_certificate_revoke_attempts}"
             )
             raise MaxRetriesExceededError(
-                f"Failed to revoke program certificate for user {student.id} for course {course_key}. Reason: {error_msg}"
+                f"Failed to revoke program certificate for user {student.id} for course {course_key}. "
+                f"Reason: {error_msg}"
             )
     else:
         LOGGER.info(f"No program certificates to revoke from user {student}")
