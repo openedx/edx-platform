@@ -375,7 +375,7 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
-        show_notifications_tray = get_show_notifications_tray(request.user)
+        show_notifications_tray = get_show_notifications_tray(self.request.user)
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS

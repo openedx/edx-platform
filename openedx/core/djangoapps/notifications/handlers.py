@@ -8,20 +8,20 @@ from django.db import IntegrityError, transaction
 from django.dispatch import receiver
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
-    COURSE_UNENROLLMENT_COMPLETED,
-    USER_NOTIFICATION_REQUESTED,
     COURSE_NOTIFICATION_REQUESTED,
+    COURSE_UNENROLLMENT_COMPLETED,
+    USER_NOTIFICATION_REQUESTED
 )
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.audience_filters import (
-    ForumRoleAudienceFilter,
-    EnrollmentAudienceFilter,
-    TeamAudienceFilter,
     CohortAudienceFilter,
     CourseRoleAudienceFilter,
+    EnrollmentAudienceFilter,
+    ForumRoleAudienceFilter,
+    TeamAudienceFilter
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_ORA_STAFF_NOTIFICATION
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 
 log = logging.getLogger(__name__)
@@ -108,11 +108,6 @@ def generate_course_notifications(signal, sender, course_notification_data, meta
     """
     Watches for COURSE_NOTIFICATION_REQUESTED signal and calls send_notifications task
     """
-    if (
-        course_notification_data.notification_type == 'ora_staff_notification'
-        and not ENABLE_ORA_STAFF_NOTIFICATION.is_enabled(course_notification_data.course_key)
-    ):
-        return
 
     from openedx.core.djangoapps.notifications.tasks import send_notifications
     course_notification_data = course_notification_data.__dict__

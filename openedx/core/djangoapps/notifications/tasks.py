@@ -18,13 +18,13 @@ from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
     get_notification_content
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATIONS_FILTERS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.filters import NotificationFilter
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
 
@@ -137,10 +137,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     generated_notification_audience = []
 
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
-        if ENABLE_NOTIFICATIONS_FILTERS.is_enabled(course_key):
-            logger.info(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
-            batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
-            logger.info(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
+        logger.info(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
+        batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
+        logger.info(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
 
         # check if what is preferences of user and make decision to send notification or not
         preferences = CourseNotificationPreference.objects.filter(
