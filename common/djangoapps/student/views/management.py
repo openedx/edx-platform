@@ -981,7 +981,6 @@ def change_email_settings(request):
 
 @csrf_exempt
 def extras_course_enroll_user(request):
-    #print(f"request  {request.body}")
 
     data = json.loads(request.body)
     log.info(data)
@@ -991,16 +990,9 @@ def extras_course_enroll_user(request):
         first_name = data["other"]["first_name"]
         last_name = data["other"]["last_name"]
         email = data["other"]["email"]
-        password = data["other"]["password"] 
-        role = data["other"]["role"]
+        password = data["other"]["password"]  
         unenroll = data["other"]["unenroll"]
-	
-        course = data['other']['course_number_run'].split("|")[0]
-        run = data['other']['course_number_run'].split("|")[1]
-        org = data['other']["site_id"]
-        
-        course_id = "course-v1:{0}+{1}+{2}".format(org, course, run)
-        #hash_key = request.GET["hk"]
+	 
     except MultiValueDictKeyError:
         return render(request, 'blank.html', {"message": "Invalid Options"})
 
@@ -1015,24 +1007,30 @@ def extras_course_enroll_user(request):
     except ObjectDoesNotExist:
         user = _create_user(username, email, first_name, last_name, password)
 
-    user = User.objects.get(email = email)
-
-    if unenroll:
-        _extras_deactivate_enrollments(user, course_id)
-        context = {"message": "Removed user %s from course %s"%(user, course_id)}
-    else:
-        add_enrollment(user, course_id)
-        context = {"message": "Added user %s to course %s"%(user, course_id)}
-    if org == "DLT":
-        _create_soical_auth_record(email, "azuread-oauth2")
-    elif org in ["GIAP", "eMBA"]:
-        _create_soical_auth_record(email, "google-oauth2")
-
-    #if role == "editingteacher":
-    #requesting_user =  User.objects.get(email = data['other']['requesting_user'])
-    #course_key = CourseKey.from_string(course_id)
-    #add_instructor(course_key, requesting_user, user)
+    if "site_id" in data["other"]:
+        if data["other"]["site_id"] == "DLT":
+            _create_soical_auth_record(email, "azuread-oauth2")
+        elif data["other"]["site_id"] in ["GIAP", "eMBA"]:
+            _create_soical_auth_record(email, "google-oauth2")
     
+    context = {"message" : "Registered User %s" %(email)}
+
+    if "course_number_run" in data["other"]:
+        course = data['other']['course_number_run'].split("|")[0]
+        run = data['other']['course_number_run'].split("|")[1]
+        org = data['other']["site_id"]
+
+        course_id = "course-v1:{0}+{1}+{2}".format(org, course, run)
+
+        user = User.objects.get(email = email)
+
+        if unenroll:
+            _extras_deactivate_enrollments(user, course_id)
+            context = {"message": "Removed user %s from course %s"%(user, course_id)}
+        else:
+            add_enrollment(user, course_id)
+            context = {"message": "Added user %s to course %s"%(user, course_id)}
+         
     log.error(context)
     return render(request, "blank.html", context)
 
