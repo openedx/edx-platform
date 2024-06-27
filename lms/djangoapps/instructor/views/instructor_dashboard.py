@@ -562,7 +562,7 @@ def _section_student_admin(course, access):
 
     section_data = {
         'section_key': 'student_admin',
-        'section_display_name': _('Student Admin'),
+        'section_display_name': _('Gradebook'),
         'access': access,
         'is_small_course': is_small_course,
         'get_student_enrollment_status_url': reverse(
