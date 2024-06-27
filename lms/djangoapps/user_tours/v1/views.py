@@ -14,6 +14,7 @@ from lms.djangoapps.user_tours.v1.serializers import UserTourSerializer, UserDis
 
 from rest_framework.views import APIView
 
+from django.contrib.auth.models import User
 
 class UserTourView(RetrieveUpdateAPIView):
     """
@@ -51,7 +52,11 @@ class UserTourView(RetrieveUpdateAPIView):
             user_tour = UserTour.objects.get(user__username=username)
         # Should never really happen, but better safe than sorry.
         except UserTour.DoesNotExist as e:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.get(username = username)
+            UserTour.objects.create(user=user)
+            #return Response(status=status.HTTP_404_NOT_FOUND)
+
+        user_tour = UserTour.objects.get(user__username=username)
 
         return Response(self.get_serializer_class()(user_tour).data, status=status.HTTP_200_OK)
 
