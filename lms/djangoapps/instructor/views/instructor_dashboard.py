@@ -135,7 +135,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         raise Http404()
 
     sections = [
-	_section_enrolled_students(course, access),
+#	_section_enrolled_students(course, access),
 	_section_gradebook(course, access, course_id),
 	_section_attendance(course, access, course_id)
     ]
