@@ -1760,7 +1760,7 @@ class StudentProgressUrl(APIView):
     authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
     permission_classes = [IsAuthenticated, permissions.InstructorPermission]
     serializer_class = StudentProgressUrlSerializer
-    custom_permission = permissions.ENROLLMENT_REPORT
+    permission_name = permissions.ENROLLMENT_REPORT
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
