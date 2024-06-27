@@ -12,7 +12,7 @@ from openedx.core.djangoapps.notifications.models import (
     get_notification_channels, get_additional_notification_channel_settings
 )
 from .base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, EmailCadence
-from .utils import filter_course_wide_preferences, remove_preferences_with_no_access
+from .utils import remove_preferences_with_no_access
 
 
 def add_info_to_notification_config(config_obj):
@@ -73,7 +73,6 @@ class UserCourseNotificationPreferenceSerializer(serializers.ModelSerializer):
         course_id = self.context['course_id']
         user = self.context['user']
         preferences = add_info_to_notification_config(preferences)
-        preferences = filter_course_wide_preferences(course_id, preferences)
         preferences = remove_preferences_with_no_access(preferences, user)
         return preferences
 
