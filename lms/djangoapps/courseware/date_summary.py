@@ -292,6 +292,7 @@ class CourseEndDate(DateSummary):
             3. End date is in the past
             4. End date does not exist (and now neither does the description)
         """
+        return ''
         if self.date and self.current_time <= self.date:
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
             if is_active and CourseMode.is_eligible_for_certificate(mode):
