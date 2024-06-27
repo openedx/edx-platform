@@ -135,24 +135,24 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         raise Http404()
 
     sections = [
-#	_section_enrolled_students(course, access),
-	_section_gradebook(course, access, course_id),
-	_section_attendance(course, access, course_id)
+            _section_enrolled_students(course, access),
+            #_section_gradebook(course, access, course_id),
+            _section_attendance(course, access, course_id),
+            _section_student_admin(course, access)
     ]
-    if access['staff']:
+    if access['staff'] and "talentsprint.com" in request.user.email:
         sections_content = [
             _section_course_info(course, access),
             _section_membership(course, access),
-            _section_cohort_management(course, access),
-            _section_student_admin(course, access),
+            _section_cohort_management(course, access), 
         ]
 
         if legacy_discussion_experience_enabled(course_key):
             sections_content.append(_section_discussions_management(course, access))
         sections.extend(sections_content)
 
-    if access['data_researcher']:
-        sections.append(_section_data_download(course, access))
+        if access['data_researcher']:
+            sections.append(_section_data_download(course, access))
 
     analytics_dashboard_message = None
     if show_analytics_dashboard_message(course_key) and (access['staff'] or access['instructor']):
@@ -181,7 +181,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
             str(course_key), len(paid_modes)
         )
 
-    if access['instructor'] and is_enabled_for_course(course_key):
+    if access['instructor'] and is_enabled_for_course(course_key) and "talentsprint.com" in request.user.email:
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
