@@ -38,6 +38,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
@@ -119,7 +120,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.api.serializers import CourseKeyField
@@ -1756,12 +1757,7 @@ class StudentProgressUrl(APIView):
         'progress_url': '/../...'
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
     permission_classes = [IsAuthenticated, permissions.InstructorPermission]
     serializer_class = StudentProgressUrlSerializer
     custom_permission = permissions.ENROLLMENT_REPORT
