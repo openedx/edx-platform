@@ -577,7 +577,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
     def dispatch_to_register():
         """Redirects to the registration page."""
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER] + '?pipeline_redirect=true')
 
     def should_force_account_creation():
         """ For some third party providers, we auto-create user accounts """

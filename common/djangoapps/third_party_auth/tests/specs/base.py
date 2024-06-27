@@ -230,7 +230,7 @@ class HelperMixin:
     def assert_redirect_to_register_looks_correct(self, response):
         """Asserts a response would redirect to /register."""
         assert 302 == response.status_code
-        assert '/register' == response.get('Location')
+        assert '/register?pipeline_redirect=true' == response.get('Location')
 
     def assert_register_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /register not in the pipeline looks correct."""
@@ -400,7 +400,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
 
         self.request_factory = test.RequestFactory()
         self.login_page_url = reverse('signin_user')
-        self.register_page_url = reverse('register_user')
+        self.register_page_url = reverse('register_user') + '?pipeline_redirect=true'
         patcher = testutil.patch_mako_templates()
         patcher.start()
         self.addCleanup(patcher.stop)

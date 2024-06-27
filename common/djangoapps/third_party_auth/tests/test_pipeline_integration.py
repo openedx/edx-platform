@@ -311,7 +311,7 @@ class EnsureUserInformationTestCase(TestCase):
         )
 
     @ddt.data(
-        (True, '/register'),
+        (True, '/register?pipeline_redirect=true'),
         (False, '/login')
     )
     @ddt.unpack
@@ -341,10 +341,10 @@ class EnsureUserInformationTestCase(TestCase):
                 assert response.url == expected_redirect_url
 
     @ddt.data(
-        ('non_existing_user_email@example.com', '/register', True),
+        ('non_existing_user_email@example.com', '/register?pipeline_redirect=true', True),
         ('email@example.com', '/login', True),
-        (None, '/register', True),
-        ('non_existing_user_email@example.com', '/register', False),
+        (None, '/register?pipeline_redirect=true', True),
+        ('non_existing_user_email@example.com', '/register?pipeline_redirect=true', False),
         ('email@example.com', '/login', False),
         (None, '/login', False),
     )
