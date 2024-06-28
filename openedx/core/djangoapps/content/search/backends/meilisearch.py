@@ -60,7 +60,7 @@ def filter_builder(_filters: list[dict]) -> list[str]:
         if "id" in f:
             f.update(**sanitized_id(f.copy(), create_usage_key=False))
         for key, val in f.items():
-            str_filters.append(f"{key}=val")
+            str_filters.append(f"{key}='{val}'")
 
     return [
         " OR ".join(str_filters)
