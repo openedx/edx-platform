@@ -1784,7 +1784,7 @@ class StudentProgressUrl(APIView):
     serializer_class = StudentProgressUrlSerializer
 
     @method_decorator(ensure_csrf_cookie)
-    @require_course_permission(permissions.ENROLLMENT_REPORT)
+    @verify_course_permission(permissions.ENROLLMENT_REPORT)
     def post(self, request, course_id):
         """Post method for validating incoming data and generating progress URL"""
         data = {
