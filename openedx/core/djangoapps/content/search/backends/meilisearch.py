@@ -312,6 +312,10 @@ class MeiliSearchEngine(SearchEngine):
         return _translate_hits(ms_response)
 
     def update_settings(self):
+        """
+        update index specific settings
+        :return:
+        """
         # Define filterable attributes
         prefix = getattr(settings, "MEILISEARCH_INDEX_PREFIX", "")
         index_settings = {
