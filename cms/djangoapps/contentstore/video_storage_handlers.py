@@ -42,6 +42,7 @@ from edxval.api import (
     update_video_status
 )
 from fs.osfs import OSFS
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 from pytz import UTC
@@ -960,3 +961,32 @@ def _update_pagination_context(request):
 
     request.session['VIDEOS_PER_PAGE'] = videos_per_page
     return JsonResponse()
+
+
+def get_course_youtube_edx_video_ids(course_id):
+    """
+    Get a list of youtube edx_video_ids
+    """
+    error_msg = "Invalid course_key: '%s'." % course_id
+    try:
+        course_key = CourseKey.from_string(course_id)
+        course = modulestore().get_course(course_key)
+    except InvalidKeyError:
+        return JsonResponse({'error': error_msg}, status=500)
+    blocks = []
+    block_yt_field = 'youtube_id_1_0'
+    block_edx_id_field = 'edx_video_id'
+    if hasattr(course, 'get_children'):
+        for section in course.get_children():
+            for subsection in section.get_children():
+                for vertical in subsection.get_children():
+                    for block in vertical.get_children():
+                        blocks.append(block)
+
+    edx_video_ids = []
+    for block in blocks:
+        if hasattr(block, block_yt_field) and getattr(block, block_yt_field):
+            if getattr(block, block_edx_id_field):
+                edx_video_ids.append(getattr(block, block_edx_id_field))
+
+    return JsonResponse({'edx_video_ids': edx_video_ids}, status=200)

@@ -198,15 +198,6 @@ codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
 colorama==0.4.6
     # via tox
-coreapi==2.3.3
-    # via
-    #   -r requirements/edx/base.txt
-    #   drf-yasg
-coreschema==0.0.4
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
-    #   drf-yasg
 coverage[toml]==7.5.3
     # via
     #   -r requirements/edx/coverage.txt
@@ -488,9 +479,8 @@ drf-jwt==1.19.2
     #   edx-drf-extensions
 drf-spectacular==0.27.2
     # via -r requirements/edx/base.txt
-drf-yasg==1.21.5
+drf-yasg==1.21.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-user-tasks
     #   edx-api-doc-tools
@@ -559,7 +549,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.19.16
+edx-enterprise==4.20.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -765,16 +755,11 @@ isort==5.13.2
     # via
     #   -r requirements/edx/testing.in
     #   pylint
-itypes==1.2.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
 jinja2==3.1.4
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
     #   code-annotations
-    #   coreschema
     #   diff-cover
     #   fastapi
 jmespath==1.0.1
@@ -917,6 +902,8 @@ newrelic==9.10.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
+nh3==0.2.17
+    # via -r requirements/edx/base.txt
 nltk==3.8.1
     # via
     #   -r requirements/edx/base.txt
@@ -964,7 +951,7 @@ openedx-events==9.10.0
     #   edx-event-bus-redis
     #   event-tracking
     #   ora2
-openedx-filters==1.8.1
+openedx-filters==1.9.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
@@ -1269,6 +1256,7 @@ pyyaml==6.0.1
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   drf-spectacular
+    #   drf-yasg
     #   edx-django-release-util
     #   edx-i18n-tools
     #   uvicorn
@@ -1295,7 +1283,6 @@ requests==2.32.3
     #   -r requirements/edx/base.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1327,14 +1314,6 @@ rpds-py==0.18.1
     #   -r requirements/edx/base.txt
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.6
-    # via
-    #   -r requirements/edx/base.txt
-    #   drf-yasg
-ruamel-yaml-clib==0.2.8
-    # via
-    #   -r requirements/edx/base.txt
-    #   ruamel-yaml
 rules==3.4
     # via
     #   -r requirements/edx/base.txt
@@ -1517,7 +1496,6 @@ unidiff==0.7.5
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/base.txt
-    #   coreapi
     #   drf-spectacular
     #   drf-yasg
 urllib3==1.26.18

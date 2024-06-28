@@ -24,7 +24,6 @@ acid-xblock                         # This XBlock is used for unit tests as well
 analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
 Babel                               # Internationalization utilities, used for date formatting in a few places
-bleach[css]                         # Allowed-list-based HTML sanitizing library that escapes or strips markup and attributes; used for capa and LTI
 boto                                # Deprecated version of the AWS SDK; we should stop using this
 boto3                               # Amazon Web Services SDK for Python
 botocore                            # via boto3, s3transfer
@@ -111,6 +110,7 @@ Markdown                            # Convert text markup to HTML; used in capa 
 meilisearch                         # Library to access Meilisearch search engine (will replace ElasticSearch)
 mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
+nh3                                 # Python bindings to the ammonia (whitelist-based HTML sanitizing library); used for capa and LTI
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 olxcleaner

@@ -17,13 +17,10 @@
 celery>=5.2.2,<6.0.0
 
 
-# required for celery>=5.2.0;<5.3.0
-click>=8.0,<9.0
-
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.19.16
+edx-enterprise==4.20.11
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -75,9 +72,6 @@ social-auth-app-django==5.0.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
 urllib3<2.0.0
 
-
-# greater version has dropped few dependencies. Fix this in other ticket.
-drf-yasg<1.21.6
 
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0

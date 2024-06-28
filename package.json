@@ -53,10 +53,10 @@
     "js-cookie": "3.0.5",
     "jwt-decode": "^3.1.2",
     "moment": "2.30.1",
-    "moment-timezone": "0.5.37",
+    "moment-timezone": "0.5.45",
     "node-gyp": "10.0.1",
     "picturefill": "3.0.3",
-    "popper.js": "1.12.9",
+    "popper.js": "1.16.1",
     "prop-types": "15.6.0",
     "raw-loader": "0.5.1",
     "react": "16.14.0",
@@ -81,7 +81,7 @@
     "webpack": "^5.90.3",
     "webpack-bundle-tracker": "0.4.3",
     "webpack-merge": "4.1.1",
-    "whatwg-fetch": "2.0.3",
+    "whatwg-fetch": "2.0.4",
     "which-country": "1.0.0"
   },
   "devDependencies": {
@@ -89,10 +89,9 @@
     "@edx/mockprock": "github:openedx/mockprock#3ad18c6888e6521e9bf7a4df0db6f8579b928235",
     "@edx/stylelint-config-edx": "2.3.3",
     "babel-jest": "26.0.0",
-    "edx-custom-a11y-rules": "1.0.6",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.8",
-    "eslint-import-resolver-webpack": "0.8.4",
+    "eslint-import-resolver-webpack": "0.13.8",
     "jasmine-core": "2.6.4",
     "jasmine-jquery": "git+https://git@github.com/velesin/jasmine-jquery.git#ebad463d592d3fea00c69f26ea18a930e09c7b58",
     "jest": "26.0.0",
@@ -112,10 +111,10 @@
     "plato": "1.7.0",
     "react-test-renderer": "16.4.0",
     "selenium-webdriver": "3.4.0",
-    "sinon": "2.3.5",
+    "sinon": "2.4.1",
     "squirejs": "0.1.0",
     "string-replace-loader": "^3.1.0",
-    "stylelint-formatter-pretty": "1.0.3",
+    "stylelint-formatter-pretty": "1.1.4",
     "webpack-cli": "^5.1.4"
   }
 }
