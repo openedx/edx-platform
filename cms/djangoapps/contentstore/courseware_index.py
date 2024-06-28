@@ -141,6 +141,9 @@ class SearchIndexerBase(metaclass=ABCMeta):
         if not searcher:
             return
 
+        if hasattr(searcher, "update_settings"):
+            searcher.update_settings()
+
         structure_key = cls.normalize_structure_key(structure_key)
         location_info = cls._get_location_info(structure_key)
 

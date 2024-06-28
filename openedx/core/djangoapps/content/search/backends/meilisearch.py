@@ -218,7 +218,7 @@ class MeiliSearchEngine(SearchEngine):
         """
         MeiliSearchEngine.set_mappings(self._prefixed_index_name, {})
 
-    def __init__(self, index=None):
+    def __init__(self, index=None, options=None):
         super().__init__(index)
         MEILISEARCH_URL = getattr(settings, "MEILISEARCH_URL", 'http://127.0.0.1:7700')
         MEILISEARCH_API_KEY = getattr(settings, "MEILISEARCH_API_KEY", "masterKey")
@@ -228,7 +228,7 @@ class MeiliSearchEngine(SearchEngine):
         try:
             self._index.fetch_info()
         except errors.MeilisearchApiError:
-            self._ms.create_index(self._prefixed_index_name)
+            self._ms.create_index(self._prefixed_index_name, options=options)
 
     @property
     def _prefixed_index_name(self):
@@ -310,3 +310,22 @@ class MeiliSearchEngine(SearchEngine):
             raise
 
         return _translate_hits(ms_response)
+
+    def update_settings(self):
+        # Define filterable attributes
+        prefix = getattr(settings, "MEILISEARCH_INDEX_PREFIX", "")
+        index_settings = {
+            f"{prefix}library_index": {
+                "filterableAttributes": [
+                    "library",
+                    "id"
+                ]
+            },
+            f"{prefix}courseware_content": {
+                "filterableAttributes": [
+                    "course",
+                    "org"
+                ]
+            },
+        }
+        return self._index.update_settings(index_settings.get(self._prefixed_index_name, {}))
