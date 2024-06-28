@@ -91,6 +91,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
   .wrapper-video-bottom-section {
     display: flex;
+    justify-content: space-between;
 
     .wrapper-download-video,
     .wrapper-download-transcripts,
@@ -175,6 +176,13 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       box-shadow: none;
       background: transparent;
     }
+  }
+
+  .google-disclaimer {
+    display: none;
+    margin-top: $baseline;
+    @include padding-right($baseline);
+    vertical-align: top;
   }
 
   .video-wrapper {
