@@ -59,6 +59,7 @@ from common.djangoapps.student.roles import (
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
     CourseInstructorRole,
+    CourseStaffRole
 )
 from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
@@ -2967,6 +2968,27 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url)
         assert response.status_code == 400
+
+    def test_get_student_progress_url_with_anonymous_user(self):
+        """ Test that progress_url returns 401 without credentials. """
+        self.client.logout()
+        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        data = {'unique_student_identifier': self.students[0].email}
+        response = self.client.post(url, data)
+        assert response.status_code == 401
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert 'Authentication credentials were not provided' in res_json['detail']
+
+    def test_get_student_progress_url_without_permissions(self):
+        """ Test that progress_url returns 403 without credentials. """
+
+        # removed both roles from courses for instructor
+        CourseDataResearcherRole(self.course.id).remove_users(self.instructor)
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        data = {'unique_student_identifier': self.students[0].email}
+        response = self.client.post(url, data)
+        assert response.status_code == 403
 
 
 class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
