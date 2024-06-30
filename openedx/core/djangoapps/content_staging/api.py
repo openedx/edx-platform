@@ -207,7 +207,7 @@ def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardDat
             tags=content.tags,
         ),
         source_usage_key=clipboard.source_usage_key,
-        source_context_title=source_context_title,
+        source_context_title=clipboard.get_source_context_title(),
     )
 
 
