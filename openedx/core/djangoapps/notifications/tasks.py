@@ -90,7 +90,6 @@ def delete_expired_notifications():
     """
     batch_size = settings.EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE
     expiry_date = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
-    logger.info(f'Deleting expired notifications with batch size: {batch_size}') # remove it
     start_time = datetime.now()
     total_deleted = 0
     delete_count = None
