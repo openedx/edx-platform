@@ -23,6 +23,7 @@ from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.content_libraries.sync import is_valid_upstream
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
 
@@ -293,7 +294,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
         staged_content_id=user_clipboard.content.id,
         static_files=static_files,
     )
-
     return new_xblock, notices
 
 
@@ -375,6 +375,12 @@ def _import_xml_node_to_parent(
     if copied_from_block:
         # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
         temp_xblock.copied_from_block = copied_from_block
+        copied_from_key = UsageKey.from_string(copied_from_block)
+        if is_valid_upstream(copied_from_key):
+            upstream_link_requested = lambda: True  # @@TODO ask user
+            if upstream_link_requested():
+                temp_xblock.assign_upstream(copied_from_key, user_id)
+
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
     new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)

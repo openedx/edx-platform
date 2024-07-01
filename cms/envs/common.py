@@ -1019,6 +1019,7 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,
+    "openedx.core.djangoapps.content_libraries.sync.UpstreamSyncMixin",
 )
 
 # .. setting_name: XBLOCK_EXTRA_MIXINS
