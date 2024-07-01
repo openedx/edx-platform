@@ -17,6 +17,7 @@ jobs:
         python-version:
           - "3.11"
         node-version: [20]
+        toxenv: [quality]
 
     steps:
       - uses: actions/checkout@v4
