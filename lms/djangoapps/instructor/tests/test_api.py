@@ -59,7 +59,6 @@ from common.djangoapps.student.roles import (
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
     CourseInstructorRole,
-    CourseStaffRole
 )
 from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
