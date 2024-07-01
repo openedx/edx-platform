@@ -7,7 +7,7 @@ from datetime import datetime
 
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.keys import UsageKey, AssetKey
+from opaque_keys.edx.keys import UsageKey, AssetKey, LearningContextKey
 
 
 class StagedContentStatus(TextChoices):
@@ -65,3 +65,9 @@ class UserClipboardData:
     """ Read-only data model for User Clipboard data (copied OLX) """
     content: StagedContentData = field(validator=validators.instance_of(StagedContentData))
     source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))  # type: ignore[type-abstract]
+    source_context_title: str
+
+    @property
+    def source_context_key(self) -> LearningContextKey:
+        """ Get the context (course/library) that this was copied from """
+        return self.source_usage_key.context_key
