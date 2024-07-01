@@ -391,7 +391,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     def get_queryset(self):
         api_version = self.kwargs.get('api_version')
         status = self.request.GET.get('status')
-        mobile_available = self.get_mobile_available_enrollments()
+        mobile_available = self.get_same_org_mobile_available_enrollments()
 
         not_duration_limited = (
             enrollment for enrollment in mobile_available
@@ -410,7 +410,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             # return all courses, with associated expiration
             return mobile_available
 
-    def get_mobile_available_enrollments(self) -> List[Optional[CourseEnrollment]]:
+    def get_same_org_mobile_available_enrollments(self) -> List[Optional[CourseEnrollment]]:
         """
         Gets list with `CourseEnrollment` for mobile available courses.
         """
@@ -438,16 +438,13 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
                 'enrollments': response.data
             }
             if api_version == API_V4 and status not in EnrollmentStatuses.values():
-                if status in EnrollmentStatuses.values():
-                    enrollment_data.update({'primary': None})
-                else:
-                    primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
-                    if primary_enrollment_obj:
-                        serializer = CourseEnrollmentSerializerModifiedForPrimary(
-                            primary_enrollment_obj,
-                            context=self.get_serializer_context(),
-                        )
-                        enrollment_data.update({'primary': serializer.data})
+                primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
+                if primary_enrollment_obj:
+                    serializer = CourseEnrollmentSerializerModifiedForPrimary(
+                        primary_enrollment_obj,
+                        context=self.get_serializer_context(),
+                    )
+                    enrollment_data.update({'primary': serializer.data})
 
             return Response(enrollment_data)
 
@@ -470,16 +467,14 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         """
         Gets primary enrollment obj by latest enrollment or latest progress on the course.
         """
-        mobile_available = self.get_mobile_available_enrollments()
+        mobile_available = self.get_same_org_mobile_available_enrollments()
         if not mobile_available:
             return None
 
         mobile_available_course_ids = [enrollment.course_id for enrollment in mobile_available]
 
         latest_enrollment = self.queryset.filter(
-            user__username=self.kwargs['username'],
-            is_active=True,
-            course__id__in=mobile_available_course_ids,
+            course__id__in=mobile_available_course_ids
         ).order_by('-created').first()
 
         if not latest_enrollment:

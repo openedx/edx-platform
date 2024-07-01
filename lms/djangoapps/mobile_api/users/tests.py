@@ -684,9 +684,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         expected_course_status = {
             'last_visited_module_id': str(subsection.location),
             'last_visited_module_path': [
-                str(subsection.location),
+                str(course.location),
                 str(section.location),
-                str(course.location)
+                str(subsection.location),
             ],
             'last_visited_block_id': str(problem.location),
             'last_visited_unit_display_name': vertical.display_name,

@@ -2,11 +2,10 @@
 Serializer for user API
 """
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from rest_framework import serializers
 from rest_framework.reverse import reverse
@@ -21,7 +20,8 @@ from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializ
 from lms.djangoapps.mobile_api.utils import API_V4
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.search import path_to_location
 
 
 class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: disable=abstract-method
@@ -182,45 +182,20 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
         Gets course status for the given user's enrollments.
         """
         try:
-            block_id = str(get_key_to_last_completed_block(model.user, model.course.id))
-        except UnavailableCompletionData:
-            block_id = ''
-
-        if not block_id:
+            block_key = get_key_to_last_completed_block(model.user, model.course.id)
+            path = path_to_location(modulestore(), block_key, self.context['request'], full_path=True)
+        except (ItemNotFoundError, NoPathToItem, UnavailableCompletionData):
             return None
 
-        path, unit_name = self._get_last_visited_block_path_and_unit_name(block_id)
-        if not path and unit_name:
-            return None
-
-        path_ids = [str(block.location) for block in path]
+        path_ids = [str(block) for block in path]
+        unit = modulestore().get_item(UsageKey.from_string(path_ids[3]), depth=0)
 
         return {
-            'last_visited_module_id': path_ids[0],
-            'last_visited_module_path': path_ids,
-            'last_visited_block_id': block_id,
-            'last_visited_unit_display_name': unit_name,
+            'last_visited_module_id': path_ids[2],
+            'last_visited_module_path': path_ids[:3],
+            'last_visited_block_id': path_ids[-1],
+            'last_visited_unit_display_name': unit.display_name,
         }
-
-    @staticmethod
-    def _get_last_visited_block_path_and_unit_name(
-        block_id: str
-    ) -> Union[Tuple[None, None], Tuple[List['XBlock'], str]]:  # lint-amnesty, pylint: disable=unused-variable
-        """
-        Returns the path to the latest block and unit name visited by the current user.
-        """
-        try:
-            last_visited_block = modulestore().get_item(UsageKey.from_string(block_id))
-            vertical = last_visited_block.get_parent()
-            sequential = vertical.get_parent()
-            chapter = sequential.get_parent()
-            course = chapter.get_parent()
-        except (ItemNotFoundError, InvalidKeyError, AttributeError):
-            return None, None
-
-        path = [sequential, chapter, course]
-
-        return path, vertical.display_name
 
     def get_course_progress(self, model: CourseEnrollment) -> Dict[str, int]:
         """

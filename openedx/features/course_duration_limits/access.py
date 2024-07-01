@@ -81,7 +81,7 @@ def get_user_course_expiration_date(user, course, enrollment=None):
     if access_duration is None:
         return None
 
-    enrollment = CourseEnrollment.get_enrollment(user, course.id) if not enrollment else enrollment
+    enrollment = enrollment or CourseEnrollment.get_enrollment(user, course.id)
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
