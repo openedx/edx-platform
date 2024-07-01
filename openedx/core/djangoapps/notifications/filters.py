@@ -81,7 +81,8 @@ class NotificationFilter:
 
         if course_time_limit.enabled_for_course(course.id):
             enrollments = enrollments.filter(created__gte=course_time_limit.enabled_as_of)
-        logger.debug("NotificationFilter: Number of audit enrollments for course %s: %s", course.id, enrollments.count())
+        logger.debug("NotificationFilter: Number of audit enrollments for course %s: %s", course.id,
+                     enrollments.count())
 
         for enrollment in enrollments:
             if enrollment.user_id in users_with_course_role or enrollment.user_id in users_with_forum_roles:
@@ -95,8 +96,8 @@ class NotificationFilter:
             content_availability_date = max(enrollment.created, course.start)
             expiration_date = content_availability_date + access_duration
             logger.debug("NotificationFilter: content_availability_date: %s and access_duration: %s",
-                        content_availability_date, access_duration
-                        )
+                         content_availability_date, access_duration
+                         )
             if expiration_date and timezone.now() > expiration_date:
                 logger.debug("User %s has expired audit access to course %s", enrollment.user_id, course.id)
                 user_ids.remove(enrollment.user_id)
