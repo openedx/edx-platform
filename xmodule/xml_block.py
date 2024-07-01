@@ -12,6 +12,7 @@ from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.util.olx import write_xml_to_file
 
 log = logging.getLogger(__name__)
 
@@ -472,8 +473,8 @@ class XmlMixin:
                 self.location.run if self.category == 'course' else url_path,
             )
             self.runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
-            with self.runtime.export_fs.open(filepath, 'wb') as fileobj:
-                ElementTree(xml_object).write(fileobj, pretty_print=True, encoding='utf-8')
+            with self.runtime.export_fs.open(filepath, 'w') as fileobj:
+                write_xml_to_file(xml_object, fileobj)
         else:
             # Write all attributes from xml_object onto node
             node.clear()
