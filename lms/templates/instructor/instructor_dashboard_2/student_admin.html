@@ -18,6 +18,25 @@
     %endif
 </div>
 
+<div class="student-progress-container action-type-container">
+    <h4 class="hd hd-4">${_("View a specific learner's grades and progress")}</h4>
+    <div class="request-response-error"></div>
+    <label for="student-select-progress">
+        ${_("Learner's {platform_name} email address or username").format(platform_name=settings.PLATFORM_NAME)}
+    </label>
+    <br>
+    <input type="text" name="student-select-progress" placeholder="${_('Learner email address or username')}" >
+    <br><br>
+    <div class="progress-link-wrapper">
+        <span name="progress-link">
+            <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }">
+                ${_("View Progress Page")}
+            </a>
+        </span>
+    </div>
+  <hr>
+</div>
+% if "talentsprint.com" in request.user.email:
 <div class="student-enrollment-status-container action-type-container">
     <h4 class="hd hd-4">${_("View a specific learner's enrollment status")}</h4>
     <div class="request-response-error"></div>
@@ -38,25 +57,6 @@
         </span>
     </div>
     <hr>
-</div>
-
-<div class="student-progress-container action-type-container">
-    <h4 class="hd hd-4">${_("View a specific learner's grades and progress")}</h4>
-    <div class="request-response-error"></div>
-    <label for="student-select-progress">
-        ${_("Learner's {platform_name} email address or username").format(platform_name=settings.PLATFORM_NAME)}
-    </label>
-    <br>
-    <input type="text" name="student-select-progress" placeholder="${_('Learner email address or username')}" >
-    <br><br>
-    <div class="progress-link-wrapper">
-        <span name="progress-link">
-            <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }">
-                ${_("View Progress Page")}
-            </a>
-        </span>
-    </div>
-  <hr>
 </div>
 
 <div class="student-grade-container action-type-container">
@@ -131,6 +131,7 @@
   <hr>
 </div>
 
+
 % if course.entrance_exam_enabled:
 <div class="entrance-exam-grade-container action-type-container">
     <h4 class="hd hd-4">${_("Adjust a learner's entrance exam results")}</h4>
@@ -192,7 +193,7 @@
 
 %endif
 
-%if section_data['access']['instructor']:
+%if section_data['access']['instructor'] and "talentsprint.com" in request.user.email:
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
 <div class="course-specific-container action-type-container">
     <h4 class="hd hd-4">${_("Adjust all enrolled learners' grades for a specific problem")}</h4>
@@ -231,7 +232,7 @@
 %endif
 %endif
 
-%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and "talentsprint.com" in request.user.email:
 <div class="running-tasks-container action-type-container">
     <h4 class="hd hd-4">${_("Pending Tasks")}</h4>
     <div class="running-tasks-section">
@@ -241,4 +242,6 @@
     </div>
     <div class="no-pending-tasks-message"></div>
 </div>
+%endif
+
 %endif
