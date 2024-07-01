@@ -38,12 +38,12 @@ def create_course_notification_preferences_for_courses(self, course_ids):
     """
     This task creates Course Notification Preferences for users in courses.
     """
-    logger.info('Running task create_course_notification_preferences')
+    logger.debug('Running task create_course_notification_preferences')
     newly_created = 0
     for course_id in course_ids:
         enrollments = CourseEnrollment.objects.filter(course_id=course_id, is_active=True)
-        logger.info(f'Found {enrollments.count()} enrollments for course {course_id}')
-        logger.info(f'Creating Course Notification Preferences for course {course_id}')
+        logger.debug(f'Found {enrollments.count()} enrollments for course {course_id}')
+        logger.debug(f'Creating Course Notification Preferences for course {course_id}')
         for enrollment in enrollments:
             _, created = CourseNotificationPreference.objects.get_or_create(
                 user=enrollment.user, course_id=course_id
@@ -51,11 +51,11 @@ def create_course_notification_preferences_for_courses(self, course_ids):
             if created:
                 newly_created += 1
 
-        logger.info(
+        logger.debug(
             f'CourseNotificationPreference back-fill completed for course {course_id}.\n'
             f'Newly created course preferences: {newly_created}.\n'
         )
-    logger.info('Completed task create_course_notification_preferences')
+    logger.debug('Completed task create_course_notification_preferences')
 
 
 @shared_task(ignore_result=True)
@@ -137,9 +137,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     generated_notification_audience = []
 
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
-        logger.info(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
+        logger.debug(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
         batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
-        logger.info(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
+        logger.debug(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
 
         # check if what is preferences of user and make decision to send notification or not
         preferences = CourseNotificationPreference.objects.filter(
@@ -227,7 +227,7 @@ def create_notification_pref_if_not_exists(user_ids: List, preferences: List, co
                 user_id=user_id,
                 course_id=course_id,
             ))
-            logger.info('Creating new notification preference for user because it does not exist.')
+            logger.debug('Creating new notification preference for user because it does not exist.')
     if new_preferences:
         # ignoring conflicts because it is possible that preference is already created by another process
         # conflicts may arise because of constraint on user_id and course_id fields in model

@@ -64,7 +64,7 @@ class NotificationFilter:
         access_duration = get_expected_duration(course.id)
         course_time_limit = CourseDurationLimitConfig.current(course_key=course.id)
         if not verified_mode:
-            logger.info(
+            logger.debug(
                 "NotificationFilter: Course %s does not have a verified mode, so no users will be filtered out",
                 course.id,
             )
@@ -81,11 +81,11 @@ class NotificationFilter:
 
         if course_time_limit.enabled_for_course(course.id):
             enrollments = enrollments.filter(created__gte=course_time_limit.enabled_as_of)
-        logger.info("NotificationFilter: Number of audit enrollments for course %s: %s", course.id, enrollments.count())
+        logger.debug("NotificationFilter: Number of audit enrollments for course %s: %s", course.id, enrollments.count())
 
         for enrollment in enrollments:
             if enrollment.user_id in users_with_course_role or enrollment.user_id in users_with_forum_roles:
-                logger.info(
+                logger.debug(
                     "NotificationFilter: User %s has a course or forum role for course %s, so they will not be "
                     "filtered out",
                     enrollment.user_id,
@@ -94,11 +94,11 @@ class NotificationFilter:
                 continue
             content_availability_date = max(enrollment.created, course.start)
             expiration_date = content_availability_date + access_duration
-            logger.info("NotificationFilter: content_availability_date: %s and access_duration: %s",
+            logger.debug("NotificationFilter: content_availability_date: %s and access_duration: %s",
                         content_availability_date, access_duration
                         )
             if expiration_date and timezone.now() > expiration_date:
-                logger.info("User %s has expired audit access to course %s", enrollment.user_id, course.id)
+                logger.debug("User %s has expired audit access to course %s", enrollment.user_id, course.id)
                 user_ids.remove(enrollment.user_id)
         return user_ids
 
@@ -110,7 +110,7 @@ class NotificationFilter:
         applicable_filters = notification_config.get('filters', [])
         course = modulestore().get_course(course_key)
         for filter_name in applicable_filters:
-            logger.info(
+            logger.debug(
                 "NotificationFilter: Applying filter %s for notification type %s",
                 filter_name,
                 notification_type,
