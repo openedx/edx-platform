@@ -3,6 +3,7 @@ Test utils.py
 """
 import datetime
 import ddt
+import pytest
 
 from django.http.response import Http404
 from itertools import product
@@ -430,9 +431,5 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
         username = f"{self.user.username}-updated"
         enc_username = encrypt_string(username)
         enc_patch = encrypt_object({"value": True})
-        try:
+        with pytest.raises(Http404):
             update_user_preferences_from_patch(enc_username, enc_patch)
-        except Http404:
-            assert True
-            return
-        assert False
