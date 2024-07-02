@@ -38,6 +38,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
@@ -119,9 +120,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
+from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
     dump_block_extensions,
@@ -225,6 +227,28 @@ def require_course_permission(permission):
 
             if request.user.has_perm(permission, course):
                 return func(*args, **kwargs)
+            else:
+                return HttpResponseForbidden()
+        return wrapped
+    return decorator
+
+
+def verify_course_permission(permission):
+    """
+    Decorator with argument that requires a specific permission of the requesting
+    user. If the requirement is not satisfied, returns an
+    HttpResponseForbidden (403).
+
+    Assumes that request is in self.
+    Assumes that course_id is in kwargs['course_id'].
+    """
+    def decorator(func):
+        def wrapped(self, *args, **kwargs):
+            request = self.request
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
+
+            if request.user.has_perm(permission, course):
+                return func(self, *args, **kwargs)
             else:
                 return HttpResponseForbidden()
         return wrapped
@@ -1717,15 +1741,35 @@ def get_student_enrollment_status(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@require_post_params(
-    unique_student_identifier="email or username of student for whom to get progress url"
-)
-@common_exceptions_400
-def get_student_progress_url(request, course_id):
+class StudentProgressUrlSerializer(serializers.Serializer):
+    """Serializer for course renders"""
+    unique_student_identifier = serializers.CharField(write_only=True)
+    course_id = CourseKeyField(required=False)
+    progress_url = serializers.SerializerMethodField()
+
+    def get_progress_url(self, obj):    # pylint: disable=unused-argument
+        """
+        Return the progress URL for the student.
+        Args:
+            obj (dict): The dictionary containing data for the serializer.
+        Returns:
+            str: The URL for the progress of the student in the course.
+        """
+        user = get_student_from_identifier(obj.get('unique_student_identifier'))
+        course_id = obj.get('course_id')  # Adjust based on your data structure
+
+        if course_home_mfe_progress_tab_is_active(course_id):
+            progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
+            if user is not None:
+                progress_url += '/{}/'.format(user.id)
+        else:
+            progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
+
+        return progress_url
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class StudentProgressUrl(APIView):
     """
     Get the progress url of a student.
     Limited to staff access.
@@ -1735,21 +1779,21 @@ def get_student_progress_url(request, course_id):
         'progress_url': '/../...'
     }
     """
-    course_id = CourseKey.from_string(course_id)
-    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StudentProgressUrlSerializer
 
-    if course_home_mfe_progress_tab_is_active(course_id):
-        progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
-        if user is not None:
-            progress_url += '/{}/'.format(user.id)
-    else:
-        progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
-
-    response_payload = {
-        'course_id': str(course_id),
-        'progress_url': progress_url,
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    @verify_course_permission(permissions.ENROLLMENT_REPORT)
+    def post(self, request, course_id):
+        """Post method for validating incoming data and generating progress URL"""
+        data = {
+            'course_id': course_id,
+            'unique_student_identifier': request.data.get('unique_student_identifier')
+        }
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
 
 
 @transaction.non_atomic_requests
