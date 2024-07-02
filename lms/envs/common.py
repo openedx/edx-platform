@@ -2266,12 +2266,9 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 #     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;
 #     frame-ancestors 'self' http://localhost:2000
 # """
-# CSP_STATIC_ENFORCE = """
-#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/ https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net;
-#     style-src 'self' https://fonts.googleapis.com 'unsafe-inline'
-#     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;
-#     frame-ancestors 'self' http://localhost:2000
-# """
+CSP_STATIC_ENFORCE = """
+    frame-ancestors 'self' http://localhost:2000
+"""
 
 import re
 
@@ -2385,7 +2382,7 @@ def conditional_content_security_policy_middleware(get_response):
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-    # 'lms.envs.common.conditional_content_security_policy_middleware',
+    'lms.envs.common.conditional_content_security_policy_middleware',
 
     'crum.CurrentRequestUserMiddleware',
 
