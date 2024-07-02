@@ -40,12 +40,12 @@ class StagedContentSerializer(serializers.ModelSerializer):
 
 class UserClipboardSerializer(serializers.Serializer):
     """
-    Serializer for the status of the user's clipboard
+    Serializer for the status of the user's clipboard (a UserClipboardData instance)
     """
     content = StagedContentSerializer(allow_null=True)
     source_usage_key = serializers.CharField(allow_blank=True)
     # The title of the course that the content came from originally, if relevant
-    source_context_title = serializers.CharField(allow_blank=True, source="get_source_context_title")
+    source_context_title = serializers.CharField(allow_blank=True)
     # The URL where the original content can be seen, if it still exists and the current user can view it
     source_edit_url = serializers.SerializerMethodField(source="get_source_edit_url")
 
