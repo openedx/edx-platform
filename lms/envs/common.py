@@ -95,11 +95,11 @@ IDA_LOGOUT_URI_LIST = []
 
 # Clickjacking protection can be disabled by setting this to 'ALLOW' or adjusted by setting this to 'SAMEORIGIN'.
 # It is not advised to set this to 'ALLOW' without a Content Security Policy header.
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 # You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
 # Content Security Policy in place.
 # SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
-X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'ALLOW'], ['.*/xblock/.*', 'ALLOW']]
+# X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'ALLOW'], ['.*/xblock/.*', 'ALLOW']]
 # X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'ALLOW']]
 
 
@@ -2259,7 +2259,19 @@ FOOTER_BROWSER_CACHE_MAX_AGE = 5 * 60
 CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 ################################# Middleware ###################################
-CSP_STATIC_ENFORCE = "default-src 'self' 'unsafe-inline' https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' http://localhost:18000 https://fonts.gstatic.com; frame-ancestors 'self' http://localhost:2000"
+# Reference:
+# CSP_STATIC_ENFORCE = """
+#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/ https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net;
+#     style-src 'self' https://fonts.googleapis.com 'unsafe-inline'
+#     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;
+#     frame-ancestors 'self' http://localhost:2000
+# """
+# CSP_STATIC_ENFORCE = """
+#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/ https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net;
+#     style-src 'self' https://fonts.googleapis.com 'unsafe-inline'
+#     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;
+#     frame-ancestors 'self' http://localhost:2000
+# """
 
 import re
 
@@ -2373,7 +2385,7 @@ def conditional_content_security_policy_middleware(get_response):
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-    'lms.envs.common.conditional_content_security_policy_middleware',
+    # 'lms.envs.common.conditional_content_security_policy_middleware',
 
     'crum.CurrentRequestUserMiddleware',
 
@@ -2485,7 +2497,7 @@ MIDDLEWARE = [
 ]
 
 # # Clickjacking protection can be disbaled by setting this to 'ALLOW'
-# X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
