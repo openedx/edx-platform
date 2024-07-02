@@ -16,6 +16,7 @@ from openedx.core.djangoapps.notifications.models import (
 )
 from .message_type import EmailNotificationMessageType
 from .utils import (
+    add_headers_to_email_message,
     create_app_notifications_dict,
     create_email_digest_context,
     filter_notification_with_email_enabled_preferences,
@@ -98,6 +99,7 @@ def send_digest_email_to_user(user, cadence_type, course_language='en', courses_
     message = EmailNotificationMessageType(
         app_label="notifications", name="email_digest"
     ).personalize(recipient, course_language, message_context)
+    message = add_headers_to_email_message(message, message_context)
     ace.send(message)
     logger.info(f'<Email Cadence> Email sent to {user.username} ==Temp Log==')
 
