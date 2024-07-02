@@ -147,8 +147,8 @@ class TestCourseInfoOverviewSerializer(TestCase):
         self.user = UserFactory()
         self.course_overview = CourseOverviewFactory()
 
-    @patch('lms.djangoapps.mobile_api.course_info.serializers.calculate_progress')
-    def test_get_media(self, calculate_progress_mock: MagicMock) -> None:
+    @patch('lms.djangoapps.mobile_api.course_info.serializers.get_assignments_completions')
+    def test_get_media(self, get_assignments_completions_mock: MagicMock) -> None:
         output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data
 
         self.assertIn('media', output_data)
@@ -157,7 +157,7 @@ class TestCourseInfoOverviewSerializer(TestCase):
         self.assertIn('small', output_data['media']['image'])
         self.assertIn('large', output_data['media']['image'])
 
-    @patch('lms.djangoapps.mobile_api.course_info.serializers.calculate_progress')
+    @patch('lms.djangoapps.mobile_api.course_info.serializers.get_assignments_completions')
     @patch(
         'lms.djangoapps.mobile_api.course_info.serializers.get_link_for_about_page',
         return_value='mock_about_link'
@@ -165,15 +165,15 @@ class TestCourseInfoOverviewSerializer(TestCase):
     def test_get_course_sharing_utm_parameters(
         self,
         mock_get_link_for_about_page: MagicMock,
-        get_course_assignment_mock: MagicMock,
+        get_assignments_completions_mock: MagicMock,
     ) -> None:
         output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data
 
         self.assertEqual(output_data['course_about'], mock_get_link_for_about_page.return_value)
         mock_get_link_for_about_page.assert_called_once_with(self.course_overview)
 
-    @patch('lms.djangoapps.mobile_api.course_info.serializers.calculate_progress')
-    def test_get_course_modes(self, get_course_assignment_mock: MagicMock) -> None:
+    @patch('lms.djangoapps.mobile_api.course_info.serializers.get_assignments_completions')
+    def test_get_course_modes(self, get_assignments_completions_mock: MagicMock) -> None:
         expected_course_modes = [{'slug': 'audit', 'sku': None, 'android_sku': None, 'ios_sku': None, 'min_price': 0}]
 
         output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data

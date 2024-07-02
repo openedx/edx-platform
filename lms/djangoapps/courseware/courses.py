@@ -12,6 +12,7 @@ import pytz
 from crum import get_current_request
 from dateutil.parser import parse as parse_date
 from django.conf import settings
+from django.core.cache import cache
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -51,7 +52,9 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, CourseRun
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
+from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -770,6 +773,38 @@ def _ora_assessment_to_assignment(
     )
 
 
+def get_assignments_grades(user, course_id, cache_timeout):
+    """
+    Calculate the progress of the assignment for the user in the course.
+
+    Arguments:
+        user (User): Django User object.
+        course_id (CourseLocator): The course key.
+        cache_timeout (int): Cache timeout in seconds
+    Returns:
+        list (ReadSubsectionGrade, ZeroSubsectionGrade): The list with assignments grades.
+    """
+    is_staff = bool(has_access(user, 'staff', course_id))
+
+    try:
+        cache_key = f'course_block_structure_{str(course_id)}_{user.id}'
+        collected_block_structure = cache.get(cache_key)
+        if not collected_block_structure:
+            collected_block_structure = get_block_structure_manager(course_id).get_collected()
+            cache.set(cache_key, collected_block_structure, cache_timeout)
+
+        course_grade = CourseGradeFactory().read(user, collected_block_structure=collected_block_structure)
+
+        # recalculate course grade from visible grades (stored grade was calculated over all grades, visible or not)
+        course_grade.update(visible_grades_only=True, has_staff_access=is_staff)
+        subsection_grades = list(course_grade.subsection_grades.values())
+    except Exception as err:  # pylint: disable=broad-except
+        log.warning(f'Could not get grades for the course: {course_id}, error: {err}')
+        return []
+
+    return subsection_grades
+
+
 def get_first_component_of_block(block_key, block_data):
     """
     This function returns the first leaf block of a section(block_key)
@@ -1062,7 +1097,7 @@ def get_past_and_future_course_assignments(request, user, course):
     return next_assignments, past_assignments
 
 
-def calculate_progress(course_key, user):
+def get_assignments_completions(course_key, user):
     """
     Calculate the progress of the user in the course by assignments.
 

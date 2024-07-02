@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment, User as StudentUser
 from common.djangoapps.static_replace import make_static_urls_absolute
 from lms.djangoapps.certificates.api import certificate_downloadable_status
-from lms.djangoapps.courseware.courses import get_course_info_section_block
+from lms.djangoapps.courseware.courses import get_assignments_grades, get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
 from lms.djangoapps.mobile_api.course_info.constants import BLOCK_STRUCTURE_CACHE_TIMEOUT
@@ -26,7 +26,6 @@ from lms.djangoapps.mobile_api.course_info.serializers import (
     CourseAccessSerializer,
     MobileCourseEnrollmentSerializer
 )
-from lms.djangoapps.mobile_api.course_info.utils import calculate_progress
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
@@ -403,7 +402,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         """
         Extends sequential xblock info with assignment's name and progress.
         """
-        subsection_grades = calculate_progress(requested_user, course_id, BLOCK_STRUCTURE_CACHE_TIMEOUT)
+        subsection_grades = get_assignments_grades(requested_user, course_id, BLOCK_STRUCTURE_CACHE_TIMEOUT)
         grades_with_locations = {str(grade.location): grade for grade in subsection_grades}
 
         for block_id, block_info in blocks_info_data.items():

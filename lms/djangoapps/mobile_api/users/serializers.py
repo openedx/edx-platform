@@ -15,7 +15,7 @@ from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import get_past_and_future_course_assignments, calculate_progress
+from lms.djangoapps.courseware.courses import get_assignments_completions, get_past_and_future_course_assignments
 from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
 from lms.djangoapps.mobile_api.utils import API_V4
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
@@ -141,7 +141,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
 
         if 'course_progress' in self.context.get('requested_fields', []) and self.context.get('api_version') == API_V4:
-            data['course_progress'] = calculate_progress(instance.course_id, instance.user)
+            data['course_progress'] = get_assignments_completions(instance.course_id, instance.user)
 
         return data
 
@@ -201,7 +201,7 @@ class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
         """
         Returns the progress of the user in the course.
         """
-        return calculate_progress(model.course_id, model.user)
+        return get_assignments_completions(model.course_id, model.user)
 
     def get_course_assignments(self, model: CourseEnrollment) -> Dict[str, Optional[List[Dict[str, str]]]]:
         """

@@ -13,7 +13,7 @@ from common.djangoapps.util.milestones_helpers import (
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
-from lms.djangoapps.courseware.courses import calculate_progress
+from lms.djangoapps.courseware.courses import get_assignments_completions
 from lms.djangoapps.mobile_api.users.serializers import ModeSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
@@ -82,7 +82,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
         """
         Gets course progress calculated by course assignments.
         """
-        return calculate_progress(obj.id, self.context.get('user'))
+        return get_assignments_completions(obj.id, self.context.get('user'))
 
 
 class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):
