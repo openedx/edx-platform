@@ -20,7 +20,7 @@ def _get_pep8_violations(clean=True):
 
     # if not report.exists():
         # sh(f'pycodestyle . | tee {report} -a')
-        subprocess.run(['pycodestyle', '.']
+    subprocess.run(['pycodestyle', '.']
 
     # violations_list = _pep8_violations(report)
 
