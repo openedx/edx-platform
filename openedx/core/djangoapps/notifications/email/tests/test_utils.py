@@ -4,6 +4,7 @@ Test utils.py
 import datetime
 import ddt
 
+from django.http.response import Http404
 from itertools import product
 from pytz import utc
 from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
@@ -429,5 +430,9 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
         username = f"{self.user.username}-updated"
         enc_username = encrypt_string(username)
         enc_patch = encrypt_object({"value": True})
-        with self.assertNumQueries(1):
+        try:
             update_user_preferences_from_patch(enc_username, enc_patch)
+        except Http404:
+            assert True
+            return
+        assert False

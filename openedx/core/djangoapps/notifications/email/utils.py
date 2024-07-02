@@ -6,6 +6,7 @@ import json
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from pytz import utc
 from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
@@ -334,7 +335,7 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
     type_value = patch.get("notification_type")
     channel_value = patch.get("channel")
     pref_value = bool(patch.get("value", False))
-    user = User.objects.get(username=username)
+    user = get_object_or_404(User, username=username)
 
     kwargs = {'user': user}
     if 'course_id' in patch.keys():
