@@ -636,13 +636,15 @@ class DeactivateLogoutView(APIView):
                 except Exception as exc:  # pylint: disable=broad-except
                     # Catch any possible exceptions from the Commerce Coordinator service to ensure we fail gracefully
                     log.exception(
-                        "Unexpected exception while attempting to retire Commercetools user in Coordinator [%s], "
-                        "user ID [%s]: ",
+                        "Unexpected exception while attempting to retire user in Coordinator, "
+                        "with user ID [%s]: ",
                         lms_user_id,
                         str(exc)
                     )
 
-                log.info('User [%s] successfully sent to Commerce Coordinator for retirement in Commercetools.', lms_user_id)
+                log.info("User [%s] successfully sent to Commerce Coordinator for retirement.",
+                         lms_user_id
+                        )
 
                 # Log the user out.
                 logout(request)
