@@ -44,6 +44,7 @@ def fail_quality(name, message):
     write_junit_xml(name, message)
     exit(1)
 
+
 def _get_pep8_violations(clean=True):
     """
     Runs pycodestyle. Returns a tuple of (number_of_violations, violations_string)
