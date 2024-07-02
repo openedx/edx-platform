@@ -2,7 +2,9 @@
 
 import os
 import subprocess
-from .utils.envs import Env
+
+from pavelib.utils.envs import Env
+
 
 def _get_pep8_violations(clean=True):
     """
@@ -51,18 +53,18 @@ def run_pep8():  # pylint: disable=unused-argument
     print(violations_count_str)
     print(violations_list)
 
-    # # Also write the number of violations to a file
-    # with open(METRICS_DIR / "pep8", "w") as f:
-    #     f.write(violations_count_str + '\n\n')
-    #     f.write(violations_list)
+    # Also write the number of violations to a file
+    with open(Env.METRICS_DIR / "pep8", "w") as f:
+        f.write(violations_count_str + '\n\n')
+        f.write(violations_list)
 
-    # # Fail if any violations are found
-    # if count:
-    #     failure_string = "FAILURE: Too many PEP 8 violations. " + violations_count_str
-    #     failure_string += f"\n\nViolations:\n{violations_list}"
-    #     fail_quality('pep8', failure_string)
-    # else:
-    #     write_junit_xml('pep8')
+    # Fail if any violations are found
+    if count:
+        failure_string = "FAILURE: Too many PEP 8 violations. " + violations_count_str
+        failure_string += f"\n\nViolations:\n{violations_list}"
+        fail_quality('pep8', failure_string)
+    else:
+        write_junit_xml('pep8')
 
 
 if __name__ == "__main__":
