@@ -41,7 +41,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import json
 import os
-import sys
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
@@ -156,6 +155,14 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # Maximum number of retries per task.
     TASK_MAX_RETRIES=5,
 )
+
+
+"""
+Middleware to add correct x-frame-options headers.
+The headers get set to the platform default which we assume is `DENY`.
+However, there's a number of paths that are set to `SAMEORIGIN` which
+we identify via regexes stored in a django setting in the application calling this.
+"""
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -971,8 +978,8 @@ MIDDLEWARE = [
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
-    # use Django built in clickjacking protection
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # use custom extension of Django built in clickjacking protection
+    'openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 
@@ -993,8 +1000,14 @@ MIDDLEWARE = [
 
 EXTRA_MIDDLEWARE_CLASSES = []
 
-# Clickjacking protection can be disabled by setting this to 'ALLOW'
+# Clickjacking protection can be disabled by setting this to 'ALLOW' or adjusted by setting this to 'SAMEORIGIN'.
+# It is not advised to set this to 'ALLOW' without a Content Security Policy header.
 X_FRAME_OPTIONS = 'DENY'
+# You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
+# Content Security Policy in place.
+# SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
+X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']]
+
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
@@ -1246,8 +1259,6 @@ COURSE_METADATA_EXPORT_BUCKET = ''
 ALTERNATE_WORKER_QUEUES = 'lms'
 
 STATIC_URL_BASE = '/static/'
-
-X_FRAME_OPTIONS = 'DENY'
 
 # .. setting_name: GIT_REPO_EXPORT_DIR
 # .. setting_default: '/edx/var/edxapp/export_course_repos'
