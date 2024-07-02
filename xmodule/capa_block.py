@@ -50,6 +50,7 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ID,
 )
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.markup import HTML, Text
 from .capa.xqueue_interface import XQueueService
 
@@ -1433,6 +1434,19 @@ class ProblemBlock(
         """
         Is the student still allowed to submit answers?
         """
+        # Checking if the course is archived
+        from xmodule.modulestore.django import modulestore
+        try:
+            if isinstance(self.course_id, CourseKey):
+                course = modulestore().get_course(self.course_id)
+                closed_date = (
+                    course.end + self.graceperiod if self.graceperiod is not None else course.end
+                )
+                if closed_date and datetime.datetime.now(utc) > closed_date:
+                    return True
+        except AttributeError:
+            pass
+
         if self.used_all_attempts():
             return True
         if self.is_past_due():
