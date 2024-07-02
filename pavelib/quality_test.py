@@ -6,6 +6,38 @@ import subprocess
 from pavelib.utils.envs import Env
 
 
+JUNIT_XML_FAILURE_TEMPLATE = '<failure message={message}/>'
+START_TIME = datetime.utcnow()
+
+
+def write_junit_xml(name, message=None):
+    """
+    Write a JUnit results XML file describing the outcome of a quality check.
+    """
+    if message:
+        failure_element = JUNIT_XML_FAILURE_TEMPLATE.format(message=quoteattr(message))
+    else:
+        failure_element = ''
+    data = {
+        'failure_count': 1 if message else 0,
+        'failure_element': failure_element,
+        'name': name,
+        'seconds': (datetime.utcnow() - START_TIME).total_seconds(),
+    }
+    Env.QUALITY_DIR.makedirs_p()
+    filename = Env.QUALITY_DIR / f'{name}.xml'
+    with open(filename, 'w') as f:
+        f.write(JUNIT_XML_TEMPLATE.format(**data))
+
+
+def fail_quality(name, message):
+    """
+    Fail the specified quality check by generating the JUnit XML results file
+    and raising a ``BuildFailure``.
+    """
+    write_junit_xml(name, message)
+    exit(1)
+
 def _get_pep8_violations(clean=True):
     """
     Runs pycodestyle. Returns a tuple of (number_of_violations, violations_string)
