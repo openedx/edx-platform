@@ -230,6 +230,27 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                                          'text_search': 'library-title-4'})) == 1
         assert len(self._list_libraries({'type': VIDEO})) == 3
 
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'title'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-title'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'created'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-created'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        # An invalid order doesn't apply any specific ordering to the result, so just
+        # check if successfully returned libraries
+        assert len(self._list_libraries({'order': 'invalid'})) == 5
+        assert len(self._list_libraries({'order': '-invalid'})) == 5
+
     # General Content Library XBlock tests:
 
     def test_library_blocks(self):
