@@ -129,10 +129,70 @@ class UnenrollmentNotAllowed(CourseEnrollmentException):
     pass
 
 
+class CourseEnrollmentQuerySet(models.QuerySet):
+    """
+    Custom queryset for CourseEnrollment with Table-level filter methods.
+    """
+
+    def active(self):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that are currently active.
+        """
+        return self.filter(is_active=True)
+
+    def without_certificates(self, user_username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that do not have a certificate.
+        """
+        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
+        course_ids_with_certificates = GeneratedCertificate.objects.filter(
+            user__username=user_username
+        ).values_list('course_id', flat=True)
+        return self.exclude(course_id__in=course_ids_with_certificates)
+
+    def with_certificates(self, user_username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have a certificate.
+        """
+        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
+        course_ids_with_certificates = GeneratedCertificate.objects.filter(
+            user__username=user_username
+        ).values_list('course_id', flat=True)
+        return self.filter(course_id__in=course_ids_with_certificates)
+
+    def in_progress(self, user_username, time_zone=UTC):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that are currently in progress.
+        """
+        now = datetime.now(time_zone)
+        return self.active().without_certificates(user_username).filter(
+            Q(course__start__lte=now, course__end__gte=now)
+            | Q(course__start__isnull=True, course__end__isnull=True)
+            | Q(course__start__isnull=True, course__end__gte=now)
+            | Q(course__start__lte=now, course__end__isnull=True),
+        )
+
+    def completed(self, user_username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have been completed.
+        """
+        return self.active().with_certificates(user_username)
+
+    def expired(self, user_username, time_zone=UTC):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have expired.
+        """
+        now = datetime.now(time_zone)
+        return self.active().without_certificates(user_username).filter(course__end__lt=now)
+
+
 class CourseEnrollmentManager(models.Manager):
     """
     Custom manager for CourseEnrollment with Table-level filter methods.
     """
+
+    def get_queryset(self):
+        return CourseEnrollmentQuerySet(self.model, using=self._db)
 
     def is_small_course(self, course_id):
         """

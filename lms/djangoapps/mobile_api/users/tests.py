@@ -4,7 +4,7 @@ Tests for users API
 
 
 import datetime
-from unittest.mock import patch
+from unittest.mock import MagicMock, Mock, patch
 from urllib.parse import parse_qs
 
 import ddt
@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -27,6 +28,7 @@ from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.mobile_api.models import MobileConfig
 from lms.djangoapps.mobile_api.testutils import (
     MobileAPITestCase,
@@ -34,7 +36,8 @@ from lms.djangoapps.mobile_api.testutils import (
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3
+from lms.djangoapps.mobile_api.users.enums import EnrollmentStatuses
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3, API_V4
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -405,6 +408,616 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         assert len(response.data["enrollments"]["results"]) == 10
         assert "next" in response.data["enrollments"]
         assert "previous" in response.data["enrollments"]
+
+    def test_student_dont_have_enrollments(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        expected_result = {
+            'configs': {
+                'iap_configs': {}
+            },
+            'user_timezone': 'UTC',
+            'enrollments': {
+                'next': None,
+                'previous': None,
+                'count': 0,
+                'num_pages': 1,
+                'current_page': 1,
+                'start': 0,
+                'results': []
+            }
+        }
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(expected_result, response.data)
+        self.assertNotIn('primary', response.data)
+
+    def test_student_have_one_enrollment(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(course.id)
+        expected_enrollments = {
+            'next': None,
+            'previous': None,
+            'count': 0,
+            'num_pages': 1,
+            'current_page': 1,
+            'start': 0,
+            'results': []
+        }
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(expected_enrollments, response.data['enrollments'])
+        self.assertIn('primary', response.data)
+        self.assertEqual(str(course.id), response.data['primary']['course']['id'])
+
+    def test_student_have_two_enrollments(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        course_first = CourseFactory.create(org="edx", mobile_available=True)
+        course_second = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(course_first.id)
+        self.enroll(course_second.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['enrollments']['results']), 1)
+        self.assertEqual(response.data['enrollments']['count'], 1)
+        self.assertEqual(response.data['enrollments']['results'][0]['course']['id'], str(course_first.id))
+        self.assertIn('primary', response.data)
+        self.assertEqual(response.data['primary']['course']['id'], str(course_second.id))
+
+    def test_student_have_more_then_ten_enrollments(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        courses = [CourseFactory.create(org="edx", mobile_available=True) for _ in range(15)]
+        for course in courses:
+            self.enroll(course.id)
+        latest_enrolment = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(latest_enrolment.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 15)
+        self.assertEqual(response.data['enrollments']['num_pages'], 3)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        self.assertIn('primary', response.data)
+        self.assertEqual(response.data['primary']['course']['id'], str(latest_enrolment.id))
+
+    def test_student_have_progress_in_old_course_and_enroll_newest_course(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        old_course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(old_course.id)
+        courses = [CourseFactory.create(org="edx", mobile_available=True) for _ in range(5)]
+        for course in courses:
+            self.enroll(course.id)
+        new_course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(new_course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 6)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        # check that we have the new_course in primary section
+        self.assertIn('primary', response.data)
+        self.assertEqual(response.data['primary']['course']['id'], str(new_course.id))
+
+        # doing progress in the old_course
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=old_course.id,
+            module_state_key=old_course.location,
+        )
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 6)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        # check that now we have the old_course in primary section
+        self.assertIn('primary', response.data)
+        self.assertEqual(response.data['primary']['course']['id'], str(old_course.id))
+
+        # enroll to the newest course
+        newest_course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(newest_course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 7)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        # check that now we have the newest_course in primary section
+        self.assertIn('primary', response.data)
+        self.assertEqual(response.data['primary']['course']['id'], str(newest_course.id))
+
+    def test_student_enrolled_only_not_mobile_available_courses(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        courses = [CourseFactory.create(org="edx", mobile_available=False) for _ in range(3)]
+        for course in courses:
+            self.enroll(course.id)
+        expected_result = {
+            "configs": {
+                "iap_configs": {}
+            },
+            "user_timezone": "UTC",
+            "enrollments": {
+                "next": None,
+                "previous": None,
+                "count": 0,
+                "num_pages": 1,
+                "current_page": 1,
+                "start": 0,
+                "results": []
+            }
+        }
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(expected_result, response.data)
+        self.assertNotIn('primary', response.data)
+
+    def test_do_progress_in_not_mobile_available_course(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        not_mobile_available = CourseFactory.create(org="edx", mobile_available=False)
+        self.enroll(not_mobile_available.id)
+        courses = [CourseFactory.create(org="edx", mobile_available=True) for _ in range(5)]
+        for course in courses:
+            self.enroll(course.id)
+        new_course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(new_course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 5)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        # check that we have the new_course in primary section
+        self.assertIn('primary', response.data)
+        self.assertEqual(response.data['primary']['course']['id'], str(new_course.id))
+
+        # doing progress in the not_mobile_available course
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=not_mobile_available.id,
+            module_state_key=not_mobile_available.location,
+        )
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 5)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        # check that we have the new_course in primary section in the same way
+        self.assertIn('primary', response.data)
+        self.assertEqual(response.data['primary']['course']['id'], str(new_course.id))
+
+    def test_pagination_for_user_enrollments_api_v4(self):
+        """
+        Tests `UserCourseEnrollmentsV4Pagination`, api_version == v4.
+        """
+        self.login()
+        courses = [CourseFactory.create(org="my_org", mobile_available=True) for _ in range(15)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['enrollments']['count'], 14)
+        self.assertEqual(response.data['enrollments']['num_pages'], 3)
+        self.assertEqual(response.data['enrollments']['current_page'], 1)
+        self.assertEqual(len(response.data['enrollments']['results']), 5)
+        self.assertIn('next', response.data['enrollments'])
+        self.assertIn('previous', response.data['enrollments'])
+        self.assertIn('primary', response.data)
+
+    def test_course_status_in_primary_obj_when_student_doesnt_have_progress(self):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['primary']['course_status'], None)
+
+    @patch('lms.djangoapps.mobile_api.users.serializers.get_key_to_last_completed_block')
+    def test_course_status_in_primary_obj_when_student_have_progress(
+        self,
+        get_last_completed_block_mock: MagicMock,
+    ):
+        """
+        Testing modified `UserCourseEnrollmentsList` view with api_version == v4.
+        """
+        self.login()
+        # create test course structure
+        course = CourseFactory.create(org="edx", mobile_available=True)
+        section = BlockFactory.create(
+            parent=course,
+            category="chapter",
+            display_name="section",
+        )
+        subsection = BlockFactory.create(
+            parent=section,
+            category="sequential",
+            display_name="subsection",
+        )
+        vertical = BlockFactory.create(
+            parent=subsection,
+            category="vertical",
+            display_name="test unit",
+        )
+        problem = BlockFactory.create(
+            parent=vertical,
+            category="problem",
+            display_name="problem",
+        )
+        self.enroll(course.id)
+        get_last_completed_block_mock.return_value = problem.location
+        expected_course_status = {
+            'last_visited_module_id': str(subsection.location),
+            'last_visited_module_path': [
+                str(course.location),
+                str(section.location),
+                str(subsection.location),
+            ],
+            'last_visited_block_id': str(problem.location),
+            'last_visited_unit_display_name': vertical.display_name,
+        }
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['primary']['course_status'], expected_course_status)
+        get_last_completed_block_mock.assert_called_once_with(self.user, course.id)
+
+    def test_user_enrollment_api_v4_in_progress_status(self):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.IN_PROGRESS.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 2)
+        self.assertEqual(enrollments['results'][1]['course']['id'], str(actual_course.id))
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(infinite_course.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_completed_status(self):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=infinite_course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+        )
+
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.COMPLETED.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 1)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(infinite_course.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_expired_status(self):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.EXPIRED.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 1)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(old_course.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_expired_course_with_certificate(self):
+        """
+        Testing that the API returns a course with
+        an expiration date in the past if the user has a certificate for this course.
+        """
+        self.login()
+        expired_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        expired_course_with_cert = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=expired_course_with_cert.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+        )
+
+        self.enroll(expired_course_with_cert.id)
+        self.enroll(expired_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.COMPLETED.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 1)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(expired_course_with_cert.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_user_enrollment_api_v4_status_all(self):
+        """
+        Testing
+        """
+        self.login()
+        old_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.THREE_YEARS_AGO,
+            end=self.LAST_WEEK
+        )
+        actual_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=self.NEXT_WEEK
+        )
+        infinite_course = CourseFactory.create(
+            org="edx",
+            mobile_available=True,
+            start=self.LAST_WEEK,
+            end=None
+        )
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=infinite_course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+        )
+
+        self.enroll(old_course.id)
+        self.enroll(actual_course.id)
+        self.enroll(infinite_course.id)
+
+        response = self.api_response(api_version=API_V4, data={'status': EnrollmentStatuses.ALL.value})
+        enrollments = response.data['enrollments']
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(enrollments['count'], 3)
+        self.assertEqual(enrollments['results'][0]['course']['id'], str(infinite_course.id))
+        self.assertEqual(enrollments['results'][1]['course']['id'], str(actual_course.id))
+        self.assertEqual(enrollments['results'][2]['course']['id'], str(old_course.id))
+        self.assertNotIn('primary', response.data)
+
+    def test_response_contains_primary_enrollment_assignments_info(self):
+        self.login()
+        course = CourseFactory.create(org='edx', mobile_available=True)
+        self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_assignments', response.data['primary'])
+        self.assertIn('past_assignments', response.data['primary']['course_assignments'])
+        self.assertIn('future_assignments', response.data['primary']['course_assignments'])
+        self.assertListEqual(response.data['primary']['course_assignments']['past_assignments'], [])
+        self.assertListEqual(response.data['primary']['course_assignments']['future_assignments'], [])
+
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments', return_value=[])
+    def test_course_progress_in_primary_enrollment_with_no_assignments(
+        self,
+        get_course_assignment_mock: MagicMock,
+    ) -> None:
+        self.login()
+        course = CourseFactory.create(org='edx', mobile_available=True)
+        self.enroll(course.id)
+        expected_course_progress = {'total_assignments_count': 0, 'assignments_completed': 0}
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_progress', response.data['primary'])
+        self.assertDictEqual(response.data['primary']['course_progress'], expected_course_progress)
+
+    @patch(
+        'lms.djangoapps.mobile_api.users.serializers.CourseEnrollmentSerializerModifiedForPrimary'
+        '.get_course_assignments'
+    )
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
+    def test_course_progress_in_primary_enrollment_with_assignments(
+        self,
+        get_course_assignment_mock: MagicMock,
+        assignments_mock: MagicMock,
+    ) -> None:
+        self.login()
+        course = CourseFactory.create(org='edx', mobile_available=True)
+        self.enroll(course.id)
+        course_assignments_mock = [
+            Mock(complete=False), Mock(complete=False), Mock(complete=True), Mock(complete=True), Mock(complete=True)
+        ]
+        get_course_assignment_mock.return_value = course_assignments_mock
+        student_assignments_mock = {
+            'future_assignments': [],
+            'past_assignments': [],
+        }
+        assignments_mock.return_value = student_assignments_mock
+        expected_course_progress = {'total_assignments_count': 5, 'assignments_completed': 3}
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_progress', response.data['primary'])
+        self.assertDictEqual(response.data['primary']['course_progress'], expected_course_progress)
+
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
+    def test_course_progress_for_secondary_enrollments_no_query_param(
+        self,
+        get_course_assignment_mock: MagicMock,
+    ) -> None:
+        self.login()
+        courses = [CourseFactory.create(org='edx', mobile_available=True) for _ in range(5)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V4)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for enrollment in response.data['enrollments']['results']:
+            self.assertNotIn('course_progress', enrollment)
+
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
+    def test_course_progress_for_secondary_enrollments_with_query_param(
+        self,
+        get_course_assignment_mock: MagicMock,
+    ) -> None:
+        self.login()
+        courses = [CourseFactory.create(org='edx', mobile_available=True) for _ in range(5)]
+        for course in courses:
+            self.enroll(course.id)
+        expected_course_progress = {'total_assignments_count': 0, 'assignments_completed': 0}
+
+        response = self.api_response(api_version=API_V4, data={'requested_fields': 'course_progress'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for enrollment in response.data['enrollments']['results']:
+            self.assertIn('course_progress', enrollment)
+            self.assertDictEqual(enrollment['course_progress'], expected_course_progress)
+
+    @patch(
+        'lms.djangoapps.mobile_api.users.serializers.CourseEnrollmentSerializerModifiedForPrimary'
+        '.get_course_assignments'
+    )
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
+    def test_course_progress_for_secondary_enrollments_with_query_param_and_assignments(
+        self,
+        get_course_assignment_mock: MagicMock,
+        assignments_mock: MagicMock,
+    ) -> None:
+        self.login()
+        courses = [CourseFactory.create(org='edx', mobile_available=True) for _ in range(2)]
+        for course in courses:
+            self.enroll(course.id)
+        course_assignments_mock = [
+            Mock(complete=False), Mock(complete=False), Mock(complete=True), Mock(complete=True), Mock(complete=True)
+        ]
+        get_course_assignment_mock.return_value = course_assignments_mock
+        student_assignments_mock = {
+            'future_assignments': [],
+            'past_assignments': [],
+        }
+        assignments_mock.return_value = student_assignments_mock
+        expected_course_progress = {'total_assignments_count': 5, 'assignments_completed': 3}
+
+        response = self.api_response(api_version=API_V4, data={'requested_fields': 'course_progress'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('course_progress', response.data['primary'])
+        self.assertDictEqual(response.data['primary']['course_progress'], expected_course_progress)
+        self.assertIn('course_progress', response.data['enrollments']['results'][0])
+        self.assertDictEqual(response.data['enrollments']['results'][0]['course_progress'], expected_course_progress)
 
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})

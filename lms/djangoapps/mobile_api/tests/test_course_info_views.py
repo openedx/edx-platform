@@ -422,3 +422,31 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data['course_modes'], expected_course_modes)
+
+    def test_extend_sequential_info_with_assignment_progress_get_only_sequential(self) -> None:
+        response = self.verify_response(url=self.url, params={'block_types_filter': 'sequential'})
+
+        expected_results = (
+            {
+                'assignment_type': 'Lecture Sequence',
+                'num_points_earned': 0.0,
+                'num_points_possible': 0.0
+            },
+            {
+                'assignment_type': None,
+                'num_points_earned': 0.0,
+                'num_points_possible': 0.0
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for sequential_info, assignment_progress in zip(response.data['blocks'].values(), expected_results):
+            self.assertDictEqual(sequential_info['assignment_progress'], assignment_progress)
+
+    @ddt.data('chapter', 'vertical', 'problem', 'video', 'html')
+    def test_extend_sequential_info_with_assignment_progress_for_other_types(self, block_type: 'str') -> None:
+        response = self.verify_response(url=self.url, params={'block_types_filter': block_type})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for block_info in response.data['blocks'].values():
+            self.assertNotEqual('assignment_progress', block_info)

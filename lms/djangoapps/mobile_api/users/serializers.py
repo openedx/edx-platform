@@ -2,7 +2,11 @@
 Serializer for user API
 """
 
+from typing import Dict, List, Optional
 
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -11,7 +15,13 @@ from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_assignments_completions, get_past_and_future_course_assignments
+from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
+from lms.djangoapps.mobile_api.utils import API_V4
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.search import path_to_location
 
 
 class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: disable=abstract-method
@@ -97,7 +107,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """
         Returns expiration date for a course audit expiration, if any or null
         """
-        return get_user_course_expiration_date(model.user, model.course)
+        return get_user_course_expiration_date(model.user, model.course, model)
 
     def get_certificate(self, model):
         """Returns the information about the user's certificate in the course."""
@@ -124,6 +134,17 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
             for mode in course_modes
         ]
 
+    def to_representation(self, instance: CourseEnrollment) -> 'OrderedDict':  # lint-amnesty, pylint: disable=unused-variable, line-too-long
+        """
+        Override the to_representation method to add the course_status field to the serialized data.
+        """
+        data = super().to_representation(instance)
+
+        if 'course_progress' in self.context.get('requested_fields', []) and self.context.get('api_version') == API_V4:
+            data['course_progress'] = get_assignments_completions(instance.course_id, instance.user)
+
+        return data
+
     class Meta:
         model = CourseEnrollment
         fields = ('audit_access_expires', 'created', 'mode', 'is_active', 'course', 'certificate', 'course_modes')
@@ -138,6 +159,76 @@ class CourseEnrollmentSerializerv05(CourseEnrollmentSerializer):
     class Meta:
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course', 'certificate')
+        lookup_field = 'username'
+
+
+class CourseEnrollmentSerializerModifiedForPrimary(CourseEnrollmentSerializer):
+    """
+    Serializes CourseEnrollment models for API v4.
+
+    Adds `course_status` field into serializer data.
+    """
+
+    course_status = serializers.SerializerMethodField()
+    course_progress = serializers.SerializerMethodField()
+    course_assignments = serializers.SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.course = modulestore().get_course(self.instance.course.id)
+
+    def get_course_status(self, model: CourseEnrollment) -> Optional[Dict[str, List[str]]]:
+        """
+        Gets course status for the given user's enrollments.
+        """
+        try:
+            block_key = get_key_to_last_completed_block(model.user, model.course.id)
+            path = path_to_location(modulestore(), block_key, self.context['request'], full_path=True)
+        except (ItemNotFoundError, NoPathToItem, UnavailableCompletionData):
+            return None
+
+        path_ids = [str(block) for block in path]
+        unit = modulestore().get_item(UsageKey.from_string(path_ids[3]), depth=0)
+
+        return {
+            'last_visited_module_id': path_ids[2],
+            'last_visited_module_path': path_ids[:3],
+            'last_visited_block_id': path_ids[-1],
+            'last_visited_unit_display_name': unit.display_name,
+        }
+
+    def get_course_progress(self, model: CourseEnrollment) -> Dict[str, int]:
+        """
+        Returns the progress of the user in the course.
+        """
+        return get_assignments_completions(model.course_id, model.user)
+
+    def get_course_assignments(self, model: CourseEnrollment) -> Dict[str, Optional[List[Dict[str, str]]]]:
+        """
+        Returns the future assignment data and past assignments data for the user in the course.
+        """
+        next_assignments, past_assignments = get_past_and_future_course_assignments(
+            self.context.get('request'), model.user, self.course
+        )
+        return {
+            'future_assignments': DateSummarySerializer(next_assignments, many=True).data,
+            'past_assignments': DateSummarySerializer(past_assignments, many=True).data,
+        }
+
+    class Meta:
+        model = CourseEnrollment
+        fields = (
+            'audit_access_expires',
+            'created',
+            'mode',
+            'is_active',
+            'course',
+            'certificate',
+            'course_modes',
+            'course_status',
+            'course_progress',
+            'course_assignments',
+        )
         lookup_field = 'username'
 
 
