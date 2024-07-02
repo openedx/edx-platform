@@ -7,7 +7,11 @@ from pavelib.utils.envs import Env
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
-
+JUNIT_XML_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="{name}" tests="1" errors="0" failures="{failure_count}" skip="0">
+<testcase classname="pavelib.quality" name="{name}" time="{seconds}">{failure_element}</testcase>
+</testsuite>
+"""
 JUNIT_XML_FAILURE_TEMPLATE = '<failure message={message}/>'
 START_TIME = datetime.utcnow()
 
