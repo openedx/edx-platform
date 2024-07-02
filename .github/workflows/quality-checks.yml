@@ -69,7 +69,7 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
           TOX_ENV: ${{ matrix.toxenv }}
-        run: python quality_test.py
+        run: python pavelib/quality_test.py
           
 
       - name: Save Job Artifacts
