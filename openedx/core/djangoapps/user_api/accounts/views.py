@@ -8,6 +8,7 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 import datetime
 import logging
 from functools import wraps
+from urllib.parse import urljoin
 
 import pytz
 from consent.models import DataSharingConsent
@@ -21,6 +22,7 @@ from django.utils.translation import gettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_client
 from openedx.core.lib.api.authentication import BearerAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
@@ -610,6 +612,37 @@ class DeactivateLogoutView(APIView):
                 except Exception as exc:
                     log.exception('Error sending out deletion notification email')
                     raise exc
+
+                # Re-use Ecommerce API client factory to build an API client for Commerce Coordinator...
+                service_user = get_user_model().objects.get(
+                    username=settings.COMMERCE_COORDINATOR_SERVICE_WORKER_USERNAME
+                )
+                api_client = get_ecommerce_api_client(service_user)
+                retirement_url = urljoin(
+                    settings.COMMERCE_COORDINATOR_URL_ROOT,
+                    settings.COMMERCE_COORDINATOR_USER_RETIREMENT_PATH
+                )
+
+                lms_user_id = request.user.id
+
+                try:
+                    api_client.post(
+                        retirement_url,
+                        json={
+                            'edx_lms_user_id': lms_user_id,
+
+                        }
+                    ).raise_for_status()
+                except Exception as exc:  # pylint: disable=broad-except
+                    # Catch any possible exceptions from the Commerce Coordinator service to ensure we fail gracefully
+                    log.exception(
+                        "Unexpected exception while attempting to retire Commercetools user in Coordinator [%s], "
+                        "user ID [%s]: ",
+                        lms_user_id,
+                        str(exc)
+                    )
+
+                log.info('User [%s] successfully sent to Commerce Coordinator for retirement in Commercetools.', lms_user_id)
 
                 # Log the user out.
                 logout(request)
