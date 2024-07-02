@@ -17,6 +17,7 @@ jobs:
         python-version:
           - "3.11"
         node-version: [20]
+        toxenv: [quality]
 
     steps:
       - uses: actions/checkout@v4
@@ -67,8 +68,9 @@ jobs:
           SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
-        run: |
-          ./scripts/all-tests.sh
+          TOX_ENV: ${{ matrix.toxenv }}
+        run: python pavelib/quality_test.py
+          
 
       - name: Save Job Artifacts
         if: always()

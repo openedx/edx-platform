@@ -60,7 +60,7 @@ function run_paver_quality {
     shift
     mkdir -p test_root/log/
     LOG_PREFIX="test_root/log/$QUALITY_TASK"
-    $TOX paver "$QUALITY_TASK" "$@" 2> "$LOG_PREFIX.err.log" > "$LOG_PREFIX.out.log" || {
+    $TOX "$QUALITY_TASK" "$@" 2> "$LOG_PREFIX.err.log" > "$LOG_PREFIX.out.log" || {
         echo "STDOUT (last 100 lines of $LOG_PREFIX.out.log):";
         tail -n 100 "$LOG_PREFIX.out.log"
         echo "STDERR (last 100 lines of $LOG_PREFIX.err.log):";
