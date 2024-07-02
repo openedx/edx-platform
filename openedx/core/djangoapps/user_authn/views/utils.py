@@ -128,16 +128,25 @@ def _get_username_prefix(data):
     - str: Name initials or None.
     """
     username_regex_partial = settings.USERNAME_REGEX_PARTIAL
+    valid_username_regex = r'^[A-Za-z0-9_\-]+$'
     full_name = ''
-    if data.get('first_name', '').strip() and data.get('last_name', '').strip():
-        full_name = f"{unidecode(data.get('first_name', ''))} {unidecode(data.get('last_name', ''))}"
-    elif data.get('name', '').strip():
-        full_name = unidecode(data['name'])
+    try:
+        if data.get('first_name', '').strip() and data.get('last_name', '').strip():
+            full_name = f"{unidecode(data.get('first_name', ''))} {unidecode(data.get('last_name', ''))}"
+        elif data.get('name', '').strip():
+            full_name = unidecode(data['name'])
 
-    if full_name.strip():
-        full_name = re.findall(username_regex_partial, full_name)[0]
-        name_initials = "".join([name_part[0] for name_part in full_name.split()[:2]])
-        return name_initials.upper() if name_initials else None
+        if full_name.strip():
+            matched_name = re.findall(username_regex_partial, full_name)
+            if matched_name:
+                full_name = " ".join(matched_name)
+                name_initials = "".join([name_part[0] for name_part in full_name.split()[:2]])
+                if re.match(valid_username_regex, name_initials):
+                    return name_initials.upper() if name_initials else None
+
+    except Exception as e:  # pylint: disable=broad-except
+        logging.info(f"Error in _get_username_prefix: {e}")
+        return None
 
     return None
 

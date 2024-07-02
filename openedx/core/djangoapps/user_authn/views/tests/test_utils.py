@@ -45,6 +45,8 @@ class TestGenerateUsername(TestCase):
         ({}, None),
         ({'first_name': '', 'last_name': ''}, None),
         ({'name': ''}, None),
+        ({'name': '='}, None),
+        ({'name': '@'}, None),
         ({'first_name': '阿提亚', 'last_name': '阿提亚'}, "AT"),
         ({'first_name': 'أحمد', 'last_name': 'محمد'}, "HM"),
         ({'name': 'أحمد محمد'}, "HM"),
