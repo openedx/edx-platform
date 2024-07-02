@@ -15,6 +15,7 @@ from openedx_filters.learning.filters import CourseEnrollmentAPIRenderStarted, C
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
 from xmodule.data import CertificatesDisplayBehaviors
+from lms.djangoapps.learner_home.utils import course_progress_url
 
 
 class LiteralField(serializers.Field):
@@ -116,7 +117,7 @@ class CourseRunSerializer(serializers.Serializer):
         return course_home_url(instance.course_id)
 
     def get_progressUrl(self, instance):
-        return reverse("progress", kwargs={"course_id": instance.course_id})
+        return course_progress_url(instance.course_id)
 
     def get_unenrollUrl(self, instance):
         return reverse("course_run_refund_status", args=[instance.course_id])
