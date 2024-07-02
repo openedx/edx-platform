@@ -4,6 +4,8 @@ import os
 import subprocess
 
 from pavelib.utils.envs import Env
+from datetime import datetime
+from xml.sax.saxutils import quoteattr
 
 
 JUNIT_XML_FAILURE_TEMPLATE = '<failure message={message}/>'
