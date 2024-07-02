@@ -34,7 +34,7 @@ django-simple-history==3.4.0
 
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
 # Major upgrade will be done in separate ticket.
-pymongo<4.0.0
+pymongo<4.4.1
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
