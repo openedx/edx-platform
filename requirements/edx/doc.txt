@@ -451,7 +451,7 @@ drf-yasg==1.21.7
     #   -r requirements/edx/base.txt
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.8.0
+edx-ace==1.9.1
     # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.8.0
     # via
@@ -492,6 +492,7 @@ edx-django-utils==5.14.2
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
+    #   edx-ace
     #   edx-drf-extensions
     #   edx-enterprise
     #   edx-event-bus-kafka
