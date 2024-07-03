@@ -45,7 +45,7 @@ nltk==3.8.1
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
-numpy==1.26.4
+numpy==2.0.0
     # via
     #   chem
     #   contourpy
@@ -56,7 +56,7 @@ openedx-calc==3.1.0
     # via -r requirements/edx-sandbox/base.in
 packaging==24.1
     # via matplotlib
-pillow==10.3.0
+pillow==10.4.0
     # via matplotlib
 pycparser==2.22
     # via cffi
@@ -72,7 +72,7 @@ random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
 regex==2024.5.15
     # via nltk
-scipy==1.13.1
+scipy==1.14.0
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem

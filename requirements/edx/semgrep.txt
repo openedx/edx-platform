@@ -76,7 +76,7 @@ tomli==2.0.1
     # via semgrep
 typing-extensions==4.12.2
     # via semgrep
-urllib3==1.26.18
+urllib3==1.26.19
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
