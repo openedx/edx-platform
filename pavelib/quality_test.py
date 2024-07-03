@@ -126,6 +126,57 @@ def _write_metric(metric, filename):
         metric_file.write(str(metric))
 
 
+def _get_report_contents(filename, report_name, last_line_only=False):
+    """
+    Returns the contents of the given file. Use last_line_only to only return
+    the last line, which can be used for getting output from quality output
+    files.
+
+    Arguments:
+        last_line_only: True to return the last line only, False to return a
+            string with full contents.
+
+    Returns:
+        String containing full contents of the report, or the last line.
+
+    """
+    if os.path.isfile(filename):
+        with open(filename) as report_file:
+            if last_line_only:
+                lines = report_file.readlines()
+                for line in reversed(lines):
+                    if line != '\n':
+                        return line
+                return None
+            else:
+                return report_file.read()
+    else:
+        file_not_found_message = f"FAILURE: The following log file could not be found: {filename}"
+        fail_quality(report_name, file_not_found_message)
+
+
+def _get_count_from_last_line(filename, file_type):
+    """
+    This will return the number in the last line of a file.
+    It is returning only the value (as a floating number).
+    """
+    report_contents = _get_report_contents(filename, file_type, last_line_only=True)
+
+    if report_contents is None:
+        return 0
+
+    last_line = report_contents.strip()
+    # Example of the last line of a compact-formatted eslint report (for example): "62829 problems"
+    regex = r'^\d+'
+
+    try:
+        return float(re.search(regex, last_line).group(0))
+    # An AttributeError will occur if the regex finds no matches.
+    # A ValueError will occur if the returned regex cannot be cast as a float.
+    except (AttributeError, ValueError):
+        return None
+
+
 def _get_stylelint_violations():
     """
     Returns the number of Stylelint violations.
