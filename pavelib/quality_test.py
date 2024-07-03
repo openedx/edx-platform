@@ -106,7 +106,6 @@ def run_pep8():  # pylint: disable=unused-argument
         write_junit_xml('pep8')
 
 
-
 def _write_metric(metric, filename):
     """
     Write a given metric to a given file
@@ -141,10 +140,9 @@ def _get_stylelint_violations():
         result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         report_file.write(result.stdout)
         report_file.write(result.stderr)
-    
+
     if result.returncode != 0:
         print(f"Warning: stylelint command exited with non-zero status {result.returncode}")
-
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
