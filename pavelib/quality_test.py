@@ -155,7 +155,7 @@ def _get_stylelint_violations():
         )
 
 
-def run_stylelint(options):
+def run_stylelint():
     """
     Runs stylelint on Sass files.
     If limit option is passed, fails build if more violations than the limit are found.
