@@ -106,6 +106,14 @@ def run_pep8():  # pylint: disable=unused-argument
         write_junit_xml('pep8')
 
 
+def _prepare_report_dir(dir_name):
+    """
+    Sets a given directory to a created, but empty state
+    """
+    dir_name.rmtree_p()
+    dir_name.mkdir_p()
+
+
 def _write_metric(metric, filename):
     """
     Write a given metric to a given file
