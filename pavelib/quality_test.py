@@ -199,7 +199,6 @@ def _get_stylelint_violations():
     with open(stylelint_report, 'w') as report_file:
         result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         report_file.write(result.stdout)
-        report_file.write(result.stderr)
 
     if result.returncode != 0:
         print(f"Warning: stylelint command exited with non-zero status {result.returncode}")
