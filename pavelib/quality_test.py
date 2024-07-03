@@ -1,6 +1,7 @@
 # run_quality_checks.py
 
 import os
+import re
 import subprocess
 
 from pavelib.utils.envs import Env
