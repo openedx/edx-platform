@@ -787,7 +787,8 @@ def get_assignments_grades(user, course_id, cache_timeout):
     is_staff = bool(has_access(user, 'staff', course_id))
 
     try:
-        cache_key = f'course_block_structure_{str(course_id)}_{user.id}'
+        course = get_course_with_access(user, 'load', course_id)
+        cache_key = f'course_block_structure_{str(course_id)}_{str(course.course_version)}_{user.id}'
         collected_block_structure = cache.get(cache_key)
         if not collected_block_structure:
             collected_block_structure = get_block_structure_manager(course_id).get_collected()

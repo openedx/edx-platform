@@ -140,50 +140,52 @@ class CourseEnrollmentQuerySet(models.QuerySet):
         """
         return self.filter(is_active=True)
 
-    def without_certificates(self, user_username):
+    def without_certificates(self, username):
         """
         Returns a queryset of CourseEnrollment objects for courses that do not have a certificate.
         """
-        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
-        course_ids_with_certificates = GeneratedCertificate.objects.filter(
-            user__username=user_username
-        ).values_list('course_id', flat=True)
-        return self.exclude(course_id__in=course_ids_with_certificates)
+        return self.exclude(course_id__in=self.get_user_course_ids_with_certificates(username))
 
-    def with_certificates(self, user_username):
+    def with_certificates(self, username):
         """
         Returns a queryset of CourseEnrollment objects for courses that have a certificate.
         """
-        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
-        course_ids_with_certificates = GeneratedCertificate.objects.filter(
-            user__username=user_username
-        ).values_list('course_id', flat=True)
-        return self.filter(course_id__in=course_ids_with_certificates)
+        return self.filter(course_id__in=self.get_user_course_ids_with_certificates(username))
 
-    def in_progress(self, user_username, time_zone=UTC):
+    def in_progress(self, username, time_zone=UTC):
         """
         Returns a queryset of CourseEnrollment objects for courses that are currently in progress.
         """
         now = datetime.now(time_zone)
-        return self.active().without_certificates(user_username).filter(
+        return self.active().without_certificates(username).filter(
             Q(course__start__lte=now, course__end__gte=now)
             | Q(course__start__isnull=True, course__end__isnull=True)
             | Q(course__start__isnull=True, course__end__gte=now)
             | Q(course__start__lte=now, course__end__isnull=True),
         )
 
-    def completed(self, user_username):
+    def completed(self, username):
         """
         Returns a queryset of CourseEnrollment objects for courses that have been completed.
         """
-        return self.active().with_certificates(user_username)
+        return self.active().with_certificates(username)
 
-    def expired(self, user_username, time_zone=UTC):
+    def expired(self, username, time_zone=UTC):
         """
         Returns a queryset of CourseEnrollment objects for courses that have expired.
         """
         now = datetime.now(time_zone)
-        return self.active().without_certificates(user_username).filter(course__end__lt=now)
+        return self.active().without_certificates(username).filter(course__end__lt=now)
+
+    def get_user_course_ids_with_certificates(self, username):
+        """
+        Gets user's course ids with certificates.
+        """
+        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
+        course_ids_with_certificates = GeneratedCertificate.objects.filter(
+            user__username=username
+        ).values_list('course_id', flat=True)
+        return course_ids_with_certificates
 
 
 class CourseEnrollmentManager(models.Manager):

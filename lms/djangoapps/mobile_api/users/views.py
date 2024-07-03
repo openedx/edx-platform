@@ -363,7 +363,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         return CourseEnrollmentSerializer
 
     @cached_property
-    def queryset(self):
+    def queryset_for_user(self):
         """
         Find and return the list of course enrollments for the user.
 
@@ -380,11 +380,11 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
         if api_version == API_V4 and status in EnrollmentStatuses.values():
             if status == EnrollmentStatuses.IN_PROGRESS.value:
-                queryset = queryset.in_progress(user_username=username, time_zone=self.user_timezone)
+                queryset = queryset.in_progress(username=username, time_zone=self.user_timezone)
             elif status == EnrollmentStatuses.COMPLETED.value:
-                queryset = queryset.completed(user_username=username)
+                queryset = queryset.completed(username=username)
             elif status == EnrollmentStatuses.EXPIRED.value:
-                queryset = queryset.expired(user_username=username, time_zone=self.user_timezone)
+                queryset = queryset.expired(username=username, time_zone=self.user_timezone)
 
         return queryset
 
@@ -417,7 +417,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         org = self.request.query_params.get('org', None)
 
         same_org = (
-            enrollment for enrollment in self.queryset
+            enrollment for enrollment in self.queryset_for_user
             if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org)
         )
         mobile_available = (
@@ -473,7 +473,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
         mobile_available_course_ids = [enrollment.course_id for enrollment in mobile_available]
 
-        latest_enrollment = self.queryset.filter(
+        latest_enrollment = self.queryset_for_user.filter(
             course__id__in=mobile_available_course_ids
         ).order_by('-created').first()
 
@@ -488,7 +488,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         if not latest_progress:
             return latest_enrollment
 
-        enrollment_with_latest_progress = self.queryset.filter(
+        enrollment_with_latest_progress = self.queryset_for_user.filter(
             course_id=latest_progress.course_id,
             user__username=self.kwargs['username'],
         ).first()
