@@ -19,6 +19,7 @@ jobs:
       team_reviewers: "arbi-bom"
       email_address: arbi-bom@edx.org
       send_success_notification: false
+      python_version: "3.11"
     secrets:
       requirements_bot_github_token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
       requirements_bot_github_email: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
