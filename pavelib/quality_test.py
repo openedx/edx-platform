@@ -106,5 +106,81 @@ def run_pep8():  # pylint: disable=unused-argument
         write_junit_xml('pep8')
 
 
+
+def _write_metric(metric, filename):
+    """
+    Write a given metric to a given file
+    Used for things like reports/metrics/eslint, which will simply tell you the number of
+    eslint violations found
+    """
+    Env.METRICS_DIR.makedirs_p()
+
+    with open(filename, "w") as metric_file:
+        metric_file.write(str(metric))
+
+
+def _get_stylelint_violations():
+    """
+    Returns the number of Stylelint violations.
+    """
+    stylelint_report_dir = (Env.REPORT_DIR / "stylelint")
+    stylelint_report = stylelint_report_dir / "stylelint.report"
+    _prepare_report_dir(stylelint_report_dir)
+    formatter = 'node_modules/stylelint-formatter-pretty'
+
+    # sh(
+    #     "stylelint **/*.scss --custom-formatter={formatter} | tee {stylelint_report}".format(
+    #         formatter=formatter,
+    #         stylelint_report=stylelint_report,
+    #     ),
+    #     ignore_error=True
+    # )
+
+    command = f"stylelint **/*.scss --custom-formatter={formatter}"
+    with open(stylelint_report, 'w') as report_file:
+        result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        report_file.write(result.stdout)
+        report_file.write(result.stderr)
+    
+    if result.returncode != 0:
+        print(f"Warning: stylelint command exited with non-zero status {result.returncode}")
+
+
+    try:
+        return int(_get_count_from_last_line(stylelint_report, "stylelint"))
+    except TypeError:
+        fail_quality(
+            'stylelint',
+            "FAILURE: Number of stylelint violations could not be found in {stylelint_report}".format(
+                stylelint_report=stylelint_report
+            )
+        )
+
+
+def run_stylelint(options):
+    """
+    Runs stylelint on Sass files.
+    If limit option is passed, fails build if more violations than the limit are found.
+    """
+    violations_limit = 0
+    num_violations = _get_stylelint_violations()
+
+    # Record the metric
+    _write_metric(num_violations, (Env.METRICS_DIR / "stylelint"))
+
+    # Fail if number of violations is greater than the limit
+    if num_violations > violations_limit:
+        fail_quality(
+            'stylelint',
+            "FAILURE: Stylelint failed with too many violations: ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations,
+                violations_limit=violations_limit,
+            )
+        )
+    else:
+        write_junit_xml('stylelint')
+
+
 if __name__ == "__main__":
     run_pep8()
+    run_stylelint()
