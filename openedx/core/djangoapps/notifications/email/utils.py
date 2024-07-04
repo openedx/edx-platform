@@ -76,7 +76,10 @@ def get_unsubscribe_link(username, patch):
         'patch': encrypted_patch
     }
     relative_url = reverse('preference_update_from_encrypted_username_view', kwargs=kwargs)
-    return f"{settings.LMS_BASE}{relative_url}"
+    protocol = 'https://'
+    if settings.DEBUG:
+        protocol = 'http://'
+    return f"{protocol}{settings.LMS_BASE}{relative_url}"
 
 
 def create_email_template_context(username):
