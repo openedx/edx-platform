@@ -5,10 +5,13 @@ import datetime
 import json
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from pytz import utc
 from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
 
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.djangoapps.notifications.base_notification import (
@@ -21,6 +24,9 @@ from openedx.core.djangoapps.notifications.models import CourseNotificationPrefe
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
+
+
+User = get_user_model()
 
 
 def is_email_notification_flag_enabled(user=None):
@@ -144,6 +150,16 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
         "email_content": email_content,
     })
     return context
+
+
+def add_headers_to_email_message(message, context):
+    """
+    Add headers to email message
+    """
+    if context.get('unsubscribe_url'):
+        message.headers['List-Unsubscribe-Post'] = f"<{context['unsubscribe_url']}>"
+        message.headers['List-Unsubscribe'] = f"<{context['unsubscribe_url']}>"
+    return message
 
 
 def get_start_end_date(cadence_type):
@@ -319,8 +335,9 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
     type_value = patch.get("notification_type")
     channel_value = patch.get("channel")
     pref_value = bool(patch.get("value", False))
+    user = get_object_or_404(User, username=username)
 
-    kwargs = {'user__username': username}
+    kwargs = {'user': user}
     if 'course_id' in patch.keys():
         kwargs['course_id'] = patch['course_id']
 
@@ -346,7 +363,16 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
             return COURSE_NOTIFICATION_APPS[app_name]['core_email_cadence']
         return COURSE_NOTIFICATION_TYPES[notification_type]['email_cadence']
 
+    course_ids = CourseEnrollment.objects.filter(user=user).values_list('course_id', flat=True)
+    CourseNotificationPreference.objects.bulk_create(
+        [
+            CourseNotificationPreference(user=user, course_id=course_id)
+            for course_id in course_ids
+        ],
+        ignore_conflicts=True
+    )
     preferences = CourseNotificationPreference.objects.filter(**kwargs)
+
     # pylint: disable=too-many-nested-blocks
     for preference in preferences:
         preference_json = preference.notification_preference_config
