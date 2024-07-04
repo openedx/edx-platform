@@ -80,7 +80,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
 
     def get_course_progress(self, obj: CourseOverview) -> Dict[str, int]:
         """
-        Gets course progress calculated by course assignments.
+        Gets course progress calculated by course completed assignments.
         """
         return get_assignments_completions(obj.id, self.context.get('user'))
 
