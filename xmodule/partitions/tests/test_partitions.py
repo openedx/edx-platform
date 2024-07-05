@@ -564,6 +564,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
             self.non_random_scheme,
             self.TEST_PARAMETERS,
         )
+        print(self.user_partition)
         self.course.user_partitions = [self.user_partition]
         all_partitions = get_all_partitions_for_course(self.course)
         assert 1 == len(all_partitions)
