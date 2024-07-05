@@ -187,14 +187,6 @@ def _get_stylelint_violations():
     _prepare_report_dir(stylelint_report_dir)
     formatter = 'node_modules/stylelint-formatter-pretty'
 
-    # sh(
-    #     "stylelint **/*.scss --custom-formatter={formatter} | tee {stylelint_report}".format(
-    #         formatter=formatter,
-    #         stylelint_report=stylelint_report,
-    #     ),
-    #     ignore_error=True
-    # )
-
     command = f"stylelint **/*.scss --custom-formatter={formatter}"
     with open(stylelint_report, 'w') as report_file:
         result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
