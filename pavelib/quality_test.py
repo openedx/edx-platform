@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 
-from utils.envs import Env
+from pavelib.utils.envs import Env
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 

@@ -11,7 +11,7 @@ from lazy import lazy
 from path import Path as path
 # from paver.easy import BuildFailure, sh
 
-from utils.cmd import django_cmd
+from pavelib.utils.cmd import django_cmd
 
 
 def repo_root():
@@ -159,14 +159,14 @@ class Env:
 
         try:
             command = django_cmd(
-                    system,
-                    settings,
-                    "print_setting {django_settings} 2>{log_file} {print_setting_args}".format(
-                        django_settings=django_settings,
-                        print_setting_args=print_setting_args,
-                        log_file=cls.PRINT_SETTINGS_LOG_FILE
-                    ).strip()
-                )
+                system,
+                settings,
+                "print_setting {django_settings} 2>{log_file} {print_setting_args}".format(
+                    django_settings=django_settings,
+                    print_setting_args=print_setting_args,
+                    log_file=cls.PRINT_SETTINGS_LOG_FILE
+                ).strip()
+            )
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             value = result.stdout.strip()
