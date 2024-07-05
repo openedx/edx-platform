@@ -9,9 +9,9 @@ from time import sleep
 
 from lazy import lazy
 from path import Path as path
-from paver.easy import BuildFailure, sh
+# from paver.easy import BuildFailure, sh
 
-from pavelib.utils.cmd import django_cmd
+from utils.cmd import django_cmd
 
 
 def repo_root():
@@ -156,9 +156,9 @@ class Env:
         settings_length = len(django_settings)
         django_settings = ' '.join(django_settings)  # parse_known_args makes a list again
         print_setting_args = ' '.join(print_setting_args or [])
+
         try:
-            value = sh(
-                django_cmd(
+            command = django_cmd(
                     system,
                     settings,
                     "print_setting {django_settings} 2>{log_file} {print_setting_args}".format(
@@ -166,12 +166,25 @@ class Env:
                         print_setting_args=print_setting_args,
                         log_file=cls.PRINT_SETTINGS_LOG_FILE
                     ).strip()
-                ),
-                capture=True
-            )
+                )
+
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            value = result.stdout.strip()
+            # value = sh(
+            #     django_cmd(
+            #         system,
+            #         settings,
+            #         "print_setting {django_settings} 2>{log_file} {print_setting_args}".format(
+            #             django_settings=django_settings,
+            #             print_setting_args=print_setting_args,
+            #             log_file=cls.PRINT_SETTINGS_LOG_FILE
+            #         ).strip()
+            #     ),
+            #     capture=True
+            # )
             # else for cases where values are not found & sh returns one None value
             return tuple(str(value).splitlines()) if value else tuple(None for _ in range(settings_length))
-        except BuildFailure:
+        except subprocess.CalledProcessError:
             print(f"Unable to print the value of the {django_settings} setting:")
             with open(cls.PRINT_SETTINGS_LOG_FILE) as f:
                 print(f.read())
