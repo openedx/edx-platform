@@ -49,6 +49,8 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     has_unpublished_deletes = serializers.BooleanField(read_only=True)
     license = serializers.ChoiceField(choices=LICENSE_OPTIONS, default=ALL_RIGHTS_RESERVED)
     can_edit_library = serializers.SerializerMethodField()
+    created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    updated = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
 
     def get_can_edit_library(self, obj):
         """

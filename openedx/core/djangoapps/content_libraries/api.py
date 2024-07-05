@@ -168,6 +168,8 @@ class ContentLibraryMetadata:
     # Studio, use it in their courses, and copy content out of this library.
     allow_public_read = attr.ib(False)
     license = attr.ib("")
+    created = attr.ib(default=None, type=datetime)
+    updated = attr.ib(default=None, type=datetime)
 
 
 class AccessLevel:
@@ -384,6 +386,8 @@ def get_library(library_key):
         has_unpublished_changes=has_unpublished_changes,
         has_unpublished_deletes=has_unpublished_deletes,
         license=ref.license,
+        created=learning_package.created,
+        updated=learning_package.updated,
     )
 
 
