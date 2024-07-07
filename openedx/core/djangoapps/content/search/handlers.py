@@ -12,6 +12,7 @@ from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
+    LIBRARY_BLOCK_UPDATED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
@@ -96,6 +97,7 @@ def xblock_deleted_handler(**kwargs) -> None:
 
 
 @receiver(LIBRARY_BLOCK_CREATED)
+@receiver(LIBRARY_BLOCK_UPDATED)
 @only_if_meilisearch_enabled
 def library_block_updated_handler(**kwargs) -> None:
     """

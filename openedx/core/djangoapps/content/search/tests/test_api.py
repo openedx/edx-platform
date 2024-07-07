@@ -5,11 +5,13 @@ from __future__ import annotations
 
 import copy
 
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, call, patch
 from opaque_keys.edx.keys import UsageKey
 
 import ddt
 from django.test import override_settings
+from freezegun import freeze_time
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -118,8 +120,16 @@ class TestSearchApi(ModuleStoreTestCase):
             title="Library",
         )
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
-        # Populate it with a problem:
-        self.problem = library_api.create_library_block(self.library.key, "problem", "p1")
+
+        # Populate it with a problem, freezing the date so we can verify created date serializes correctly.
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            self.problem = library_api.create_library_block(self.library.key, "problem", "p1")
+        # Update the problem, freezing the date so we can verify modified date serializes correctly.
+        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(modified_date):
+            library_api.set_library_block_olx(self.problem.usage_key, "<problem />")
+
         self.doc_problem = {
             "id": "lborg1libproblemp1-a698218e",
             "usage_key": "lb:org1:lib:problem:p1",
@@ -132,6 +142,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "content": {"problem_types": [], "capa_content": " "},
             "type": "library_block",
             "access_id": lib_access.id,
+            "last_published": None,
+            "created": created_date.timestamp(),
+            "modified": modified_date.timestamp(),
         }
 
         # Create a couple of taxonomies with tags
@@ -170,6 +183,22 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             any_order=True,
         )
+
+        # Check that the sorting-related settings were updated to support sorting on the expected fields
+        mock_meilisearch.return_value.index.return_value.update_sortable_attributes.assert_called_with([
+            "display_name",
+            "created",
+            "modified",
+            "last_published",
+        ])
+        mock_meilisearch.return_value.index.return_value.update_ranking_rules.assert_called_with([
+            "sort",
+            "words",
+            "typo",
+            "proximity",
+            "attribute",
+            "exactness",
+        ])
 
     @ddt.data(
         True,
