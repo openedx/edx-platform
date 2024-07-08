@@ -4,15 +4,11 @@ Mixin class that provides authoring capabilities for XBlocks.
 
 
 import logging
-from datetime import datetime, timezone
-from uuid import uuid4
 
 from django.conf import settings
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockMixin
 from xblock.fields import String, Scope
-from openedx_events.content_authoring.data import DuplicatedXBlockData
-from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 
 
 log = logging.getLogger(__name__)
