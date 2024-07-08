@@ -242,7 +242,7 @@ class LibraryXBlockType:
 # ============
 
 
-def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
+def get_libraries_for_user(user, org=None, library_type=None, text_search=None, order=None):
     """
     Return content libraries that the user has permission to view.
     """
@@ -263,7 +263,22 @@ def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
             Q(learning_package__description__icontains=text_search)
         )
 
-    return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+
+    if order:
+        order_query = 'learning_package__'
+        valid_order_fields = ['title', 'created', 'updated']
+        # If order starts with a -, that means order descending (default is ascending)
+        if order.startswith('-'):
+            order_query = f"-{order_query}"
+            order = order[1:]
+
+        if order in valid_order_fields:
+            return filtered.order_by(f"{order_query}{order}")
+        else:
+            log.exception(f"Error ordering libraries by {order}: Invalid order field")
+
+    return filtered
 
 
 def get_metadata(queryset, text_search=None):

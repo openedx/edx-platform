@@ -115,6 +115,7 @@ class BaseFilterSerializer(serializers.Serializer):
     """
     text_search = serializers.CharField(default=None, required=False)
     org = serializers.CharField(default=None, required=False)
+    order = serializers.CharField(default=None, required=False)
 
 
 class ContentLibraryFilterSerializer(BaseFilterSerializer):
