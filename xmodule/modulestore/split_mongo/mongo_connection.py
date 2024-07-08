@@ -246,9 +246,10 @@ class CourseStructureCache:
             data_size = len(compressed_pickled_data)
             tagger.measure('compressed_size', data_size)
 
-            # Structures are immutable, so we set a timeout of "never"
+            # We rely on the course structure cache default timeout, which should be
+            # high by default (~ a few days).
             try:
-                self.cache.set(key, compressed_pickled_data, None)
+                self.cache.set(key, compressed_pickled_data)
             except Exception:  # pylint: disable=broad-except
                 total_bytes_in_one_mb = 1024 * 1024
                 chunk_size_in_mbs = round(data_size / total_bytes_in_one_mb, 2)
@@ -506,7 +507,7 @@ class MongoPersistenceBackend:
                 key_attr: getattr(course_key, key_attr)
                 for key_attr in ('org', 'course', 'run')
             }
-            return self.course_index.remove(query)
+            return self.course_index.delete_one(query)
 
     def get_definition(self, key, course_context=None):
         """
@@ -700,7 +701,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
         new_index.save()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().insert_course_index(course_index, course_context)
 
     def update_course_index(self, course_index, from_index=None, course_context=None):  # pylint: disable=arguments-differ
@@ -754,7 +757,10 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
 
         # Save the course index entry and create a historical record:
         index_obj.save()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().update_course_index(course_index, from_index, course_context)
 
     def delete_course_index(self, course_key):
@@ -763,7 +769,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         RequestCache(namespace="course_index_cache").clear()
         SplitModulestoreCourseIndex.objects.filter(course_id=course_key).delete()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().delete_course_index(course_key)
 
     def _drop_database(self, database=True, collections=True, connections=True):
@@ -781,5 +789,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
                 "post-test cleanup failed with TransactionManagementError. "
                 "Use 'with self.allow_transaction_exception():' from ModuleStoreTestCase/...IsolationMixin to fix it."
             ) from err
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super()._drop_database(database, collections, connections)

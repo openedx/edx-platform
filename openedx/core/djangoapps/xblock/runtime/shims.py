@@ -102,7 +102,7 @@ class RuntimeShim:
 
         Only used for capa problems.
         """
-        # TODO: load the python code from Blockstore. Ensure it's not publicly accessible.
+        # TODO: load the python code from Learning Core. Ensure it's not publicly accessible.
         return None
 
     @property
@@ -166,9 +166,8 @@ class RuntimeShim:
         """
         A filesystem that XBlocks can use to read large binary assets.
         """
-        # TODO: implement this to serve any static assets that
-        # self._active_block has in its blockstore "folder". But this API should
-        # be deprecated and we should instead get compatible XBlocks to use a
+        # TODO: implement this to serve any static assets that self._active_block has.
+        # But this API should be deprecated and we should instead get compatible XBlocks to use a
         # runtime filesystem service. Some initial exploration of that (as well
         # as of the 'FileField' concept) has been done and is included in the
         # XBlock repo at xblock.reference.plugins.FSService and is available in

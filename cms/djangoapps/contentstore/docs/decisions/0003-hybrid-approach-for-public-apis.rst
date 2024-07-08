@@ -1,6 +1,18 @@
 0003: Hybrid approach for public course authoring APIs
 ======================================================
 
+Status
+------
+
+Rejected
+
+Reason for rejection
+--------------------
+
+The objectives for public authoring APIs changed from the time this decision was made:
+We are now limiting our offering to a set of experimental APIs with which to flesh our what a supported set of APIs might become. As such, the authoring APIs we are now implementing
+are just a public set of wrappers around existing functionality, and are not fit for production course authoring. The responsibility for avoiding conflicts and resolving them, if they occur, is on the user.
+
 Context
 -------
 

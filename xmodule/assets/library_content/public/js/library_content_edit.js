@@ -7,8 +7,6 @@ window.LibraryContentAuthorView = function(runtime, element) {
     // But it is still inside this xblock's wrapper element, which we can easily find:
     var $wrapper = $element.parents('*[data-locator="' + usage_id + '"]');
 
-    // We can't bind to the button itself because in the bok choy test environment,
-    // it may not yet exist at this point in time... not sure why.
     $wrapper.on('click', '.library-update-btn', function(e) {
         e.preventDefault();
         // Update the XBlock with the latest matching content from the library:

@@ -54,7 +54,9 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from common.test.utils import disable_signal
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.support.models import CourseResetAudit
 from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
+from lms.djangoapps.support.tests.factories import CourseResetCourseOptInFactory, CourseResetAuditFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
@@ -353,6 +355,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
         assert 'enterprise_course_enrollments' not in data[0]
         assert data[0]['order_number'] == ''
+        assert data[0]['source_system'] == ''
 
     @ddt.data(*itertools.product(['username', 'email'], [(3, 'ORD-003'), (1, 'ORD-001')]))
     @ddt.unpack
@@ -373,6 +376,23 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         data = json.loads(response.content.decode('utf-8'))
         assert len(data) == 1
         assert data[0]['order_number'] == order_details[1]
+
+    def test_order_source_system_information(self):
+        CourseEnrollmentAttributeFactory(
+            enrollment=self.enrollment,
+            namespace='order',
+            name='source_system',
+            value='commercetools'
+        )
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': self.student.username}
+        )
+        response = self.client.get(url)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert len(data) == 1
+        assert data[0]['source_system'] == 'commercetools'
 
     @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @enterprise_is_enabled()
@@ -2067,3 +2087,398 @@ class TestOnboardingView(SupportViewTestCase, ProctoredExamTestCase):
         # assert that most recent enrollment (current status) has other_course_approved status
         self.assertEqual(response_data['current_status']['onboarding_status'], 'other_course_approved')
         self.assertEqual(response_data['current_status']['course_id'], self.course_id)
+
+
+class ResetCourseViewTestBase(SupportViewTestCase):
+    """
+    Shared base class for course reset view tests
+    """
+    def _url(self, username):
+        """ Helper to generate URL """
+        return reverse("support:course_reset", kwargs={'username_or_email': username})
+
+    def setUp(self):
+        """
+        Set permissions, create an open course and learner, enroll learner and opt into course reset
+        """
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+        self.now = datetime.now().replace(tzinfo=UTC)
+        self.course = CourseFactory.create(
+            start=self.now - timedelta(days=90),
+            end=self.now + timedelta(days=90),
+        )
+        self.course_id = str(self.course.id)
+        self.course_overview = CourseOverview.get_from_id(self.course.id)
+        self.learner = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory.create(user=self.learner, course_id=self.course.id)
+        self.opt_in = CourseResetCourseOptInFactory.create(course_id=self.course.id)
+
+
+@ddt.ddt
+class TestResetCourseListView(ResetCourseViewTestBase):
+    """ Tests for the list endpoint for course reset """
+
+    def assert_course_ids(self, expected_course_ids, learner=None):
+        """ Helper that asserts the course ids that will be returned from the listing endpoint """
+        learner = learner or self.learner
+        response = self.client.get(self._url(learner))
+        self.assertEqual(response.status_code, 200)
+
+        actual_course_ids = [course['course_id'] for course in response.json()]
+        self.assertEqual(expected_course_ids, actual_course_ids)
+
+    def test_no_enrollments(self):
+        """ When a learner has no enrollments, the endpoint should return an empty list """
+        no_enrollment_learner = UserFactory.create()
+        self.assert_course_ids([], learner=no_enrollment_learner)
+
+    def test_not_opted_in(self):
+        """
+        If a learner is enrolled in a course that is not opted into the course reset feature,
+        it will not be returned by the endpoint
+        """
+        non_opted_in_course = CourseFactory.create()
+        CourseEnrollmentFactory.create(user=self.learner, course_id=non_opted_in_course.id)
+        self.assert_course_ids([self.course_id])
+
+    def test_deactivated_opt_in(self):
+        """
+        If a learner is enrolled in a course that has opted in, but that opt-in is
+        deactivated, it will not be returned from the endpoint
+        """
+        self.assert_course_ids([self.course_id])
+
+        self.opt_in.active = False
+        self.opt_in.save()
+
+        self.assert_course_ids([])
+
+    def test_deactivated_enrollment(self):
+        """
+        If a learner's enrollment in an opted in course is deactivated,
+        the course will not be returned by the endpoint
+        """
+        self.assert_course_ids([self.course_id])
+
+        self.enrollment.is_active = False
+        self.enrollment.save()
+
+        self.assert_course_ids([])
+
+    def assertResponse(self, expected_response):
+        """ Helper to assert the contents of the response from the listing endpoint """
+        response = self.client.get(self._url(self.learner))
+        self.assertEqual(response.status_code, 200)
+
+        actual_response = response.json()
+        self.assertEqual(expected_response, actual_response)
+        return actual_response
+
+    def test_course_not_started(self):
+        """ If a course is opted in but has not started, it should not be resettable """
+        self.course_overview.start = self.now + timedelta(days=10)
+        self.course_overview.end = self.now + timedelta(days=11)
+        self.course_overview.save()
+        self.assertResponse([{
+            'course_id': self.course_id,
+            'display_name': self.course_overview.display_name,
+            'can_reset': False,
+            'comment': '',
+            'status': 'Course Not Started'
+        }])
+
+    def test_course_ended(self):
+        """ If a course is opted in but has ended, it should not be resettable """
+        self.course_overview.start = self.now - timedelta(days=11)
+        self.course_overview.end = self.now - timedelta(days=10)
+        self.course_overview.save()
+        self.assertResponse([
+            {
+                'course_id': self.course_id,
+                'display_name': self.course_overview.display_name,
+                'can_reset': False,
+                'comment': '',
+                'status': 'Course Ended'
+            }
+        ])
+
+    @patch('lms.djangoapps.support.views.course_reset.user_has_passing_grade_in_course', return_value=True)
+    def test_user_has_passing_grade(self, _):
+        """ If a course is opted in but the learner has a passing grade, it should not be resettable """
+        self.assertResponse([{
+            'course_id': self.course_id,
+            'display_name': self.course_overview.display_name,
+            'can_reset': False,
+            'comment': '',
+            'status': 'Learner Has Passing Grade'
+        }])
+
+    @patch('lms.djangoapps.support.views.course_reset.user_has_passing_grade_in_course', return_value=True)
+    def test_ended_with_passing_grade(self, _):
+        """
+        If a course has ended and the learner has a passing grade,
+        the passing grade message should override the ended message
+        """
+        self.course_overview.start = self.now - timedelta(days=11)
+        self.course_overview.end = self.now - timedelta(days=10)
+        self.assertResponse([{
+            'course_id': self.course_id,
+            'display_name': self.course_overview.display_name,
+            'can_reset': False,
+            'comment': '',
+            'status': 'Learner Has Passing Grade'
+        }])
+
+    def test_available_course(self):
+        """ If a course is opted in and had nothing stopping it from being reset, it should be resettable """
+        self.assertResponse([{
+            'course_id': self.course_id,
+            'display_name': self.course.display_name,
+            'can_reset': True,
+            'comment': '',
+            'status': 'Available'
+        }])
+
+    @ddt.unpack
+    @ddt.data(
+        (CourseResetAudit.CourseResetStatus.ENQUEUED, False),
+        (CourseResetAudit.CourseResetStatus.IN_PROGRESS, False),
+        (CourseResetAudit.CourseResetStatus.FAILED, True),
+        (CourseResetAudit.CourseResetStatus.COMPLETE, False),
+    )
+    def test_audit(self, audit_status, expected_can_reset):
+        """
+        If a course enrollment has a CourseResetAudit associated with it,
+        it should not be resettable unless the audit is FAILED
+        """
+        audit = CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=audit_status,
+        )
+        self.assertResponse([{
+            'course_id': self.course_id,
+            'display_name': self.course.display_name,
+            'can_reset': expected_can_reset,
+            'comment': audit.comment,
+            'status': audit.status_message()
+        }])
+
+    def _set_up_course(self, opt_in=True):
+        """
+        Make a course, enroll self.learner, and optionally opt into course reset
+        """
+        course = CourseFactory.create(start=self.course.start, end=self.course.end)
+        CourseEnrollmentFactory.create(course_id=course.id, user=self.learner)
+        if opt_in:
+            CourseResetCourseOptInFactory.create(course_id=course.id)
+        return course
+
+    def test_multiple_courses(self):
+        """ Test for the behavior of multiple courses """
+        # Create four opted in courses and four non-opted-in courses
+        opted_in_courses = [self._set_up_course(opt_in=True) for _ in range(4)]
+        for _ in range(4):
+            self._set_up_course(opt_in=False)
+
+        expected_response = [{
+            'course_id': self.course_id,
+            'display_name': self.course.display_name,
+            'can_reset': True,
+            'comment': '',
+            'status': 'Available'
+        }]
+        for course in opted_in_courses:
+            expected_response.append({
+                'course_id': str(course.id),
+                'display_name': course.display_name,
+                'comment': '',
+                'can_reset': True,
+                'status': 'Available'
+            })
+
+        self.assertResponse(expected_response)
+
+    def test_multiple_audits(self):
+        """
+        If you have multiple audits for an enrollment (should only happen if process fails)
+        the information returned should be for the most recent ONLY
+        """
+        daysago = lambda x: self.now - timedelta(days=x)
+        CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.FAILED,
+            created=daysago(3),
+            modified=daysago(3),
+        )
+        CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.FAILED,
+            created=daysago(2),
+            modified=daysago(2),
+        )
+        most_recent_audit = CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.IN_PROGRESS,
+        )
+
+        self.assertResponse([{
+            'course_id': self.course_id,
+            'display_name': self.course.display_name,
+            'can_reset': False,
+            'comment': most_recent_audit.comment,
+            'status': most_recent_audit.status_message()
+        }])
+
+    def test_multiple_failed_audits(self):
+        """
+        If you have multiple audits for an enrollment and the most recent was a failure,
+        you should still be able to reset the course
+        """
+        daysago = lambda x: self.now - timedelta(days=x)
+        CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.FAILED,
+            created=daysago(3),
+            modified=daysago(3),
+        )
+        CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.FAILED,
+            created=daysago(2),
+            modified=daysago(2),
+        )
+        most_recent_audit = CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.FAILED,
+        )
+
+        self.assertResponse([{
+            'course_id': self.course_id,
+            'display_name': self.course.display_name,
+            'can_reset': True,
+            'comment': most_recent_audit.comment,
+            'status': most_recent_audit.status_message()
+        }])
+
+
+class TestResetCourseCreateView(ResetCourseViewTestBase):
+    """
+    Tests for POST endpoint for performing course reset
+    """
+
+    def request(self, username=None, course_id=None, comment=None):
+        """ Helper to perform request """
+        username = username or self.learner.username
+        return self.client.post(
+            self._url(username),
+            data={
+                "course_id": course_id if course_id else self.course_id,
+                "comment": comment if comment else ""
+            }
+        )
+
+    def assert_error_response(self, response, expected_status_code, expected_error_message):
+        """ Helper to assert status code and error message """
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response.data['error'], expected_error_message)
+
+    def test_wrong_username(self):
+        """ A request with a username which does not exits returns 404 """
+        response = self.request(username='does_not_exist')
+        self.assert_error_response(response, 404, "User does not exist")
+
+    def test_invalid_course_id(self):
+        """ A request for an invalid course id returns 400 """
+        response = self.request(course_id='thisisnotacourseid')
+        self.assert_error_response(response, 400, "invalid course id")
+
+    def test_missing_course_id(self):
+        """ A request without a course id returns 400 """
+        response = self.client.post(self._url(self.learner.username))
+        self.assert_error_response(response, 400, "Must specify course id")
+
+    def test_course_not_opt_in(self):
+        """ A request for a course which isn't opted into the feature returns 404 """
+        self.opt_in.active = False
+        self.opt_in.save()
+
+        response = self.request()
+        self.assert_error_response(response, 404, "Course is not eligible")
+
+    def test_unenrolled(self):
+        """ A request for a learner who isn't enrolled in the given course returns a 404 """
+        self.enrollment.is_active = False
+        self.enrollment.save()
+
+        response = self.request()
+        self.assert_error_response(response, 404, "Learner is not enrolled in course")
+
+    @patch('lms.djangoapps.support.views.course_reset.can_enrollment_be_reset')
+    def test_cannot_reset(self, mock_can_reset):
+        """ A request for a course which isn't able to be reset returns a 404 """
+        mock_status = str(uuid4())
+        mock_can_reset.return_value = (False, mock_status)
+
+        response = self.request()
+        self.assert_error_response(response, 400, f"Cannot reset course: {mock_status}")
+
+    @patch('lms.djangoapps.support.views.course_reset.reset_student_course')
+    def test_learner_course_reset(self, mock_reset_student_course):
+        """ Happy path test """
+        comment = str(uuid4())
+
+        # A request for a given learner and course with a comment should return a 201
+        response = self.request(comment=comment)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, {
+            'course_id': self.course_id,
+            'status': response.data['status'],
+            'can_reset': False,
+            'comment': comment,
+            'display_name': self.course.display_name
+        })
+        # The reset task should be queued
+        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.email, self.user.email)
+        # And an audit should be created as ENQUEUED
+        self.assertEqual(
+            self.enrollment.courseresetaudit_set.first().status,
+            CourseResetAudit.CourseResetStatus.ENQUEUED
+        )
+
+    @patch('lms.djangoapps.support.views.course_reset.reset_student_course')
+    def test_course_reset_failed(self, mock_reset_student_course):
+        """ An audit that has failed previously should be able to be run successfully """
+        CourseResetAudit.objects.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            reset_by=self.user,
+            status=CourseResetAudit.CourseResetStatus.FAILED
+        )
+        response = self.request()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, {
+            'course_id': self.course_id,
+            'status': response.data['status'],
+            'can_reset': False,
+            'comment': '',
+            'display_name': self.course.display_name
+        })
+        mock_reset_student_course.delay.assert_called_once_with(self.course_id, self.learner.email, self.user.email)
+
+    def test_course_reset_already_reset(self):
+        """ A course that has an audit that hasn't failed should not be allowed to be run again """
+        additional_audit = CourseResetAuditFactory.create(
+            course=self.opt_in,
+            course_enrollment=self.enrollment,
+            status=CourseResetAudit.CourseResetStatus.ENQUEUED
+        )
+        response = self.request()
+        self.assert_error_response(response, 400, f"Cannot reset course: {additional_audit.status_message()}")

@@ -13,6 +13,10 @@
   background: rgba(0, 0, 0, 0.8);
 }
 
+.drawer-cover.gray-cover {
+  background: rgba(112, 112, 112, 0.8);
+}
+
 .drawer {
   @extend %ui-depth4;
 

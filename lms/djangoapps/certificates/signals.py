@@ -4,6 +4,7 @@ Signal handler for enabling/disabling self-generated certificates based on the c
 
 import logging
 
+from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -22,7 +23,10 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.api import auto_certificate_generation_enabled
+from lms.djangoapps.certificates.api import (
+    auto_certificate_generation_enabled,
+    invalidate_certificate
+)
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
 from openedx.core.djangoapps.signals.signals import (
@@ -30,6 +34,9 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
+
+User = get_user_model()
 
 log = logging.getLogger(__name__)
 
@@ -156,3 +163,17 @@ def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs)
                 course_key,
             )
             return False
+
+
+@receiver(EXAM_ATTEMPT_REJECTED)
+def handle_exam_attempt_rejected_event(sender, signal, **kwargs):
+    """
+    Consume `EXAM_ATTEMPT_REJECTED` events from the event bus.
+    Pass the received data to invalidate_certificate in the services.py file in this folder.
+    """
+    event_data = kwargs.get('exam_attempt')
+    user_data = event_data.student_user
+    course_key = event_data.course_key
+
+    # Note that the course_key is the same as the course_key_or_id, and is being passed in as the course_key param
+    invalidate_certificate(user_data.id, course_key, source='exam_event')

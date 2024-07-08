@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-imp
 
 import ddt  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
+from completion.models import BlockCompletion
 from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
 from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
@@ -404,6 +405,16 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 200
         assert response.data['user_has_passing_grade'] is True
 
+    def test_hide_from_toc_field(self):
+        """
+        Test that the hide_from_toc field is returned in the response.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        for block in response.data["course_blocks"]["blocks"].values():
+            assert "hide_from_toc" in block
+
     def assert_can_enroll(self, can_enroll):
         response = self.client.get(self.url)
         assert response.status_code == 200
@@ -437,3 +448,351 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.update_course_and_overview()
         CourseEnrollment.enroll(UserFactory(), self.course.id)  # grr, some rando took our spot!
         self.assert_can_enroll(False)
+
+
+@ddt.ddt
+class SidebarBlocksTestViews(BaseCourseHomeTests):
+    """
+    Tests for the Course Sidebar Blocks API
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.chapter = ''
+        self.sequential = ''
+        self.vertical = ''
+        self.ungraded_sequential = ''
+        self.ungraded_vertical = ''
+        self.url = ''
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('course-home:course-navigation', args=[self.course.id])
+
+    def update_course_and_overview(self):
+        """
+        Update the course and course overview records.
+        """
+        self.update_course(self.course, self.user.id)
+        CourseOverview.load_from_module_store(self.course.id)
+
+    def add_blocks_to_course(self):
+        """
+        Add test blocks to the self course.
+        """
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = BlockFactory.create(category='chapter', parent_location=self.course.location)
+            self.sequential = BlockFactory.create(
+                display_name='Test',
+                category='sequential',
+                graded=True,
+                has_score=True,
+                parent_location=self.chapter.location
+            )
+            self.vertical = BlockFactory.create(
+                category='vertical',
+                graded=True,
+                has_score=True,
+                parent_location=self.sequential.location
+            )
+            self.ungraded_sequential = BlockFactory.create(
+                display_name='Ungraded',
+                category='sequential',
+                parent_location=self.chapter.location
+            )
+            self.ungraded_vertical = BlockFactory.create(
+                category='vertical',
+                parent_location=self.ungraded_sequential.location
+            )
+        update_outline_from_modulestore(self.course.id)
+
+    def create_completion(self, problem, completion):
+        return BlockCompletion.objects.create(
+            user=self.user,
+            context_key=problem.context_key,
+            block_type='problem',
+            block_key=problem.location,
+            completion=completion,
+        )
+
+    @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
+    def test_get_authenticated_enrolled_user(self, enrollment_mode):
+        """
+        Test that the API returns the correct data for an authenticated, enrolled user.
+        """
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        chapter_data = response.data['blocks'][str(self.chapter.location)]
+        assert str(self.sequential.location) in chapter_data['children']
+
+        sequential_data = response.data['blocks'][str(self.sequential.location)]
+        assert str(self.vertical.location) in sequential_data['children']
+
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+        assert vertical_data['children'] == []
+
+    @ddt.data(True, False)
+    def test_get_authenticated_user_not_enrolled(self, has_previously_enrolled):
+        """
+        Test that the API returns an empty response for an authenticated user who is not enrolled in the course.
+        """
+        if has_previously_enrolled:
+            CourseEnrollment.enroll(self.user, self.course.id)
+            CourseEnrollment.unenroll(self.user, self.course.id)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data == {}
+
+    def test_get_unauthenticated_user(self):
+        """
+        Test that the API returns an empty response for an unauthenticated user.
+        """
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        assert response.status_code == 200
+        assert response.data.get('blocks') is None
+
+    def test_course_staff_can_see_non_user_specific_content_in_masquerade(self):
+        """
+        Test that course staff can see the outline and other non-user-specific content when masquerading as a learner
+        """
+        instructor = UserFactory(username='instructor', email='instructor@example.com', password='foo', is_staff=False)
+        CourseInstructorRole(self.course.id).add_users(instructor)
+        self.client.login(username=instructor, password='foo')
+        self.update_masquerade(role='student')
+        response = self.client.get(self.url)
+        assert response.data['blocks'] is not None
+
+    def test_get_unknown_course(self):
+        """
+        Test that the API returns a 404 when the course is not found.
+        """
+        url = reverse('course-home:course-navigation', args=['course-v1:unknown+course+2T2020'])
+        response = self.client.get(url)
+        assert response.status_code == 404
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+    @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')
+    def test_proctored_exam(self, mock_summary):
+        """
+        Test that the API returns the correct data for a proctored exam.
+        """
+        course = CourseFactory.create(
+            org='edX',
+            course='900',
+            run='test_run',
+            enable_proctored_exams=True,
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
+        )
+        chapter = BlockFactory.create(parent=course, category='chapter', display_name='Test Section')
+        sequence = BlockFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=10,
+            is_practice_exam=True,
+            due=datetime.now(),
+            exam_review_rules='allow_use_of_paper',
+            hide_after_due=False,
+            is_onboarding_exam=False,
+        )
+        vertical = BlockFactory.create(
+            parent=sequence,
+            category='vertical',
+            graded=True,
+            has_score=True,
+        )
+        BlockFactory.create(
+            parent=vertical,
+            category='problem',
+            graded=True,
+            has_score=True,
+        )
+        sequence.is_proctored_exam = True
+        update_outline_from_modulestore(course.id)
+        CourseEnrollment.enroll(self.user, course.id)
+        mock_summary.return_value = {
+            'short_description': 'My Exam',
+            'suggested_icon': 'fa-foo-bar',
+        }
+
+        url = reverse('course-home:course-navigation', args=[course.id])
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+        exam_data = response.data['blocks'][str(sequence.location)]
+        assert not exam_data['complete']
+        assert exam_data['display_name'] == 'Test Proctored Exam (1 Question)'
+        assert exam_data['special_exam_info'] == 'My Exam'
+        assert exam_data['due'] is not None
+
+    def test_assignment(self):
+        """
+        Test that the API returns the correct data for an assignment.
+        """
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        exam_data = response.data['blocks'][str(self.sequential.location)]
+        assert exam_data['display_name'] == 'Test'
+        assert exam_data['icon'] is None
+        assert str(self.vertical.location) in exam_data['children']
+
+        ungraded_data = response.data['blocks'][str(self.ungraded_sequential.location)]
+        assert ungraded_data['display_name'] == 'Ungraded'
+        assert ungraded_data['icon'] is None
+        assert str(self.ungraded_vertical.location) in ungraded_data['children']
+
+    @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
+    @ddt.data(*itertools.product(
+        [True, False], [True, False], [None, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE]
+    ))
+    @ddt.unpack
+    def test_visibility(self, is_enrolled, is_staff, course_visibility):
+        """
+        Test that the API returns the correct data based on the user's enrollment status and the course's visibility.
+        """
+        if is_enrolled:
+            CourseEnrollment.enroll(self.user, self.course.id)
+        if is_staff:
+            self.user.is_staff = True
+            self.user.save()
+        if course_visibility:
+            self.course.course_visibility = course_visibility
+            self.update_course_and_overview()
+
+        show_enrolled = is_enrolled or is_staff
+        is_public = course_visibility == COURSE_VISIBILITY_PUBLIC
+        is_public_outline = course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE
+
+        data = self.client.get(self.url).data
+        if not (show_enrolled or is_public or is_public_outline):
+            assert data == {}
+        else:
+            assert (data['blocks'] is not None) == (show_enrolled or is_public or is_public_outline)
+
+    def test_hide_learning_sequences(self):
+        """
+        Check that Learning Sequences filters out sequences.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        blocks = response.data['blocks']
+        seq_block_id = next(block_id for block_id, block in blocks.items() if block['type'] in ('sequential', 'lock'))
+
+        # With a course outline loaded, the same sequence is removed.
+        new_learning_seq_outline = CourseOutlineData(
+            course_key=self.course.id,
+            title='Test Course Outline!',
+            published_at=datetime(2021, 6, 14, tzinfo=timezone.utc),
+            published_version='5ebece4b69dd593d82fe2022',
+            entrance_exam_id=None,
+            days_early_for_beta=None,
+            sections=[],
+            self_paced=False,
+            course_visibility=CourseVisibility.PRIVATE
+        )
+        replace_course_outline(new_learning_seq_outline)
+        blocks = self.client.get(self.url).data['blocks']
+        assert seq_block_id not in blocks
+
+    def test_empty_blocks_complete(self):
+        """
+        Test that the API returns the correct complete state for empty blocks.
+        """
+        self.add_blocks_to_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+        url = reverse('course-home:course-navigation', args=[self.course.id])
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+        assert sequence_data['complete']
+        assert vertical_data['complete']
+
+    @ddt.data(True, False)
+    def test_blocks_complete_with_problem(self, problem_complete):
+        self.add_blocks_to_course()
+        problem = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(problem, int(problem_complete))
+
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert sequence_data['complete'] == problem_complete
+        assert vertical_data['complete'] == problem_complete
+
+    def test_blocks_completion_stat(self):
+        """
+        Test that the API returns the correct completion statistics for the blocks.
+        """
+        self.add_blocks_to_course()
+        completed_problem = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        uncompleted_problem = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        update_outline_from_modulestore(self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(completed_problem, 1)
+        self.create_completion(uncompleted_problem, 0)
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        expected_sequence_completion_stat = {
+            'completion': 0,
+            'completable_children': 1,
+        }
+        expected_vertical_completion_stat = {
+            'completion': 1,
+            'completable_children': 2,
+        }
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert not sequence_data['complete']
+        assert not vertical_data['complete']
+        assert sequence_data['completion_stat'] == expected_sequence_completion_stat
+        assert vertical_data['completion_stat'] == expected_vertical_completion_stat
+
+    def test_blocks_completion_stat_all_problem_completed(self):
+        """
+        Test that the API returns the correct completion statistics for the blocks when all problems are completed.
+        """
+        self.add_blocks_to_course()
+        problem1 = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        problem2 = BlockFactory.create(parent=self.vertical, category='problem', graded=True, has_score=True)
+        update_outline_from_modulestore(self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(problem1, 1)
+        self.create_completion(problem2, 1)
+        response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        expected_sequence_completion_stat = {
+            'completion': 1,
+            'completable_children': 1,
+        }
+        expected_vertical_completion_stat = {
+            'completion': 2,
+            'completable_children': 2,
+        }
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert sequence_data['complete']
+        assert vertical_data['complete']
+        assert sequence_data['completion_stat'] == expected_sequence_completion_stat
+        assert vertical_data['completion_stat'] == expected_vertical_completion_stat

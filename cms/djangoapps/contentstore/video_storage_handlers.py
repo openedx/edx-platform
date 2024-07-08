@@ -8,6 +8,12 @@ import csv
 import io
 import json
 import logging
+import os
+import requests
+import shutil
+import pathlib
+import zipfile
+
 from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -15,7 +21,7 @@ from boto.s3.connection import S3Connection
 from boto import s3
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.http import FileResponse, HttpResponseNotFound
+from django.http import FileResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
@@ -35,10 +41,15 @@ from edxval.api import (
     update_video_image,
     update_video_status
 )
+from fs.osfs import OSFS
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from path import Path as path
 from pytz import UTC
 from rest_framework import status as rest_status
 from rest_framework.response import Response
+from tempfile import NamedTemporaryFile, mkdtemp
+from wsgiref.util import FileWrapper
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse
@@ -163,9 +174,8 @@ class StatusDisplayStrings:
 
     @staticmethod
     def get(val_status):
-        """Map a VAL status string to a localized display string"""
-        # pylint: disable=translation-of-non-string
-        return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
+        """Map a VAL status string to a display string"""
+        return StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN)
 
 
 def handle_videos(request, course_key_string, edx_video_id=None):
@@ -219,6 +229,53 @@ def handle_videos(request, course_key_string, edx_video_id=None):
 
         data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
+
+
+def send_zip(zip_file, size=None):
+    """
+    Generates a streaming http response for the zip file
+    """
+    wrapper = FileWrapper(zip_file, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
+    response = StreamingHttpResponse(wrapper, content_type='application/zip')
+    response['Content-Dispositon'] = 'attachment; filename=%s' % os.path.basename(zip_file.name)
+    response['Content-Length'] = size
+    return response
+
+
+def create_video_zip(course_key_string, files):
+    """
+    Generates the video zip, or returns None if there was an error.
+
+    Updates the context with any error information if applicable.
+    """
+    name = course_key_string + '_videos'
+    video_folder_zip = NamedTemporaryFile(prefix=name + '_',
+                                          suffix=".zip")  # lint-amnesty, pylint: disable=consider-using-with
+    root_dir = path(mkdtemp())
+    video_dir = root_dir + '/' + name
+    zip_folder = None
+    try:
+        for file in files:
+            url = file['url']
+            file_name = file['name']
+            response = requests.get(url, allow_redirects=True)
+            file_type = '.' + response.headers['Content-Type'][6:]
+            if file_type not in file_name:
+                file_name = file['name'] + file_type
+            if not os.path.isdir(video_dir):
+                os.makedirs(video_dir)
+            with OSFS(video_dir).open(file_name, mode="wb") as f:
+                f.write(response.content)
+        directory = pathlib.Path(video_dir)
+        with zipfile.ZipFile(video_folder_zip, mode="w") as archive:
+            for file_path in directory.iterdir():
+                archive.write(file_path, arcname=file_path.name)
+        zip_folder = open(video_folder_zip.name, '+rb')
+
+        return send_zip(zip_folder, video_folder_zip.tell())
+    finally:
+        if os.path.exists(root_dir / name):
+            shutil.rmtree(root_dir / name)
 
 
 def get_video_usage_path(course_key, edx_video_id):
@@ -600,7 +657,10 @@ def _get_videos(course, pagination_conf=None):
                 language_code=language_code,
             )
         # Convert the video status.
-        video['status'] = convert_video_status(video, is_video_encodes_ready)
+        # Legacy frontend expects the status to be translated unlike MFEs which handle translation themselves.
+        video['status_nontranslated'] = convert_video_status(video, is_video_encodes_ready)
+        # pylint: disable=translation-of-non-string
+        video['status'] = _(video['status_nontranslated'])
 
     return videos, pagination_context
 
@@ -618,7 +678,7 @@ def _get_index_videos(course, pagination_conf=None):
     """
     course_id = str(course.id)
     attrs = [
-        'edx_video_id', 'client_video_id', 'created', 'duration',
+        'edx_video_id', 'client_video_id', 'created', 'duration', 'status_nontranslated',
         'status', 'courses', 'encoded_videos', 'transcripts', 'transcription_status',
         'transcript_urls', 'error_description'
     ]
@@ -628,11 +688,13 @@ def _get_index_videos(course, pagination_conf=None):
         Get data for predefined video attributes.
         """
         values = {}
-        values["usage_locations"] = get_video_usage_path(course.id, video["edx_video_id"])['usage_locations']
         for attr in attrs:
             if attr == 'courses':
                 current_course = [c for c in video['courses'] if course_id in c]
-                (__, values['course_video_image_url']), = list(current_course[0].items())
+                if current_course:
+                    values['course_video_image_url'] = current_course[0][course_id]
+                else:
+                    values['course_video_image_url'] = None
             elif attr == 'encoded_videos':
                 values['download_link'] = ''
                 values['file_size'] = 0
@@ -899,3 +961,32 @@ def _update_pagination_context(request):
 
     request.session['VIDEOS_PER_PAGE'] = videos_per_page
     return JsonResponse()
+
+
+def get_course_youtube_edx_video_ids(course_id):
+    """
+    Get a list of youtube edx_video_ids
+    """
+    error_msg = "Invalid course_key: '%s'." % course_id
+    try:
+        course_key = CourseKey.from_string(course_id)
+        course = modulestore().get_course(course_key)
+    except InvalidKeyError:
+        return JsonResponse({'error': error_msg}, status=500)
+    blocks = []
+    block_yt_field = 'youtube_id_1_0'
+    block_edx_id_field = 'edx_video_id'
+    if hasattr(course, 'get_children'):
+        for section in course.get_children():
+            for subsection in section.get_children():
+                for vertical in subsection.get_children():
+                    for block in vertical.get_children():
+                        blocks.append(block)
+
+    edx_video_ids = []
+    for block in blocks:
+        if hasattr(block, block_yt_field) and getattr(block, block_yt_field):
+            if getattr(block, block_edx_id_field):
+                edx_video_ids.append(getattr(block, block_edx_id_field))
+
+    return JsonResponse({'edx_video_ids': edx_video_ids}, status=200)

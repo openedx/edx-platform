@@ -43,7 +43,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
-from lms.djangoapps.courseware.toggles import course_exit_page_is_active, learning_assistant_is_active
+from lms.djangoapps.courseware.toggles import course_exit_page_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -133,6 +133,10 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
+
+    @property
+    def language(self):
+        return self.course.language
 
     @property
     def notes(self):
@@ -367,7 +371,7 @@ class CoursewareMeta:
         """
         Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
         """
-        return learning_assistant_is_active(self.course_key)
+        return getattr(settings, 'LEARNING_ASSISTANT_AVAILABLE', False)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -418,6 +422,7 @@ class CoursewareInformation(RetrieveAPIView):
             * entrance_exam_passed: (bool) Indicates if the entrance exam has been passed
         * id: A unique identifier of the course; a serialized representation
             of the opaque key identifying the course.
+        * language: The language code for the course
         * media: An object that contains named media items.  Included here:
             * course_image: An image to show for the course.  Represented
               as an object with the following fields:

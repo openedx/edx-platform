@@ -3,4 +3,4 @@ paver commands
 """
 
 
-from . import assets, docs, i18n, js_test, prereqs, quality, servers
+from . import assets, js_test, prereqs, quality

@@ -16,8 +16,9 @@ class GenerateReportTest(TestCase):
     Test for generate_report command.
     """
 
+    @mock.patch('openedx.features.survey_report.api.send_report_to_external_api')
     @mock.patch('openedx.features.survey_report.api.get_report_data')
-    def test_generate_report(self, mock_get_report_data):
+    def test_generate_report(self, mock_get_report_data, mock_send_report):
         """
         Test that generate_report command creates a survey report.
         """
@@ -30,6 +31,7 @@ class GenerateReportTest(TestCase):
             'extra_data': {'extra': 'data'},
         }
         mock_get_report_data.return_value = report_test_data
+        mock_send_report.return_value = None
         out = StringIO()
         call_command('generate_report', no_send=True, stdout=out)
 

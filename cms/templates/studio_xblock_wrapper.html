@@ -7,19 +7,21 @@ from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow, use_tagging_taxonomy_list_page
+from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 %>
 <%
 use_new_editor_text = use_new_text_editor()
 use_new_editor_video = use_new_video_editor()
 use_new_editor_problem = use_new_problem_editor()
 use_new_video_gallery_flow = use_video_gallery_flow()
-use_tagging = use_tagging_taxonomy_list_page()
+use_tagging = not is_tagging_feature_disabled()
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block_type)
 messages = xblock.validate().to_json()
+has_not_configured_message = messages.get('summary',{}).get('type', None) == 'not-configured'
 block_is_unit = is_unit(xblock)
 %>
 
@@ -28,6 +30,9 @@ block_is_unit = is_unit(xblock)
 <%block name="header_extras">
 <script type="text/template" id="xblock-validation-messages-tpl">
     <%static:include path="js/xblock-validation-messages.underscore" />
+</script>
+<script type="text/template" id="tag-count-tpl">
+    <%static:include path="js/tag-count.underscore" />
 </script>
 </%block>
 
@@ -40,6 +45,16 @@ block_is_unit = is_unit(xblock)
         $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
     );
 </script>
+
+<%static:webpack entry="js/factories/tag_count">
+    TagCountFactory({
+        tags_count: "${tags_count | n, js_escaped_string}",
+        content_id: "${xblock.location | n, js_escaped_string}",
+        course_authoring_url: "${course_authoring_url | n, js_escaped_string}",
+    },
+        $('li.tag-count[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
+</%static:webpack>
 
 % if not is_root:
     % if is_reorderable:
@@ -99,6 +114,9 @@ block_is_unit = is_unit(xblock)
             <ul class="actions-list nav-dd ui-right">
                 % if not is_root:
                     % if can_edit:
+                        % if use_tagging:
+                            <li class="action-item tag-count" data-locator="${xblock.location}"></li>
+                        % endif
                         % if not show_inline:
                             <li class="action-item action-edit">
                                 <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
@@ -116,6 +134,21 @@ block_is_unit = is_unit(xblock)
                                 <div class="nav-sub">
                                   <ul>
                                     % if not show_inline:
+                                        % if can_edit_visibility:
+                                            <li class="nav-item">
+                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
+                                            </li>
+                                        % endif
+                                        % if can_move:
+                                            <li class="nav-item">
+                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
+                                            </li>
+                                        % endif
+                                        % if use_tagging:
+                                            <li class="nav-item">
+                                                <a class="manage-tags-button" href="#" role="button">${_("Manage Tags")}</a>
+                                            </li>
+                                        % endif
                                         % if is_course:
                                             <!--
                                                 Only show the "Copy to Clipboard" button for xblocks inside courses since
@@ -128,21 +161,6 @@ block_is_unit = is_unit(xblock)
                                         % if can_add:
                                             <li class="nav-item">
                                                 <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
-                                            </li>
-                                        % endif
-                                        % if use_tagging:
-                                            <li class="nav-item">
-                                                <a class="tags-button" href="#" role="button">${_("Manage tags")}</a>
-                                            </li>
-                                        % endif
-                                        % if can_move:
-                                            <li class="nav-item">
-                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
-                                            </li>
-                                        % endif
-                                        % if can_edit_visibility:
-                                            <li class="nav-item">
-                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
                                             </li>
                                         % endif
                                     % endif
@@ -174,7 +192,7 @@ block_is_unit = is_unit(xblock)
     </div>
     % if not is_root:
         <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location}"/>
-        % if xblock_url:
+        % if xblock_url and not has_not_configured_message:
         <div class="xblock-header-secondary">
             <div class="meta-info">${_('This block contains multiple components.')}</div>
             <ul class="actions-list">

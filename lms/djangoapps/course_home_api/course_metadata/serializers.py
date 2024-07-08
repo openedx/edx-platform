@@ -29,6 +29,14 @@ class CourseTabSerializer(serializers.Serializer):
         return request.build_absolute_uri(tab.link_func(self.context.get('course'), reverse))
 
 
+class CourseModeSerrializer(serializers.Serializer):
+    """
+    Serializer for the Course Mode
+    """
+    slug = serializers.CharField()
+    name = serializers.CharField()
+
+
 class CourseHomeMetadataSerializer(VerifiedModeSerializer):
     """
     Serializer for the Course Home Course Metadata
@@ -48,3 +56,5 @@ class CourseHomeMetadataSerializer(VerifiedModeSerializer):
     username = serializers.CharField()
     user_timezone = serializers.CharField()
     can_view_certificate = serializers.BooleanField()
+    course_modes = CourseModeSerrializer(many=True)
+    is_new_discussion_sidebar_view_enabled = serializers.BooleanField()

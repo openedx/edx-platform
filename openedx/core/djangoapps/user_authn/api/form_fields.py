@@ -346,7 +346,8 @@ def add_country_field(is_field_required=False):
     to send the field name and whether or not we want to show error message if this field is
     empty
     """
-    return {'name': 'country', 'error_message': is_field_required}
+    error_msg = accounts.REQUIRED_FIELD_COUNTRY_MSG
+    return {'name': 'country', 'error_message': error_msg if is_field_required else ''}
 
 
 def add_confirm_email_field(is_field_required=False):
@@ -364,3 +365,15 @@ def add_confirm_email_field(is_field_required=False):
         'label': email_label,
         'error_message': accounts.REQUIRED_FIELD_CONFIRM_EMAIL_TEXT_MSG if is_field_required else '',
     }
+
+
+def add_work_experience_field(is_field_required=False):
+    """
+    Returns the user work experience field description
+    """
+    # Translators: This label appears above a dropdown menu to select
+    # the user's work experience
+    work_experience_label = _("Work experience")
+    return _add_field_with_configurable_select_options(
+        'work_experience', work_experience_label, is_field_required,
+    )

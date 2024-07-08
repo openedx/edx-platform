@@ -15,7 +15,8 @@ def cms_api_filter(endpoints):
             path.startswith("/api/contentstore/v0/xblock") or
             path.startswith("/api/contentstore/v0/videos") or
             path.startswith("/api/contentstore/v0/video_transcripts") or
-            path.startswith("/api/contentstore/v0/file_assets")
+            path.startswith("/api/contentstore/v0/file_assets") or
+            path.startswith("/api/contentstore/v0/youtube_transcripts")
         ):
             filtered.append((path, path_regex, method, callback))
     return filtered

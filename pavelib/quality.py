@@ -10,8 +10,6 @@ from xml.sax.saxutils import quoteattr
 
 from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
-from openedx.core.djangolib.markup import HTML
-
 from .utils.envs import Env
 from .utils.timer import timed
 
@@ -79,143 +77,6 @@ def top_python_dirs(dirname):
     return top_dirs
 
 
-@task
-@needs('pavelib.prereqs.install_python_prereqs')
-@cmdopts([
-    ("system=", "s", "System to act on"),
-])
-@timed
-def find_fixme(options):
-    """
-    Run pylint on system code, only looking for fixme items.
-    """
-    num_fixme = 0
-    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
-
-    for system in systems:
-        # Directory to put the pylint report in.
-        # This makes the folder if it doesn't already exist.
-        report_dir = (Env.REPORT_DIR / system).makedirs_p()
-
-        apps_list = ' '.join(top_python_dirs(system))
-
-        cmd = (
-            "pylint --disable all --enable=fixme "
-            "--output-format=parseable {apps} "
-            "> {report_dir}/pylint_fixme.report".format(
-                apps=apps_list,
-                report_dir=report_dir
-            )
-        )
-
-        sh(cmd, ignore_error=True)
-
-        num_fixme += _count_pylint_violations(
-            f"{report_dir}/pylint_fixme.report")
-
-    print("Number of pylint fixmes: " + str(num_fixme))
-
-
-def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, clean=True):
-    """
-    Runs pylint. Returns a tuple of (number_of_violations, list_of_violations)
-    where list_of_violations is a list of all pylint violations found, separated
-    by new lines.
-    """
-    # Make sure the metrics subdirectory exists
-    Env.METRICS_DIR.makedirs_p()
-
-    num_violations = 0
-    violations_list = []
-
-    for system in systems:
-        # Directory to put the pylint report in.
-        # This makes the folder if it doesn't already exist.
-        report_dir = (Env.REPORT_DIR / system).makedirs_p()
-
-        flags = []
-        if errors_only:
-            flags.append("--errors-only")
-
-        apps_list = ' '.join(top_python_dirs(system))
-
-        system_report = report_dir / 'pylint.report'
-        if clean or not system_report.exists():
-            sh(
-                "export DJANGO_SETTINGS_MODULE={env}.envs.test; "
-                "pylint {flags} --output-format=parseable {apps} "
-                "> {report_dir}/pylint.report".format(
-                    flags=" ".join(flags),
-                    apps=apps_list,
-                    report_dir=report_dir,
-                    env=('cms' if system == 'cms' else 'lms')
-                ),
-                ignore_error=True,
-            )
-
-        num_violations += _count_pylint_violations(system_report)
-        with open(system_report) as report_contents:
-            violations_list.extend(report_contents)
-
-    # Print number of violations to log
-    return num_violations, violations_list
-
-
-@task
-@needs('pavelib.prereqs.install_python_prereqs')
-@cmdopts([
-    ("system=", "s", "System to act on"),
-    ("errors", "e", "Check for errors only"),
-])
-@timed
-def run_pylint(options):
-    """
-    Run pylint on system code. When violations limit is passed in,
-    fail the task if too many violations are found.
-    """
-    errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
-    result_name = 'pylint_{}'.format('_'.join(systems))
-
-    num_violations, violations_list = _get_pylint_violations(systems, errors)
-
-    # Print number of violations to log
-    violations_count_str = "Number of pylint violations: " + str(num_violations)
-    print(violations_count_str)
-
-    # Also write the number of violations to a file
-    with open(Env.METRICS_DIR / "pylint", "w") as f:
-        f.write(violations_count_str)
-
-    # Fail if there are violations found in pylint report.
-    if num_violations > 0:
-        failure_message = "FAILURE: Pylint violations found.\n"
-        for violation in violations_list:
-            failure_message += violation  # lint-amnesty, pylint: disable=consider-using-join
-        fail_quality(result_name, failure_message)
-    else:
-        write_junit_xml(result_name)
-
-
-def _count_pylint_violations(report_file):
-    """
-    Parses a pylint report line-by-line and determines the number of violations reported
-    """
-    num_violations_report = 0
-    # An example string:
-    # xmodule/xmodule/tests/test_conditional.py:21: [C0111(missing-docstring), DummySystem] Missing docstring
-    # More examples can be found in the unit tests for this method
-    pylint_pattern = re.compile(r".(\d+):\ \[(\D\d+.+\]).")
-
-    for line in open(report_file):
-        violation_list_for_line = pylint_pattern.split(line)
-        # If the string is parsed into four parts, then we've found a violation. Example of split parts:
-        # test file, line number, violation name, violation details
-        if len(violation_list_for_line) == 4:
-            num_violations_report += 1
-    return num_violations_report
-
-
 def _get_pep8_violations(clean=True):
     """
     Runs pycodestyle. Returns a tuple of (number_of_violations, violations_string)
@@ -248,7 +109,6 @@ def _pep8_violations(report_file):
 
 
 @task
-@needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("system=", "s", "System to act on"),
 ])
@@ -740,70 +600,3 @@ def check_keywords():
                 report_path
             )
         )
-
-
-@task
-@needs('pavelib.prereqs.install_python_prereqs')
-@timed
-# pylint: disable=too-many-statements
-def run_quality():
-    """
-    Build the html quality reports, and print the reports to the console.
-    """
-    failure_reasons = []
-
-    def _lint_output(linter, count, violations_list, is_html=False):
-        """
-        Given a count & list of pylint violations, pretty-print the output.
-        If `is_html`, will print out with HTML markup.
-        """
-        if is_html:
-            lines = ['<body>\n']
-            sep = '-------------<br/>\n'
-            title = HTML("<h1>Quality Report: {}</h1>\n").format(linter)
-            violations_bullets = ''.join(
-                [HTML('<li>{violation}</li><br/>\n').format(violation=violation) for violation in violations_list]
-            )
-            violations_str = HTML('<ul>\n{bullets}</ul>\n').format(bullets=HTML(violations_bullets))
-            violations_count_str = HTML("<b>Violations</b>: {count}<br/>\n")
-            fail_line = HTML("<b>FAILURE</b>: {} count should be 0<br/>\n").format(linter)
-        else:
-            lines = []
-            sep = '-------------\n'
-            title = f"Quality Report: {linter}\n"
-            violations_str = ''.join(violations_list)
-            violations_count_str = "Violations: {count}\n"
-            fail_line = f"FAILURE: {linter} count should be 0\n"
-
-        violations_count_str = violations_count_str.format(count=count)
-
-        lines.extend([sep, title, sep, violations_str, sep, violations_count_str])
-
-        if count > 0:
-            lines.append(fail_line)
-        lines.append(sep + '\n')
-        if is_html:
-            lines.append('</body>')
-
-        return ''.join(lines)
-
-    (count, violations_list) = _get_pylint_violations(clean=False)
-
-    # Print total number of violations to log
-    print(_lint_output('pylint', count, violations_list))
-    if count > 0:
-        failure_reasons.append('Too many total pylint violations.')
-        msg = "FAILURE: " + " ".join(failure_reasons)
-        fail_quality('Quality Failure', msg)
-
-
-def get_violations_reports(violations_type):
-    """
-    Finds violations reports files by naming convention (e.g., all "pep8.report" files)
-    """
-    violations_files = []
-    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
-        for f in files:
-            if f == f"{violations_type}.report":
-                violations_files.append(os.path.join(subdir, f))
-    return violations_files

@@ -24,6 +24,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
 from edx_django_utils.monitoring import set_custom_attribute
+from eventtracking import tracker
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import SESSION_LOGIN_COMPLETED
 from openedx_filters.learning.filters import StudentLoginRequested
@@ -61,6 +62,7 @@ from openedx.features.enterprise_support.api import activate_learner_enterprise,
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 USER_MODEL = get_user_model()
+PASSWORD_RESET_INITIATED = 'edx.user.passwordreset.initiated'
 
 
 def _do_third_party_auth(request):
@@ -194,6 +196,13 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
             LoginFailures.increment_lockout_counter(user)
 
         AUDIT_LOG.info("Password reset initiated for email %s.", user.email)
+        tracker.emit(
+            PASSWORD_RESET_INITIATED,
+            {
+                "user_id": user.id,
+                "source": "Policy Compliance",
+            }
+        )
         send_password_reset_email_for_user(user, request)
 
         # Prevent the login attempt.
@@ -402,7 +411,7 @@ def _check_user_auth_flow(site, user):
             # we don't record their e-mail in case there is sensitive info accidentally
             # in there.
             set_custom_attribute('login_tpa_domain_shortcircuit_user_id', user.id)
-            log.warn("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)  # lint-amnesty, pylint: disable=deprecated-method
+            log.warning("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)
             return
         user_domain = email_parts[1].strip().lower()
 
@@ -591,7 +600,10 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
             _handle_failed_authentication(user, possibly_authenticated_user)
 
         pwned_properties = check_pwned_password_and_send_track_event(
-            user.id, request.POST.get('password'), user.is_staff
+            user_id=user.id,
+            password=request.POST.get('password'),
+            internal_user=user.is_staff,
+            request_page='login'
         ) if not is_user_third_party_authenticated else {}
         # Set default for third party login
         password_frequency = pwned_properties.get('frequency', -1)

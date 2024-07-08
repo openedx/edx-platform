@@ -50,3 +50,23 @@ class StrictSerializer(serializers.Serializer):
                 )
 
         return ret
+
+
+class ProctoringErrorModelSerializer(serializers.Serializer):
+    """
+    Serializer for proctoring error model item.
+    """
+    deprecated = serializers.BooleanField()
+    display_name = serializers.CharField()
+    help = serializers.CharField()
+    hide_on_enabled_publisher = serializers.BooleanField()
+    value = serializers.CharField()
+
+
+class ProctoringErrorListSerializer(serializers.Serializer):
+    """
+    Serializer for proctoring error list.
+    """
+    key = serializers.CharField()
+    message = serializers.CharField()
+    model = ProctoringErrorModelSerializer()

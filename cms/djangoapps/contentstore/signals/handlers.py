@@ -123,9 +123,17 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         update_search_index,
         update_special_exams_and_publish
     )
-    from cms.djangoapps.coursegraph.tasks import (
-        dump_course_to_neo4j
-    )
+
+    # DEVELOPER README: probably all tasks here should use transaction.on_commit
+    # to avoid stale data, but the tasks are owned by many teams and are often
+    # working well enough. Several instead use a waiting strategy.
+    # If you are in here trying to figure out why your task is not working correctly,
+    # consider whether it is getting stale data and if so choose to wait for the transaction
+    # like exams or put your task to sleep for a while like discussions.
+    # You will not be able to replicate these errors in an environment where celery runs
+    # in process because it will be inside the transaction. Use the settings from
+    # devstack_with_worker.py, and consider adding a time.sleep into send_bulk_published_signal
+    # if you really want to make sure that the task happens before the data is ready.
 
     # register special exams asynchronously after the data is ready
     course_key_str = str(course_key)
@@ -135,14 +143,9 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         # Push the course outline to learning_sequences asynchronously.
         update_outline_from_modulestore_task.delay(course_key_str)
 
-    if settings.COURSEGRAPH_DUMP_COURSE_ON_PUBLISH:
-        # Push the course out to CourseGraph asynchronously.
-        dump_course_to_neo4j.delay(course_key_str)
-
-    # Finally, call into the course search subsystem
-    # to kick off an indexing action
+    # Kick off a courseware indexing action after the data is ready
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
-        update_search_index.delay(course_key_str, datetime.now(UTC).isoformat())
+        transaction.on_commit(lambda: update_search_index.delay(course_key_str, datetime.now(UTC).isoformat()))
 
     update_discussions_settings_from_course_task.apply_async(
         args=[course_key_str],

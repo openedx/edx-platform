@@ -149,6 +149,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                         releaseDate: this.model.get('release_date'),
                         releaseDateFrom: this.model.get('release_date_from'),
                         hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
+                        hideFromTOC: this.model.get('hide_from_toc'),
                         staffLockFrom: this.model.get('staff_lock_from'),
                         enableCopyUnit: this.model.get('enable_copy_paste_units'),
                         course: window.course,
@@ -370,6 +371,82 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             }
         },
 
+        setupMessageListener: function () {
+            window.addEventListener(
+                "message", (event) => {
+                    // Listen any message from Manage tags drawer.
+                    var data = event.data;
+                    var courseAuthoringUrl = new URL(this.model.get("course_authoring_url")).origin;
+                    if (event.origin == courseAuthoringUrl
+                        && data.type == 'authoring.events.tags.updated') {
+                        // This message arrives when there is a change in the tag list.
+                        // The message contains the new list of tags.
+                        data = data.data
+                        if (data.contentId == this.model.id) {
+                            this.model.set('tags', this.buildTaxonomyTree(data));
+                            this.render();
+                        }
+                    }
+                },
+            );
+        },
+
+        buildTaxonomyTree: function(data) {
+            // TODO We can use this function for the initial request of tags
+            // and avoid to use two functions (see get_unit_tags on contentstore/views/component.py)
+
+            var taxonomyList = [];
+            var totalCount = 0;
+            var actualId = 0;
+            data.taxonomies.forEach((taxonomy) => {
+                // Build a tag tree for each taxonomy
+                var rootTagsValues = [];
+                var tags = {};
+                taxonomy.tags.forEach((tag) => {
+                    // Creates the tags for all the lineage of this tag
+                    for (let i = tag.lineage.length - 1; i >= 0; i--){
+                        var tagValue = tag.lineage[i]
+                        var tagProcessedBefore = tags.hasOwnProperty(tagValue);
+                        if (!tagProcessedBefore) {
+                            tags[tagValue] = {
+                                id: actualId,
+                                value: tagValue,
+                                children: [],
+                            }
+                            actualId++;
+                            if (i == 0) {
+                                rootTagsValues.push(tagValue);
+                            }
+                        }
+                        if (i !== tag.lineage.length - 1) {
+                            // Add a child into the children list
+                            tags[tagValue].children.push(tags[tag.lineage[i + 1]])
+                        }
+                        if (tagProcessedBefore) {
+                            // Break this loop if the tag has been processed before,
+                            // we don't need to process lineage again to avoid duplicates.
+                            break;
+                        }
+                    }
+                })
+
+                var tagCount = Object.keys(tags).length;
+                // Add the tree to the taxonomy list
+                taxonomyList.push({
+                    id: taxonomy.taxonomyId,
+                    value: taxonomy.name,
+                    tags: rootTagsValues.map(rootValue => tags[rootValue]),
+                    count: tagCount,
+                });
+                totalCount += tagCount;
+            });
+
+            return {
+                count: totalCount,
+                taxonomies: taxonomyList,
+            };
+        },
+
         handleKeyDownOnHeader: function(event) {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -465,6 +542,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     tagContentElement.ariaExpanded = "false";
                     tagContentElement.setAttribute('aria-controls', `content-tags-tag-${tag.id}`);
                     tagContentElement.appendChild(tagIconElement);
+                    tagContentElement.className += ' tagging-label-link';
                     parentElement.appendChild(tagChildrenElement);
 
                     // Render children

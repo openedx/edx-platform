@@ -53,48 +53,8 @@ class LearningContext:
 
     def definition_for_usage(self, usage_key, **kwargs):
         """
-        Given a usage key for an XBlock in this context, return the
-        BundleDefinitionLocator which specifies the actual XBlock definition
-        (as a path to an OLX in a specific blockstore bundle).
+        Given a usage key in this context, return the key indicating the actual XBlock definition.
 
-        usage_key: the UsageKeyV2 subclass used for this learning context
-
-        kwargs: optional additional parameters unique to the learning context
-
-        Must return a BundleDefinitionLocator if the XBlock exists in this
-        context, or None otherwise.
+        Retuns None if the usage key doesn't exist in this context.
         """
         raise NotImplementedError
-
-    def usage_for_child_include(self, parent_usage, parent_definition, parsed_include):
-        """
-        Method that the runtime uses when loading a block's child, to get the
-        ID of the child. Must return a usage key.
-
-        The child is always from an <xblock-include /> element.
-
-        parent_usage: the UsageKeyV2 subclass key of the parent
-
-        parent_definition: the BundleDefinitionLocator key of the parent (same
-            as returned by definition_for_usage(parent_usage) but included here
-            as an optimization since it's already known.)
-
-        parsed_include: the XBlockInclude tuple containing the data from the
-            parsed <xblock-include /> element. See xblock.runtime.olx_parsing.
-
-        Must return a UsageKeyV2 subclass
-        """
-        raise NotImplementedError
-
-    # Future functionality:
-    # def get_field_overrides(self, user, usage_key):
-    #     """
-    #     Each learning context may have a way for authors to specify field
-    #     overrides that apply to XBlocks in the context.
-
-    #     For example, courses might allow an instructor to specify that all
-    #     'problem' blocks in her course have 'num_attempts' set to '5',
-    #     regardless of the 'num_attempts' value in the underlying problem XBlock
-    #     definitions.
-    #     """
-    #     raise NotImplementedError

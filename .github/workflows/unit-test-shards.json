@@ -239,7 +239,6 @@
     "paths": [
       "cms/djangoapps/api/",
       "cms/djangoapps/cms_user_tasks/",
-      "cms/djangoapps/coursegraph/",
       "cms/djangoapps/course_creators/",
       "cms/djangoapps/export_course_metadata/",
       "cms/djangoapps/maintenance/",
@@ -259,13 +258,15 @@
   "common-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
-      "common/djangoapps/"
+      "common/djangoapps/",
+      "pavelib/"
     ]
   },
   "common-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
-      "common/djangoapps/"
+      "common/djangoapps/",
+      "pavelib/"
     ]
   },
   "xmodule-with-lms": {

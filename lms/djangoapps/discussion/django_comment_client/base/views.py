@@ -55,10 +55,12 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     comment_deleted,
     comment_edited,
     comment_endorsed,
+    comment_flagged,
     comment_voted,
     thread_created,
     thread_deleted,
     thread_edited,
+    thread_flagged,
     thread_followed,
     thread_unfollowed,
     thread_voted
@@ -900,6 +902,7 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     thread.flagAbuse(user, thread)
     track_discussion_reported_event(request, course, thread)
+    thread_flagged.send(sender='flag_abuse_for_thread', user=request.user, post=thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -938,6 +941,7 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user, comment)
     track_discussion_reported_event(request, course, comment)
+    comment_flagged.send(sender='flag_abuse_for_comment', user=request.user, post=comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 

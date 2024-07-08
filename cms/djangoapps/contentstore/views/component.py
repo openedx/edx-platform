@@ -4,7 +4,6 @@ Studio component views
 
 
 import logging
-from urllib.parse import quote_plus
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -25,23 +24,14 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
-from cms.djangoapps.contentstore.toggles import (
-    use_new_problem_editor,
-    use_tagging_taxonomy_list_page,
-)
+from cms.djangoapps.contentstore.helpers import is_unit
+from cms.djangoapps.contentstore.toggles import use_new_problem_editor, use_new_unit_page
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import load_services_for_studio
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
-from openedx.core.djangoapps.content_staging import api as content_staging_api
-from openedx.core.djangoapps.content_tagging.api import get_content_tags
+from openedx.core.djangoapps.content_tagging.api import get_object_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from ..toggles import use_new_unit_page
-from ..utils import get_lms_link_for_item, get_sibling_urls, load_services_for_studio, reverse_course_url, get_unit_url
-from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
-    add_container_page_publishing_info,
-    create_xblock_info,
-)
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 __all__ = [
     'container_handler',
@@ -120,6 +110,9 @@ def container_handler(request, usage_key_string):  # pylint: disable=too-many-st
         html: returns the HTML page for editing a container
         json: not currently supported
     """
+
+    from ..utils import get_container_handler_context, get_unit_url
+
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
 
         try:
@@ -131,10 +124,6 @@ def container_handler(request, usage_key_string):  # pylint: disable=too-many-st
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
-            component_templates = get_component_templates(course)
-            ancestor_xblocks = []
-            parent = get_parent_xblock(xblock)
-            action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
@@ -142,97 +131,12 @@ def container_handler(request, usage_key_string):  # pylint: disable=too-many-st
             if is_unit_page and use_new_unit_page(course.id):
                 return redirect(get_unit_url(course.id, unit.location))
 
-            is_first = True
-            block = xblock
-
-            # Build the breadcrumbs and find the ``Unit`` ancestor
-            # if it is not the immediate parent.
-            while parent:
-
-                if unit is None and is_unit(block):
-                    unit = block
-
-                # add all to nav except current xblock page
-                if xblock != block:
-                    current_block = {
-                        'title': block.display_name_with_default,
-                        'children': parent.get_children(),
-                        'is_last': is_first
-                    }
-                    is_first = False
-                    ancestor_xblocks.append(current_block)
-
-                block = parent
-                parent = get_parent_xblock(parent)
-
-            ancestor_xblocks.reverse()
-
-            assert unit is not None, "Could not determine unit page"
-            subsection = get_parent_xblock(unit)
-            assert subsection is not None, "Could not determine parent subsection from unit " + str(
-                unit.location)
-            section = get_parent_xblock(subsection)
-            assert section is not None, "Could not determine ancestor section from unit " + str(unit.location)
-
-            # for the sequence navigator
-            prev_url, next_url = get_sibling_urls(subsection, unit.location)
-            # these are quoted here because they'll end up in a query string on the page,
-            # and quoting with mako will trigger the xss linter...
-            prev_url = quote_plus(prev_url) if prev_url else None
-            next_url = quote_plus(next_url) if next_url else None
-
-            show_unit_tags = use_tagging_taxonomy_list_page()
-            unit_tags = None
-            if show_unit_tags and is_unit_page:
-                unit_tags = get_unit_tags(usage_key)
-
-            # Fetch the XBlock info for use by the container page. Note that it includes information
-            # about the block's ancestors and siblings for use by the Unit Outline.
-            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, tags=unit_tags)
-
-            if is_unit_page:
-                add_container_page_publishing_info(xblock, xblock_info)
-
-            # need to figure out where this item is in the list of children as the
-            # preview will need this
-            index = 1
-            for child in subsection.get_children():
-                if child.location == unit.location:
-                    break
-                index += 1
-
-            # Get the status of the user's clipboard so they can paste components if they have something to paste
-            user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
-            library_block_types = [problem_type['component'] for problem_type in LIBRARY_BLOCK_TYPES]
-            is_library_xblock = xblock.location.block_type in library_block_types
-
-            return render_to_response('container.html', {
-                'language_code': request.LANGUAGE_CODE,
-                'context_course': course,  # Needed only for display of menus at top of page.
-                'action': action,
-                'xblock': xblock,
-                'xblock_locator': xblock.location,
-                'unit': unit,
-                'is_unit_page': is_unit_page,
-                'is_collapsible': is_library_xblock,
-                'subsection': subsection,
-                'section': section,
-                'position': index,
-                'prev_url': prev_url,
-                'next_url': next_url,
-                'new_unit_category': 'vertical',
-                'outline_url': '{url}?format=concise'.format(url=reverse_course_url('course_handler', course.id)),
-                'ancestor_xblocks': ancestor_xblocks,
-                'component_templates': component_templates,
-                'xblock_info': xblock_info,
+            container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
+            container_handler_context.update({
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES,
-                'show_unit_tags': show_unit_tags,
-                # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
-                'user_clipboard': user_clipboard,
-                'is_fullwidth_content': is_library_xblock,
             })
+            return render_to_response('container.html', container_handler_context)
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
 
@@ -241,6 +145,9 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
+
+    from ..helpers import xblock_type_display_name
+
     def create_template_dict(name, category, support_level, boilerplate_name=None, tab="common", hinted=False):
         """
         Creates a component template dict.
@@ -544,6 +451,9 @@ def _get_item_in_course(request, usage_key):
 
     Verifies that the caller has permission to access this item.
     """
+
+    from ..utils import get_lms_link_for_item
+
     # usage_key's course_key may have an empty run property
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
@@ -623,7 +533,7 @@ def get_unit_tags(usage_key):
     which already provides this grouping + sorting logic.
     """
     # Get content tags from content tagging API
-    content_tags = get_content_tags(usage_key)
+    content_tags = get_object_tags(str(usage_key))
 
     # Group content tags by taxonomy
     taxonomy_dict = {}

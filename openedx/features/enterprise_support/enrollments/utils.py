@@ -28,6 +28,7 @@ def lms_update_or_create_enrollment(
     desired_mode,
     is_active,
     enterprise_uuid=None,
+    force_enrollment=False,
 ):
     """
     Update or create the user's course enrollment based on the existing enrollment mode.
@@ -50,6 +51,9 @@ def lms_update_or_create_enrollment(
      - is_active (bool): A Boolean value that indicates whether the
         enrollment is to be set to inactive (if False). Usually we want a True if enrolling anew.
      - enterprise_uuid (str): Optional. id to identify the enterprise to enroll under
+     - force_enrollment (bool):
+         Enroll user even if course enrollment_end date is expired (default False). This only has an effect when the
+         enrollment is being created, not when it is only updated.
 
     Returns: A serializable dictionary of the new or updated course enrollment. If it hits
      CourseEnrollmentError or CourseEnrollmentNotUpdatableError, it raises those exceptions.
@@ -105,6 +109,7 @@ def lms_update_or_create_enrollment(
                     is_active=is_active,
                     enrollment_attributes=None,
                     enterprise_uuid=enterprise_uuid,
+                    force_enrollment=force_enrollment,
                 )
                 if not response:
                     log.exception(
@@ -128,12 +133,13 @@ def lms_update_or_create_enrollment(
         except (CourseEnrollmentError, CourseEnrollmentNotUpdatableError) as error:
             log.exception(
                 "Raising error [%s] for user "
-                "[%s]: course run = [%s], enterprise_uuid = [%s], is_active = [%s], ",
+                "[%s]: course run = [%s], enterprise_uuid = [%s], is_active = [%s], force_enrollment = [%s], ",
                 error,
                 username,
                 course_id,
                 str(enterprise_uuid),
                 is_active,
+                force_enrollment,
             )
             raise error
         finally:

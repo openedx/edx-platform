@@ -8,23 +8,30 @@ from django.db import IntegrityError, transaction
 from django.dispatch import receiver
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
-    COURSE_UNENROLLMENT_COMPLETED,
-    USER_NOTIFICATION_REQUESTED,
     COURSE_NOTIFICATION_REQUESTED,
+    COURSE_UNENROLLMENT_COMPLETED,
+    USER_NOTIFICATION_REQUESTED
 )
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.notifications.audience_filters import RoleAudienceFilter, EnrollmentAudienceFilter
+from openedx.core.djangoapps.notifications.audience_filters import (
+    CohortAudienceFilter,
+    CourseRoleAudienceFilter,
+    EnrollmentAudienceFilter,
+    ForumRoleAudienceFilter,
+    TeamAudienceFilter
+)
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 
 log = logging.getLogger(__name__)
 
-AUDIENCE_FILTER_TYPES = ['role', 'enrollment']
-
 AUDIENCE_FILTER_CLASSES = {
-    'role': RoleAudienceFilter,
-    'enrollment': EnrollmentAudienceFilter,
+    'discussion_roles': ForumRoleAudienceFilter,
+    'course_roles': CourseRoleAudienceFilter,
+    'enrollments': EnrollmentAudienceFilter,
+    'teams': TeamAudienceFilter,
+    'cohorts': CohortAudienceFilter,
 }
 
 
@@ -76,11 +83,15 @@ def calculate_course_wide_notification_audience(course_key, audience_filters):
     Calculate the audience for a course-wide notification based on the audience filters
     """
     if not audience_filters:
-        return CourseEnrollment.objects.filter(course_id=course_key, is_active=True).values_list('user_id', flat=True)
+        active_enrollments = CourseEnrollment.objects.filter(
+            course_id=course_key,
+            is_active=True
+        ).values_list('user_id', flat=True)
+        return list(active_enrollments)
 
     audience_user_ids = []
     for filter_type, filter_values in audience_filters.items():
-        if filter_type in AUDIENCE_FILTER_TYPES:
+        if filter_type in AUDIENCE_FILTER_CLASSES.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
             filter_class = AUDIENCE_FILTER_CLASSES.get(filter_type)
             if filter_class:
                 filter_instance = filter_class(course_key)
@@ -93,20 +104,28 @@ def calculate_course_wide_notification_audience(course_key, audience_filters):
 
 
 @receiver(COURSE_NOTIFICATION_REQUESTED)
-def generate_course_notifications(signal, sender, notification_data, metadata, **kwargs):
+def generate_course_notifications(signal, sender, course_notification_data, metadata, **kwargs):
     """
     Watches for COURSE_NOTIFICATION_REQUESTED signal and calls send_notifications task
     """
-    from openedx.core.djangoapps.notifications.tasks import send_notifications
-    notification_data = notification_data.__dict__
-    notification_data['course_key'] = str(notification_data['course_key'])
 
-    audience_filters = notification_data.pop('audience_filters')
+    from openedx.core.djangoapps.notifications.tasks import send_notifications
+    course_notification_data = course_notification_data.__dict__
     user_ids = calculate_course_wide_notification_audience(
-        notification_data['course_key'],
-        audience_filters,
+        str(course_notification_data['course_key']),
+        course_notification_data['audience_filters']
     )
-    notification_data['user_ids'] = user_ids
-    notification_data['context'] = notification_data.pop('content_context')
+    sender_id = course_notification_data.get('content_context', {}).get('sender_id')
+    if sender_id in user_ids:
+        user_ids.remove(sender_id)
+
+    notification_data = {
+        'course_key': str(course_notification_data['course_key']),
+        'user_ids': user_ids,
+        'context': course_notification_data.get('content_context'),
+        'app_name': course_notification_data.get('app_name'),
+        'notification_type': course_notification_data.get('notification_type'),
+        'content_url': course_notification_data.get('content_url'),
+    }
 
     send_notifications.delay(**notification_data)

@@ -143,6 +143,40 @@
           }
         }
       }
+
+      .subsection-share-link-tabs-header {
+        margin-bottom: $baseline;
+        border-bottom: 1px solid $gray-l3;
+
+        li.subsection-share-link-tab-buttons {
+          display: inline-block;
+          margin-right: $baseline;
+
+          .subsection-share-link-tab-button {
+            @extend %t-copy-sub1;
+            @extend %t-regular;
+
+            background-image: none;
+            background-color: $white;
+            color: $gray-d1;
+            border-radius: 0;
+            box-shadow: none;
+            border: 0;
+            padding: ($baseline/4) ($baseline/2);
+            text-transform: uppercase;
+
+            &:hover {
+              background-color: theme-color("inverse");
+              color: theme-color("primary");
+            }
+
+            &.active {
+              border-bottom: 4px solid theme-color("primary");
+              color: theme-color("primary");
+            }
+          }
+        }
+      }
     }
 
     .modal-section-title {
@@ -168,6 +202,33 @@
         min-height: 95px;
       }
 
+      .enable-hide-from-toc-container {
+        background: #E5F1F8;
+        padding: 20px 32px;
+        margin: 16px 0px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        .icon-message {
+          color: white;
+          background: #0075B4;
+          padding: 8px;
+          border-radius: 50%;
+          transform: rotate(90deg);
+          font-size: 16px;
+          height: 18px;
+          width: 20px;
+        }
+
+        .text-message {
+          padding: 0px 10px;
+          word-wrap: break-word;
+          font-weight: 500;
+        }
+      }
+
       .list-fields,
       .list-actions {
         display: inline-block;
@@ -181,6 +242,28 @@
 
         .action-button {
           @extend %t-icon4;
+        }
+      }
+
+      .subsection-share-link-container {
+        display: flex;
+        align-items: center;
+
+        .copy-link-button {
+          border-radius: ($baseline/4);
+          font-size: 1.5rem;
+          font-weight: 600;
+          padding: 0.7rem 1rem;
+
+          .icon-copy-clipboard {
+            color: $white;
+          }
+        }
+
+        .share-link-animated-svg {
+          border-radius: 0.5rem;
+          margin-left: 1rem;
+          box-shadow: 0 0 7px $shadow-d1;
         }
       }
     }

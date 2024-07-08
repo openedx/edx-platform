@@ -33,3 +33,6 @@ DATA_DIR: "/tmp/edx-platform/data_dir/"
 # For just the CMS
 LMS_ROOT_URL: "http://localhost"
 LMS_INTERNAL_ROOT_URL: "http://localhost"
+
+# So that Swagger config code doesn't complain
+API_ACCESS_MANAGER_EMAIL: "api-access@example.com"

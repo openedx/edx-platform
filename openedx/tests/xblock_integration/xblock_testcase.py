@@ -84,8 +84,6 @@ class XBlockEventTestMixin:
 
     Good things to look at as developing the code:
     * Gabe's library for parsing events. This is nice.
-    * Bok choy has a nice Mongo search for events in the cohorts test
-      case. It is a little slow for the general case.
     * This is originally based on a cleanup of the EventTestMixin. We
       could work to converge those in some sensible way.
     """

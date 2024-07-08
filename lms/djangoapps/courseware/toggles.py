@@ -68,6 +68,48 @@ COURSEWARE_MICROFRONTEND_SEARCH_ENABLED = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.mfe_courseware_search', __name__
 )
 
+# .. toggle_name: courseware.disable_navigation_sidebar_blocks_caching
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Disable caching of navigation sidebar blocks on Learning MFE.
+#   It can be used when caching the structure of large courses for a large number of users
+#   at the same time can overload the cache storage (memcache or redis).
+# .. toggle_use_cases: opt_out, open_edx
+# .. toggle_creation_date: 2024-03-21
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: FC-0056
+# .. toggle_warning: None.
+COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.disable_navigation_sidebar_blocks_caching', __name__
+)
+
+# .. toggle_name: courseware.enable_navigation_sidebar
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enable navigation sidebar on Learning MFE
+# .. toggle_use_cases: opt_out, open_edx
+# .. toggle_creation_date: 2024-03-07
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: FC-0056
+COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.enable_navigation_sidebar', __name__
+)
+
+# .. toggle_name: courseware.always_open_auxiliary_sidebar
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: True
+# .. toggle_description: Waffle flag that determines whether the auxiliary sidebar,
+#   such as discussion or notification, should automatically expand
+#   on each course unit page within the Learning MFE, without preserving
+#   the previous state of the sidebar.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-04-28
+# .. toggle_target_removal_date: 2024-07-28
+# .. toggle_tickets: FC-0056
+COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.always_open_auxiliary_sidebar', __name__
+)
+
 # .. toggle_name: courseware.mfe_progress_milestones_streak_discount_enabled
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -109,21 +151,22 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 # .. toggle_status: unsupported
 COURSES_INVITE_ONLY = SettingToggle('COURSES_INVITE_ONLY', default=False)
 
-# .. toggle_name: courseware.learning_assistant
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables an the visibility of an LTI-based learning assistant
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-07-05
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: MST-1977
-COURSEWARE_LEARNING_ASSISTANT = CourseWaffleFlag(
-    f'{WAFFLE_FLAG_NAMESPACE}.learning_assistant', __name__
-)
-
 
 ENABLE_OPTIMIZELY_IN_COURSEWARE = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     'RET.enable_optimizely_in_courseware', __name__
+)
+
+# .. toggle_name: courseware.discovery_default_language_filter
+# .. toggle_implementation: WaffleSwitch
+# .. toggle_default: False
+# .. toggle_description: Enable courses to be filtered by user language by default.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-11-02
+# .. toggle_target_removal_date: None
+# .. toggle_warning: The ENABLE_COURSE_DISCOVERY feature flag should be enabled.
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33647
+ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER = WaffleSwitch(
+    f'{WAFFLE_FLAG_NAMESPACE}.discovery_default_language_filter', __name__
 )
 
 
@@ -164,12 +207,15 @@ def course_is_invitation_only(courselike) -> bool:
     return COURSES_INVITE_ONLY.is_enabled() or courselike.invitation_only or courselike.id.deprecated
 
 
-def learning_assistant_is_active(course_key):
-    return COURSEWARE_LEARNING_ASSISTANT.is_enabled(course_key)
-
-
 def courseware_mfe_search_is_enabled(course_key=None):
     """
     Return whether the courseware.mfe_courseware_search flag is on.
     """
     return COURSEWARE_MICROFRONTEND_SEARCH_ENABLED.is_enabled(course_key)
+
+
+def courseware_disable_navigation_sidebar_blocks_caching(course_key=None):
+    """
+    Return whether the courseware.disable_navigation_sidebar_blocks_caching flag is on.
+    """
+    return COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING.is_enabled(course_key)

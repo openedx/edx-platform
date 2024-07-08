@@ -32,7 +32,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .save-button': 'saveSelectedLibraryComponents',
             'click .paste-component-button': 'pasteComponent',
-            'click .tags-button': 'openManageTags',
+            'click .manage-tags-button': 'openManageTags',
             'change .header-library-checkbox': 'toggleLibraryComponent',
             'click .collapse-button': 'collapseXBlock',
         },
@@ -107,11 +107,14 @@ function($, _, Backbone, gettext, BasePage,
                 });
                 this.viewLiveActions.render();
 
-                this.tagListView = new ContainerSubviews.TagList({
-                    el: this.$('.unit-tags'),
-                    model: this.model
-                });
-                this.tagListView.render();
+                if (!this.model.get('is_tagging_feature_disabled')) {
+                    this.tagListView = new ContainerSubviews.TagList({
+                        el: this.$('.unit-tags'),
+                        model: this.model
+                    });
+                    this.tagListView.setupMessageListener();
+                    this.tagListView.render();
+                }
 
                 this.unitOutlineView = new UnitOutlineView({
                     el: this.$('.wrapper-unit-overview'),
@@ -364,7 +367,7 @@ function($, _, Backbone, gettext, BasePage,
             event.preventDefault();
 
             if (!options || options.view !== 'visibility_view') {
-                const primaryHeader = $(event.target).closest('.xblock-header-primary');
+                const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
 
                 var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
                     useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),

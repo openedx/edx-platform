@@ -1,24 +1,34 @@
 """
 Tagging Org API Views
 """
+from __future__ import annotations
+
+from django.db.models import Count
+from django.http import StreamingHttpResponse
 from openedx_tagging.core.tagging import rules as oel_tagging_rules
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, TaxonomyView
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from openedx_events.content_authoring.data import ContentObjectData
+from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
 
+from ...auth import has_view_object_tags_access
 from ...api import (
     create_taxonomy,
-    get_taxonomy,
+    generate_csv_rows,
     get_taxonomies,
     get_taxonomies_for_org,
-    set_taxonomy_orgs,
+    get_taxonomy,
+    get_unassigned_taxonomies,
+    set_taxonomy_orgs
 )
 from ...rules import get_admin_orgs
-from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
+from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -55,15 +65,23 @@ class TaxonomyOrgView(TaxonomyView):
         query_params = TaxonomyOrgListQueryParamsSerializer(data=self.request.query_params.dict())
         query_params.is_valid(raise_exception=True)
         enabled = query_params.validated_data.get("enabled", None)
+        org = query_params.validated_data.get("org", None)
 
         # If org filtering was requested, then use it, even if the org is invalid/None
-        org = query_params.validated_data.get("org", None)
         if "org" in query_params.validated_data:
             queryset = get_taxonomies_for_org(enabled, org)
+        elif "unassigned" in query_params.validated_data:
+            queryset = get_unassigned_taxonomies(enabled)
         else:
             queryset = get_taxonomies(enabled)
 
-        return queryset.prefetch_related("taxonomyorg_set")
+        # Prefetch taxonomyorgs so we can check permissions
+        queryset = queryset.prefetch_related("taxonomyorg_set__org")
+
+        # Annotate with tags_count to avoid selecting all the tags
+        queryset = queryset.annotate(tags_count=Count("tag", distinct=True))
+
+        return queryset
 
     def perform_create(self, serializer):
         """
@@ -73,11 +91,11 @@ class TaxonomyOrgView(TaxonomyView):
         serializer.instance = create_taxonomy(**serializer.validated_data, orgs=user_admin_orgs)
 
     @action(detail=False, url_path="import", methods=["post"])
-    def create_import(self, request: Request, **kwargs) -> Response:
+    def create_import(self, request: Request, **kwargs) -> Response:  # type: ignore
         """
         Creates a new taxonomy with the given orgs and imports the tags from the uploaded file.
         """
-        response = super().create_import(request, **kwargs)
+        response = super().create_import(request=request, **kwargs)  # type: ignore
 
         # If creation was successful, set the orgs for the new taxonomy
         if status.is_success(response.status_code):
@@ -122,8 +140,59 @@ class TaxonomyOrgView(TaxonomyView):
 class ObjectTagOrgView(ObjectTagView):
     """
     View to create and retrieve ObjectTags for a provided Object ID (object_id).
-    This view extends the ObjectTagView to add Organization filters for the results.
+    This view extends the ObjectTagView to add Organization filters for the results,
+    and fires events when the tags are updated.
 
     Refer to ObjectTagView docstring for usage details.
     """
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
+
+    def update(self, request, *args, **kwargs) -> Response:
+        """
+        Extend the update method to fire CONTENT_OBJECT_TAGS_CHANGED event
+        """
+        response = super().update(request, *args, **kwargs)
+        if response.status_code == 200:
+            object_id = kwargs.get('object_id')
+            CONTENT_OBJECT_TAGS_CHANGED.send_event(
+                content_object=ContentObjectData(object_id=object_id)
+            )
+        return response
+
+
+class ObjectTagExportView(APIView):
+    """"
+    View to export a CSV with all children and tags for a given course/context.
+    """
+    def get(self, request: Request, **kwargs) -> StreamingHttpResponse:
+        """
+        Export a CSV with all children and tags for a given course/context.
+        """
+
+        class Echo(object):
+            """
+            Class that implements just the write method of the file-like interface,
+            used for the streaming response.
+            """
+            def write(self, value):
+                return value
+
+        object_id: str = kwargs.get('context_id', None)
+        pseudo_buffer = Echo()
+
+        if not has_view_object_tags_access(self.request.user, object_id):
+            raise PermissionDenied(
+                "You do not have permission to view object tags for this object_id."
+            )
+
+        try:
+            return StreamingHttpResponse(
+                streaming_content=generate_csv_rows(
+                    object_id,
+                    pseudo_buffer,
+                ),
+                content_type="text/csv",
+                headers={'Content-Disposition': f'attachment; filename="{object_id}_tags.csv"'},
+            )
+        except ValueError as e:
+            raise ValidationError from e

@@ -268,7 +268,8 @@ def _get_extended_profile_fields():
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         ),
         "profession": _("Profession"),
-        "specialty": _("Specialty")
+        "specialty": _("Specialty"),
+        "work_experience": _("Work experience")
     }
 
     extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])

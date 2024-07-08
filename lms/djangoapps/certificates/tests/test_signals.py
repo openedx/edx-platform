@@ -2,11 +2,17 @@
 Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
-
+from datetime import datetime, timezone
 from unittest import mock
+from uuid import uuid4
 
 import ddt
+from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_events.data import EventsMetadata
+from openedx_events.learning.data import ExamAttemptData, UserData, UserPersonalData
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -18,6 +24,7 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     GeneratedCertificate
 )
+from lms.djangoapps.certificates.signals import handle_exam_attempt_rejected_event
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
@@ -433,3 +440,75 @@ class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
         ) as mock_allowlist_task:
             self.verified_enrollment.change_mode('audit')
             mock_allowlist_task.assert_not_called()
+
+
+class ExamCompletionEventBusTests(TestCase):
+    """
+    Tests completion events from the event bus.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course_key = CourseKey.from_string('course-v1:edX+TestX+Test_Course')
+        cls.subsection_id = 'block-v1:edX+TestX+Test_Course+type@sequential+block@subsection'
+        cls.usage_key = UsageKey.from_string(cls.subsection_id)
+        cls.student_user = UserFactory(
+            username='student_user',
+        )
+
+    @staticmethod
+    def _get_exam_event_data(student_user, course_key, usage_key, exam_type, requesting_user=None):
+        """ create ExamAttemptData object for exam based event """
+        if requesting_user:
+            requesting_user_data = UserData(
+                id=requesting_user.id,
+                is_active=True,
+                pii=None
+            )
+        else:
+            requesting_user_data = None
+
+        return ExamAttemptData(
+            student_user=UserData(
+                id=student_user.id,
+                is_active=True,
+                pii=UserPersonalData(
+                    username=student_user.username,
+                    email=student_user.email,
+                ),
+            ),
+            course_key=course_key,
+            usage_key=usage_key,
+            requesting_user=requesting_user_data,
+            exam_type=exam_type,
+        )
+
+    @staticmethod
+    def _get_exam_event_metadata(event_signal):
+        """ create metadata object for event """
+        return EventsMetadata(
+            event_type=event_signal.event_type,
+            id=uuid4(),
+            minorversion=0,
+            source='openedx/lms/web',
+            sourcehost='lms.test',
+            time=datetime.now(timezone.utc)
+        )
+
+    @mock.patch('lms.djangoapps.certificates.signals.invalidate_certificate')
+    def test_exam_attempt_rejected_event(self, mock_api_function):
+        """
+        Assert that CertificateService api's invalidate_certificate is called upon consuming the event
+        """
+        exam_event_data = self._get_exam_event_data(self.student_user,
+                                                    self.course_key,
+                                                    self.usage_key,
+                                                    exam_type='proctored')
+        event_metadata = self._get_exam_event_metadata(EXAM_ATTEMPT_REJECTED)
+
+        event_kwargs = {
+            'exam_attempt': exam_event_data,
+            'metadata': event_metadata
+        }
+        handle_exam_attempt_rejected_event(None, EXAM_ATTEMPT_REJECTED, **event_kwargs)
+        mock_api_function.assert_called_once_with(self.student_user.id, self.course_key, source='exam_event')

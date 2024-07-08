@@ -20,8 +20,10 @@ log = logging.getLogger(__name__)
 
 NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 
+ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
+
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 4
+COURSE_NOTIFICATION_CONFIG_VERSION = 10
 
 
 def get_course_notification_preference_config():
@@ -84,6 +86,13 @@ def get_notification_channels():
     return NOTIFICATION_CHANNELS
 
 
+def get_additional_notification_channel_settings():
+    """
+    Returns the additional notification channel settings.
+    """
+    return ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS
+
+
 class Notification(TimeStampedModel):
     """
     Model to store notifications for users
@@ -96,6 +105,8 @@ class Notification(TimeStampedModel):
     notification_type = models.CharField(max_length=64)
     content_context = models.JSONField(default=dict)
     content_url = models.URLField(null=True, blank=True)
+    web = models.BooleanField(default=True, null=False, blank=False)
+    email = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
 
@@ -204,6 +215,36 @@ class CourseNotificationPreference(TimeStampedModel):
         if self.is_core(app_name, notification_type):
             return self.get_core_config(app_name).get('web', False)
         return self.get_notification_type_config(app_name, notification_type).get('web', False)
+
+    def is_enabled_for_any_channel(self, app_name, notification_type) -> bool:
+        """
+        Returns True if the notification type is enabled for any channel.
+        """
+        if self.is_core(app_name, notification_type):
+            return any(self.get_core_config(app_name).get(channel, False) for channel in NOTIFICATION_CHANNELS)
+        return any(self.get_notification_type_config(app_name, notification_type).get(channel, False) for channel in
+                   NOTIFICATION_CHANNELS)
+
+    def get_channels_for_notification_type(self, app_name, notification_type) -> list:
+        """
+        Returns the channels for the given app name and notification type.
+        if notification is core then return according to core settings
+        Sample Response:
+        ['web', 'push']
+        """
+        if self.is_core(app_name, notification_type):
+            notification_channels = [channel for channel in NOTIFICATION_CHANNELS if
+                                     self.get_core_config(app_name).get(channel, False)]
+            additional_channel_settings = [channel for channel in ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS if
+                                           self.get_core_config(app_name).get(channel, False)]
+        else:
+            notification_channels = [channel for channel in NOTIFICATION_CHANNELS if
+                                     self.get_notification_type_config(app_name, notification_type).get(channel, False)]
+            additional_channel_settings = [channel for channel in ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS if
+                                           self.get_notification_type_config(app_name, notification_type).get(channel,
+                                                                                                              False)]
+
+        return notification_channels + additional_channel_settings
 
     def is_core(self, app_name, notification_type) -> bool:
         """

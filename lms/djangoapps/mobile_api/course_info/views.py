@@ -3,23 +3,38 @@ Views for course info API
 """
 
 import logging
+from typing import Optional, Union
 
+import django
 from django.contrib.auth import get_user_model
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
+from common.djangoapps.student.models import CourseEnrollment, User as StudentUser
 from common.djangoapps.static_replace import make_static_urls_absolute
+from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
+from lms.djangoapps.mobile_api.course_info.serializers import (
+    CourseInfoOverviewSerializer,
+    CourseAccessSerializer,
+    MobileCourseEnrollmentSerializer
+)
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from ..decorators import mobile_course_access, mobile_view
 
 User = get_user_model()
 log = logging.getLogger(__name__)
+
+UserType = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser, StudentUser]
 
 
 @mobile_view()
@@ -166,3 +181,202 @@ class CourseGoalsRecordUserActivity(APIView):
         # Populate user activity for tracking progress towards a user's course goals
         UserActivity.record_user_activity(user, course_key)
         return Response(status=(200))
+
+
+@view_auth_classes(is_authenticated=False)
+class BlocksInfoInCourseView(BlocksInCourseView):
+    """
+    **Use Case**
+
+        This API endpoint is specifically optimized for the course homepage on Mobile Apps.
+        The endpoint returns the blocks in the course according to the requesting user's access level.
+        Additionally, response encompasses info fields with information about the course,
+        including certificate URL, media dictionary with course image URLs, start and end dates for the course.
+
+    **Example requests**:
+
+        This api works with all versions {api_version}, you can use: v0.5, v1, v2 or v3
+
+        GET /api/mobile/{api_version}/course_info/blocks/?course_id=<course_id>
+        GET /api/mobile/{api_version}/course_info/blocks/?course_id=<course_id>
+            &username=anjali
+            &depth=all
+            &requested_fields=graded,format,student_view_multi_device,lti_url
+            &block_counts=video
+            &student_view_data=video
+            &block_types_filter=problem,html
+
+    **Parameters:**
+
+            username (str): The username of the specified user for whom the course data
+                is being accessed.
+            depth (integer, str, None): Optional number of blocks you receive in response
+                course nesting depth, you can get only sections, sections and subsections,
+                or provide string 'all' to receive all blocks of the course.
+            requested_field (list): Optional list of names of additional fields to return for each block.
+                Supported fields can be found in transformers.SUPPORTED_FIELDS.
+            block_counts (list): Optional list of names of block types for which an aggregated count
+                of blocks is returned.
+            student_view_data (list): Optional list of names of block types for
+                which student_view_data is returned.
+            block_types_filter (list): Filter by block types:
+                'video', 'discussion', 'html', 'chapter', 'sequential', 'vertical'.
+            return_type (list, dict): Optional list or dictionary of block's fields based on 'return_type'.
+
+    **Response example**
+
+        Body consists of the following fields, you received this response if you use
+        'return_type=dict' in query params:
+
+        root: (str) The ID of the root node of the requested course block structure.\
+        blocks: (dict) A dictionary or list, based on the value of the
+            "return_type" parameter. Maps block usage IDs to a collection of
+            information about each block. Each block contains the following
+            fields.
+
+        id: (str) The Course's id (Course Run key)
+        name: (str) The course's name
+        number: (str) The course's number
+        org: (str) The course's organisation
+        start: (str) Date the course begins, in ISO 8601 notation
+        start_display: (str) Readably formatted start of the course
+        start_type: (str) Hint describing how `start_display` is set. One of:
+            * `"string"`: manually set by the course author
+            * `"timestamp"`: generated from the `start` timestamp
+            * `"empty"`: no start date is specified
+        end: (str) Date the course ends, in ISO 8601 notation
+        media: (dict) An object that contains named media items. Included here:
+            * course_image: An image to show for the course.  Represented
+              as an object with the following fields:
+                * uri: The location of the image
+        certificate: (dict) Information about the user's earned certificate in the course.
+            Included here:
+                * uri: The location of the user's certificate
+        is_self_paced: (bool) Indicates if the course is self paced
+
+        Body consists of the following fields, you received this response if you use
+        'return_type=list' in query params:
+
+        id: (str) The Course's id (Course Run key)
+        block_id: (str) The unique identifier for the block_id
+        lms_web_url: (str) The URL to the navigational container of the xBlock on the web.
+        legacy_web_url: (str) Like `lms_web_url`, but always directs to
+            the "Legacy" frontend experience.
+        student_view_url: (str) The URL to retrieve the HTML rendering
+            of this block's student view
+        type: (str): The type of block. Possible values the names of any
+            XBlock type in the system, including custom blocks. Examples are
+            course, chapter, sequential, vertical, html, problem, video, and
+            discussion.
+        display_name: (str) The display name of the block.
+
+    **Returns**
+
+        * 200 on success with above fields.
+        * 400 if an invalid parameter was sent or the username was not provided
+        * 401 unauthorized, the provided access token has expired and is no longer valid
+          for an authenticated request.
+        * 403 if a user who does not have permission to masquerade as
+          another user specifies a username other than their own.
+        * 404 if the course is not available or cannot be seen.
+    """
+
+    def get_requested_user(self, user: UserType, username: Optional[str] = None) -> Union[UserType, None]:
+        """
+        Return a user for whom the course blocks are fetched.
+
+        Arguments:
+            user: current user from request.
+            username: string with username.
+        Returns: A user object or None.
+        """
+        if user.is_anonymous:
+            return None
+
+        if not username or (username and user.username == username):
+            return user
+        if username and (user.is_staff or user.is_superuser):
+            try:
+                return User.objects.get(username=username)
+            except User.DoesNotExist:
+                log.warning('Provided username does not correspond to an existing user %s', username)
+        return None
+
+    def get_certificate(self, request, user, course_id):
+        """
+        Return the information about the user's certificate in the course.
+
+        Arguments:
+            request (Request): The request object.
+            user (User): The user object.
+            course_id (str): The identifier of the course.
+        Returns:
+            (dict): A dict containing information about location of the user's certificate
+            or an empty dictionary, if there is no certificate.
+        """
+        certificate_info = certificate_downloadable_status(user, course_id)
+        if certificate_info['is_downloadable']:
+            return {
+                'url': request.build_absolute_uri(
+                    certificate_info['download_url']
+                ),
+            }
+        return {}
+
+    def list(self, request, **kwargs):  # pylint: disable=W0221
+        """
+        REST API endpoint for listing all the blocks information in the course and
+        information about the course considering user access and roles.
+
+        Arguments:
+            request - Django request object
+        """
+
+        response = super().list(request, kwargs)
+
+        if request.GET.get('return_type', 'dict') == 'dict':
+            api_version = self.kwargs.get('api_version')
+            course_id = request.query_params.get('course_id', None)
+            course_key = CourseKey.from_string(course_id)
+            course_overview = CourseOverview.get_from_id(course_key)
+            requested_username = request.query_params.get('username', None)
+
+            course_data = {
+                'id': course_id,
+                'course_updates': reverse(
+                    'course-updates-list',
+                    kwargs={'api_version': api_version, 'course_id': course_id},
+                    request=request,
+                ),
+                'course_handouts': reverse(
+                    'course-handouts-list',
+                    kwargs={'api_version': api_version, 'course_id': course_id},
+                    request=request,
+                ),
+            }
+
+            course_info_context = {}
+            if requested_user := self.get_requested_user(request.user, requested_username):
+                course_info_context = {
+                    'user': requested_user
+                }
+                user_enrollment = CourseEnrollment.get_enrollment(user=requested_user, course_key=course_key)
+                course_data.update({
+                    'discussion_url': reverse(
+                        'discussion_course',
+                        kwargs={'course_id': course_id},
+                        request=request,
+                    ) if course_overview.is_discussion_tab_enabled(requested_user) else None,
+                    'course_access_details': CourseAccessSerializer({
+                        'user': requested_user,
+                        'course': course_overview,
+                        'course_id': course_key
+                    }).data,
+                    'certificate': self.get_certificate(request, requested_user, course_key),
+                    'enrollment_details': MobileCourseEnrollmentSerializer(user_enrollment).data,
+                })
+
+            course_data.update(CourseInfoOverviewSerializer(course_overview, context=course_info_context).data)
+
+            response.data.update(course_data)
+        return response

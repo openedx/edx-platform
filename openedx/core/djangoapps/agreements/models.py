@@ -24,7 +24,7 @@ class IntegritySignature(TimeStampedModel):
         unique_together = ('user', 'course_key')
 
 
-class LTIPIITool(models.Model):
+class LTIPIITool(TimeStampedModel):
     """
     This model stores the relationship between a course and the LTI tools in the course that share PII.
     """
@@ -36,7 +36,7 @@ class LTIPIITool(models.Model):
         app_label = 'agreements'
 
 
-class LTIPIISignature(models.Model):
+class LTIPIISignature(TimeStampedModel):
     """
     This model stores a user's acknowledgement to share PII via LTI tools in a particular course.
     """
@@ -54,7 +54,7 @@ class LTIPIISignature(models.Model):
         app_label = 'agreements'
 
 
-class ProctoringPIISignature(models.Model):
+class ProctoringPIISignature(TimeStampedModel):
     """
     This model stores a user's acknowledgment to share PII via proctoring in a particular course.
     """

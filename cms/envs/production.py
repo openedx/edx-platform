@@ -13,7 +13,6 @@ import os
 import warnings
 import yaml
 
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
@@ -170,7 +169,8 @@ ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_IN
 AUTHORING_API_URL = ENV_TOKENS.get('AUTHORING_API_URL', '')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
-OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
+CHAT_COMPLETION_API = ENV_TOKENS.get('CHAT_COMPLETION_API', '')
+CHAT_COMPLETION_API_KEY = ENV_TOKENS.get('CHAT_COMPLETION_API_KEY', '')
 LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
 LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
     'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
@@ -406,19 +406,6 @@ XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
-# Configure an API auth token at (blockstore URL)/admin/authtoken/token/
-BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
-
-# Datadog for events!
-DATADOG = AUTH_TOKENS.get("DATADOG", {})
-DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
-
-# TODO: deprecated (compatibility with previous settings)
-if 'DATADOG_API' in AUTH_TOKENS:
-    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
-
 # Celery Broker
 CELERY_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
@@ -531,9 +518,6 @@ JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
-############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
-
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
@@ -606,9 +590,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
-    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
-    )
 
 ################# Settings for brand logos. #################
 LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)
@@ -633,8 +614,6 @@ EXPLICIT_QUEUES = {
         'queue': SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY},
     'cms.djangoapps.contentstore.tasks.update_search_index': {
         'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
-    'cms.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
-        'queue': COURSEGRAPH_JOB_QUEUE},
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')

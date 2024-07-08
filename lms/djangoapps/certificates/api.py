@@ -929,9 +929,9 @@ def invalidate_certificate(user_id, course_key_or_id, source):
     Invalidate the user certificate in a given course if it exists and the user is not on the allowlist for this
     course run.
 
-    This function is called in services.py and handlers.py within the certificates folder. As of now,
+    This function is called in services.py and signals.py within the certificates folder. As of now,
     The call in services.py occurs when an exam attempt is rejected in the legacy exams backend, edx-proctoring.
-    The call in handlers.py is occurs when an exam attempt is rejected in the newer exams backend, edx-exams.
+    The call in signals.py is occurs when an exam attempt is rejected in the newer exams backend, edx-exams.
     """
     course_key = _get_key(course_key_or_id, CourseKey)
     if _is_on_certificate_allowlist(user_id, course_key):
@@ -953,3 +953,21 @@ def invalidate_certificate(user_id, course_key_or_id, source):
         return False
 
     return True
+
+
+def clear_pii_from_certificate_records_for_user(user):
+    """
+    Utility function to remove PII from certificate records when a learner's account is being retired. Used by the
+    `AccountRetirementView` in the `user_api` Django app (invoked by the /api/user/v1/accounts/retire endpoint).
+
+    The update is performed using a bulk SQL update via the Django ORM. This will not trigger the GeneratedCertificate
+    model's custom `save()` function, nor fire any Django signals (which is desired at the time of writing). There is
+    nothing to update in our external systems by this update.
+
+    Args:
+        user (User): The User instance of the learner actively being retired.
+
+    Returns:
+        None
+    """
+    GeneratedCertificate.objects.filter(user=user).update(name="")

@@ -15,6 +15,8 @@ from django.http import (
     HttpResponsePermanentRedirect
 )
 from django.utils.deprecation import MiddlewareMixin
+from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import WaffleFlag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
 
@@ -30,11 +32,19 @@ from .caching import get_cached_content, set_cached_content
 from .models import CdnUserAgentsConfig, CourseAssetCacheTtlConfig
 
 log = logging.getLogger(__name__)
-try:
-    import newrelic.agent
-except ImportError:
-    newrelic = None  # pylint: disable=invalid-name
 
+# .. toggle_name: content_server.use_view
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Deployment flag for switching asset serving from a middleware
+#   to a view. Intended to be used once in each environment to test the cutover and
+#   ensure there are no errors or changes in behavior. Once this has been tested,
+#   the middleware can be fully converted to a view.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-05-02
+# .. toggle_target_removal_date: 2024-07-01
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/34702
+CONTENT_SERVER_USE_VIEW = WaffleFlag('content_server.use_view', module_name=__name__)
 
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
@@ -42,12 +52,26 @@ except ImportError:
 HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
-class StaticContentServer(MiddlewareMixin):
+class StaticContentServerMiddleware(MiddlewareMixin):
+    """
+    Shim to maintain old pattern of serving course assets from a middleware. See views.py.
+    """
+    def process_request(self, request):
+        """Intercept asset request or allow view to handle it, depending on config."""
+        if CONTENT_SERVER_USE_VIEW.is_enabled():
+            return
+        else:
+            set_custom_attribute('content_server.handled_by.middleware', True)
+            return IMPL.process_request(request)
+
+
+class StaticContentServer():
     """
     Serves course assets to end users.  Colloquially referred to as "contentserver."
     """
     def is_asset_request(self, request):
         """Determines whether the given request is an asset request"""
+        # Don't change this without updating urls.py! See docstring of views.py.
         return (
             request.path.startswith('/' + XASSET_LOCATION_TAG + '/')
             or
@@ -99,18 +123,17 @@ class StaticContentServer(MiddlewareMixin):
             if safe_course_key.run is None:
                 safe_course_key = safe_course_key.replace(run='only')
 
-            if newrelic:
-                newrelic.agent.add_custom_attribute('course_id', safe_course_key)
-                newrelic.agent.add_custom_attribute('org', loc.org)
-                newrelic.agent.add_custom_attribute('contentserver.path', loc.path)
+            set_custom_attribute('course_id', safe_course_key)
+            set_custom_attribute('org', loc.org)
+            set_custom_attribute('contentserver.path', loc.path)
 
-                # Figure out if this is a CDN using us as the origin.
-                is_from_cdn = StaticContentServer.is_cdn_request(request)
-                newrelic.agent.add_custom_attribute('contentserver.from_cdn', is_from_cdn)
+            # Figure out if this is a CDN using us as the origin.
+            is_from_cdn = StaticContentServer.is_cdn_request(request)
+            set_custom_attribute('contentserver.from_cdn', is_from_cdn)
 
-                # Check if this content is locked or not.
-                locked = self.is_content_locked(content)
-                newrelic.agent.add_custom_attribute('contentserver.locked', locked)
+            # Check if this content is locked or not.
+            locked = self.is_content_locked(content)
+            set_custom_attribute('contentserver.locked', locked)
 
             # Check that user has access to the content.
             if not self.is_user_authorized(request, content, loc):
@@ -168,8 +191,7 @@ class StaticContentServer(MiddlewareMixin):
                             response['Content-Length'] = str(last - first + 1)
                             response.status_code = 206  # Partial Content
 
-                            if newrelic:
-                                newrelic.agent.add_custom_attribute('contentserver.ranged', True)
+                            set_custom_attribute('contentserver.ranged', True)
                         else:
                             log.warning(
                                 "Cannot satisfy ranges in Range header: %s for content: %s",
@@ -182,9 +204,8 @@ class StaticContentServer(MiddlewareMixin):
                 response = HttpResponse(content.stream_data())
                 response['Content-Length'] = content.length
 
-            if newrelic:
-                newrelic.agent.add_custom_attribute('contentserver.content_len', content.length)
-                newrelic.agent.add_custom_attribute('contentserver.content_type', content.content_type)
+            set_custom_attribute('contentserver.content_len', content.length)
+            set_custom_attribute('contentserver.content_type', content.content_type)
 
             # "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
             response['Accept-Ranges'] = 'bytes'
@@ -213,14 +234,12 @@ class StaticContentServer(MiddlewareMixin):
         # indicate there should be no caching whatsoever.
         cache_ttl = CourseAssetCacheTtlConfig.get_cache_ttl()
         if cache_ttl > 0 and not is_locked:
-            if newrelic:
-                newrelic.agent.add_custom_attribute('contentserver.cacheable', True)
+            set_custom_attribute('contentserver.cacheable', True)
 
             response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
             response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
         elif is_locked:
-            if newrelic:
-                newrelic.agent.add_custom_attribute('contentserver.cacheable', False)
+            set_custom_attribute('contentserver.cacheable', False)
 
             response['Cache-Control'] = "private, no-cache, no-store"
 
@@ -301,6 +320,9 @@ class StaticContentServer(MiddlewareMixin):
                 set_cached_content(content)
 
         return content
+
+
+IMPL = StaticContentServer()
 
 
 def parse_range_header(header_value, content_length):

@@ -159,7 +159,7 @@ class VideoBlock(
 
     uses_xmodule_styles_setup = True
 
-    def get_transcripts_for_student(self, transcripts):
+    def get_transcripts_for_student(self, transcripts, dest_lang=None):
         """Return transcript information necessary for rendering the XModule student view.
         This is more or less a direct extraction from `get_html`.
 
@@ -180,7 +180,7 @@ class VideoBlock(
             elif sub or other_lang:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
-        transcript_language = self.get_default_transcript_language(transcripts)
+        transcript_language = self.get_default_transcript_language(transcripts, dest_lang)
         native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
         languages = {
             lang: native_languages.get(lang, display)
@@ -237,11 +237,11 @@ class VideoBlock(
 
         return False
 
-    def student_view(self, _context):
+    def student_view(self, context):
         """
         Return the student view.
         """
-        fragment = Fragment(self.get_html())
+        fragment = Fragment(self.get_html(context=context))
         add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
@@ -371,7 +371,10 @@ class VideoBlock(
                 download_video_link = next((url for url in self.html5_sources if not url.endswith('.m3u8')), None)
 
         transcripts = self.get_transcripts_info()
-        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
+        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(
+            transcripts=transcripts,
+            dest_lang=context.get("dest_lang")
+        )
 
         cdn_eval = False
         cdn_exp_group = None
@@ -727,7 +730,7 @@ class VideoBlock(
         return video_block
 
     @classmethod
-    def parse_xml(cls, node, runtime, _keys, id_generator):
+    def parse_xml(cls, node, runtime, _keys):
         """
         Use `node` to construct a new block.
 
@@ -735,13 +738,13 @@ class VideoBlock(
         """
         url_name = node.get('url_name')
         block_type = 'video'
-        definition_id = id_generator.create_definition(block_type, url_name)
-        usage_id = id_generator.create_usage(definition_id)
+        definition_id = runtime.id_generator.create_definition(block_type, url_name)
+        usage_id = runtime.id_generator.create_usage(definition_id)
         if is_pointer_tag(node):
             filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
             node = cls.load_file(filepath, runtime.resources_fs, usage_id)
-            runtime.parse_asides(node, definition_id, usage_id, id_generator)
-        field_data = cls.parse_video_xml(node, id_generator)
+            runtime.parse_asides(node, definition_id, usage_id, runtime.id_generator)
+        field_data = cls.parse_video_xml(node, runtime.id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
         video = runtime.construct_xblock_from_class(
@@ -757,7 +760,7 @@ class VideoBlock(
         video.edx_video_id = video.import_video_info_into_val(
             node,
             runtime.resources_fs,
-            getattr(id_generator, 'target_course_id', None)
+            getattr(runtime.id_generator, 'target_course_id', None)
         )
 
         return video

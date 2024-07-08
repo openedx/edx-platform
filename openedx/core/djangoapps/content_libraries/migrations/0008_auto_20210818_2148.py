@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ltigradedresource',
             name='usage_key',
-            field=opaque_keys.edx.django.models.UsageKeyField(help_text='The usage key string of the blockstore resource serving the content of this launch.', max_length=255),
+            field=opaque_keys.edx.django.models.UsageKeyField(help_text='The usage key string of the resource serving the content of this launch.', max_length=255),
         ),
         migrations.AlterField(
             model_name='ltiprofile',

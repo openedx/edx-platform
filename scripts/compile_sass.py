@@ -42,7 +42,9 @@ See docs/decisions/0017-reimplement-asset-processing.rst for more details.
 from __future__ import annotations
 
 import glob
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 import click
@@ -65,14 +67,12 @@ NORMALIZED_ENVS = {
     "theme_dirs",
     metavar="PATH",
     multiple=True,
-    envvar="EDX_PLATFORM_THEME_DIRS",
-    type=click.Path(
-        exists=True, file_okay=False, readable=True, writable=True, path_type=Path
-    ),
+    envvar="COMPREHENSIVE_THEME_DIRS",
+    type=click.Path(path_type=Path),
     help=(
         "Consider sub-dirs of PATH as themes. "
         "Multiple theme dirs are accepted. "
-        "If none are provided, we look at colon-separated paths on the EDX_PLATFORM_THEME_DIRS env var."
+        "If none are provided, we look at colon-separated paths on the COMPREHENSIVE_THEME_DIRS env var."
     ),
 )
 @click.option(
@@ -153,45 +153,111 @@ def main(
 
     def compile_sass_dir(
         message: str,
-        source: Path,
-        dest: Path,
+        source_root: Path,
+        target_root: Path,
         includes: list[Path],
         tolerate_missing: bool = False,
     ) -> None:
         """
         Compile a directory of Sass into a target CSS directory, and generate any missing RTL CSS.
-
         Structure of source dir is mirrored in target dir.
+
+        IMPLEMENTATION NOTES:
+        =====================
+
+        libsass is a C++ library for compiling Sass (ref: https://github.com/sass/libsass).
+
+        libsass-python is a small PyPI package wrapping libsass, including:
+          * The `_sass` module, which provides direct Python bindings for the C++ library.
+            (ref: https://github.com/sass/libsass-python/blob/0.10.0/pysass.cpp)
+          * The `sass` module, which adds some friendly Pythonic wrapper functions around `_sass`,
+            notably `sass.compile_dirname(...)`.
+            (ref: https://github.com/sass/libsass-python/blob/0.10.0/sass.py#L198-L201)
+
+        Our legacy Sass code only works with a super old version of libsass (3.3.2,) which is provided to us by a super
+        old version of libsass-python (0.10.0). In this super old libsass-python version:
+          * the `sass` module DOESN'T support Python 3.11+, but
+          * the `_sass` module DOES support Python 3.11+.
+
+        Upgrading our Sass to work with newer a libsass version would be arduous and would potentially break
+        comprehensive themes, so we don't want to do that. Forking libsass-python at v0.10.0 and adding Python 3.11+
+        support would mean adding another repo to the openedx org. Rather than do either of those, we've decided to
+        hack around the problem by just reimplementing what we need of `sass.compile_dirname` here, directly on top
+        of the `_sass` C++ binding module.
+
+        Eventually, we may eschew libsass-python altogether by switching to SassC@3.3.2, a direct CLI for libsass@3.3.2.
+        (ref: https://github.com/sass/sassc). This would be nice because it would allow us to remove Python from the
+        Sass build pipeline entirely. However, it would mean explicitly compiling & installing both libsass and SassC
+        within the edx-platform Dockerfile, which has its own drawbacks.
         """
-        use_dev_settings = NORMALIZED_ENVS[env] == "development"
+        # Constants from libsass-python
+        SASS_STYLE_NESTED = 0
+        _SASS_STYLE_EXPANDED = 1
+        _SASS_STYLE_COMPACT = 2
+        SASS_STYLE_COMPRESSED = 3
+        SASS_COMMENTS_NONE = 0
+        SASS_COMMENTS_LINE_NUMBERS = 1
+
+        # Defaults from libass-python
+        precision = 5
+        source_map_filename = None
+        custom_functions = []
+        importers = None
+
+        use_dev_settings: bool = NORMALIZED_ENVS[env] == "development"
+        fs_encoding: str = sys.getfilesystemencoding() or sys.getdefaultencoding()
+        output_style: int = SASS_STYLE_NESTED if use_dev_settings else SASS_STYLE_COMPRESSED
+        source_comments: int = SASS_COMMENTS_LINE_NUMBERS if use_dev_settings else SASS_COMMENTS_NONE
+        include_paths: bytes = os.pathsep.join(str(include) for include in includes).encode(fs_encoding)
+
         click.secho(f"  {message}...", fg="cyan")
-        click.secho(f"      Source: {source}")
-        click.secho(f"      Target: {dest}")
-        if not source.is_dir():
+        click.secho(f"    Source: {source_root}")
+        click.secho(f"    Target: {target_root}")
+        if not source_root.is_dir():
             if tolerate_missing:
-                click.secho(f"      Skipped because source directory does not exist.", fg="yellow")
+                click.secho(f"    Skipped because source directory does not exist.", fg="yellow")
                 return
             else:
-                raise FileNotFoundError(f"missing Sass source dir: {source}")
-        click.echo(f"      Include paths:")
+                raise FileNotFoundError(f"missing Sass source dir: {source_root}")
+        click.echo(f"    Include paths:")
         for include in includes:
-            click.echo(f"        {include}")
-        if not dry:
-            # Import sass late so that this script can be dry-run without installing
-            # libsass, which takes a while as it must be compiled from its C source.
-            import sass
+            click.echo(f"      {include}")
 
-            dest.mkdir(parents=True, exist_ok=True)
-            sass.compile(
-                dirname=(str(source), str(dest)),
-                include_paths=[str(include_path) for include_path in includes],
-                source_comments=use_dev_settings,
-                output_style=("nested" if use_dev_settings else "compressed"),
-            )
-        click.secho(f"      Compiled.", fg="green")
+        click.echo(f"    Files:")
+        for dirpath, _, filenames in os.walk(str(source_root)):
+            for filename in filenames:
+                if filename.startswith('_'):
+                    continue
+                if not filename.endswith(('.scss', '.sass')):
+                    continue
+                source = Path(dirpath) / filename
+                target = (target_root / source.relative_to(source_root)).with_suffix('.css')
+                click.echo(f"      {source} -> {target}")
+                if not dry:
+                    # Import _sass late so that this script can be dry-run without installing
+                    # libsass, which takes a while as it must be compiled from its C source.
+                    from _sass import compile_filename  # pylint: disable=protected-access
+                    success, output, _ = compile_filename(
+                        str(source).encode(fs_encoding),
+                        output_style,
+                        source_comments,
+                        include_paths,
+                        precision,
+                        source_map_filename,
+                        custom_functions,
+                        importers,
+                    )
+                    output_text = output.decode('utf-8')
+                    if not success:
+                        raise Exception(f"Failed to compile {source}: {output_text}")
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    with open(target, 'w', encoding="utf-8") as target_file:
+                        target_file.write(output_text)
+
+        click.secho(f"    Done.", fg="green")
         # For Sass files without explicit RTL versions, generate
         # an RTL version of the CSS using the rtlcss library.
-        for sass_path in glob.glob(str(source) + "/**/*.scss"):
+        for sass_path in glob.glob(str(source_root) + "/**/*.scss"):
             if Path(sass_path).name.startswith("_"):
                 # Don't generate RTL CSS for partials
                 continue
@@ -201,16 +267,16 @@ def main(
             if Path(sass_path.replace(".scss", "-rtl.scss")).exists():
                 # Don't generate RTL CSS if there is an explicit Sass version for RTL
                 continue
-            click.echo("      Generating missing right-to-left CSS:")
-            source_css_file = sass_path.replace(str(source), str(dest)).replace(
+            click.echo("    Generating missing right-to-left CSS:")
+            source_css_file = sass_path.replace(str(source_root), str(target_root)).replace(
                 ".scss", ".css"
             )
             target_css_file = source_css_file.replace(".css", "-rtl.css")
-            click.echo(f"         Source: {source_css_file}")
-            click.echo(f"         Target: {target_css_file}")
+            click.echo(f"      Source: {source_css_file}")
+            click.echo(f"      Target: {target_css_file}")
             if not dry:
                 subprocess.run(["rtlcss", source_css_file, target_css_file])
-            click.secho("         Generated.", fg="green")
+            click.secho("      Generated.", fg="green")
 
     # Information
     click.secho(f"USING ENV: {NORMALIZED_ENVS[env]}", fg="blue")
@@ -219,7 +285,6 @@ def main(
     click.echo()
 
     # Warnings
-    click.secho("WARNING: `npm run compile-sass` is experimental. Use at your own risk.", fg="yellow", bold=True)
     if show_help:
         click.echo(context.get_help())
         return

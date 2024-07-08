@@ -5,9 +5,9 @@ name: Lockfile Version check
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
 
 jobs:
   version-check:
-    uses: openedx/.github/.github/workflows/lockfileversion-check.yml@master
+    uses: openedx/.github/.github/workflows/lockfileversion-check-v3.yml@master

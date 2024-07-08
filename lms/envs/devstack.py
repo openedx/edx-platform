@@ -7,8 +7,6 @@ Specific overrides to the base prod settings to make development easier.
 import logging
 from os.path import abspath, dirname, join
 
-from corsheaders.defaults import default_headers as corsheaders_default_headers
-
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 #####################################################################
 from edx_django_utils.plugins import add_plugins
@@ -137,7 +135,7 @@ REQUIRE_DEBUG = DEBUG
 
 PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
-# Load development webpack donfiguration
+# Load development webpack configuration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################
@@ -238,6 +236,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and (
 ):
     AUTHENTICATION_BACKENDS = ['common.djangoapps.third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
 
+########################## Authn MFE Context API #######################
+ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
+
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
@@ -260,9 +261,6 @@ TOKEN_SIGNING.update({
         'puDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"}]}'
     )
 })
-
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
 ########################## PROGRAMS LEARNER PORTAL ##############################
 LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
@@ -292,9 +290,6 @@ FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-    'use-jwt-cookie',
-)
 
 LOGIN_REDIRECT_WHITELIST.extend([
     CMS_BASE,
@@ -392,7 +387,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
-EXAMS_DATE_MICROFRONTEND_URL = 'http://localhost:2020'
+EXAMS_DASHBOARD_MICROFRONTEND_URL = 'http://localhost:2020'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
@@ -518,6 +513,15 @@ certificate_revoked_event_config['learning-certificate-lifecycle']['enabled'] = 
 certificate_created_event_config = EVENT_BUS_PRODUCER_CONFIG['org.openedx.learning.certificate.created.v1']
 certificate_created_event_config['learning-certificate-lifecycle']['enabled'] = True
 
+course_access_role_added_event_setting = EVENT_BUS_PRODUCER_CONFIG[
+    'org.openedx.learning.user.course_access_role.added.v1'
+]
+course_access_role_added_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
+course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
+    'org.openedx.learning.user.course_access_role.removed.v1'
+]
+course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
+
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
@@ -536,6 +540,23 @@ AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/lat
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
+############################ CSRF ##################################
+
+# MFEs that will call this service in devstack
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:2000',  # frontend-app-learning
+    'http://localhost:2001',  # frontend-app-course-authoring
+    'http://localhost:1997',  # frontend-app-account
+    'http://localhost:1995',  # frontend-app-profile
+    'http://localhost:1992',  # frontend-app-ora
+    'http://localhost:2002',  # frontend-app-discussions
+    'http://localhost:1991',  # frontend-app-admin-portal
+    'http://localhost:1999',  # frontend-app-authn
+    'http://localhost:18450',  # frontend-app-support-tools
+    'http://localhost:1994',  # frontend-app-gradebook
+]
+
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
