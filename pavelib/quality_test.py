@@ -206,6 +206,70 @@ def _get_stylelint_violations():
         )
 
 
+def run_eslint():
+    """
+    Runs eslint on static asset directories.
+    If limit option is passed, fails build if more violations than the limit are found.
+    """
+
+    eslint_report_dir = (Env.REPORT_DIR / "eslint")
+    eslint_report = eslint_report_dir / "eslint.report"
+    _prepare_report_dir(eslint_report_dir)
+    violations_limit = 4950
+
+    command = (
+        f"node --max_old_space_size=4096 node_modules/.bin/eslint "
+        "--ext .js --ext .jsx --format=compact ."
+    )
+    with open(eslint_report, 'w') as report_file:
+        # Run the command
+        result = subprocess.run(
+            command, 
+            shell=True, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            text=True
+        )
+        
+        # Write the output to the report file
+        report_file.write(result.stdout)
+        
+    # Check the return code and handle errors if any
+    if result.returncode != 0:
+        print(f"Warning: eslint command exited with non-zero status {result.returncode}")
+
+    # sh(
+    #     "node --max_old_space_size=4096 node_modules/.bin/eslint "
+    #     "--ext .js --ext .jsx --format=compact . | tee {eslint_report}".format(
+    #         eslint_report=eslint_report
+    #     ),
+    #     ignore_error=True
+    # )
+
+    try:
+        num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
+    except TypeError:
+        fail_quality(
+            'eslint',
+            "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
+                eslint_report=eslint_report
+            )
+        )
+
+    # Record the metric
+    _write_metric(num_violations, (Env.METRICS_DIR / "eslint"))
+
+    # Fail if number of violations is greater than the limit
+    if num_violations > violations_limit > -1:
+        fail_quality(
+            'eslint',
+            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations, violations_limit=violations_limit
+            )
+        )
+    else:
+        write_junit_xml('eslint')
+
 def run_stylelint():
     """
     Runs stylelint on Sass files.
@@ -232,4 +296,5 @@ def run_stylelint():
 
 if __name__ == "__main__":
     run_pep8()
+    run_eslint()
     run_stylelint()
