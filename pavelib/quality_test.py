@@ -224,16 +224,16 @@ def run_eslint():
     with open(eslint_report, 'w') as report_file:
         # Run the command
         result = subprocess.run(
-            command, 
-            shell=True, 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE, 
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True
         )
-        
+
         # Write the output to the report file
         report_file.write(result.stdout)
-        
+
     # Check the return code and handle errors if any
     if result.returncode != 0:
         print(f"Warning: eslint command exited with non-zero status {result.returncode}")
@@ -269,6 +269,7 @@ def run_eslint():
         )
     else:
         write_junit_xml('eslint')
+
 
 def run_stylelint():
     """
