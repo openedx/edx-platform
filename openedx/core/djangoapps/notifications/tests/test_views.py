@@ -7,6 +7,7 @@ from unittest import mock
 
 import ddt
 from django.conf import settings
+from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
@@ -26,8 +27,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
+from openedx.core.djangoapps.notifications.email.utils import get_unsubscribe_link
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -1078,6 +1081,40 @@ class NotificationReadAPIViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
+
+
+@ddt.ddt
+class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
+    """
+    Tests if preference is updated when encrypted url is hit
+    """
+    def setUp(self):
+        """
+        Setup test case
+        """
+        super().setUp()
+        password = 'password'
+        self.user = UserFactory(password=password)
+        self.client.login(username=self.user.username, password=password)
+        self.course = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
+        CourseNotificationPreference(course_id=self.course.id, user=self.user).save()
+
+    @override_settings(LMS_BASE="")
+    @ddt.data('get', 'post')
+    def test_if_preference_is_updated(self, request_type):
+        """
+        Tests if preference is updated when url is hit
+        """
+        url = get_unsubscribe_link(self.user.username, {'channel': 'email', 'value': False})
+        func = getattr(self.client, request_type)
+        response = func(url)
+        assert response.status_code == status.HTTP_200_OK
+        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
+        config = preference.notification_preference_config
+        for app_name, app_prefs in config.items():
+            for type_prefs in app_prefs['notification_types'].values():
+                assert type_prefs['email'] is False
+                assert type_prefs['email_cadence'] == EmailCadence.NEVER
 
 
 def remove_notifications_with_visibility_settings(expected_response):
