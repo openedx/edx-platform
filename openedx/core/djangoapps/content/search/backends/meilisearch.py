@@ -134,7 +134,7 @@ def _translate_hits(ms_response):
         Any conversion from Meilisearch result syntax into our search engine syntax
         """
         translated_result = copy.copy(result)
-        translated_result["data"] = translated_result.pop("data", {})
+        translated_result["data"] = {**translated_result}
         translated_result["score"] = translated_result.pop("_score", 1.0)
         return translated_result
 
