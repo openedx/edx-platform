@@ -443,6 +443,8 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
 
     @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
     def test_response_data(self, mock_certificate_downloadable_status):
+        """ Test course enrollment detail view """
+
         certificate_url = 'https://test_certificate_url'
         mock_certificate_downloadable_status.return_value = {
             'is_downloadable': True,
@@ -458,6 +460,8 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
         self.verify_course_access_details(response)
 
     def verify_course_info_overview(self, response):
+        """ Verify course info overview """
+
         expected_image_urls = {
             'image':
                 {
@@ -492,6 +496,8 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
         self.assertEqual(course_info['course_about'], expected_course_about_link)
 
     def verify_course_access_details(self, response):
+        """ Verify access details """
+
         expected_course_access_details = {
             'has_unmet_prerequisites': False,
             'is_too_early': False,
@@ -511,6 +517,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
         self.assertDictEqual(response.data['course_access_details'], expected_course_access_details)
 
     def verify_certificate(self, response, mock_certificate_downloadable_status):
+        """ Verify certificate url """
         mock_certificate_downloadable_status.assert_called_once()
         certificate_url = 'https://test_certificate_url'
         assert response.data['certificate'] == {'url': certificate_url}

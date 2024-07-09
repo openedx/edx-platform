@@ -1,3 +1,7 @@
+"""
+Common utility methods for Course info apis.
+"""
+
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 
 

@@ -154,18 +154,33 @@ class CourseDetailSerializer(serializers.Serializer):
     discussion_url = serializers.SerializerMethodField()
     course_info_overview = serializers.SerializerMethodField()
 
-    def get_id(self, data):
+    @staticmethod
+    def get_id(data):
+        """
+        Returns course id.
+        """
         return str(data['course_id'])
 
-    def get_course_overview(self, course_id):
+    @staticmethod
+    def get_course_overview(course_id):
+        """
+        Returns course overview.
+        """
         return CourseOverview.get_from_id(course_id)
 
     def get_course_info_overview(self, data):
+        """
+        Returns course info overview.
+        """
         course_overview = self.get_course_overview(data['course_id'])
         course_info_context = {'user': data['user']}
         return CourseInfoOverviewSerializer(course_overview, context=course_info_context).data
 
-    def get_discussion_url(self, data):
+    @staticmethod
+    def get_discussion_url(data):
+        """
+        Returns discussion url.
+        """
         course_overview = CourseOverview.get_from_id(data['course_id'])
         if not course_overview.is_discussion_tab_enabled(data['user']):
             return
@@ -173,6 +188,9 @@ class CourseDetailSerializer(serializers.Serializer):
         return reverse('discussion_course', kwargs={'course_id': data['course_id']}, request=data['request'])
 
     def get_course_access_details(self, data):
+        """
+        Returns course access details.
+        """
         course_access_data = {
             'course': self.get_course_overview(data['course_id']),
             'course_id': data['course_id'],
@@ -180,20 +198,34 @@ class CourseDetailSerializer(serializers.Serializer):
         }
         return CourseAccessSerializer(course_access_data).data
 
-    def get_certificate(self, data):
+    @staticmethod
+    def get_certificate(data):
+        """
+        Returns course certificate url.
+        """
         return get_user_certificate_download_url(data['request'], data['user'], data['course_id'])
 
-    def get_enrollment_details(self, data):
+    @staticmethod
+    def get_enrollment_details(data):
         """
         Retrieve course enrollment details of the course.
         """
         user_enrollment = CourseEnrollment.get_enrollment(user=data['user'], course_key=data['course_id'])
         return MobileCourseEnrollmentSerializer(user_enrollment).data
 
-    def get_course_handouts(self, data):
+    @staticmethod
+    def get_course_handouts(data):
+        """
+        Returns course_handouts.
+        """
+
         url_params = {'api_version': data['api_version'], 'course_id': data['course_id']}
         return reverse('course-handouts-list', kwargs=url_params, request=data['request'])
 
-    def get_course_updates(self, data):
+    @staticmethod
+    def get_course_updates(data):
+        """
+        Returns course_updates.
+        """
         url_params = {'api_version': data['api_version'], 'course_id': data['course_id']}
         return reverse('course-updates-list', kwargs=url_params, request=data['request'])
