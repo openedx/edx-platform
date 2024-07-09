@@ -17,8 +17,32 @@ from search.utils import ValueRange, _is_iterable
 # log appears to be standard name used for logger
 log = logging.getLogger(__name__)
 
+prefix = getattr(settings, "MEILISEARCH_INDEX_PREFIX", "")
 RESERVED_CHARACTERS = "+=><!(){}[]^~*:\\/&|?"
-
+INDEX_SETTINGS = {
+    f"{prefix}library_index": {
+        "filterableAttributes": [
+            "library",
+            "id"
+        ]
+    },
+    f"{prefix}courseware_content": {
+        "filterableAttributes": [
+            "id",
+            "course",
+            "org"
+        ]
+    },
+    f"{prefix}course_info": {
+        "filterableAttributes": [
+            "id",
+            "org",
+            "course",
+            "start",
+            "enrollment_start"
+        ]
+    },
+}
 
 def sanitize_id(_id: str | int) -> str:
     return hashlib.md5(f"{_id}".encode('utf-8')).hexdigest()
@@ -45,6 +69,19 @@ def sanitized_id(source: dict, create_usage_key=True) -> dict:
 
     return source
 
+def build_filter(key,val):
+    if isinstance(val, list):
+        if len(val) == 2 and type(val[0]) in (datetime, type(None)) and type(val[1]) in (datetime, type(None)):
+            f = ""
+            if val[0]:
+                f += f"{str(key).lower()} > \"{val[0].isoformat(timespec='milliseconds')}\""
+            if val[1]:
+                f += f" and {str(key).lower()} >= \"{val[1].isoformat(timespec='milliseconds')}\""
+            return f"({f})"
+
+    elif isinstance(val, dict):
+        log.info('Dict Filter Not Handled')
+    return f"{str(key).lower()}='{val}'"
 
 def filter_builder(_filters: list[dict]) -> list[str]:
     """
@@ -60,8 +97,7 @@ def filter_builder(_filters: list[dict]) -> list[str]:
         if "id" in f:
             f.update(**sanitized_id(f.copy(), create_usage_key=False))
         for key, val in f.items():
-            str_filters.append(f"{key}='{val}'")
-
+            str_filters.append(build_filter(key, val))
     return [
         " OR ".join(str_filters)
     ]
@@ -229,6 +265,7 @@ class MeiliSearchEngine(SearchEngine):
             self._index.fetch_info()
         except errors.MeilisearchApiError:
             self._ms.create_index(self._prefixed_index_name, options=options)
+            self.update_settings()
 
     @property
     def _prefixed_index_name(self):
@@ -282,6 +319,7 @@ class MeiliSearchEngine(SearchEngine):
 
         log.debug("searching index with %s", query_string)
         filters = []
+        filterables = INDEX_SETTINGS.get(self._prefixed_index_name, {}).get('filterableAttributes', [])
 
         if query_string:
             query_string = query_string.translate(
@@ -292,11 +330,12 @@ class MeiliSearchEngine(SearchEngine):
             filters.extend(filter_builder(_process_field_queries(field_dictionary)))
 
         if filter_dictionary:
+            filter_dictionary = {
+                fl: filter_dictionary.get(fl, None) for fl in filterables if
+                filter_dictionary.get(fl, None)
+            }
             filters.extend(filter_builder(_process_filters(filter_dictionary)))
 
-        if exclude_dictionary:
-            exclude_filters = list(_process_exclude_dictionary(exclude_dictionary))
-            filters.extend(filter_builder(exclude_filters))
         search_params = {
             "filter": filters,
         }
@@ -317,19 +356,5 @@ class MeiliSearchEngine(SearchEngine):
         :return:
         """
         # Define filterable attributes
-        prefix = getattr(settings, "MEILISEARCH_INDEX_PREFIX", "")
-        index_settings = {
-            f"{prefix}library_index": {
-                "filterableAttributes": [
-                    "library",
-                    "id"
-                ]
-            },
-            f"{prefix}courseware_content": {
-                "filterableAttributes": [
-                    "course",
-                    "org"
-                ]
-            },
-        }
-        return self._index.update_settings(index_settings.get(self._prefixed_index_name, {}))
+
+        return self._index.update_settings(INDEX_SETTINGS.get(self._prefixed_index_name, {}))
