@@ -17,6 +17,11 @@ JUNIT_XML_FAILURE_TEMPLATE = '<failure message={message}/>'
 START_TIME = datetime.utcnow()
 
 
+class BuildFailure(Exception):
+    """Represents a problem with some part of the build's execution."""
+    pass
+
+
 def write_junit_xml(name, message=None):
     """
     Write a JUnit results XML file describing the outcome of a quality check.
@@ -295,7 +300,72 @@ def run_stylelint():
         write_junit_xml('stylelint')
 
 
+def run_pii_check():
+    """
+    Guarantee that all Django models are PII-annotated.
+    """
+    pii_report_name = 'pii'
+    default_report_dir = (Env.REPORT_DIR / pii_report_name)
+    report_dir = getattr(options, 'report_dir', default_report_dir)
+    output_file = os.path.join(report_dir, 'pii_check_{}.report')
+    env_report = []
+    pii_check_passed = True
+    for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
+        try:
+            print()
+            print(f"Running {env_name} PII Annotation check and report")
+            print("-" * 45)
+            run_output_file = str(output_file).format(env_name.lower())
+            os.makedirs(report_dir, exist_ok=True)
+            command = (
+                f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
+                "code_annotations django_find_annotations "
+                f"--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()} "
+                f"--lint --report --coverage | tee {run_output_file}"
+            )
+            # sh(
+            #     "mkdir -p {} && "  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
+            #     "export DJANGO_SETTINGS_MODULE={}; "
+            #     "code_annotations django_find_annotations "
+            #     "--config_file .pii_annotations.yml --report_path {} --app_name {} "
+            #     "--lint --report --coverage | tee {}".format(
+            #         report_dir, env_settings_file, report_dir, env_name.lower(), run_output_file
+            #     )
+            # )
+            result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            with open(run_output_file, 'w') as f:
+                f.write(result.stdout)
+            if result.returncode != 0:
+                print(f"Warning: Command exited with non-zero status {result.returncode}")
+
+            uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
+            env_report.append((
+                uncovered_model_count,
+                full_log,
+            ))
+
+        except BuildFailure as error_message:
+            fail_quality(pii_report_name, f'FAILURE: {error_message}')
+
+        if not pii_check_passed_env:
+            pii_check_passed = False
+
+    # Determine which suite is the worst offender by obtaining the max() keying off uncovered_count.
+    uncovered_count, full_log = max(env_report, key=lambda r: r[0])
+
+    # Write metric file.
+    if uncovered_count is None:
+        uncovered_count = 0
+    metrics_str = f"Number of PII Annotation violations: {uncovered_count}\n"
+    _write_metric(metrics_str, (Env.METRICS_DIR / pii_report_name))
+
+    # Finally, fail the paver task if code_annotations suggests that the check failed.
+    if not pii_check_passed:
+        fail_quality('pii', full_log)
+
+
 if __name__ == "__main__":
     run_pep8()
     run_eslint()
     run_stylelint()
+    run_pii_check()
