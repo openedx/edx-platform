@@ -16,21 +16,23 @@ from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment, User as StudentUser
 from common.djangoapps.static_replace import make_static_urls_absolute
-from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.courses import get_assignments_grades, get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
 from lms.djangoapps.mobile_api.course_info.constants import BLOCK_STRUCTURE_CACHE_TIMEOUT
 from lms.djangoapps.mobile_api.course_info.serializers import (
-    CourseInfoOverviewSerializer,
     CourseAccessSerializer,
+    CourseDetailSerializer,
+    CourseInfoOverviewSerializer,
     MobileCourseEnrollmentSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
+
 from ..decorators import mobile_course_access, mobile_view
+from .utils import get_user_certificate_download_url
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -308,27 +310,6 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                 log.warning('Provided username does not correspond to an existing user %s', username)
         return None
 
-    def get_certificate(self, request, user, course_id):
-        """
-        Return the information about the user's certificate in the course.
-
-        Arguments:
-            request (Request): The request object.
-            user (User): The user object.
-            course_id (str): The identifier of the course.
-        Returns:
-            (dict): A dict containing information about location of the user's certificate
-            or an empty dictionary, if there is no certificate.
-        """
-        certificate_info = certificate_downloadable_status(user, course_id)
-        if certificate_info['is_downloadable']:
-            return {
-                'url': request.build_absolute_uri(
-                    certificate_info['download_url']
-                ),
-            }
-        return {}
-
     def list(self, request, **kwargs):  # pylint: disable=W0221
         """
         REST API endpoint for listing all the blocks information in the course and
@@ -384,7 +365,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                         'course': course_overview,
                         'course_id': course_key
                     }).data,
-                    'certificate': self.get_certificate(request, requested_user, course_key),
+                    'certificate': get_user_certificate_download_url(request, requested_user, course_key),
                     'enrollment_details': MobileCourseEnrollmentSerializer(user_enrollment).data,
                 })
 
@@ -425,3 +406,32 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                         }
                     }
                 )
+
+@mobile_view()
+class CourseEnrollmentDetailsView(APIView):
+    """
+    API that returns course details for logged-in user in the given course
+
+    **Example requests**:
+
+        This api works with all versions {api_version}, you can use: v0.5, v1, v2 or v3
+
+        GET /api/mobile/{api_version}/course_info/{course_id}}/enrollment_details
+
+    """
+    @mobile_course_access()
+    def get(self, request, course, *args, **kwargs):
+        """
+        Handle the GET request
+
+        Returns user enrollment and course details.
+        """
+        data = {
+            'api_version': self.kwargs.get('api_version'),
+            'course_id': course.id,
+            'user': request.user,
+            'request': request,
+        }
+
+        course_detail = CourseDetailSerializer(data).data
+        return Response(data=course_detail, status=status.HTTP_200_OK)
