@@ -70,6 +70,12 @@ def sanitized_id(source: dict, create_usage_key=True) -> dict:
     return source
 
 def build_filter(key,val):
+    """
+    This function is making meilisearch compatible filters
+    :param key: name of attribute
+    :param val: value of attribute
+    :return:
+    """
     if isinstance(val, list):
         if len(val) == 2 and type(val[0]) in (datetime, type(None)) and type(val[1]) in (datetime, type(None)):
             f = ""
@@ -272,7 +278,6 @@ class MeiliSearchEngine(SearchEngine):
         """
         Property that returns the defined index_name with the configured prefix.
         """
-        prefix = getattr(settings, "MEILISEARCH_INDEX_PREFIX", "")
         return prefix + self.index_name
 
     def _check_mappings(self, body):
