@@ -342,6 +342,7 @@ def _extract_missing_pii_annotations(filename):
 
     return (uncovered_models, pii_check_passed, full_log)
 
+
 def run_pii_check():
     """
     Guarantee that all Django models are PII-annotated.
