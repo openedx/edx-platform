@@ -60,6 +60,7 @@ def apply_settings(django_settings):
         'common.djangoapps.third_party_auth.pipeline.set_pipeline_timeout',
         'common.djangoapps.third_party_auth.pipeline.ensure_user_information',
         'social_core.pipeline.user.create_user',
+        'common.djangoapps.third_party_auth.pipeline.complete_user_creation',
         'social_core.pipeline.social_auth.associate_user',
         'social_core.pipeline.social_auth.load_extra_data',
         'social_core.pipeline.user.user_details',
@@ -67,6 +68,7 @@ def apply_settings(django_settings):
         'common.djangoapps.third_party_auth.pipeline.set_id_verification_status',
         'common.djangoapps.third_party_auth.pipeline.set_logged_in_cookies',
         'common.djangoapps.third_party_auth.pipeline.login_analytics',
+        'common.djangoapps.third_party_auth.pipeline.redirect_to_welcome_page',
         'common.djangoapps.third_party_auth.pipeline.ensure_redirect_url_is_safe',
     ]
 

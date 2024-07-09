@@ -794,8 +794,13 @@ class EmailChangeMiddleware(MiddlewareMixin):
         Invalidate the user session if there's a mismatch
         between the email in the user's session and request.user.email.
         """
+        print(f'\n\n\n EmailChangeMiddleware - process_request => request.user.is_authenticated={request.user.is_authenticated}')
         if request.user.is_authenticated:
             user_session_email = request.session.get('email', None)
+            print(
+                f'\n\n\n EmailChangeMiddleware - process_request => user_session_email={user_session_email}')
+            print(
+                f'\n\n\n EmailChangeMiddleware - process_request => request.user.email={request.user.email}')
             are_emails_mismatched = user_session_email is not None and request.user.email != user_session_email
             EmailChangeMiddleware._set_session_email_match_custom_attributes(are_emails_mismatched)
             if settings.ENFORCE_SESSION_EMAIL_MATCH and are_emails_mismatched:
@@ -812,14 +817,21 @@ class EmailChangeMiddleware(MiddlewareMixin):
         1. Update the logged-in cookies if the email change was requested
         2. Store user's email in session if not already
         """
+        print(f'\n\n\n EmailChangeMiddleware - process_response => request.user.is_authenticated={request.user.is_authenticated}')
         if request.user.is_authenticated:
+            print(f'\n\n\n EmailChangeMiddleware - process_response => request.session.get(email, None)=',request.session.get("email", None))
+            print(f'\n\n\n EmailChangeMiddleware - process_response => type request.session.get(email, None)=',type(request.session.get("email", None)))
+            print(f'\n\n\n EmailChangeMiddleware - process_response => request.session.get(email, None) is None = ',request.session.get('email', None) is None)
+
             if request.session.get('email', None) is None:
                 # .. custom_attribute_name: session_with_no_email_found
                 # .. custom_attribute_description: Indicates that user's email was not
                 #      yet stored in the user's session.
                 set_custom_attribute('session_with_no_email_found', True)
+                print(f'\n\n\n EmailChangeMiddleware - process_response => setting in session request.user.email = ', request.user.email)
                 request.session['email'] = request.user.email
 
+            print(f'\n\n\n EmailChangeMiddleware - process_response => request_cache.get_cached_response(email_change_requested).is_found={request_cache.get_cached_response("email_change_requested").is_found}')
             if request_cache.get_cached_response('email_change_requested').is_found:
                 # Update the JWT cookies with new user email
                 response = set_logged_in_cookies(request, response, request.user)
