@@ -300,6 +300,48 @@ def run_stylelint():
         write_junit_xml('stylelint')
 
 
+def _extract_missing_pii_annotations(filename):
+    """
+    Returns the number of uncovered models from the stdout report of django_find_annotations.
+
+    Arguments:
+        filename: Filename where stdout of django_find_annotations was captured.
+
+    Returns:
+        three-tuple containing:
+            1. The number of uncovered models,
+            2. A bool indicating whether the coverage is still below the threshold, and
+            3. The full report as a string.
+    """
+    uncovered_models = 0
+    pii_check_passed = True
+    if os.path.isfile(filename):
+        with open(filename) as report_file:
+            lines = report_file.readlines()
+
+            # Find the count of uncovered models.
+            uncovered_regex = re.compile(r'^Coverage found ([\d]+) uncovered')
+            for line in lines:
+                uncovered_match = uncovered_regex.match(line)
+                if uncovered_match:
+                    uncovered_models = int(uncovered_match.groups()[0])
+                    break
+
+            # Find a message which suggests the check failed.
+            failure_regex = re.compile(r'^Coverage threshold not met!')
+            for line in lines:
+                failure_match = failure_regex.match(line)
+                if failure_match:
+                    pii_check_passed = False
+                    break
+
+            # Each line in lines already contains a newline.
+            full_log = ''.join(lines)
+    else:
+        fail_quality('pii', f'FAILURE: Log file could not be found: {filename}')
+
+    return (uncovered_models, pii_check_passed, full_log)
+
 def run_pii_check():
     """
     Guarantee that all Django models are PII-annotated.
