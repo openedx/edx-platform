@@ -306,7 +306,7 @@ def run_pii_check():
     """
     pii_report_name = 'pii'
     default_report_dir = (Env.REPORT_DIR / pii_report_name)
-    report_dir = getattr(options, 'report_dir', default_report_dir)
+    report_dir = default_report_dir
     output_file = os.path.join(report_dir, 'pii_check_{}.report')
     env_report = []
     pii_check_passed = True
