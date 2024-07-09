@@ -8,17 +8,6 @@
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
--e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
--e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 accessible-pygments==0.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -858,6 +847,13 @@ enmerkar-underscore==2.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
 execnet==2.1.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1299,6 +1295,10 @@ openedx-filters==1.8.1
 openedx-learning==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+openedx-mongodbproxy==0.2.1
+    # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 optimizely-sdk==4.1.1

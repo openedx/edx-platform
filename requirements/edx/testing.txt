@@ -6,14 +6,6 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
--e git+https://github.com/openedx/event-tracking.git@umar/upgrade-pymongo#egg=event-tracking==2.4.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-completion
-    #   edx-proctoring
-    #   edx-search
--e git+https://github.com/awais786/MongoDBProxy.git@fixing-pymongo4.0-#egg=openedx-mongodbproxy==0.2.1
-    # via -r requirements/edx/base.txt
 acid-xblock==0.3.1
     # via -r requirements/edx/base.txt
 aiohttp==3.9.5
@@ -654,6 +646,12 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/base.txt
+event-tracking==2.4.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-completion
+    #   edx-proctoring
+    #   edx-search
 execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.0
@@ -965,6 +963,8 @@ openedx-learning==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
+openedx-mongodbproxy==0.2.1
+    # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
