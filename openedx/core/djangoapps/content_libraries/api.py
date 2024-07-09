@@ -216,7 +216,7 @@ class LibraryXBlockMetadata:
             ),
             display_name=component.versioning.draft.title,
             created=component.created,
-            modified=component.versioning.latest.created,
+            modified=component.versioning.draft.created,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
             has_unpublished_changes=component.versioning.has_unpublished_changes
         )
