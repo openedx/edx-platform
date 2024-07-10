@@ -24,11 +24,18 @@ INDEX_SETTINGS = {
         "filterableAttributes": [
             "library",
             "id"
+        ],
+        "facets": [
+            "library"
         ]
     },
     f"{prefix}courseware_content": {
         "filterableAttributes": [
             "id",
+            "course",
+            "org"
+        ],
+        "facets": [
             "course",
             "org"
         ]
@@ -40,9 +47,14 @@ INDEX_SETTINGS = {
             "course",
             "start",
             "enrollment_start"
+        ],
+        "facets": [
+            "org",
+            "course",
         ]
     },
 }
+
 
 def sanitize_id(_id: str | int) -> str:
     return hashlib.md5(f"{_id}".encode('utf-8')).hexdigest()
@@ -69,7 +81,8 @@ def sanitized_id(source: dict, create_usage_key=True) -> dict:
 
     return source
 
-def build_filter(key,val):
+
+def build_filter(key, val):
     """
     This function is making meilisearch compatible filters
     :param key: name of attribute
@@ -88,6 +101,7 @@ def build_filter(key,val):
     elif isinstance(val, dict):
         log.info('Dict Filter Not Handled')
     return f"{str(key).lower()}='{val}'"
+
 
 def filter_builder(_filters: list[dict]) -> list[str]:
     """
@@ -151,8 +165,11 @@ def _translate_hits(ms_response):
         "max_score": max(result["score"] for result in results) if results else None,
         "results": results,
     }
-    if "aggregations" in ms_response:
-        response["aggs"] = ms_response["aggregations"]
+    if "facetDistribution" in ms_response:
+        aggs = {}
+        for key, terms in ms_response["facetDistribution"].items():
+            aggs[key] = {"terms": terms}
+        response["aggs"] = aggs
 
     return response
 
@@ -343,6 +360,7 @@ class MeiliSearchEngine(SearchEngine):
 
         search_params = {
             "filter": filters,
+            "facets": INDEX_SETTINGS.get(self._prefixed_index_name, {}).get('facets', [])
         }
         if log_search_params:
             log.info(f"full meili search body {search_params}")
