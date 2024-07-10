@@ -443,6 +443,7 @@ def check_keywords():
         except BuildFailure:
             overall_status = False
 
+
     if not overall_status:
         fail_quality(
             'keywords',
