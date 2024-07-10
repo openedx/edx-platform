@@ -119,7 +119,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser, BearerAuthentication
+from rest_framework.authentication import SessionAuthentication
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
@@ -1062,58 +1063,61 @@ def modify_access(request, course_id):
     }
     return JsonResponse(response_payload)
 
-
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EDIT_COURSE_ACCESS)
-@require_post_params(rolename="'instructor', 'staff', or 'beta'")
-def list_course_role_members(request, course_id):
+def verify_course_permission(permission):
     """
-    List instructors and staff.
-    Requires instructor access.
+        Decorator with argument that requires a specific permission of the requesting
+        user. If the requirement is not satisfied, returns an
+        HttpResponseForbidden (403).
+        Assumes that request is in self.
+        Assumes that course_id is in kwargs['course_id'].
+        """
 
-    rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
+    def decorator(func):
+        def wrapped(self, *args, **kwargs):
+            request = self.request
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
-    Returns JSON of the form {
-        "course_id": "some/course/id",
-        "staff": [
-            {
-                "username": "staff1",
-                "email": "staff1@example.org",
-                "first_name": "Joe",
-                "last_name": "Shmoe",
-            }
-        ]
-    }
-    """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'instructor', course_id, depth=None
-    )
+            if request.user.has_perm(permission, course):
+                return func(self, *args, **kwargs)
+            else:
+                return HttpResponseForbidden()
 
-    rolename = request.POST.get('rolename')
+        return wrapped
 
-    if rolename not in ROLES:
-        return HttpResponseBadRequest()
+    return decorator
 
-    def extract_user_info(user):
-        """ convert user into dicts for json view """
 
-        return {
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name']
+
+
+class ListCourseRoleMembersView(APIView):
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    @method_decorator(ensure_csrf_cookie)
+    @verify_course_permission(permissions.EDIT_COURSE_ACCESS)
+    def post(self, request, course_id):
+
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_with_access(
+            request.user, 'instructor', course_id, depth=None
+        )
+        rolename = request.data.get('rolename')
+        if rolename not in ROLES:
+            return Response({"error": "Invalid role name"}, status=status.HTTP_400_BAD_REQUEST)
+
+        users = list_with_level(course.id, rolename)
+        serializer = UserSerializer(users, many=True)
+
+        response_payload = {
+            'course_id': str(course_id),
+            rolename: serializer.data,
         }
 
-    response_payload = {
-        'course_id': str(course_id),
-        rolename: list(map(extract_user_info, list_with_level(
-            course.id, rolename
-        ))),
-    }
-    return JsonResponse(response_payload)
+        return Response(response_payload, status=status.HTTP_200_OK)
 
 
 class ProblemResponseReportPostParamsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
