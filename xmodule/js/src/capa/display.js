@@ -1224,11 +1224,21 @@
         Problem.prototype.disableAllButtonsWhileRunning = function(operationCallback, isFromCheckOperation) {
             var that = this;
             var allButtons = [this.resetButton, this.saveButton, this.showButton, this.hintButton, this.submitButton];
+            // require this array to enable all except submit buttom
+            var buttonsExceptSubmit = [this.resetButton, this.saveButton, this.showButton, this.hintButton];
             var initiallyEnabledButtons = allButtons.filter(function(button) {
                 return !button.attr('disabled');
             });
             this.enableButtons(initiallyEnabledButtons, false, isFromCheckOperation);
             return operationCallback().always(function() {
+                if (!(isFromCheckOperation)){
+                  // submit button is enabled conditionally during a reset operation
+                  if (that.el.find(".notification-gentle-alert .notification-message:visible").length === 0){
+                    that.enableButtons([that.submitButton], false, isFromCheckOperation);
+                    return that.enableButtons(buttonsExceptSubmit, true, isFromCheckOperation);
+
+                  }
+                }
                 return that.enableButtons(initiallyEnabledButtons, true, isFromCheckOperation);
             });
         };
