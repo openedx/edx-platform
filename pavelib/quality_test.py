@@ -407,8 +407,54 @@ def run_pii_check():
         fail_quality('pii', full_log)
 
 
+def check_keywords():
+    """
+    Check Django model fields for names that conflict with a list of reserved keywords
+    """
+    report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
+    # sh(f"mkdir -p {report_path}")
+    os.makedirs(report_path, exist_ok=True)
+
+    overall_status = True
+    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+        report_file = f"{env}_reserved_keyword_report.csv"
+        override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
+        try:
+            command = (
+                f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
+                f"python manage.py {env} check_reserved_keywords "
+                f"--override_file {override_file} "
+                f"--report_path {report_path} "
+                f"--report_file {report_file}".format(
+                    settings_file=env_settings_file, app=env, override_file=override_file,
+                    report_path=report_path, report_file=report_file
+            )
+            # sh(
+            #     "export DJANGO_SETTINGS_MODULE={settings_file}; "
+            #     "python manage.py {app} check_reserved_keywords "
+            #     "--override_file {override_file} "
+            #     "--report_path {report_path} "
+            #     "--report_file {report_file}".format(
+            #         settings_file=env_settings_file, app=env, override_file=override_file,
+            #         report_path=report_path, report_file=report_file
+            #     )
+            # )
+            result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)            
+        except BuildFailure:
+            overall_status = False
+
+    if not overall_status:
+        fail_quality(
+            'keywords',
+            'Failure: reserved keyword checker failed. Reports can be found here: {}'.format(
+                report_path
+            )
+        )
+
+
 if __name__ == "__main__":
     run_pep8()
     run_eslint()
     run_stylelint()
     run_pii_check()
+    check_keywords()
