@@ -428,6 +428,7 @@ def check_keywords():
                 f"--report_file {report_file}".format(
                     settings_file=env_settings_file, app=env, override_file=override_file,
                     report_path=report_path, report_file=report_file
+                )
             )
             # sh(
             #     "export DJANGO_SETTINGS_MODULE={settings_file}; "
@@ -442,7 +443,6 @@ def check_keywords():
             result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)            
         except BuildFailure:
             overall_status = False
-
 
     if not overall_status:
         fail_quality(
