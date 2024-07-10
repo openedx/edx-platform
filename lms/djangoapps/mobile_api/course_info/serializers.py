@@ -2,7 +2,7 @@
 Course Info serializers
 """
 from rest_framework import serializers
-from typing import Union
+from typing import Dict, Union
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -13,6 +13,7 @@ from common.djangoapps.util.milestones_helpers import (
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware.courses import get_assignments_completions
 from lms.djangoapps.mobile_api.users.serializers import ModeSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
@@ -31,6 +32,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
     course_sharing_utm_parameters = serializers.SerializerMethodField()
     course_about = serializers.SerializerMethodField('get_course_about_url')
     course_modes = serializers.SerializerMethodField()
+    course_progress = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseOverview
@@ -47,6 +49,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             'course_sharing_utm_parameters',
             'course_about',
             'course_modes',
+            'course_progress',
         )
 
     @staticmethod
@@ -74,6 +77,12 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             ModeSerializer(mode).data
             for mode in course_modes
         ]
+
+    def get_course_progress(self, obj: CourseOverview) -> Dict[str, int]:
+        """
+        Gets course progress calculated by course completed assignments.
+        """
+        return get_assignments_completions(obj.id, self.context.get('user'))
 
 
 class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):

@@ -68,7 +68,7 @@ def get_user_course_duration(user, course):
     return get_expected_duration(course.id)
 
 
-def get_user_course_expiration_date(user, course):
+def get_user_course_expiration_date(user, course, enrollment=None):
     """
     Return expiration date for given user course pair.
     Return None if the course does not expire.
@@ -81,7 +81,7 @@ def get_user_course_expiration_date(user, course):
     if access_duration is None:
         return None
 
-    enrollment = CourseEnrollment.get_enrollment(user, course.id)
+    enrollment = enrollment or CourseEnrollment.get_enrollment(user, course.id)
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
