@@ -440,7 +440,7 @@ def check_keywords():
             #         report_path=report_path, report_file=report_file
             #     )
             # )
-            result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)            
+            result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         except BuildFailure:
             overall_status = False
 
