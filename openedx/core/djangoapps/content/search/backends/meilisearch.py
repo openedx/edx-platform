@@ -36,7 +36,6 @@ INDEX_SETTINGS = {
             "org"
         ],
         "facets": [
-            "course",
             "org"
         ]
     },
@@ -50,7 +49,6 @@ INDEX_SETTINGS = {
         ],
         "facets": [
             "org",
-            "course",
         ]
     },
 }
