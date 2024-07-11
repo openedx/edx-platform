@@ -101,7 +101,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2425
-    'DISPLAY_DEBUG_INFO_TO_STAFF': False,
+    'DISPLAY_DEBUG_INFO_TO_STAFF': True,
 
     # .. toggle_name: FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF']
     # .. toggle_implementation: DjangoSetting
