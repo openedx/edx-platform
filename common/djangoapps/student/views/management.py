@@ -30,7 +30,7 @@ from openedx.core.djangoapps.enrollments.api import add_enrollment
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import int_to_base36
-
+from openedx.core.djangoapps.enrollments.data import get_course_enrollments
 
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -1331,3 +1331,27 @@ def ist_to_utc(item):
             item[date] = '-'
     return item
 
+
+@csrf_exempt
+def extras_get_user_enrolled_courses(request):
+    user_email = request.POST.get("user_email")
+    context = {}
+    try:
+        user = User.objects.get(email = user_email)
+        user_courses = _get_active_inactive_courses(user)
+        context['user_courses'] = user_courses
+        context['user_details'] = {"name" : user.first_name , "roll_no" : user.username}
+    except User.DoesNotExist:
+        context['message'] = _("User with user email {} does not exist").format(user_email)
+        return JsonResponse(context, status=400)
+    return JsonResponse(context)
+
+def _get_active_inactive_courses(user):
+    user_courses = get_course_enrollments(user.username, include_inactive = True)
+    user_active_inactive_courses = {}
+    for i, user_course in enumerate(user_courses):
+        if user_course["is_active"]:
+            user_active_inactive_courses.update({user_course["course_details"]["course_id"] : "Active"})
+        else:
+            user_active_inactive_courses.update({user_course["course_details"]["course_id"] : "Dropped"})
+    return user_active_inactive_courses
