@@ -544,7 +544,7 @@ def run_xsslint():
     command = f"cat {metrics_report}"
     # Print number of violations to log.
     subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    
+
     error_message = ""
     # Test total violations against threshold.
     if 'total' in list(violation_thresholds.keys()):
@@ -621,13 +621,12 @@ def diff_coverage():
         # )
         
         command = (
-            f"diff-cover {xml_report_str}
+            f"diff-cover {xml_report_str}"
             f"--diff-range-notation '..'"
             f"--compare-branch={compare_branch} "
             f"--html-report {diff_html_path}"
         )
         subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
 
 
 if __name__ == "__main__":
