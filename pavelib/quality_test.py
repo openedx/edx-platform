@@ -513,7 +513,7 @@ def run_xsslint():
         f"--rule-totals --config=scripts.xsslint_config >> {xsslint_report}"
     )
 
-    result = subprocess.run(command, shell=True, check=False, stdout=report_file, stderr=subprocess.STDOUT, text=True)
+    result = subprocess.run(command, shell=True, check=False, stdout=xsslint_report, stderr=subprocess.STDOUT, text=True)
     xsslint_counts = _get_xsslint_counts(xsslint_report)
 
     try:
