@@ -12,6 +12,8 @@ If true, it:
 
 
 from django.conf import settings
+
+from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
 from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 
@@ -21,6 +23,8 @@ def apply_settings(django_settings):
     # Whitelisted URL query parameters retrained in the pipeline session.
     # Params not in this whitelist will be silently dropped.
     django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
+    if is_auto_generated_username_enabled():
+        django_settings.FIELDS_STORED_IN_SESSION.append('registration_params')
 
     # Inject exception middleware to make redirects fire.
     django_settings.MIDDLEWARE.extend(

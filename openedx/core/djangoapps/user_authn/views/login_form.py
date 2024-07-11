@@ -153,6 +153,7 @@ def login_and_registration_form(request, initial_mode="login"):
     #  since Django's SessionAuthentication middleware auto-updates session cookies but not
     #  the other login-related cookies. See ARCH-282 and ARCHBOM-1718
     if request.user.is_authenticated:
+        print('\n\n\n\n\n request.user.is_authenticated redirect_to = ', redirect_to, '\n\n\n\n\n')
         response = redirect(redirect_to)
         response = set_logged_in_cookies(request, response, request.user)
         return response
@@ -212,6 +213,7 @@ def login_and_registration_form(request, initial_mode="login"):
         # instead of the desired redirect URL (e.g. finish_auth) resulting in learners not enrolling
         # into the courses.
         if request.user.is_authenticated and redirect_to:
+            print('\n\n\n\n\n should_redirect_to_authn_microfrontend redirect_to = ', redirect_to, '\n\n\n\n\n')
             return redirect(redirect_to)
 
         query_params = request.GET.urlencode()

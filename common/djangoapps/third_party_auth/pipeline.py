@@ -89,6 +89,7 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.accounts.utils import username_suffix_generator
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
@@ -105,7 +106,9 @@ from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password
 from common.djangoapps.student.models import UserProfile
-from openedx.core.djangoapps.user_authn.views.utils import get_auto_generated_username
+from openedx.core.djangoapps.user_authn.views.utils import (
+    get_auto_generated_username
+)
 from . import provider
 
 # These are the query string params you can pass
@@ -672,8 +675,14 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             )
 
 
-def complete_user_creation(user=None, details=None, *args, **kwargs):
+def complete_user_creation(strategy, user=None, details=None, *args, **kwargs):
     auto_generate_username_enabled = True
+    is_marketable = False
+    profile = None
+    request = strategy.request if strategy else None
+    print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request: {request}  ')
+    print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.site={request.site} ')
+    print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.data={ strategy.request_data(merge=False)} ')
     if auto_generate_username_enabled and user:
         if not user.has_usable_password():
             password = normalize_password(generate_password())
@@ -688,6 +697,17 @@ def complete_user_creation(user=None, details=None, *args, **kwargs):
             except Exception:
                 logger.exception(f"UserProfile creation failed for user {user.id}.")
                 raise
+        if strategy.session_get('registration_params', None):
+            registration_params = json.loads(strategy.session_get('registration_params'))
+            print(f'\n\n\n PIPELINE_STEP: complete_user_creation => registration_params: {registration_params}')
+            try:
+                is_marketable = registration_params.get('marketing_emails_opt_in', None) in ['true', '1']
+                print(f'\n\n\n PIPELINE_STEP: complete_user_creation => is_marketable: {is_marketable}')
+                # _record_is_marketable_attribute(is_marketable, user)
+            except Exception:  # pylint: disable=broad-except
+                logger.exception('Error while setting is_marketable attribute.')
+        # params = {'marketing_emails_opt_in': strategy.session_get('marketing_emails_opt_in', None)}
+        # _track_user_registration(user, profile, params=[], third_party_provider=None, registration=None, is_marketable=is_marketable)
         return {'user': user}
 
 

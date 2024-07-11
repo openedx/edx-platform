@@ -63,7 +63,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
-from openedx.core.djangoapps.user_authn.views.utils import get_auto_generated_username
+from openedx.core.djangoapps.user_authn.views.utils import get_auto_generated_username, complete_user_registration
 from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
 from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
@@ -80,7 +80,7 @@ from common.djangoapps.student.models import (
     UserAttribute,
     create_comments_service_user,
     email_exists_or_retired,
-    username_exists_or_retired
+    username_exists_or_retired, Registration
 )
 from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
@@ -222,71 +222,83 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         django_login(request, new_user)
         request.session.set_expiry(0)
 
-    try:
-        _record_is_marketable_attribute(is_marketable, new_user)
-    # Don't prevent a user from registering if is_marketable is not being set.
-    # Also update the is_marketable value to None so that it is consistent with
-    # our database when we send it to segment.
-    except Exception:   # pylint: disable=broad-except
-        log.exception('Error while setting is_marketable attribute.')
-        is_marketable = None
+    from openedx.features.enterprise_support.utils import is_enterprise_learner
+    print(f'\n\n\n\n\n new_user={new_user} date_joined={new_user.date_joined.strftime("%Y-%m-%d")} username={new_user.username} id={new_user.id} email={new_user.email} is_staff={new_user.is_staff} is_enterprise={is_enterprise_learner(new_user)} registration_object={Registration.objects.get(user=new_user)} profile={new_user.profile} profile_name={new_user.profile.name} is_active={new_user.is_active} \n\n\n\n\n\n\n\n\n\n')
+    print(f'\n\n\n\n\n user={user} date_joined={user.date_joined.strftime("%Y-%m-%d")} username={user.username} id={user.id} email={user.email} is_staff={user.is_staff} is_enterprise={is_enterprise_learner(user)} registration_object={Registration.objects.get(user=user)} profile={user.profile} profile_name={user.profile.name} is_active={user.is_active} \n\n\n\n\n\n\n\n\n\n')
 
-    _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable)
-
-    # Sites using multiple languages need to record the language used during registration.
-    # If not, compose_and_send_activation_email will be sent in site's default language only.
-    create_or_set_user_attribute_created_on_site(user, request.site)
-
-    # Only add a default user preference if user does not already has one.
-    if not preferences_api.has_user_preference(user, LANGUAGE_KEY):
-        preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
-
-    # Check if system is configured to skip activation email for the current user.
-    skip_email = _skip_activation_email(
-        user, running_pipeline, third_party_provider,
+    cleaned_password = form.cleaned_data['password']
+    new_user = complete_user_registration(
+        user, profile, params, third_party_provider, registration,
+        is_marketable, request, running_pipeline, cleaned_password
     )
-
-    if skip_email:
-        registration.activate()
-    else:
-        redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
-        redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        compose_and_send_activation_email(user, profile, registration, redirect_url, True)
-
-    if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
-        try:
-            enable_notifications(user)
-        except Exception:  # pylint: disable=broad-except
-            log.exception(f"Enable discussion notifications failed for user {user.id}.")
-
-    # Announce registration
-    REGISTER_USER.send(sender=None, user=user, registration=registration)
-
-    # .. event_implemented_name: STUDENT_REGISTRATION_COMPLETED
-    STUDENT_REGISTRATION_COMPLETED.send_event(
-        user=UserData(
-            pii=UserPersonalData(
-                username=user.username,
-                email=user.email,
-                name=user.profile.name,
-            ),
-            id=user.id,
-            is_active=user.is_active,
-        ),
-    )
-
-    create_comments_service_user(user)
-
-    try:
-        _record_registration_attributions(request, new_user)
-    # Don't prevent a user from registering due to attribution errors.
-    except Exception:   # pylint: disable=broad-except
-        log.exception('Error while attributing cookies to user registration.')
-
-    # TODO: there is no error checking here to see that the user actually logged in successfully,
-    # and is not yet an active user.
-    is_new_user(form.cleaned_data['password'], new_user)
     return new_user
+    # try:
+    #     _record_is_marketable_attribute(is_marketable, new_user)
+    # # Don't prevent a user from registering if is_marketable is not being set.
+    # # Also update the is_marketable value to None so that it is consistent with
+    # # our database when we send it to segment.
+    # except Exception:   # pylint: disable=broad-except
+    #     log.exception('Error while setting is_marketable attribute.')
+    #     is_marketable = None
+    #
+    # _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable)
+    #
+    # # Sites using multiple languages need to record the language used during registration.
+    # # If not, compose_and_send_activation_email will be sent in site's default language only.
+    # print(f'\n\n\n\n create_or_set_user_attribute_created_on_site user={user} request.site={request.site}')
+    # create_or_set_user_attribute_created_on_site(user, request.site)
+    #
+    # # Only add a default user preference if user does not already has one.
+    # if not preferences_api.has_user_preference(user, LANGUAGE_KEY):
+    #     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
+    #
+    # # Check if system is configured to skip activation email for the current user.
+    # skip_email = _skip_activation_email(
+    #     user, running_pipeline, third_party_provider,
+    # )
+    #
+    # if skip_email:
+    #     registration.activate()
+    # else:
+    #     redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
+    #     redirect_url = get_redirect_url_with_host(root_url, redirect_to)
+    #     compose_and_send_activation_email(user, profile, registration, redirect_url, True)
+    #
+    # if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
+    #     try:
+    #         enable_notifications(user)
+    #     except Exception:  # pylint: disable=broad-except
+    #         log.exception(f"Enable discussion notifications failed for user {user.id}.")
+    #
+    # # Announce registration
+    # REGISTER_USER.send(sender=None, user=user, registration=registration)
+    #
+    # # .. event_implemented_name: STUDENT_REGISTRATION_COMPLETED
+    # STUDENT_REGISTRATION_COMPLETED.send_event(
+    #     user=UserData(
+    #         pii=UserPersonalData(
+    #             username=user.username,
+    #             email=user.email,
+    #             name=user.profile.name,
+    #         ),
+    #         id=user.id,
+    #         is_active=user.is_active,
+    #     ),
+    # )
+    #
+    # create_comments_service_user(user)
+    #
+    # try:
+    #     _record_registration_attributions(request, new_user)
+    # # Don't prevent a user from registering due to attribution errors.
+    # except Exception:   # pylint: disable=broad-except
+    #     log.exception('Error while attributing cookies to user registration.')
+    #
+    # # TODO: there is no error checking here to see that the user actually logged in successfully,
+    # # and is not yet an active user.
+    # is_new_user(form.cleaned_data['password'], new_user)
+    #
+    # return new_user
 
 
 def is_new_user(password, user):

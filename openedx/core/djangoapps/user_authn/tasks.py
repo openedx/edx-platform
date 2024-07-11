@@ -73,6 +73,7 @@ def send_activation_email(self, msg_string, from_address=None, site_id=None):
 
     try:
         with emulate_http_request(site=site, user=user):
+            print(f'\n\n\nACTIVATION EMAIL SENT FOR USER={user} site={site} msg={msg} msg={msg.__dict__}')
             ace.send(msg)
     except RecoverableChannelDeliveryError:
         log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'.format(
