@@ -2186,6 +2186,9 @@ def list_background_email_tasks(request, course_id):
 
 
 class ListCourseRoleMembersView(APIView):
+    """
+    List the content of bulk emails sent
+    """
     authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticated,)
 
