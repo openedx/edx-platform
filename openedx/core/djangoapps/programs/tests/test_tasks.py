@@ -100,7 +100,7 @@ class AwardProgramCertificateTestCase(TestCase):
             "http://test-server/credentials/",
         )
 
-        tasks.award_program_certificate(test_client, student, 123, datetime(2010, 5, 30))
+        tasks.award_program_certificate(test_client, student, 123)
 
         expected_body = {
             "username": student.username,
@@ -109,12 +109,6 @@ class AwardProgramCertificateTestCase(TestCase):
                 "program_uuid": 123,
                 "type": tasks.PROGRAM_CERTIFICATE,
             },
-            "attributes": [
-                {
-                    "name": "visible_date",
-                    "value": "2010-05-30T00:00:00Z",
-                }
-            ],
         }
         last_request_body = httpretty.last_request().body.decode("utf-8")
         assert json.loads(last_request_body) == expected_body
@@ -180,10 +174,6 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         actual_program_uuids = [call[0][2] for call in mock_award_program_certificate.call_args_list]
         assert actual_program_uuids == expected_awarded_program_uuids
 
-        actual_visible_dates = [call[0][3] for call in mock_award_program_certificate.call_args_list]
-        assert actual_visible_dates == expected_awarded_program_uuids
-        # program uuids are same as mock dates
-
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration")
     def test_awarding_certs_with_skip_program_certificate(
         self,
@@ -215,9 +205,6 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         tasks.award_program_certificates.delay(self.student.username).get()
         actual_program_uuids = [call[0][2] for call in mock_award_program_certificate.call_args_list]
         assert actual_program_uuids == expected_awarded_program_uuids
-        actual_visible_dates = [call[0][3] for call in mock_award_program_certificate.call_args_list]
-        assert actual_visible_dates == expected_awarded_program_uuids
-        # program uuids are same as mock dates
 
     @ddt.data(
         ("credentials", "enable_learner_issuance"),
@@ -471,9 +458,7 @@ class PostCourseCertificateTestCase(TestCase):
             "http://test-server/credentials/",
         )
 
-        visible_date = datetime.now()
-
-        tasks.post_course_certificate(test_client, self.student.username, self.certificate, visible_date)
+        tasks.post_course_certificate(test_client, self.student.username, self.certificate)
 
         expected_body = {
             "username": self.student.username,
@@ -484,12 +469,6 @@ class PostCourseCertificateTestCase(TestCase):
                 "type": tasks.COURSE_CERTIFICATE,
             },
             "date_override": None,
-            "attributes": [
-                {
-                    "name": "visible_date",
-                    "value": visible_date.strftime("%Y-%m-%dT%H:%M:%SZ"),  # text representation of date
-                }
-            ],
         }
         last_request_body = httpretty.last_request().body.decode("utf-8")
         assert json.loads(last_request_body) == expected_body
@@ -1007,76 +986,6 @@ class PostCourseCertificateConfigurationTestCase(TestCase):
         }
         last_request_body = httpretty.last_request().body.decode("utf-8")
         assert json.loads(last_request_body) == expected_body
-
-
-@skip_unless_lms
-class UpdateCertificateVisibleDatesOnCourseUpdateTestCase(CredentialsApiConfigMixin, TestCase):
-    """
-    Tests for the `update_certificate_visible_date_on_course_update` task.
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.credentials_api_config = self.create_credentials_config(enabled=False)
-        # setup course
-        self.course = CourseOverviewFactory.create()
-        # setup users
-        self.student1 = UserFactory.create(username="test-student1")
-        self.student2 = UserFactory.create(username="test-student2")
-        self.student3 = UserFactory.create(username="test-student3")
-        # award certificates to users in course we created
-        self.certificate_student1 = GeneratedCertificateFactory.create(
-            user=self.student1,
-            mode="verified",
-            course_id=self.course.id,
-            status="downloadable",
-        )
-        self.certificate_student2 = GeneratedCertificateFactory.create(
-            user=self.student2,
-            mode="verified",
-            course_id=self.course.id,
-            status="downloadable",
-        )
-        self.certificate_student3 = GeneratedCertificateFactory.create(
-            user=self.student3,
-            mode="verified",
-            course_id=self.course.id,
-            status="downloadable",
-        )
-
-    def tearDown(self):
-        super().tearDown()
-        self.credentials_api_config = self.create_credentials_config(enabled=False)
-
-    def test_update_visible_dates_but_credentials_config_disabled(self):
-        """
-        This test verifies the behavior of the `update_certificate_visible_date_on_course_update` task when the
-        CredentialsApiConfig is disabled.
-
-        If the system is configured to _not_ use the Credentials IDA, we should expect this task to eventually throw an
-        exception when the max number of retries has reached.
-        """
-        with pytest.raises(MaxRetriesExceededError):
-            # pylint: disable=no-value-for-parameter
-            tasks.update_certificate_visible_date_on_course_update(self.course.id)
-
-    def test_update_visible_dates(self):
-        """
-        Happy path test.
-
-        This test verifies the behavior of the `update_certificate_visible_date_on_course_update` task. This test
-        verifies attempts by the system to queue a number of `award_course_certificate` tasks to ensure the
-        `visible_date` attribute is updated on all eligible course certificates.
-        """
-        # enable the CredentialsApiConfig to issue certificates using the Credentials service
-        self.credentials_api_config.enabled = True
-        self.credentials_api_config.enable_learner_issuance = True
-
-        with mock.patch(f"{TASKS_MODULE}.award_course_certificate.delay") as award_course_cert:
-            # pylint: disable=no-value-for-parameter
-            tasks.update_certificate_visible_date_on_course_update(self.course.id)
-
-        assert award_course_cert.call_count == 3
 
 
 @skip_unless_lms
