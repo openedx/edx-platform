@@ -513,7 +513,6 @@ def run_xsslint():
     )
 
     result = subprocess.run(command, shell=True, check=False, stdout=report_file, stderr=subprocess.STDOUT, text=True)
-    
     xsslint_counts = _get_xsslint_counts(xsslint_report)
 
     try:
