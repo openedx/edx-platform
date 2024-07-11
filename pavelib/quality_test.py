@@ -544,9 +544,8 @@ def run_xsslint():
     command = f"cat {metrics_report}"
     # Print number of violations to log.
     subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
+    
     error_message = ""
-
     # Test total violations against threshold.
     if 'total' in list(violation_thresholds.keys()):
         if violation_thresholds['total'] < xsslint_counts['total']:
