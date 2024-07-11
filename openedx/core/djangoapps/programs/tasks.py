@@ -35,7 +35,7 @@ from xmodule.data import CertificatesDisplayBehaviors
 if TYPE_CHECKING:
     from datetime import datetime
 
-    from django.contrib.auth.models import User as UserType
+    from django.contrib.auth.models import User as UserType  # pylint: disable: imported-auth-user
     from requests import Session
 
 User = get_user_model()
