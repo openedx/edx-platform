@@ -430,16 +430,6 @@ def check_keywords():
                     report_path=report_path, report_file=report_file
                 )
             )
-            # sh(
-            #     "export DJANGO_SETTINGS_MODULE={settings_file}; "
-            #     "python manage.py {app} check_reserved_keywords "
-            #     "--override_file {override_file} "
-            #     "--report_path {report_path} "
-            #     "--report_file {report_file}".format(
-            #         settings_file=env_settings_file, app=env, override_file=override_file,
-            #         report_path=report_path, report_file=report_file
-            #     )
-            # )
             result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         except BuildFailure:
             overall_status = False
@@ -453,9 +443,148 @@ def check_keywords():
         )
 
 
+def _get_xsslint_counts(filename):
+    """
+    This returns a dict of violations from the xsslint report.
+
+    Arguments:
+        filename: The name of the xsslint report.
+
+    Returns:
+        A dict containing the following:
+            rules: A dict containing the count for each rule as follows:
+                violation-rule-id: N, where N is the number of violations
+            total: M, where M is the number of total violations
+
+    """
+    report_contents = _get_report_contents(filename, 'xsslint')
+    rule_count_regex = re.compile(r"^(?P<rule_id>[a-z-]+):\s+(?P<count>\d+) violations", re.MULTILINE)
+    total_count_regex = re.compile(r"^(?P<count>\d+) violations total", re.MULTILINE)
+    violations = {'rules': {}}
+    for violation_match in rule_count_regex.finditer(report_contents):
+        try:
+            violations['rules'][violation_match.group('rule_id')] = int(violation_match.group('count'))
+        except ValueError:
+            violations['rules'][violation_match.group('rule_id')] = None
+    try:
+        violations['total'] = int(total_count_regex.search(report_contents).group('count'))
+    # An AttributeError will occur if the regex finds no matches.
+    # A ValueError will occur if the returned regex cannot be cast as a float.
+    except (AttributeError, ValueError):
+        violations['total'] = None
+    return violations
+
+
+def run_xsslint():
+    """
+    Runs xsslint/xss_linter.py on the codebase
+    """
+    # thresholds_option = getattr(options, 'thresholds', '{}')
+    try:
+        json_file_path = 'scripts/xsslint_thresholds.json'
+        # Read the JSON file
+        with open(json_file_path, 'r') as file:
+            violation_thresholds = json.load(file)
+
+        # violation_thresholds = json.loads(thresholds_option)
+    except ValueError:
+        violation_thresholds = None
+    if isinstance(violation_thresholds, dict) is False or \
+            any(key not in ("total", "rules") for key in violation_thresholds.keys()):
+
+        fail_quality(
+            'xsslint',
+            """FAILURE: Thresholds option "{thresholds_option}" was not supplied using proper format.\n"""
+            """Here is a properly formatted example, '{{"total":100,"rules":{{"javascript-escape":0}}}}' """
+            """with property names in double-quotes.""".format(
+                thresholds_option=thresholds_option
+            )
+        )
+
+    xsslint_script = "xss_linter.py"
+    xsslint_report_dir = (Env.REPORT_DIR / "xsslint")
+    xsslint_report = xsslint_report_dir / "xsslint.report"
+    _prepare_report_dir(xsslint_report_dir)
+
+    # Prepare the command to run the xsslint script
+    command = (
+        f"{Env.REPO_ROOT}/scripts/xsslint/{xsslint_script} "
+        f"--rule-totals --config=scripts.xsslint_config >> {xsslint_report}"
+    )
+
+    result = subprocess.run(command, shell=True, check=False, stdout=report_file, stderr=subprocess.STDOUT, text=True)
+    
+    xsslint_counts = _get_xsslint_counts(xsslint_report)
+
+    try:
+        metrics_str = "Number of {xsslint_script} violations: {num_violations}\n".format(
+            xsslint_script=xsslint_script, num_violations=int(xsslint_counts['total'])
+        )
+        if 'rules' in xsslint_counts and any(xsslint_counts['rules']):
+            metrics_str += "\n"
+            rule_keys = sorted(xsslint_counts['rules'].keys())
+            for rule in rule_keys:
+                metrics_str += "{rule} violations: {count}\n".format(
+                    rule=rule,
+                    count=int(xsslint_counts['rules'][rule])
+                )
+    except TypeError:
+        fail_quality(
+            'xsslint',
+            "FAILURE: Number of {xsslint_script} violations could not be found in {xsslint_report}".format(
+                xsslint_script=xsslint_script, xsslint_report=xsslint_report
+            )
+        )
+
+    metrics_report = (Env.METRICS_DIR / "xsslint")
+    # Record the metric
+    _write_metric(metrics_str, metrics_report)
+    # Print number of violations to log.
+    sh(f"cat {metrics_report}", ignore_error=True)
+
+    error_message = ""
+
+    # Test total violations against threshold.
+    if 'total' in list(violation_thresholds.keys()):
+        if violation_thresholds['total'] < xsslint_counts['total']:
+            error_message = "Too many violations total ({count}).\nThe limit is {violations_limit}.".format(
+                count=xsslint_counts['total'], violations_limit=violation_thresholds['total']
+            )
+
+    # Test rule violations against thresholds.
+    if 'rules' in violation_thresholds:
+        threshold_keys = sorted(violation_thresholds['rules'].keys())
+        for threshold_key in threshold_keys:
+            if threshold_key not in xsslint_counts['rules']:
+                error_message += (
+                    "\nNumber of {xsslint_script} violations for {rule} could not be found in "
+                    "{xsslint_report}."
+                ).format(
+                    xsslint_script=xsslint_script, rule=threshold_key, xsslint_report=xsslint_report
+                )
+            elif violation_thresholds['rules'][threshold_key] < xsslint_counts['rules'][threshold_key]:
+                error_message += \
+                    "\nToo many {rule} violations ({count}).\nThe {rule} limit is {violations_limit}.".format(
+                        rule=threshold_key, count=xsslint_counts['rules'][threshold_key],
+                        violations_limit=violation_thresholds['rules'][threshold_key],
+                    )
+
+    if error_message:
+        fail_quality(
+            'xsslint',
+            "FAILURE: XSSLinter Failed.\n{error_message}\n"
+            "See {xsslint_report} or run the following command to hone in on the problem:\n"
+            "  ./scripts/xss-commit-linter.sh -h".format(
+                error_message=error_message, xsslint_report=xsslint_report
+            )
+        )
+    else:
+        write_junit_xml('xsslint')
+
 if __name__ == "__main__":
     run_pep8()
     run_eslint()
     run_stylelint()
+    run_xsslint()
     run_pii_check()
     check_keywords()
