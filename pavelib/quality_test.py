@@ -541,10 +541,9 @@ def run_xsslint():
     _write_metric(metrics_str, metrics_report)
     # Print number of violations to log.
     # sh(f"cat {metrics_report}", ignore_error=True)
-    command = f"cat {metrics_report}" 
+    command = f"cat {metrics_report}"
     # Print number of violations to log.
     subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    
 
     error_message = ""
 
