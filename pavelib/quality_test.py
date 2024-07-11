@@ -619,7 +619,6 @@ def diff_coverage():
         #         diff_html_path=diff_html_path,
         #     )
         # )
-        
         command = (
             f"diff-cover {xml_report_str}"
             f"--diff-range-notation '..'"
