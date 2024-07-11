@@ -584,6 +584,53 @@ def run_xsslint():
     else:
         write_junit_xml('xsslint')
 
+
+def diff_coverage():
+    """
+    Build the diff coverage reports
+    """
+    # compare_branch = options.get('compare_branch', 'origin/master')
+    compare_branch = 'origin/master'
+
+    # Find all coverage XML files (both Python and JavaScript)
+    xml_reports = []
+
+    for filepath in Env.REPORT_DIR.walk():
+        if bool(re.match(r'^coverage.*\.xml$', filepath.basename())):
+            xml_reports.append(filepath)
+
+    if not xml_reports:
+        err_msg = colorize(
+            'red',
+            "No coverage info found.  Run `paver test` before running "
+            "`paver coverage`.\n"
+        )
+        sys.stderr.write(err_msg)
+    else:
+        xml_report_str = ' '.join(xml_reports)
+        diff_html_path = os.path.join(Env.REPORT_DIR, 'diff_coverage_combined.html')
+
+        # Generate the diff coverage reports (HTML and console)
+        # The --diff-range-notation parameter is a workaround for https://github.com/Bachmann1234/diff_cover/issues/153
+        # sh(
+        #     "diff-cover {xml_report_str} --diff-range-notation '..' --compare-branch={compare_branch} "
+        #     "--html-report {diff_html_path}".format(
+        #         xml_report_str=xml_report_str,
+        #         compare_branch=compare_branch,
+        #         diff_html_path=diff_html_path,
+        #     )
+        # )
+        
+        command = (
+            f"diff-cover {xml_report_str}
+            f"--diff-range-notation '..'"
+            f"--compare-branch={compare_branch} "
+            f"--html-report {diff_html_path}"
+        )
+        subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+
+
 if __name__ == "__main__":
     run_pep8()
     run_eslint()
@@ -591,3 +638,4 @@ if __name__ == "__main__":
     run_xsslint()
     run_pii_check()
     check_keywords()
+    diff_coverage()
