@@ -52,7 +52,7 @@ class PhoneNumberSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint
 
     def to_internal_value(self, data):
         """Remove all non numeric characters in phone number"""
-        return re.sub("[^0-9]", "", data) or None
+        return re.sub(r'(?!^)\+|[^0-9+]', "", data) or None
 
 
 class LanguageProficiencySerializer(serializers.ModelSerializer):
