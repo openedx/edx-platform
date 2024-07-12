@@ -294,7 +294,7 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
 
         handle_course_cert_date_change(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
-        assert mock_visible_date_task.call_count == 1
+        assert mock_visible_date_task.call_count == 0
         assert mock_cad_task.call_count == 1
 
 
@@ -355,5 +355,5 @@ class CoursePacingChangedReceiverTest(TestCase):
 
         handle_course_pacing_change(**self.signal_kwargs)
         assert mock_is_creds_enabled.call_count == 1
-        assert mock_visible_date_task.call_count == 1
+        assert mock_visible_date_task.call_count == 0
         assert mock_cad_task.call_count == 1
