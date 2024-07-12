@@ -238,8 +238,8 @@ class CertRevokedReceiverTest(TestCase):
 
 
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update.delay')
 @mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
