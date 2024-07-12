@@ -21,6 +21,10 @@ from xblock.fields import Scope
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from openedx_events.content_authoring.data import LibraryBlockData
+from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED
+
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
     get_block_metadata,
@@ -253,6 +257,20 @@ class BlockFieldsView(APIView):
 
         # Save after the callback so any changes made in the callback will get persisted.
         block.save()
+
+        # Raise a signal to indicate the library block was updated
+        try:
+            library_block_key = LibraryUsageLocatorV2.from_string(usage_key_str)
+            LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(
+                    library_key=library_block_key.context_key,
+                    usage_key=library_block_key,
+                )
+            )
+
+        except InvalidKeyError:
+            # TODO raise XBLOCK_UPDATED if this API is ever used for course blocks.
+            pass
 
         return Response({
             "id": str(block.location),
