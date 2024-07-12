@@ -137,8 +137,6 @@ def handle_course_cert_date_change(sender, course_key, **kwargs):  # pylint: dis
     LOGGER.info(f"Handling COURSE_CERT_DATE_CHANGE for course {course_key}")
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
     from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
-    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
-    update_certificate_visible_date_on_course_update.delay(str(course_key))
     update_certificate_available_date_on_course_update.delay(str(course_key))
 
 
@@ -163,6 +161,4 @@ def handle_course_pacing_change(sender, updated_course_overview, **kwargs):  # p
     LOGGER.info(f"Handling COURSE_PACING_CHANGED for course {course_id}")
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
     from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
-    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
     update_certificate_available_date_on_course_update.delay(course_id)
-    update_certificate_visible_date_on_course_update.delay(course_id)
