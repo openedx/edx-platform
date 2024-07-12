@@ -1,39 +1,76 @@
 <%page args="section_data" expression_filter="h"/>
+<%!
+    import re
 
+    def strip_html_tags(description):
+        # Compile regex pattern to match HTML tags
+        clean = re.compile('<.*?>')
+        # Substitute HTML tags with an empty string
+        return re.sub(clean, '', description)
+%>
 <script>
         var current_course_id = "${section_data['course_id']}"
 </script>
 
 
         <div>
+        <!--            <input class="attendance_summary" onclick="attendance_summary_func()" type="button" value="Open Summary"/>  -->
 
-		<table class = "attendance-report" id = "attendance-report">
+                <table class = 'gradebook-report attendance-report' id = 'attendance-statistics' style = "display:none">
+                        <thead id="attendance_summary_thead">
+                                <th>Session Name</th>
+                                 <th>Date</th>
+                                <th>Time</th>
+                                <th>Present %</th>
+                        </thead>
+                        <tbody>
+                                %if 'session_records' in section_data['attendance_link'] and section_data['attendance_link']['session_records']:
+                                        %for i in section_data['attendance_link']['session_records']:
+                                                <tr>
+                                                        <td>${strip_html_tags(i['description']) | h}</td>
+                                                        <td>${i['sessdate']}</td>
+                                                        <td>${i['duration']}</td>
+                                                        <td>${i['session_percentage']}</td>
+                                                </tr>
+                                        %endfor
+                                %endif
+                        </tbody>
+                </table>
+
+                <table class = "attendance-report" id = 'attendance-report'>
                                 <thead>
-					<th>S.No</th>
+                                        <th>S.No</th>
                                         <th>Student ID</th>
+                                        <th>Name</th>
                                         <th>Email</th>
-					%if 'session_records' in section_data['attendance_link'] and section_data['attendance_link']['session_records']:                        
+                                        <th>Mandatory Session %</th>
+                                        <th>Optional Session %</th>
+                                        %if 'session_records' in section_data['attendance_link'] and section_data['attendance_link']['session_records']:
                                                 %for i in section_data['attendance_link']['session_records']:
                                                         <th>${i['description'] | n}</th>
                                                 %endfor
-					%endif
+                                        %endif
                                 </thead>
                                 <tbody>
-					<%
+                                        <%
                                             attendance_count = 1
                                         %>
-                                        % if 'user_info' in section_data['attendance_link']: 
+                                        % if 'user_info' in section_data['attendance_link']:
                                         %for i in section_data['attendance_link']['user_info']:
+                                                % if "@talentsprint.com" not in i["user_email"] and "@ts.com" not in i["user_email"]:
                                                 %if i['sessions']:
                                                         <%
                                                                 session_ids = [d['session_id'] for d in i['sessions'] if 'session_id' in d]
                                                         %>
-                                                        <tr>    
-								<td>${attendance_count}</td>
-								<% attendance_count = attendance_count + 1 %>
+                                                        <tr>
+                                                                <td>${attendance_count}</td>
+                                                                <% attendance_count = attendance_count + 1 %>
                                                                 <td>${i['user_firstname']}</td>
+                                                                <td>${i['user_fullname']}</td>
                                                                 <td>${i['user_email']}</td>
-                                                               
+                                                                <td>${i['mandatory_percentage']}</td>
+                                                                <td>${i['optional_percentage']}</td>
+
                                                                 %for session_index in range(0, len(section_data['attendance_link']['session_records'])):
                                                                                 <%
                                                                                 try:
@@ -47,15 +84,16 @@
                                                                                 %>
                                                                         <td>${session_name}</td>
                                                                 %endfor
-                                                              
-                                                        </tr>
-                        	                %endif
-                                	%endfor
-					%endif
-                		</tbody>
 
-           		</table>
-	
+                                                        </tr>
+                                                %endif
+                                                %endif
+                                        %endfor
+                                        %endif
+                                </tbody>
+
+                        </table>
+
         </div>
 
 <script>
@@ -67,40 +105,64 @@ function formatAttendanceReport() {
   });
 }
 $(document).ready(function() {
-	var course_id_name = current_course_id.replaceAll("+", "-")
+        var course_id_name = current_course_id.replaceAll("+", "-")
                 course_id_name = course_id_name.replaceAll(":", "-")
                 var attendance_file_name = "attendance_" +  Math.floor(new Date() / 1000)
 
-	$('table#attendance-report').DataTable({
+        $('table#attendance-report').DataTable({
                 'dom': 'Bfrtip',
-		'buttons': [{'extend': 'excel', 'text': '<i class="fa fa-download" aria-hidden="true"></i>', 'title': attendance_file_name}],
+                'buttons': [{'extend': 'excel', 'text': '<i class="fa fa-download" aria-hidden="true"></i>', 'title': attendance_file_name}],
                 'search' : false,
-		'pageLength' : 50,
+                'pageLength' : 50,
                 'lengthChange': false,
                 'info': false,
                 'paging': true,
                 'iDisplaylength': 25,
                 'aLengthMenu': [[25, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-		'language': { search: '', searchPlaceholder: "Search" },
-		'bDestroy' : true
+                'language': { search: '', searchPlaceholder: "Search" },
+                'bDestroy' : true
                 //'scrollX': true
         });
-	var intervalId_table = setInterval(function () {
-                        $('#attendance-report_wrapper .dataTable').wrap('<div class="wrapper_table"></div>');
+        var intervalId_table = setInterval(function () {
+    //                    $('#attendance-report_wrapper table').wrap('<div class="wrapper_table"></div>');
+      //      $('#attendance-statistics').prependTo('#attendance .wrapper_table');
+                $('#attendance-report_wrapper table').wrap('<div class="summary_div_attendance"><div class="wrapper_table"></div></div>');
+                $('#attendance-statistics').prependTo('#attendance .wrapper_table');
+                $('#attendance-statistics').wrap('<div class="summary-table-div-attendance"></div>');
+                $('.summary-table-div-attendance').prependTo('#attendance .summary_div_attendance');
                         clearInterval(intervalId_table);
-                }, 100);
-
-	$("input[type=search]").attr("placeholder", "Search"); //13-04-2022
+        }, 100);
+$('#attendance-report_wrapper .dt-buttons, #attendance-report_wrapper #attendance-report_filter').wrapAll('<div class="action_btn"></div>');
+        $("input[type=search]").attr("placeholder", "Search"); //13-04-2022
         $(".dataTables_filter label").contents().first()[0].textContent='';//13-04-2022
-        $(".dt-button").text("Download");
-        $(".dt-button").css("width","100px");
-	//email field in 2 lines
-		    formatAttendanceReport();
+        //email field in 2 lines
+                    formatAttendanceReport();
                    $('.paginate_button').on('click', function () {
                     formatAttendanceReport();
                     });
-		    $('.attendance-report th').on('click', function () {
+                    $('.attendance-report th').on('click', function () {
                     formatAttendanceReport();
-                    });
- });
+                     });
+               $("#attendance-report_wrapper .action_btn").prepend('<input class="attendance_summary" onclick="attendance_summary_func()" type="button" value="Summary">');
+        //if ($(window).width() < 768) {
+          // $('#attendance .attendance_summary, #attendance .dt-buttons').wrapAll('<div class="wrap_btn"></div>');
+           //}
+        });
+        var attendance_summary_toggle = 0;
+
+function attendance_summary_func() {
+    if (attendance_summary_toggle == 0) {
+        attendance_summary_toggle = 1;
+        $("#attendance-statistics").show();
+        $(".attendance_summary").val("Hide Summary");
+    } else {
+        attendance_summary_toggle = 0;
+        $("#attendance-statistics").hide();
+        $(".attendance_summary").val("Summary");
+    }
+}
+var tbl = document.getElementById('attendance-statistics');
+ if (tbl.rows.length == 1) {
+            tab_header = document.getElementById("attendance_summary_thead").innerHTML = "No data available";
+    }
 </script>
