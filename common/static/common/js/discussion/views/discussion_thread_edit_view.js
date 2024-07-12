@@ -1,6 +1,7 @@
 /* globals DiscussionTopicMenuView, DiscussionUtil */
 (function() {
     'use strict';
+
     if (Backbone) {
         this.DiscussionThreadEditView = Backbone.View.extend({
             tagName: 'form',

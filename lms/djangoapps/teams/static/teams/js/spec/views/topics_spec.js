@@ -3,6 +3,7 @@ define([
     'teams/js/spec_helpers/team_spec_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function(Backbone, _, TopicCollection, TopicsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
+
     describe('TopicsView', function() {
         var initialTopics, topicCollection, createTopicsView, triggerUpdateEvent;
 
@@ -55,7 +56,7 @@ define([
                 {
                     course_id: TeamSpecHelpers.testCourseID,
                     page: '1',
-                    page_size: '5',  // currently the page size is determined by the size of the collection
+                    page_size: '5', // currently the page size is determined by the size of the collection
                     order_by: 'name',
                     text_search: ''
                 }
@@ -74,7 +75,7 @@ define([
                 {
                     course_id: TeamSpecHelpers.testCourseID,
                     page: '1',
-                    page_size: '5',  // currently the page size is determined by the size of the collection
+                    page_size: '5', // currently the page size is determined by the size of the collection
                     order_by: 'name',
                     text_search: ''
                 }

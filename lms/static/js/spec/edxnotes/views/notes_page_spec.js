@@ -4,6 +4,7 @@ define([
     'js/edxnotes/views/page_factory'
 ], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory) {
     'use strict';
+
     describe('EdxNotes NotesPage', function() {
         var notes = Helpers.getDefaultNotes();
 

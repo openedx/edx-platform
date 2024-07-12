@@ -23,6 +23,7 @@ class CourseEntitlementView extends Backbone.View {
                 'click .popover-dismiss': 'hideDialog',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -51,17 +52,24 @@ class CourseEntitlementView extends Backbone.View {
 
         // Grab elements from the parent card that work with this view
         this.$parentEl = options.$parentEl; // Containing course card (must be a backbone view root el)
+        // eslint-disable-next-line no-undef
         this.$enterCourseBtn = $(options.enterCourseBtn); // Button link to course home page
+        // eslint-disable-next-line no-undef
         this.$courseCardMessages = $(options.courseCardMessages); // Additional session messages
+        // eslint-disable-next-line no-undef
         this.$courseTitleLink = $(options.courseTitleLink); // Title link to course home page
+        // eslint-disable-next-line no-undef
         this.$courseImageLink = $(options.courseImageLink); // Image link to course home page
+        // eslint-disable-next-line no-undef
         this.$policyMsg = $(options.policyMsg); // Message for policy information
 
         // Bind action elements with associated events to objects outside this view
-        this.$dateDisplayField = this.$parentEl ? this.$parentEl.find(options.dateDisplayField) :
-            $(options.dateDisplayField); // Displays current session dates
-        this.$triggerOpenBtn = this.$parentEl ? this.$parentEl.find(options.triggerOpenBtn) :
-            $(options.triggerOpenBtn); // Opens/closes session selection view
+        this.$dateDisplayField = this.$parentEl ? this.$parentEl.find(options.dateDisplayField)
+            // eslint-disable-next-line no-undef
+            : $(options.dateDisplayField); // Displays current session dates
+        this.$triggerOpenBtn = this.$parentEl ? this.$parentEl.find(options.triggerOpenBtn)
+            // eslint-disable-next-line no-undef
+            : $(options.triggerOpenBtn); // Opens/closes session selection view
         this.$triggerOpenBtn.on('click', this.toggleSessionSelectionPanel.bind(this));
 
         this.render(options);
@@ -77,14 +85,17 @@ class CourseEntitlementView extends Backbone.View {
 
     postRender() {
     // Close any visible popovers on click-away
+        // eslint-disable-next-line no-undef
         $(document).on('click', (e) => {
-            if (this.$('.popover:visible').length &&
-          !($(e.target).closest('.enroll-btn-initial, .popover').length)) {
+            if (this.$('.popover:visible').length
+          // eslint-disable-next-line no-undef
+          && !($(e.target).closest('.enroll-btn-initial, .popover').length)) {
                 this.hideDialog(this.$('.enroll-btn-initial'));
             }
         });
 
         // Initialize focus to cancel button on popover load
+        // eslint-disable-next-line no-undef
         $(document).on('shown.bs.popover', () => {
             this.$('.final-confirmation-btn:first').focus();
         });
@@ -97,7 +108,7 @@ class CourseEntitlementView extends Backbone.View {
     */
         // Do not allow for enrollment when button is disabled
         const prevSession = this.entitlementModel.get('currentSessionId');
-        if (this.$('.enroll-btn-initial').hasClass('disabled')) return;
+        if (this.$('.enroll-btn-initial').hasClass('disabled')) { return; }
 
         // Grab the id for the desired session, a leave session event will return null
         this.currentSessionSelection = this.$('.session-select')
@@ -105,10 +116,12 @@ class CourseEntitlementView extends Backbone.View {
         const isLeavingSession = !this.currentSessionSelection;
 
         // Display the indicator icon
-        HtmlUtils.setHtml(this.$dateDisplayField,
+        HtmlUtils.setHtml(
+            this.$dateDisplayField,
             HtmlUtils.HTML('<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>'),
         );
 
+        // eslint-disable-next-line no-undef
         $.ajax({
             type: isLeavingSession ? 'DELETE' : 'POST',
             url: this.enrollUrl,
@@ -141,8 +154,8 @@ class CourseEntitlementView extends Backbone.View {
         this.trackSessionChange(eventPage, eventAction, prevSession);
 
         // With a containing backbone view, we can simply re-render the parent card
-        if (this.$parentEl &&
-        this.courseCardModel.get('course_run_key') !== this.currentSessionSelection) {
+        if (this.$parentEl
+        && this.courseCardModel.get('course_run_key') !== this.currentSessionSelection) {
             this.courseCardModel.updateCourseRun(this.currentSessionSelection);
             return;
         }
@@ -154,7 +167,8 @@ class CourseEntitlementView extends Backbone.View {
         this.$triggerOpenBtn.removeClass('hidden');
 
         // Display a success indicator
-        HtmlUtils.setHtml(this.$dateDisplayField,
+        HtmlUtils.setHtml(
+            this.$dateDisplayField,
             HtmlUtils.joinHtml(
                 HtmlUtils.HTML(successIconEl),
                 this.getAvailableSessionWithId(newSession).session_dates,
@@ -303,11 +317,11 @@ class CourseEntitlementView extends Backbone.View {
 
         // Update the button popover text to enable two step authentication.
         if (newSessionId) {
-            confirmationMsgTitle = !currentSessionId ?
-                gettext('Are you sure you want to select this session?') :
-                gettext('Are you sure you want to change to a different session?');
-            confirmationMsgBody = !currentSessionId ? '' :
-                gettext('Any course progress or grades from your current session will be lost.');
+            confirmationMsgTitle = !currentSessionId
+                ? gettext('Are you sure you want to select this session?')
+                : gettext('Are you sure you want to change to a different session?');
+            confirmationMsgBody = !currentSessionId ? ''
+                : gettext('Any course progress or grades from your current session will be lost.');
         } else {
             confirmationMsgTitle = gettext('Are you sure that you want to leave this session?');
             confirmationMsgBody = gettext('Any course progress or grades from your current session will be lost.'); // eslint-disable-line max-len
@@ -328,6 +342,7 @@ class CourseEntitlementView extends Backbone.View {
 
     removeDialog(el) {
     /* Removes the Bootstrap v4 dialog modal from the update session enrollment button. */
+        // eslint-disable-next-line no-undef
         const $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
         if (this.$('popover').length) {
             $el.popover('dispose');
@@ -336,6 +351,7 @@ class CourseEntitlementView extends Backbone.View {
 
     hideDialog(el, returnFocus) {
     /* Hides the modal if it is visible without removing it from the DOM. */
+        // eslint-disable-next-line no-undef
         const $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
         if (this.$('.popover:visible').length) {
             $el.popover('hide');
@@ -348,14 +364,16 @@ class CourseEntitlementView extends Backbone.View {
     handleVerificationPopoverA11y(e) {
     /* Ensure that the second step verification popover is treated as an a11y compliant dialog */
         let $nextButton;
+        // eslint-disable-next-line no-undef
         const $verificationOption = $(e.target);
+        // eslint-disable-next-line no-undef
         const openButton = $(e.target).closest('.course-entitlement-selection-container')
             .find('.enroll-btn-initial');
         if (e.key === 'Tab') {
             e.preventDefault();
-            $nextButton = $verificationOption.is(':first-child') ?
-                $verificationOption.next('.final-confirmation-btn') :
-                $verificationOption.prev('.final-confirmation-btn');
+            $nextButton = $verificationOption.is(':first-child')
+                ? $verificationOption.next('.final-confirmation-btn')
+                : $verificationOption.prev('.final-confirmation-btn');
             $nextButton.focus();
         } else if (e.key === 'Escape') {
             this.hideDialog(openButton);
@@ -383,8 +401,8 @@ class CourseEntitlementView extends Backbone.View {
     */
         // Set the date format string to the user's selected language
         moment.locale(document.documentElement.lang);
-        const dateFormat = moment.localeData().longDateFormat('L').indexOf('DD') >
-      moment.localeData().longDateFormat('L').indexOf('MM') ? 'MMMM D, YYYY' : 'D MMMM, YYYY';
+        const dateFormat = moment.localeData().longDateFormat('L').indexOf('DD')
+      > moment.localeData().longDateFormat('L').indexOf('MM') ? 'MMMM D, YYYY' : 'D MMMM, YYYY';
 
         sessionData.forEach((session) => {
             Object.assign(session, {

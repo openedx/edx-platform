@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'utility',
@@ -75,7 +76,8 @@
                 this.platformName = options.platform_name;
                 this.supportURL = options.support_link;
                 this.passwordResetSupportUrl = options.password_reset_support_link;
-                this.createAccountOption = options.account_creation_allowed;
+                this.createAccountOption = options.account_creation_allowed && options.register_links_allowed;
+                this.showRegisterLinks = options.register_links_allowed;
                 this.hideAuthWarnings = options.hide_auth_warnings || false;
                 this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
                 this.enterpriseName = options.enterprise_name || '';
@@ -116,7 +118,7 @@
                             mode: this.activeForm
                         })
                     )
-                )
+                );
                 this.postRender();
 
                 return this;
@@ -146,8 +148,8 @@
                         method: data.method,
                         url: data.submit_url
                     });
-                    var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl ?
-                        this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
+                    var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl
+                        ? this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
 
                     this.subview.login = new LoginView({
                         fields: data.fields,
@@ -161,6 +163,7 @@
                         supportURL: this.supportURL,
                         passwordResetSupportUrl: this.passwordResetSupportUrl,
                         createAccountOption: this.createAccountOption,
+                        showRegisterLinks: this.showRegisterLinks,
                         hideAuthWarnings: this.hideAuthWarnings,
                         pipelineUserDetails: this.pipelineUserDetails,
                         enterpriseName: this.enterpriseName,
@@ -186,7 +189,8 @@
 
                     this.subview.passwordHelp = new PasswordResetView({
                         fields: data.fields,
-                        model: this.resetModel
+                        model: this.resetModel,
+                        showRegisterLinks: this.showRegisterLinks
                     });
 
                     // Listen for 'password-email-sent' event to toggle sub-views
@@ -211,6 +215,7 @@
                         hideAuthWarnings: this.hideAuthWarnings,
                         is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
                         enableCoppaCompliance: this.enable_coppa_compliance,
+                        showRegisterLinks: this.showRegisterLinks
                     });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
@@ -271,7 +276,6 @@
 
                 // Load the form. Institution login is always refreshed since it changes based on the previous form.
                 if (!this.form.isLoaded($form) || type == 'institution_login') {
-
                     // We need a special case for loading reset form as there is mismatch of form id
                     // value ie 'password-reset' vs load function name ie 'reset'
                     if (type === 'password-reset') {

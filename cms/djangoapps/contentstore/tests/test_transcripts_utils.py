@@ -464,14 +464,16 @@ class TestYoutubeTranscripts(unittest.TestCase):
         setup_caption_responses(mock_get, 'en', 'test', track_status_code)
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
-            transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+            link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
+            transcripts_utils.get_transcript_from_youtube(link, youtube_id, translation)
 
     @patch('xmodule.video_block.transcripts_utils.requests.get')
     def test_youtube_empty_text(self, mock_get):
         setup_caption_responses(mock_get, 'en', '')
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
-            transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+            link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
+            transcripts_utils.get_transcript_from_youtube(link, youtube_id, translation)
 
     def test_youtube_good_result(self):
         caption_response_string = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
@@ -491,7 +493,8 @@ class TestYoutubeTranscripts(unittest.TestCase):
         language_code = 'en'
         with patch('xmodule.video_block.transcripts_utils.requests.get') as mock_get:
             setup_caption_responses(mock_get, language_code, caption_response_string)
-            transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+            link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
+            transcripts = transcripts_utils.get_transcript_from_youtube(link['en'], youtube_id, translation)
 
         self.assertEqual(transcripts, expected_transcripts)
         self.assertEqual(2, len(mock_get.mock_calls))

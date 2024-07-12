@@ -2,8 +2,6 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "files" %></%def>
 <%!
-  import six
-
   from cms.djangoapps.contentstore import utils
   from cms.djangoapps.contentstore.config.waffle_utils import should_show_checklists_quality
   from django.urls import reverse
@@ -40,7 +38,7 @@
         <%static:studiofrontend entry="courseHealthCheck">
 
             <%
-                course_key = six.text_type(context_course.id)
+                course_key = str(context_course.id)
                 certificates_url = ''
                 if has_certificates_enabled(context_course):
                     certificates_url = utils.reverse_course_url('certificates_list_handler', course_key)
@@ -51,7 +49,7 @@
                     "id": "${context_course.id | n, js_escaped_string}",
                     "name": "${context_course.display_name_with_default | n, js_escaped_string}",
                     "is_course_self_paced": ${context_course.self_paced | n, dump_js_escaped_json},
-                    "url_name": "${context_course.location.name | n, js_escaped_string}",
+                    "url_name": "${context_course.location.block_id | n, js_escaped_string}",
                     "org": "${context_course.location.org | n, js_escaped_string}",
                     "num": "${context_course.location.course | n, js_escaped_string}",
                     "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",

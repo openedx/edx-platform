@@ -140,15 +140,15 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                         keys_to_check.extend(children)
         return new_keys
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, asides=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
-        old_descriptor_locn = descriptor.location
-        descriptor.location = self._map_revision_to_branch(old_descriptor_locn)
-        emit_signals = descriptor.location.branch == ModuleStoreEnum.BranchName.published \
-            or descriptor.location.block_type in DIRECT_ONLY_CATEGORIES
+    def update_item(self, block, user_id, allow_not_found=False, force=False, asides=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        old_block_locn = block.location
+        block.location = self._map_revision_to_branch(old_block_locn)
+        emit_signals = block.location.branch == ModuleStoreEnum.BranchName.published \
+            or block.location.block_type in DIRECT_ONLY_CATEGORIES
 
-        with self.bulk_operations(descriptor.location.course_key, emit_signals=emit_signals):
+        with self.bulk_operations(block.location.course_key, emit_signals=emit_signals):
             item = super().update_item(
-                descriptor,
+                block,
                 user_id,
                 allow_not_found=allow_not_found,
                 force=force,
@@ -156,7 +156,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 **kwargs
             )
             self._auto_publish_no_children(item.location, item.location.block_type, user_id, **kwargs)
-            descriptor.location = old_descriptor_locn
+            block.location = old_block_locn
             return item
 
     def create_item(self, user_id, course_key, block_type, block_id=None,     # pylint: disable=W0221

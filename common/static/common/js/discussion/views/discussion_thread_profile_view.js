@@ -1,6 +1,7 @@
 /* globals DiscussionUtil, MathJax */
 (function() {
     'use strict';
+
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {

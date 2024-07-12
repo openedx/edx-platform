@@ -161,7 +161,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         if self.current_user != username:
             self.logout()
             user_email = User.objects.get(username=username).email
-            self.login(user_email, "test")
+            self.login(user_email, self.TEST_PASSWORD)
             self.current_user = username
 
     def _create_user(self, username, email=None, is_staff=False, mode='honor', enrollment_active=True):
@@ -254,12 +254,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
             self.module_store.update_item(item, self.user.id)
             self.module_store.publish(location, self.user.id)
 
-    def get_student_module(self, username, descriptor):
-        """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""
+    def get_student_module(self, username, block):
+        """Get StudentModule object for test course, given the `username` and the problem's `block`."""
         return StudentModule.objects.get(course_id=self.course.id,
                                          student=User.objects.get(username=username),
-                                         module_type=descriptor.location.block_type,
-                                         module_state_key=descriptor.location,
+                                         module_type=block.location.block_type,
+                                         module_state_key=block.location,
                                          )
 
     def submit_student_answer(self, username, problem_url_name, responses):

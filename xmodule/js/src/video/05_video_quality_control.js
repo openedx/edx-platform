@@ -1,6 +1,8 @@
 (function(requirejs, require, define) {
 // VideoQualityControl module.
+
     'use strict';
+
     define(
         'video/05_video_quality_control.js',
         ['edx-ui-toolkit/js/utils/html-utils'],
@@ -80,6 +82,7 @@
             //     make the created DOM elements available via the 'state' object. Much easier to work this
             //     way - you don't have to do repeated jQuery element selects.
             function _renderElements(state) {
+                // eslint-disable-next-line no-multi-assign
                 var element = state.videoQualityControl.el = $(template.toString());
                 state.videoQualityControl.quality = 'large';
                 HtmlUtils.append(state.el.find('.secondary-controls'), HtmlUtils.HTML(element));

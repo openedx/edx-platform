@@ -88,7 +88,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         super().setUp()
 
         self.test_user = self.create_user()
-        self.login(self.test_user.email, 'test')
+        self.login(self.test_user.email, self.TEST_PASSWORD)
         self.enroll(self.course, True)
 
     def get_courseware_page(self):
@@ -298,12 +298,12 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
     def login_staff(self):
         """ Login as a staff user """
         self.logout()
-        self.login(self.test_user.email, 'test')
+        self.login(self.test_user.email, self.TEST_PASSWORD)
 
     def login_student(self):
         """ Login as a student """
         self.logout()
-        self.login(self.student_user.email, 'test')
+        self.login(self.student_user.email, self.TEST_PASSWORD)
 
     def submit_answer(self, response1, response2):
         """
@@ -351,7 +351,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         student = UserFactory.create(username=username)
         CourseEnrollment.enroll(student, self.course.id)
         self.logout()
-        self.login(student.email, 'test')
+        self.login(student.email, self.TEST_PASSWORD)
         # Answer correctly as the student, and check progress.
         self.submit_answer('Correct', 'Correct')
         assert self.get_progress_detail() == '2/2'
@@ -378,7 +378,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
         # Verify the student state did not change.
         self.logout()
-        self.login(student.email, 'test')
+        self.login(student.email, self.TEST_PASSWORD)
         assert self.get_progress_detail() == '2/2'
 
     def test_masquerading_with_language_preference(self):

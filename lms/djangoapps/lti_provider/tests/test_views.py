@@ -5,6 +5,7 @@ Tests for the LTI provider views
 
 from unittest.mock import MagicMock, patch
 
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -58,7 +59,7 @@ def build_launch_request(extra_post_data=None, param_to_delete=None):
         del post_data[param_to_delete]
     request = RequestFactory().post('/', data=post_data)
     request.user = UserFactory.create()
-    request.session = {}
+    request.session = MagicMock()
     return request
 
 
@@ -81,6 +82,14 @@ class LtiTestMixin:
             consumer_secret='secret'
         )
         self.consumer.save()
+
+        self.auto_link_consumer = models.LtiConsumer(
+            consumer_name='auto-link-consumer',
+            consumer_key='consumer_key_2',
+            consumer_secret='secret_2',
+            require_user_account=True
+        )
+        self.auto_link_consumer.save()
 
 
 class LtiLaunchTest(LtiTestMixin, TestCase):
@@ -111,6 +120,18 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             request.user,
             self.consumer
         )
+
+    @patch('lms.djangoapps.courseware.views.views.render_xblock')
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
+    def test_render_xblock_params(self, _authenticate, render):
+        """
+        Verifies that the LTI renders an XBlock without:
+        1. Checking the enrollment.
+        2. Displaying staff debug info.
+        """
+        request = build_launch_request()
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
+        render.assert_called_with(request, str(USAGE_KEY), check_if_enrolled=False, disable_staff_debug_info=True)
 
     @patch('lms.djangoapps.lti_provider.views.render_courseware')
     @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters')
@@ -176,6 +197,36 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
         )
         assert consumer.instance_guid == 'consumer instance guid'
+
+    @patch('lms.djangoapps.lti_provider.views.render_to_response')
+    def test_unauthenticated_user_shown_error_when_require_user_account_is_enabled(self, render_error):
+        """
+        Verify that an error page is shown instead of LTI Content for an unauthenticated user,
+        when the `require_user_account` flag is enabled for the LTI Consumer.
+        """
+        request = build_launch_request({'oauth_consumer_key': 'consumer_key_2'})
+        request.user = AnonymousUser()
+
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
+
+        render_error.assert_called()
+        assert render_error.call_args[0][0] == "lti_provider/user-auth-error.html"
+
+    @patch('lms.djangoapps.lti_provider.views.render_to_response')
+    def test_auth_error_shown_when_lis_email_is_different_from_user_email(self, render_error):
+        """
+        When the `require_user_account` flag is enabled for the LTI Consumer, verify that
+        an error page is shown instead of LTI Content if the authenticated user's email
+        doesn't match the `lis_person_contact_email_primary` value from LTI Launch.
+        """
+        # lis email different from logged in user
+        request = build_launch_request({
+            'oauth_consumer_key': 'consumer_key_2',
+            'lis_person_contact_email_primary': 'random_email@test.com'
+        })
+
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
+        render_error.assert_called()
 
 
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):

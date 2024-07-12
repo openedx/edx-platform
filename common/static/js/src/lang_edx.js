@@ -1,5 +1,6 @@
 var Language = (function() {
     'use strict';
+
     var $settings_language_selector,
         self = null;
     return {
@@ -64,5 +65,6 @@ var Language = (function() {
 }());
 $(document).ready(function() {
     'use strict';
+
     Language.init();
 });

@@ -12,7 +12,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
 from django.test.client import Client, RequestFactory
 from django.urls import reverse
-from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_KEY
@@ -38,8 +37,8 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
     def setUp(self):
         super().setUp()
-        self.middleware = LanguagePreferenceMiddleware()
-        self.session_middleware = SessionMiddleware()
+        self.middleware = LanguagePreferenceMiddleware(get_response=lambda request: None)
+        self.session_middleware = SessionMiddleware(get_response=lambda request: None)
         self.user = UserFactory.create()
         self.anonymous_user = AnonymousUserFactory()
         self.request = RequestFactory().get('/somewhere')
@@ -88,8 +87,6 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
                 domain=settings.SESSION_COOKIE_DOMAIN,
             )
 
-        assert LANGUAGE_SESSION_KEY not in self.request.session
-
     @ddt.data(*itertools.product(
         (None, 'eo', 'es'),  # LANGUAGE_COOKIE_NAME
         (None, 'es', 'en'),  # Language Preference In
@@ -115,32 +112,26 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         (logged_in, ) + test_def
         for logged_in in (True, False)
         for test_def in [
-            # (LANGUAGE_COOKIE_NAME, LANGUAGE_SESSION_KEY, Accept-Language In,
-            #  Accept-Language Out, Session Lang Out)
-            (None, None, None, None, None),
-            (None, 'eo', None, None, 'eo'),
-            (None, 'en', None, None, 'en'),
-            (None, 'eo', 'en', 'en', 'eo'),
-            (None, None, 'en', 'en', None),
-            ('en', None, None, 'en', None),
-            ('en', 'en', None, 'en', 'en'),
-            ('en', None, 'eo', 'en;q=1.0,eo', None),
-            ('en', None, 'en', 'en', None),
-            ('en', 'eo', 'en', 'en', None),
-            ('en', 'eo', 'eo', 'en;q=1.0,eo', None)
+            # (LANGUAGE_COOKIE_NAME, Accept-Language In, Accept-Language Out)
+            (None, None, None),
+            (None, None, None),
+            (None, None, None),
+            (None, 'en', 'en'),
+            (None, 'en', 'en'),
+            ('en', None, 'en'),
+            ('en', None, 'en'),
+            ('en', 'eo', 'en;q=1.0,eo'),
+            ('en', 'en', 'en'),
+            ('en', 'en', 'en'),
+            ('en', 'eo', 'en;q=1.0,eo')
         ]
     ))
     @ddt.unpack
-    def test_preference_cookie_overrides_browser(
-            self, logged_in, lang_cookie, lang_session_in, accept_lang_in, accept_lang_out,
-            lang_session_out,
-    ):
+    def test_preference_cookie_overrides_browser(self, logged_in, lang_cookie, accept_lang_in, accept_lang_out):
         if not logged_in:
             self.request.user = self.anonymous_user
         if lang_cookie:
             self.request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = lang_cookie
-        if lang_session_in:
-            self.request.session[LANGUAGE_SESSION_KEY] = lang_session_in
         if accept_lang_in:
             self.request.META['HTTP_ACCEPT_LANGUAGE'] = accept_lang_in
         else:
@@ -159,8 +150,6 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
             self.assertCountEqual(accept_lang_result, accept_lang_out)
         else:
             assert accept_lang_result == accept_lang_out
-
-        assert self.request.session.get(LANGUAGE_SESSION_KEY) == lang_session_out
 
     @ddt.data(None, 'es', 'en')
     def test_logout_preserves_cookie(self, lang_cookie):
@@ -293,10 +282,6 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         assert get_user_preference(self.user, LANGUAGE_KEY) == user_preference
         assert response['Content-Language'] == 'eo'
-        # `LocaleMiddleware` no longer looks for language in the session since Django 3.2. It checks the cookie instead.
-        # See: https://docs.djangoproject.com/en/3.2/releases/3.0/#miscellaneous
-        assert self.client.session.get(LANGUAGE_SESSION_KEY) is None
-
         # Clean up by making a request to a Site without specific configuration.
         with with_site_configuration_context():
             self.client.get('/')

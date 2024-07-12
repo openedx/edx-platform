@@ -3,7 +3,6 @@ define(['underscore'], function(_) {
 
     var USER_ACCOUNTS_API_URL = '/api/user/v0/accounts/student';
     var USER_PREFERENCES_API_URL = '/api/user/v0/preferences/student';
-    var BADGES_API_URL = '/api/badges/v1/assertions/user/student/';
     var IMAGE_UPLOAD_API_URL = '/api/profile_images/v0/staff/upload';
     var IMAGE_REMOVE_API_URL = '/api/profile_images/v0/staff/remove';
     var FIND_COURSES_URL = '/courses';
@@ -36,21 +35,29 @@ define(['underscore'], function(_) {
     var FIELDS_DATA = {
         country: {
             options: FIELD_OPTIONS
-        }, gender: {
+        },
+        gender: {
             options: FIELD_OPTIONS
-        }, language: {
+        },
+        language: {
             options: FIELD_OPTIONS
-        }, beta_language: {
+        },
+        beta_language: {
             options: []
-        }, level_of_education: {
+        },
+        level_of_education: {
             options: FIELD_OPTIONS
-        }, password: {
+        },
+        password: {
             url: '/password_reset'
-        }, year_of_birth: {
+        },
+        year_of_birth: {
             options: FIELD_OPTIONS
-        }, preferred_language: {
+        },
+        preferred_language: {
             options: FIELD_OPTIONS
-        }, time_zone: {
+        },
+        time_zone: {
             options: FIELD_OPTIONS
         }
     };
@@ -99,7 +106,7 @@ define(['underscore'], function(_) {
         email: 'student@edx.org',
         level_of_education: null,
         gender: null,
-        year_of_birth: '3',    // Note: test birth year range is a string from 0-3
+        year_of_birth: '3', // Note: test birth year range is a string from 0-3
         requires_parental_consent: false,
         country: '1',
         language: 'en-US',
@@ -108,7 +115,6 @@ define(['underscore'], function(_) {
         social_links: [{platform: 'facebook', social_link: 'https://www.facebook.com/edX'}],
         language_proficiencies: [{code: '1'}],
         profile_image: PROFILE_IMAGE,
-        accomplishments_shared: false
     };
     var DEFAULT_USER_PREFERENCES_DATA = {
         'pref-lang': '2',
@@ -215,7 +221,6 @@ define(['underscore'], function(_) {
     return {
         USER_ACCOUNTS_API_URL: USER_ACCOUNTS_API_URL,
         USER_PREFERENCES_API_URL: USER_PREFERENCES_API_URL,
-        BADGES_API_URL: BADGES_API_URL,
         FIND_COURSES_URL: FIND_COURSES_URL,
         IMAGE_UPLOAD_API_URL: IMAGE_UPLOAD_API_URL,
         IMAGE_REMOVE_API_URL: IMAGE_REMOVE_API_URL,

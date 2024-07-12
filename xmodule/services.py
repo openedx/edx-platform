@@ -147,9 +147,8 @@ class RebindUserService(Service):
     """
     An XBlock Service that allows modules to get rebound to real users if it was previously bound to an AnonymousUser.
 
-    This used to be a local function inside the `lms.djangoapps.courseware.block_render.get_module_system_for_user`
-    method, and was passed as a constructor argument to x_module.ModuleSystem. This has been refactored out into a
-    service to simplify the ModuleSystem and lives in this module temporarily.
+    This used to be a local function inside the `lms.djangoapps.courseware.block_render.prepare_runtime_for_user`
+    method. This has been refactored out into a service and lives in this module temporarily.
 
     TODO: Only the old LTI XBlock uses it in 2 places for LTI 2.0 integration. As the LTI XBlock is deprecated in
     favour of the LTI Consumer XBlock, this should be removed when the LTI XBlock is removed.
@@ -158,19 +157,13 @@ class RebindUserService(Service):
         user (User) - A Django User object
         course_id (str) - Course ID
         course (Course) - Course Object
-        get_module_system_for_user (function) - The helper function that will be called to create a module system
-            for a specfic user. This is the parent function from which this service was reactored out.
-            `lms.djangoapps.courseware.block_render.get_module_system_for_user`
-        kwargs (dict) - all the keyword arguments that need to be passed to the `get_module_system_for_user`
+        kwargs (dict) - all the keyword arguments that need to be passed to the `prepare_runtime_for_user`
             function when it is called during rebinding
     """
-    def __init__(self, user, course_id, get_module_system_for_user, **kwargs):
+    def __init__(self, user, course_id, **kwargs):
         super().__init__(**kwargs)
         self.user = user
         self.course_id = course_id
-        self._ref = {
-            "get_module_system_for_user": get_module_system_for_user
-        }
         self._kwargs = kwargs
 
     def rebind_noauth_module_to_user(self, block, real_user):
@@ -191,7 +184,7 @@ class RebindUserService(Service):
             log.error(err_msg)
             raise RebindUserServiceError(err_msg)
 
-        field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache_real_user = FieldDataCache.cache_for_block_descendents(
             self.course_id,
             real_user,
             block,
@@ -202,37 +195,32 @@ class RebindUserService(Service):
         with modulestore().bulk_operations(self.course_id):
             course = modulestore().get_course(course_key=self.course_id)
 
-        (inner_system, inner_student_data) = self._ref["get_module_system_for_user"](
+        from lms.djangoapps.courseware.block_render import prepare_runtime_for_user
+        prepare_runtime_for_user(
             user=real_user,
             student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
-            descriptor=block,
+            runtime=block.runtime,
             course_id=self.course_id,
             course=course,
             **self._kwargs
         )
 
         block.bind_for_student(
-            inner_system,
             real_user.id,
             [
                 partial(DateLookupFieldData, course_id=self.course_id, user=self.user),
                 partial(OverrideFieldData.wrap, real_user, course),
-                partial(LmsFieldData, student_data=inner_student_data),
+                partial(LmsFieldData, student_data=student_data_real_user),
             ],
         )
-
-        block.scope_ids = block.scope_ids._replace(user_id=real_user.id)
-        # now bind the module to the new ModuleSystem instance and vice-versa
-        block.runtime = inner_system
-        inner_system.xmodule_instance = block
 
 
 class EventPublishingService(Service):
     """
     An XBlock Service that allows XModules to publish events (e.g. grading, completion).
 
-    We have separated it from the ModuleSystem to be able to alter its behavior when using a different context:
-    LMS, Studio, or Instructor tasks.
+    We have implemented it as a seperate service to be able to alter its behavior when using
+    a different context: LMS, Studio, or Instructor tasks.
     """
     def __init__(self, user, course_id, track_function, **kwargs):
         super().__init__(**kwargs)

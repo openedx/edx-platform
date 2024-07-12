@@ -5,14 +5,14 @@ import logging
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from django.core.exceptions import ObjectDoesNotExist
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from xblock.completable import XBlockCompletionMode
-from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.student.models import get_user_by_username_or_email
-from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+from lms.djangoapps.courseware.model_data import FieldDataCache
 from openedx.core.lib.request_utils import get_request_or_stub
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -45,7 +45,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
     try:
         user = get_user_by_username_or_email(user_identifier)
         block_key = UsageKey.from_string(content_id)
-        root_descriptor = modulestore().get_item(block_key)
+        root_block = modulestore().get_item(block_key)
     except ObjectDoesNotExist:
         err_msg = err_msg_prefix + 'User does not exist!'
     except InvalidKeyError:
@@ -66,13 +66,13 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
     request = get_request_or_stub()
     request.user = user
 
-    # Now evil modulestore magic to inflate our descriptor with user state and
+    # Now evil modulestore magic to inflate our block with user state and
     # permissions checks.
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        root_descriptor.scope_ids.usage_id.context_key, user, root_descriptor, read_only=True,
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
+        root_block.scope_ids.usage_id.context_key, user, root_block, read_only=True,
     )
     root_block = get_block_for_descriptor(
-        user, request, root_descriptor, field_data_cache, root_descriptor.scope_ids.usage_id.context_key,
+        user, request, root_block, field_data_cache, root_block.scope_ids.usage_id.context_key,
     )
     if not root_block:
         err_msg = err_msg_prefix + 'Block unable to be created from descriptor!'
@@ -89,11 +89,11 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
         elif mode == XBlockCompletionMode.AGGREGATOR:
             # I know this looks weird, but at the time of writing at least, there isn't a good
             # single way to get the children assigned for a partcular user. Some blocks define the
-            # child descriptors method, but others don't and with blocks like Randomized Content
+            # child blocks method, but others don't and with blocks like Randomized Content
             # (Library Content), the get_children method returns all children and not just assigned
             # children. So this is our way around situations like that. See also Split Test Block
-            # for another use case where user state has to be taken into account via get_child_descriptors
-            block_children = ((hasattr(block, 'get_child_descriptors') and block.get_child_descriptors())
+            # for another use case where user state has to be taken into account via get_child_blocks
+            block_children = ((hasattr(block, 'get_child_blocks') and block.get_child_blocks())
                               or (hasattr(block, 'get_children') and block.get_children())
                               or [])
             for child in block_children:

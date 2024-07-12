@@ -43,9 +43,9 @@ define(
         };
 
         var breadcrumbTrail = function(path, unitDisplayName) {
-            return _.pluck(path, 'display_name').
-                concat([unitDisplayName]).
-                join(' <span class="icon fa fa-caret-right" aria-hidden="true"></span><span class="sr">-</span> ');
+            return _.pluck(path, 'display_name')
+                .concat([unitDisplayName])
+                .join(' <span class="icon fa fa-caret-right" aria-hidden="true"></span><span class="sr">-</span> ');
         };
 
         var verifyBookmarkedData = function(view, expectedData) {

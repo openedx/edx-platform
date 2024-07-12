@@ -23,8 +23,10 @@
  * - The specified 'nextUrl' if safe, or
  * - The dashboard
  */
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -66,7 +68,7 @@
                 this.purchaseWorkflow = queryParams.purchaseWorkflow;
                 if (queryParams.next) {
                     // Ensure that the next URL is internal for security reasons
-                    if (! window.isExternal(queryParams.next)) {
+                    if (!window.isExternal(queryParams.next)) {
                         this.nextUrl = queryParams.next;
                     }
                 }

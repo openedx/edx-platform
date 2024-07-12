@@ -20,12 +20,12 @@ from social_django.models import Partial, UserSocialAuth
 from testfixtures import LogCapture
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
     AUTHN_EMAIL_CONFLICT_MSG,
     AUTHN_EMAIL_INVALID_MSG,
+    AUTHN_PASSWORD_COMPROMISED_MSG,
     AUTHN_USERNAME_CONFLICT_MSG,
     EMAIL_BAD_LENGTH_MSG,
     EMAIL_MAX_LENGTH,
@@ -49,7 +49,6 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
 from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILURE_LOGGING_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
@@ -66,6 +65,8 @@ from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions
 )
+ENABLE_AUTO_GENERATED_USERNAME = settings.FEATURES.copy()
+ENABLE_AUTO_GENERATED_USERNAME['ENABLE_AUTO_GENERATED_USERNAME'] = True
 
 
 @ddt.ddt
@@ -296,36 +297,42 @@ class RegistrationViewValidationErrorTest(
             }
         )
 
-    @override_waffle_flag(REGISTRATION_FAILURE_LOGGING_FLAG, True)
-    def test_registration_failure_logging(self):
-        # Register a user
+        # testing for http/https
         response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": self.NAME,
-            "username": self.USERNAME,
-            "password": self.PASSWORD,
+            "email": "bob@example.com",
+            "name": "http://",
+            "username": "bob",
+            "password": "password",
             "honor_code": "true",
         })
-        self.assertHttpOK(response)
-
-        # Try to create a second user with the same email address
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": "Someone Else",
-            "username": "someone_else",
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-
-        assert response.status_code == 409
+        assert response.status_code == 400
         response_json = json.loads(response.content.decode('utf-8'))
         self.assertDictEqual(
             response_json,
             {
-                "email": [{
-                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
-                }],
-                "error_code": "duplicate-email"
+                "name": [{"user_message": 'Enter a valid name'}],
+                "error_code": "validation-error"
+            }
+        )
+
+    def test_register_fullname_html_validation_error(self):
+        """
+        Test for catching invalid full name errors
+        """
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "<Bob Smith>",
+            "username": "bob",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                'name': [{'user_message': 'Full Name cannot contain the following characters: < >'}],
+                "error_code": "validation-error"
             }
         )
 
@@ -1856,6 +1863,117 @@ class RegistrationViewTestV1(
         assert response.status_code == 403
         cache.clear()
 
+    @override_settings(FEATURES=ENABLE_AUTO_GENERATED_USERNAME)
+    def test_register_with_auto_generated_username(self):
+        """
+        Test registration functionality with auto-generated username.
+
+        This method tests the registration process when auto-generated username
+        feature is enabled. It creates a new user account, verifies that the user
+        account settings are correctly set, and checks if the user is successfully
+        logged in after registration.
+        """
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        user = User.objects.get(email=self.EMAIL)
+        request = RequestFactory().get('/url')
+        request.user = user
+        account_settings = get_account_settings(request)[0]
+
+        assert self.EMAIL == account_settings["email"]
+        assert not account_settings["is_active"]
+        assert self.NAME == account_settings["name"]
+
+        # Verify that we've been logged in
+        # by trying to access a page that requires authentication
+        response = self.client.get(reverse("dashboard"))
+        self.assertHttpOK(response)
+
+    @override_settings(FEATURES=ENABLE_AUTO_GENERATED_USERNAME)
+    def test_register_with_empty_name(self):
+        """
+        Test registration field validations when ENABLE_AUTO_GENERATED_USERNAME is enabled.
+
+        Sends a POST request to the registration endpoint with empty name field.
+        Expects a 400 Bad Request response with the corresponding validation error message for the name field.
+        """
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": 'Your legal name must be a minimum of one character long'}],
+                "error_code": "validation-error"
+            }
+        )
+
+    @override_settings(FEATURES=ENABLE_AUTO_GENERATED_USERNAME)
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils._get_username_prefix')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils.random.choices')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils.datetime')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils.get_auto_generated_username')
+    def test_register_autogenerated_duplicate_username(self,
+                                                       mock_get_auto_generated_username,
+                                                       mock_datetime,
+                                                       mock_choices,
+                                                       mock_get_username_prefix):
+        """
+        Test registering a user with auto-generated username where a duplicate username conflict occurs.
+
+        Mocks various utilities to control the auto-generated username process and verifies the response content
+        when a duplicate username conflict happens during user registration.
+        """
+        mock_datetime.now.return_value.strftime.return_value = '24 03'
+        mock_choices.return_value = ['X', 'Y', 'Z', 'A']  # Fixed random string for testing
+
+        mock_get_username_prefix.return_value = None
+
+        current_year_month = f"{datetime.now().year % 100}{datetime.now().month:02d}_"
+        random_string = 'XYZA'
+        expected_username = current_year_month + random_string
+        mock_get_auto_generated_username.return_value = expected_username
+
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+        # Try to create a second user with the same username
+        response = self.client.post(self.url, {
+            "email": "someone+else@example.com",
+            "name": "Someone Else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+
+        assert response.status_code == 409
+        response_json = json.loads(response.content.decode('utf-8'))
+        response_json.pop('username_suggestions')
+        self.assertDictEqual(
+            response_json,
+            {
+                "username": [{
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
+                }],
+                "error_code": "duplicate-username"
+            }
+        )
+
     def _assert_fields_match(self, actual_field, expected_field):
         """
         Assert that the actual field and the expected field values match.
@@ -2254,6 +2372,11 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
     @skip_unless_lms
     def test_register_success_with_redirect(self, next_url, course_id, expected_redirect):
+        expected_response = {
+            'username': self.USERNAME,
+            'full_name': self.NAME,
+            'user_id': 1
+        }
         post_params = {
             "email": self.EMAIL,
             "name": self.NAME,
@@ -2273,6 +2396,12 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             HTTP_ACCEPT='*/*',
         )
         self._assert_redirect_url(response, expected_redirect)
+        assert response.status_code == 200
+
+        # Check that authenticated user details are also returned in
+        # the response for successful registration
+        decoded_response = json.loads(response.content.decode('utf-8'))
+        assert decoded_response['authenticated_user'] == expected_response
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.register._record_is_marketable_attribute')
     def test_logs_for_error_when_setting_is_marketable_attribute(self, set_is_marketable_attr):
@@ -2304,6 +2433,40 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             )
 
             assert response.status_code == 200
+
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
+    )
+    @mock.patch('eventtracking.tracker.emit')
+    @mock.patch(
+        'openedx.core.djangoapps.user_authn.views.registration_form.check_pwned_password',
+        mock.Mock(return_value={
+            'vulnerability': 'yes',
+            'frequency': 3,
+            'user_request_page': 'registration',
+        })
+    )
+    def test_register_error_with_pwned_password(self, emit):
+        post_params = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        }
+        response = self.client.post(
+            self.url,
+            post_params,
+            HTTP_ACCEPT='*/*',
+        )
+        emit.assert_called_with(
+            'edx.bi.user.pwned.password.status',
+            {
+                'frequency': 3,
+                'vulnerability': 'yes',
+                'user_request_page': 'registration',
+            })
+        assert response.status_code == 400
 
 
 @httpretty.activate
@@ -2718,20 +2881,30 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {"username": str(USERNAME_INVALID_CHARS_ASCII)}
         )
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_password_empty_validation_decision(self):
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = 'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
             {'password': ''},
             {"password": msg}
         )
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_password_bad_min_length_validation_decision(self):
         password = 'p'
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = 'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 4 characters.'
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}
@@ -2787,3 +2960,28 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {'username': 'user', 'email': 'user@email.com', 'is_authn_mfe': True, 'form_field_key': 'email'},
             {'email': AUTHN_EMAIL_CONFLICT_MSG}
         )
+
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
+    )
+    @mock.patch('eventtracking.tracker.emit')
+    @mock.patch(
+        'openedx.core.djangoapps.user_api.accounts.api.check_pwned_password',
+        mock.Mock(return_value={
+            'vulnerability': 'yes',
+            'frequency': 3,
+            'user_request_page': 'registration',
+        })
+    )
+    def test_pwned_password_and_emit_track_event(self, emit):
+        self.assertValidationDecision(
+            {'password': 'testtest12'},
+            {'password': AUTHN_PASSWORD_COMPROMISED_MSG}
+        )
+        emit.assert_called_with(
+            'edx.bi.user.pwned.password.status',
+            {
+                'frequency': 3,
+                'vulnerability': 'yes',
+                'user_request_page': 'registration',
+            })

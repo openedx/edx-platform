@@ -1,23 +1,22 @@
 """
 Logistration API View Tests
 """
-import socket
-from unittest.mock import patch
-from urllib.parse import urlencode
-
 import ddt
+import socket
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from unittest.mock import patch
+from urllib.parse import urlencode
 
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -42,6 +41,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
         self.country_code = country_code_from_ip(ip_address)
+        self.pipeline_user_details = {}
 
         # Several third party auth providers are created for these tests:
         self.configure_google_provider(enabled=True, visible=True)
@@ -93,8 +93,20 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Returns the MFE context
         """
+
+        if add_user_details:
+            self.pipeline_user_details.update(
+                {
+                    'username': None,
+                    'email': 'test@test.com',
+                    'name': None,
+                    'firstName': None,
+                    'lastName': None
+                }
+            )
+
         return {
-            'context_data': {
+            'contextData': {
                 'currentProvider': current_provider,
                 'platformName': settings.PLATFORM_NAME,
                 'providers': self.get_provider_data(params) if params else [],
@@ -102,12 +114,17 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'finishAuthUrl': pipeline.get_complete_url(backend_name) if backend_name else None,
                 'errorMessage': None,
                 'registerFormSubmitButtonText': 'Create Account',
+                'autoSubmitRegForm': False,
                 'syncLearnerProfileData': False,
-                'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {},
-                'countryCode': self.country_code
+                'countryCode': self.country_code,
+                'welcomePageRedirectUrl': None,
+                'pipelineUserDetails': self.pipeline_user_details,
             },
-            'registration_fields': {},
-            'optional_fields': {
+            'registrationFields': {
+                'fields': {},
+            },
+            'optionalFields': {
+                'fields': {},
                 'extended_profile': [],
             },
         }
@@ -182,7 +199,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         })
 
         response = self.client.get(self.url, self.query_params)
-        assert response.data['context_data']['providers'] == provider_data
+        assert response.data['contextData']['providers'] == provider_data
 
     def test_user_country_code(self):
         """
@@ -191,7 +208,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         response = self.client.get(self.url, self.query_params)
 
         assert response.status_code == 200
-        assert response.data['context_data']['countryCode'] == self.country_code
+        assert response.data['contextData']['countryCode'] == self.country_code
 
     @override_settings(
         ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
@@ -205,7 +222,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['registration_fields']['fields'] == {}
+        assert response.data['registrationFields']['fields'] == {}
 
     @with_site_configuration(
         configuration={
@@ -223,8 +240,9 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
+
         assert response.status_code == status.HTTP_200_OK
-        assert list(response.data['registration_fields']['fields'].keys()) == ['first_name', 'last_name', 'state']
+        assert list(response.data['registrationFields']['fields'].keys()) == ['first_name', 'last_name', 'state']
 
     @override_settings(
         ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
@@ -248,7 +266,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['optional_fields']['fields'] == expected_response
+        assert response.data['optionalFields']['fields'] == expected_response
 
     @with_site_configuration(
         configuration={
@@ -282,8 +300,9 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         }
         self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
+
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['optional_fields']['fields'] == expected_response
+        assert response.data['optionalFields']['fields'] == expected_response
 
     @with_site_configuration(
         configuration={
@@ -302,7 +321,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
-        assert list(response.data['optional_fields']['fields'].keys()) == ['specialty', 'goals']
+        assert list(response.data['optionalFields']['fields'].keys()) == ['specialty', 'goals']
 
     @with_site_configuration(
         configuration={
@@ -322,7 +341,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
-        assert list(response.data['registration_fields']['fields'].keys()) == ['specialty']
+        assert list(response.data['registrationFields']['fields'].keys()) == ['specialty']
 
     @override_settings(
         ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
@@ -333,8 +352,62 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         Test that API return valid response dictionary with both required and optional fields
         """
         response = self.client.get(self.url, self.query_params)
-
         assert response.data == self.get_context()
+
+    def test_mfe_context_api_serialized_response(self):
+        """
+        Test MFE Context API serialized response
+        """
+        response = self.client.get(self.url, self.query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        params = {
+            'next': self.query_params['next']
+        }
+
+        self.assertEqual(
+            response.data,
+            self.get_context(params)
+        )
+
+    def test_mfe_context_api_response_keys(self):
+        """
+        Test MFE Context API response keys
+        """
+        response = self.client.get(self.url, self.query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response_keys = set(response.data.keys())
+        self.assertSetEqual(
+            response_keys,
+            {
+                'contextData',
+                'registrationFields',
+                'optionalFields'
+            }
+        )
+
+    @with_site_configuration(
+        configuration={
+            'extended_profile_fields': ['specialty']
+        }
+    )
+    @override_settings(
+        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
+        REGISTRATION_EXTRA_FIELDS={'specialty': 'optional', 'goals': 'optional'},
+        LOGIN_REDIRECT_WHITELIST=['openedx.service'],
+    )
+    def test_welcome_page_context(self):
+        """
+        Test MFE Context API response for welcome page
+        """
+        redirect_url = 'https://openedx.service/coolpage'
+        self.query_params.update({'is_welcome_page': True, 'next': redirect_url})
+        response = self.client.get(self.url, self.query_params, HTTP_ACCEPT='*/*')
+        assert response.status_code == status.HTTP_200_OK
+        assert list(response.data['optionalFields']['fields'].keys()) == ['specialty', 'goals']
+        assert list(response.data['optionalFields']['extended_profile']) == ['specialty']
+        assert response.data['contextData']['welcomePageRedirectUrl'] == redirect_url
 
 
 @skip_unless_lms
@@ -348,9 +421,9 @@ class SendAccountActivationEmail(UserAPITestCase):
         Create a user, then log in.
         """
         super().setUp()
-        self.user = UserFactory()
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         Registration().register(self.user)
-        result = self.client.login(username=self.user.username, password="test")
+        result = self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         assert result, 'Could not log in'
         self.path = reverse('send_account_activation_email')
 

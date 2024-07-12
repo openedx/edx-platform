@@ -256,3 +256,17 @@ def dump_student_extensions(course, student):
         "title": _("Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
+
+
+def keep_field_private(query_features, field_name):
+    '''
+    Utility to remove a field from a list of field names requested of a report
+    Keeps the specified field_name private (excluded from report)
+    '''
+    if (query_features is None) or (field_name is None):
+        raise DashboardError("Missing private field specification")
+
+    try:
+        query_features.remove(field_name)
+    except ValueError:
+        pass

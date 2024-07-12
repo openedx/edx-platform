@@ -47,6 +47,8 @@
                         } else if (!teamHasSpace) {
                             showJoinButton = false;
                             message = view.teamFullMessage;
+                        } else if (info.canJoinTeam) {
+                            showJoinButton = true;
                         } else if (!info.isAdminOrStaff && info.isInstructorManagedTopic) {
                             showJoinButton = false;
                             message = view.notJoinInstructorManagedTeam;
@@ -100,12 +102,14 @@
                 // this.topic.getMaxTeamSize() will return null for a managed team,
                 // but the size is considered to be arbitarily large.
                 var isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
-                var teamHasSpace = isInstructorManagedTopic ||
-                        (this.model.get('membership').length < this.topic.getMaxTeamSize(courseMaxTeamSize));
+                var canJoinTeam = TeamUtils.canJoinTeam(this.context.userInfo, this.topic.attributes.type)
+                var teamHasSpace = isInstructorManagedTopic
+                        || (this.model.get('membership').length < this.topic.getMaxTeamSize(courseMaxTeamSize));
 
                 info.memberOfCurrentTeam = TeamUtils.isUserMemberOfTeam(this.model.get('membership'), username);
                 info.isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
                 info.isInstructorManagedTopic = isInstructorManagedTopic;
+                info.canJoinTeam = canJoinTeam;
 
                 if (info.memberOfCurrentTeam) {
                     info.alreadyInTeamset = true;

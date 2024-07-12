@@ -1,6 +1,7 @@
 """
 Test grading events across apps.
 """
+import ddt
 from unittest.mock import call as mock_call
 from unittest.mock import patch
 
@@ -20,6 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # l
 from ... import events
 
 
+@ddt.ddt
 class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
     """
     Tests integration between the eventing in various layers
@@ -70,9 +72,9 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user
-        self.client.login(username=self.student.username, password="test")
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
         CourseEnrollment.enroll(self.student, self.course.id)
-        self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password='test')
+        self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password=self.TEST_PASSWORD)
         self.refresh_course()
 
     @patch('lms.djangoapps.grades.events.tracker')
@@ -113,56 +115,67 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             any_order=True,
         )
 
-    def test_delete_student_state(self):
+    @ddt.data(True, False)
+    def test_delete_student_state(self, emit_signals):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_2'})
 
         with patch('lms.djangoapps.instructor.enrollment.tracker') as enrollment_tracker:
             with patch('lms.djangoapps.grades.events.tracker') as events_tracker:
                 reset_student_attempts(
-                    self.course.id, self.student, self.problem.location, self.instructor, delete_module=True,
+                    self.course.id,
+                    self.student,
+                    self.problem.location,
+                    self.instructor,
+                    delete_module=True,
+                    emit_signals_and_events=emit_signals
                 )
         course = self.store.get_course(self.course.id, depth=0)
 
-        event_transaction_id = enrollment_tracker.method_calls[0][1][1]['event_transaction_id']
-        enrollment_tracker.emit.assert_called_with(
-            events.STATE_DELETED_EVENT_TYPE,
-            {
-                'user_id': str(self.student.id),
-                'course_id': str(self.course.id),
-                'problem_id': str(self.problem.location),
-                'instructor_id': str(self.instructor.id),
-                'event_transaction_id': event_transaction_id,
-                'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
-            }
-        )
-        events_tracker.emit.assert_has_calls(
-            [
-                mock_call(
-                    events.COURSE_GRADE_CALCULATED,
-                    {
-                        'percent_grade': 0.0,
-                        'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                        'user_id': str(self.student.id),
-                        'letter_grade': '',
-                        'event_transaction_id': event_transaction_id,
-                        'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
-                        'course_id': str(self.course.id),
-                        'course_edited_timestamp': str(course.subtree_edited_on),
-                        'course_version': str(course.course_version),
-                    }
-                ),
-                mock_call(
-                    events.COURSE_GRADE_NOW_FAILED_EVENT_TYPE,
-                    {
-                        'user_id': str(self.student.id),
-                        'event_transaction_id': event_transaction_id,
-                        'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
-                        'course_id': str(self.course.id),
-                    }
-                ),
-            ],
-            any_order=True,
-        )
+        if not emit_signals:
+            enrollment_tracker.assert_not_called()
+            enrollment_tracker.emit.assert_not_called()
+            events_tracker.emit.assert_not_called()
+        else:
+            event_transaction_id = enrollment_tracker.method_calls[0][1][1]['event_transaction_id']
+            enrollment_tracker.emit.assert_called_with(
+                events.STATE_DELETED_EVENT_TYPE,
+                {
+                    'user_id': str(self.student.id),
+                    'course_id': str(self.course.id),
+                    'problem_id': str(self.problem.location),
+                    'instructor_id': str(self.instructor.id),
+                    'event_transaction_id': event_transaction_id,
+                    'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
+                }
+            )
+            events_tracker.emit.assert_has_calls(
+                [
+                    mock_call(
+                        events.COURSE_GRADE_CALCULATED,
+                        {
+                            'percent_grade': 0.0,
+                            'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                            'user_id': str(self.student.id),
+                            'letter_grade': '',
+                            'event_transaction_id': event_transaction_id,
+                            'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
+                            'course_id': str(self.course.id),
+                            'course_edited_timestamp': str(course.subtree_edited_on),
+                            'course_version': str(course.course_version),
+                        }
+                    ),
+                    mock_call(
+                        events.COURSE_GRADE_NOW_FAILED_EVENT_TYPE,
+                        {
+                            'user_id': str(self.student.id),
+                            'event_transaction_id': event_transaction_id,
+                            'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
+                            'course_id': str(self.course.id),
+                        }
+                    ),
+                ],
+                any_order=True,
+            )
 
     def test_rescoring_events(self):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_3'})

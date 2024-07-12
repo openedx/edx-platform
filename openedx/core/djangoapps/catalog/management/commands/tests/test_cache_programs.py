@@ -48,29 +48,53 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             }
         )
 
+        self.site_domain2 = 'testsite2.com'
+        self.site2 = self.set_up_site(
+            self.site_domain2,
+            {
+                'COURSE_CATALOG_API_URL': self.catalog_integration.get_internal_api_url().rstrip('/')
+            }
+        )
+
         self.list_url = self.catalog_integration.get_internal_api_url().rstrip('/') + '/programs/'
         self.detail_tpl = self.list_url.rstrip('/') + '/{uuid}/'
         self.pathway_url = self.catalog_integration.get_internal_api_url().rstrip('/') + '/pathways/'
 
         self.programs = ProgramFactory.create_batch(3)
+        self.programs2 = ProgramFactory.create_batch(3)
         self.pathways = PathwayFactory.create_batch(3)
+        self.pathways2 = PathwayFactory.create_batch(3)
         self.child_program = ProgramFactory.create()
+        self.child_program2 = ProgramFactory.create()
 
         self.programs[0]['curricula'][0]['programs'].append(self.child_program)
         self.programs.append(self.child_program)
-
         self.programs[0]['authoring_organizations'] = OrganizationFactory.create_batch(2)
+
+        self.programs2[0]['curricula'][0]['programs'].append(self.child_program2)
+        self.programs2.append(self.child_program2)
+        self.programs2[0]['authoring_organizations'] = OrganizationFactory.create_batch(2)
 
         for pathway in self.pathways:
             self.programs += pathway['programs']
 
-        self.uuids = [program['uuid'] for program in self.programs]
+        for pathway in self.pathways2:
+            self.programs2 += pathway['programs']
+
+        self.uuids = {
+            f"{self.site_domain}": [program["uuid"] for program in self.programs],
+            f"{self.site_domain2}": [program["uuid"] for program in self.programs2],
+        }
 
         # add some of the previously created programs to some pathways
         self.pathways[0]['programs'].extend([self.programs[0], self.programs[1]])
         self.pathways[1]['programs'].append(self.programs[0])
 
-    def mock_list(self):
+        # add some of the previously created programs to some pathways
+        self.pathways2[0]['programs'].extend([self.programs2[0], self.programs2[1]])
+        self.pathways2[1]['programs'].append(self.programs2[0])
+
+    def mock_list(self, site=""):
         """ Mock the data returned by the program listing API endpoint. """
         # pylint: disable=unused-argument
         def list_callback(request, uri, headers):
@@ -81,8 +105,8 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
                 'uuids_only': ['1']
             }
             assert request.querystring == expected
-
-            return (200, headers, json.dumps(self.uuids))
+            uuids = self.uuids[self.site_domain2] if site else self.uuids[self.site_domain]
+            return (200, headers, json.dumps(uuids))
 
         httpretty.register_uri(
             httpretty.GET,
@@ -130,16 +154,35 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
             return (200, headers, json.dumps(body))
 
-        # NOTE: httpretty does not properly match against query strings here (using match_querystring arg)
-        # as such, it does not actually look at the query parameters (for page num), but returns items in a LIFO order.
-        # this means that for multiple pages, you must call this function starting from the last page.
-        # we do assert the page number query param above, however
         httpretty.register_uri(
             httpretty.GET,
-            self.pathway_url,
+            self.pathway_url + f'?exclude_utm=1&page={page_number}',
             body=pathways_callback,
             content_type='application/json',
+            match_querystring=True,
         )
+
+    def test_handle_domain(self):
+        """
+        Verify that the command argument is working correct or not.
+        """
+        UserFactory(username=self.catalog_integration.service_username)
+
+        programs = {
+            PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid']): program for program in self.programs2
+        }
+
+        self.mock_list(self.site2)
+        self.mock_pathways(self.pathways2)
+
+        for uuid in self.uuids[self.site_domain2]:
+            program = programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
+            self.mock_detail(uuid, program)
+
+        call_command('cache_programs', f'--domain={self.site_domain2}')
+
+        cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain2))
+        assert set(cached_uuids) == set(self.uuids[self.site_domain2])
 
     def test_handle_programs(self):
         """
@@ -158,14 +201,14 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         self.mock_list()
         self.mock_pathways(self.pathways)
 
-        for uuid in self.uuids:
+        for uuid in self.uuids[self.site_domain]:
             program = programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
             self.mock_detail(uuid, program)
 
         call_command('cache_programs')
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        assert set(cached_uuids) == set(self.uuids)
+        assert set(cached_uuids) == set(self.uuids[self.site_domain])
 
         program_keys = list(programs.keys())
         cached_programs = cache.get_many(program_keys)
@@ -228,7 +271,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         self.mock_list()
         self.mock_pathways(self.pathways)
 
-        for uuid in self.uuids:
+        for uuid in self.uuids[self.site_domain]:
             program = programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
             self.mock_detail(uuid, program)
 
@@ -267,7 +310,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         }
 
         self.mock_list()
-        for uuid in self.uuids:
+        for uuid in self.uuids[self.site_domain]:
             program = programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
             self.mock_detail(uuid, program)
 
@@ -337,7 +380,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.mock_list()
 
-        for uuid in self.uuids:
+        for uuid in self.uuids[self.site_domain]:
             program = programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
             self.mock_detail(uuid, program)
 
@@ -365,7 +408,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.mock_list()
 
-        for uuid in self.uuids[:2]:
+        for uuid in self.uuids[self.site_domain][:2]:
             program = partial_programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
             self.mock_detail(uuid, program)
 
@@ -375,7 +418,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         assert context.value.code == 1
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        assert set(cached_uuids) == set(self.uuids)
+        assert set(cached_uuids) == set(self.uuids[self.site_domain])
 
         program_keys = list(all_programs.keys())
         cached_programs = cache.get_many(program_keys)

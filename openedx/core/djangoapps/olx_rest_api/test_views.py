@@ -1,15 +1,14 @@
 """
 Test for the OLX REST API app.
 """
-import re
-from xml.dom import minidom
+from xml.etree import ElementTree
 
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
 @skip_unless_cms
@@ -40,17 +39,12 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
 
     # Helper methods:
 
-    def assertXmlEqual(self, xml_str_a, xml_str_b):
-        """
-        Assert that the given XML strings are equal,
-        ignoring attribute order and some whitespace variations.
-        """
-        def clean(xml_str):
-            # Collapse repeated whitespace:
-            xml_str = re.sub(r'(\s)\s+', r'\1', xml_str)
-            xml_bytes = xml_str.encode('utf8')
-            return minidom.parseString(xml_bytes).toprettyxml()
-        assert clean(xml_str_a) == clean(xml_str_b)
+    def assertXmlEqual(self, xml_str_a: str, xml_str_b: str) -> bool:
+        """ Assert that the given XML strings are equal, ignoring attribute order and some whitespace variations. """
+        self.assertEqual(
+            ElementTree.canonicalize(xml_str_a, strip_text=True),
+            ElementTree.canonicalize(xml_str_b, strip_text=True),
+        )
 
     def get_olx_response_for_block(self, block_id):
         return self.client.get(f'/api/olx-export/v1/xblock/{block_id}/')

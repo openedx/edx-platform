@@ -105,6 +105,7 @@ export default class AxiosJwtTokenService {
     }
 
     async getJwtToken() {
+        // eslint-disable-next-line no-useless-catch
         try {
             const decodedJwtToken = this.decodeJwtCookie(this.tokenCookieName);
             if (!AxiosJwtTokenService.isTokenExpired(decodedJwtToken)) {
@@ -115,6 +116,7 @@ export default class AxiosJwtTokenService {
             throw e;
         }
 
+        // eslint-disable-next-line no-useless-catch
         try {
             return await this.refresh();
         } catch (e) {

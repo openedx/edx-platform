@@ -17,16 +17,18 @@ class MakoDescriptorSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=a
 
         self.render_template = render_template
 
-        # Add the MakoService to the descriptor system.
+        # Add the MakoService to the runtime services.
+        # If it already exists, do not attempt to reinitialize it; otherwise, this could override the `namespace_prefix`
+        # of the `MakoService`, breaking template rendering in Studio.
         #
-        # This is not needed by most XBlocks, because they are initialized with a full runtime ModuleSystem that already
-        # has the MakoService.
-        # However, there are a few cases where the XBlock only has the descriptor system instead of the full module
+        # This is not needed by most XBlocks, because the MakoService is added to their runtimes.
+        # However, there are a few cases where the MakoService is not added to the XBlock's
         # runtime. Specifically:
         # * in the Instructor Dashboard bulk emails tab, when rendering the HtmlBlock for its WYSIWYG editor.
-        # * during testing, when using the ModuleSystemTestCase to fetch factory-created blocks.
-        from common.djangoapps.edxmako.services import MakoService
-        self._services['mako'] = MakoService()
+        # * during testing, when fetching factory-created blocks.
+        if 'mako' not in self._services:
+            from common.djangoapps.edxmako.services import MakoService
+            self._services['mako'] = MakoService()
 
 
 class MakoTemplateBlockBase:

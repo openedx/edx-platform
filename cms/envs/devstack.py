@@ -5,7 +5,6 @@ Specific overrides to the base prod settings to make development easier.
 
 import logging
 from os.path import abspath, dirname, join
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -49,6 +48,11 @@ LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
+
+################################## Video Pipeline Settings #########################
+
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
@@ -99,7 +103,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
     'debug_toolbar.panels.history.HistoryPanel',
 )
@@ -141,10 +144,17 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = False
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
-FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': 'edx.devstack.elasticsearch710',
+        'port': 9200
+    }
+]
 
 ################################ COURSE DISCUSSIONS ###########################
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -156,7 +166,10 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ########################## AUTHOR PERMISSION #######################
-FEATURES['ENABLE_CREATOR_GROUP'] = False
+FEATURES['ENABLE_CREATOR_GROUP'] = True
+
+########################## Library creation organizations restriction #######################
+FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
 
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
@@ -194,21 +207,6 @@ JWT_AUTH.update({
         '4Ee9qG5T38LFe8_oAuFCEntimWxN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzG'
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
     ),
-
-    # TODO Remove this once CMS redirects to LMS for Login
-    'JWT_PRIVATE_SIGNING_JWK': (
-        '{"e": "AQAB", "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTu'
-        'iqEGR_MI6aI7h5D8vRj_5x-pxOz-0MCB8TY8dcuK9FkljmgtYvV9flVzCk_uUb3ZJIBVyIW8En7n7nV7JXpS9zey1yVLld2AbRG6W5--Pgqr9J'
-        'CI5-bLdc2otCLuen2sKyuUDHO5NIj30qGTaKUL-OW_PgVmxrwKwccF3w5uGNEvMQ-IcicosCOvzBwdIm1uhdm9rnHU1-fXz8VLRHNhGVv7z6mo'
-        'ghjNI0_u4smhUkEsYeshPv7RQEWTdkOQ", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu48BUI5VcVtUWIPqzRK_LDSlZYh'
-        '9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC4Ee9qG5T38LFe8_oAuFCEntimW'
-        'xN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzGy5ZLcTUomo4rZLjghVpq6KZxfS'
-        '6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw", "q": "7KWj7l-ZkfCElyfvwsl7kiosvi-ppOO7Imsv90cribf88Dex'
-        'cO67xdMPesjM9Nh5X209IT-TzbsOtVTXSQyEsy42NY72WETnd1_nAGLAmfxGdo8VV4ZDnRsA8N8POnWjRDwYlVBUEEeuT_MtMWzwIKU94bzkWV'
-        'nHCY5vbhBYLeM", "p": "wPkfnjavNV1Hqb5Qqj2crBS9HQS6GDQIZ7WF9hlBb2ofDNe2K2dunddFqCOdvLXr7ydRcK51ZwSeHjcjgD1aJkHA'
-        '9i1zqyboxgd0uAbxVDo6ohnlVqYLtap2tXXcavKm4C9MTpob_rk6FBfEuq4uSsuxFvCER4yG3CYBBa4gZVU", "kid": "devstack_key", "'
-        'kty": "RSA"}'
-    ),
 })
 
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
@@ -219,9 +217,6 @@ IDA_LOGOUT_URI_LIST = [
 ]
 
 ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms/oauth2"
-
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
 #####################################################################
 
@@ -257,9 +252,6 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-    'use-jwt-cookie',
-)
 
 ################### Special Exams (Proctoring) and Prereqs ###################
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
@@ -268,17 +260,6 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
-
-############## CourseGraph devstack settings ############################
-
-COURSEGRAPH_CONNECTION: dict = {
-    "protocol": "bolt",
-    "secure": False,
-    "host": "edx.devstack.coursegraph",
-    "port": 7687,
-    "user": "neo4j",
-    "password": "edx",
-}
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
@@ -297,27 +278,74 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 #################### Credentials Settings ####################
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+########################## ORA MFE APP ##############################
+ORA_MICROFRONTEND_URL = 'http://localhost:1992'
+
+############################ AI_TRANSLATIONS ##################################
+AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
+############################ CSRF ##################################
+
+# MFEs that will call this service in devstack
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3001',  # frontend-app-library-authoring
+    'http://localhost:2001',  # frontend-app-course-authoring
+    'http://localhost:1992',  # frontend-app-ora
+    'http://localhost:1999',  # frontend-app-authn
+]
+
 #################### Event bus backend ########################
-# .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS']
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Temporary configuration which enables sending xblock events over the event bus.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-02-21
-# .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
-#   in the LMS and CMS.
-# .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
-FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
-EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
-EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
-EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+
+EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
+EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
+EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
+
+course_catalog_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.course.catalog_info.changed.v1']
+course_catalog_event_setting['course-catalog-info-changed']['enabled'] = True
+
+xblock_published_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.published.v1']
+xblock_published_event_setting['course-authoring-xblock-lifecycle']['enabled'] = True
+xblock_deleted_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.deleted.v1']
+xblock_deleted_event_setting['course-authoring-xblock-lifecycle']['enabled'] = True
+xblock_duplicated_event_setting = EVENT_BUS_PRODUCER_CONFIG['org.openedx.content_authoring.xblock.duplicated.v1']
+xblock_duplicated_event_setting['course-authoring-xblock-lifecycle']['enabled'] = True
+
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
     from .private import *  # pylint: disable=import-error,wildcard-import
+
+############## Authoring API drf-spectacular openapi settings ##############
+# These fields override the spectacular settings default values.
+# Any fields not included here will use the default values.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Authoring API',
+    'DESCRIPTION': f'''Experimental API to edit xblocks and course content.
+    \n\nDanger: Do not use on running courses!
+    \n\n - How to gain access: Please email the owners of this openedx service.
+    \n - How to use: This API uses oauth2 authentication with the
+    access token endpoint: `{LMS_ROOT_URL}/oauth2/access_token`.
+    Please see separately provided documentation.
+    \n - How to test: You must be logged in as course author for whatever course you want to test with.
+    You can use the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/) to "Try out" the API with your test course. To do this, you must select the "Local" server.
+    \n - Public vs. Local servers: The "Public" server is where you can reach the API externally. The "Local" server is
+    for development with a local edx-platform version,  and for use via the [Swagger UI](https://{CMS_BASE}/authoring-api/ui/).
+    \n - Swaggerfile: [Download link](https://{CMS_BASE}/authoring-api/schema/)''',
+    'VERSION': '0.1.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # restrict spectacular to CMS API endpoints (cms/lib/spectacular.py):
+    'PREPROCESSING_HOOKS': ['cms.lib.spectacular.cms_api_filter'],
+    # remove the default schema path prefix to replace it with server-specific base paths:
+    'SCHEMA_PATH_PREFIX': '/api/contentstore',
+    'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
+    'SERVERS': [
+        {'url': AUTHORING_API_URL, 'description': 'Public'},
+        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'Local'}
+    ],
+}

@@ -8,6 +8,7 @@ define([
 ],
 function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
     'use strict';
+
     var GroupConfigurationEditorView = ListItemEditorView.extend({
         tagName: 'div',
         events: {

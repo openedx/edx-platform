@@ -43,15 +43,18 @@
                         modal_id = '#modal_clone';
                     }
 
+                    // eslint-disable-next-line no-shadow
                     $('#lean_overlay').click(function(e) {
                         close_modal(modal_id, e);
                     });
 
+                    // eslint-disable-next-line no-shadow
                     $(o.closeButton).click(function(e) {
                         close_modal(modal_id, e);
                     });
 
                     // To enable closing of email modal when copy button hit
+                    // eslint-disable-next-line no-shadow
                     $(o.copyEmailButton).click(function(e) {
                         close_modal(modal_id, e);
                     });
@@ -103,13 +106,16 @@
         }
     });
 
+    // eslint-disable-next-line no-shadow
     $(document).ready(function($) {
         $('a[rel*=leanModal]').each(function() {
             var $link = $(this),
                 closeButton = $link.data('modalCloseButtonSelector') || '.close-modal',
                 embed;
 
-            $link.leanModal({top: 120, overlay: 1, closeButton: closeButton, position: 'absolute'});
+            $link.leanModal({
+                top: 120, overlay: 1, closeButton: closeButton, position: 'absolute'
+            });
             embed = $($link.attr('href')).find('iframe');
             if (embed.length > 0 && embed.attr('src')) {
                 var sep = (embed.attr('src').indexOf('?') > 0) ? '&' : '?';

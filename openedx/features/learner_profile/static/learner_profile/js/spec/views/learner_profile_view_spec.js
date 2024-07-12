@@ -15,13 +15,12 @@ define(
         'js/student_account/models/user_preferences_model',
         'learner_profile/js/views/learner_profile_fields',
         'learner_profile/js/views/learner_profile_view',
-        'learner_profile/js/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner'
     ],
     function(gettext, Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
         FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
-        BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
+        AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
 
         describe('edx.user.LearnerProfileView', function() {
@@ -124,22 +123,13 @@ define(
                         editable: editable,
                         showMessages: false,
                         title: 'About me',
-                        placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
-                            "what your interests are, why you're taking courses on edX, or what you hope to learn.",
+                        placeholderValue: 'Tell other edX learners a little about yourself: where you live, '
+                            + "what your interests are, why you're taking courses on edX, or what you hope to learn.",
                         valueAttribute: 'bio',
                         helpMessage: '',
                         messagePosition: 'header'
                     })
                 ];
-
-                var badgeCollection = new PagingCollection();
-                badgeCollection.url = Helpers.BADGES_API_URL;
-
-                var badgeListContainer = new BadgeListContainer({
-                    attributes: {class: 'badge-set-display'},
-                    collection: badgeCollection,
-                    find_courses_url: Helpers.FIND_COURSES_URL
-                });
 
                 return new LearnerProfileView(
                     {
@@ -154,7 +144,6 @@ define(
                         profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
                         sectionTwoFieldViews: sectionTwoFieldViews,
-                        badgeListContainer: badgeListContainer
                     });
             };
 
@@ -224,17 +213,6 @@ define(
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
-            });
-
-            it("renders an error if the badges can't be fetched", function() {
-                var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
-                learnerProfileView.options.accountSettingsModel.set({accomplishments_shared: true});
-                var requests = AjaxHelpers.requests(this);
-
-                learnerProfileView.render();
-
-                LearnerProfileHelpers.breakBadgeLoading(learnerProfileView, requests);
-                LearnerProfileHelpers.expectBadgeLoadingErrorIsRendered(learnerProfileView);
             });
         });
     });

@@ -1,6 +1,7 @@
 /* globals $$course_id, Content, Markdown, MathJax, URI, _ */
 (function() {
     'use strict';
+
     this.DiscussionUtil = (function() {
         function DiscussionUtil() {
         }
@@ -29,10 +30,11 @@
         DiscussionUtil.isStaff = function(userId) {
             var staff;
             if (_.isUndefined(userId)) {
+                // eslint-disable-next-line no-void
                 userId = this.user ? this.user.id : void 0;
             }
-            if(_.isUndefined(this.roleIds)) {
-                this.roleIds = {}
+            if (_.isUndefined(this.roleIds)) {
+                this.roleIds = {};
             }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
             return _.include(staff, parseInt(userId));
@@ -41,6 +43,7 @@
         DiscussionUtil.isTA = function(userId) {
             var ta;
             if (_.isUndefined(userId)) {
+                // eslint-disable-next-line no-void
                 userId = this.user ? this.user.id : void 0;
             }
             ta = _.union(this.roleIds['Community TA']);
@@ -51,6 +54,7 @@
             var groupTa,
                 localUserId = userId;
             if (_.isUndefined(userId)) {
+                // eslint-disable-next-line no-void
                 localUserId = this.user ? this.user.id : void 0;
             }
             groupTa = _.union(this.roleIds['Group Moderator']);
@@ -76,7 +80,9 @@
         DiscussionUtil.generateDiscussionLink = function(cls, txt, handler) {
             return $('<a>')
                 .addClass('discussion-link').attr('href', '#')
-                .addClass(cls).text(txt).click(function() { return handler(this); });
+                .addClass(cls)
+                .text(txt)
+                .click(function() { return handler(this); });
         };
 
         DiscussionUtil.urlFor = function(name, param, param1, param2) {
@@ -391,6 +397,7 @@
             htmlString = $div.html();
             htmlString = htmlString.replace(/\\\$/g, ESCAPED_DOLLAR);
             /* eslint-disable no-loop-func */
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (RE_INLINEMATH.test(htmlString)) {
                     htmlString = htmlString.replace(RE_INLINEMATH, function($0, $1, $2, $3) {
@@ -483,7 +490,6 @@
                 element,
                 this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
             );
-
         };
 
         DiscussionUtil.typesetMathJax = function(element) {

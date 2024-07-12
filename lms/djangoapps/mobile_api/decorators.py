@@ -29,7 +29,7 @@ def mobile_course_access(depth=0):
         def _wrapper(self, request, *args, **kwargs):
             """
             Expects kwargs to contain 'course_id'.
-            Passes the course descriptor to the given decorated function.
+            Passes the course block to the given decorated function.
             Raises 404 if access to course is disallowed.
             """
             course_id = CourseKey.from_string(kwargs.pop('course_id'))

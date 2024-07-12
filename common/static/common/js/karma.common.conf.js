@@ -40,21 +40,14 @@
 
 var path = require('path');
 var _ = require('underscore');
-var appRoot = path.join(__dirname, '../../../../');
-var webdriver = require('selenium-webdriver');
-var firefox = require('selenium-webdriver/firefox');
-var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 
-// The following crazy bit is to work around the webpack.optimize.CommonsChunkPlugin
-// plugin. The problem is that it it factors out the code that defines webpackJsonp
-// and puts in in the commons JS, which Karma doesn't know to load first. This is a
-// workaround recommended in the karma-webpack bug report that basically just removes
-// the plugin for the purposes of Karma testing (the plugin is meant to be an
-// optimization only).
-//     https://github.com/webpack-contrib/karma-webpack/issues/24#issuecomment-257613167
-//
-// This should be fixed in v3 of karma-webpack
-var commonsChunkPluginIndex = webpackConfig[0].plugins.findIndex(function(plugin) { return plugin.chunkNames; });
+var appRoot = path.join(__dirname, '../../../../');
+// eslint-disable-next-line import/no-extraneous-dependencies
+var webdriver = require('selenium-webdriver');
+// eslint-disable-next-line import/no-extraneous-dependencies
+var firefox = require('selenium-webdriver/firefox');
+
+var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
@@ -79,10 +72,6 @@ var commonFiles = {
     ]
 };
 
-webpackConfig[0].plugins.splice(commonsChunkPluginIndex, 1);
-
-delete webpackConfig[0].entry;
-
 /**
  * Customize the name attribute in xml testcase element
  * @param {Object} browser
@@ -93,7 +82,6 @@ function junitNameFormatter(browser, result) {
     return result.suite[0] + ': ' + result.description;
 }
 
-
 /**
  * Customize the classname attribute in xml testcase element
  * @param {Object} browser
@@ -102,7 +90,6 @@ function junitNameFormatter(browser, result) {
 function junitClassNameFormatter(browser) {
     return 'Javascript.' + browser.name.split(' ')[0];
 }
-
 
 /**
  * Return array containing default and user supplied reporters
@@ -116,7 +103,6 @@ function reporters(config) {
     }
     return defaultReporters;
 }
-
 
 /**
  * Split a filepath into basepath and filename
@@ -142,7 +128,6 @@ function getBasepathAndFilename(filepath) {
     };
 }
 
-
 /**
  * Return coverage reporter settings
  * @param {String} config
@@ -160,7 +145,6 @@ function coverageSettings(config) {
         ]
     };
 }
-
 
 /**
  * Return junit reporter settings
@@ -191,8 +175,8 @@ function defaultNormalizeFunc(appRoot, pattern) { // eslint-disable-line no-shad
     if (pat.match(/^common\/js/)) {
         pat = path.join(appRoot, '/common/static/' + pat);
     } else if (pat.match(/^xmodule_js\/common_static/)) {
-        pat = path.join(appRoot, '/common/static/' +
-            pat.replace(/^xmodule_js\/common_static\//, ''));
+        pat = path.join(appRoot, '/common/static/'
+            + pat.replace(/^xmodule_js\/common_static\//, ''));
     }
     return pat;
 }
@@ -282,15 +266,6 @@ function getBaseConfig(config, useRequireJs) {
         'framework:custom': ['factory', initFrameworks]
     };
 
-    if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
-        hostname = process.env.BOK_CHOY_HOSTNAME;
-        if (hostname === 'edx.devstack.lms') {
-            port = 19876;
-        } else {
-            port = 19877;
-        }
-    }
-
     initFrameworks.$inject = ['config.files'];
 
     return {
@@ -316,7 +291,6 @@ function getBaseConfig(config, useRequireJs) {
             customPlugin
         ],
 
-
         // list of files to exclude
         exclude: [],
 
@@ -329,31 +303,24 @@ function getBaseConfig(config, useRequireJs) {
             showSpecTiming: true
         },
 
-
         coverageReporter: coverageSettings(config),
 
-
         junitReporter: junitSettings(config),
-
 
         // web server hostname and port
         hostname: hostname,
         port: port,
 
-
         // enable / disable colors in the output (reporters and logs)
         colors: true,
-
 
         // level of logging
         /* possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN
          || config.LOG_INFO || config.LOG_DEBUG */
         logLevel: config.LOG_INFO,
 
-
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: false,
-
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
@@ -394,7 +361,7 @@ function getBaseConfig(config, useRequireJs) {
                 }
             }
         },
-
+        
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: config.singleRun,

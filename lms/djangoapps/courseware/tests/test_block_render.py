@@ -1,12 +1,13 @@
 """
 Test for lms courseware app, block render unit
 """
-
-
 import json
 import textwrap
 from datetime import datetime
 from functools import partial
+from unittest.mock import MagicMock, Mock, patch
+import warnings
+
 import pytest
 import ddt
 import pytz
@@ -27,7 +28,6 @@ from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty
 from edx_when.field_data import DateLookupFieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
 from milestones.tests.utils import MilestonesTestCaseMixin  # lint-amnesty, pylint: disable=wrong-import-order
-from unittest.mock import MagicMock, Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.asides import AsideUsageKeyV2  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=wrong-import-order
 from pyquery import PyQuery  # lint-amnesty, pylint: disable=wrong-import-order
@@ -37,11 +37,10 @@ from xblock.core import XBlock, XBlockAside  # lint-amnesty, pylint: disable=wro
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import FieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import ScopeIds  # lint-amnesty, pylint: disable=wrong-import-order
-from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime  # lint-amnesty, pylint: disable=wrong-import-order
+from xblock.runtime import DictKeyValueStore, KvsFieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong-import-order
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
-from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
@@ -58,15 +57,24 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, Toy
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.services import RebindUserServiceError
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps import static_replace
+from xmodule.x_module import STUDENT_VIEW, DescriptorSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
-from lms.djangoapps.badges.tests.factories import BadgeClassFactory
-from lms.djangoapps.badges.tests.test_models import get_image
+from common.djangoapps.student.tests.factories import (
+    BetaTesterFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    RequestFactoryNoCsrf,
+    StaffFactory,
+    UserFactory,
+)
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_BETA_TESTER,
+    ATTR_KEY_USER_IS_GLOBAL_STAFF,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ROLE,
+)
 from lms.djangoapps.courseware import block_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
@@ -81,7 +89,7 @@ from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.jwt import _create_jwt, create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
@@ -95,7 +103,6 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 @XBlock.needs('fs')
-@XBlock.needs('field-data')
 @XBlock.needs('mako')
 @XBlock.needs('user')
 @XBlock.needs('verification')
@@ -109,7 +116,6 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @XBlock.needs('content_type_gating')
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
-@XBlock.needs('xqueue')
 @XBlock.needs('replace_urls')
 @XBlock.needs('rebind_user')
 @XBlock.needs('completion')
@@ -251,7 +257,7 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         course = get_course_with_access(self.mock_user, 'load', self.course_key)
 
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course_key, self.mock_user, course, depth=2)
 
         block = render.get_block(
@@ -354,7 +360,7 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_session_authentication(self):
         """ Test that the xblock endpoint supports session authentication."""
-        self.client.login(username=self.mock_user.username, password="test")
+        self.client.login(username=self.mock_user.username, password=self.TEST_PASSWORD)
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url)
         assert 200 == response.status_code
@@ -375,11 +381,31 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(dispatch_url, {}, **headers)
         assert 200 == response.status_code
 
+    def test_jwt_authentication_with_restricted_application(self):
+        """Test that the XBlock endpoint disallows JWT authentication with restricted applications."""
+
+        def _mock_create_restricted_jwt(*args, **kwargs):
+            """Pass an additional argument to `_create_jwt` without modifying the signature of `create_jwt_for_user`."""
+            kwargs['is_restricted'] = True
+            return _create_jwt(*args, **kwargs)
+
+        with patch('openedx.core.djangoapps.oauth_dispatch.jwt._create_jwt', _mock_create_restricted_jwt):
+            token = create_jwt_for_user(self.mock_user)
+
+        dispatch_url = self._get_dispatch_url()
+        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
+
+        response = self.client.get(dispatch_url, {}, **headers)
+        assert 403 == response.status_code
+
+        response = self.client.post(dispatch_url, {}, **headers)
+        assert 403 == response.status_code
+
     def test_missing_position_handler(self):
         """
         Test that sending POST request without or invalid position argument don't raise server error
         """
-        self.client.login(username=self.mock_user.username, password="test")
+        self.client.login(username=self.mock_user.username, password=self.TEST_PASSWORD)
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url)
         assert 200 == response.status_code
@@ -411,14 +437,14 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         request = self.request_factory.get('')
         request.user = self.mock_user
         course = CourseFactory()
-        descriptor = BlockFactory(category=block_type, parent=course)
-        field_data_cache = FieldDataCache([self.toy_course, descriptor], self.toy_course.id, self.mock_user)
+        block = BlockFactory(category=block_type, parent=course)
+        field_data_cache = FieldDataCache([self.toy_course, block], self.toy_course.id, self.mock_user)
         # This is verifying that caching doesn't cause an error during get_block_for_descriptor, which
         # is why it calls the method twice identically.
         render.get_block_for_descriptor(
             self.mock_user,
             request,
-            descriptor,
+            block,
             field_data_cache,
             self.toy_course.id,
             course=self.toy_course
@@ -426,7 +452,7 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         render.get_block_for_descriptor(
             self.mock_user,
             request,
-            descriptor,
+            block,
             field_data_cache,
             self.toy_course.id,
             course=self.toy_course
@@ -442,7 +468,7 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     @ddt.data('regular', 'test_aside')
     def test_rebind_different_users(self, block_category):
         """
-        This tests the rebinding a descriptor to a student does not result
+        This tests the rebinding a block to a student does not result
         in overly nested _field_data.
         """
         def create_aside(item, block_type):
@@ -467,33 +493,32 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         request.user = self.mock_user
         course = CourseFactory.create()
 
-        descriptor = BlockFactory(category="html", parent=course)
+        block = BlockFactory(category="html", parent=course)
         if block_category == 'test_aside':
-            descriptor = create_aside(descriptor, "test_aside")
+            block = create_aside(block, "test_aside")
 
         field_data_cache = FieldDataCache(
-            [course, descriptor], course.id, self.mock_user
+            [course, block], course.id, self.mock_user
         )
 
         # grab what _field_data was originally set to
-        original_field_data = descriptor._field_data  # lint-amnesty, pylint: disable=no-member, protected-access
+        original_field_data = block._field_data  # lint-amnesty, pylint: disable=no-member, protected-access
 
         render.get_block_for_descriptor(
-            self.mock_user, request, descriptor, field_data_cache, course.id, course=course
+            self.mock_user, request, block, field_data_cache, course.id, course=course
         )
 
-        # check that _unwrapped_field_data is the same as the original
+        # check that block.runtime.service(block, 'field-data-unbound') is the same as the original
         # _field_data, but now _field_data as been reset.
-        # pylint: disable=protected-access
-        assert descriptor._unwrapped_field_data is original_field_data  # lint-amnesty, pylint: disable=no-member
-        assert descriptor._unwrapped_field_data is not descriptor._field_data  # lint-amnesty, pylint: disable=no-member
+        assert block.runtime.service(block, 'field-data-unbound') is original_field_data
+        assert block.runtime.service(block, 'field-data-unbound') is not block._field_data  # pylint: disable=protected-access, line-too-long
 
         # now bind this block to a few other students
         for user in [UserFactory(), UserFactory(), self.mock_user]:
             render.get_block_for_descriptor(
                 user,
                 request,
-                descriptor,
+                block,
                 field_data_cache,
                 course.id,
                 course=course
@@ -501,14 +526,15 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # _field_data should now be wrapped by LmsFieldData
         # pylint: disable=protected-access
-        assert isinstance(descriptor._field_data, LmsFieldData)  # lint-amnesty, pylint: disable=no-member
+        assert isinstance(block._field_data, LmsFieldData)  # lint-amnesty, pylint: disable=no-member
 
         # the LmsFieldData should now wrap OverrideFieldData
-        assert isinstance(descriptor._field_data._authored_data._source, OverrideFieldData)   # lint-amnesty, pylint: disable=no-member, line-too-long
+        assert isinstance(block._field_data._authored_data._source, OverrideFieldData)   # lint-amnesty, pylint: disable=no-member, line-too-long
 
         # the OverrideFieldData should point to the date FieldData
-        assert isinstance(descriptor._field_data._authored_data._source.fallback, DateLookupFieldData)    # lint-amnesty, pylint: disable=no-member, line-too-long
-        assert descriptor._field_data._authored_data._source.fallback._defaults is descriptor._unwrapped_field_data    # lint-amnesty, pylint: disable=no-member, line-too-long
+        assert isinstance(block._field_data._authored_data._source.fallback, DateLookupFieldData)    # lint-amnesty, pylint: disable=no-member, line-too-long
+        assert block._field_data._authored_data._source.fallback._defaults \
+            is block.runtime.service(block, 'field-data-unbound')
 
     def test_hash_resource(self):
         """
@@ -903,17 +929,17 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     @patch('xmodule.services.grades_signals.SCORE_PUBLISHED.send')
     def test_anonymous_user_not_be_graded(self, mock_score_signal):
         course = CourseFactory.create()
-        descriptor_kwargs = {
+        block_kwargs = {
             'category': 'problem',
         }
         request = self.request_factory.get('/')
         request.user = AnonymousUser()
-        descriptor = BlockFactory.create(**descriptor_kwargs)
+        block = BlockFactory.create(**block_kwargs)
 
         render.handle_xblock_callback(
             request,
             str(course.id),
-            quote_slashes(str(descriptor.location)),
+            quote_slashes(str(block.location)),
             'xmodule_handler',
             'problem_check',
         )
@@ -929,19 +955,19 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_will_recheck_access_handler_attribute(self, handler, will_recheck_access, mock_get_block):
         """Confirm that we pay attention to any 'will_recheck_access' attributes on handler methods"""
         course = CourseFactory.create()
-        descriptor_kwargs = {
+        block_kwargs = {
             'category': 'sequential',
             'parent': course,
         }
-        descriptor = BlockFactory.create(**descriptor_kwargs)
-        usage_id = str(descriptor.location)
+        block = BlockFactory.create(**block_kwargs)
+        usage_id = str(block.location)
 
         # Send no special parameters, which will be invalid, but we don't care
         request = self.request_factory.post('/', data='{}', content_type='application/json')
         request.user = self.mock_user
 
         render.handle_xblock_callback(request, str(course.id), usage_id, handler)
-        assert mock_get_block.call_count == 1
+        assert mock_get_block.call_count == 2
         assert mock_get_block.call_args[1]['will_recheck_access'] == will_recheck_access
 
 
@@ -1021,7 +1047,7 @@ class TestTOC(ModuleStoreTestCase):
         with self.modulestore.bulk_operations(self.course_key):
             with check_mongo_calls(num_finds, num_sends):
                 self.toy_course = self.store.get_course(self.course_key, depth=2)  # pylint: disable=attribute-defined-outside-init
-                self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+                self.field_data_cache = FieldDataCache.cache_for_block_descendents(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
                     self.course_key, self.request.user, self.toy_course, depth=2
                 )
 
@@ -1113,7 +1139,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access
         with self.modulestore.bulk_operations(self.course_key):
             self.toy_course = self.store.get_course(self.course_key, depth=2)
-            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.field_data_cache = FieldDataCache.cache_for_block_descendents(
                 self.course_key, self.request.user, self.toy_course, depth=2
             )
 
@@ -1348,7 +1374,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         self.toy_course = self.update_course(self.toy_course, self.user.id)
 
         # refresh cache after update
-        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        self.field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course_key, self.request.user, self.toy_course, depth=2
         )
 
@@ -1440,7 +1466,7 @@ class TestGatedSubsectionRendering(ModuleStoreTestCase, MilestonesTestCaseMixin)
 
         self.request = RequestFactoryNoCsrf().get(f'/courses/{self.course.id}/{self.chapter.display_name}')
         self.request.user = UserFactory()
-        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        self.field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id, self.request.user, self.course, depth=2
         )
         gating_api.add_prerequisite(self.course.id, self.open_seq.location)
@@ -1504,15 +1530,15 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.rewrite_link = '<a href="/static/foo/content">Test rewrite</a>'
         self.rewrite_bad_link = '<img src="/static//file.jpg" />'
         self.course_link = '<a href="/course/bar/content">Test course rewrite</a>'
-        self.descriptor = BlockFactory.create(
+        self.block = BlockFactory.create(
             category='html',
             data=self.content_string + self.rewrite_link + self.rewrite_bad_link + self.course_link
         )
-        self.location = self.descriptor.location
-        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        self.location = self.block.location
+        self.field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id,
             self.user,
-            self.descriptor
+            self.block
         )
 
     def test_xblock_display_wrapper_enabled(self):
@@ -1649,12 +1675,12 @@ class JsonInitDataTest(ModuleStoreTestCase):
         mock_request = MagicMock()
         mock_request.user = mock_user
         course = CourseFactory()
-        descriptor = BlockFactory(category='withjson', parent=course)
-        field_data_cache = FieldDataCache([course, descriptor], course.id, mock_user)
+        block = BlockFactory(category='withjson', parent=course)
+        field_data_cache = FieldDataCache([course, block], course.id, mock_user)
         block = render.get_block_for_descriptor(
             mock_user,
             mock_request,
-            descriptor,
+            block,
             field_data_cache,
             course.id,
             course=course
@@ -1704,17 +1730,17 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             options=['Correct', 'Incorrect'],
             correct_option='Correct'
         )
-        self.descriptor = BlockFactory.create(
+        self.block = BlockFactory.create(
             category='problem',
             data=problem_xml,
             display_name='Option Response Problem'
         )
 
-        self.location = self.descriptor.location
-        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        self.location = self.block.location
+        self.field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id,
             self.user,
-            self.descriptor
+            self.block
         )
 
     @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': False})
@@ -1757,14 +1783,14 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             </optionresponse>
         </problem>
         """
-        problem_descriptor = BlockFactory.create(
+        problem_block = BlockFactory.create(
             category='problem',
             data=problem_xml
         )
         block = render.get_block(
             self.user,
             self.request,
-            problem_descriptor.location,
+            problem_block.location,
             self.field_data_cache
         )
         html_fragment = block.render(STUDENT_VIEW)
@@ -1774,26 +1800,26 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
         <label for="sd_fs_{block_id}"> / 0</label>
       </div>""")
 
-        assert expected_score_override_html.format(block_id=problem_descriptor.location.block_id) in\
+        assert expected_score_override_html.format(block_id=problem_block.location.block_id) in\
                html_fragment.content
 
     @XBlock.register_temp_plugin(DetachedXBlock, identifier='detached-block')
     def test_staff_debug_info_disabled_for_detached_blocks(self):
         """Staff markup should not be present on detached blocks."""
 
-        descriptor = BlockFactory.create(
+        detached_block = BlockFactory.create(
             category='detached-block',
             display_name='Detached Block'
         )
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id,
             self.user,
-            descriptor
+            detached_block
         )
         block = render.get_block(
             self.user,
             self.request,
-            descriptor.location,
+            detached_block.location,
             field_data_cache,
         )
         result_fragment = block.render(STUDENT_VIEW)
@@ -1813,21 +1839,21 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
     def test_histogram_enabled_for_unscored_xblocks(self):
         """Histograms should not display for xblocks which are not scored."""
 
-        html_descriptor = BlockFactory.create(
+        html_block = BlockFactory.create(
             category='html',
             data='Here are some course details.'
         )
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id,
             self.user,
-            self.descriptor
+            self.block
         )
         with patch('openedx.core.lib.xblock_utils.grade_histogram') as mock_grade_histogram:
             mock_grade_histogram.return_value = []
             block = render.get_block(
                 self.user,
                 self.request,
-                html_descriptor.location,
+                html_block.location,
                 field_data_cache,
             )
             block.render(STUDENT_VIEW)
@@ -1858,6 +1884,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
 
 PER_COURSE_ANONYMIZED_XBLOCKS = (
     LTIBlock,
+    VideoBlock,
 )
 PER_STUDENT_ANONYMIZED_XBLOCKS = [
     AboutBlock,
@@ -1865,7 +1892,6 @@ PER_STUDENT_ANONYMIZED_XBLOCKS = [
     HtmlBlock,
     ProblemBlock,
     StaticTabBlock,
-    VideoBlock,
 ]
 
 
@@ -1886,58 +1912,64 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         self.user = UserFactory()
 
     @patch('lms.djangoapps.courseware.block_render.has_access', Mock(return_value=True, autospec=True))
-    def _get_anonymous_id(self, course_id, xblock_class):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _get_anonymous_id(self, course_id, xblock_class, should_get_deprecated_id: bool):  # lint-amnesty, pylint: disable=missing-function-docstring
         location = course_id.make_usage_key('dummy_category', 'dummy_name')
-        descriptor = Mock(
+        block = Mock(
             spec=xblock_class,
             _field_data=Mock(spec=FieldData, name='field_data'),
             location=location,
             static_asset_path=None,
             _runtime=Mock(
-                spec=Runtime,
+                spec=DescriptorSystem,
                 resources_fs=None,
                 mixologist=Mock(_mixins=(), name='mixologist'),
+                _services={},
                 name='runtime',
             ),
             scope_ids=Mock(spec=ScopeIds),
-            name='descriptor',
+            name='block',
             _field_data_cache={},
             _dirty_fields={},
             fields={},
             days_early_for_beta=None,
         )
-        descriptor.runtime = CombinedSystem(descriptor._runtime, None)  # pylint: disable=protected-access
+        block.runtime = DescriptorSystem(None, None, None)
         # Use the xblock_class's bind_for_student method
-        descriptor.bind_for_student = partial(xblock_class.bind_for_student, descriptor)
+        block.bind_for_student = partial(xblock_class.bind_for_student, block)
 
         if hasattr(xblock_class, 'module_class'):
-            descriptor.module_class = xblock_class.module_class
+            block.module_class = xblock_class.module_class
 
-        block = render.get_block_for_descriptor_internal(
+        rendered_block = render.get_block_for_descriptor(
             user=self.user,
-            descriptor=descriptor,
+            block=block,
             student_data=Mock(spec=FieldData, name='student_data'),
-            course_id=course_id,
+            course_key=course_id,
             track_function=Mock(name='track_function'),  # Track Function
             request_token='request_token',
             course=self.course,
+            request=None,
+            field_data_cache=None,
         )
-        current_user = block.xmodule_runtime.service(block, 'user').get_current_user()
+        current_user = rendered_block.runtime.service(rendered_block, 'user').get_current_user()
+
+        if should_get_deprecated_id:
+            return current_user.opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
         return current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
 
     @ddt.data(*PER_STUDENT_ANONYMIZED_XBLOCKS)
-    def test_per_student_anonymized_id(self, descriptor_class):
+    def test_per_student_anonymized_id(self, block_class):
         for course_id in ('MITx/6.00x/2012_Fall', 'MITx/6.00x/2013_Spring'):
             assert 'de619ab51c7f4e9c7216b4644c24f3b5' == \
-                   self._get_anonymous_id(CourseKey.from_string(course_id), descriptor_class)
+                   self._get_anonymous_id(CourseKey.from_string(course_id), block_class, True)
 
     @ddt.data(*PER_COURSE_ANONYMIZED_XBLOCKS)
     def test_per_course_anonymized_id(self, xblock_class):
         assert '0c706d119cad686d28067412b9178454' == \
-               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), xblock_class)
+               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), xblock_class, False)
 
         assert 'e9969c28c12c8efa6e987d6dbeedeb0b' == \
-               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), xblock_class)
+               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), xblock_class, False)
 
 
 @patch('common.djangoapps.track.views.eventtracker', autospec=True)
@@ -1976,7 +2008,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     @patch('xmodule.modulestore.mongo.base.CachingDescriptorSystem.applicable_aside_types',
            lambda self, block: ['test_aside'])
-    @patch('lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.applicable_aside_types',
+    @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types',
            lambda self, block: ['test_aside'])
     def test_context_contains_aside_info(self, mock_tracker):
         """
@@ -2013,14 +2045,14 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         metadata from the emitted problem_check event.
         """
 
-        descriptor_kwargs = {
+        block_kwargs = {
             'category': 'problem',
             'data': self.problem_xml
         }
         if problem_display_name:
-            descriptor_kwargs['display_name'] = problem_display_name
+            block_kwargs['display_name'] = problem_display_name
 
-        descriptor = BlockFactory.create(**descriptor_kwargs)
+        block = BlockFactory.create(**block_kwargs)
         mock_tracker_for_context = MagicMock()
         with patch('lms.djangoapps.courseware.block_render.tracker', mock_tracker_for_context), patch(
             'xmodule.services.tracker', mock_tracker_for_context
@@ -2028,7 +2060,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             render.handle_xblock_callback(
                 self.request,
                 str(self.course.id),
-                quote_slashes(str(descriptor.location)),
+                quote_slashes(str(block.location)),
                 'xmodule_handler',
                 'problem_check',
             )
@@ -2095,7 +2127,7 @@ class TestXBlockRuntimeEvent(TestSubmittingProblems):
         """Helper function to get useful block at self.location in self.course_id for user"""
         mock_request = MagicMock()
         mock_request.user = user
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id, user, self.course, depth=2)
 
         return render.get_block(
@@ -2166,7 +2198,7 @@ class TestRebindBlock(TestSubmittingProblems):
         """Helper function to get useful block at self.location in self.course_id for user"""
         mock_request = MagicMock()
         mock_request.user = user
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id, user, self.course, depth=2)
 
         if item is None:
@@ -2185,7 +2217,7 @@ class TestRebindBlock(TestSubmittingProblems):
         # Bind the block to another student, which will remove "correct_map"
         # from the block's _field_data_cache and _dirty_fields.
         user2 = UserFactory.create()
-        block.bind_for_student(block.runtime, user2.id)
+        block.bind_for_student(user2.id)
 
         # XBlock's save method assumes that if a field is in _dirty_fields,
         # then it's also in _field_data_cache. If this assumption
@@ -2194,7 +2226,7 @@ class TestRebindBlock(TestSubmittingProblems):
         # _field_data cache, but not _dirty_fields, when we bound
         # this block to the second student. (TNL-2640)
         user3 = UserFactory.create()
-        block.bind_for_student(block.runtime, user3.id)
+        block.bind_for_student(user3.id)
 
     def test_rebind_noauth_block_to_user_not_anonymous(self):
         """
@@ -2220,7 +2252,8 @@ class TestRebindBlock(TestSubmittingProblems):
         user2.id = 2
         block.runtime.service(block, 'rebind_user').rebind_noauth_module_to_user(block, user2)
         assert block
-        assert block.runtime.anonymous_student_id == anonymous_id_for_user(user2, self.course.id)
+        block_user_info = block.runtime.service(block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID) == anonymous_id_for_user(user2, self.course.id)
         assert block.scope_ids.user_id == user2.id
         assert block.scope_ids.user_id == user2.id
 
@@ -2247,9 +2280,9 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         request = self.request_factory.get('')
         request.user = self.mock_user
         course = CourseFactory()
-        descriptor = BlockFactory(category='xblock', parent=course)
-        field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)
-        block = render.get_block(self.mock_user, request, descriptor.location, field_data_cache)
+        block = BlockFactory(category='xblock', parent=course)
+        field_data_cache = FieldDataCache([course, block], course.id, self.mock_user)
+        block = render.get_block(self.mock_user, request, block.location, field_data_cache)
 
         event_type = 'event_type'
         event = {'event': 'data'}
@@ -2263,16 +2296,16 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
     """
-    Helper class that initializes the LmsModuleSystem.
+    Helper class that initializes the runtime.
     """
     def _prepare_runtime(self):
         """
-        Instantiate the LmsModuleSystem.
+        Instantiate the runtem.
         """
-        self.runtime, _ = render.get_module_system_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.descriptor,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2290,7 +2323,7 @@ class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
         self.student_data = Mock()
         self.track_function = Mock()
         self.request_token = Mock()
-        self.descriptor = BlockFactory(category="pure", parent=self.course)
+        self.block = BlockFactory(category="pure", parent=self.course)
         self._prepare_runtime()
 
 
@@ -2316,7 +2349,6 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         'content_type_gating',
         'cache',
         'sandbox',
-        'xqueue',
         'replace_urls',
         'rebind_user',
         'completion',
@@ -2333,19 +2365,8 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         """
         Tests that the 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
         """
-        service = self.runtime.service(self.descriptor, expected_service)
+        service = self.block.runtime.service(self.block, expected_service)
         assert service is not None
-
-    def test_beta_tester_fields_added(self):
-        """
-        Tests that the beta tester fields are set on LMS runtime.
-        """
-        self.descriptor.days_early_for_beta = 5
-        self._prepare_runtime()
-
-        # pylint: disable=no-member
-        assert not self.runtime.user_is_beta_tester
-        assert self.runtime.days_early_for_beta == 5
 
     def test_get_set_tag(self):
         """
@@ -2355,63 +2376,23 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         key = 'key1'
 
         # test for when we haven't set the tag yet
-        tag = self.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
+        tag = self.block.runtime.service(self.block, 'user_tags').get_tag(scope, key)
         assert tag is None
 
         # set the tag
         set_value = 'value'
-        self.runtime.service(self.descriptor, 'user_tags').set_tag(scope, key, set_value)
-        tag = self.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
+        self.block.runtime.service(self.block, 'user_tags').set_tag(scope, key, set_value)
+        tag = self.block.runtime.service(self.block, 'user_tags').get_tag(scope, key)
 
         assert tag == set_value
 
         # Try to set tag in wrong scope
         with pytest.raises(ValueError):
-            self.runtime.service(self.descriptor, 'user_tags').set_tag('fake_scope', key, set_value)
+            self.block.runtime.service(self.block, 'user_tags').set_tag('fake_scope', key, set_value)
 
         # Try to get tag in wrong scope
         with pytest.raises(ValueError):
-            self.runtime.service(self.descriptor, 'user_tags').get_tag('fake_scope', key)
-
-
-@ddt.ddt
-class TestBadgingService(LMSXBlockServiceMixin):
-    """Test the badging service interface"""
-
-    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    def test_service_rendered(self):
-        self._prepare_runtime()
-        assert self.runtime.service(self.descriptor, 'badging')
-
-    def test_no_service_rendered(self):
-        with pytest.raises(NoSuchServiceError):
-            self.runtime.service(self.descriptor, 'badging')
-
-    @ddt.data(True, False)
-    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    def test_course_badges_toggle(self, toggle):
-        self.course = CourseFactory.create(metadata={'issue_badges': toggle})
-        self._prepare_runtime()
-        assert self.runtime.service(self.descriptor, 'badging').course_badges_enabled is toggle
-
-    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-    def test_get_badge_class(self):
-        self._prepare_runtime()
-        badge_service = self.runtime.service(self.descriptor, 'badging')
-        premade_badge_class = BadgeClassFactory.create()
-        # Ignore additional parameters. This class already exists.
-        # We should get back the first class we created, rather than a new one.
-        with get_image('good') as image_handle:
-            badge_class = badge_service.get_badge_class(
-                slug='test_slug', issuing_component='test_component', description='Attempted override',
-                criteria='test', display_name='Testola', image_file_handle=image_handle
-            )
-        # These defaults are set on the factory.
-        assert badge_class.criteria == 'https://example.com/syllabus'
-        assert badge_class.display_name == 'Test Badge'
-        assert badge_class.description == "Yay! It's a test badge."
-        # File name won't always be the same.
-        assert badge_class.image.path == premade_badge_class.image.path
+            self.block.runtime.service(self.block, 'user_tags').get_tag('fake_scope', key)
 
 
 class TestI18nService(LMSXBlockServiceMixin):
@@ -2421,7 +2402,7 @@ class TestI18nService(LMSXBlockServiceMixin):
         """
         Test: module i18n service in LMS
         """
-        i18n_service = self.runtime.service(self.descriptor, 'i18n')
+        i18n_service = self.block.runtime.service(self.block, 'i18n')
         assert i18n_service is not None
         assert isinstance(i18n_service, XBlockI18nService)
 
@@ -2429,29 +2410,31 @@ class TestI18nService(LMSXBlockServiceMixin):
         """
         Test: NoSuchServiceError should be raised block declaration returns none
         """
-        self.descriptor.service_declaration = Mock(return_value=None)
+        self.block.service_declaration = Mock(return_value=None)
         with pytest.raises(NoSuchServiceError):
-            self.runtime.service(self.descriptor, 'i18n')
+            self.block.runtime.service(self.block, 'i18n')
 
     def test_no_service_exception_(self):
         """
         Test: NoSuchServiceError should be raised if i18n service is none.
         """
-        self.runtime._services['i18n'] = None  # pylint: disable=protected-access
+        i18nService = self.block.runtime._services['i18n']  # pylint: disable=protected-access
+        self.block.runtime._services['i18n'] = None  # pylint: disable=protected-access
         with pytest.raises(NoSuchServiceError):
-            self.runtime.service(self.descriptor, 'i18n')
+            self.block.runtime.service(self.block, 'i18n')
+        self.block.runtime._services['i18n'] = i18nService  # pylint: disable=protected-access
 
     def test_i18n_service_callable(self):
         """
         Test: _services dict should contain the callable i18n service in LMS.
         """
-        assert callable(self.runtime._services.get('i18n'))  # pylint: disable=protected-access
+        assert callable(self.block.runtime._services.get('i18n'))  # pylint: disable=protected-access
 
     def test_i18n_service_not_callable(self):
         """
         Test: i18n service should not be callable in LMS after initialization.
         """
-        assert not callable(self.runtime.service(self.descriptor, 'i18n'))
+        assert not callable(self.block.runtime.service(self.block, 'i18n'))
 
 
 class PureXBlockWithChildren(PureXBlock):
@@ -2488,27 +2471,10 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
 
     @ddt.data(*USER_NUMBERS)
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    def test_unbound_then_bound_as_descriptor(self, user_number):
-        user = self.users[user_number]
-        block = self._load_block()
-        self.assertUnboundChildren(block)
-        self._bind_block(block, user)
-        self.assertBoundChildren(block, user)
-
-    @ddt.data(*USER_NUMBERS)
-    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
     def test_unbound_then_bound_as_xblock(self, user_number):
         user = self.users[user_number]
         block = self._load_block()
         self.assertUnboundChildren(block)
-        self._bind_block(block, user)
-        self.assertBoundChildren(block, user)
-
-    @ddt.data(*USER_NUMBERS)
-    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    def test_bound_only_as_descriptor(self, user_number):
-        user = self.users[user_number]
-        block = self._load_block()
         self._bind_block(block, user)
         self.assertBoundChildren(block, user)
 
@@ -2541,7 +2507,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         Bind `block` to the supplied `user`.
         """
         course_id = self.course.id
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course_id,
             user,
             block,
@@ -2602,25 +2568,25 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
 
     def test_get_item(self):
         course = CourseFactory()
-        self._verify_descriptor('video', course, 'HiddenBlockWithMixins')
+        self._verify_block('video', course, 'HiddenBlockWithMixins')
 
     def test_dynamic_updates(self):
         """Tests that the list of disabled xblocks can dynamically update."""
         course = CourseFactory()
-        item_usage_id = self._verify_descriptor('problem', course, 'ProblemBlockWithMixins')
+        item_usage_id = self._verify_block('problem', course, 'ProblemBlockWithMixins')
         XBlockConfiguration(name='problem', enabled=False).save()
 
         # First verify that the cached value is used until there is a new request cache.
-        self._verify_descriptor('problem', course, 'ProblemBlockWithMixins', item_usage_id)
+        self._verify_block('problem', course, 'ProblemBlockWithMixins', item_usage_id)
 
         # Now simulate a new request cache.
         self.store.request_cache.data.clear()
-        self._verify_descriptor('problem', course, 'HiddenBlockWithMixins', item_usage_id)
+        self._verify_block('problem', course, 'HiddenBlockWithMixins', item_usage_id)
 
-    def _verify_descriptor(self, category, course, descriptor, item_id=None):
+    def _verify_block(self, category, course, block, item_id=None):
         """
         Helper method that gets an item with the specified category from the
-        modulestore and verifies that it has the expected descriptor name.
+        modulestore and verifies that it has the expected block name.
 
         Returns the item's usage_id.
         """
@@ -2629,7 +2595,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
             item_id = item.scope_ids.usage_id  # lint-amnesty, pylint: disable=no-member
 
         item = self.store.get_item(item_id)
-        assert item.__class__.__name__ == descriptor
+        assert item.__class__.__name__ == block
         return item_id
 
 
@@ -2646,15 +2612,15 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         """
-        Set up the course and descriptor used to instantiate the runtime.
+        Set up the course and block used to instantiate the runtime.
         """
         super().setUpClass()
         org = 'edX'
         number = 'LmsModuleShimTest'
         run = '2021_Fall'
         cls.course = CourseFactory.create(org=org, number=number, run=run)
-        cls.descriptor = BlockFactory(category="vertical", parent=cls.course)
-        cls.problem_descriptor = BlockFactory(category="problem", parent=cls.course)
+        cls.block = BlockFactory(category="vertical", parent=cls.course)
+        cls.problem_block = BlockFactory(category="problem", parent=cls.course)
 
     def setUp(self):
         """
@@ -2666,10 +2632,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.track_function = Mock()
         self.request_token = Mock()
         self.contentstore = contentstore()
-        self.runtime, _ = render.get_module_system_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.descriptor,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2686,160 +2652,203 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         """
         Tests that the deprecated attributes provided by the user service match expected values.
         """
-        assert getattr(self.runtime, attribute) == expected_value
+        assert getattr(self.block.runtime, attribute) == expected_value
 
-    @patch('lms.djangoapps.courseware.block_render.has_access', Mock(return_value=True, autospec=True))
-    def test_user_is_staff(self):
-        runtime, _ = render.get_module_system_for_user(
+    @ddt.data((True, 'staff'), (False, 'student'))
+    @ddt.unpack
+    def test_user_is_staff(self, is_staff, expected_role):
+        if is_staff:
+            self.user = StaffFactory(course_key=self.course.id)
+
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.descriptor,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
             course=self.course,
         )
-        assert runtime.user_is_staff
-        assert runtime.get_user_role() == 'student'
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_STAFF) == is_staff
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == expected_role
+        with warnings.catch_warnings():  # For now, also test the deprecated accessors for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.user_is_staff == is_staff
+            assert self.block.runtime.get_user_role() == expected_role
 
-    @patch('lms.djangoapps.courseware.block_render.get_user_role', Mock(return_value='instructor', autospec=True))
-    def test_get_user_role(self):
-        runtime, _ = render.get_module_system_for_user(
+    @ddt.data(True, False)
+    def test_user_is_admin(self, is_global_staff):
+        if is_global_staff:
+            self.user = GlobalStaffFactory.create()
+
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.descriptor,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
             course=self.course,
         )
-        assert runtime.get_user_role() == 'instructor'
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_GLOBAL_STAFF) == is_global_staff
+        with warnings.catch_warnings():  # For now, also test the deprecated accessors for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.user_is_admin == is_global_staff
+
+    @ddt.data(True, False)
+    def test_user_is_beta_tester(self, is_beta_tester):
+        if is_beta_tester:
+            self.user = BetaTesterFactory(course_key=self.course.id)
+
+        render.prepare_runtime_for_user(
+            self.user,
+            self.student_data,
+            self.block.runtime,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course,
+        )
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_BETA_TESTER) == is_beta_tester
+        with warnings.catch_warnings():  # For now, also test the deprecated accessors for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.user_is_beta_tester == is_beta_tester
+
+    @ddt.data((True, 'instructor'), (False, 'student'))
+    @ddt.unpack
+    def test_get_user_role(self, is_instructor, expected_role):
+        if is_instructor:
+            self.user = InstructorFactory(course_key=self.course.id)
+
+        render.prepare_runtime_for_user(
+            self.user,
+            self.student_data,
+            self.block.runtime,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course,
+        )
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == expected_role
+        with warnings.catch_warnings():  # For now, also test the deprecated accessor for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.get_user_role() == expected_role
 
     def test_anonymous_student_id(self):
-        assert self.runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+        expected_anon_id = anonymous_id_for_user(self.user, self.course.id)
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID) == expected_anon_id
+        with warnings.catch_warnings():  # For now, also test the deprecated accessor for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.anonymous_student_id == expected_anon_id
 
     def test_anonymous_student_id_bug(self):
         """
-        Verifies that subsequent calls to get_module_system_for_user have no effect on each block runtime's
+        Verifies that subsequent calls to prepare_runtime_for_user have no effect on each block runtime's
         anonymous_student_id value.
         """
-        problem_runtime, _ = render.get_module_system_for_user(
+
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.problem_descriptor,
+            self.problem_block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
             course=self.course,
         )
         # Ensure the problem block returns a per-user anonymous id
-        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+        assert self.problem_block.runtime.service(self.problem_block, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
+        ) == anonymous_id_for_user(self.user, None)
 
-        vertical_runtime, _ = render.get_module_system_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.descriptor,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
             course=self.course,
         )
         # Ensure the vertical block returns a per-course+user anonymous id
-        assert vertical_runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+        assert self.block.runtime.service(self.block, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_ANONYMOUS_USER_ID
+        ) == anonymous_id_for_user(self.user, self.course.id)
 
         # Ensure the problem runtime's anonymous student ID is unchanged after the above call.
-        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+        assert self.problem_block.runtime.service(self.problem_block, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
+        ) == anonymous_id_for_user(self.user, None)
 
     def test_user_service_with_anonymous_user(self):
-        runtime, _ = render.get_module_system_for_user(
+        render.prepare_runtime_for_user(
             AnonymousUser(),
             self.student_data,
-            self.descriptor,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
             course=self.course,
         )
-        assert runtime.anonymous_student_id is None
-        assert runtime.seed == 0
-        assert runtime.user_id is None
-        assert not runtime.user_is_staff
-        assert not runtime.get_user_role()
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID) is None
+        assert self.block.scope_ids.user_id is None
+        assert not block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        assert not block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE)
+        # Also test the deprecated accessors for backwards compatibility:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.anonymous_student_id is None
+            assert self.block.runtime.seed == 0
+            assert self.block.runtime.user_id is None
+            assert not self.block.runtime.user_is_staff
+            assert not self.block.runtime.get_user_role()
 
     def test_get_real_user(self):
-        runtime, _ = render.get_module_system_for_user(
+        """
+        Test the deprecated runtime.get_real_user() method, to ensure backwards compatibility.
+
+        Newer code should use the user service, which gets tested in test_user_service.py
+        """
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.descriptor,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
             course=self.course,
         )
         course_anonymous_student_id = anonymous_id_for_user(self.user, self.course.id)
-        assert runtime.get_real_user(course_anonymous_student_id) == self.user  # pylint: disable=not-callable
-
         no_course_anonymous_student_id = anonymous_id_for_user(self.user, None)
-        assert runtime.get_real_user(no_course_anonymous_student_id) == self.user  # pylint: disable=not-callable
 
-        # Tests that the default is to use the user service's anonymous_student_id
-        assert runtime.get_real_user() == self.user  # pylint: disable=not-callable
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            # pylint: disable=not-callable
+            assert self.block.runtime.get_real_user(course_anonymous_student_id) == self.user
+            assert self.block.runtime.get_real_user(no_course_anonymous_student_id) == self.user
+            # Tests that the default is to use the user service's anonymous_student_id
+            assert self.block.runtime.get_real_user() == self.user
 
     def test_render_template(self):
-        rendered = self.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
+        rendered = self.block.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
         assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'
-
-    def test_xqueue(self):
-        xqueue = self.runtime.xqueue
-        assert isinstance(xqueue['interface'], XQueueInterface)
-        assert xqueue['interface'].url == 'http://sandbox-xqueue.edx.org'
-        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
-        assert xqueue['waittime'] == 5
-        callback_url = f'http://localhost:8000/courses/{self.course.id}/xqueue/232/{self.descriptor.location}'
-        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
-        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
-
-    @override_settings(
-        XQUEUE_INTERFACE={
-            'callback_url': 'http://alt.url',
-            'url': 'http://xqueue.url',
-            'django_auth': {
-                'username': 'user',
-                'password': 'password',
-            },
-            'basic_auth': ('basic', 'auth'),
-        },
-        XQUEUE_WAITTIME_BETWEEN_REQUESTS=15,
-    )
-    def test_xqueue_settings(self):
-        runtime, _ = render.get_module_system_for_user(
-            self.user,
-            self.student_data,
-            self.descriptor,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course,
-        )
-        xqueue = runtime.xqueue
-        assert isinstance(xqueue['interface'], XQueueInterface)
-        assert xqueue['interface'].url == 'http://xqueue.url'
-        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
-        assert xqueue['waittime'] == 15
-        callback_url = f'http://alt.url/courses/{self.course.id}/xqueue/232/{self.descriptor.location}'
-        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
-        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+LmsModuleShimTest\+2021_Fall'])
     def test_can_execute_unsafe_code_when_allowed(self):
-        assert self.runtime.can_execute_unsafe_code()
+        assert self.block.runtime.can_execute_unsafe_code()
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+full\+2021_Fall'])
     def test_cannot_execute_unsafe_code_when_disallowed(self):
-        assert not self.runtime.can_execute_unsafe_code()
+        assert not self.block.runtime.can_execute_unsafe_code()
 
     def test_cannot_execute_unsafe_code(self):
-        assert not self.runtime.can_execute_unsafe_code()
+        assert not self.block.runtime.can_execute_unsafe_code()
 
     @override_settings(PYTHON_LIB_FILENAME=PYTHON_LIB_FILENAME)
     def test_get_python_lib_zip(self):
@@ -2849,7 +2858,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             source_file=self.PYTHON_LIB_SOURCE_FILE,
             target_filename=self.PYTHON_LIB_FILENAME,
         )
-        assert self.runtime.get_python_lib_zip() == zipfile
+        assert self.block.runtime.get_python_lib_zip() == zipfile
 
     def test_no_get_python_lib_zip(self):
         zipfile = upload_file_to_course(
@@ -2858,32 +2867,19 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             source_file=self.PYTHON_LIB_SOURCE_FILE,
             target_filename=self.PYTHON_LIB_FILENAME,
         )
-        assert self.runtime.get_python_lib_zip() is None
+        assert self.block.runtime.get_python_lib_zip() is None
 
     def test_cache(self):
-        assert hasattr(self.runtime.cache, 'get')
-        assert hasattr(self.runtime.cache, 'set')
-
-    def test_replace_urls(self):
-        html = '<a href="/static/id">'
-        assert self.runtime.replace_urls(html) == \
-            static_replace.replace_static_urls(html, course_id=self.course.id)
-
-    def test_replace_course_urls(self):
-        html = '<a href="/course/id">'
-        assert self.runtime.replace_course_urls(html) == \
-            static_replace.replace_course_urls(html, course_key=self.course.id)
-
-    def test_replace_jump_to_id_urls(self):
-        html = '<a href="/jump_to_id/id">'
-        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.course.id), 'module_id': ''})
-        assert self.runtime.replace_jump_to_id_urls(html) == \
-            static_replace.replace_jump_to_id_urls(html, self.course.id, jump_to_id_base_url)
+        assert hasattr(self.block.runtime.cache, 'get')
+        assert hasattr(self.block.runtime.cache, 'set')
 
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
     def test_course_id(self):
-        descriptor = BlockFactory(category="pure", parent=self.course)
+        block = BlockFactory(category="pure", parent=self.course)
 
-        block = render.get_block(self.user, Mock(), descriptor.location, None)
-        assert str(block.runtime.course_id) == self.COURSE_ID
+        rendered_block = render.get_block(self.user, Mock(), block.location, None)
+        assert str(rendered_block.scope_ids.usage_id.context_key) == self.COURSE_ID
+        with warnings.catch_warnings():  # For now, also test the deprecated accessor for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert str(rendered_block.runtime.course_id) == self.COURSE_ID

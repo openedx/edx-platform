@@ -3,6 +3,7 @@
  */
 (function(define) {
     'use strict';
+
     define(['backbone', 'teams/js/models/team'], function(Backbone, TeamModel) {
         var TeamMembership = Backbone.Model.extend({
             defaults: {

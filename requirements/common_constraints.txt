@@ -2,7 +2,6 @@
 # In edx-lint, until the pyjwt constraint in edx-lint has been removed.
 # See BOM-2721 for more details.
 # Below is the copied and edited version of common_constraints
-
 # A central location for most common version constraints
 # (across edx repos) for pip-installation.
 #
@@ -18,20 +17,19 @@
 
 
 # using LTS django version
-Django<4.0
+Django<5.0
 
 # elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
 elasticsearch<7.14.0
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
-django-simple-history==3.0.0
 
-# tox>4.0.0 isn't yet compatible with many tox plugins, causing CI failures in almost all repos.
-# Details can be found in this discussion: https://github.com/tox-dev/tox/discussions/1810
-tox<4.0.0
-
-# edx-sphinx-theme is not compatible with latest Sphinx==6.0.0 version 
-# Pinning Sphinx version unless the compatibility issue gets resolved
-# For details, see issue https://github.com/openedx/edx-sphinx-theme/issues/197
-sphinx<6.0.0
+# opentelemetry requires version 6.x at the moment:
+# https://github.com/open-telemetry/opentelemetry-python/issues/3570
+# Normally this could be added as a constraint in edx-django-utils, where we're
+# adding the opentelemetry dependency. However, when we compile pip-tools.txt,
+# that uses version 7.x, and then there's no undoing that when compiling base.txt.
+# So we need to pin it globally, for now.
+# Ticket for unpinning: https://github.com/openedx/edx-lint/issues/407
+importlib-metadata<7

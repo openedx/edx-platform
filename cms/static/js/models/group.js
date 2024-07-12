@@ -3,6 +3,7 @@ define([
     'backbone.associations'
 ], function(Backbone, _, str, gettext) {
     'use strict';
+
     var Group = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {

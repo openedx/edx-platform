@@ -97,7 +97,6 @@
                 _updateVcrAndRegion(this);
             }
 
-
             // function _initialize(state)
             //
             //     Create any necessary DOM elements, attach them, and set their
@@ -153,14 +152,14 @@
                 state.browserIsFirefox = userAgent.indexOf('firefox') > -1;
                 state.browserIsChrome = userAgent.indexOf('chrome') > -1;
                 // Chrome includes both "Chrome" and "Safari" in the user agent.
-                state.browserIsSafari = (userAgent.indexOf('safari') > -1 &&
-                                 !state.browserIsChrome);
+                state.browserIsSafari = (userAgent.indexOf('safari') > -1
+                                 && !state.browserIsChrome);
 
                 // Browser can play HLS videos if either `Media Source Extensions`
                 // feature is supported or browser is safari (native HLS support)
                 state.canPlayHLS = state.HLSVideoSources.length > 0 && (HLS.isSupported() || state.browserIsSafari);
-                state.HLSOnlySources = state.config.sources.length > 0 &&
-                               state.config.sources.length === state.HLSVideoSources.length;
+                state.HLSOnlySources = state.config.sources.length > 0
+                               && state.config.sources.length === state.HLSVideoSources.length;
 
                 commonPlayerConfig = {
                     playerVars: state.videoPlayer.playerVars,
@@ -192,6 +191,7 @@
                     } else {
                         state.videoPlayer.player = new HTML5Video.Player(state.el, commonPlayerConfig);
                     }
+                    // eslint-disable-next-line no-multi-assign
                     player = state.videoEl = state.videoPlayer.player.videoEl;
                     player[0].addEventListener(eventToBeTriggered, state.videoPlayer.onLoadMetadataHtml5, false);
                     player.on('remove', state.videoPlayer.destroy);
@@ -210,6 +210,7 @@
                     });
 
                     state.el.on('initialize', function() {
+                        // eslint-disable-next-line no-shadow, no-multi-assign
                         var player = state.videoEl = state.el.find('iframe'),
                             videoWidth = player.attr('width') || player.width(),
                             videoHeight = player.attr('height') || player.height();
@@ -227,7 +228,9 @@
             }
 
             function _updateVcrAndRegion(state, isYoutube) {
+                // eslint-disable-next-line no-shadow
                 var update = function(state) {
+                    // eslint-disable-next-line no-shadow
                     var duration = state.videoPlayer.duration(),
                         time;
 
@@ -397,8 +400,8 @@
                     // than end-time. Also, we must make sure that this is only done
                     // once per video playing from start to end.
                     if (
-                        this.videoPlayer.endTime !== null &&
-                this.videoPlayer.endTime <= this.videoPlayer.currentTime
+                        this.videoPlayer.endTime !== null
+                && this.videoPlayer.endTime <= this.videoPlayer.currentTime
                     ) {
                         this.videoPlayer.pause();
 
@@ -454,6 +457,7 @@
             }
 
             function seekTo(time) {
+                // eslint-disable-next-line no-shadow
                 var duration = this.videoPlayer.duration();
 
                 if ((typeof time !== 'number') || (time > duration) || (time < 0)) {
@@ -465,8 +469,8 @@
                 if (this.videoPlayer.isPlaying()) {
                     this.videoPlayer.stopTimer();
                 }
-                var isUnplayed = this.videoPlayer.isUnstarted() ||
-                         this.videoPlayer.isCued();
+                var isUnplayed = this.videoPlayer.isUnstarted()
+                         || this.videoPlayer.isCued();
 
                 // Use `cueVideoById` method for youtube video that is not played before.
                 if (isUnplayed && this.isYoutubeType()) {
@@ -511,7 +515,6 @@
 
             function onEnded() {
                 var time = this.videoPlayer.duration();
-
 
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
                     end: true
@@ -610,8 +613,8 @@
                 // For more information, please see the PR that introduced this change:
                 //     https://github.com/openedx/edx-platform/pull/2841
                 if (
-                    (this.isHtml5Mode() || availablePlaybackRates.length > 1) &&
-            this.isYoutubeType()
+                    (this.isHtml5Mode() || availablePlaybackRates.length > 1)
+            && this.isYoutubeType()
                 ) {
                     if (availablePlaybackRates.length === 1 && !this.isTouch) {
                         // This condition is needed in cases when Firefox version is
@@ -661,7 +664,7 @@
                     this.videoPlayer.player.setPlaybackRate(this.speed);
                 }
 
-
+                // eslint-disable-next-line no-shadow
                 var duration = this.videoPlayer.duration(),
                     time = this.videoPlayer.figureOutStartingTime(duration);
 
@@ -685,6 +688,7 @@
                     'is-ended', 'is-cued'
                 ].join(' '));
 
+                // eslint-disable-next-line default-case
                 switch (event.data) {
                 case this.videoPlayer.PlayerState.UNSTARTED:
                     this.el.addClass('is-unstarted');
@@ -719,6 +723,7 @@
                 this.el.trigger('error', [code]);
             }
 
+            // eslint-disable-next-line no-shadow
             function figureOutStartEndTime(duration) {
                 var videoPlayer = this.videoPlayer;
 
@@ -731,8 +736,8 @@
 
                 videoPlayer.endTime = this.config.endTime;
                 if (
-                    videoPlayer.endTime <= videoPlayer.startTime ||
-            videoPlayer.endTime >= duration
+                    videoPlayer.endTime <= videoPlayer.startTime
+            || videoPlayer.endTime >= duration
                 ) {
                     videoPlayer.endTime = null;
                 } else if (this.isFlashMode()) {
@@ -740,6 +745,7 @@
                 }
             }
 
+            // eslint-disable-next-line no-shadow
             function figureOutStartingTime(duration) {
                 var savedVideoPosition = this.config.savedVideoPosition,
 
@@ -757,26 +763,26 @@
 
                 if (startTime > 0) {
                     if (
-                        startTime < savedVideoPosition &&
-                (endTime > savedVideoPosition || endTime === null) &&
+                        startTime < savedVideoPosition
+                && (endTime > savedVideoPosition || endTime === null)
 
                 // We do not want to jump to the end of the video.
                 // We subtract 1 from the duration for a 1 second
                 // safety net.
-                savedVideoPosition < duration - 1
+                && savedVideoPosition < duration - 1
                     ) {
                         time = savedVideoPosition;
                     } else {
                         time = startTime;
                     }
                 } else if (
-                    savedVideoPosition > 0 &&
-            (endTime > savedVideoPosition || endTime === null) &&
+                    savedVideoPosition > 0
+            && (endTime > savedVideoPosition || endTime === null)
 
             // We do not want to jump to the end of the video.
             // We subtract 1 from the duration for a 1 second
             // safety net.
-            savedVideoPosition < duration - 1
+            && savedVideoPosition < duration - 1
                 ) {
                     time = savedVideoPosition;
                 }

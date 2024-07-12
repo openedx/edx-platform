@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/models/cohort',
         'js/groups/views/cohort_editor', 'js/groups/views/cohort_form',
         'js/groups/views/course_cohort_settings_notification',
@@ -133,7 +134,8 @@
                 }).fail(function(result) {
                     self.showNotification({
                         type: 'error',
-                        title: gettext("We've encountered an error. Refresh your browser and then try again.")},
+                        title: gettext("We've encountered an error. Refresh your browser and then try again.")
+                    },
                     self.$('.cohorts-state-section')
                     );
                 });
@@ -270,6 +272,7 @@
                         submitButtonText: gettext('Upload File and Assign Students'),
                         extensions: '.csv',
                         url: this.context.uploadCohortsCsvUrl,
+                        // eslint-disable-next-line no-shadow
                         successNotification: function(file, event, data) {
                             var message = interpolate_text(gettext(
                                 "Your file '{file}' has been uploaded. Allow a few minutes for processing."

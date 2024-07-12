@@ -1,4 +1,4 @@
-(function (define){
+(function(define) {
     'use strict';
 
     define([
@@ -14,15 +14,13 @@
         'js/views/fields',
         'learner_profile/js/views/learner_profile_fields',
         'learner_profile/js/views/learner_profile_view',
-        'learner_profile/js/models/badges_model',
-        'learner_profile/js/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
-    ], function (gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
-        AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel,
-        BadgeListContainer, AccountSettingsFieldViews, MessageBannerView){
-        return function (options) {
+    ], function(gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
+        AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView,
+        AccountSettingsFieldViews, MessageBannerView) {
+        return function(options) {
             var $learnerProfileElement = $('.wrapper-profile');
 
             var accountSettingsModel = new AccountSettingsModel(
@@ -55,9 +53,6 @@
                 nameFieldView,
                 sectionOneFieldViews,
                 sectionTwoFieldViews,
-                BadgeCollection,
-                badgeCollection,
-                badgeListContainer,
                 learnerProfileView,
                 getProfileVisibility,
                 showLearnerProfileView;
@@ -122,7 +117,7 @@
                     helpMessage: '',
                     userLanguage: accountSettingsModel.get('language'),
                     userTimezone: accountPreferencesModel.get('time_zone'),
-                    dateFormat: 'MMMM YYYY'  // not localized, but hopefully ok.
+                    dateFormat: 'MMMM YYYY' // not localized, but hopefully ok.
                 }),
 
                 new FieldsView.DropdownFieldView({
@@ -172,26 +167,6 @@
                 })
             ];
 
-            BadgeCollection = PagingCollection.extend({
-                queryParams: {
-                    currentPage: 'current_page'
-                }
-            });
-            badgeCollection = new BadgeCollection();
-            badgeCollection.url = options.badges_api_url;
-
-            badgeListContainer = new BadgeListContainer({
-                attributes: {class: 'badge-set-display'},
-                collection: badgeCollection,
-                find_courses_url: options.find_courses_url,
-                ownProfile: options.own_profile,
-                badgeMeta: {
-                    badges_logo: options.badges_logo,
-                    backpack_ui_img: options.backpack_ui_img,
-                    badges_icon: options.badges_icon
-                }
-            });
-
             learnerProfileView = new LearnerProfileView({
                 el: $learnerProfileElement,
                 ownProfile: options.own_profile,
@@ -204,11 +179,10 @@
                 nameFieldView: nameFieldView,
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews,
-                badgeListContainer: badgeListContainer,
                 platformName: options.platform_name
             });
 
-            getProfileVisibility = function (){
+            getProfileVisibility = function() {
                 if (options.has_preferences_access) {
                     return accountPreferencesModel.get('account_privacy');
                 } else {
@@ -216,7 +190,7 @@
                 }
             };
 
-            showLearnerProfileView = function (){
+            showLearnerProfileView = function() {
                 // Record that the profile page was viewed
                 Logger.log('edx.user.settings.viewed', {
                     page: 'profile',
@@ -239,7 +213,6 @@
                 accountSettingsModel: accountSettingsModel,
                 accountPreferencesModel: accountPreferencesModel,
                 learnerProfileView: learnerProfileView,
-                badgeListContainer: badgeListContainer
             };
         };
     });

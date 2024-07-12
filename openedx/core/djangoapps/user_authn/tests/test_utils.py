@@ -41,7 +41,7 @@ class TestRedirectUtils(TestCase):
         RedirectCase('http://edx.org/courses', 'edx.org', req_is_secure=False, expected_is_safe=True),
         RedirectCase('http://edx.org/courses', 'edx.org', req_is_secure=True, expected_is_safe=False),
 
-        # Django's is_safe_url protects against "///"
+        # Django's url_has_allowed_host_and_scheme protects against "///"
         RedirectCase('http:///edx.org/courses', 'edx.org', req_is_secure=True, expected_is_safe=False),
     )
     @ddt.unpack

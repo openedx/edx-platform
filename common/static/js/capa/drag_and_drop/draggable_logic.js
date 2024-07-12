@@ -137,10 +137,10 @@
                     }
                 } else {
                     if (
-                        (positionIE.left < 0) ||
-                (positionIE.left + this.iconWidth > this.state.baseImageEl.width()) ||
-                (positionIE.top < 0) ||
-                (positionIE.top + this.iconHeight > this.state.baseImageEl.height())
+                        (positionIE.left < 0)
+                || (positionIE.left + this.iconWidth > this.state.baseImageEl.width())
+                || (positionIE.top < 0)
+                || (positionIE.top + this.iconHeight > this.state.baseImageEl.height())
                     ) {
                         this.moveBackToSlider();
 
@@ -185,27 +185,30 @@
                     // (with an ID different from the one we are checking
                     // against), then go to next target.
                     if (
-                        (this.state.config.onePerTarget === true) &&
-                (target.draggableList.length === 1) &&
-                (target.draggableList[0].uniqueId !== this.uniqueId)
+                        (this.state.config.onePerTarget === true)
+                && (target.draggableList.length === 1)
+                && (target.draggableList[0].uniqueId !== this.uniqueId)
                     ) {
+                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
                     // If the target is on a draggable (from target field), we must make sure that
                     // this draggable is not the same as "this" one.
                     if ((target.type === 'on_drag') && (target.draggableObj.uniqueId === this.uniqueId)) {
+                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
                     // Check if the draggable's center coordinate is within
                     // the target's dimensions. If not, go to next target.
                     if (
-                        (positionIE.top + this.iconHeight * 0.5 < target.offset.top) ||
-                (positionIE.top + this.iconHeight * 0.5 > target.offset.top + target.h) ||
-                (positionIE.left + this.iconWidth * 0.5 < target.offset.left) ||
-                (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w)
+                        (positionIE.top + this.iconHeight * 0.5 < target.offset.top)
+                || (positionIE.top + this.iconHeight * 0.5 > target.offset.top + target.h)
+                || (positionIE.left + this.iconWidth * 0.5 < target.offset.left)
+                || (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w)
                     ) {
+                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -216,6 +219,7 @@
                     if ((this.onTarget !== null) && (this.onTarget.uniqueId !== target.uniqueId)) {
                         this.onTarget.removeDraggable(this);
                         target.addDraggable(this);
+                    // eslint-disable-next-line brace-style
                     }
                     // If the draggable was moved from the slider to a
                     // target, remember the target, and add ID to the
@@ -285,8 +289,8 @@
                     if (this.onTarget.draggableList.length > 0) {
                         for (c1 = 0; c1 < this.onTarget.draggableList.length; c1 += 1) {
                             if (
-                                (this.onTarget.draggableList[c1].zIndex > highestZIndex) &&
-                        (this.onTarget.draggableList[c1].zIndex !== 1000)
+                                (this.onTarget.draggableList[c1].zIndex > highestZIndex)
+                        && (this.onTarget.draggableList[c1].zIndex !== 1000)
                             ) {
                                 highestZIndex = this.onTarget.draggableList[c1].zIndex;
                             }
@@ -298,8 +302,8 @@
                     for (c1 = 0; c1 < this.state.draggables.length; c1++) {
                         if (this.inContainer === false) {
                             if (
-                                (this.state.draggables[c1].zIndex > highestZIndex) &&
-                        (this.state.draggables[c1].zIndex !== 1000)
+                                (this.state.draggables[c1].zIndex > highestZIndex)
+                        && (this.state.draggables[c1].zIndex !== 1000)
                             ) {
                                 highestZIndex = this.state.draggables[c1].zIndex;
                             }

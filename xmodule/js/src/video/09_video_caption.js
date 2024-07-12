@@ -1,5 +1,6 @@
 (function(define) {
 // VideoCaption module.
+
     'use strict';
 
     define('video/09_video_caption.js', [
@@ -36,7 +37,8 @@
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie'
+                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie',
+                'toggleGoogleDisclaimer'
             );
 
             this.state = state;
@@ -480,6 +482,7 @@
                 // get start and caption. If startTime and endTime
                 // are specified, filter by that range.
                 var times = this.getStartEndTimes();
+                // eslint-disable-next-line prefer-spread
                 var results = this.sjson.filter.apply(this.sjson, times);
                 var start = results.start;
                 var captions = results.captions;
@@ -488,6 +491,31 @@
                     start: start,
                     captions: captions
                 };
+            },
+
+            /**
+            * @desc Shows/Hides Google disclaimer based on captions being AI generated and
+            * if ClosedCaptions are being shown.
+            *
+            * @param {array} captions List of captions for the video.
+            *
+            * @returns {boolean}
+            */
+            toggleGoogleDisclaimer: function(captions) {
+                var self = this,
+                    state = this.state,
+                    aIGeneratedSpan = '<span id="captions-ai-generated"></span>',
+                    captionsAIGenerated = captions.some(caption => caption.includes(aIGeneratedSpan));
+
+                if (!self.hideCaptionsOnLoad && !state.captionsHidden) {
+                    if (captionsAIGenerated) {
+                        state.el.find('.google-disclaimer').show();
+                        self.shouldShowGoogleDisclaimer = true;
+                    } else {
+                        state.el.find('.google-disclaimer').hide();
+                        self.shouldShowGoogleDisclaimer = false;
+                    }
+                }
             },
 
             /**
@@ -545,6 +573,8 @@
                         start = results.start;
                         captions = results.captions;
 
+                        self.toggleGoogleDisclaimer(captions);
+
                         if (self.loaded) {
                             if (self.rendered) {
                                 self.renderCaption(start, captions);
@@ -581,8 +611,8 @@
                         var canFetchWithYoutubeId;
                         console.log('[Video info]: ERROR while fetching captions.');
                         console.log(
-                            '[Video info]: STATUS:', textStatus +
-                            ', MESSAGE:', '' + errorThrown
+                            '[Video info]: STATUS:', textStatus
+                            + ', MESSAGE:', '' + errorThrown
                         );
                         // If initial list of languages has more than 1 item, check
                         // for availability other transcripts.
@@ -594,7 +624,7 @@
                         } else if (!fetchWithYoutubeId && state.videoType === 'html5') {
                             canFetchWithYoutubeId = self.fetchCaption(true);
                             if (canFetchWithYoutubeId) {
-                                console.log('[Video info]: Html5 mode fetching caption with youtubeId.');  // eslint-disable-line max-len, no-console
+                                console.log('[Video info]: Html5 mode fetching caption with youtubeId.'); // eslint-disable-line max-len, no-console
                             } else {
                                 self.hideCaptions(true);
                                 self.languageChooserEl.hide();
@@ -804,7 +834,7 @@
                     self.state.el.addClass('is-captions-rendered');
 
                     self.subtitlesEl
-                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.'));  // eslint-disable-line max-len
+                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.')); // eslint-disable-line max-len
 
                     self.subtitlesEl.find('.transcript-title')
                         .text(gettext('Video transcript'));
@@ -818,7 +848,7 @@
                         .attr('lang', $('html').attr('lang'));
 
                     self.container.find('.menu-container .instructions')
-                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.'));  // eslint-disable-line max-len
+                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // eslint-disable-line max-len
                 };
 
                 this.rendered = false;
@@ -836,7 +866,7 @@
                 var topSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>',  // eslint-disable-line max-len, indent
+                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>', // eslint-disable-line max-len, indent
                         '</li>'
                     ].join('')),
                     {
@@ -848,7 +878,7 @@
                 var bottomSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>',  // eslint-disable-line max-len, indent
+                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>', // eslint-disable-line max-len, indent
                         '</li>'
                     ].join('')),
                     {
@@ -940,8 +970,8 @@
                     // The second and second to last elements turn automatic scrolling
                     // off again as it may have been enabled in captionBlur.
                     if (
-                        captionIndex <= 1 ||
-                        captionIndex >= this.sjson.getSize() - 2
+                        captionIndex <= 1
+                        || captionIndex >= this.sjson.getSize() - 2
                     ) {
                         this.autoScrolling = false;
                     }
@@ -965,8 +995,8 @@
                 // direction we are tabbing. So we could be on the first element and
                 // tabbing back out of the captions or on the last element and tabbing
                 // forward out of the captions.
-                if (captionIndex === 0 ||
-                    captionIndex === this.sjson.getSize() - 1) {
+                if (captionIndex === 0
+                    || captionIndex === this.sjson.getSize() - 1) {
                     this.autoScrolling = true;
                 }
             },
@@ -994,9 +1024,9 @@
                 // Automatic scrolling gets disabled if one of the captions has
                 // received focus through tabbing.
                 if (
-                    !this.frozen &&
-                    el.length &&
-                    this.autoScrolling
+                    !this.frozen
+                    && el.length
+                    && this.autoScrolling
                 ) {
                     this.subtitlesEl.scrollTo(
                         el,
@@ -1055,12 +1085,13 @@
                     // if start and end times are defined, limit search.
                     // else, use the entire list of video captions
                     params = [time].concat(times);
+                    // eslint-disable-next-line prefer-spread
                     newIndex = this.sjson.search.apply(this.sjson, params);
 
                     if (
-                        typeof newIndex !== 'undefined' &&
-                        newIndex !== -1 &&
-                        this.currentIndex !== newIndex
+                        typeof newIndex !== 'undefined'
+                        && newIndex !== -1
+                        && this.currentIndex !== newIndex
                     ) {
                         if (typeof this.currentIndex !== 'undefined') {
                             this.subtitlesEl
@@ -1281,6 +1312,7 @@
                 var captions = this.captionDisplayEl['0'];
 
                 if (typeof Draggabilly === 'function') {
+                    // eslint-disable-next-line no-new
                     new Draggabilly(captions, {containment: true});
                 } else {
                     console.log('Closed captioning available but not draggable');
@@ -1295,6 +1327,7 @@
             */
             hideCaptions: function(hideCaptions, triggerEvent) {
                 var transcriptControlEl = this.transcriptControlEl,
+                    self = this,
                     state = this.state,
                     text;
 
@@ -1305,6 +1338,8 @@
                     if (triggerEvent) {
                         this.state.el.trigger('transcript:hide');
                     }
+
+                    state.el.find('.google-disclaimer').hide();
 
                     transcriptControlEl
                         .removeClass('is-active')
@@ -1318,6 +1353,10 @@
                     if (triggerEvent) {
                         this.state.el.trigger('transcript:show');
                     }
+
+                    if (self.shouldShowGoogleDisclaimer) {
+                        state.el.find('.google-disclaimer').show();
+                      }
 
                     transcriptControlEl
                         .addClass('is-active')
@@ -1359,13 +1398,13 @@
                 var height = 0,
                     state = this.state;
                 // on page load captionHidden = undefined
-                if ((state.captionsHidden === undefined && this.hideCaptionsOnLoad) ||
-                    state.captionsHidden === true
+                if ((state.captionsHidden === undefined && this.hideCaptionsOnLoad)
+                    || state.captionsHidden === true
                 ) {
                     // In case of html5 autoshowing subtitles, we adjust height of
                     // subs, by height of scrollbar.
-                    height = state.el.find('.video-controls').height() +
-                        0.5 * state.el.find('.slider').height();
+                    height = state.el.find('.video-controls').height()
+                        + 0.5 * state.el.find('.slider').height();
                     // Height of videoControl does not contain height of slider.
                     // css is set to absolute, to avoid yanking when slider
                     // autochanges its height.

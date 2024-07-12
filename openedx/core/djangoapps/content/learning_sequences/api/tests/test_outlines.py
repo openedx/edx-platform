@@ -3,7 +3,7 @@ Top level API tests. Tests API public contracts only. Do not import/create/mock
 models for this app.
 """
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import unittest
 
 from django.conf import settings
@@ -16,9 +16,16 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 import attr
 import ddt
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups import (
+    TeamPartitionGroupsOutlineProcessor,
+)
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 import pytest
 
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
+from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings, CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.course_modes.models import CourseMode
@@ -1717,6 +1724,190 @@ class EnrollmentTrackPartitionGroupsTestCase(OutlineProcessorTestCase):  # lint-
             assert len(removed_usage_keys) == expected_values_dict[learner_to_verify.username]
 
 
+@ddt.ddt
+class CohortPartitionGroupsTestCase(OutlineProcessorTestCase):
+    """Tests for cohort partitions outline processor that affects outlines"""
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.visibility = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
+
+    def _create_and_enroll_learner(self, username, is_staff=False):
+        """
+        Helper function to create the learner based on the username,
+        then enroll the learner into the test course with VERIFIED
+        mode.
+        Returns the created learner
+        """
+        learner = UserFactory.create(
+            username=username, email='{}@example.com'.format(username), is_staff=is_staff
+        )
+        learner.courseenrollment_set.create(course_id=self.course_key, is_active=True, mode=CourseMode.VERIFIED)
+        return learner
+
+    def _setup_course_outline_with_sections(
+        self,
+        course_sections,
+        course_start_date=datetime(2021, 3, 26, tzinfo=timezone.utc)
+    ):
+        """
+        Helper function to update the course outline under test with
+        the course sections passed in.
+        Returns the newly constructed course outline
+        """
+        set_dates_for_course(
+            self.course_key,
+            [
+                (
+                    self.course_key.make_usage_key('course', 'course'),
+                    {'start': course_start_date}
+                )
+            ]
+        )
+
+        new_outline = CourseOutlineData(
+            course_key=self.course_key,
+            title="Cohort User Partition Test Course",
+            published_at=course_start_date,
+            published_version="8ebece4b69dd593d82fe2023",
+            sections=course_sections,
+            self_paced=False,
+            days_early_for_beta=None,
+            entrance_exam_id=None,
+            course_visibility=CourseVisibility.PRIVATE,
+        )
+
+        replace_course_outline(new_outline)
+
+        return new_outline
+
+    @ddt.data(
+        (
+            None,
+            None,
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            set([1001]),
+            None,
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            set([1002]),
+            None,
+            ['student1', 'student2'],
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            set([1001, 1002]),
+            None,
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            None,
+            set([1001]),
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            None,
+            set([1002]),
+            ['student1', 'student2'],
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            None,
+            set([1001, 1002]),
+            ['student1', 'student2'],
+            {'student1': 1, 'student2': 1}
+        ),
+    )
+    @ddt.unpack
+    def test_cohort_partition_on_outline(
+        self,
+        section_visible_groups,
+        sequence_visible_groups,
+        learners,
+        expected_values_dict
+    ):
+
+        section_user_partition_groups = None
+        sequence_user_partition_groups = None
+        if section_visible_groups:
+            section_user_partition_groups = {
+                1000: frozenset(section_visible_groups)
+            }
+        if sequence_visible_groups:
+            sequence_user_partition_groups = {
+                1000: frozenset(sequence_visible_groups)
+            }
+
+        CourseCohortsSettings.objects.create(course_id=self.course_key, is_cohorted=True)
+
+        # Enroll students in the course
+        learners_to_verify = []
+        for username in learners:
+            learners_to_verify.append(
+                self._create_and_enroll_learner(username)
+            )
+
+        # Create cohorts and corresponding GroupPartitions
+        cohort_1 = CohortFactory(
+            course_id=self.course_key,
+            name='Test Cohort 1',
+            users=[learners_to_verify[0]]
+        )
+
+        CourseUserGroupPartitionGroup(
+            course_user_group=cohort_1,
+            partition_id=1000,
+            group_id=1001
+        ).save()
+
+        cohort_2 = CohortFactory(
+            course_id=self.course_key,
+            name='Test Cohort 2',
+            users=[learners_to_verify[1]]
+        )
+
+        CourseUserGroupPartitionGroup(
+            course_user_group=cohort_2,
+            partition_id=1000,
+            group_id=1002
+        ).save()
+
+        self._setup_course_outline_with_sections(
+            [
+                CourseSectionData(
+                    usage_key=self.course_key.make_usage_key('chapter', '0'),
+                    title="Section 0",
+                    user_partition_groups=section_user_partition_groups,
+                    sequences=[
+                        CourseLearningSequenceData(
+                            usage_key=self.course_key.make_usage_key('subsection', '0'),
+                            title='Subsection 0',
+                            visibility=self.visibility,
+                            user_partition_groups=sequence_user_partition_groups,
+                        ),
+                    ]
+                )
+            ]
+        )
+
+        check_date = datetime(2021, 3, 27, tzinfo=timezone.utc)
+
+        for learner_to_verify in learners_to_verify:
+            learner_details = get_user_course_outline_details(self.course_key, learner_to_verify, check_date)
+            assert len(learner_details.outline.accessible_sequences) == expected_values_dict[learner_to_verify.username]
+
+
 class ContentErrorTestCase(CacheIsolationTestCase):
     """Test error collection and reporting."""
 
@@ -1776,3 +1967,227 @@ class ContentErrorTestCase(CacheIsolationTestCase):
         assert get_content_errors(course_key) == [
             ContentErrorData(message="Content is Hard", usage_key=None),
         ]
+
+
+@patch(
+    "openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups.CONTENT_GROUPS_FOR_TEAMS.is_enabled",  # lint-amnesty, pylint: disable=line-too-long
+    lambda _: True
+)
+@skip_unless_lms
+class TeamPartitionGroupsTestCase(OutlineProcessorTestCase):
+    """Tests for team partitions processor that affects outlines."""
+
+    @classmethod
+    def _create_and_enroll_learner(cls, username, is_staff=False):
+        """
+        Helper function to create the learner based on the username,
+        then enroll the learner into the test course with VERIFIED
+        mode.
+        Returns the created learner
+        """
+        learner = UserFactory.create(
+            username=username, email='{}@example.com'.format(username), is_staff=is_staff
+        )
+        learner.courseenrollment_set.create(course_id=cls.course_key, is_active=True)
+        return learner
+
+    @classmethod
+    def _setup_course_outline_with_sections(
+        cls,
+        course_sections,
+        course_start_date=datetime(2021, 3, 26, tzinfo=timezone.utc)
+    ):
+        """
+        Helper function to update the course outline under test with
+        the course sections passed in.
+        Returns the newly constructed course outline
+        """
+        set_dates_for_course(
+            cls.course_key,
+            [
+                (
+                    cls.course_key.make_usage_key('course', 'course'),
+                    {'start': course_start_date}
+                )
+            ]
+        )
+
+        new_outline = CourseOutlineData(
+            course_key=cls.course_key,
+            title="User Partition Test Course",
+            published_at=course_start_date,
+            published_version="8ebece4b69dd593d82fe2021",
+            sections=course_sections,
+            self_paced=False,
+            days_early_for_beta=None,
+            entrance_exam_id=None,
+            course_visibility=CourseVisibility.PRIVATE,
+        )
+
+        replace_course_outline(new_outline)
+
+        return new_outline
+
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Set up the test case with the necessary data. Which includes:
+        - Two Mocked team sets mirroring Teams Configurations team-sets created in Studio.
+        - Two teams, one in each team set.
+        - A course outline with two sections, each with a sequence that is visible to a different team via partition
+        groups.
+        - A student enrolled in the course and added to one of the teams.
+        """
+        super().setUpTestData()
+        cls.visibility = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
+        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outlines+TeamPartitions")
+        cls.team_sets = [
+            MagicMock(name="1st TeamSet", teamset_id=1, user_partition_id=51),
+            MagicMock(name="2nd TeamSet", teamset_id=2, user_partition_id=52),
+        ]
+        cls.student = cls._create_and_enroll_learner("student")
+        cls.team_1 = CourseTeamFactory.create(
+            name="Team in 1st TeamSet",
+            course_id=cls.course_key,
+            topic_id=cls.team_sets[0].teamset_id,
+        )
+        CourseTeamFactory.create(
+            name="Team in 2nd TeamSet",
+            course_id=cls.course_key,
+            topic_id=cls.team_sets[1].teamset_id,
+        )
+        cls.team_1.add_user(cls.student)
+        team_1_sequence_partition_groups = {
+            cls.team_sets[0].user_partition_id: frozenset([cls.team_sets[0].teamset_id]),
+        }
+        team_2_sequence_partition_groups = {
+            cls.team_sets[1].user_partition_id: frozenset([cls.team_sets[1].teamset_id]),
+        }
+        cls.outline = cls._setup_course_outline_with_sections(
+            [
+                CourseSectionData(
+                    usage_key=cls.course_key.make_usage_key('chapter', '1'),
+                    title="Section 0",
+                    sequences=[
+                        CourseLearningSequenceData(
+                            usage_key=cls.course_key.make_usage_key('subsection', '1'),
+                            title='Subsection 0',
+                            visibility=cls.visibility,
+                            user_partition_groups=team_1_sequence_partition_groups,
+                        ),
+                        CourseLearningSequenceData(
+                            usage_key=cls.course_key.make_usage_key('subsection', '2'),
+                            title='Subsection 1',
+                            visibility=cls.visibility,
+                            user_partition_groups=team_2_sequence_partition_groups,
+                        ),
+                    ]
+                )
+            ]
+        )
+
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
+    def test_load_data_in_partition_processor(self, team_sets_mock, team_configuration_service_mock):
+        """
+        Test that the team partition groups processor loads the data correctly for the given user.
+
+        Expected result:
+        - The number of user groups should be equal to the number of teams the user is a part of.
+        - The current user groups should contain user_partition_id as the key and an instance of the Group model
+          as the value with the teams data.
+        - The current user groups should contain the name of the team as the value for the key equal to the
+        user_partition_id.
+        """
+        team_sets_mock.return_value = self.team_sets
+        team_configuration_service_mock.return_value.get_teams_configuration.teamsets = self.team_sets
+        team_partition_groups_processor = TeamPartitionGroupsOutlineProcessor(
+            self.course_key, self.student, datetime.now()
+        )
+
+        team_partition_groups_processor.load_data(self.outline)
+
+        assert len(team_partition_groups_processor.current_user_groups) == 1
+        assert team_partition_groups_processor.current_user_groups.get(
+            self.team_sets[0].user_partition_id
+        ) is not None
+        assert team_partition_groups_processor.current_user_groups.get(
+            self.team_sets[1].user_partition_id
+        ) is None
+        assert team_partition_groups_processor.current_user_groups.get(
+            self.team_sets[0].user_partition_id
+        ).name == self.team_1.name
+
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
+    def test_user_not_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
+        """
+        Test that the team partition groups processor correctly determines if a user is excluded by the partition
+        groups.
+
+        Expected result:
+        - The user should not be excluded by the partition groups meaning the method should return False.
+        """
+        team_sets_mock.return_value = self.team_sets
+        team_configuration_service_mock.return_value.get_teams_configuration.teamsets = self.team_sets
+        team_partition_groups_processor = TeamPartitionGroupsOutlineProcessor(
+            self.course_key, self.student, datetime.now()
+        )
+        sequence_partition_groups = {
+            self.team_sets[0].user_partition_id: frozenset([self.team_sets[0].teamset_id]),
+            self.team_sets[1].user_partition_id: frozenset([self.team_sets[1].teamset_id]),
+            53: frozenset([100]),
+        }
+        team_partition_groups_processor.load_data(self.outline)
+
+        # pylint: disable=protected-access
+        assert not team_partition_groups_processor._is_user_excluded_by_partition_group(
+            sequence_partition_groups
+        )
+        assert not team_partition_groups_processor._is_user_excluded_by_partition_group([])
+
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
+    def test_user_excluded_by_partition_group(self, team_sets_mock, team_configuration_service_mock):
+        """
+        Test that the team partition groups processor correctly determines if a user is excluded by the partition
+        groups.
+
+        Expected result:
+        - The user should not be excluded by the partition groups meaning the method should return False.
+        """
+        team_sets_mock.return_value = self.team_sets
+        team_configuration_service_mock.return_value.get_teams_configuration.teamsets = self.team_sets
+        team_partition_groups_processor = TeamPartitionGroupsOutlineProcessor(
+            self.course_key, self.student, datetime.now()
+        )
+        sequence_partition_groups = {
+            self.team_sets[1].user_partition_id: frozenset([self.team_sets[1].teamset_id]),
+            53: frozenset([100]),
+        }
+        team_partition_groups_processor.load_data(self.outline)
+
+        # pylint: disable=protected-access
+        assert team_partition_groups_processor._is_user_excluded_by_partition_group(sequence_partition_groups)
+
+    @patch("lms.djangoapps.teams.team_partition_scheme.TeamsConfigurationService")
+    @patch("openedx.core.lib.teams_config._get_team_sets")
+    def test_usage_keys_removed(self, team_sets_mock, team_configuration_service_mock):
+        """Test that the team partition groups processor correctly determines the usage keys to remove from the outline.
+
+        Expected result:
+        - The method should return the usage keys that are not visible to the user based on the partition groups.
+        """
+        team_sets_mock.return_value = self.team_sets
+        team_configuration_service_mock.return_value.get_teams_configuration.teamsets = self.team_sets
+        team_partition_groups_processor = TeamPartitionGroupsOutlineProcessor(
+            self.course_key, self.student, datetime.now()
+        )
+        team_partition_groups_processor.load_data(self.outline)
+
+        assert team_partition_groups_processor.usage_keys_to_remove(self.outline) == {
+            self.course_key.make_usage_key('subsection', '2')
+        }

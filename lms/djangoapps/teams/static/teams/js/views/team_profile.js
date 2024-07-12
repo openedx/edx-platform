@@ -3,6 +3,7 @@
  */
 (function(define) {
     'use strict';
+
     define([
         'backbone',
         'underscore',
@@ -43,13 +44,14 @@
                     isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
                     isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
                     isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
+                    canJoinTeam = TeamUtils.canJoinTeam(this.context.userInfo, this.topic.attributes.type),
                     maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
 
                 // Assignments URL isn't provided if team assignments shouldn't be shown
                 // so we can treat it like a toggle
                 var showAssignments = !!this.context.teamsAssignmentsUrl;
 
-                var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
+                var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic || canJoinTeam);
 
                 HtmlUtils.setHtml(
                     this.$el,
@@ -140,8 +142,8 @@
                 var view = this; // eslint-disable-line vars-on-top
                 ViewUtils.confirmThenRunOperation(
                     gettext('Leave this team?'),
-                    gettext("If you leave, you can no longer post in this team's discussions." +
-                            'Your place will be available to another learner.'),
+                    gettext("If you leave, you can no longer post in this team's discussions."
+                            + 'Your place will be available to another learner.'),
                     gettext('Confirm'),
                     function() {
                         $.ajax({

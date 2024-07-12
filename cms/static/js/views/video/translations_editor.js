@@ -56,6 +56,7 @@ define(
             getDropdown: (function() {
                 var dropdown,
                     disableOptions = function(element, values) {
+                        // eslint-disable-next-line no-shadow
                         var dropdown = $(element).clone();
 
                         _.each(values, function(value, key) {
@@ -302,7 +303,7 @@ define(
 
                 // This Omits a language from the dropdown's data. It is
                 // needed when an item is going to be removed.
-                if (typeof(omittedLanguage) !== 'undefined') {
+                if (typeof omittedLanguage !== 'undefined') {
                     data = _.omit(data, omittedLanguage);
                 }
 

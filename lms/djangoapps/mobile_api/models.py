@@ -93,7 +93,7 @@ class IgnoreMobileAvailableFlagConfig(ConfigurationModel):
     Configuration for the mobile_available flag. Default is false.
 
     Enabling this configuration will cause the mobile_available flag check in
-    access.py._is_descriptor_mobile_available to ignore the mobile_available
+    access.py._is_block_mobile_available to ignore the mobile_available
     flag.
 
     .. no_pii:
@@ -110,7 +110,7 @@ class MobileConfig(TimeStampedModel):
     .. no_pii:
     """
     name = models.CharField(max_length=255)
-    value = models.CharField(max_length=255)
+    value = models.CharField(max_length=1000)
 
     class Meta:
         app_label = "mobile_api"

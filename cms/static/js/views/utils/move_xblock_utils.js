@@ -14,6 +14,7 @@ define([
 ],
 function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtils) {
     'use strict';
+
     var redirectLink, moveXBlock, undoMoveXBlock, showMovedNotification, hideMovedNotification;
 
     redirectLink = function(link) {

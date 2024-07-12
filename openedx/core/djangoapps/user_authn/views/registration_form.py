@@ -4,6 +4,7 @@ Objects and utilities used to construct registration forms.
 
 import copy
 from importlib import import_module
+from eventtracking import tracker
 import re
 
 from django import forms
@@ -93,7 +94,7 @@ def contains_url(value):
     """
     Validator method to check whether full name contains url
     """
-    regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', value)
+    regex = re.findall(r'://', value)
     return bool(regex)
 
 
@@ -241,12 +242,14 @@ class AccountCreationForm(forms.Form):
 
             if settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY:
                 # Checks the Pwned Databases for password vulnerability.
-                pwned_response = check_pwned_password(password)
+                pwned_properties = check_pwned_password(password)
 
                 if (
-                    pwned_response.get('vulnerability', 'no') == 'yes' and
-                    pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+                    pwned_properties.get('vulnerability', 'no') == 'yes' and
+                    pwned_properties.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
                 ):
+                    pwned_properties['user_request_page'] = 'registration'
+                    tracker.emit('edx.bi.user.pwned.password.status', pwned_properties)
                     raise ValidationError(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
         return password
 

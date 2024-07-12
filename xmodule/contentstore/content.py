@@ -445,7 +445,7 @@ class ContentStore:
                     if not dimensions:
                         dimensions = (128, 128)
 
-                    thumbnail_image.thumbnail(dimensions, Image.ANTIALIAS)
+                    thumbnail_image.thumbnail(dimensions, Image.LANCZOS)
                     thumbnail_image.save(thumbnail_file, 'JPEG')
                     thumbnail_file.seek(0)
 

@@ -131,6 +131,17 @@ class CommentClientPaginatedResult:
         self.corrected_text = corrected_text
 
 
+class SubscriptionsPaginatedResult:
+    """ class for paginated results returned from comment services"""
+
+    def __init__(self, collection, page, num_pages, subscriptions_count=0, corrected_text=None):
+        self.collection = collection
+        self.page = page
+        self.num_pages = num_pages
+        self.subscriptions_count = subscriptions_count
+        self.corrected_text = corrected_text
+
+
 def check_forum_heartbeat():
     """
     Check the forum connection via its built-in heartbeat service and create an answer which can be used in the LMS

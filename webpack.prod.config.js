@@ -6,6 +6,7 @@ var Merge = require('webpack-merge');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var _ = require('underscore');
+const TerserPlugin = require("terser-webpack-plugin");
 
 var commonConfig = require('./webpack.common.config.js');
 
@@ -18,21 +19,20 @@ var optimizedConfig = Merge.smart(commonConfig, {
         plugins: [
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': JSON.stringify('production'),
-                'process.env.JS_ENV_EXTRA_CONFIG': process.env.JS_ENV_EXTRA_CONFIG
+                'process.env.JS_ENV_EXTRA_CONFIG': process.env.JS_ENV_EXTRA_CONFIG || '{}'
             }),
-            new webpack.LoaderOptionsPlugin({  // This may not be needed; legacy option for loaders written for webpack 1
+            new webpack.LoaderOptionsPlugin({ // This may not be needed; legacy option for loaders written for webpack 1
                 minimize: true
-            }),
-            new webpack.optimize.UglifyJsPlugin(),
-            new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.[chunkhash].js',
-                minChunks: 3
             })
-        ]
-    }});
+        ],
+        optimization: {
+            minimize: true,
+            minimizer: [
+                new TerserPlugin(),
+            ],
+        }
+    }
+});
 
 // requireCompatConfig only exists so that you can use RequireJS to require a
 // Webpack bundle (but try not to do that if you can help it). RequireJS knows
@@ -51,17 +51,9 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
     web: {
         output: {
             filename: '[name].js'
-        },
-        plugins: [
-            new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.js',
-                minChunks: 3
-            })
-        ]
-    }});
+        }
+    }
+});
 
 // Step 2: Remove the plugin entries that generate the webpack-stats.json files
 // that Django needs to look up resources. We never want to accidentally

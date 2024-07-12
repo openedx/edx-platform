@@ -16,7 +16,6 @@
             isOpera: /opera/.test(nav.userAgent.toLowerCase())
         };
 
-
     // -------------------------------------------------------------------
     //  YOUR CHANGES GO HERE
     //
@@ -34,16 +33,16 @@
 
     // The text that appears on the dialog box when entering Images.
     var imageDialogText = gettext('Insert Image (upload file or type URL)'),
-        imageUrlHelpText = gettext("Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')"),  // eslint-disable-line max-len
+        imageUrlHelpText = gettext("Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')"), // eslint-disable-line max-len
         imageDescriptionLabel = gettext('Image Description'),
         imageDefaultText = 'http://', // The default text that appears in input
-        imageDescError = gettext('Please describe this image or agree that it has no contextual value by checking the checkbox.'),  // eslint-disable-line max-len
-        imageDescriptionHelpText = gettext("e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image."),  // eslint-disable-line max-len
+        imageDescError = gettext('Please describe this image or agree that it has no contextual value by checking the checkbox.'), // eslint-disable-line max-len
+        imageDescriptionHelpText = gettext("e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image."), // eslint-disable-line max-len
         imageDescriptionHelpLink = {
             href: 'http://www.w3.org/TR/html5/embedded-content-0.html#alt',
             text: gettext('How to create useful text alternatives.')
         },
-        imageIsDecorativeLabel = gettext('This image is for decorative purposes only and does not require a description.');  // eslint-disable-line max-len
+        imageIsDecorativeLabel = gettext('This image is for decorative purposes only and does not require a description.'); // eslint-disable-line max-len
 
     // Text that is shared between both link and image dialog boxes.
     var defaultHelpHoverTitle = gettext('Markdown Editing Help'),
@@ -65,10 +64,11 @@
     Markdown.Editor = function(markdownConverter, idPostfix, help, imageUploadHandler) {
         idPostfix = idPostfix || '';
 
+        // eslint-disable-next-line no-multi-assign
         var hooks = this.hooks = new Markdown.HookCollection();
-        hooks.addNoop('onPreviewPush');       // called with no arguments after the preview has been refreshed
+        hooks.addNoop('onPreviewPush'); // called with no arguments after the preview has been refreshed
         hooks.addNoop('postBlockquoteCreation'); // called with the user's selection *after* the blockquote was created; should return the actual to-be-inserted text
-        hooks.addFalse('insertImageDialog');     /* called with one parameter: a callback to be called with the URL of the image. If the application creates
+        hooks.addFalse('insertImageDialog'); /* called with one parameter: a callback to be called with the URL of the image. If the application creates
                                                   * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
                                                   * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
                                                   */
@@ -90,8 +90,8 @@
             if (!/\?noundo/.test(doc.location.href)) {
                 undoManager = new UndoManager(function() {
                     previewManager.refresh();
-                    if (uiManager) // not available on the first call
-                    { uiManager.setUndoRedoButtonStates(); }
+                    // not available on the first call
+                    if (uiManager) { uiManager.setUndoRedoButtonStates(); }
                 }, panels);
                 this.textOperation = function(f) {
                     undoManager.setCommandMode();
@@ -103,6 +103,7 @@
             uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, help, imageUploadHandler);
             uiManager.setUndoRedoButtonStates();
 
+            // eslint-disable-next-line no-multi-assign
             var forceRefresh = that.refreshPreview = function() { previewManager.refresh(true); };
 
             forceRefresh();
@@ -124,7 +125,7 @@
 
             this.before = this.before.replace(regex,
                 function(match) {
-                    chunkObj.startTag = chunkObj.startTag + match;
+                    chunkObj.startTag += match;
                     return '';
                 });
 
@@ -132,7 +133,7 @@
 
             this.selection = this.selection.replace(regex,
                 function(match) {
-                    chunkObj.startTag = chunkObj.startTag + match;
+                    chunkObj.startTag += match;
                     return '';
                 });
         }
@@ -164,6 +165,7 @@
         var beforeReplacer, afterReplacer,
             that = this;
         if (remove) {
+            // eslint-disable-next-line no-multi-assign
             beforeReplacer = afterReplacer = '';
         } else {
             beforeReplacer = function(s) { that.before += s; return ''; };
@@ -172,7 +174,6 @@
 
         this.selection = this.selection.replace(/^(\s*)/, beforeReplacer).replace(/(\s*)$/, afterReplacer);
     };
-
 
     Chunks.prototype.skipLines = function(nLinesBefore, nLinesAfter, findExtraNewlines) {
         if (nLinesBefore === undefined) {
@@ -196,16 +197,17 @@
 
         this.selection = this.selection.replace(/(^\n*)/, '');
 
-        this.startTag = this.startTag + re.$1;
+        this.startTag += re.$1;
 
         this.selection = this.selection.replace(/(\n*$)/, '');
-        this.endTag = this.endTag + re.$1;
+        this.endTag += re.$1;
         this.startTag = this.startTag.replace(/(^\n*)/, '');
-        this.before = this.before + re.$1;
+        this.before += re.$1;
         this.endTag = this.endTag.replace(/(\n*$)/, '');
-        this.after = this.after + re.$1;
+        this.after += re.$1;
 
         if (this.before) {
+            // eslint-disable-next-line no-multi-assign
             regexText = replacementText = '';
 
             while (nLinesBefore--) {
@@ -220,6 +222,7 @@
         }
 
         if (this.after) {
+            // eslint-disable-next-line no-multi-assign
             regexText = replacementText = '';
 
             while (nLinesAfter--) {
@@ -238,8 +241,7 @@
 
     function findAnEmptyToolbar(toolbarClassName) {
         var toolbars = doc.getElementsByClassName(toolbarClassName);
-        for (var i=0; i < toolbars.length; ++i)
-        {
+        for (var i = 0; i < toolbars.length; ++i) {
             var aToolbar = toolbars[i];
             if (aToolbar.children.length == 0) {
                 var anEmptyToolbar = aToolbar;
@@ -287,7 +289,6 @@
         }
     };
 
-
     // Adds a listener callback to a DOM element which is fired on a specified
     // event.
     util.addEvent = function(elem, event, listener) {
@@ -299,7 +300,6 @@
             elem.addEventListener(event, listener, false);
         }
     };
-
 
     // Removes a listener callback from a DOM element which is fired on a specified
     // event.
@@ -358,6 +358,7 @@
     position.getTop = function(elem, isInner) {
         var result = elem.offsetTop;
         if (!isInner) {
+            // eslint-disable-next-line no-cond-assign
             while (elem = elem.offsetParent) {
                 result += elem.offsetTop;
             }
@@ -528,8 +529,8 @@
                 var keyCode = event.charCode || event.keyCode;
                 var keyCodeChar = String.fromCharCode(keyCode);
 
+                // eslint-disable-next-line default-case
                 switch (keyCodeChar) {
-
                 case 'y':
                     undoObj.redo();
                     handled = true;
@@ -553,7 +554,6 @@
                 if (window.event) {
                     window.event.returnValue = false;
                 }
-                return;
             }
         };
 
@@ -643,6 +643,7 @@
 
             this.setInputAreaSelectionStartEnd();
             this.scrollTop = inputArea.scrollTop;
+            // eslint-disable-next-line no-mixed-operators
             if (!this.text && inputArea.selectionStart || inputArea.selectionStart === 0) {
                 this.text = inputArea.value;
             }
@@ -742,7 +743,7 @@
 
         // Sets the TextareaState properties given a chunk of markdown.
         this.setChunks = function(chunk) {
-            chunk.before = chunk.before + chunk.startTag;
+            chunk.before += chunk.startTag;
             chunk.after = chunk.endTag + chunk.after;
 
             this.start = chunk.before.length;
@@ -791,7 +792,6 @@
             // If there is no registered preview panel
             // there is nothing to do.
             if (!panels.preview) { return; }
-
 
             var text = panels.input.value;
             if (text && text == oldInputText) {
@@ -870,7 +870,7 @@
             var sibling = preview.nextSibling;
             parent.removeChild(preview);
             preview.innerHTML = text;
-            if (!sibling) { parent.appendChild(preview); } else { parent.insertBefore(preview, sibling); } // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target
+            if (!sibling) { parent.appendChild(preview); } else { parent.insertBefore(preview, sibling); } // xss-lint: disable=javascript-jquery-insert-into-target
         };
 
         var nonSuckyBrowserPreviewSet = function(text) {
@@ -973,8 +973,10 @@
     //      It receives a single argument; either the entered text (if OK was chosen) or null (if Cancel
     //      was chosen).
     ui.prompt = function(title,
+        // eslint-disable-next-line no-shadow
         urlLabel,
         urlHelp,
+        // eslint-disable-next-line no-shadow
         urlError,
         urlDescLabel,
         urlDescHelp,
@@ -982,14 +984,15 @@
         urlDescError,
         defaultInputText,
         callback,
+        // eslint-disable-next-line no-shadow
         imageIsDecorativeLabel,
         imageUploadHandler) {
         // These variables need to be declared at this level since they are used
         // in multiple functions.
-        var dialog,         // The dialog box.
-            urlInput,       // The text box where you enter the hyperlink.
+        var dialog, // The dialog box.
+            urlInput, // The text box where you enter the hyperlink.
             urlErrorMsg,
-            descInput,      // The text box where you enter the description.
+            descInput, // The text box where you enter the description.
             descErrorMsg,
             okButton,
             cancelButton;
@@ -1033,8 +1036,8 @@
 
             var isValidUrl = util.isValidUrl(url),
                 isValidDesc = (
-                    descInput.checkValidity() &&
-                    (descInput.required ? description.length : true)
+                    descInput.checkValidity()
+                    && (descInput.required ? description.length : true)
                 );
 
             if ((isValidUrl && isValidDesc) || isCancel) {
@@ -1053,7 +1056,7 @@
                 }
 
                 document.getElementById('wmd-editor-dialog-form-errors').textContent = [
-                    interpolate( // eslint-disable-line no-undef, xss-lint: disable=javascript-interpolate
+                    interpolate( // xss-lint: disable=javascript-interpolate
                         ngettext(
                             // Translators: 'errorCount' is the number of errors found in the form.
                             '%(errorCount)s error found in form.', '%(errorCount)s errors found in form.',
@@ -1155,6 +1158,7 @@
                 if (event.which === 9 && event.shiftKey && event.target === urlInput) {
                     event.preventDefault();
                     cancelButton.focus();
+                // eslint-disable-next-line brace-style
                 }
                 // On tab forward from the last tabbable item in the prompt
                 else if (event.which === 9 && !event.shiftKey && event.target === cancelButton) {
@@ -1163,7 +1167,6 @@
                 }
             });
         };
-
 
         // Why is this in a zero-length timeout?
         // Is it working around a browser bug?
@@ -1248,7 +1251,6 @@
                     return;
                 }
 
-
                 if (key.preventDefault) {
                     key.preventDefault();
                 }
@@ -1281,7 +1283,6 @@
                 }
             });
         }
-
 
         // Perform the button's action.
         function doClick(button) {
@@ -1395,6 +1396,7 @@
                 button.removeAttribute('aria-disabled');
             } else {
                 image.style.backgroundPosition = button.XShift + ' ' + disabledYShift;
+                // eslint-disable-next-line no-multi-assign
                 button.onmouseover = button.onmouseout = button.onclick = function() { };
                 // This line does not appear in vanilla WMD. It was added by edX to improve accessibility.
                 // It should become a separate commit applied to WMD's official HEAD if we remove this edited version
@@ -1468,14 +1470,14 @@
             buttons.hr = makeButton('wmd-hr-button', gettext('Horizontal Rule (Ctrl+R)'), '-180px', bindCommand('doHorizontalRule'), -1);
             makeSpacer(3);
             buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null, -1);
-            buttons.undo.execute = function(manager) { if (manager) manager.undo(); };
+            buttons.undo.execute = function(manager) { if (manager) { manager.undo(); } };
 
-            var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
-                gettext('Redo (Ctrl+Y)') :
-                gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
+            var redoTitle = /win/.test(nav.platform.toLowerCase())
+                ? gettext('Redo (Ctrl+Y)')
+                : gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
 
             buttons.redo = makeButton('wmd-redo-button', redoTitle, '-220px', null, -1);
-            buttons.redo.execute = function(manager) { if (manager) manager.redo(); };
+            buttons.redo.execute = function(manager) { if (manager) { manager.redo(); } };
 
             if (helpOptions) {
                 var helpButton = document.createElement('span');
@@ -1580,11 +1582,9 @@
 
             // Add the true markup.
             var markup = nStars <= 1 ? '*' : '**'; // shouldn't the test be = ?
-            chunk.before = chunk.before + markup;
+            chunk.before += markup;
             chunk.after = markup + chunk.after;
         }
-
-        return;
     };
 
     commandProto.stripLinkDefs = function(text, defsToAdd) {
@@ -1671,7 +1671,9 @@
             });
             if (title) {
                 title = title.trim ? title.trim() : title.replace(/^\s*/, '').replace(/\s*$/, '');
-                title = $.trim(title).replace(/"/g, 'quot;').replace(/\(/g, '&#40;').replace(/\)/g, '&#41;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                title = $.trim(title).replace(/"/g, 'quot;').replace(/\(/g, '&#40;').replace(/\)/g, '&#41;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
             }
             return title ? link + ' "' + title + '"' : link;
         });
@@ -1691,6 +1693,7 @@
             // *removing* a link, but *adding* one, so whatever findTags() found is now back to being part of the
             // link text. linkEnteredCallback takes care of escaping any brackets.
             chunk.selection = chunk.startTag + chunk.selection + chunk.endTag;
+            // eslint-disable-next-line no-multi-assign
             chunk.startTag = chunk.endTag = '';
 
             if (/\n\n/.test(chunk.selection)) {
@@ -1879,14 +1882,14 @@
                 var good = false;
                 line = lines[i];
                 inChain = inChain && line.length > 0; // c) any non-empty line continues the chain
-                if (/^>/.test(line)) {                // a)
+                if (/^>/.test(line)) { // a)
                     good = true;
-                    if (!inChain && line.length > 1)  // c) any line that starts with ">" and has at least one more character starts the chain
-                    { inChain = true; }
-                } else if (/^[ \t]*$/.test(line)) {   // b)
+                    // c) any line that starts with ">" and has at least one more character starts the chain
+                    if (!inChain && line.length > 1) { inChain = true; }
+                } else if (/^[ \t]*$/.test(line)) { // b)
                     good = true;
                 } else {
-                    good = inChain;                   // c) the line is not empty and does not start with ">", so it matches if and only if we're in the chain
+                    good = inChain; // c) the line is not empty and does not start with ">", so it matches if and only if we're in the chain
                 }
                 if (good) {
                     match += line + '\n';
@@ -1895,7 +1898,7 @@
                     match = '\n';
                 }
             }
-            if (!/(^|\n)>/.test(match)) {             // d)
+            if (!/(^|\n)>/.test(match)) { // d)
                 leftOver += match;
                 match = '';
             }
@@ -1995,6 +1998,7 @@
             } else {
                 if (/^[ ]{0,3}\S/m.test(chunk.selection)) {
                     if (/\n/.test(chunk.selection)) { chunk.selection = chunk.selection.replace(/^/gm, '    '); } else // if it's not multiline, do not select the four added spaces; this is more consistent with the doList behavior
+                    // eslint-disable-next-line brace-style
                     { chunk.before += '    '; }
                 } else {
                     chunk.selection = chunk.selection.replace(/^[ ]{4}/gm, '');
@@ -2007,6 +2011,7 @@
             chunk.findTags(/`/, /`/);
 
             if (!chunk.startTag && !chunk.endTag) {
+                // eslint-disable-next-line no-multi-assign
                 chunk.startTag = chunk.endTag = '`';
                 if (!chunk.selection) {
                     chunk.selection = gettext('enter code here');
@@ -2015,6 +2020,7 @@
                 chunk.before += chunk.endTag;
                 chunk.endTag = '';
             } else {
+                // eslint-disable-next-line no-multi-assign
                 chunk.startTag = chunk.endTag = '';
             }
         }
@@ -2132,13 +2138,14 @@
             return;
         }
 
-        var headerLevel = 0;     // The existing header level of the selected text.
+        var headerLevel = 0; // The existing header level of the selected text.
 
         // Remove any existing hash heading markdown and save the header level.
         chunk.findTags(/#+[ ]*/, /[ ]*#+/);
         if (/#+/.test(chunk.startTag)) {
             headerLevel = re.lastMatch.length;
         }
+        // eslint-disable-next-line no-multi-assign
         chunk.startTag = chunk.endTag = '';
 
         // Try to get the current header level by looking for - and = in the line
@@ -2152,6 +2159,7 @@
         }
 
         // Skip to the next line so we can create the header markdown.
+        // eslint-disable-next-line no-multi-assign
         chunk.startTag = chunk.endTag = '';
         chunk.skipLines(1, 1);
 

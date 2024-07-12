@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('VideoPlaySkipControl', function() {
         var state, oldOTBD;
 

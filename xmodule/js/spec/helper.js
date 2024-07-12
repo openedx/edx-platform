@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var origAjax = $.ajax;
 
     var stubbedYT = {
@@ -60,13 +61,13 @@
             'MICHAEL CIMA: So let\'s do the first one here.',
             'Vacancies, where do they come from?',
             'Well, imagine a perfect crystal.',
-            'Now we know at any temperature other than absolute zero ' +
-                'there\'s enough',
+            'Now we know at any temperature other than absolute zero '
+                + 'there\'s enough',
             'energy going around that some atoms will have more energy',
             'than others, right?',
             'There\'s a distribution.',
-            'If I plot energy here and number, these atoms in the crystal ' +
-                'will have a',
+            'If I plot energy here and number, these atoms in the crystal '
+                + 'will have a',
             'distribution of energy.',
             'And some will have quite a bit of energy, just for a moment.'
         ]
@@ -170,15 +171,47 @@
                     html: window.readFixtures('problem_content.html')
                 });
             } else if (
-                settings.url === '/calculate' ||
-                settings.url.match(/.+\/goto_position$/) ||
-                settings.url.match(/event$/) ||
-                settings.url.match(/.+\/problem_(check|reset|show|save)$/)
+                settings.url === '/calculate'
+                || settings.url.match(/.+\/goto_position$/)
+                || settings.url.match(/event$/)
+                || settings.url.match(/.+\/problem_(check|reset|show|save)$/)
             ) {
                 // Do nothing.
                 return {};
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
+            } else if (settings.url.match(/.+video-transcript.+$/)) {
+                if (settings.url.match(/.+&video_id=notAIGenerated/)) {
+                    return settings.success(null);
+                }
+                if (settings.url.match(/.+&video_id=inProgress/)) {
+                    return settings.success({
+                        status: 'In Progress'
+                    });
+                }
+                if (settings.url.match(/.+&video_id=error/)) {
+                    return settings.error();
+                }
+                return settings.success({
+                    status: 'Completed'
+                });
+            } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'GET') {
+                if (settings.url.match(/.+&video_id=error.+$/)) {
+                    return settings.error();
+                }
+                if (settings.url.match(/.+&video_id=negative.+$/)) {
+                    return settings.success({
+                        value: false
+                    });
+                }
+                if (settings.url.match(/.+&video_id=none.+$/)) {
+                    return settings.success(null);
+                }
+                return settings.success({
+                    value: true
+                });
+            } else if (settings.url.match(/.+transcript-feedback.+$/) && settings.type === 'POST') {
+                return settings.success(settings.data.value !== null ? { value: settings.data.value } : null);
             } else if (settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + '.+', 'g'))) {
                 return origAjax(settings);
             } else {
@@ -275,14 +308,14 @@
     // automated tests happen in firefox.
     jasmine.mockFullscreenAPI = function() {
         var fullscreenElement;
-        var vendorChangeEvent = 'fullscreenEnabled' in document ?
-            'fullscreenchange' : 'mozfullscreenchange';
-        var vendorRequestFullscreen = 'requestFullscreen' in window.HTMLElement.prototype ?
-            'requestFullscreen' : 'mozRequestFullScreen';
-        var vendorExitFullscreen = 'exitFullscreen' in document ?
-            'exitFullscreen' : 'mozCancelFullScreen';
-        var vendorFullscreenElement = 'fullscreenEnabled' in document ?
-            'fullscreenElement' : 'mozFullScreenElement';
+        var vendorChangeEvent = 'fullscreenEnabled' in document
+            ? 'fullscreenchange' : 'mozfullscreenchange';
+        var vendorRequestFullscreen = 'requestFullscreen' in window.HTMLElement.prototype
+            ? 'requestFullscreen' : 'mozRequestFullScreen';
+        var vendorExitFullscreen = 'exitFullscreen' in document
+            ? 'exitFullscreen' : 'mozCancelFullScreen';
+        var vendorFullscreenElement = 'fullscreenEnabled' in document
+            ? 'fullscreenElement' : 'mozFullScreenElement';
 
         spyOn(window.HTMLElement.prototype, vendorRequestFullscreen).and.callFake(function() {
             fullscreenElement = this;

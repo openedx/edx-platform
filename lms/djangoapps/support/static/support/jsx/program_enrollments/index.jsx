@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
-import { Button, InputText, TextArea, StatusAlert } from '@edx/paragon';
+import {
+    Button, InputText, TextArea, StatusAlert,
+} from '@edx/paragon';
 
+// eslint-disable-next-line react/function-component-definition
 export const LinkProgramEnrollmentsSupportPage = props => (
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value={Cookies.get('csrftoken')} />

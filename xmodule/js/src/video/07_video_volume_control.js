@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     // VideoVolumeControl module.
     define(
         'video/07_video_volume_control.js', ['edx-ui-toolkit/js/utils/html-utils'],
@@ -66,7 +67,7 @@
                         '</div>',
                         '</div>'].join('')),
                     {
-                        volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'),  // eslint-disable-line max-len
+                        volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'), // eslint-disable-line max-len
                         adjustVideoVolume: gettext('Adjust video volume'),
                         volumeText: gettext('Volume')
                     }
@@ -76,6 +77,7 @@
                     this.volumeSlider.slider('destroy');
                     this.state.el.find('iframe').removeAttr('tabindex');
                     this.a11y.destroy();
+                    // eslint-disable-next-line no-multi-assign
                     this.cookie = this.a11y = null;
                     this.closeMenu();
 
@@ -342,6 +344,7 @@
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
+                    // eslint-disable-next-line default-case
                     switch (keyCode) {
                     case KEY.UP:
                     // Shift + Arrows keyboard shortcut might be used by
@@ -391,6 +394,7 @@
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
+                    // eslint-disable-next-line default-case
                     switch (keyCode) {
                     case KEY.ENTER:
                     case KEY.SPACE:

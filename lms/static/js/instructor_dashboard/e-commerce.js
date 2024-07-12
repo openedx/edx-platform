@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var ECommerce, PendingInstructorTasks, ReportDownloads;
 
     PendingInstructorTasks = function() {

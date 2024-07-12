@@ -10,6 +10,7 @@ define([
 ],
 function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
     'use strict';
+
     var LearningInfoView = Backbone.View.extend({
 
         events: {

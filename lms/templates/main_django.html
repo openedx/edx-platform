@@ -28,6 +28,18 @@
 
   {% optional_include "head-extra.html"|microsite_template_path %}
 
+  {% google_analytics_4_id as ga_4_id %}
+  {% if ga_4_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_4_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ ga_4_id }}');
+    </script>
+  {% endif %}
+
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
 

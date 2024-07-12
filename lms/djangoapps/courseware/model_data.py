@@ -51,30 +51,30 @@ class InvalidWriteError(Exception):
     """
 
 
-def _all_usage_keys(descriptors, aside_types):
+def _all_usage_keys(blocks, aside_types):
     """
-    Return a set of all usage_ids for the `descriptors` and for
-    as all asides in `aside_types` for those descriptors.
+    Return a set of all usage_ids for the `blocks` and for
+    as all asides in `aside_types` for those blocks.
     """
     usage_ids = set()
-    for descriptor in descriptors:
-        usage_ids.add(descriptor.scope_ids.usage_id)
+    for block in blocks:
+        usage_ids.add(block.scope_ids.usage_id)
 
         for aside_type in aside_types:
-            usage_ids.add(AsideUsageKeyV1(descriptor.scope_ids.usage_id, aside_type))
-            usage_ids.add(AsideUsageKeyV2(descriptor.scope_ids.usage_id, aside_type))
+            usage_ids.add(AsideUsageKeyV1(block.scope_ids.usage_id, aside_type))
+            usage_ids.add(AsideUsageKeyV2(block.scope_ids.usage_id, aside_type))
 
     return usage_ids
 
 
-def _all_block_types(descriptors, aside_types):
+def _all_block_types(blocks, aside_types):
     """
-    Return a set of all block_types for the supplied `descriptors` and for
-    the asides types in `aside_types` associated with those descriptors.
+    Return a set of all block_types for the supplied `blocks` and for
+    the asides types in `aside_types` associated with those blocks.
     """
     block_types = set()
-    for descriptor in descriptors:
-        block_types.add(BlockTypeKeyV1(descriptor.entry_point, descriptor.scope_ids.block_type))
+    for block in blocks:
+        block_types.add(BlockTypeKeyV1(block.entry_point, block.scope_ids.block_type))
 
     for aside_type in aside_types:
         block_types.add(BlockTypeKeyV1(XBlockAside.entry_point, aside_type))
@@ -665,15 +665,15 @@ class FieldDataCache:
     A cache of django model objects needed to supply the data
     for a block and its descendants
     """
-    def __init__(self, descriptors, course_id, user, asides=None, read_only=False):
+    def __init__(self, blocks, course_id, user, asides=None, read_only=False):
         """
-        Find any courseware.models objects that are needed by any descriptor
-        in descriptors. Attempts to minimize the number of queries to the database.
+        Find any courseware.models objects that are needed by any block
+        in blocks. Attempts to minimize the number of queries to the database.
         Note: Only blocks that have store_state = True or have shared
         state will have a StudentModule.
 
         Arguments
-        descriptors: A list of XModuleDescriptors.
+        blocks: A list of XBlocks.
         course_id: The id of the current course
         user: The user for which to cache data
         asides: The list of aside types to load, or None to prefetch no asides.
@@ -705,84 +705,84 @@ class FieldDataCache:
             ),
         }
         self.scorable_locations = set()
-        self.add_descriptors_to_cache(descriptors)
+        self.add_blocks_to_cache(blocks)
 
-    def add_descriptors_to_cache(self, descriptors):
+    def add_blocks_to_cache(self, blocks):
         """
-        Add all `descriptors` to this FieldDataCache.
+        Add all `blocks` to this FieldDataCache.
         """
         if self.user.is_authenticated:
-            self.scorable_locations.update(desc.location for desc in descriptors if desc.has_score)
-            for scope, fields in self._fields_to_cache(descriptors).items():
+            self.scorable_locations.update(block.location for block in blocks if block.has_score)
+            for scope, fields in self._fields_to_cache(blocks).items():
                 if scope not in self.cache:
                     continue
 
-                self.cache[scope].cache_fields(fields, descriptors, self.asides)
+                self.cache[scope].cache_fields(fields, blocks, self.asides)
 
-    def add_descriptor_descendents(self, descriptor, depth=None, descriptor_filter=lambda descriptor: True):
+    def add_block_descendents(self, block, depth=None, block_filter=lambda block: True):
         """
-        Add all descendants of `descriptor` to this FieldDataCache.
+        Add all descendants of `block` to this FieldDataCache.
 
         Arguments:
-            descriptor: An XModuleDescriptor
+            block: An XBlock
             depth is the number of levels of descendant blocks to load StudentModules for, in addition to
-                the supplied descriptor. If depth is None, load all descendant StudentModules
-            descriptor_filter is a function that accepts a descriptor and return whether the field data
+                the supplied block. If depth is None, load all descendant StudentModules
+            block_filter is a function that accepts a block and return whether the field data
                 should be cached
         """
 
-        def get_child_descriptors(descriptor, depth, descriptor_filter):
+        def get_child_blocks(block, depth, block_filter):
             """
-            Return a list of all child descriptors down to the specified depth
-            that match the descriptor filter. Includes `descriptor`
+            Return a list of all child blocks down to the specified depth
+            that match the block filter. Includes `block`
 
-            descriptor: The parent to search inside
+            block: The parent to search inside
             depth: The number of levels to descend, or None for infinite depth
-            descriptor_filter(descriptor): A function that returns True
-                if descriptor should be included in the results
+            block_filter(block): A function that returns True
+                if block should be included in the results
             """
-            if descriptor_filter(descriptor):
-                descriptors = [descriptor]
+            if block_filter(block):
+                blocks = [block]
             else:
-                descriptors = []
+                blocks = []
 
             if depth is None or depth > 0:
                 new_depth = depth - 1 if depth is not None else depth
 
-                for child in descriptor.get_children() + descriptor.get_required_block_descriptors():
-                    descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
+                for child in block.get_children() + block.get_required_block_descriptors():
+                    blocks.extend(get_child_blocks(child, new_depth, block_filter))
 
-            return descriptors
+            return blocks
 
-        with modulestore().bulk_operations(descriptor.location.course_key):
-            descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
+        with modulestore().bulk_operations(block.location.course_key):
+            blocks = get_child_blocks(block, depth, block_filter)
 
-        self.add_descriptors_to_cache(descriptors)
+        self.add_blocks_to_cache(blocks)
 
     @classmethod
-    def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
-                                         descriptor_filter=lambda descriptor: True,
-                                         asides=None, read_only=False):
+    def cache_for_block_descendents(cls, course_id, user, block, depth=None,
+                                    block_filter=lambda block: True,
+                                    asides=None, read_only=False):
         """
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
-        descriptor: An XModuleDescriptor
+        block: An XBlock
         depth is the number of levels of descendant blocks to load StudentModules for, in addition to
-            the supplied descriptor. If depth is None, load all descendant StudentModules
-        descriptor_filter is a function that accepts a descriptor and return whether the field data
+            the supplied block. If depth is None, load all descendant StudentModules
+        block_filter is a function that accepts a block and return whether the field data
             should be cached
         """
         cache = FieldDataCache([], course_id, user, asides=asides, read_only=read_only)
-        cache.add_descriptor_descendents(descriptor, depth, descriptor_filter)
+        cache.add_block_descendents(block, depth, block_filter)
         return cache
 
-    def _fields_to_cache(self, descriptors):
+    def _fields_to_cache(self, blocks):
         """
         Returns a map of scopes to fields in that scope that should be cached
         """
         scope_map = defaultdict(set)
-        for descriptor in descriptors:
-            for field in descriptor.fields.values():
+        for block in blocks:
+            for field in block.fields.values():
                 scope_map[field.scope].add(field)
         return scope_map
 

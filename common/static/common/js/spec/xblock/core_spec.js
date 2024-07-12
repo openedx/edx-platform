@@ -4,26 +4,26 @@
     describe('XBlock', function() {
         beforeEach(function() {
             return setFixtures(
-                '<div>\n' +
-                '  <div class="xblock"\n' +
-                '       id="vA"\n' +
-                '       data-runtime-version="A"\n' +
-                '       data-runtime-class="TestRuntime"\n' +
-                '       data-init="initFnA"\n' +
-                '       data-name="a-name"\n' +
-                '  />\n' +
-                '  <div>\n' +
-                '    <div class="xblock"\n' +
-                '         id="vZ"\n' +
-                '         data-runtime-version="Z"\n' +
-                '         data-runtime-class="TestRuntime"\n' +
-                '         data-init="initFnZ"\n' +
-                '         data-request-token="req-token-z"\n' +
-                '    />\n' +
-                '  </div>\n' +
-                '  <div class="xblock" id="missing-version" data-init="initFnA" data-name="no-version"/>\n' +
-                '  <div class="xblock" id="missing-init" data-runtime-version="A" data-name="no-init"/>\n' +
-                '</div>');
+                '<div>\n'
+                + '  <div class="xblock"\n'
+                + '       id="vA"\n'
+                + '       data-runtime-version="A"\n'
+                + '       data-runtime-class="TestRuntime"\n'
+                + '       data-init="initFnA"\n'
+                + '       data-name="a-name"\n'
+                + '  />\n'
+                + '  <div>\n'
+                + '    <div class="xblock"\n'
+                + '         id="vZ"\n'
+                + '         data-runtime-version="Z"\n'
+                + '         data-runtime-class="TestRuntime"\n'
+                + '         data-init="initFnZ"\n'
+                + '         data-request-token="req-token-z"\n'
+                + '    />\n'
+                + '  </div>\n'
+                + '  <div class="xblock" id="missing-version" data-init="initFnA" data-name="no-version"/>\n'
+                + '  <div class="xblock" id="missing-init" data-runtime-version="A" data-name="no-init"/>\n'
+                + '</div>');
         });
         describe('initializeBlock', function() {
             beforeEach(function() {
@@ -97,7 +97,9 @@
 
             it('initializes children', function() {
                 XBlock.initializeBlocks($('#jasmine-fixtures'));
+                // eslint-disable-next-line no-void
                 expect(XBlock.initializeBlock).toHaveBeenCalledWith(this.vANode, void 0);
+                // eslint-disable-next-line no-void
                 expect(XBlock.initializeBlock).toHaveBeenCalledWith(this.vZNode, void 0);
             });
 

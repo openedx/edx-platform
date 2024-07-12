@@ -55,7 +55,6 @@ def load_serialized_data(response, key):
 class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
     maxDiff = None
-    password = 'test'
     url = reverse_lazy('program_listing_view')
 
     @classmethod
@@ -75,7 +74,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super().setUp()
 
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     @classmethod
     def program_sort_key(cls, program):
@@ -112,7 +111,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             '{}?next={}'.format(reverse('signin_user'), self.url)
         )
 
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         response = self.client.get(self.url)
         assert response.status_code == 200
@@ -224,7 +223,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         super().setUp()
 
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     def assert_program_data_present(self, response):
         """Verify that program data is present."""
@@ -277,7 +276,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
             '{}?next={}'.format(reverse('signin_user'), self.url)
         )
 
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         with mock.patch('lms.djangoapps.learner_dashboard.programs.get_certificates') as certs:
             certs.return_value = [{'type': 'program', 'url': '/'}]
@@ -324,7 +323,7 @@ class TestProgramDetailsFragmentView(SharedModuleStoreTestCase, ProgramCacheMixi
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
         self.create_programs_config()
 

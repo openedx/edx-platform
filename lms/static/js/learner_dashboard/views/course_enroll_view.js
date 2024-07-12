@@ -13,6 +13,7 @@ class CourseEnrollView extends Backbone.View {
                 'change .run-select': 'updateEnrollUrl',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -94,8 +95,10 @@ class CourseEnrollView extends Backbone.View {
 
     updateEnrollUrl() {
         if (this.model.get('is_mobile_only') === true) {
+            // eslint-disable-next-line no-undef
             const courseRunKey = $('.run-select').val();
             const href = `edxapp://enroll?course_id=${courseRunKey}&email_opt_in=true`;
+            // eslint-disable-next-line no-undef
             $('.enroll-course-button').attr('href', href);
         }
     }

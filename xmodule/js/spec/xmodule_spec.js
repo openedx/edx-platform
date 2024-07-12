@@ -127,7 +127,6 @@
                         return XBlockToXModuleShim(null, $el);
                     };
 
-
                 if (window.console) {
                     window.console = undefined;
                 }

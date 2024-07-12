@@ -10,7 +10,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import authentication, generics, status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -31,7 +31,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     DRF class for interacting with the User ORM object
     """
-    authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = User.objects.all().prefetch_related("preferences").select_related("profile")
     serializer_class = UserSerializer
@@ -43,7 +42,6 @@ class ForumRoleUsersListView(generics.ListAPIView):
     """
     Forum roles are represented by a list of user dicts
     """
-    authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
     paginate_by = 10
@@ -67,7 +65,6 @@ class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     """
     DRF class for interacting with the UserPreference ORM
     """
-    authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = UserPreference.objects.all()
     filter_backends = (DjangoFilterBackend,)
@@ -81,7 +78,6 @@ class PreferenceUsersListView(generics.ListAPIView):
     """
     DRF class for listing a user's preferences
     """
-    authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
     paginate_by = 10

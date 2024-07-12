@@ -38,7 +38,7 @@ def emulate_http_request(site=None, user=None, middleware_classes=None):
         CurrentRequestUserMiddleware,
         CurrentSiteThemeMiddleware,
     ]
-    middleware_instances = [klass() for klass in middleware_classes]
+    middleware_instances = [klass(get_response=lambda request: None) for klass in middleware_classes]
     response = HttpResponse()
 
     for middleware in middleware_instances:

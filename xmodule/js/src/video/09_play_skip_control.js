@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_play_skip_control.js', [], function() {
     /**
      * Play/skip control module.

@@ -12,6 +12,10 @@ import lxml.etree
 from fs.osfs import OSFS
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+from openedx.core.djangoapps.content_tagging.api import (
+    export_tags_in_csv_file,
+    get_object_tag_counts
+)
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
@@ -111,7 +115,7 @@ class ExportManager:
 
         `modulestore`: A `ModuleStore` object that is the source of the blocks to export
         `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
-        `courselike_key`: The Locator of the Descriptor to export
+        `courselike_key`: The Locator of the block to export
         `root_dir`: The directory to write the exported xml to
         `target_dir`: The name of the directory inside `root_dir` to write the content to
         """
@@ -281,6 +285,15 @@ class CourseExportManager(ExportManager):
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4).encode('utf-8'))
 
         _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
+
+        courselike_key_str = str(self.courselike_key)
+        block_id_pattern = f"{courselike_key_str.replace('course-v1:', 'block-v1:', 1)}*"
+
+        tags_count = get_object_tag_counts(block_id_pattern)
+        course_tags_count = get_object_tag_counts(courselike_key_str)
+
+        if tags_count or course_tags_count:
+            export_tags_in_csv_file(courselike_key_str, export_fs, 'tags.csv')
 
 
 class LibraryExportManager(ExportManager):

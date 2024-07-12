@@ -9,7 +9,7 @@ from lxml import etree
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.randomize_block import RandomizeBlock
-from xmodule.tests import get_test_system
+from xmodule.tests import prepare_block_runtime
 
 from .test_course_block import DummySystem as TestImportSystem
 
@@ -42,9 +42,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
         Bind module system to block so we can access student-specific data.
         """
         user = Mock(name='get_test_system.user', id=user_id, is_staff=False)
-        module_system = get_test_system(course_id=block.location.course_key, user=user)
-        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
-        block.xmodule_runtime = module_system
+        prepare_block_runtime(block.runtime, course_id=block.location.course_key, user=user)
 
     def test_xml_export_import_cycle(self):
         """
@@ -64,7 +62,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
 
         export_fs = MemoryFS()
         # Set the virtual FS to export the olx to.
-        randomize_block.runtime._descriptor_system.export_fs = export_fs  # pylint: disable=protected-access
+        randomize_block.runtime.export_fs = export_fs  # pylint: disable=protected-access
 
         # Export the olx.
         node = etree.Element("unknown_root")
@@ -85,8 +83,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
 
         # Now import it.
         olx_element = etree.fromstring(exported_olx)
-        id_generator = Mock()
-        imported_randomize_block = RandomizeBlock.parse_xml(olx_element, runtime, None, id_generator)
+        imported_randomize_block = RandomizeBlock.parse_xml(olx_element, runtime, None)
 
         # Check the new XBlock has the same properties as the old one.
         assert imported_randomize_block.display_name == randomize_block.display_name
@@ -106,8 +103,8 @@ class RandomizeBlockTest(MixedSplitTestCase):
         assert len(randomize_block.children) == 3
 
         # Check how many children each user will see:
-        assert len(randomize_block.get_child_descriptors()) == 1
-        assert randomize_block.get_child_descriptors()[0].display_name == 'Hello HTML 1'
+        assert len(randomize_block.get_child_blocks()) == 1
+        assert randomize_block.get_child_blocks()[0].display_name == 'Hello HTML 1'
         # Check that get_content_titles() doesn't return titles for hidden/unused children
         # get_content_titles() is not overridden in RandomizeBlock so titles of the 3 children are returned.
         assert len(randomize_block.get_content_titles()) == 3
@@ -115,4 +112,4 @@ class RandomizeBlockTest(MixedSplitTestCase):
         # Bind to another user and check a different child block is displayed to user.
         randomize_block = self.store.get_item(self.randomize_block.location)
         self._bind_module_system(randomize_block, 1)
-        assert randomize_block.get_child_descriptors()[0].display_name == 'Hello HTML 2'
+        assert randomize_block.get_child_blocks()[0].display_name == 'Hello HTML 2'

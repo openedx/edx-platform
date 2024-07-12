@@ -24,7 +24,12 @@ log = logging.getLogger('edx.celery.task')
 
 @shared_task
 @set_code_owner_attribute
-def check_pwned_password_and_send_track_event(user_id, password, internal_user=False, is_new_user=False):
+def check_pwned_password_and_send_track_event(
+    user_id, password,
+    internal_user=False,
+    is_new_user=False,
+    request_page=''
+):
     """
     Check the Pwned Databases and send its event to Segment.
     """
@@ -33,6 +38,7 @@ def check_pwned_password_and_send_track_event(user_id, password, internal_user=F
         if pwned_properties:
             pwned_properties['internal_user'] = internal_user
             pwned_properties['new_user'] = is_new_user
+            pwned_properties['user_request_page'] = request_page
             segment.track(user_id, 'edx.bi.user.pwned.password.status', pwned_properties)
         return pwned_properties
     except Exception:  # pylint: disable=W0703
@@ -45,7 +51,7 @@ def check_pwned_password_and_send_track_event(user_id, password, internal_user=F
 
 @shared_task(bind=True, default_retry_delay=30, max_retries=2)
 @set_code_owner_attribute
-def send_activation_email(self, msg_string, from_address=None):
+def send_activation_email(self, msg_string, from_address=None, site_id=None):
     """
     Sending an activation email to the user.
     """
@@ -62,7 +68,7 @@ def send_activation_email(self, msg_string, from_address=None):
 
     dest_addr = msg.recipient.email_address
 
-    site = Site.objects.get_current()
+    site = Site.objects.get(id=site_id) if site_id else Site.objects.get_current()
     user = User.objects.get(id=msg.recipient.lms_user_id)
 
     try:

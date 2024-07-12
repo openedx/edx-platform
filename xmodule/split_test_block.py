@@ -12,21 +12,20 @@ from uuid import uuid4
 
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Integer, ReferenceValueDict, Scope, String
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.progress import Progress
 from xmodule.seq_block import ProctoringFields, SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -132,7 +131,6 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -158,48 +156,43 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     show_in_read_only_mode = True
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
-    }
-
     mako_template = "widgets/metadata-only-edit.html"
     studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
-    }
 
     @cached_property
-    def child_descriptor(self):
+    def child_block(self):
         """
         Return the child block for the partition or None.
         """
-        child_descriptors = self.get_child_descriptors()
-        if len(child_descriptors) >= 1:
-            return child_descriptors[0]
+        child_blocks = self.get_child_blocks()
+        if len(child_blocks) >= 1:
+            return child_blocks[0]
         return None
 
     @cached_property
     def child(self):
         """
         Return the user bound child block for the partition or None.
+
+        Handles the AttributeError exception that may occur when attempting to retrieve
+        an icon for the split_test xblock within the CMS.
         """
-        if self.child_descriptor is not None:
-            return self.runtime.get_block_for_descriptor(self.child_descriptor)
-        else:
+        try:
+            if self.child_block is not None:
+                return self.runtime.get_block_for_descriptor(self.child_block)
+            else:
+                return None
+        except AttributeError:
+            log.warning(
+                "Error while getting block instance for descriptor with location: [%s]",
+                self.location
+            )
             return None
 
-    def get_child_descriptor_by_location(self, location):
+    def get_child_block_by_location(self, location):
         """
         Look through the children and look for one with the given location.
-        Returns the descriptor.
+        Returns the block.
         If none match, return None
         """
         for child in self.get_children():
@@ -227,31 +220,49 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         """
         return self.child.get_content_titles()
 
-    def get_child_descriptors(self):
+    def get_child_blocks(self):
         """
         For grading--return just the chosen child.
+
+        Handles the NoSuchServiceError and ValueError exception that may occur when attempting to retrieve
+        an icon for the split_test xblock within the CMS.
         """
-        group_id = self.get_group_id()
+        try:
+            group_id = self.get_group_id()
+        except NoSuchServiceError:
+            log.warning(
+                "Error while getting user service in runtime with location: [%s]",
+                self.location
+            )
+            return []
+        except ValueError:
+            log.warning(
+                "Error while getting group ID for partition with location: [%s]",
+                self.location
+            )
+            return []
+
         if group_id is None:
             return []
 
         # group_id_to_child comes from json, so it has to have string keys
         str_group_id = str(group_id)
+        child_block = None
         if str_group_id in self.group_id_to_child:
             child_location = self.group_id_to_child[str_group_id]
-            child_descriptor = self.get_child_descriptor_by_location(child_location)
+            child_block = self.get_child_block_by_location(child_location)
         else:
             # Oops.  Config error.
             log.debug("configuration error in split test block: invalid group_id %r (not one of %r).  Showing error", str_group_id, list(self.group_id_to_child.keys()))  # lint-amnesty, pylint: disable=line-too-long
 
-        if child_descriptor is None:
-            # Peak confusion is great.  Now that we set child_descriptor,
+        if child_block is None:
+            # Peak confusion is great.  Now that we set child_block,
             # get_children() should return a list with one element--the
             # xmodule for the child
             log.debug("configuration error in split test block: no such child")
             return []
 
-        return [child_descriptor]
+        return [child_block]
 
     def get_group_id(self):
         """
@@ -271,8 +282,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         inactive_contents = []
 
         for child_location in self.children:  # pylint: disable=no-member
-            child_descriptor = self.get_child_descriptor_by_location(child_location)
-            child = self.runtime.get_block_for_descriptor(child_descriptor)
+            child_block = self.get_child_block_by_location(child_location)
+            child = self.runtime.get_block_for_descriptor(child_block)
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_fragment_resources(rendered_child)
             group_name, updated_group_id = self.get_data_for_vertical(child)
@@ -300,7 +311,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         sorted_inactive_contents = sorted(inactive_contents, key=itemgetter('group_name'))
 
         # Use the new template
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('split_test_staff_view.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('split_test_staff_view.html', {
             'items': sorted_active_contents + sorted_inactive_contents,
         }))
         fragment.add_css('.split-test-child { display: none; }')
@@ -327,7 +338,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                 fragment, inactive_children, context
             )
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('split_test_author_view.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('split_test_author_view.html', {
             'split_test': self,
             'is_root': is_root,
             'is_configured': self.is_configured,
@@ -346,8 +357,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         dependencies are added to the specified fragment.
         """
         html = ""
-        for active_child_descriptor in children:
-            active_child = self.runtime.get_block_for_descriptor(active_child_descriptor)
+        for active_child_block in children:
+            active_child = self.runtime.get_block_for_descriptor(active_child_block)
             rendered_child = active_child.render(StudioEditableBlock.get_preview_view_name(active_child), context)
             if active_child.category == 'vertical':
                 group_name, group_id = self.get_data_for_vertical(active_child)
@@ -366,9 +377,9 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'SplitTestBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'SplitTestBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
@@ -378,14 +389,14 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         conditions for staff.
         """
         if self.child is None:
-            # raise error instead?  In fact, could complain on descriptor load...
+            # raise error instead?  In fact, could complain on block load...
             return Fragment(content="<div>Nothing here.  Move along.</div>")
 
         if self.runtime.user_is_staff:
             return self._staff_view(context)
         else:
             child_fragment = self.child.render(STUDENT_VIEW, context)
-            fragment = Fragment(self.runtime.service(self, 'mako').render_template('split_test_student_view.html', {
+            fragment = Fragment(self.runtime.service(self, 'mako').render_lms_template('split_test_student_view.html', {
                 'child_content': child_fragment.content,
                 'child_id': self.child.scope_ids.usage_id,
             }))
@@ -409,7 +420,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             )
             raise
         else:
-            self.runtime.publish('xblock.split_test.child_render', {'child_id': child_id})
+            self.runtime.publish(self, 'xblock.split_test.child_render', {'child_id': child_id})
             return Response()
 
     def get_icon_class(self):
@@ -464,8 +475,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
         for child in xml_object:
             try:
-                descriptor = system.process_xml(etree.tostring(child))
-                children.append(descriptor.scope_ids.usage_id)
+                block = system.process_xml(etree.tostring(child))
+                children.append(block.scope_ids.usage_id)
             except Exception:  # lint-amnesty, pylint: disable=broad-except
                 msg = "Unable to load child when parsing split_test block."
                 log.exception(msg)
@@ -486,7 +497,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
-        makes it use block.get_child_descriptors().
+        makes it use block.get_child_blocks().
         """
         return True
 
@@ -561,9 +572,9 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         if not user_partition:
             return [], children
 
-        def get_child_descriptor(location):
+        def get_child_block(location):
             """
-            Returns the child descriptor which matches the specified location, or None if one is not found.
+            Returns the child block which matches the specified location, or None if one is not found.
             """
             for child in children:
                 if child.location == location:
@@ -575,7 +586,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         for group in user_partition.groups:
             group_id = str(group.id)
             child_location = self.group_id_to_child.get(group_id, None)
-            child = get_child_descriptor(child_location)
+            child = get_child_block(child_location)
             if child:
                 active_children.append(child)
 

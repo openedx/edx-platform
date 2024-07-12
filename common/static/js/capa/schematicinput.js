@@ -2,6 +2,7 @@ $(function() {
     // TODO: someone should fix all of this...
     // $("a[rel*=leanModal]").leanModal(); //TODO: Make this work with the new modal library. Try and integrate this with the "slices"
 
+    /* eslint-disable no-multi-str */
     // xss-lint: disable=javascript-jquery-append
     $('body').append('\
     <div id="circuit_editor_modal" class="modal hide fade"> \

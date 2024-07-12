@@ -249,7 +249,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             mode='audit'
         )
         CourseInstructorRole(self.course.id).add_users(instructor)
-        self.client.login(username=instructor.username, password='test')
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
 
         self.update_masquerade(**masquerade_config)
 
@@ -285,7 +285,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             mode='audit'
         )
         CourseInstructorRole(self.course.id).add_users(instructor)
-        self.client.login(username=instructor.username, password='test')
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
 
         self.update_masquerade(username='audit')
 
@@ -320,7 +320,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             mode='audit'
         )
         CourseInstructorRole(self.course.id).add_users(instructor)
-        self.client.login(username=instructor.username, password='test')
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
 
         self.update_masquerade(username='audit')
 
@@ -370,7 +370,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             mode='audit'
         )
 
-        self.client.login(username=staff_user.username, password='test')
+        self.client.login(username=staff_user.username, password=self.TEST_PASSWORD)
 
         self.update_masquerade(username=expired_staff.username)
 
@@ -418,7 +418,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             mode='audit'
         )
 
-        self.client.login(username=staff_user.username, password='test')
+        self.client.login(username=staff_user.username, password=self.TEST_PASSWORD)
 
         self.update_masquerade(username=expired_staff.username)
 

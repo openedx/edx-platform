@@ -1,10 +1,14 @@
 /* global gettext */
 import React from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import isFunction from 'lodash/isFunction';
 
-const Page = ({ children }) => children;
+const Page = ({children}) => children;
+// eslint-disable-next-line react/function-component-definition
 const Header = () => null;
+// eslint-disable-next-line react/function-component-definition
 const Closer = () => null;
+// eslint-disable-next-line react/function-component-definition
 const ErrorPage = () => null;
 export default class Wizard extends React.Component {
     constructor(props) {
@@ -15,8 +19,9 @@ export default class Wizard extends React.Component {
             currentPage: 1,
             totalPages: 0,
             pages: [],
+            // eslint-disable-next-line react/no-unused-state
             wizardContext: {},
-        }
+        };
 
         this.wizardComplete = this.wizardComplete.bind(this);
     }
@@ -27,23 +32,25 @@ export default class Wizard extends React.Component {
         const wizardContext = this.props.wizardContext;
         const closer = this.findSubComponentByType(Wizard.Closer.name)[0];
         pages.push(closer);
-        this.setState({ pages, totalPages, wizardContext });
+        // eslint-disable-next-line react/no-unused-state
+        this.setState({pages, totalPages, wizardContext});
     }
 
     handleNext() {
         if (this.state.currentPage < this.props.children.length) {
-            this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }))
+            this.setState(prevState => ({currentPage: prevState.currentPage + 1}));
         }
     }
 
     findSubComponentByType(type) {
-        return React.Children.toArray(this.props.children).filter(child => child.type.name === type)
+        return React.Children.toArray(this.props.children).filter(child => child.type.name === type);
     }
 
     // this needs to handle the case of no provided header
+    // eslint-disable-next-line react/sort-comp
     renderHeader() {
         const header = this.findSubComponentByType(Wizard.Header.name)[0];
-        return header.props.children({ currentPage: this.state.currentPage, totalPages: this.state.totalPages })
+        return header.props.children({currentPage: this.state.currentPage, totalPages: this.state.totalPages});
     }
 
     renderPage() {
@@ -54,7 +61,7 @@ export default class Wizard extends React.Component {
             }
 
             if (isFunction(page.props.children)) {
-                return page.props.children({ wizardConsumer: this.props.wizardContext });
+                return page.props.children({wizardConsumer: this.props.wizardContext});
             } else {
                 return page.props.children;
             }
@@ -66,15 +73,16 @@ export default class Wizard extends React.Component {
     renderError() {
         const errorPage = this.findSubComponentByType(Wizard.ErrorPage.name)[0];
         return (
-            <div className="wizard-container" role="dialog" aria-label={gettext("demographics questionnaire")}>
+            <div className="wizard-container" role="dialog" aria-label={gettext('demographics questionnaire')}>
                 <div className="wizard-header">
                     {errorPage.props.children}
                 </div>
                 <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-                    <button className="wizard-button colored" arial-label={gettext("close questionnaire")} onClick={this.props.onWizardComplete}>{gettext("Close")}</button>
+                    {/* eslint-disable-next-line react/button-has-type, react/no-unknown-property */}
+                    <button className="wizard-button colored" arial-label={gettext('close questionnaire')} onClick={this.props.onWizardComplete}>{gettext('Close')}</button>
                 </div>
             </div>
-        )
+        );
     }
 
     /**
@@ -104,14 +112,16 @@ export default class Wizard extends React.Component {
             return this.renderError();
         }
         return (
-            <div className="wizard-container" role="dialog" aria-label={gettext("demographics questionnaire")}>
+            <div className="wizard-container" role="dialog" aria-label={gettext('demographics questionnaire')}>
                 <div className="wizard-header mb-4">
                     {this.state.totalPages >= this.state.currentPage && this.renderHeader()}
                 </div>
                 {this.renderPage()}
                 <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-                    <button className={`wizard-button ${finalPage && 'colored'}`} onClick={this.wizardComplete} aria-label={gettext("finish later")}>{finalPage ? gettext("Return to my dashboard") : gettext("Finish later")}</button>
-                    <button className="wizard-button colored" hidden={finalPage} onClick={this.handleNext} aria-label={gettext("next page")}>{gettext("Next")}</button>
+                    {/* eslint-disable-next-line react/button-has-type */}
+                    <button className={`wizard-button ${finalPage && 'colored'}`} onClick={this.wizardComplete} aria-label={gettext('finish later')}>{finalPage ? gettext('Return to my dashboard') : gettext('Finish later')}</button>
+                    {/* eslint-disable-next-line react/button-has-type */}
+                    <button className="wizard-button colored" hidden={finalPage} onClick={this.handleNext} aria-label={gettext('next page')}>{gettext('Next')}</button>
                 </div>
             </div>
         );

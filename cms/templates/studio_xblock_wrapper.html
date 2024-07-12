@@ -1,24 +1,27 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import gettext as _
-from cms.djangoapps.contentstore.views.helpers import xblock_studio_url
+from cms.djangoapps.contentstore.helpers import xblock_studio_url
 from cms.djangoapps.contentstore.utils import is_visible_to_specific_partition_groups, get_editor_page_base_url, determine_label
 from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor
+from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 %>
 <%
 use_new_editor_text = use_new_text_editor()
 use_new_editor_video = use_new_video_editor()
 use_new_editor_problem = use_new_problem_editor()
+use_new_video_gallery_flow = use_video_gallery_flow()
+use_tagging = not is_tagging_feature_disabled()
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
-collapsible_class = "is-collapsible" if xblock.has_children else ""
 label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block_type)
 messages = xblock.validate().to_json()
+has_not_configured_message = messages.get('summary',{}).get('type', None) == 'not-configured'
 block_is_unit = is_unit(xblock)
 %>
 
@@ -27,6 +30,9 @@ block_is_unit = is_unit(xblock)
 <%block name="header_extras">
 <script type="text/template" id="xblock-validation-messages-tpl">
     <%static:include path="js/xblock-validation-messages.underscore" />
+</script>
+<script type="text/template" id="tag-count-tpl">
+    <%static:include path="js/tag-count.underscore" />
 </script>
 </%block>
 
@@ -40,21 +46,34 @@ block_is_unit = is_unit(xblock)
     );
 </script>
 
+<%static:webpack entry="js/factories/tag_count">
+    TagCountFactory({
+        tags_count: "${tags_count | n, js_escaped_string}",
+        content_id: "${xblock.location | n, js_escaped_string}",
+        course_authoring_url: "${course_authoring_url | n, js_escaped_string}",
+    },
+        $('li.tag-count[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
+</%static:webpack>
+
 % if not is_root:
     % if is_reorderable:
-    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    <li class="studio-xblock-wrapper is-draggable" id="${xblock.location}" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % else:
-    <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    <div class="studio-xblock-wrapper" id="${xblock.location}" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}
+    <section class="wrapper-xblock is-collapsible ${section_class}
     % if is_visible_to_specific_partition_groups(xblock):
         has-group-visibility-set
     % endif
     ">
+    <div class="ui-loading ${'is-hidden' if not is_loading else ''}">
+        <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Importing components")}</span></p>
+    </div>
 % endif
 
-<header class="xblock-header xblock-header-${xblock.category}">
+<header class="xblock-header xblock-header-${xblock.category} ${'is-hidden' if is_loading else ''}">
     <div class="xblock-header-primary
     % if not show_preview:
         is-collapsed
@@ -63,6 +82,7 @@ block_is_unit = is_unit(xblock)
     use-new-editor-text = ${use_new_editor_text}
     use-new-editor-video = ${use_new_editor_video}
     use-new-editor-problem = ${use_new_editor_problem}
+    use-video-gallery-flow = ${use_new_video_gallery_flow}
     authoring_MFE_base_url = ${get_editor_page_base_url(xblock.location.course_key)}
     data-block-type = ${xblock.scope_ids.block_type}
     data-usage-id = ${xblock.scope_ids.usage_id}
@@ -75,7 +95,16 @@ block_is_unit = is_unit(xblock)
             </a>
             % endif
             <div class="xblock-display-title">
+                % if selectable:
+                <input type="checkbox" name="library-component" id="${xblock.location}"
+                       class="header-library-checkbox" ${'checked="checked"' if is_selected else ''}>
+                <label for="${xblock.location}" class="xblock-display-name header-library-checkbox-label">
+                    <span class="sr-only">${_("Select this problem")}</span>
+                    ${label}
+                </label>
+                % else:
                 <span class="xblock-display-name">${label}</span>
+                % endif
                 % if selected_groups_label:
                 <p class="xblock-group-visibility-label">${selected_groups_label}</p>
                 % endif
@@ -85,6 +114,9 @@ block_is_unit = is_unit(xblock)
             <ul class="actions-list nav-dd ui-right">
                 % if not is_root:
                     % if can_edit:
+                        % if use_tagging:
+                            <li class="action-item tag-count" data-locator="${xblock.location}"></li>
+                        % endif
                         % if not show_inline:
                             <li class="action-item action-edit">
                                 <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
@@ -92,88 +124,56 @@ block_is_unit = is_unit(xblock)
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </button>
                             </li>
-                            % if can_edit_visibility and not enable_copy_paste:
-                                <li class="action-item action-visibility">
-                                    <button data-tooltip="${_("Access Settings")}" class="btn-default access-button action-button">
-                                        <span class="icon fa fa-gear" aria-hidden="true"></span>
-                                        <span class="sr">${_("Set Access")}</span>
-                                    </button>
-                                </li>
-                            % endif
-                            % if can_add and not enable_copy_paste:
-                                <li class="action-item action-duplicate">
-                                    <button data-tooltip="${_("Duplicate")}" class="btn-default duplicate-button action-button">
-                                    <span class="icon fa fa-copy" aria-hidden="true"></span>
-                                    <span class="sr">${_("Duplicate")}</span>
-                                    </button>
-                                </li>
-                            % endif
-                            % if can_move and not enable_copy_paste:
-                                <li class="action-item action-move">
-                                    <button data-tooltip="${_("Move")}" class="btn-default move-button action-button">
-                                        <span class="stack-move-icon fa-stack fa-lg ">
-                                            <span class="fa fa-file-o fa-stack-2x fa-fw" aria-hidden="true"></span>
-                                            <span class="fa fa-arrow-right fa-stack-1x fa-fw" aria-hidden="true"></span>
-                                        </span>
-                                        <span class="sr">${_("Move")}</span>
-                                    </button>
-                                </li>
-                            % endif
                         % endif
-                        % if can_add and not enable_copy_paste:
-                            <!-- If we can add, we can delete. -->
-                            <li class="action-item action-delete">
-                                <button data-tooltip="${_("Delete")}" class="btn-default delete-button action-button">
-                                    <span class="icon fa fa-trash-o" aria-hidden="true"></span>
-                                    <span class="sr">${_("Delete")}</span>
-                                </button>
-                            </li>
-                        % endif
-                        % if enable_copy_paste:
-                            <!--
-                                If the "copy/paste" feature flag is enabled, all the actions besides "Edit" appear in a
-                                menu. We use .nav-dd on the parent element and .nav-item on this button to get the same
-                                dropdown menu appearance and behavior as in Studio's various other nav bars.
-                            -->
-                            <li class="action-item action-actions-menu nav-item">
-                                <button data-tooltip="${_("Actions")}" class="btn-default show-actions-menu-button action-button">
-                                    <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
-                                    <span class="sr">${_("Actions")}</span>
-                                </button>
-                                <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
-                                    <div class="nav-sub">
-                                      <ul>
-                                        % if not show_inline:
+                        <li class="action-item action-actions-menu nav-item">
+                            <button data-tooltip="${_("Actions")}" class="btn-default show-actions-menu-button action-button">
+                                <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
+                                <span class="sr">${_("Actions")}</span>
+                            </button>
+                            <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
+                                <div class="nav-sub">
+                                  <ul>
+                                    % if not show_inline:
+                                        % if can_edit_visibility:
                                             <li class="nav-item">
-                                                <a class="copy-button" href="#" role="button">${_("Copy")}</a>
+                                                <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
                                             </li>
-                                            % if can_add:
-                                                <li class="nav-item">
-                                                    <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
-                                                </li>
-                                            % endif
-                                            % if can_move:
-                                                <li class="nav-item">
-                                                    <a class="move-button" href="#" role="button">${_("Move")}</a>
-                                                </li>
-                                            % endif
-                                            % if can_edit_visibility:
-                                                <li class="nav-item">
-                                                    <a class="access-button" href="#" role="button">${_("Manage Access")}</a>
-                                                </li>
-                                            % endif
+                                        % endif
+                                        % if can_move:
+                                            <li class="nav-item">
+                                                <a class="move-button" href="#" role="button">${_("Move")}</a>
+                                            </li>
+                                        % endif
+                                        % if use_tagging:
+                                            <li class="nav-item">
+                                                <a class="manage-tags-button" href="#" role="button">${_("Manage Tags")}</a>
+                                            </li>
+                                        % endif
+                                        % if is_course:
+                                            <!--
+                                                Only show the "Copy to Clipboard" button for xblocks inside courses since
+                                                the copy/paste functionality is not yet implemented for LibraryContent.
+                                            -->
+                                            <li class="nav-item">
+                                                <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
+                                            </li>
                                         % endif
                                         % if can_add:
-                                            <!-- If we can add, we can delete. -->
                                             <li class="nav-item">
-                                                <a class="delete-button" href="#" role="button">${_("Delete")}</a>
+                                                <a class="duplicate-button" href="#" role="button">${_("Duplicate")}</a>
                                             </li>
                                         % endif
-                                    </ul>
-                                    </div>
-                                  </div>
-                            </li>
-                        % endif
+                                    % endif
+                                    % if can_add:
+                                        <!-- If we can add, we can delete. -->
+                                        <li class="nav-item">
+                                            <a class="delete-button" href="#" role="button">${_("Delete")}</a>
+                                        </li>
+                                    % endif
+                                </ul>
+                                </div>
+                            </div>
+                        </li>
                         % if is_reorderable:
                             <li class="action-item action-drag">
                                 <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
@@ -192,14 +192,14 @@ block_is_unit = is_unit(xblock)
     </div>
     % if not is_root:
         <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location}"/>
-        % if xblock_url:
+        % if xblock_url and not has_not_configured_message:
         <div class="xblock-header-secondary">
             <div class="meta-info">${_('This block contains multiple components.')}</div>
             <ul class="actions-list">
                 <li class="action-item action-view">
                     <a href="${xblock_url}" class="action-button">
                         ## Translators: this is a verb describing the action of viewing more details
-                        <span class="action-button-text">${_('View')}</span>
+                        <span class="action-button-text">${('View')}</span>
                         <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
                     </a>
                 </li>

@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
+
     define(['jquery', 'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/course_cohort_settings',
         'js/groups/models/content_group'],
     function($, CohortsView, CohortCollection, CourseCohortSettingsModel, ContentGroupModel) {
@@ -39,4 +41,3 @@
         };
     });
 }).call(this, define || RequireJS.define);
-

@@ -1,27 +1,29 @@
 """
 Tests for Blocks Views
 """
-import ddt
-
 from datetime import datetime
 from unittest import mock
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 from urllib.parse import urlencode, urlunparse
 
+import ddt
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.urls import reverse
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from rest_framework.utils.serializer_helpers import ReturnList
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseDataResearcherRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from openedx.core.djangoapps.discussions.models import (
-    DiscussionsConfiguration,
-    Provider,
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+    SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import (  # lint-amnesty, pylint: disable=wrong-import-order
+    BlockFactory,
+    ToyCourseFactory
+)
 
 from .helpers import deserialize_usage_key
 
@@ -60,7 +62,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.admin_user = AdminFactory.create()
         self.data_researcher = UserFactory.create()
         CourseDataResearcherRole(self.course_key).add_users(self.data_researcher)
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
 
         # default values for url and query_params
@@ -207,8 +209,9 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.query_params['all_blocks'] = True
         self.verify_response(403)
 
+    @mock.patch('lms.djangoapps.courseware.courses.get_course_assignments', return_value=[])
     @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
-    def test_not_authenticated_public_course_with_blank_username(self):
+    def test_not_authenticated_public_course_with_blank_username(self, get_course_assignment_mock: MagicMock) -> None:
         """
         Verify behaviour when accessing course blocks of a public course for anonymous user anonymously.
         """
@@ -248,7 +251,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.client.logout()
         self.verify_response(403, cacheable=False)
         # Verify response for a staff user.
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         self.verify_response(cacheable=False)
 
     def test_non_existent_course(self):
@@ -269,7 +272,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response(400)
 
     def test_no_user_staff_all_blocks(self):
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         self.query_params.pop('username')
         self.query_params['all_blocks'] = True
         self.verify_response()
@@ -319,7 +322,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
             - other_course_settings
             - course_visibility
         """
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         response = self.verify_response(params={
             'all_blocks': True,
             'requested_fields': ['other_course_settings', 'course_visibility'],
@@ -351,7 +354,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
             - other_course_settings
             - course_visibility
         """
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         response = self.verify_response(params={
             'all_blocks': True,
             'requested_fields': ['course_visibility'],
@@ -366,11 +369,12 @@ class TestBlocksView(SharedModuleStoreTestCase):
                 block_data['type'] == 'course'
             )
 
-    def test_data_researcher_access(self):
+    @mock.patch('lms.djangoapps.courseware.courses.get_course_assignments', return_value=[])
+    def test_data_researcher_access(self, get_course_assignment_mock: MagicMock) -> None:
         """
         Test if data researcher has access to the api endpoint
         """
-        self.client.login(username=self.data_researcher.username, password='test')
+        self.client.login(username=self.data_researcher.username, password=self.TEST_PASSWORD)
 
         self.verify_response(params={
             'all_blocks': True,
@@ -498,17 +502,26 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
             assert response.data['blocks'][block_id].get('completion')
 
     @ddt.data(
-        False,
-        True,
+        (False, 'list'),
+        (True, 'list'),
+        (False, 'dict'),
+        (True, 'dict'),
     )
-    def test_filter_discussion_xblocks(self, is_openedx_provider):
+    @ddt.unpack
+    def test_filter_discussion_xblocks(self, is_openedx_provider, return_type):
         """
         Tests if discussion xblocks are hidden for openedx provider
         """
+
         def blocks_has_discussion_xblock(blocks):
-            for key, value in blocks.items():
-                if value.get('type') == 'discussion':
-                    return True
+            if isinstance(blocks, ReturnList):
+                for value in blocks:
+                    if value.get('type') == 'discussion':
+                        return True
+            else:
+                for key, value in blocks.items():
+                    if value.get('type') == 'discussion':
+                        return True
             return False
 
         BlockFactory.create(
@@ -520,9 +533,14 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         )
         if is_openedx_provider:
             DiscussionsConfiguration.objects.create(context_key=self.course_key, provider_type=Provider.OPEN_EDX)
-        response = self.client.get(self.url, self.query_params)
+        params = self.query_params.copy()
+        if return_type == 'list':
+            params['return_type'] = 'list'
+        response = self.client.get(self.url, params)
 
-        has_discussion_xblock = blocks_has_discussion_xblock(response.data.get('blocks', {}))
+        has_discussion_xblock = blocks_has_discussion_xblock(
+            response.data if isinstance(response.data, ReturnList) else response.data.get('blocks', {})
+        )
         if is_openedx_provider:
             assert not has_discussion_xblock
         else:
@@ -556,7 +574,7 @@ class TestBlockMetadataView(SharedModuleStoreTestCase):  # pylint: disable=test-
     def setUp(self):
         super().setUp()
         self.admin_user = AdminFactory.create()
-        self.client.login(username=self.admin_user.username, password='test')
+        self.client.login(username=self.admin_user.username, password=self.TEST_PASSWORD)
         self.usage_key = list(self.non_orphaned_block_usage_keys)[0]
         self.url = reverse(
             'blocks_metadata',

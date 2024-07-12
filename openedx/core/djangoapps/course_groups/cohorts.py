@@ -619,3 +619,17 @@ def _get_cohort_settings_from_modulestore(course):
         'cohorted_discussions': list(course.cohorted_discussions),
         'always_cohort_inline_discussions': course.always_cohort_inline_discussions
     }
+
+
+def get_cohorted_user_partition_id(course_key):
+    """
+    Returns the partition id to which cohorts are linked or None if there is no cohort linked
+    to a content group.
+    """
+    course_user_group_partition_group = CourseUserGroupPartitionGroup.objects.filter(
+        course_user_group__course_id=course_key
+    ).first()
+
+    if course_user_group_partition_group:
+        return course_user_group_partition_group.partition_id
+    return None

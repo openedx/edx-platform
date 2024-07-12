@@ -7,6 +7,7 @@ import datetime
 import json
 import unittest
 from unittest import mock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -14,7 +15,6 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.test import TestCase
 from edx_when.api import get_dates_for_course, set_dates_for_course
 from edx_when.field_data import DateLookupFieldData
-from mock.mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xmodule.fields import Date
@@ -458,3 +458,39 @@ class TestStudentFromIdentifier(TestCase):
         """Test with invalid identifier"""
         with pytest.raises(User.DoesNotExist):
             assert tools.get_student_from_identifier("invalid")
+
+
+class TestProfilePrivacy(TestCase):
+    '''
+    Tests utility function for stripping a feature from the list of features to be reported on
+    '''
+    def test_no_feature_list_supplied(self):
+        '''
+        Missing first argument raises an exception
+        '''
+        with pytest.raises(tools.DashboardError):
+            assert tools.keep_field_private(None, "bogus_field_name")
+
+    def test_no_privacy_feature_supplied(self):
+        '''
+        Missing second argument raises an exception
+        '''
+        with pytest.raises(tools.DashboardError):
+            assert tools.keep_field_private(["bogus_field1", "bogus_field2"], None)
+
+    def test_feature_supplied_and_stripped(self):
+        '''
+        Request to strip a feature in feature list succeeds
+        '''
+        query_fields = ['Name', 'Address', 'Secret']
+        assert 'Secret' in query_fields
+        tools.keep_field_private(query_fields, 'Secret')
+        assert 'Secret' not in query_fields
+
+    def test_feature_absent_and_exception_consumed(self):
+        '''
+        Request to strip a feature not in feature list is a silent no-op
+        '''
+        query_fields = ['Name', 'Address']
+        tools.keep_field_private(query_fields, 'Secret')
+        assert len(query_fields) == 2

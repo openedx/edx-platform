@@ -44,7 +44,6 @@
                 return dfd.promise();
             };
 
-
             // Private functions.
 
             function _makeFunctionsPublic(state) {
@@ -78,7 +77,6 @@
                     state.el.trigger('mousemove');
                 });
             }
-
 
             // Public functions.
 

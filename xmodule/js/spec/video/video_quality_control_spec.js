@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     describe('VideoQualityControl', function() {
         var state, qualityControl, videoPlayer, player;

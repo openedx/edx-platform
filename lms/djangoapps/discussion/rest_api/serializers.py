@@ -6,7 +6,7 @@ from urllib.parse import urlencode, urlunparse
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import TextChoices
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -41,6 +41,7 @@ from openedx.core.djangoapps.django_comment_common.comment_client.thread import 
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.user_api.accounts.api import get_profile_images
 from openedx.core.lib.api.serializers import CourseKeyField
 
 User = get_user_model()
@@ -83,6 +84,8 @@ def get_context(course, request, thread=None):
         "ta_user_ids": ta_user_ids,
         "cc_requester": cc_requester,
         "has_moderation_privilege": has_moderation_privilege,
+        "is_global_staff": is_global_staff,
+        "is_staff_or_admin": requester.id in course_staff_user_ids,
     }
 
 
@@ -155,6 +158,7 @@ class _ContentSerializer(serializers.Serializer):
     anonymous_to_peers = serializers.BooleanField(default=False)
     last_edit = serializers.SerializerMethodField(required=False)
     edit_reason_code = serializers.CharField(required=False, validators=[validate_edit_reason_code])
+    edit_by_label = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = set()
 
@@ -199,17 +203,30 @@ class _ContentSerializer(serializers.Serializer):
 
     def _get_user_label(self, user_id):
         """
-        Returns the role label (i.e. "Staff" or "Community TA") for the user
+        Returns the role label (i.e. "Staff", "Moderator" or "Community TA") for the user
         with the given id.
         """
-        is_staff = user_id in self.context["course_staff_user_ids"] or user_id in self.context["moderator_user_ids"]
+        is_staff = user_id in self.context["course_staff_user_ids"]
+        is_moderator = user_id in self.context["moderator_user_ids"]
         is_ta = user_id in self.context["ta_user_ids"]
 
         return (
             "Staff" if is_staff else
+            "Moderator" if is_moderator else
             "Community TA" if is_ta else
             None
         )
+
+    def _get_user_label_from_username(self, username):
+        """
+        Returns role label of user from username
+        Possible Role Labels: Staff, Moderator, Community TA or None
+        """
+        try:
+            user = User.objects.get(username=username)
+            return self._get_user_label(user.id)
+        except ObjectDoesNotExist:
+            return None
 
     def get_author_label(self, obj):
         """
@@ -282,6 +299,17 @@ class _ContentSerializer(serializers.Serializer):
             last_edit["reason"] = EDIT_REASON_CODES.get(reason_code)
         return last_edit
 
+    def get_edit_by_label(self, obj):
+        """
+        Returns the role label for the last edit user.
+        """
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        is_user_privileged = _validate_privileged_access(self.context)
+        edit_history = obj.get("edit_history")
+        if (is_user_author or is_user_privileged) and edit_history:
+            last_edit = edit_history[-1]
+            return self._get_user_label_from_username(last_edit.get('editor_username'))
+
 
 class ThreadSerializer(_ContentSerializer):
     """
@@ -316,6 +344,7 @@ class ThreadSerializer(_ContentSerializer):
     close_reason_code = serializers.CharField(required=False, validators=[validate_close_reason_code])
     close_reason = serializers.SerializerMethodField()
     closed_by = serializers.SerializerMethodField()
+    closed_by_label = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
@@ -402,10 +431,9 @@ class ThreadSerializer(_ContentSerializer):
 
     def get_preview_body(self, obj):
         """
-        Returns a cleaned and truncated version of the thread's body to display in a
-        preview capacity.
+        Returns a cleaned version of the thread's body to display in a preview capacity.
         """
-        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ')
+        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ').replace('&nbsp;', ' ')
 
     def get_close_reason(self, obj):
         """
@@ -425,6 +453,14 @@ class ThreadSerializer(_ContentSerializer):
         is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
         if _validate_privileged_access(self.context) or is_user_author:
             return obj.get("closed_by")
+
+    def get_closed_by_label(self, obj):
+        """
+        Returns the role label for the user who closed the post.
+        """
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        if is_user_author or _validate_privileged_access(self.context):
+            return self._get_user_label_from_username(obj.get("closed_by"))
 
     def create(self, validated_data):
         thread = Thread(user_id=self.context["cc_requester"]["id"], **validated_data)
@@ -470,6 +506,7 @@ class CommentSerializer(_ContentSerializer):
     child_count = serializers.IntegerField(read_only=True)
     children = serializers.SerializerMethodField(required=False)
     abuse_flagged_any_user = serializers.SerializerMethodField(required=False)
+    profile_image = serializers.SerializerMethodField(read_only=True)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
 
@@ -551,6 +588,10 @@ class CommentSerializer(_ContentSerializer):
         """
         if _validate_privileged_access(self.context):
             return len(obj.get("abuse_flaggers", [])) > 0
+
+    def get_profile_image(self, obj):
+        request = self.context["request"]
+        return get_profile_images(request.user.profile, request.user, request)
 
     def validate(self, attrs):
         """

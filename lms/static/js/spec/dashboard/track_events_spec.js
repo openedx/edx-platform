@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'js/dashboard/track_events'
@@ -37,7 +38,6 @@
                     window.edx.dashboard.generateTrackProperties
                 );
             });
-
 
             it('sends an analytics event when the user clicks enter course link', function() {
                 var $enterCourse = $('.enter-course');

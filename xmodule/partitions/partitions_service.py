@@ -3,13 +3,12 @@ This is a service-like API that assigns tracks which groups users are in for var
 user partitions.  It uses the user_service key/value store provided by the LMS runtime to
 persist the assignments.
 """
-
-
 import logging
 from typing import Dict
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.dynamic_partitions_generators import DynamicPartitionGeneratorsPluginManager
 
@@ -44,7 +43,7 @@ def get_all_partitions_for_course(course, active_only=False):
     return all_partitions
 
 
-def get_user_partition_groups(course_key: str, user_partitions: list, user: User,
+def get_user_partition_groups(course_key: CourseKey, user_partitions: list, user: User,
                               partition_dict_key: str = 'name') -> Dict[str, Group]:
     """
     Collect group ID for each partition in this course for this user.
@@ -83,7 +82,13 @@ def _get_dynamic_partitions(course):
     for generator in dynamic_partition_generators:
         generated_partition = generator(course)
         if generated_partition:
-            generated_partitions.append(generated_partition)
+            # If the generator returns a list of partitions, add them all to the list.
+            # Otherwise, just add the single partition. This is needed for cases where
+            # a single generator can return multiple partitions, such as the TeamUserPartition.
+            if isinstance(generated_partition, list):
+                generated_partitions.extend(generated_partition)
+            else:
+                generated_partitions.append(generated_partition)
 
     return generated_partitions
 
@@ -113,7 +118,9 @@ class PartitionService:
         through course.user_partitions, and any dynamic partitions that exist). Note: this returns
         both active and inactive partitions.
         """
-        return get_all_partitions_for_course(self.get_course())
+        if course := self.get_course():
+            return get_all_partitions_for_course(course)
+        return []
 
     def get_user_group_id_for_partition(self, user, user_partition_id):
         """

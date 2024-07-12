@@ -9,10 +9,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
 
-from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
-from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()
@@ -211,11 +209,6 @@ class ProctoringCourseApp(CourseApp):
             "configure": True,
         }
 
-    @staticmethod
-    def legacy_link(course_key: CourseKey):
-        if not proctoring_settings_modal_view_enabled(course_key):
-            return get_proctored_exam_settings_url(course_key)
-
 
 class CustomPagesCourseApp(CourseApp):
     """
@@ -267,3 +260,48 @@ class CustomPagesCourseApp(CourseApp):
     @staticmethod
     def legacy_link(course_key: CourseKey):
         return urls.reverse('tabs_handler', kwargs={'course_key_string': course_key})
+
+
+class ORASettingsApp(CourseApp):
+    """
+    Course App config for ORA app.
+    """
+
+    app_id = "ora_settings"
+    name = _("Open Response Assessment Settings")
+    description = _("Course level settings for Open Response Assessment.")
+    documentation_links = {
+        "learn_more_configuration": settings.ORA_SETTINGS_HELP_URL,
+    }
+
+    @classmethod
+    def is_available(cls, course_key: CourseKey) -> bool:
+        """
+        Open response is available for course with at least one ORA.
+        """
+        oras = modulestore().get_items(course_key, qualifiers={'category': 'openassessment'})
+        return len(oras) > 0
+
+    @classmethod
+    def is_enabled(cls, course_key: CourseKey) -> bool:
+        """
+        Get open response enabled status from course overview model.
+        """
+        return True
+
+    @classmethod
+    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
+        """
+        Update open response enabled status in modulestore. Always enable to avoid confusion that user can disable ora.
+        """
+        return True
+
+    @classmethod
+    def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:
+        """
+        Get allowed operations for open response app.
+        """
+        return {
+            "enable": False,
+            "configure": True,
+        }

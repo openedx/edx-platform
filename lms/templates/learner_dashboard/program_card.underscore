@@ -61,3 +61,8 @@
         </picture>
     </div>
 </a>
+<% if (isSubscribed) { %>
+<div class="subscription-badge">
+    <span class="badge badge-light"><%- gettext('Subscribed') %></span>
+</div>
+<% } %>

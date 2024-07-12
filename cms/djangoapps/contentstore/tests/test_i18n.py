@@ -1,8 +1,6 @@
 """
 Tests for validate Internationalization and XBlock i18n service.
 """
-
-
 import gettext
 from unittest import mock, skip
 
@@ -15,9 +13,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.tests.test_export import PureXBlock
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
-from cms.djangoapps.contentstore.views.preview import _preview_module_system
+from cms.djangoapps.contentstore.views.preview import _prepare_runtime_for_preview
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.lib.edx_six import get_gettext
 
 
 class FakeTranslations(XBlockI18nService):
@@ -68,20 +65,15 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         self.test_language = 'dummy language'
         self.request = mock.Mock()
         self.course = CourseFactory.create()
-        self.field_data = mock.Mock()
-        self.descriptor = BlockFactory(category="pure", parent=self.course)
-        self.runtime = _preview_module_system(
-            self.request,
-            self.descriptor,
-            self.field_data,
-        )
+        self.block = BlockFactory(category="pure", parent=self.course)
+        _prepare_runtime_for_preview(self.request, self.block)
         self.addCleanup(translation.deactivate)
 
-    def get_block_i18n_service(self, descriptor):
+    def get_block_i18n_service(self, block):
         """
         return the block i18n service.
         """
-        i18n_service = self.runtime.service(descriptor, 'i18n')
+        i18n_service = self.block.runtime.service(block, 'i18n')
         self.assertIsNotNone(i18n_service)
         self.assertIsInstance(i18n_service, XBlockI18nService)
         return i18n_service
@@ -99,7 +91,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
 
             def __init__(self, module):
                 self.module = module
-                self.old_ugettext = get_gettext(module)
+                self.old_ugettext = module.gettext
 
             def __enter__(self):
                 def new_ugettext(*args, **kwargs):
@@ -113,7 +105,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
                 self.module.ugettext = self.old_ugettext
                 self.module.gettext = self.old_ugettext
 
-        i18n_service = self.get_block_i18n_service(self.descriptor)
+        i18n_service = self.get_block_i18n_service(self.block)
 
         # Activate french, so that if the fr files haven't been loaded, they will be loaded now.
         with translation.override("fr"):
@@ -126,7 +118,6 @@ class TestXBlockI18nService(ModuleStoreTestCase):
             # Check that the old ugettext has been put back into place
             self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
 
-    @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_django_translator_in_use_with_empty_block(self):
         """
@@ -135,7 +126,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         i18n_service = XBlockI18nService(None)
         self.assertEqual(i18n_service.ugettext(self.test_language), 'XYZ-TEST-LANGUAGE')
 
-    @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
+    @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_message_catalog_translations(self):
         """
         Test: Message catalog from FakeTranslation should return required translations.
@@ -150,28 +141,28 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         translation.activate("es")
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
                                                                         languages=[get_language()])):
-            i18n_service = self.get_block_i18n_service(self.descriptor)
+            i18n_service = self.get_block_i18n_service(self.block)
             self.assertEqual(i18n_service.ugettext('Hello'), 'es-hello-world')
 
         translation.activate("ar")
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
                                                                         languages=[get_language()])):
-            i18n_service = self.get_block_i18n_service(self.descriptor)
-            self.assertEqual(get_gettext(i18n_service)('Hello'), 'Hello')
-            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'fr-hello-world')
-            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'es-hello-world')
+            i18n_service = self.get_block_i18n_service(self.block)
+            self.assertEqual(i18n_service.gettext('Hello'), 'Hello')
+            self.assertNotEqual(i18n_service.gettext('Hello'), 'fr-hello-world')
+            self.assertNotEqual(i18n_service.gettext('Hello'), 'es-hello-world')
 
         translation.activate("fr")
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
                                                                         languages=[get_language()])):
-            i18n_service = self.get_block_i18n_service(self.descriptor)
+            i18n_service = self.get_block_i18n_service(self.block)
             self.assertEqual(i18n_service.ugettext('Hello'), 'fr-hello-world')
 
     def test_i18n_service_callable(self):
         """
         Test: i18n service should be callable in studio.
         """
-        self.assertTrue(callable(self.runtime._services.get('i18n')))  # pylint: disable=protected-access
+        self.assertTrue(callable(self.block.runtime._services.get('i18n')))  # pylint: disable=protected-access
 
 
 class InternationalizationTest(ModuleStoreTestCase):
@@ -193,7 +184,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         self.uname = 'testuser'
         self.email = 'test+courses@edx.org'
-        self.password = 'foo'
+        self.password = self.TEST_PASSWORD
 
         # Create the use so we can log them in.
         self.user = UserFactory.create(username=self.uname, email=self.email, password=self.password)

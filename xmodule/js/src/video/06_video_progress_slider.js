@@ -266,8 +266,8 @@ mind, or whether to act, and in acting, to live."
                 }
 
                 if (
-                    this.videoProgressSlider.slider &&
-            !this.videoProgressSlider.frozen
+                    this.videoProgressSlider.slider
+            && !this.videoProgressSlider.frozen
                 ) {
                     this.videoProgressSlider.slider
                         .slider('option', 'max', endTime)
@@ -318,6 +318,7 @@ mind, or whether to act, and in acting, to live."
                     i18n = function(value, word) {
                         var msg;
 
+                        // eslint-disable-next-line default-case
                         switch (word) {
                         case 'hour':
                             msg = ngettext('%(value)s hour', '%(value)s hours', value);
@@ -332,16 +333,16 @@ mind, or whether to act, and in acting, to live."
                         return interpolate(msg, {value: value}, true);
                     };
 
-                seconds = seconds % 60;
-                minutes = minutes % 60;
+                seconds %= 60;
+                minutes %= 60;
 
                 if (hours) {
-                    return i18n(hours, 'hour') + ' ' +
-                    i18n(minutes, 'minute') + ' ' +
-                    i18n(seconds, 'second');
+                    return i18n(hours, 'hour') + ' '
+                    + i18n(minutes, 'minute') + ' '
+                    + i18n(seconds, 'second');
                 } else if (minutes) {
-                    return i18n(minutes, 'minute') + ' ' +
-                    i18n(seconds, 'second');
+                    return i18n(minutes, 'minute') + ' '
+                    + i18n(seconds, 'second');
                 }
 
                 return i18n(seconds, 'second');

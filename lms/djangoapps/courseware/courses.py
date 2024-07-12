@@ -12,6 +12,7 @@ import pytz
 from crum import get_current_request
 from dateutil.parser import parse as parse_date
 from django.conf import settings
+from django.core.cache import cache
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -35,6 +36,7 @@ from lms.djangoapps.courseware.access_response import (
 )
 from lms.djangoapps.courseware.access_utils import check_authentication, check_data_sharing_consent, check_enrollment, \
     check_correct_active_enterprise_customer, is_priority_access_error
+from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
@@ -50,7 +52,9 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, CourseRun
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
+from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -76,7 +80,7 @@ _Assignment = namedtuple(
 
 def get_course(course_id, depth=0):
     """
-    Given a course id, return the corresponding course descriptor.
+    Given a course id, return the corresponding course block.
 
     If the course does not exist, raises a CourseRunNotFound. This is appropriate
     for internal use.
@@ -92,9 +96,9 @@ def get_course(course_id, depth=0):
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
-    Given a course_key, look up the corresponding course descriptor,
+    Given a course_key, look up the corresponding course block,
     check that the user has the access to perform the specified action
-    on the course, and return the descriptor.
+    on the course, and return the block.
 
     Raises a 404 if the course_key is invalid, or the user doesn't have access.
 
@@ -587,7 +591,7 @@ def get_course_blocks_completion_summary(course_key, user):
 
 
 @request_cached()
-def get_course_assignments(course_key, user, include_access=False):  # lint-amnesty, pylint: disable=too-many-statements
+def get_course_assignments(course_key, user, include_access=False, include_without_due=False,):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
 
@@ -607,7 +611,8 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
         for subsection_key in block_data.get_children(section_key):
             due = block_data.get_xblock_field(subsection_key, 'due')
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
-            if due and graded:
+
+            if (due or include_without_due) and graded:
                 first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(
                     subsection_key, 'contains_gated_content', False)
@@ -624,81 +629,181 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                 else:
                     complete = False
 
-                past_due = not complete and due < now
+                if due:
+                    past_due = not complete and due < now
+                else:
+                    past_due = False
+                    due = None
                 assignments.append(_Assignment(
                     subsection_key, title, url, due, contains_gated_content,
                     complete, past_due, assignment_type, None, first_component_block_id
                 ))
-
-            # Load all dates for ORA blocks as separate assignments
-            descendents = block_data.get_children(subsection_key)
-            while descendents:
-                descendent = descendents.pop()
-                descendents.extend(block_data.get_children(descendent))
-                if block_data.get_xblock_field(descendent, 'category', None) == 'openassessment':
-                    graded = block_data.get_xblock_field(descendent, 'graded', False)
-                    has_score = block_data.get_xblock_field(descendent, 'has_score', False)
-                    weight = block_data.get_xblock_field(descendent, 'weight', 1)
-                    if not (graded and has_score and (weight is None or weight > 0)):
-                        continue
-
-                    all_assessments = [{
-                        'name': 'submission',
-                        'due': block_data.get_xblock_field(descendent, 'submission_due'),
-                        'start': block_data.get_xblock_field(descendent, 'submission_start'),
-                        'required': True
-                    }]
-
-                    valid_assessments = block_data.get_xblock_field(descendent, 'valid_assessments')
-                    if valid_assessments:
-                        all_assessments.extend(valid_assessments)
-
-                    assignment_type = block_data.get_xblock_field(descendent, 'format', None)
-                    complete = is_block_structure_complete_for_assignments(block_data, descendent)
-
-                    block_title = block_data.get_xblock_field(descendent, 'title', _('Open Response Assessment'))
-
-                    for assessment in all_assessments:
-                        due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC) if assessment.get('due') else None  # lint-amnesty, pylint: disable=line-too-long
-                        if due is None:
-                            continue
-
-                        assessment_name = assessment.get('name')
-                        if assessment_name is None:
-                            continue
-
-                        if assessment_name == 'self-assessment':
-                            assessment_type = _("Self Assessment")
-                        elif assessment_name == 'peer-assessment':
-                            assessment_type = _("Peer Assessment")
-                        elif assessment_name == 'staff-assessment':
-                            assessment_type = _("Staff Assessment")
-                        elif assessment_name == 'submission':
-                            assessment_type = _("Submission")
-                        else:
-                            assessment_type = assessment_name
-                        title = f"{block_title} ({assessment_type})"
-                        url = ''
-                        start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None  # lint-amnesty, pylint: disable=line-too-long
-                        assignment_released = not start or start < now
-                        if assignment_released:
-                            url = reverse('jump_to', args=[course_key, descendent])
-
-                        past_due = not complete and due and due < now
-                        first_component_block_id = str(descendent)
-                        assignments.append(_Assignment(
-                            descendent,
-                            title,
-                            url,
-                            due,
-                            False,
-                            complete,
-                            past_due,
-                            assignment_type,
-                            _("Open Response Assessment due dates are set by your instructor and can't be shifted."),
-                            first_component_block_id,
-                        ))
+            assignments.extend(get_ora_blocks_as_assignments(block_data, subsection_key))
     return assignments
+
+
+def get_ora_blocks_as_assignments(block_data, subsection_key):
+    """
+    Given a subsection key, navigate through descendents and find open response assessments.
+    For each graded ORA, return a list of "Assignment" tuples that map to the individual steps
+    of the ORA
+    """
+    ora_assignments = []
+    descendents = block_data.get_children(subsection_key)
+    while descendents:
+        descendent = descendents.pop()
+        descendents.extend(block_data.get_children(descendent))
+        if block_data.get_xblock_field(descendent, 'category', None) == 'openassessment':
+            ora_assignments.extend(get_ora_as_assignments(block_data, descendent))
+    return ora_assignments
+
+
+def get_ora_as_assignments(block_data, ora_block):
+    """
+    Given an individual ORA, return the list of individual ORA steps as Assignment tuples
+    """
+    graded = block_data.get_xblock_field(ora_block, 'graded', False)
+    has_score = block_data.get_xblock_field(ora_block, 'has_score', False)
+    weight = block_data.get_xblock_field(ora_block, 'weight', 1)
+
+    if not (graded and has_score and (weight is None or weight > 0)):
+        return []
+
+    complete = is_block_structure_complete_for_assignments(block_data, ora_block)
+
+    # Put all ora 'steps' (response, peer, self, etc) into a single list in a common format
+    all_assessments = [{
+        'name': 'submission',
+        'due': block_data.get_xblock_field(ora_block, 'submission_due'),
+        'start': block_data.get_xblock_field(ora_block, 'submission_start'),
+        'required': True
+    }]
+    valid_assessments = block_data.get_xblock_field(ora_block, 'valid_assessments')
+    if valid_assessments:
+        all_assessments.extend(valid_assessments)
+
+    # Loop through all steps and construct Assignment tuples from them
+    assignments = []
+    for assessment in all_assessments:
+        assignment = _ora_assessment_to_assignment(
+            block_data,
+            ora_block,
+            complete,
+            assessment
+        )
+        if assignment is not None:
+            assignments.append(assignment)
+    return assignments
+
+
+def _ora_assessment_to_assignment(
+    block_data,
+    ora_block,
+    complete,
+    assessment
+):
+    """
+    Create an assignment from an ORA assessment dict
+    """
+    date_config_type = block_data.get_xblock_field(ora_block, 'date_config_type', 'manual')
+    assignment_type = block_data.get_xblock_field(ora_block, 'format', None)
+    block_title = block_data.get_xblock_field(ora_block, 'title', _('Open Response Assessment'))
+    block_key = block_data.root_block_usage_key
+
+    # Steps with no "due" date, like staff or training, should not show up here
+    assessment_step_due = assessment.get('start')
+    if assessment_step_due is None:
+        return None
+
+    if date_config_type == 'subsection':
+        assessment_start = block_data.get_xblock_field(ora_block, 'start')
+        assessment_due = block_data.get_xblock_field(ora_block, 'due')
+        extra_info = None
+    elif date_config_type == 'course_end':
+        assessment_start = None
+        assessment_due = block_data.get_xblock_field(block_key, 'end')
+        extra_info = None
+    else:
+        assessment_start, assessment_due = None, None
+        if assessment.get('start'):
+            assessment_start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC)
+        if assessment.get('due'):
+            assessment_due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC)
+        extra_info = _(
+            "This Open Response Assessment's due dates are set by your instructor and can't be shifted."
+        )
+
+    if assessment_due is None:
+        return None
+
+    assessment_name = assessment.get('name')
+    if assessment_name is None:
+        return None
+
+    if assessment_name == 'self-assessment':
+        assessment_type = _("Self Assessment")
+    elif assessment_name == 'peer-assessment':
+        assessment_type = _("Peer Assessment")
+    elif assessment_name == 'staff-assessment':
+        assessment_type = _("Staff Assessment")
+    elif assessment_name == 'submission':
+        assessment_type = _("Submission")
+    else:
+        assessment_type = assessment_name
+    title = f"{block_title} ({assessment_type})"
+    url = ''
+    now = datetime.now(pytz.UTC)
+    assignment_released = not assessment_start or assessment_start < now
+    if assignment_released:
+        url = reverse('jump_to', args=[block_key.course_key, ora_block])
+
+    past_due = not complete and assessment_due and assessment_due < now
+    first_component_block_id = str(ora_block)
+    return _Assignment(
+        ora_block,
+        title,
+        url,
+        assessment_due,
+        False,
+        complete,
+        past_due,
+        assignment_type,
+        extra_info,
+        first_component_block_id,
+    )
+
+
+def get_assignments_grades(user, course_id, cache_timeout):
+    """
+    Calculate the progress of the assignment for the user in the course.
+
+    Arguments:
+        user (User): Django User object.
+        course_id (CourseLocator): The course key.
+        cache_timeout (int): Cache timeout in seconds
+    Returns:
+        list (ReadSubsectionGrade, ZeroSubsectionGrade): The list with assignments grades.
+    """
+    is_staff = bool(has_access(user, 'staff', course_id))
+
+    try:
+        course = get_course_with_access(user, 'load', course_id)
+        cache_key = f'course_block_structure_{str(course_id)}_{str(course.course_version)}_{user.id}'
+        collected_block_structure = cache.get(cache_key)
+        if not collected_block_structure:
+            collected_block_structure = get_block_structure_manager(course_id).get_collected()
+            cache.set(cache_key, collected_block_structure, cache_timeout)
+
+        course_grade = CourseGradeFactory().read(user, collected_block_structure=collected_block_structure)
+
+        # recalculate course grade from visible grades (stored grade was calculated over all grades, visible or not)
+        course_grade.update(visible_grades_only=True, has_staff_access=is_staff)
+        subsection_grades = list(course_grade.subsection_grades.values())
+    except Exception as err:  # pylint: disable=broad-except
+        log.warning(f'Could not get grades for the course: {course_id}, error: {err}')
+        return []
+
+    return subsection_grades
 
 
 def get_first_component_of_block(block_key, block_data):
@@ -753,7 +858,7 @@ def get_course_syllabus_section(course, section_key):
 
 
 @function_trace('get_courses')
-def get_courses(user, org=None, filter_=None, permissions=None, active_only=False):
+def get_courses(user, org=None, filter_=None, permissions=None, active_only=False, course_keys=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code
     (case-insensitive) or a set of permissions to be satisfied for the specified
@@ -763,7 +868,8 @@ def get_courses(user, org=None, filter_=None, permissions=None, active_only=Fals
     courses = branding.get_visible_courses(
         org=org,
         filter_=filter_,
-        active_only=active_only
+        active_only=active_only,
+        course_keys=course_keys
     ).prefetch_related(
         'modes',
     ).select_related(
@@ -857,26 +963,26 @@ def get_problems_in_section(section):
     """
     This returns a dict having problems in a section.
     Returning dict has problem location as keys and problem
-    descriptor as values.
+    block as values.
     """
 
-    problem_descriptors = defaultdict()
+    problem_blocks = defaultdict()
     if not isinstance(section, UsageKey):
         section_key = UsageKey.from_string(section)
     else:
         section_key = section
     # it will be a Mongo performance boost, if you pass in a depth=3 argument here
     # as it will optimize round trips to the database to fetch all children for the current node
-    section_descriptor = modulestore().get_item(section_key, depth=3)
+    section_block = modulestore().get_item(section_key, depth=3)
 
     # iterate over section, sub-section, vertical
-    for subsection in section_descriptor.get_children():
+    for subsection in section_block.get_children():
         for vertical in subsection.get_children():
             for component in vertical.get_children():
                 if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
-                    problem_descriptors[str(component.location)] = component
+                    problem_blocks[str(component.location)] = component
 
-    return problem_descriptors
+    return problem_blocks
 
 
 def get_current_child(xblock, min_depth=None, requested_child=None):
@@ -955,3 +1061,64 @@ def get_course_chapter_ids(course_key):
         log.exception('Failed to retrieve course from modulestore.')
         return []
     return [str(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+
+
+def get_past_and_future_course_assignments(request, user, course):
+    """
+    Returns the future assignment data and past assignments data for given user and course.
+
+    Arguments:
+        request (Request): The HTTP GET request.
+        user (User): The user for whom the assignments are received.
+        course (Course): Course object for whom the assignments are received.
+    Returns:
+        tuple (list, list): Tuple of `past_assignments` list and `next_assignments` list.
+                            `next_assignments` list contains only uncompleted assignments.
+    """
+    assignments = get_course_assignment_date_blocks(course, user, request, include_past_dates=True)
+    past_assignments = []
+    future_assignments = []
+
+    timezone = get_user_timezone_or_last_seen_timezone_or_utc(user)
+    for assignment in sorted(assignments, key=lambda x: x.date):
+        if assignment.date < datetime.now(timezone):
+            past_assignments.append(assignment)
+        else:
+            if not assignment.complete:
+                future_assignments.append(assignment)
+
+    if future_assignments:
+        future_assignment_date = future_assignments[0].date.date()
+        next_assignments = [
+            assignment for assignment in future_assignments if assignment.date.date() == future_assignment_date
+        ]
+    else:
+        next_assignments = []
+
+    return next_assignments, past_assignments
+
+
+def get_assignments_completions(course_key, user):
+    """
+    Calculate the progress of the user in the course by assignments.
+
+    Arguments:
+        course_key (CourseLocator): The Course for which course progress is requested.
+        user (User): The user for whom course progress is requested.
+    Returns:
+        dict (dict): Dictionary contains information about total assignments count
+                     in the given course and how many assignments the user has completed.
+    """
+    course_assignments = get_course_assignments(course_key, user, include_without_due=True)
+
+    total_assignments_count = 0
+    assignments_completed = 0
+
+    if course_assignments:
+        total_assignments_count = len(course_assignments)
+        assignments_completed = len([assignment for assignment in course_assignments if assignment.complete])
+
+    return {
+        'total_assignments_count': total_assignments_count,
+        'assignments_completed': assignments_completed,
+    }

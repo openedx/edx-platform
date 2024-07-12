@@ -11,6 +11,7 @@ import dateutil.parser
 import requests
 from django.conf import settings
 from django.core.validators import validate_email
+from edx_toggles.toggles import SettingDictToggle
 from lazy import lazy
 from lxml import etree
 from path import Path as path
@@ -54,6 +55,25 @@ COURSE_VISIBILITY_PRIVATE = 'private'
 COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
 COURSE_VISIBILITY_PUBLIC = 'public'
 
+COURSE_VIDEO_SHARING_PER_VIDEO = 'per-video'
+COURSE_VIDEO_SHARING_ALL_VIDEOS = 'all-on'
+COURSE_VIDEO_SHARING_NONE = 'all-off'
+# .. toggle_name: FEATURES['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE']
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: False
+# .. toggle_description: The default behavior, when this is disabled, is that a newly created course has no
+#   enrollment_start date set. When the feature is enabled - the newly created courses will have the
+#   enrollment_start_date set to DEFAULT_START_DATE. This is intended to be a permanent option.
+#     This toggle affects the course listing pages (platform's index page, /courses page) when course search is
+#   performed using the `lms.djangoapp.branding.get_visible_courses` method and the
+#   COURSE_CATALOG_VISIBILITY_PERMISSION setting is set to 'see_exists'. Switching the toggle to True will prevent
+#   the newly created (empty) course from appearing in the course listing.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-06-22
+CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE = SettingDictToggle(
+    "FEATURES", "CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE", default=False, module_name=__name__
+)
+
 
 class StringOrDate(Date):  # lint-amnesty, pylint: disable=missing-class-docstring
     def from_json(self, value):  # lint-amnesty, pylint: disable=arguments-differ
@@ -88,6 +108,7 @@ class EmailString(String):
     """
     Parse String with email validation
     """
+
     def from_json(self, value):
         if value:
             validate_email(value)
@@ -206,6 +227,7 @@ class ProctoringProvider(String):
     ProctoringProvider field, which includes validation of the provider
     and default that pulls from edx platform settings.
     """
+
     def from_json(self, value):
         """
         Return ProctoringProvider as full featured Python type. Perform validation on the provider
@@ -311,7 +333,11 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     )
 
     wiki_slug = String(help=_("Slug that points to the wiki for this course"), scope=Scope.content)
-    enrollment_start = Date(help=_("Date that enrollment for this class is opened"), scope=Scope.settings)
+    enrollment_start = Date(
+        help=_("Date that enrollment for this class is opened"),
+        default=DEFAULT_START_DATE if CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE.is_enabled() else None,
+        scope=Scope.settings
+    )
     enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
     start = Date(
         help=_("Start time when this block is visible"),
@@ -594,14 +620,6 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
-    )
-    issue_badges = Boolean(
-        display_name=_("Issue Open Badges"),
-        help=_(
-            "Issue Open Badges badges for this course. Badges are generated when certificates are created."
-        ),
-        scope=Scope.settings,
-        default=True
     )
     ## Course level Certificate Name overrides.
     cert_name_short = String(
@@ -958,6 +976,29 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ],
     )
 
+    video_sharing_options = String(
+        display_name=_("Video Sharing Options"),
+        help=_(
+            "Specify the video sharing options for the course. "
+            "This can be set to one of three values: "
+            "'all-on', 'all-off' and 'per-video'. with 'per-video' as the default."
+        ),
+        default=COURSE_VIDEO_SHARING_PER_VIDEO,
+        scope=Scope.settings,
+        values=[
+            {"display_name": "all-on", "value": COURSE_VIDEO_SHARING_ALL_VIDEOS},
+            {"display_name": "all-off", "value": COURSE_VIDEO_SHARING_NONE},
+            {"display_name": "per-video", "value": COURSE_VIDEO_SHARING_PER_VIDEO},
+        ]
+    )
+
+    force_on_flexible_peer_openassessments = Boolean(
+        display_name=_("Force Flexible Grading for Peer ORAs"),
+        help=_("Setting this flag will force on the flexible grading option for all peer-graded ORAs in this course."),
+        scope=Scope.settings,
+        default=False,
+    )
+
     """
     instructor_info dict structure:
     {
@@ -1127,8 +1168,8 @@ class CourseBlock(
         return policy_str
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
-        instance = super().parse_xml(node, runtime, keys, id_generator)
+    def parse_xml(cls, node, runtime, keys):
+        instance = super().parse_xml(node, runtime, keys)
 
         policy_dir = None
         url_name = node.get('url_name')
@@ -1418,15 +1459,18 @@ class CourseBlock(
     @property
     def forum_posts_allowed(self):
         """
-        Return whether forum posts are allowed by the discussion_blackouts
-        setting
+        Return whether forum posts are allowed by the discussion_blackouts setting
+        Checks if posting restrictions are enabled or if there's a currently ongoing blackout period.
         """
+
         blackouts = self.get_discussion_blackout_datetimes()
+        posting_restrictions = self.discussions_settings.get('posting_restrictions', 'disabled')
         now = datetime.now(utc)
-        for blackout in blackouts:
-            if blackout["start"] <= now <= blackout["end"]:
-                return False
-        return True
+
+        if posting_restrictions == 'enabled':
+            return False
+
+        return all(not (blackout["start"] <= now <= blackout["end"]) for blackout in blackouts)
 
     @property
     def number(self):

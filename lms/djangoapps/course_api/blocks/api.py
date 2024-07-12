@@ -159,7 +159,7 @@ def get_block_metadata(block, includes=()):
     Get metadata about the specified XBlock.
 
     Args:
-        block (XModuleDescriptor): block object
+        block (XBlock): block object
         includes (list|set): list or set of metadata keys to include. Valid keys are:
             index_dictionary: a dictionary of data used to add this XBlock's content
                 to a search index.

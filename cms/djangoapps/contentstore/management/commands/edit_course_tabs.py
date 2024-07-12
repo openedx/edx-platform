@@ -25,7 +25,7 @@ def print_course(course):
         print('num type name')
         for index, item in enumerate(course.tabs):
             print(index + 1, '"' + item.get('type') + '"', '"' + item.get('name', '') + '"')
-    # If a course is bad we will get an error descriptor here, dump it and die instead of
+    # If a course is bad we will get an error here, dump it and die instead of
     # just sending up the error that .id doesn't exist.
     except AttributeError:
         print(course)

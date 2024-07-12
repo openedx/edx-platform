@@ -45,26 +45,29 @@ const entitlementColumns = [
     },
 ];
 
-const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) =>
-    entitlements.map((entitlement) => {
-        const { expiredAt, created, modified, orderNumber, enrollmentCourseRun } = entitlement;
-        return Object.assign({}, entitlement, {
-            expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
-            createdAt: moment(created).format('lll'),
-            modifiedAt: moment(modified).format('lll'),
-            orderNumber: <Hyperlink
-                destination={`${ecommerceUrl}${orderNumber}/`}
-                content={orderNumber || ''}
-            />,
-            button: <Button
-                disabled={!enrollmentCourseRun}
-                className={['btn', 'btn-primary']}
-                label="Reissue"
-                onClick={() => openReissueForm(entitlement)}
-            />,
-        });
+const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) => entitlements.map((entitlement) => {
+    const {
+        expiredAt, created, modified, orderNumber, enrollmentCourseRun,
+    } = entitlement;
+    // eslint-disable-next-line prefer-object-spread
+    return Object.assign({}, entitlement, {
+        expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
+        createdAt: moment(created).format('lll'),
+        modifiedAt: moment(modified).format('lll'),
+        orderNumber: <Hyperlink
+            destination={`${ecommerceUrl}${orderNumber}/`}
+            content={orderNumber || ''}
+        />,
+        button: <Button
+            disabled={!enrollmentCourseRun}
+            className={['btn', 'btn-primary']}
+            label="Reissue"
+            onClick={() => openReissueForm(entitlement)}
+        />,
     });
+});
 
+// eslint-disable-next-line react/function-component-definition
 const EntitlementSupportTable = props => (
     <Table
         data={parseEntitlementData(props.entitlements, props.ecommerceUrl, props.openReissueForm)}

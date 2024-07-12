@@ -36,7 +36,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleMixin
+from xmodule.x_module import DoNothingCache, XModuleMixin
 from openedx.core.lib.cache_utils import CacheService
 
 
@@ -46,9 +46,35 @@ MODULE_DIR = path(__file__).dirname()
 DATA_DIR = MODULE_DIR.parent.parent / "common" / "test" / "data"
 
 
-class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+def handler_url(block, handler, suffix='', query='', thirdparty=False):  # lint-amnesty, pylint: disable=arguments-differ
+    return '{usage_id}/{handler}{suffix}?{query}'.format(
+        usage_id=str(block.scope_ids.usage_id),
+        handler=handler,
+        suffix=suffix,
+        query=query,
+    )
+
+
+def local_resource_url(block, uri):
+    return 'resource/{usage_id}/{uri}'.format(
+        usage_id=str(block.scope_ids.usage_id),
+        uri=uri,
+    )
+
+
+# Disable XBlockAsides in most tests
+def get_asides(block):
+    return []
+
+
+@property
+def resources_fs():
+    return Mock(name='TestDescriptorSystem.resources_fs', root_path='.')
+
+
+class TestDescriptorSystem(MakoDescriptorSystem):  # pylint: disable=abstract-method
     """
-    ModuleSystem for testing
+    DescriptorSystem for testing
     """
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):  # lint-amnesty, pylint: disable=arguments-differ
         return '{usage_id}/{handler}{suffix}?{query}'.format(
@@ -68,9 +94,8 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     def get_asides(self, block):
         return []
 
-    @property
-    def resources_fs(self):
-        return Mock(name='TestModuleSystem.resources_fs', root_path='.')
+    def resources_fs(self):  # lint-amnesty, pylint: disable=method-hidden
+        return Mock(name='TestDescriptorSystem.resources_fs', root_path='.')
 
     def __repr__(self):
         """
@@ -94,13 +119,19 @@ def get_test_system(
     user_is_staff=False,
     user_location=None,
     render_template=None,
+    add_get_block_overrides=False
 ):
     """
-    Construct a test ModuleSystem instance.
+    Construct a test DescriptorSystem instance.
 
     By default, the descriptor system's render_template() method simply returns the repr of the
     context it is passed.  You can override this by passing in a different render_template argument.
     """
+
+    id_manager = CourseLocationManager(course_id)
+
+    descriptor_system = get_test_descriptor_system(id_reader=id_manager, id_generator=id_manager)
+
     if not user:
         user = Mock(name='get_test_system.user', is_staff=False)
     if not user_location:
@@ -108,6 +139,7 @@ def get_test_system(
     user_service = StubUserService(
         user=user,
         anonymous_user_id='student',
+        deprecated_anonymous_user_id='student',
         user_is_staff=user_is_staff,
         user_role='student',
         request_country_code=user_location,
@@ -117,63 +149,113 @@ def get_test_system(
 
     replace_url_service = StubReplaceURLService()
 
-    descriptor_system = get_test_descriptor_system()
-
-    id_manager = CourseLocationManager(course_id)
-
-    def get_block(descriptor):
+    def get_block(block):
         """Mocks module_system get_block function"""
 
-        # Unlike XBlock Runtimes or DescriptorSystems,
-        # each XModule is provided with a new ModuleSystem.
-        # Construct one for the new XModule.
-        module_system = get_test_system()
+        prepare_block_runtime(block.runtime, add_overrides=add_get_block_overrides)
+        block.runtime.get_block_for_descriptor = get_block
+        block.bind_for_student(user.id)
 
-        # Descriptors can all share a single DescriptorSystem.
-        # So, bind to the same one as the current descriptor.
-        module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
+        return block
 
-        descriptor.bind_for_student(module_system, user.id)
+    services = {
+        'user': user_service,
+        'mako': mako_service,
+        'replace_urls': replace_url_service,
+        'cache': CacheService(DoNothingCache()),
+        'field-data': DictFieldData({}),
+        'sandbox': SandboxService(contentstore, course_id),
+    }
 
-        return descriptor
+    descriptor_system.get_block_for_descriptor = get_block  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+    descriptor_system._services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
-    return TestModuleSystem(
-        get_block=get_block,
-        services={
-            'user': user_service,
-            'mako': mako_service,
-            'xqueue': XQueueService(
-                url='http://xqueue.url',
-                django_auth={},
-                basic_auth=[],
-                default_queuename='testqueue',
-                waittime=10,
-                construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
-            ),
-            'replace_urls': replace_url_service,
-            'cache': CacheService(DoNothingCache()),
-            'field-data': DictFieldData({}),
-            'sandbox': SandboxService(contentstore, course_id),
-        },
-        descriptor_runtime=descriptor_system,
-        id_reader=id_manager,
-        id_generator=id_manager,
+    return descriptor_system
+
+
+def prepare_block_runtime(
+    runtime,
+    course_id=CourseKey.from_string('/'.join(['org', 'course', 'run'])),
+    user=None,
+    user_is_staff=False,
+    user_location=None,
+    render_template=None,
+    add_overrides=False,
+    add_get_block=False,
+):
+    """
+    Sets properties in the runtime of the specified block that is
+    required for tests.
+    """
+
+    if not user:
+        user = Mock(name='get_test_system.user', is_staff=False)
+    if not user_location:
+        user_location = Mock(name='get_test_system.user_location')
+    user_service = StubUserService(
+        user=user,
+        anonymous_user_id='student',
+        deprecated_anonymous_user_id='student',
+        user_is_staff=user_is_staff,
+        user_role='student',
+        request_country_code=user_location,
     )
 
+    mako_service = StubMakoService(render_template=render_template)
 
-def get_test_descriptor_system(render_template=None):
+    replace_url_service = StubReplaceURLService()
+
+    def get_block(block):
+        """Mocks module_system get_block function"""
+
+        prepare_block_runtime(block.runtime)
+        block.bind_for_student(user.id)
+
+        return block
+
+    services = {
+        'user': user_service,
+        'mako': mako_service,
+        'replace_urls': replace_url_service,
+        'cache': CacheService(DoNothingCache()),
+        'field-data': DictFieldData({}),
+        'sandbox': SandboxService(contentstore, course_id),
+    }
+
+    if add_overrides:
+        runtime.handler_url_override = handler_url
+        runtime.local_resource_url = local_resource_url
+        runtime.get_asides = get_asides
+        runtime.resources_fs = resources_fs
+
+    if add_get_block:
+        runtime.get_block_for_descriptor = get_block
+
+    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
+
+    # runtime.load_item=Mock(name='get_test_descriptor_system.load_item')
+    # runtime.resources_fs=Mock(name='get_test_descriptor_system.resources_fs')
+    # runtime.error_tracker=Mock(name='get_test_descriptor_system.error_tracker')
+    # runtime.render_template=render_template or mock_render_template,
+    # runtime.mixins=(InheritanceMixin, XModuleMixin)
+
+    return runtime
+
+
+def get_test_descriptor_system(render_template=None, **kwargs):
     """
     Construct a test DescriptorSystem instance.
     """
     field_data = DictFieldData({})
 
-    descriptor_system = MakoDescriptorSystem(
+    descriptor_system = TestDescriptorSystem(
         load_item=Mock(name='get_test_descriptor_system.load_item'),
         resources_fs=Mock(name='get_test_descriptor_system.resources_fs'),
         error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=render_template or mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
         services={'field-data': field_data},
+        **kwargs
     )
     descriptor_system.get_asides = lambda block: []
     return descriptor_system

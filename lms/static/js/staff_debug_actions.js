@@ -158,7 +158,6 @@ var StaffDebug = (function() {
 
 // Register click handlers
 $(document).ready(function() {
-
     var $mainContainer = $('#main');
     $mainContainer.on('click', '.staff-debug-reset', function() {
         StaffDebug.reset(

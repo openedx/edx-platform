@@ -1,6 +1,7 @@
 /* globals _, Backbone, DiscussionTopicMenuView, DiscussionUtil, Thread */
 (function() {
     'use strict';
+
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
@@ -37,6 +38,7 @@
                 var _ref;
                 this.mode = options.mode || 'inline';
                 this.startHeader = options.startHeader;
+                // eslint-disable-next-line no-cond-assign
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
@@ -198,6 +200,7 @@
                 url = DiscussionUtil.urlFor('create_thread', topicId);
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
+                    // eslint-disable-next-line no-void
                     $loading: event ? $(event.target) : void 0,
                     url: url,
                     type: 'POST',
@@ -221,8 +224,7 @@
                             if (discussionBreadcrumbsModel.get('contents').length) {
                                 discussionBreadcrumbsModel.set('contents', self.topicView.topicText.split('/'));
                             }
-                            self.discussionBoardView.discussionThreadListView.discussionIds =
-                                self.topicView.currentTopicId;
+                            self.discussionBoardView.discussionThreadListView.discussionIds = self.topicView.currentTopicId;
                         }
                         self.$el.addClass('is-hidden');
                         self.resetForm();
@@ -241,7 +243,7 @@
             NewPostView.prototype.cancel = function(event) {
                 event.preventDefault();
                 if (this.formModified()) {
-                    if (!confirm(gettext('Your post will be discarded.'))) {  // eslint-disable-line no-alert
+                    if (!confirm(gettext('Your post will be discarded.'))) { // eslint-disable-line no-alert
                         return;
                     }
                 }

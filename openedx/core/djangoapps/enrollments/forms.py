@@ -15,9 +15,10 @@ class CourseEnrollmentsApiListForm(Form):
     """
     A form that validates the query string parameters for the CourseEnrollmentsApiListView.
     """
-    MAX_USERNAME_COUNT = 100
+    MAX_INPUT_COUNT = 100
     username = CharField(required=False)
     course_id = CharField(required=False)
+    email = CharField(required=False)
 
     def clean_course_id(self):
         """
@@ -38,14 +39,31 @@ class CourseEnrollmentsApiListForm(Form):
         usernames_csv_string = self.cleaned_data.get('username')
         if usernames_csv_string:
             usernames = usernames_csv_string.split(',')
-            if len(usernames) > self.MAX_USERNAME_COUNT:
+            if len(usernames) > self.MAX_INPUT_COUNT:
                 raise ValidationError(
                     "Too many usernames in a single request - {}. A maximum of {} is allowed".format(
                         len(usernames),
-                        self.MAX_USERNAME_COUNT,
+                        self.MAX_INPUT_COUNT,
                     )
                 )
             for username in usernames:
                 validate_username(username)
             return usernames
         return usernames_csv_string
+
+    def clean_email(self):
+        """
+        Validate a string of comma-separated emails and return a list of emails.
+        """
+        emails_csv_string = self.cleaned_data.get('email')
+        if emails_csv_string:
+            emails = emails_csv_string.split(',')
+            if len(emails) > self.MAX_INPUT_COUNT:
+                raise ValidationError(
+                    "Too many emails in a single request - {}. A maximum of {} is allowed".format(
+                        len(emails),
+                        self.MAX_INPUT_COUNT,
+                    )
+                )
+            return emails
+        return emails_csv_string

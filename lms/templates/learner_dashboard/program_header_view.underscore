@@ -1,5 +1,10 @@
 <div class="program-details-header">
     <div class="meta-info grid-container">
+        <% if (isSubscribed) { %>
+            <div class="mb-3">
+                <span class="badge badge-light"><%- gettext('Subscribed') %></span>
+            </div>
+        <% } %>
         <% if (logo) { %>
             <% // xss-lint: disable=underscore-not-escaped %>
             <span aria-label="<%- gettext(programData.type) %>" class="<%- programData.type.toLowerCase() %> program-details-icon"><%= logo %></span>

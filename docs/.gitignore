@@ -1,0 +1,7 @@
+_build
+references/docs/*
+references/docstrings/cms
+references/docstrings/common
+references/docstrings/lms
+references/docstrings/openedx
+references/docstrings/xmodule

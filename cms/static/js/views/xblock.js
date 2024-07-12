@@ -14,6 +14,10 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
             'click .notification-action-button': 'fireNotificationActionEvent'
         },
 
+        options: {
+            clipboardData: { content: null },
+        },
+
         initialize: function() {
             BaseView.prototype.initialize.call(this);
             this.view = this.options.view;
@@ -23,9 +27,10 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
             var self = this,
                 view = this.view,
                 xblockInfo = this.model,
-                xblockUrl = xblockInfo.url();
+                xblockUrl = xblockInfo.url(),
+                querystring = window.location.search; // pass any querystring down to child views
             return $.ajax({
-                url: decodeURIComponent(xblockUrl) + '/' + view,
+                url: decodeURIComponent(xblockUrl) + '/' + view + querystring,
                 type: 'GET',
                 cache: false,
                 headers: {Accept: 'application/json'},
@@ -114,7 +119,7 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
              * may have thrown JavaScript errors after rendering in which case the xblock parameter
              * will be null.
              */
-        xblockReady: function(xblock) {  // eslint-disable-line no-unused-vars
+        xblockReady: function(xblock) { // eslint-disable-line no-unused-vars
             // Do nothing
         },
 

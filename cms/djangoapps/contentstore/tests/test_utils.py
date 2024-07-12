@@ -9,14 +9,17 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
+from rest_framework import status
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
 from cms.djangoapps.contentstore import utils
 from cms.djangoapps.contentstore.tasks import ALL_ALLOWED_XBLOCKS, validate_course_olx
 from cms.djangoapps.contentstore.tests.utils import TEST_DATA_DIR, CourseTestCase
+from common.djangoapps.student.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -620,7 +623,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         self.assertEqual(partitions[0]["scheme"], "random")
 
     def _set_partitions(self, partitions):
-        """Set the user partitions of the course descriptor. """
+        """Set the user partitions of the course block. """
         self.course.user_partitions = partitions
         self.course = self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
 
@@ -785,3 +788,142 @@ class DetermineLabelTests(TestCase):
         block_type = "something else"
         result = utils.determine_label(display_name, block_type)
         self.assertEqual(result, "something else")
+
+
+class AuthorizeStaffTestCase():
+    """
+    Test that only staff roles can access an API endpoint.
+    """
+    @classmethod
+    def get_course_key_string(cls):
+        return 'course-v1:edX+ToyX+Toy_Course'
+
+    @classmethod
+    def get_other_course_key_string(cls):
+        return 'course-v1:edX+ToyX_Other_Course+Toy_Course'
+
+    def setUp(self):
+        super().setUp()
+        self.course_key = self.get_course_key_string()
+        self.other_course_key = self.get_other_course_key_string()
+        self.course = self.create_course_from_course_key(CourseKey.from_string(self.course_key))
+        self.other_course = self.create_course_from_course_key(CourseKey.from_string(self.other_course_key))
+        self.password = 'password'
+        self.student = UserFactory.create(username='student', password=self.password)
+        self.global_staff = GlobalStaffFactory(
+            username='global-staff', password=self.password
+        )
+        self.course_instructor = InstructorFactory(
+            username='instructor',
+            password=self.password,
+            course_key=self.course.id,
+        )
+        self.other_course_instructor = InstructorFactory(
+            username='other-course-instructor',
+            password=self.password,
+            course_key=self.other_course.id,
+        )
+
+    @classmethod
+    def create_course_from_course_key(cls, course_key):
+        return CourseFactory.create(
+            org=course_key.org,
+            course=course_key.course,
+            run=course_key.run
+        )
+
+    def make_request(self, course_id=None, data=None):
+        raise NotImplementedError
+
+    def get_url(self, course_key):
+        raise NotImplementedError
+
+    def test_student(self, expect_status=status.HTTP_403_FORBIDDEN):
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.make_request()
+        assert response.status_code == expect_status
+
+    def test_instructor_in_another_course(self, expect_status=status.HTTP_403_FORBIDDEN):
+        self.client.login(
+            username=self.other_course_instructor.username,
+            password=self.password
+        )
+        response = self.make_request()
+        assert response.status_code == expect_status
+
+    def test_global_staff(self, expect_status=status.HTTP_200_OK):
+        self.client.login(username=self.global_staff.username, password=self.password)
+        response = self.make_request()
+        assert response.status_code == expect_status
+        return response
+
+    def test_course_instructor(self, expect_status=status.HTTP_200_OK):
+        self.client.login(username=self.course_instructor.username, password=self.password)
+        response = self.make_request()
+        assert response.status_code == expect_status
+        return response
+
+
+class UpdateCourseDetailsTests(ModuleStoreTestCase):
+    """
+    Unit tests for the `update_course_details` utility function.
+    """
+
+    class Request:
+        """
+        Basic Python class that mocks the required structural components of a WSGIRequest object instance, used in the
+        functions under test.
+        """
+        def __init__(self):
+            self.user = UserFactory.create(username="course_staff", password="password")
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+
+    @patch.dict("django.conf.settings.FEATURES", {
+        "ENABLE_PREREQUISITE_COURSES": False,
+        "ENTRANCE_EXAMS": False,
+    })
+    @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
+    def test_update_course_details_self_paced(self, mock_update):
+        """
+        This test ensures that expected updates and validation occur on a course update before the settings payload
+        is commit to Mongo. This tests checks that we're removing bad certificates display behavior and availability
+        settings before we process the settings updates.
+        """
+        mock_request = self.Request()
+        payload = {
+            "certificate_available_date": "2024-08-01T00:00:00Z",
+            "certificates_display_behavior": "end_with_date",
+            "self_paced": True,
+        }
+        expected_payload = {
+            "certificate_available_date": None,
+            "certificates_display_behavior": "early_no_info",
+            "self_paced": True,
+        }
+
+        utils.update_course_details(mock_request, self.course.id, payload, None)
+        mock_update.assert_called_once_with(self.course.id, expected_payload, mock_request.user)
+
+    @patch.dict("django.conf.settings.FEATURES", {
+        "ENABLE_PREREQUISITE_COURSES": False,
+        "ENTRANCE_EXAMS": False,
+    })
+    @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
+    def test_update_course_details_instructor_paced(self, mock_update):
+        """
+        This test ensures that expected updates and validation occur on a course update before the settings payload
+        is commit to Mongo. This test checks that we don't modify any of the incoming settings when a course is
+        instructor-paced.
+        """
+        mock_request = self.Request()
+        payload = {
+            "certificate_available_date": "2024-08-01T00:00:00Z",
+            "certificates_display_behavior": "end_with_date",
+            "self_paced": False,
+        }
+
+        utils.update_course_details(mock_request, self.course.id, payload, None)
+        mock_update.assert_called_once_with(self.course.id, payload, mock_request.user)

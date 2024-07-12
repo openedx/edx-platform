@@ -5,6 +5,7 @@ function(
     $, _, Backbone, XBlockViewUtils, TemplateUtils, CourseOutlineModalsFactory, HtmlUtils
 ) {
     'use strict';
+
     var CourseHighlightsEnableView = Backbone.View.extend({
         events: {
             'click button.status-highlights-enabled-value': 'handleEnableButtonPress',

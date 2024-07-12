@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 from .helpers import add_course_mode
 
-TEST_PASSWORD = 'test'
+TEST_PASSWORD = 'Password1234'
 TEST_VERIFICATION_SOCK_LOCATOR = '<div class="verification-sock"'
 
 

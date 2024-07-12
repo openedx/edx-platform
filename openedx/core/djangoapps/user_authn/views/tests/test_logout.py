@@ -5,7 +5,7 @@ Tests for logout
 import urllib
 from unittest import mock
 import ddt
-import bleach
+import nh3
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -196,6 +196,33 @@ class LogoutTests(TestCase):
             }
             self.assertDictContainsSubset(expected, response.context_data)
 
+    @mock.patch('django.conf.settings.TPA_AUTOMATIC_LOGOUT_ENABLED', True)
+    def test_automatic_tpa_logout_url_redirect(self):
+        """
+        Test user automatically redirected to tpa logout_url
+        when TPA_AUTOMATIC_LOGOUT is set to True.
+        """
+        idp_logout_url = 'http://mock-idp.com/logout'
+        client = self._create_oauth_client()
+
+        with mock.patch(
+            'openedx.core.djangoapps.user_authn.views.logout.tpa_pipeline.get_idp_logout_url_from_running_pipeline'
+        ) as mock_idp_logout_url:
+            mock_idp_logout_url.return_value = idp_logout_url
+            self._authenticate_with_oauth(client)
+            response = self.client.get(reverse('logout'))
+            assert response.status_code == 302
+            assert response.url == idp_logout_url
+
+    @mock.patch('django.conf.settings.TPA_AUTOMATIC_LOGOUT_ENABLED', True)
+    def test_no_automatic_tpa_logout_without_logout_url(self):
+        """
+        Test user is NOT automatically redirected when tpa logout_url is not set
+        even if TPA_AUTOMATIC_LOGOUT is set to True.
+        """
+        client = self._create_oauth_client()
+        self._assert_session_logged_out(client)
+
     @ddt.data(
         ('%22%3E%3Cscript%3Ealert(%27xss%27)%3C/script%3E', 'edx.org'),
     )
@@ -210,6 +237,6 @@ class LogoutTests(TestCase):
         )
         response = self.client.get(url, HTTP_HOST=host)
         expected = {
-            'target': bleach.clean(urllib.parse.unquote(redirect_url)),
+            'target': nh3.clean(urllib.parse.unquote(redirect_url)),
         }
         self.assertDictContainsSubset(expected, response.context_data)

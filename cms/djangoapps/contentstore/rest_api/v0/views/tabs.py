@@ -13,6 +13,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from ..serializers import CourseTabSerializer, CourseTabUpdateSerializer, TabIDLocatorSerializer
+from ....toggles import use_new_custom_pages
 from ....views.tabs import edit_tab_handler, get_course_tabs, reorder_tabs_handler
 
 
@@ -78,12 +79,24 @@ class CourseTabListView(DeveloperErrorViewMixin, APIView):
         ```
         """
         course_key = CourseKey.from_string(course_id)
+        if not use_new_custom_pages(course_key):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
 
         course_block = modulestore().get_course(course_key)
         tabs_to_render = get_course_tabs(course_block, request.user)
-        return Response(CourseTabSerializer(tabs_to_render, many=True).data)
+        serializedCourseTabs = CourseTabSerializer(tabs_to_render, many=True).data
+        if use_new_custom_pages(course_key):
+            json_tabs = []
+            for tab in serializedCourseTabs:
+                if tab.get('type') == 'static_tab':
+                    url_slug = tab.get('settings').get('url_slug')
+                    static_tab_loc = course_block.id.make_usage_key("static_tab", url_slug)
+                    tab["id"] = str(static_tab_loc)
+                    json_tabs.append(tab)
+            return Response(json_tabs)
+        return Response(serializedCourseTabs)
 
 
 @view_auth_classes(is_authenticated=True)

@@ -4,6 +4,7 @@ define([
 ],
 function(Backbone, _, gettext, GroupModel, GroupCollection) {
     'use strict';
+
     var GroupConfiguration = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {

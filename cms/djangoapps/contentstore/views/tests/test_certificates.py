@@ -249,7 +249,7 @@ class CertificatesListHandlerTestCase(
         Tests user without write permissions on course should not able to create certificate
         """
         user = UserFactory()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.ajax_post(
             self._url(),
             data=CERTIFICATE_JSON
@@ -635,7 +635,7 @@ class CertificatesDetailHandlerTestCase(
         """
         self._add_course_certificates(count=2, signatory_count=1, asset_path_format=signatory_path)
         user = UserFactory()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.delete(
             self._url(cid=1),
             content_type="application/json",
@@ -653,7 +653,7 @@ class CertificatesDetailHandlerTestCase(
         user = UserFactory()
         for role in [CourseInstructorRole, CourseStaffRole]:
             role(self.course.id).add_users(user)
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.delete(
             self._url(cid=1),
             content_type="application/json",
@@ -681,7 +681,7 @@ class CertificatesDetailHandlerTestCase(
         user = UserFactory()
         for role in [CourseInstructorRole, CourseStaffRole]:
             role(self.course.id).add_users(user)
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.put(
             self._url(cid=1),
             data=json.dumps(cert_data),
@@ -799,7 +799,7 @@ class CertificatesDetailHandlerTestCase(
         test_url = reverse_course_url('certificate_activation_handler', self.course.id)
         self._add_course_certificates(count=1, signatory_count=2, asset_path_format=signatory_path)
         user = UserFactory()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.post(
             test_url,
             data=json.dumps({"is_active": activate}),

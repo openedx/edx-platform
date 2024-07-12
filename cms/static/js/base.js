@@ -27,6 +27,7 @@ function(
     DropdownMenuView
 ) {
     'use strict';
+
     var $body;
 
     function smoothScrollLink(e) {
@@ -74,6 +75,7 @@ function(
         $body.click(function() {
             $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $('.nav-dd .nav-item .title').removeClass('is-selected');
+            $('.custom-dropdown .dropdown-options').hide();
         });
 
         $('.nav-dd .nav-item, .filterable-column .nav-item').click(function(e) {

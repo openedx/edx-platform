@@ -21,7 +21,7 @@ from edxval.api import create_external_video, create_or_update_video_transcript
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 
-from cms.djangoapps.contentstore.views.videos import TranscriptProvider
+from cms.djangoapps.contentstore.video_storage_handlers import TranscriptProvider
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
@@ -39,8 +39,9 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
     get_transcript,
     get_transcript_for_video,
     get_transcript_from_val,
-    get_transcripts_from_youtube,
-    get_transcript_link_from_youtube
+    get_transcript_from_youtube,
+    get_transcript_link_from_youtube,
+    get_transcript_links_from_youtube,
 )
 
 __all__ = [
@@ -71,7 +72,7 @@ def link_video_to_component(video_component, user):
     Links a VAL video to the video component.
 
     Arguments:
-        video_component: video descriptor item.
+        video_component: video block.
         user: A requesting user.
 
     Returns:
@@ -134,7 +135,7 @@ def validate_video_block(request, locator):
         locator: video locator.
 
     Returns:
-        A tuple containing error(or None) and video descriptor(i.e. if validation succeeds).
+        A tuple containing error(or None) and video block(i.e. if validation succeeds).
 
     Raises:
         PermissionDenied: if requesting user does not have access to author the video component.
@@ -231,6 +232,8 @@ def upload_transcripts(request):
                 file_data=ContentFile(sjson_subs),
             )
 
+            video.transcripts['en'] = f"{edx_video_id}-en.srt"
+            video.save_with_metadata(request.user)
             if transcript_created is None:
                 response = JsonResponse({'status': 'Invalid Video ID'}, status=400)
 
@@ -343,13 +346,17 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
             #check youtube local and server transcripts for equality
             if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
                 try:
-                    youtube_server_subs = get_transcripts_from_youtube(
+                    transcript_links = get_transcript_links_from_youtube(
                         youtube_id,
                         settings,
                         item.runtime.service(item, "i18n")
                     )
-                    if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
-                        transcripts_presence['youtube_diff'] = False
+                    for (_, link) in transcript_links.items():
+                        youtube_server_subs = get_transcript_from_youtube(
+                            link, youtube_id, item.runtime.service(item, "i18n")
+                        )
+                        if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
+                            transcripts_presence['youtube_diff'] = False
                 except GetTranscriptsFromYouTubeException:
                     pass
 
@@ -448,7 +455,6 @@ def _validate_transcripts_data(request):
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
         raise TranscriptsRequestValidationException(_('Incoming video data is empty.'))
-
     try:
         item = _get_item(request, data)
     except (InvalidKeyError, ItemNotFoundError):
@@ -510,7 +516,6 @@ def validate_transcripts_request(request, include_yt=False, include_html5=False)
             for video in videos
             if video['type'] != 'youtube'
         }
-
     return error, validated_data
 
 
@@ -620,8 +625,13 @@ def replace_transcripts(request):
         # 2. Link a video to video component if its not already linked to one.
         edx_video_id = link_video_to_component(video, request.user)
 
+        # for transcript in transcript_links:
+
         # 3. Upload YT transcript to DS for the linked video ID.
-        success = save_video_transcript(edx_video_id, Transcript.SJSON, transcript_content, language_code='en')
+        success = True
+        for transcript in transcript_content:
+            [language_code, json_content] = transcript
+            success = save_video_transcript(edx_video_id, Transcript.SJSON, json_content, language_code)
         if success:
             response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
         else:

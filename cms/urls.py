@@ -3,14 +3,15 @@ Urls of Studio.
 """
 
 from django.conf import settings
-from django.conf.urls import include
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
+from django.urls import include
 from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
+from django.contrib import admin
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
-from django.contrib import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
@@ -66,18 +67,22 @@ urlpatterns = oauth2_urlpatterns + [
     path('not_found', contentstore_views.not_found, name='not_found'),
     path('server_error', contentstore_views.server_error, name='server_error'),
     path('organizations', OrganizationListView.as_view(), name='organizations'),
+    path('api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),
 
     # noop to squelch ajax errors
     path('event', contentstore_views.event, name='event'),
     path('heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
 
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
+
     # User API endpoints
     path('api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
     # Update session view
-    path('lang_pref/session_language', openedx.core.djangoapps.lang_pref.views.update_session_language,
-         name='session_language'
+    path('lang_pref/update_language', openedx.core.djangoapps.lang_pref.views.update_language,
+         name='update_language'
          ),
 
     # Darklang View to change the preview language (or dark language)
@@ -123,6 +128,9 @@ urlpatterns = oauth2_urlpatterns + [
     re_path(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
             contentstore_views.assets_handler,
             name='assets_handler'),
+    re_path(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}/usage',
+            contentstore_views.asset_usage_path_handler,
+            name='asset_usage_path_handler'),
     re_path(fr'^import/{COURSELIKE_KEY_PATTERN}$', contentstore_views.import_handler,
             name='import_handler'),
     re_path(fr'^import_status/{COURSELIKE_KEY_PATTERN}/(?P<filename>.+)$',
@@ -164,11 +172,7 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.video_images_handler, name='video_images_handler'),
     path('video_images_upload_enabled', contentstore_views.video_images_upload_enabled,
          name='video_images_upload_enabled'),
-    re_path(
-        fr'^video_features/{settings.COURSE_KEY_PATTERN}',
-        contentstore_views.get_video_features,
-        name='video_features'
-    ),
+    path('video_features/', contentstore_views.get_video_features, name='video_features'),
     re_path(fr'^transcript_preferences/{settings.COURSE_KEY_PATTERN}$',
             contentstore_views.transcript_preferences_handler, name='transcript_preferences_handler'),
     re_path(fr'^transcript_credentials/{settings.COURSE_KEY_PATTERN}$',
@@ -190,6 +194,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
+    re_path(fr'api/youtube/courses/{COURSELIKE_KEY_PATTERN}/edx-video-ids$',
+            contentstore_views.get_course_youtube_edx_videos_ids, name='youtube_edx_video_ids'),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
@@ -281,12 +287,12 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     urlpatterns += static(
-        settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],
+        settings.VIDEO_IMAGE_SETTINGS['BASE_URL'],
         document_root=settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location']
     )
 
     urlpatterns += static(
-        settings.VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['base_url'],
+        settings.VIDEO_TRANSCRIPTS_SETTINGS['BASE_URL'],
         document_root=settings.VIDEO_TRANSCRIPTS_SETTINGS['STORAGE_KWARGS']['location']
     )
 
@@ -304,6 +310,10 @@ urlpatterns.append(
         namespace='learning_sequences'
     ),
     ),
+)
+
+urlpatterns.append(
+    path('', include(('openedx.core.djangoapps.content.search.urls', 'content_search'), namespace='content_search')),
 )
 
 # display error page templates, for testing purposes
@@ -332,7 +342,21 @@ from openedx.core.djangoapps.plugins.constants import ProjectType  # isort:skip
 
 urlpatterns.extend(get_plugin_url_patterns(ProjectType.CMS))
 
-# Contentstore
+# Contentstore REST APIs
 urlpatterns += [
     path('api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
+]
+
+# Content tagging
+urlpatterns += [
+    path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls', 'content_tagging'))),
+]
+
+# Authoring-api specific API docs (using drf-spectacular and openapi-v3).
+# This is separate from and in addition to the full studio swagger documentation already existing at /api-docs.
+# Custom settings are provided in SPECTACULAR_SETTINGS as environment variables
+# Filter function in cms/lib/spectacular.py determines paths that are swagger-documented.
+urlpatterns += [
+    re_path('^authoring-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    re_path('^authoring-api/schema/', SpectacularAPIView.as_view(), name='schema'),
 ]

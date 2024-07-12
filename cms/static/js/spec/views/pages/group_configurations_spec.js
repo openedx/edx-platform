@@ -4,6 +4,7 @@ define([
     'common/js/spec_helpers/template_helpers'
 ], function($, _, GroupConfigurationsPage, GroupConfigurationModel, GroupConfigurationCollection, TemplateHelpers) {
     'use strict';
+
     describe('GroupConfigurationsPage', function() {
         var mockGroupConfigurationsPage = readFixtures(
                 'mock/mock-group-configuration-page.underscore'

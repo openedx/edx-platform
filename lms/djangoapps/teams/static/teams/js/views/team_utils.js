@@ -1,6 +1,7 @@
-/*  Team utility methods*/
+/*  Team utility methods */
 (function(define) {
     'use strict';
+
     define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/string-utils'],
         function($, _, StringUtils) {
             return {
@@ -80,6 +81,10 @@
                         return false;
                     }
                     return topicType.toLowerCase() !== 'open';
+                },
+
+                canJoinTeam: function(userInfo, topicType = '') {
+                    return userInfo.privileged || userInfo.staff || topicType.includes("open");
                 },
 
                 /** Shows info/error banner for team membership CSV upload

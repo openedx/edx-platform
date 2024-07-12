@@ -3,6 +3,7 @@
 
 (function(define) {
     'use strict';
+
     define([
         'backbone',
         'gettext',
@@ -49,8 +50,7 @@
 
             update: function(data) {
                 _.each(data, function(item) {
-                    var certificate_exception_model =
-                            this.getModel({user_name: item.user_name, user_email: item.user_email});
+                    var certificate_exception_model = this.getModel({user_name: item.user_name, user_email: item.user_email});
                     certificate_exception_model.set(item);
                 }, this);
             }

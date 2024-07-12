@@ -64,7 +64,6 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             expect($payButton.length).toEqual(0);
         };
 
-
         goToPayment = function(requests, kwargs) {
             var params = {
                 contribution: kwargs.amount || '',

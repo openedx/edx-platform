@@ -55,6 +55,7 @@
 @import 'elements/uploaded-assets'; // layout for asset tables
 @import 'elements/creative-commons';
 @import 'elements/tooltip';
+@import 'elements/drawer';
 
 // +Base - Specific Views
 // ====================
@@ -84,8 +85,6 @@
 
 // +Xmodule
 // ====================
-@import 'xmodule/modules/css/module-styles.scss';
-@import 'xmodule/descriptors/css/module-styles.scss';
 @import 'xmodule/headings';
 @import 'elements/xmodules'; // styling for Studio-specific contexts
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring

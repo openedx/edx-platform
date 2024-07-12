@@ -138,6 +138,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 val = 'i4x://edX/DemoX/sequential/edx_introduction';
                 view.sequential_select.val(val);
                 view.sequential_select.change();
+                // eslint-disable-next-line no-unused-expressions, no-sequences
                 val = 'i4x://edX/DemoX/vertical/vertical_0270f6de40fc',
                 view.vertical_select.val(val);
                 view.vertical_select.change();

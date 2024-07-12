@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('js/discussions_management/views/discussions_dashboard_factory',
         ['jquery', 'js/discussions_management/views/discussions',
             'js/discussions_management/models/course_discussions_detail',
@@ -30,4 +31,3 @@
             };
         });
 }).call(this, define || RequireJS.define);
-

@@ -7,6 +7,7 @@ define([
 ],
 function(Backbone, gettext, Certificate) {
     'use strict';
+
     var CertificateCollection = Backbone.Collection.extend({
         model: Certificate,
 

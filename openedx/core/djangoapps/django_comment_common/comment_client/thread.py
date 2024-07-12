@@ -11,7 +11,6 @@ log = logging.getLogger(__name__)
 
 
 class Thread(models.Model):
-
     # accessible_fields can be set and retrieved on the model
     accessible_fields = [
         'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
@@ -29,12 +28,6 @@ class Thread(models.Model):
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type',
         'close_reason_code', 'edit_reason_code', 'closing_user_id', 'editing_user_id',
-    ]
-
-    # metric_tag_fields are used by Datadog to record metrics about the model
-    metric_tag_fields = [
-        'course_id', 'group_id', 'pinned', 'closed', 'anonymous', 'anonymous_to_peers',
-        'endorsed', 'read',
     ]
 
     # initializable_fields are sent in POST requests
@@ -152,6 +145,7 @@ class Thread(models.Model):
             'resp_skip': kwargs.get('response_skip'),
             'resp_limit': kwargs.get('response_limit'),
             'reverse_order': kwargs.get('reverse_order', False),
+            'merge_question_type_responses': kwargs.get('merge_question_type_responses', False)
         }
         request_params = utils.strip_none(request_params)
 

@@ -1,0 +1,108 @@
+"""
+REST API views for content staging
+"""
+from __future__ import annotations
+
+from django.db import transaction
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+import edx_api_doc_tools as apidocs
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import CourseLocator
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from common.djangoapps.student.auth import has_studio_read_access
+
+from openedx.core.lib.api.view_utils import view_auth_classes
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from . import api
+from .data import StagedContentStatus
+from .models import StagedContent
+from .serializers import UserClipboardSerializer, PostToClipboardSerializer
+
+
+@view_auth_classes(is_authenticated=True)
+class StagedContentOLXEndpoint(APIView):
+    """
+    API Endpoint to get the OLX of any given StagedContent.
+    """
+
+    def get(self, request, id):  # pylint: disable=redefined-builtin
+        """
+        Get the OLX of the given StagedContent object.
+        """
+        staged_content = get_object_or_404(StagedContent, pk=id)
+        if staged_content.user.id != request.user.id:
+            raise PermissionDenied("Users can only access their own staged content")
+        if staged_content.status != StagedContentStatus.READY:
+            # If the status is LOADING, the OLX may not be generated/valid yet.
+            # If the status is ERROR or EXPIRED, this row is no longer usable.
+            raise NotFound("The requested content is not available.")
+        return HttpResponse(staged_content.olx, headers={
+            "Content-Type": f"application/vnd.openedx.xblock.v1.{staged_content.block_type}+xml",
+            "Content-Disposition": f'attachment; filename="{staged_content.olx_filename}"',
+        })
+
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+@view_auth_classes(is_authenticated=True)
+class ClipboardEndpoint(APIView):
+    """
+    API Endpoint that can be used to get the status of the current user's
+    clipboard or to POST some content to the clipboard.
+    """
+
+    @apidocs.schema(
+        responses={
+            200: UserClipboardSerializer,
+        }
+    )
+    def get(self, request):
+        """
+        Get the detailed status of the user's clipboard. This does not return the OLX.
+        """
+        return Response(api.get_user_clipboard_json(request.user.id, request))
+
+    @apidocs.schema(
+        body=PostToClipboardSerializer,
+        responses={
+            200: UserClipboardSerializer,
+            403: "You do not have permission to read the specified usage key.",
+            404: "The requested usage key does not exist.",
+        },
+    )
+    def post(self, request):
+        """
+        Put some piece of content into the user's clipboard.
+        """
+        # Check if the content exists and the user has permission to read it.
+        # Parse the usage key:
+        try:
+            usage_key = UsageKey.from_string(request.data["usage_key"])
+        except (ValueError, InvalidKeyError):
+            raise ValidationError('Invalid usage key')  # lint-amnesty, pylint: disable=raise-missing-from
+        if usage_key.block_type in ('course', 'chapter', 'sequential'):
+            raise ValidationError('Requested XBlock tree is too large')
+        course_key = usage_key.context_key
+        if not isinstance(course_key, CourseLocator):
+            # In the future, we'll support libraries too but for now we don't.
+            raise ValidationError('Invalid usage key: not a modulestore course')
+        # Make sure the user has permission on that course
+        if not has_studio_read_access(request.user, course_key):
+            raise PermissionDenied("You must be a member of the course team in Studio to export OLX using this API.")
+
+        # Load the block and copy it to the user's clipboard
+        try:
+            block = modulestore().get_item(usage_key)
+        except ItemNotFoundError as exc:
+            raise NotFound("The requested usage key does not exist.") from exc
+        clipboard = api.save_xblock_to_user_clipboard(block=block, user_id=request.user.id)
+
+        # Return the current clipboard exactly as if GET was called:
+        serializer = UserClipboardSerializer(clipboard, context={"request": request})
+        return Response(serializer.data)

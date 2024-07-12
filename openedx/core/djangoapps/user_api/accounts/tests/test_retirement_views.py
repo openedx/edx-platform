@@ -30,25 +30,6 @@ from wiki.models.pluginbase import RevisionPlugin, RevisionPluginRevision
 
 from common.djangoapps.entitlements.models import CourseEntitlementSupportDetail
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
-from openedx.core.djangoapps.credit.models import (
-    CreditCourse,
-    CreditProvider,
-    CreditRequest,
-    CreditRequirement,
-    CreditRequirementStatus
-)
-from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
-from openedx.core.djangoapps.user_api.models import (
-    RetirementState,
-    UserOrgTag,
-    UserRetirementPartnerReportingStatus,
-    UserRetirementStatus
-)
 from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
@@ -71,9 +52,31 @@ from common.djangoapps.student.tests.factories import (
     SuperuserFactory,
     UserFactory
 )
+from lms.djangoapps.certificates.api import get_certificate_for_user_id
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.credit.models import (
+    CreditCourse,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
+)
+from openedx.core.djangoapps.external_user_ids.models import ExternalIdType
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
+from openedx.core.djangoapps.user_api.models import (
+    RetirementState,
+    UserOrgTag,
+    UserRetirementPartnerReportingStatus,
+    UserRetirementStatus
+)
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ...tests.factories import UserOrgTagFactory
 from ..views import USER_PROFILE_PII, AccountRetirementView
@@ -262,6 +265,22 @@ class TestDeactivateLogout(RetirementTestCase):
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_bearer_auth(self):
+        """
+        Test the account deactivation/logout endpoint using Bearer auth
+        """
+        # testing with broken token
+        headers = {'HTTP_AUTHORIZATION': 'Bearer broken_token'}
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        # testing with correct token
+        access_token = AccessTokenFactory(user=self.test_user,
+                                          application=ApplicationFactory(name="test_bearer",
+                                                                         user=self.test_user)).token
+        headers = {'HTTP_AUTHORIZATION': f'Bearer {access_token}'}
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 @skip_unless_lms
@@ -479,7 +498,6 @@ class TestPartnerReportingList(ModuleStoreTestCase):
     """
     EXPECTED_MB_ORGS_CONFIG = [
         {
-            AccountRetirementPartnerReportView.ORGS_CONFIG_ORG_KEY: 'mb_coaching',
             AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY: [
                 AccountRetirementPartnerReportView.STUDENT_ID_KEY,
                 AccountRetirementPartnerReportView.ORIGINAL_EMAIL_KEY,
@@ -499,7 +517,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         self.url = reverse('accounts_retirement_partner_report')
         self.maxDiff = None
         self.test_created_datetime = datetime.datetime(2018, 1, 1, tzinfo=pytz.UTC)
-        ExternalIdType.objects.get_or_create(name=ExternalIdType.MICROBACHELORS_COACHING)
+        ExternalIdType.objects.get_or_create(name=ExternalIdType.CALIPER)
 
     def get_user_dict(self, user, enrollments):
         """
@@ -606,56 +624,6 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         self.create_partner_reporting_statuses(courses=(self.course_awesome_org,), is_being_processed=True)
 
         self.assert_status_and_user_list(user_dicts)
-
-    def test_success_mb_coaching(self):
-        """
-        Check that MicroBachelors users who have consented to coaching have the proper info
-        included for the partner report.
-        """
-        path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
-        with mock.patch(path, return_value=True) as mock_has_ever_consented:
-            user_dicts, users = self.create_partner_reporting_statuses(num=1)
-            external_id, created = ExternalId.add_new_user_id(  # lint-amnesty, pylint: disable=unused-variable
-                user=users[0],
-                type_name=ExternalIdType.MICROBACHELORS_COACHING
-            )
-
-            expected_user = user_dicts[0]
-            expected_users = [expected_user]
-            expected_user[AccountRetirementPartnerReportView.STUDENT_ID_KEY] = str(external_id.external_user_id)
-            expected_user[
-                AccountRetirementPartnerReportView.ORGS_CONFIG_KEY] = TestPartnerReportingList.EXPECTED_MB_ORGS_CONFIG
-
-            self.assert_status_and_user_list(expected_users)
-            mock_has_ever_consented.assert_called_once()
-
-    def test_success_mb_coaching_no_external_id(self):
-        """
-        Check that MicroBachelors users who have consented to coaching, but who do not have an external id, have the
-        proper info included for the partner report.
-        """
-        path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
-        with mock.patch(path, return_value=True) as mock_has_ever_consented:
-            user_dicts, users = self.create_partner_reporting_statuses(num=1)  # lint-amnesty, pylint: disable=unused-variable
-
-            self.assert_status_and_user_list(user_dicts)
-            mock_has_ever_consented.assert_called_once()
-
-    def test_success_mb_coaching_no_consent(self):
-        """
-        Check that MicroBachelors users who have not consented to coaching have the proper info
-        included for the partner report.
-        """
-        path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
-        with mock.patch(path, return_value=False) as mock_has_ever_consented:
-            user_dicts, users = self.create_partner_reporting_statuses(num=1)
-            ExternalId.add_new_user_id(
-                user=users[0],
-                type_name=ExternalIdType.MICROBACHELORS_COACHING
-            )
-
-            self.assert_status_and_user_list(user_dicts)
-            mock_has_ever_consented.assert_called_once()
 
     def test_no_users(self):
         """
@@ -1380,6 +1348,46 @@ class TestAccountRetirementPost(RetirementTestCase):
         self.headers['content_type'] = "application/json"
         self.url = reverse('accounts_retire')
 
+    def _data_sharing_consent_assertions(self):
+        """
+        Helper method for asserting that ``DataSharingConsent`` objects are retired.
+        """
+        self.consent.refresh_from_db()
+        assert self.retired_username == self.consent.username
+        test_users_data_sharing_consent = DataSharingConsent.objects.filter(
+            username=self.original_username
+        )
+        assert not test_users_data_sharing_consent.exists()
+
+    def _entitlement_support_detail_assertions(self):
+        """
+        Helper method for asserting that ``CourseEntitleSupportDetail`` objects are retired.
+        """
+        self.entitlement_support_detail.refresh_from_db()
+        assert '' == self.entitlement_support_detail.comments
+
+    def _pending_enterprise_customer_user_assertions(self):
+        """
+        Helper method for asserting that ``PendingEnterpriseCustomerUser`` objects are retired.
+        """
+        self.pending_enterprise_user.refresh_from_db()
+        assert self.retired_email == self.pending_enterprise_user.user_email
+        pending_enterprise_users = PendingEnterpriseCustomerUser.objects.filter(
+            user_email=self.original_email
+        )
+        assert not pending_enterprise_users.exists()
+
+    def _sapsf_audit_assertions(self):
+        """
+        Helper method for asserting that ``SapSuccessFactorsLearnerDataTransmissionAudit`` objects are retired.
+        """
+        self.sapsf_audit.refresh_from_db()
+        assert '' == self.sapsf_audit.sapsf_user_id
+        audits_for_original_user_id = SapSuccessFactorsLearnerDataTransmissionAudit.objects.filter(
+            sapsf_user_id=self.test_user.id,
+        )
+        assert not audits_for_original_user_id.exists()
+
     def post_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
         """
         Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
@@ -1516,57 +1524,30 @@ class TestAccountRetirementPost(RetirementTestCase):
         AccountRetirementView.retire_users_data_sharing_consent(self.test_user.username, self.retired_username)
         self._data_sharing_consent_assertions()
 
-    def _data_sharing_consent_assertions(self):
-        """
-        Helper method for asserting that ``DataSharingConsent`` objects are retired.
-        """
-        self.consent.refresh_from_db()
-        assert self.retired_username == self.consent.username
-        test_users_data_sharing_consent = DataSharingConsent.objects.filter(
-            username=self.original_username
-        )
-        assert not test_users_data_sharing_consent.exists()
-
     def test_can_retire_users_sap_success_factors_audits(self):
         AccountRetirementView.retire_sapsf_data_transmission(self.test_user)
         self._sapsf_audit_assertions()
-
-    def _sapsf_audit_assertions(self):
-        """
-        Helper method for asserting that ``SapSuccessFactorsLearnerDataTransmissionAudit`` objects are retired.
-        """
-        self.sapsf_audit.refresh_from_db()
-        assert '' == self.sapsf_audit.sapsf_user_id
-        audits_for_original_user_id = SapSuccessFactorsLearnerDataTransmissionAudit.objects.filter(
-            sapsf_user_id=self.test_user.id,
-        )
-        assert not audits_for_original_user_id.exists()
 
     def test_can_retire_user_from_pendingenterprisecustomeruser(self):
         AccountRetirementView.retire_user_from_pending_enterprise_customer_user(self.test_user, self.retired_email)
         self._pending_enterprise_customer_user_assertions()
 
-    def _pending_enterprise_customer_user_assertions(self):
-        """
-        Helper method for asserting that ``PendingEnterpriseCustomerUser`` objects are retired.
-        """
-        self.pending_enterprise_user.refresh_from_db()
-        assert self.retired_email == self.pending_enterprise_user.user_email
-        pending_enterprise_users = PendingEnterpriseCustomerUser.objects.filter(
-            user_email=self.original_email
-        )
-        assert not pending_enterprise_users.exists()
-
     def test_course_entitlement_support_detail_comments_are_retired(self):
         AccountRetirementView.retire_entitlement_support_detail(self.test_user)
         self._entitlement_support_detail_assertions()
 
-    def _entitlement_support_detail_assertions(self):
+    def test_clear_pii_from_certificate_records(self):
         """
-        Helper method for asserting that ``CourseEntitleSupportDetail`` objects are retired.
+        Test to verify a learner's name is scrubbed from associated certificate records when the AccountRetirementView's
+        `clear_pii_from_certificate_records` static function is called.
         """
-        self.entitlement_support_detail.refresh_from_db()
-        assert '' == self.entitlement_support_detail.comments
+        GeneratedCertificateFactory(course_id=self.course_key, name="Bob Loblaw", user=self.test_user)
+        cert = get_certificate_for_user_id(self.test_user.id, self.course_key)
+        assert cert.name == "Bob Loblaw"
+
+        AccountRetirementView.clear_pii_from_certificate_records(self.test_user)
+        cert = get_certificate_for_user_id(self.test_user.id, self.course_key)
+        assert cert.name == ""
 
 
 @skip_unless_lms

@@ -5,24 +5,24 @@ Tests for vertical block.
 # pylint: disable=protected-access
 
 
+import json
 from collections import namedtuple
 from datetime import datetime, timedelta
-import json
 from unittest.mock import Mock, patch
 
-import pytz
 import ddt
-from fs.memoryfs import MemoryFS
+import pytz
 from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
+from fs.memoryfs import MemoryFS
 from openedx_filters import PipelineStep
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 
-from . import get_test_system
+from ..x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
+from . import prepare_block_runtime
 from .helpers import StubUserService
 from .xml import XModuleXmlImportTest
 from .xml import factories as xml
-from ..x_module import STUDENT_VIEW, AUTHOR_VIEW, PUBLIC_VIEW
 
 COMPLETION_DELAY = 9876
 
@@ -164,13 +164,12 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
 
         self.course = self.process_xml(course)
         course_seq = self.course.get_children()[0]
-        self.module_system = get_test_system()
+        prepare_block_runtime(self.course.runtime)
 
-        self.module_system.descriptor_runtime = self.course._runtime
         self.course.runtime.export_fs = MemoryFS()
 
         self.vertical = course_seq.get_children()[0]
-        self.vertical.xmodule_runtime = self.module_system
+        self.vertical.runtime = self.course.runtime
 
         self.html_block = self.vertical.get_children()[0]
         self.problem_block = self.vertical.get_children()[1]
@@ -213,17 +212,19 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test the rendering of the student and public view.
         """
-        self.module_system._services['bookmarks'] = Mock()
+        self.course.runtime._services['bookmarks'] = Mock()
         now = datetime.now(pytz.UTC)
         self.vertical.due = now + timedelta(days=days)
         if view == STUDENT_VIEW:
-            self.module_system._services['user'] = StubUserService(user=Mock(username=self.username))
-            self.module_system._services['completion'] = StubCompletionService(enabled=True,
-                                                                               completion_value=completion_value)
+            self.course.runtime._services['user'] = StubUserService(user=Mock(username=self.username))
+            self.course.runtime._services['completion'] = StubCompletionService(
+                enabled=True,
+                completion_value=completion_value
+            )
         elif view == PUBLIC_VIEW:
-            self.module_system._services['user'] = StubUserService(user=AnonymousUser())
+            self.course.runtime._services['user'] = StubUserService(user=AnonymousUser())
 
-        html = self.module_system.render(
+        html = self.course.runtime.render(
             self.vertical, view, self.default_context if context is None else context
         ).content
         assert self.test_html in html
@@ -248,15 +249,15 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test the rendering of the student and public view.
         """
-        self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService(user=Mock())
-        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+        self.course.runtime._services['bookmarks'] = Mock()
+        self.course.runtime._services['user'] = StubUserService(user=Mock())
+        self.course.runtime._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
 
         now = datetime.now(pytz.UTC)
         self.vertical.due = now + timedelta(days=-1)
         self.problem_block.has_score = has_score
 
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+        html = self.course.runtime.render(self.vertical, STUDENT_VIEW, self.default_context).content
         if has_score:
             assert "'has_assignments': True" in html
             assert "'completed': False" in html
@@ -270,14 +271,14 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
     @ddt.unpack
     def test_render_access_denied_blocks(self, node_has_access_error, child_has_access_error):
         """ Tests access denied blocks are not rendered when hide_access_error_blocks is True """
-        self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService(user=Mock())
+        self.course.runtime._services['bookmarks'] = Mock()
+        self.course.runtime._services['user'] = StubUserService(user=Mock())
         self.vertical.due = datetime.now(pytz.UTC) + timedelta(days=-1)
         self.problem_block.has_access_error = node_has_access_error
         self.nested_problem_block.has_access_error = child_has_access_error
 
         context = {'username': self.username, 'hide_access_error_blocks': True}
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, context).content
+        html = self.course.runtime.render(self.vertical, STUDENT_VIEW, context).content
 
         if node_has_access_error and child_has_access_error:
             assert self.test_problem not in html
@@ -316,11 +317,11 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         Test that mark-completed-on-view-after-delay is only set for relevant child Xblocks.
         """
         with patch.object(self.html_block, 'render') as mock_student_view:
-            self.module_system._services['completion'] = StubCompletionService(
+            self.course.runtime._services['completion'] = StubCompletionService(
                 enabled=completion_enabled,
                 completion_value=completion_value,
             )
-            self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context)
+            self.course.runtime.render(self.vertical, STUDENT_VIEW, self.default_context)
             if mark_completed_enabled:
                 assert mock_student_view.call_args[0][1]['wrap_xblock_data']['mark-completed-on-view-after-delay'] ==\
                        9876
@@ -335,7 +336,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         context = {
             'is_unit_page': True
         }
-        html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
+        html = self.course.runtime.render(self.vertical, AUTHOR_VIEW, context).content
         assert self.test_html not in html
         assert self.test_problem not in html
 
@@ -345,7 +346,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             'is_unit_page': False,
             'reorderable_items': reorderable_items,
         }
-        html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
+        html = self.course.runtime.render(self.vertical, AUTHOR_VIEW, context).content
         assert self.test_html in html
         assert self.test_problem in html
 
@@ -363,11 +364,11 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test the VerticalBlockChildRenderStarted filter's effects on student view.
         """
-        self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService(user=Mock())
-        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+        self.course.runtime._services['bookmarks'] = Mock()
+        self.course.runtime._services['user'] = StubUserService(user=Mock())
+        self.course.runtime._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
 
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+        html = self.course.runtime.render(self.vertical, STUDENT_VIEW, self.default_context).content
 
         assert TestVerticalBlockChildRenderStep.filter_content in html
 
@@ -385,11 +386,11 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test VerticalBlockChildRenderStarted filter can be used to skip child blocks.
         """
-        self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService(user=Mock())
-        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+        self.course.runtime._services['bookmarks'] = Mock()
+        self.course.runtime._services['user'] = StubUserService(user=Mock())
+        self.course.runtime._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
 
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+        html = self.course.runtime.render(self.vertical, STUDENT_VIEW, self.default_context).content
 
         assert self.test_html not in html
         assert self.test_html_nested not in html
@@ -408,11 +409,11 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test the VerticalBlockRenderCompleted filter's execution.
         """
-        self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService(user=Mock())
-        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+        self.course.runtime._services['bookmarks'] = Mock()
+        self.course.runtime._services['user'] = StubUserService(user=Mock())
+        self.course.runtime._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
 
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+        html = self.course.runtime.render(self.vertical, STUDENT_VIEW, self.default_context).content
 
         assert TestVerticalBlockRenderCompletedStep.filter_content in html
 
@@ -430,10 +431,10 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test VerticalBlockRenderCompleted filter can be used to prevent vertical block from rendering.
         """
-        self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService(user=Mock())
-        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+        self.course.runtime._services['bookmarks'] = Mock()
+        self.course.runtime._services['user'] = StubUserService(user=Mock())
+        self.course.runtime._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
 
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+        html = self.course.runtime.render(self.vertical, STUDENT_VIEW, self.default_context).content
 
         assert TestPreventVerticalBlockRenderStep.filter_content == html

@@ -11,7 +11,8 @@ from django.test import TestCase
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator
 from xblock.fields import ScopeIds
 
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
+from xmodule.x_module import DescriptorSystem
+from lms.djangoapps.lms_xblock.runtime import handler_url
 
 
 class BlockMock(Mock):
@@ -50,10 +51,13 @@ class TestHandlerUrl(TestCase):
     def setUp(self):
         super().setUp()
         self.block = BlockMock(name='block')
-        self.runtime = LmsModuleSystem(
-            get_block=Mock(),
-            descriptor_runtime=Mock(),
+        self.runtime = DescriptorSystem(
+            load_item=Mock(name='get_test_descriptor_system.load_item'),
+            resources_fs=Mock(name='get_test_descriptor_system.resources_fs'),
+            error_tracker=Mock(name='get_test_descriptor_system.error_tracker')
         )
+        self.runtime.get_block_for_descriptor = Mock()
+        self.runtime.handler_url_override = handler_url
 
     def test_trailing_characters(self):
         assert not self.runtime.handler_url(self.block, 'handler').endswith('?')

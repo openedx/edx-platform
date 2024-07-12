@@ -88,6 +88,24 @@ class AuthNotConfigured(SocialAuthBaseException):
         )
 
 
+def _get_site_id_from_settings() -> int:
+    """
+    Simply return SITE_ID from settings.
+
+    We define this function so the current SITE_ID can be used as the default value on a
+    couple fields in this module. We can't use `settings.SITE_ID` directly in the model class,
+    because then the migration file will contain whatever the value of SITE_ID was when the
+    migration was created. This value is usually 1, but in the event that a developer is
+    running a non-default site, they would get a value like 2 or 3, which will result in
+    a dirty migration state. By defining this wrapper function, the name
+    `_get_site_id_from_settings` will be serialized to the migration file as the default,
+    regardless of what any developer's active SITE_ID is.
+
+    Reference: https://docs.djangoproject.com/en/dev/ref/models/fields/#default
+    """
+    return settings.SITE_ID
+
+
 class ProviderConfig(ConfigurationModel):
     """
     Abstract Base Class for configuring a third_party_auth provider
@@ -143,7 +161,7 @@ class ProviderConfig(ConfigurationModel):
     )
     site = models.ForeignKey(
         Site,
-        default=settings.SITE_ID,
+        default=_get_site_id_from_settings,
         related_name='%(class)ss',
         help_text=_(
             'The Site that this provider configuration belongs to.'
@@ -366,13 +384,12 @@ class OAuth2ProviderConfig(ProviderConfig):
 
     .. no_pii:
     """
-    # We are keying the provider config by backend_name here as suggested in the python social
-    # auth documentation. In order to reuse a backend for a second provider, a subclass can be
-    # created with seperate name.
+    # We are keying the provider config by backend_name and site_id to support configuration per site.
+    # In order to reuse a backend for a second provider, a subclass can be created with seperate name.
     # example:
     # class SecondOpenIDProvider(OpenIDAuth):
     #   name = "second-openId-provider"
-    KEY_FIELDS = ('backend_name',)
+    KEY_FIELDS = ('site_id', 'backend_name')
     prefix = 'oa2'
     backend_name = models.CharField(
         max_length=50, blank=False, db_index=True,
@@ -400,6 +417,29 @@ class OAuth2ProviderConfig(ProviderConfig):
         app_label = "third_party_auth"
         verbose_name = "Provider Configuration (OAuth)"
         verbose_name_plural = verbose_name
+
+    @classmethod
+    def current(cls, *args):
+        """
+        Get the current config model for the provider according to the given backend and the current
+        site.
+        """
+        site_id = Site.objects.get_current(get_current_request()).id
+        return super(OAuth2ProviderConfig, cls).current(site_id, *args)
+
+    @property
+    def provider_id(self):
+        """
+        Unique string key identifying this provider. Must be URL and css class friendly.
+        Ignoring site_id as the config is filtered using current method which fetches the configuration for the current
+        site_id.
+        """
+        assert self.prefix is not None
+        return "-".join((self.prefix, ) + tuple(
+            str(getattr(self, field))
+            for field in self.KEY_FIELDS
+            if field != 'site_id'
+        ))
 
     def clean(self):
         """ Standardize and validate fields """
@@ -433,7 +473,7 @@ class SAMLConfiguration(ConfigurationModel):
     KEY_FIELDS = ('site_id', 'slug')
     site = models.ForeignKey(
         Site,
-        default=settings.SITE_ID,
+        default=_get_site_id_from_settings,
         related_name='%(class)ss',
         help_text=_(
             'The Site that this SAML configuration belongs to.'

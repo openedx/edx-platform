@@ -93,6 +93,8 @@ l8N6+LEIVTMAytPk+/bImHvGHKZkCz5rEMSuYJWOmqKI92rUtI6fz5DUb3XSbrwT
 3W+sdGFUK3GH1NAX71VxbAlFVLUetcMwai1+wXmGkRw6A7YezVFnhw==
 -----END RSA PRIVATE KEY-----"""
 
+TEST_PASSWORD = 'Password1234'
+
 
 def _mock_payment_processors():
     """
@@ -122,8 +124,8 @@ class StartView(TestCase):
         Test the case where the user has no pending `PhotoVerificationAttempts`,
         but is just starting their first.
         """
-        UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
+        UserFactory.create(username="rusty", password=TEST_PASSWORD)
+        self.client.login(username="rusty", password=TEST_PASSWORD)
 
     def must_be_logged_in(self):
         self.assertHttpForbidden(self.client.get(self.start_url()))  # lint-amnesty, pylint: disable=no-member
@@ -1055,11 +1057,11 @@ class CheckoutTestMixin:
         """ Create a user and course. """
         super().setUp()
 
-        self.user = UserFactory.create(username="test", password="test")
+        self.user = UserFactory.create(username="test", password=TEST_PASSWORD)
         self.course = CourseFactory.create()
         for mode, min_price in (('audit', 0), ('honor', 0), ('verified', 100)):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
-        self.client.login(username="test", password="test")
+        self.client.login(username="test", password=TEST_PASSWORD)
 
     def _assert_checked_out(
         self,
@@ -1868,7 +1870,7 @@ class TestPhotoURLView(TestVerificationBase):
         super().setUp()
 
         self.user = AdminFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.login(username=self.user.username, password=TEST_PASSWORD)
         assert login_success
         self.attempt = SoftwareSecurePhotoVerification(
             status="submitted",
@@ -1895,7 +1897,7 @@ class TestPhotoURLView(TestVerificationBase):
 
     def test_403_for_non_staff(self):
         self.user = UserFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.login(username=self.user.username, password=TEST_PASSWORD)
         assert login_success
         url = reverse('verification_photo_urls', kwargs={'receipt_id': str(self.receipt_id)})
         response = self.client.get(url)
@@ -1934,7 +1936,7 @@ class TestDecodeImageViews(MockS3Boto3Mixin, TestVerificationBase):
     def setUp(self):
         super().setUp()
         self.user = AdminFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.login(username=self.user.username, password=TEST_PASSWORD)
         assert login_success
 
     def _mock_submit_images(self):
@@ -1995,7 +1997,7 @@ class TestDecodeImageViews(MockS3Boto3Mixin, TestVerificationBase):
     @ddt.data("face", "photo_id")
     def test_403_for_non_staff(self, img_type):
         self.user = UserFactory()
-        login_success = self.client.login(username=self.user.username, password='test')
+        login_success = self.client.login(username=self.user.username, password=TEST_PASSWORD)
         assert login_success
 
         self._mock_submit_images()

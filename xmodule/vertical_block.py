@@ -10,16 +10,17 @@ from functools import reduce
 
 import pytz
 from lxml import etree
+from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import Boolean, Scope
-from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
+
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_block import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.util.misc import is_xblock_an_assignment
-from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields
 from xmodule.xml_block import XmlMixin
 
@@ -116,7 +117,6 @@ class VerticalBlock(
                 child_block_context['wrap_xblock_data'] = {
                     'mark-completed-on-view-after-delay': complete_on_view_delay
                 }
-
             try:
                 # .. filter_implemented_name: VerticalBlockChildRenderStarted
                 # .. filter_type: org.openedx.learning.vertical_block_child.render.started.v1
@@ -161,9 +161,10 @@ class VerticalBlock(
                     child_context['username'], str(self.location)),  # pylint: disable=no-member
             })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', fragment_context))
+        mako_service = self.runtime.service(self, 'mako')
+        fragment.add_content(mako_service.render_lms_template('vert_module.html', fragment_context))
 
-        add_webpack_to_fragment(fragment, 'VerticalStudentView')
+        add_webpack_js_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')
 
         try:

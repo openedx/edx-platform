@@ -3,12 +3,16 @@ Views for user API
 """
 
 
+import logging
+from functools import cached_property
+from typing import Optional
+
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in
 from django.db import transaction
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import dateparse
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
@@ -19,23 +23,34 @@ from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
+from edx_rest_framework_extensions.paginators import DefaultPagination
 
 from common.djangoapps.student.models import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
 from lms.djangoapps.courseware.access import is_mobile_available_for_user
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
+from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
 from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.mobile_api.models import MobileConfig
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2, API_V3, API_V4
 from openedx.features.course_duration_limits.access import check_course_expired
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
-from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05, UserSerializer
+from .enums import EnrollmentStatuses
+from .serializers import (
+    CourseEnrollmentSerializer,
+    CourseEnrollmentSerializerModifiedForPrimary,
+    CourseEnrollmentSerializerv05,
+    UserSerializer,
+)
+
+log = logging.getLogger(__name__)
 
 
 @mobile_view(is_user=True)
@@ -140,7 +155,7 @@ class UserCourseStatus(views.APIView):
         the course block. If there is no such visit, the first item deep enough down the course
         tree is used.
         """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course.id, request.user, course, depth=2)
 
         course_block = get_block_for_descriptor(
@@ -173,14 +188,15 @@ class UserCourseStatus(views.APIView):
         """
         Saves the module id if the found modification_date is less recent than the passed modification date
         """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course.id, request.user, course, depth=2)
         try:
-            block_descriptor = modulestore().get_item(module_key)
+            descriptor = modulestore().get_item(module_key)
         except ItemNotFoundError:
+            log.error(f"{errors.ERROR_INVALID_MODULE_ID} %s", module_key)
             return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
         block = get_block_for_descriptor(
-            request.user, request, block_descriptor, field_data_cache, course.id, course=course
+            request.user, request, descriptor, field_data_cache, course.id, course=course
         )
 
         if modification_date:
@@ -228,12 +244,14 @@ class UserCourseStatus(views.APIView):
         if modification_date_string:
             modification_date = dateparse.parse_datetime(modification_date_string)
             if not modification_date or not modification_date.tzinfo:
+                log.error(f"{errors.ERROR_INVALID_MODIFICATION_DATE} %s", modification_date_string)
                 return Response(errors.ERROR_INVALID_MODIFICATION_DATE, status=400)
 
         if module_id:
             try:
                 module_key = UsageKey.from_string(module_id)
             except InvalidKeyError:
+                log.error(f"{errors.ERROR_INVALID_MODULE_ID} %s", module_id)
                 return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
 
             return self._update_last_visited_module_id(request, course, module_key, modification_date)
@@ -254,6 +272,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         a user rather than only the enrollments the user has access to (that haven't expired).
         An additional attribute "expiration" has been added to the response, which lists the date
         when access to the course will expire or null if it doesn't expire.
+
+        In v4 we added to the response primary object. Primary object contains the latest user's enrollment
+        or course where user has the latest progress. Primary object has been cut from user's
+        enrolments array and inserted into separated section with key `primary`.
 
     **Example Request**
 
@@ -304,8 +326,12 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         * mode: The type of certificate registration for this course (honor or
           certified).
         * url: URL to the downloadable version of the certificate, if exists.
+        * course_progress: Contains information about how many assignments are in the course
+          and how many assignments the student has completed.
+        * total_assignments_count: Total course's assignments count.
+        * assignments_completed: Assignments witch the student has completed.
     """
-    queryset = CourseEnrollment.objects.all()
+
     lookup_field = 'username'
 
     # In Django Rest Framework v3, there is a default pagination
@@ -324,7 +350,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
+        requested_fields = self.request.GET.get('requested_fields', '')
+
         context['api_version'] = self.kwargs.get('api_version')
+        context['requested_fields'] = requested_fields.split(',')
         return context
 
     def get_serializer_class(self):
@@ -333,46 +362,160 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             return CourseEnrollmentSerializerv05
         return CourseEnrollmentSerializer
 
+    @cached_property
+    def queryset_for_user(self):
+        """
+        Find and return the list of course enrollments for the user.
+
+        In v4 added filtering by statuses.
+        """
+        api_version = self.kwargs.get('api_version')
+        status = self.request.GET.get('status')
+        username = self.kwargs['username']
+
+        queryset = CourseEnrollment.objects.all().select_related('course', 'user').filter(
+            user__username=username,
+            is_active=True
+        ).order_by('-created')
+
+        if api_version == API_V4 and status in EnrollmentStatuses.values():
+            if status == EnrollmentStatuses.IN_PROGRESS.value:
+                queryset = queryset.in_progress(username=username, time_zone=self.user_timezone)
+            elif status == EnrollmentStatuses.COMPLETED.value:
+                queryset = queryset.completed(username=username)
+            elif status == EnrollmentStatuses.EXPIRED.value:
+                queryset = queryset.expired(username=username, time_zone=self.user_timezone)
+
+        return queryset
+
     def get_queryset(self):
         api_version = self.kwargs.get('api_version')
-        enrollments = self.queryset.filter(
-            user__username=self.kwargs['username'],
-            is_active=True
-        ).order_by('created').reverse()
-        org = self.request.query_params.get('org', None)
+        status = self.request.GET.get('status')
+        mobile_available = self.get_same_org_mobile_available_enrollments()
 
-        same_org = (
-            enrollment for enrollment in enrollments
-            if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org)
-        )
-        mobile_available = (
-            enrollment for enrollment in same_org
-            if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
-        )
         not_duration_limited = (
             enrollment for enrollment in mobile_available
             if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
         )
+
+        if api_version == API_V4 and status not in EnrollmentStatuses.values():
+            primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
+            if primary_enrollment_obj:
+                mobile_available.remove(primary_enrollment_obj)
 
         if api_version == API_V05:
             # for v0.5 don't return expired courses
             return list(not_duration_limited)
         else:
             # return all courses, with associated expiration
-            return list(mobile_available)
+            return mobile_available
+
+    def get_same_org_mobile_available_enrollments(self) -> list[CourseEnrollment]:
+        """
+        Gets list with `CourseEnrollment` for mobile available courses.
+        """
+        org = self.request.query_params.get('org', None)
+
+        same_org = (
+            enrollment for enrollment in self.queryset_for_user
+            if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org)
+        )
+        mobile_available = (
+            enrollment for enrollment in same_org
+            if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
+        )
+        return list(mobile_available)
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         api_version = self.kwargs.get('api_version')
+        status = self.request.GET.get('status')
 
-        if api_version == API_V2:
+        if api_version in (API_V2, API_V3, API_V4):
             enrollment_data = {
                 'configs': MobileConfig.get_structured_configs(),
+                'user_timezone': str(self.user_timezone),
                 'enrollments': response.data
             }
+            if api_version == API_V4 and status not in EnrollmentStatuses.values():
+                primary_enrollment_obj = self.get_primary_enrollment_by_latest_enrollment_or_progress()
+                if primary_enrollment_obj:
+                    serializer = CourseEnrollmentSerializerModifiedForPrimary(
+                        primary_enrollment_obj,
+                        context=self.get_serializer_context(),
+                    )
+                    enrollment_data.update({'primary': serializer.data})
+
             return Response(enrollment_data)
 
         return response
+
+    @cached_property
+    def user_timezone(self):
+        """
+        Get the user's timezone.
+        """
+        return get_user_timezone_or_last_seen_timezone_or_utc(self.get_user())
+
+    def get_user(self) -> User:
+        """
+        Get user object by username.
+        """
+        return get_object_or_404(User, username=self.kwargs['username'])
+
+    def get_primary_enrollment_by_latest_enrollment_or_progress(self) -> Optional[CourseEnrollment]:
+        """
+        Gets primary enrollment obj by latest enrollment or latest progress on the course.
+        """
+        mobile_available = self.get_same_org_mobile_available_enrollments()
+        if not mobile_available:
+            return None
+
+        mobile_available_course_ids = [enrollment.course_id for enrollment in mobile_available]
+
+        latest_enrollment = self.queryset_for_user.filter(
+            course__id__in=mobile_available_course_ids
+        ).order_by('-created').first()
+
+        if not latest_enrollment:
+            return None
+
+        latest_progress = StudentModule.objects.filter(
+            student__username=self.kwargs['username'],
+            course_id__in=mobile_available_course_ids,
+        ).order_by('-modified').first()
+
+        if not latest_progress:
+            return latest_enrollment
+
+        enrollment_with_latest_progress = self.queryset_for_user.filter(
+            course_id=latest_progress.course_id,
+            user__username=self.kwargs['username'],
+        ).first()
+
+        if latest_enrollment.created > latest_progress.modified:
+            return latest_enrollment
+        else:
+            return enrollment_with_latest_progress
+
+    # pylint: disable=attribute-defined-outside-init
+    @property
+    def paginator(self):
+        """
+        Override API View paginator property to dynamically determine pagination class
+
+        Implements solutions from the discussion at
+        https://www.github.com/encode/django-rest-framework/issues/6397.
+        """
+        super().paginator  # pylint: disable=expression-not-assigned
+        api_version = self.kwargs.get('api_version')
+
+        if self._paginator is None and api_version == API_V3:
+            self._paginator = DefaultPagination()
+        if self._paginator is None and api_version == API_V4:
+            self._paginator = UserCourseEnrollmentsV4Pagination()
+
+        return self._paginator
 
 
 @api_view(["GET"])
@@ -385,3 +528,11 @@ def my_user_info(request, api_version):
     # updating it from the oauth2 related code is too complex
     user_logged_in.send(sender=User, user=request.user, request=request)
     return redirect("user-detail", api_version=api_version, username=request.user.username)
+
+
+class UserCourseEnrollmentsV4Pagination(DefaultPagination):
+    """
+    Pagination for `UserCourseEnrollments` API v4.
+    """
+    page_size = 5
+    max_page_size = 50

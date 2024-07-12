@@ -210,7 +210,7 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
     if the problem is already being reset.
     """
     # check arguments:  make sure that the usage_key is defined
-    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
+    # (since that's currently typed in).  If the corresponding block doesn't exist,
     # an exception will be raised.  Let it pass up to the caller.
     modulestore().get_item(usage_key)
 
@@ -256,7 +256,7 @@ def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint:
     if the particular problem's state is already being deleted.
     """
     # check arguments:  make sure that the usage_key is defined
-    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
+    # (since that's currently typed in).  If the corresponding block doesn't exist,
     # an exception will be raised.  Let it pass up to the caller.
     modulestore().get_item(usage_key)
 
@@ -270,7 +270,7 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     """
     Requests reset of state for entrance exam as a background task.
 
-    Module state for all problems in entrance exam will be deleted
+    Block state for all problems in entrance exam will be deleted
     for specified student.
 
     All User Milestones of entrance exam will be removed for the specified student

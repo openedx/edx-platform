@@ -15,12 +15,10 @@ import requests
 import simplejson as json
 from django.conf import settings
 from lxml import etree
-from opaque_keys.edx.locator import BundleDefinitionLocator
+from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 
-from openedx.core.djangolib import blockstore_cache
-from openedx.core.lib import blockstore_api
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -185,15 +183,19 @@ def get_transcript_link_from_youtube(youtube_id):
         caption_matched = re.search(caption_re, youtube_html.content.decode("utf-8"))
         if caption_matched:
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
+            caption_links = {}
             for caption in caption_tracks:
-                if "languageCode" in caption.keys() and caption["languageCode"] == "en":
-                    return caption["baseUrl"]
+                language_code = caption.get('languageCode', None)
+                if language_code and not language_code == 'None':
+                    link = caption.get("baseUrl")
+                    caption_links[language_code] = link
+            return None if not caption_links else caption_links
         return None
     except ConnectionError:
         return None
 
 
-def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
+def get_transcript_links_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Gets transcripts from youtube for youtube_id.
 
@@ -202,19 +204,30 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
 
     Returns (status, transcripts): bool, dict.
     """
-    _ = i18n.ugettext
+    _ = i18n.gettext
+    transcript_links = get_transcript_link_from_youtube(youtube_id)
 
-    utf8_parser = etree.XMLParser(encoding='utf-8')
-
-    transcript_link = get_transcript_link_from_youtube(youtube_id)
-
-    if not transcript_link:
+    if not transcript_links:
         msg = _("Can't get transcript link from Youtube for {youtube_id}.").format(
             youtube_id=youtube_id,
         )
         raise GetTranscriptsFromYouTubeException(msg)
 
-    data = requests.get(transcript_link)
+    return transcript_links
+
+
+def get_transcript_from_youtube(link, youtube_id, i18n):
+    """
+    Gets transcripts from youtube for youtube_id.
+
+    Parses only utf-8 encoded transcripts.
+    Other encodings are not supported at the moment.
+
+    Returns (status, transcripts): bool, dict.
+    """
+    _ = i18n.gettext
+    utf8_parser = etree.XMLParser(encoding='utf-8')
+    data = requests.get(link)
 
     if data.status_code != 200 or not data.text:
         msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {status_code}.").format(
@@ -241,13 +254,13 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     return {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
 
 
-def download_youtube_subs(youtube_id, video_descriptor, settings):  # lint-amnesty, pylint: disable=redefined-outer-name
+def download_youtube_subs(youtube_id, video_block, settings):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Download transcripts from Youtube.
 
     Args:
         youtube_id: str, actual youtube_id of the video.
-        video_descriptor: video descriptor instance.
+        video_block: video block instance.
 
     We save transcripts for 1.0 speed, as for other speed conversion is done on front-end.
 
@@ -257,11 +270,14 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):  # lint-amnes
     Raises:
         GetTranscriptsFromYouTubeException, if fails.
     """
-    i18n = video_descriptor.runtime.service(video_descriptor, "i18n")
-    _ = i18n.ugettext
-
-    subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
-    return json.dumps(subs, indent=2)
+    i18n = video_block.runtime.service(video_block, "i18n")
+    _ = i18n.gettext
+    transcript_links = get_transcript_links_from_youtube(youtube_id, settings, i18n)
+    subs = []
+    for (language_code, link) in transcript_links.items():
+        sub = get_transcript_from_youtube(link, youtube_id, i18n)
+        subs.append([language_code, json.dumps(sub, indent=2)])
+    return subs
 
 
 def remove_subs_from_store(subs_id, item, lang='en'):
@@ -284,7 +300,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, block, langu
     :param language: str, language of translation of transcripts
     :returns: True, if all subs are generated and saved successfully.
     """
-    _ = block.runtime.service(block, "i18n").ugettext
+    _ = block.runtime.service(block, "i18n").gettext
     if subs_type.lower() != 'srt':
         raise TranscriptsGenerationException(_("We support only SubRip (*.srt) transcripts format."))
     try:
@@ -433,7 +449,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
         (To avoid confusing situation if you attempt to correct a translation by uploading
         a new version of the SRT file with same name).
     """
-    _ = item.runtime.service(item, "i18n").ugettext
+    _ = item.runtime.service(item, "i18n").gettext
 
     # # 1.
     # html5_ids = get_html5_ids(item.html5_sources)
@@ -487,7 +503,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
                     lang,
                 )
-            except TranscriptException as ex:  # lint-amnesty, pylint: disable=unused-variable
+            except TranscriptException:
                 pass
         if reraised_message:
             item.save_with_metadata(user)
@@ -518,7 +534,7 @@ def generate_sjson_for_all_speeds(block, user_filename, result_subs_dict, lang):
     """
     Generates sjson from srt for given lang.
     """
-    _ = block.runtime.service(block, "i18n").ugettext
+    _ = block.runtime.service(block, "i18n").gettext
 
     try:
         srt_transcripts = contentstore().find(Transcript.asset_location(block.location, user_filename))
@@ -840,15 +856,19 @@ class VideoTranscriptsMixin:
         # to clean redundant language codes.
         return list(set(translations))
 
-    def get_default_transcript_language(self, transcripts):
+    def get_default_transcript_language(self, transcripts, dest_lang=None):
         """
         Returns the default transcript language for this video block.
 
         Args:
             transcripts (dict): A dict with all transcripts and a sub.
+            dest_lang (unicode): language coming from unit translation language selector.
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
-        if self.transcript_language in other_lang:
+
+        if dest_lang and dest_lang in other_lang.keys():
+            transcript_language = dest_lang
+        elif self.transcript_language in other_lang:
             transcript_language = self.transcript_language
         elif sub:
             transcript_language = 'en'
@@ -925,7 +945,7 @@ def get_transcript_for_video(video_location, subs_id, file_name, language):
     """
     Get video transcript from content store. This is a lower level function and is used by
     `get_transcript_from_contentstore`. Prefer that function instead where possible. If you
-    need to support getting transcripts from VAL or Blockstore as well, use the `get_transcript`
+    need to support getting transcripts from VAL or Learning Core as well, use the `get_transcript`
     function instead.
 
     NOTE: Transcripts can be searched from content store by two ways:
@@ -961,7 +981,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     Get video transcript from content store.
 
     Arguments:
-        video (Video Descriptor): Video descriptor
+        video (Video block): Video block
         language (unicode): transcript language
         output_format (unicode): transcript output format
         transcripts_info (dict): transcript info for a video
@@ -1013,29 +1033,31 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
 
 
-def get_transcript_from_blockstore(video_block, language, output_format, transcripts_info):
+def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
     """
-    Get video transcript from Blockstore.
+    Get video transcript from Learning Core.
 
-    Blockstore expects video transcripts to be placed into the 'static/'
-    subfolder of the XBlock's folder in a Blockstore bundle. For example, if the
-    video XBlock's definition is in the standard location of
-        video/video1/definition.xml
-    Then the .srt files should be placed at e.g.
-        video/video1/static/video1-en.srt
-    This is the same place where other public static files are placed for other
-    XBlocks, such as image files used by HTML blocks.
+    HISTORIC INFORMATION FROM WHEN THIS FUNCTION WAS `get_transcript_from_blockstore`:
 
-    Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
-    JSON dictionary listing the filename of the transcript for each language:
-        <video
-            youtube_id_1_0="3_yD_cEKoCk"
-            transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
-            display_name="Welcome Video with Transcript"
-            download_track="true"
-        />
+      Blockstore expects video transcripts to be placed into the 'static/'
+      subfolder of the XBlock's folder in a Blockstore bundle. For example, if the
+      video XBlock's definition is in the standard location of
+          video/video1/definition.xml
+      Then the .srt files should be placed at e.g.
+          video/video1/static/video1-en.srt
+      This is the same place where other public static files are placed for other
+      XBlocks, such as image files used by HTML blocks.
 
-    This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
+      Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
+      JSON dictionary listing the filename of the transcript for each language:
+          <video
+              youtube_id_1_0="3_yD_cEKoCk"
+              transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
+              display_name="Welcome Video with Transcript"
+              download_track="true"
+          />
+
+      This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
 
     Arguments:
         video_block (Video XBlock): The video XBlock
@@ -1046,42 +1068,9 @@ def get_transcript_from_blockstore(video_block, language, output_format, transcr
     Returns:
         tuple containing content, filename, mimetype
     """
-    if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
-        raise NotFoundError(f'Invalid transcript format `{output_format}`')
-    transcripts = transcripts_info['transcripts']
-    if language not in transcripts:
-        raise NotFoundError("Video {} does not have a transcript file defined for the '{}' language in its OLX.".format(
-            video_block.scope_ids.usage_id,
-            language,
-        ))
-    filename = transcripts[language]
-    if not filename.endswith('.srt'):
-        # We want to standardize on .srt
-        raise NotFoundError("Video XBlocks in Blockstore only support .srt transcript files.")
-    # Try to load the transcript file out of Blockstore
-    # In lieu of an XBlock API for this (like block.runtime.resources_fs), we use the blockstore API directly.
-    bundle_uuid = video_block.scope_ids.def_id.bundle_uuid
-    path = video_block.scope_ids.def_id.olx_path.rpartition('/')[0] + '/static/' + filename
-    bundle_version = video_block.scope_ids.def_id.bundle_version  # Either bundle_version or draft_name will be set.
-    draft_name = video_block.scope_ids.def_id.draft_name
-    try:
-        content_binary = blockstore_cache.get_bundle_file_data_with_cache(bundle_uuid, path, bundle_version, draft_name)
-    except blockstore_api.BundleFileNotFound:
-        raise NotFoundError("Transcript file '{}' missing for video XBlock {}".format(  # lint-amnesty, pylint: disable=raise-missing-from
-            path,
-            video_block.scope_ids.usage_id,
-        ))
-    # Now convert the transcript data to the requested format:
-    filename_no_extension = os.path.splitext(filename)[0]
-    output_filename = f'{filename_no_extension}.{output_format}'
-    output_transcript = Transcript.convert(
-        content_binary.decode('utf-8'),
-        input_format=Transcript.SRT,
-        output_format=output_format,
-    )
-    if not output_transcript.strip():
-        raise NotFoundError('No transcript content')
-    return output_transcript, output_filename, Transcript.mime_types[output_format]
+    # TODO: Update to use Learning Core data models once static assets support
+    # has been added.
+    raise NotImplementedError("Transcripts not supported.")
 
 
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
@@ -1089,7 +1078,7 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     Get video transcript from edx-val or content store.
 
     Arguments:
-        video (Video Descriptor): Video Descriptor
+        video (Video block): Video block
         lang (unicode): transcript language
         output_format (unicode): transcript output format
         youtube_id (unicode): youtube video id
@@ -1101,11 +1090,9 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     if not lang:
         lang = video.get_default_transcript_language(transcripts_info)
 
-    if isinstance(video.scope_ids.def_id, BundleDefinitionLocator):
-        # This block is in Blockstore.
-        # For Blockstore, VAL is considered deprecated and we can load the transcript file
-        # directly using the Blockstore API:
-        return get_transcript_from_blockstore(video, lang, output_format, transcripts_info)
+    if isinstance(video.scope_ids.usage_id, UsageKeyV2):
+        # This block is in Learning Core.
+        return get_transcript_from_learning_core(video, lang, output_format, transcripts_info)
 
     try:
         edx_video_id = clean_video_id(video.edx_video_id)

@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 import ddt
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 from opaque_keys.edx.locations import CourseLocator
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
@@ -42,6 +42,10 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 TOTAL_COURSES_COUNT = 10
 USER_COURSES_COUNT = 1
+FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
+FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = True
+FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
+FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = False
 
 
 @ddt.ddt
@@ -56,12 +60,12 @@ class TestCourseListing(ModuleStoreTestCase):
         super().setUp()
         # create and log in a staff user.
         # create and log in a non-staff user
-        self.user = UserFactory()
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.factory = RequestFactory()
         self.request = self.factory.get('/course')
         self.request.user = self.user
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     def _create_course_with_access_groups(self, course_location, user=None):
         """
@@ -182,12 +186,18 @@ class TestCourseListing(ModuleStoreTestCase):
 
         self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
 
-        # Verify fetched accessible courses list is a list of CourseSummery instances
-        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list_by_staff))
+        with override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API):
+            # Verify fetched accessible courses list is a list of CourseOverview instances when home page course v2
+            # api is enabled.
+            self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list_by_staff))
 
-        # Now count the db queries for staff
-        with check_mongo_calls(2):
-            list(_accessible_courses_summary_iter(self.request))
+        with override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API):
+            # Verify fetched accessible courses list is a list of CourseSummery instances
+            self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list_by_staff))
+
+            # Now count the db queries for staff
+            with check_mongo_calls(2):
+                list(_accessible_courses_summary_iter(self.request))
 
     def test_get_course_list_with_invalid_course_location(self):
         """
@@ -202,13 +212,21 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list = list(courses_iter)
         self.assertEqual(len(courses_list), 1)
 
-        courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
-        courses_summary_list = list(courses_summary_iter)
+        with override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API):
+            # Verify fetched accessible courses list is a list of CourseOverview instances when home page course v2
+            # api is enabled.
+            courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
+            courses_summary_list = list(courses_summary_iter)
+            self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_summary_list))
+            self.assertEqual(len(courses_summary_list), 1)
 
-        # Verify fetched accessible courses list is a list of CourseSummery instances and only one course
-        # is returned
-        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_summary_list))
-        self.assertEqual(len(courses_summary_list), 1)
+        with override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API):
+            # Verify fetched accessible courses list is a list of CourseSummery instances and only one course
+            # is returned
+            courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
+            courses_summary_list = list(courses_summary_iter)
+            self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_summary_list))
+            self.assertEqual(len(courses_summary_list), 1)
 
         # get courses by reversing group name formats
         courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)

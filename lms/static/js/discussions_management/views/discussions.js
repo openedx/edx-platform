@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'underscore', 'backbone', 'gettext',
         'js/discussions_management/views/divided_discussions_inline',
         'js/discussions_management/views/divided_discussions_course_wide',
@@ -45,8 +46,8 @@
                 this.updateTopicVisibility(this.getSelectedScheme(), this.getTopicNav());
                 this.renderTopics();
 
-                if (this.isSchemeAvailable(COHORT) ||
-                        (!this.isSchemeAvailable(COHORT) && this.getSelectedScheme() === COHORT)) {
+                if (this.isSchemeAvailable(COHORT)
+                        || (!this.isSchemeAvailable(COHORT) && this.getSelectedScheme() === COHORT)) {
                     this.showCohortSchemeControl(true);
                 }
                 return this;

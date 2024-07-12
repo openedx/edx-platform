@@ -3,19 +3,23 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 class CircleChartLegend extends React.Component {
+    // eslint-disable-next-line no-useless-constructor
     constructor(props) {
         super(props);
     }
-  
+
     getList() {
         const {data} = this.props;
 
-        return data.map(({ value, label, sliceIndex }, index) => {
+        return data.map(({value, label, sliceIndex}, index) => {
             const swatchClass = `swatch-${sliceIndex}`;
             return (
+                // eslint-disable-next-line react/no-array-index-key
                 <li className="legend-item" key={index}>
-                    <div className={classNames('color-swatch', swatchClass)}
-                        aria-hidden="true"></div>
+                    <div
+                        className={classNames('color-swatch', swatchClass)}
+                        aria-hidden="true"
+                    />
                     <span className="label">{label}</span>
                     <span className="percentage">{this.getPercentage(value)}</span>
                 </li>
@@ -46,9 +50,9 @@ class CircleChartLegend extends React.Component {
     }
 }
 
-
 CircleChartLegend.propTypes = {
+    // eslint-disable-next-line react/forbid-prop-types
     data: PropTypes.array.isRequired
-}
+};
 
 export default CircleChartLegend;

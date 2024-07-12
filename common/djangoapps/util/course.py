@@ -40,7 +40,7 @@ def get_encoded_course_sharing_utm_params():
 def get_link_for_about_page(course):
     """
     Arguments:
-        course: This can be either a course overview object or a course descriptor.
+        course: This can be either a course overview object or a course block.
 
     Returns the course sharing url, this can be one of course's social sharing url, marketing url, or
     lms course about url.
@@ -65,7 +65,7 @@ def get_link_for_about_page(course):
 def has_certificates_enabled(course):
     """
     Arguments:
-        course: This can be either a course overview object or a course descriptor.
+        course: This can be either a course overview object or a course block.
     Returns a boolean if the course has enabled certificates
     """
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):

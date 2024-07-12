@@ -155,6 +155,15 @@
         }
       }
 
+      // CASE: is hidden from TOC
+      &.is-hidden-from-toc{
+        @extend %bar-module-black;
+
+        &.is-scheduled .wrapper-release .copy {
+          text-decoration: line-through;
+        }
+      }
+
       // CASE: content is gated
       &.is-gated {
         @extend %bar-module-black;
@@ -237,6 +246,98 @@
           &.is-disabled {
             pointer-events: none;
             color: $gray-l1;
+          }
+        }
+
+        .action-copy {
+          width: 100%;
+          border-color: #0075b4;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          line-height: 24px;
+          border-radius: 4px;
+
+          &:hover {
+            @extend %btn-primary-blue;
+          }
+        }
+      }
+    }
+
+    .unit-tags {
+      .wrapper-tags {
+        margin-bottom: $baseline;
+        padding: ($baseline*0.75);
+        background-color: $white;
+
+        .wrapper-tag-header {
+          display: flex;
+          justify-content: space-between;
+          border: 1px dotted transparent;
+
+          .tag-title {
+            font-weight: bold;
+          }
+
+          .count-badge {
+            background-color: $gray-l5;
+            border-radius: 50%;
+            display: inline-block;
+            padding: 0px 8px;
+          }
+        }
+
+        .wrapper-tag-header:focus-visible {
+          border-color: $gray;
+        }
+
+        .action-primary {
+          @extend %btn-primary-inverse;
+
+          width: 100%;
+          margin: 16px 2px 8px 2px;
+        }
+
+        .wrapper-tag-content {
+          background-color: $white;
+
+          .content-taxonomies {
+            display: flex;
+            flex-direction: column;
+            padding-top: 10px;
+
+            .tagging-label {
+              display: flex;
+              padding: 4px 0px;
+
+              .tagging-label-value {
+                display: inline-block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+
+              .tagging-label-count {
+                display: inline-block;
+                margin: 0 0.5em;
+              }
+            }
+
+            .tagging-label-link {
+              border: 1px dotted transparent;
+            }
+
+            .tagging-label-link:hover {
+              color: $blue;
+            }
+
+            .tagging-label-link:focus-visible {
+              border-color: $gray;
+            }
+
+            .icon {
+              margin-left: 5px;
+            }
           }
         }
       }

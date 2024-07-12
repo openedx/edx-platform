@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     describe('Video HTML5Video', function() {
         var STATUS = window.STATUS;
@@ -94,7 +95,6 @@
                         expect(state.videoPlayer.player.video.play).toHaveBeenCalled();
                     });
 
-
                     it('player state was changed', function(done) {
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
@@ -153,8 +153,8 @@
 
                 describe('[loadedmetadata]', function() {
                     it(
-                        'player state was changed, start/end was defined, ' +
-                        'onReady called', function(done) {
+                        'player state was changed, start/end was defined, '
+                        + 'onReady called', function(done) {
                             jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
@@ -214,6 +214,7 @@
                     });
 
                     it('set new incorrect values', function() {
+                        // eslint-disable-next-line no-shadow
                         var seek = state.videoPlayer.player.video.currentTime;
                         state.videoPlayer.player.seekTo(-50);
                         expect(state.videoPlayer.player.getCurrentTime()).toBe(seek);
@@ -265,6 +266,7 @@
                 });
 
                 it('getVolume', function() {
+                    // eslint-disable-next-line no-multi-assign
                     volume = state.videoPlayer.player.video.volume = 0.5;
                     expect(state.videoPlayer.player.getVolume()).toBe(volume);
                 });

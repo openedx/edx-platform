@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'underscore', 'underscore.string', './feedback'],
         function($, _, str, SystemFeedbackView) {
             var Notification = SystemFeedbackView.extend({
@@ -12,7 +13,7 @@
             // create Notification.Warning, Notification.Confirmation, etc
             var capitalCamel, intents, miniOptions;
             capitalCamel = _.compose(str.capitalize, str.camelize);
-            intents = ['warning', 'error', 'confirmation', 'announcement', 'step-required', 'help', 'mini'];
+            intents = ['warning', 'error', 'confirmation', 'announcement', 'step-required', 'help', 'mini', 'info'];
             _.each(intents, function(intent) {
                 var subclass;
                 subclass = Notification.extend({

@@ -11,7 +11,6 @@ from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
 from openedx.core.djangolib.markup import HTML, Text
-import six
 from six.moves.urllib.parse import quote
 %>
 
@@ -55,7 +54,7 @@ from six.moves.urllib.parse import quote
       <article class="content-primary" role="main">
 
         % for config in all_group_configurations:
-          <div class="wrapper-groups content-groups ${config['scheme']}">
+          <div class="wrapper-groups content-groups ${config['scheme']} ${config['id']}">
             <h3 class="title">${config['name']}</h3>
               <div class="ui-loading">
                   <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
@@ -115,7 +114,7 @@ from six.moves.urllib.parse import quote
       <div class="bit">
       % if context_course:
         <%
-          url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='')
+          url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='')
           details_url = utils.reverse_course_url('settings_handler', context_course.id)
           grading_url = utils.reverse_course_url('grading_handler', context_course.id)
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)

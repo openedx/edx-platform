@@ -91,6 +91,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     entrance_exam_data = serializers.DictField()
     id = serializers.CharField()  # pylint: disable=invalid-name
     license = serializers.CharField()
+    language = serializers.CharField(allow_null=True)
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     offer = serializers.DictField()
@@ -114,6 +115,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     linkedin_add_to_profile_url = serializers.URLField()
     is_integrity_signature_enabled = serializers.BooleanField()
     user_needs_integrity_signature = serializers.BooleanField()
+    learning_assistant_enabled = serializers.BooleanField()
 
     def __init__(self, *args, **kwargs):
         """

@@ -4,6 +4,7 @@ define([
 ],
 function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupListView) {
     'use strict';
+
     var GroupConfigurationsPage = BasePage.extend({
         initialize: function(options) {
             var currentScheme,
@@ -24,6 +25,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
                 currentScheme = this.allGroupConfigurations[i].get('scheme');
                 this.allGroupViewList.push(
                     new PartitionGroupListView({
+                        id: this.allGroupConfigurations[i].get('id'),
                         collection: this.allGroupConfigurations[i].get('groups'),
                         restrictEditing: this.allGroupConfigurations[i].get('read_only'),
                         scheme: currentScheme
@@ -42,7 +44,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
 
             // Render the remaining Configuration groups
             for (i = 0; i < this.allGroupViewList.length; i++) {
-                currentClass = '.wrapper-groups.content-groups.' + this.allGroupViewList[i].scheme;
+                currentClass = `.wrapper-groups.content-groups.${this.allGroupViewList[i].scheme}.${this.allGroupViewList[i].id}`;
                 this.$(currentClass).append(this.allGroupViewList[i].render().el);
             }
 
@@ -73,8 +75,8 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
         },
 
         onBeforeUnload: function() {
-            var dirty = this.areAnyConfigurationsDirty() ||
-                (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
+            var dirty = this.areAnyConfigurationsDirty()
+                || (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
                     return configuration.isDirty();
                 }));
 

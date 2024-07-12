@@ -323,7 +323,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
 
     Arguments:
         request: HTTP request object
-        course: Course descriptor
+        course: Course block
         page: requested or default page number
         page_size: requested or default page size
         text: text to search. If None then return all results for the current logged in user.

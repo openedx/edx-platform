@@ -11,7 +11,6 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
-from lms.djangoapps.badges.utils import badges_enabled
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -105,8 +104,6 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'country_options': list(countries),
             'find_courses_url': marketing_link('COURSES'),
             'language_options': settings.ALL_LANGUAGES,
-            'badges_logo': staticfiles_storage.url('certificates/images/backpack-logo.png'),
-            'badges_icon': staticfiles_storage.url('certificates/images/ico-mozillaopenbadges.png'),
             'backpack_ui_img': staticfiles_storage.url('certificates/images/backpack-ui.png'),
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             'social_platforms': settings.SOCIAL_PLATFORMS,
@@ -127,8 +124,5 @@ def learner_profile_context(request, profile_username, user_is_staff):
             own_profile=own_profile,
         )
         context['achievements_fragment'] = achievements_fragment
-
-    if badges_enabled():
-        context['data']['badges_api_url'] = reverse("badges_api:user_assertions", kwargs={'username': profile_username})
 
     return context

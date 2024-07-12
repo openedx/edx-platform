@@ -9,7 +9,6 @@ import unittest
 from uuid import uuid4
 from unittest import mock
 
-import pytest
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from path import Path as path
@@ -19,7 +18,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
-from xmodule.modulestore.xml_importer import StaticContentImporter, _update_and_import_block, _update_block_location
+from xmodule.modulestore.xml_importer import StaticContentImporter, _update_block_location
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
@@ -123,121 +122,6 @@ class StubXBlock(XModuleMixin, InheritanceMixin):
         scope=Scope.settings,
         default="default value"
     )
-
-
-class RemapNamespaceTest(ModuleStoreNoSettings):
-    """
-    Test that remapping the namespace from import to the actual course location.
-    """
-
-    def setUp(self):
-        """
-        Create a stub XBlock backed by in-memory storage.
-        """
-        self.runtime = mock.MagicMock(Runtime)
-        self.field_data = KvsFieldData(kvs=DictKeyValueStore())
-        self.scope_ids = ScopeIds('Bob', 'stubxblock', '123', 'import')
-        self.xblock = StubXBlock(self.runtime, self.field_data, self.scope_ids)
-        super().setUp()
-
-    def test_remap_namespace_native_xblock(self):
-
-        # Set the XBlock's location
-        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
-
-        # Explicitly set the content and settings fields
-        self.xblock.test_content_field = "Explicitly set"
-        self.xblock.test_settings_field = "Explicitly set"
-        self.xblock.save()
-
-        # Move to different runtime w/ different course id
-        target_location_namespace = CourseKey.from_string("org/course/run")
-        new_version = _update_and_import_block(
-            self.xblock,
-            modulestore(),
-            999,
-            self.xblock.location.course_key,
-            target_location_namespace,
-            do_import_static=False
-        )
-
-        # Check the XBlock's location
-        assert new_version.location.course_key == target_location_namespace
-
-        # Check the values of the fields.
-        # The content and settings fields should be preserved
-        assert new_version.test_content_field == 'Explicitly set'
-        assert new_version.test_settings_field == 'Explicitly set'
-
-        # Expect that these fields are marked explicitly set
-        assert 'test_content_field' in new_version.get_explicitly_set_fields_by_scope(scope=Scope.content)
-        assert 'test_settings_field' in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-
-    def test_remap_namespace_native_xblock_default_values(self):
-
-        # Set the XBlock's location
-        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
-
-        # Do NOT set any values, so the fields should use the defaults
-        self.xblock.save()
-
-        # Remap the namespace
-        target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
-        new_version = _update_and_import_block(
-            self.xblock,
-            modulestore(),
-            999,
-            self.xblock.location.course_key,
-            target_location_namespace.course_key,
-            do_import_static=False
-        )
-
-        # Check the values of the fields.
-        # The content and settings fields should be the default values
-        assert new_version.test_content_field == 'default value'
-        assert new_version.test_settings_field == 'default value'
-
-        # The fields should NOT appear in the explicitly set fields
-        assert 'test_content_field' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.content)
-        assert 'test_settings_field' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-
-    def test_remap_namespace_native_xblock_inherited_values(self):
-
-        # Set the XBlock's location
-        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
-        self.xblock.save()
-
-        # Remap the namespace
-        target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
-        new_version = _update_and_import_block(
-            self.xblock,
-            modulestore(),
-            999,
-            self.xblock.location.course_key,
-            target_location_namespace.course_key,
-            do_import_static=False
-        )
-
-        # Inherited fields should NOT be explicitly set
-        assert 'start' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-        assert 'graded' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-
-    def test_xblock_invalid_field_value_type(self):
-        # Setting the wrong field-value in Xblock-field will raise TypeError.
-        # Example if xblock-field is of 'Dictionary' type by setting the 'List' value in that dict-type will raise
-        # TypeError.
-
-        # Set the XBlock's location
-        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
-        # Explicitly set the content field
-        self.xblock.test_content_field = ['Explicitly set']
-        self.xblock.save()
-
-        # clearing the dirty fields and removing value from cache will fetch the value from field-data.
-        self.xblock._dirty_fields = {}  # pylint: disable=protected-access
-        self.xblock.fields['test_content_field']._del_cached_value(self.xblock)  # lint-amnesty, pylint: disable=protected-access, unsubscriptable-object
-        with pytest.raises(TypeError):
-            self.xblock.get_explicitly_set_fields_by_scope(scope=Scope.content)
 
 
 class StubXBlockWithMutableFields(StubXBlock):

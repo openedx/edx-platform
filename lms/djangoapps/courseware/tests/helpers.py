@@ -4,6 +4,7 @@ Helpers for courseware tests.
 
 
 import ast
+import re
 import json
 from collections import OrderedDict
 from datetime import timedelta
@@ -31,9 +32,9 @@ from common.djangoapps.student.models import CourseEnrollment, Registration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.date_utils import strftime_localized_html
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests import get_test_descriptor_system, get_test_system  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests import get_test_descriptor_system, get_test_system, prepare_block_runtime  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class BaseTestXmodule(ModuleStoreTestCase):
@@ -47,15 +48,14 @@ class BaseTestXmodule(ModuleStoreTestCase):
         1. CATEGORY
         2. DATA or METADATA
         3. MODEL_DATA
-        4. COURSE_DATA and USER_COUNT if needed
+        4. USER_COUNT if needed
 
     This class should not contain any tests, because CATEGORY
     should be defined in child class.
     """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     USER_COUNT = 2
-    COURSE_DATA = {}
 
     # Data from YAML xmodule/templates/NAME/default.yaml
     CATEGORY = "vertical"
@@ -66,10 +66,12 @@ class BaseTestXmodule(ModuleStoreTestCase):
     METADATA = {}
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def new_module_runtime(self, **kwargs):
+    def new_module_runtime(self, runtime=None, **kwargs):
         """
-        Generate a new ModuleSystem that is minimally set up for testing
+        Generate a new DescriptorSystem that is minimally set up for testing
         """
+        if runtime:
+            return prepare_block_runtime(runtime, course_id=self.course.id, **kwargs)
         return get_test_system(course_id=self.course.id, **kwargs)
 
     def new_descriptor_runtime(self, **kwargs):
@@ -83,23 +85,23 @@ class BaseTestXmodule(ModuleStoreTestCase):
             'category': self.CATEGORY
         })
 
-        self.item_descriptor = BlockFactory.create(**kwargs)
+        self.block = BlockFactory.create(**kwargs)
 
         self.runtime = self.new_descriptor_runtime()
 
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
-        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
+        self.block._field_data = LmsFieldData(self.block._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
 
         if runtime_kwargs is None:
             runtime_kwargs = {}
-        self.item_descriptor.xmodule_runtime = self.new_module_runtime(**runtime_kwargs)
+        self.new_module_runtime(runtime=self.block.runtime, **runtime_kwargs)
 
-        self.item_url = str(self.item_descriptor.location)
+        self.item_url = str(self.block.location)
 
     def setup_course(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        self.course = CourseFactory.create(data=self.COURSE_DATA)
+        self.course = CourseFactory.create()
 
         # Turn off cache.
         modulestore().request_cache = None
@@ -127,7 +129,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.clients = {user.username: Client() for user in self.users}
         self.login_statuses = [
             self.clients[user.username].login(
-                username=user.username, password='test')
+                username=user.username, password=self.TEST_PASSWORD)
             for user in self.users
         ]
 
@@ -148,6 +150,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
 class XModuleRenderingTestBase(BaseTestXmodule):  # lint-amnesty, pylint: disable=missing-class-docstring
 
+    # lint-amnesty, pylint: disable=arguments-differ
     def new_module_runtime(self, **kwargs):
         """
         Create a runtime that actually does html rendering
@@ -171,7 +174,7 @@ class LoginEnrollmentTestCase(TestCase):
         Create a user account, activate, and log in.
         """
         self.email = 'foo@test.com'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.password = 'bar'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.password = 'Password1234'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.username = 'test'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.user = self.create_account(
             self.username,
@@ -448,11 +451,15 @@ def get_context_dict_from_string(data):
     Retrieve dictionary from string.
     """
     # Replace tuple and un-necessary info from inside string and get the dictionary.
-    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())
-    cleaned_data['metadata'] = OrderedDict(
-        sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
+    cleaned_data = data.split('((\'video.html\',')[1].replace("),\n {})", '').strip()
+    # Omit user_id validation
+    cleaned_data_without_user = re.sub(".*user_id.*\n?", '', cleaned_data)
+
+    validated_data = ast.literal_eval(cleaned_data_without_user)
+    validated_data['metadata'] = OrderedDict(
+        sorted(json.loads(validated_data['metadata']).items(), key=lambda t: t[0])
     )
-    return cleaned_data
+    return validated_data
 
 
 def set_preview_mode(preview_mode: bool):

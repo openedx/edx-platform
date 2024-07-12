@@ -256,6 +256,7 @@ class TestUploadTranscripts(BaseTranscripts):
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
+        self.assertDictEqual(video.transcripts, {'en': f'{expected_edx_video_id}-en.srt'})
 
         # Verify transcript content
         actual_transcript = get_video_transcript_content(video.edx_video_id, language_code='en')
@@ -319,6 +320,8 @@ class TestUploadTranscripts(BaseTranscripts):
             expected_status_code=400,
             expected_message='There is a problem with this transcript file. Try to upload a different file.'
         )
+        video = modulestore().get_item(self.video_usage_key)
+        self.assertDictEqual(video.transcripts, {})
 
     def test_transcript_upload_unknown_category(self):
         """
@@ -364,7 +367,7 @@ class TestUploadTranscripts(BaseTranscripts):
     def test_transcript_upload_with_non_existant_edx_video_id(self):
         """
         Test that transcript upload works as expected if `edx_video_id` set on
-        video descriptor is different from `edx_video_id` received in POST request.
+        video block is different from `edx_video_id` received in POST request.
         """
         non_existant_edx_video_id = '1111-2222-3333-4444'
 
@@ -625,7 +628,7 @@ class TestRenameTranscripts(BaseTranscripts):
 @ddt.ddt
 @patch(
     'cms.djangoapps.contentstore.views.transcripts_ajax.download_youtube_subs',
-    Mock(return_value=SJSON_TRANSCRIPT_CONTENT)
+    Mock(return_value=[['en', SJSON_TRANSCRIPT_CONTENT]])
 )
 class TestReplaceTranscripts(BaseTranscripts):
     """

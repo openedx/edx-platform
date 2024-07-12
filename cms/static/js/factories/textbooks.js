@@ -4,6 +4,7 @@ import * as TextbookCollection from 'js/collections/textbook';
 import * as ListTextbooksView from 'js/views/list_textbooks';
 import './base';
 
+// eslint-disable-next-line no-unused-expressions
 'use strict';
 export default function TextbooksFactory(textbooksJson) {
     var textbooks = new TextbookCollection(textbooksJson, {parse: true}),
@@ -19,6 +20,6 @@ export default function TextbooksFactory(textbooksJson) {
             return gettext('You have unsaved changes. Do you really want to leave this page?');
         }
     });
-};
+}
 
-export {TextbooksFactory}
+export {TextbooksFactory};

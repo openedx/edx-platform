@@ -4,6 +4,8 @@ Course API Views
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -89,6 +91,7 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
+        self.overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
 
@@ -130,6 +133,10 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
+
+    @property
+    def language(self):
+        return self.course.language
 
     @property
     def notes(self):
@@ -359,7 +366,15 @@ class CoursewareMeta:
             enrollment_active = self.enrollment['is_active']
             return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
+    @property
+    def learning_assistant_enabled(self):
+        """
+        Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
+        """
+        return getattr(settings, 'LEARNING_ASSISTANT_AVAILABLE', False)
 
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareInformation(RetrieveAPIView):
     """
     **Use Cases**
@@ -407,6 +422,7 @@ class CoursewareInformation(RetrieveAPIView):
             * entrance_exam_passed: (bool) Indicates if the entrance exam has been passed
         * id: A unique identifier of the course; a serialized representation
             of the opaque key identifying the course.
+        * language: The language code for the course
         * media: An object that contains named media items.  Included here:
             * course_image: An image to show for the course.  Represented
               as an object with the following fields:
@@ -448,6 +464,7 @@ class CoursewareInformation(RetrieveAPIView):
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
+        * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
 
     **Parameters:**
 

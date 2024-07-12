@@ -15,6 +15,7 @@ define([
 function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils, smoothScroll,
     certificateDetailsTemplate) {
     'use strict';
+
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
         events: {

@@ -1,6 +1,7 @@
 /* globals DiscussionSpecHelper, DiscussionUtil, ResponseCommentView, ResponseCommentShowView, user */
 (function() {
     'use strict';
+
     var $$course_id = '$$course_id';
 
     describe('ResponseCommentView', function() {

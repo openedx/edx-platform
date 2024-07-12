@@ -4,7 +4,6 @@ define([
 ], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';
 
-
     var MEANINGS = {
         org: {
             name: 'Organization',
@@ -27,7 +26,6 @@ define([
         }
     };
 
-
     var JSON_RESPONSE = {
         total: 365,
         results: [
@@ -47,7 +45,8 @@ define([
                     start: '1970-01-01T05:00:00+00:00',
                     image_url: '/c4x/edX/DemoX/asset/images_course_image.jpg',
                     org: 'edX',
-                    id: 'edX/DemoX/Demo_Course'
+                    id: 'edX/DemoX/Demo_Course',
+                    language: 'en'
                 }
             }
         ],
@@ -93,7 +92,6 @@ define([
             }
         }
     };
-
 
     describe('discovery.DiscoveryFactory', function() {
         beforeEach(function() {
@@ -196,6 +194,35 @@ define([
             expect($('.active-filter [data-value="edX1"]').length).toBe(1);
             $('.search-facets li [data-value="edX1"]').trigger('click');
             expect($('.active-filter [data-value="edX1"]').length).toBe(0);
+        });
+    });
+
+    describe('discovery.DiscoveryFactory default filters', function() {
+        beforeEach(function() {
+            loadFixtures('js/fixtures/discovery.html');
+            TemplateHelpers.installTemplates([
+                'templates/discovery/course_card',
+                'templates/discovery/facet',
+                'templates/discovery/facet_option',
+                'templates/discovery/filter',
+                'templates/discovery/filter_bar'
+            ]);
+            // setDefaultFilter to true
+            DiscoveryFactory(MEANINGS, '', 'en', 'Asia/Kolkata', true);
+
+            jasmine.clock().install();
+        });
+
+        afterEach(function() {
+            jasmine.clock().uninstall();
+        });
+
+        it('filters by default language', function() {
+            var requests = AjaxHelpers.requests(this);
+            $('.discovery-submit').trigger('click');
+            var request = AjaxHelpers.currentRequest(requests);
+            // make sure language filter is set
+            expect(request.requestBody).toMatch(/language=en/);
         });
     });
 });

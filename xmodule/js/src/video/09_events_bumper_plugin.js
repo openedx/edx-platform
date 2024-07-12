@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_events_bumper_plugin.js', [], function() {
     /**
      * Events module.

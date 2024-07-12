@@ -20,9 +20,9 @@ import re
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
+from typing import Optional
 from xml.sax.saxutils import unescape
 
-import six
 from django.conf import settings
 
 from lxml import etree
@@ -36,7 +36,7 @@ from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.safe_exec import safe_exec
 from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_block
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.edx_six import get_gettext
+from openedx.core.lib.safe_lxml.xmlparser import XML
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -93,7 +93,7 @@ class LoncapaSystem(object):
         i18n: an object implementing the `gettext.Translations` interface so
             that we can use `.ugettext` to localize strings.
 
-    See :class:`ModuleSystem` for documentation of other attributes.
+    See :class:`DescriptorSystem` for documentation of other attributes.
 
     """
     def __init__(
@@ -173,6 +173,12 @@ class LoncapaProblem(object):
         self.has_saved_answers = state.get('has_saved_answers', False)
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
+            self.correct_map_history = []
+            for cmap in state.get('correct_map_history', []):
+                correct_map = CorrectMap()
+                correct_map.set_dict(cmap)
+                self.correct_map_history.append(correct_map)
+
         self.done = state.get('done', False)
         self.input_state = state.get('input_state', {})
 
@@ -182,10 +188,10 @@ class LoncapaProblem(object):
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
-        if isinstance(problem_text, six.text_type):
+        if isinstance(problem_text, str):
             # etree chokes on Unicode XML with an encoding declaration
             problem_text = problem_text.encode('utf-8')
-        self.tree = etree.XML(problem_text)
+        self.tree = XML(problem_text)
 
         try:
             self.make_xml_compatible(self.tree)
@@ -232,6 +238,15 @@ class LoncapaProblem(object):
 
             if extract_tree:
                 self.extracted_tree = self._extract_html(self.tree)
+
+    @property
+    def is_grading_method_enabled(self) -> bool:
+        """
+        Returns whether the grading method feature is enabled. If the
+        feature is not enabled, the grading method field will not be shown in
+        Studio settings and the default grading method will be used.
+        """
+        return settings.FEATURES.get('ENABLE_GRADING_METHOD_IN_PROBLEMS', False)
 
     def make_xml_compatible(self, tree):
         """
@@ -300,8 +315,10 @@ class LoncapaProblem(object):
         Reset internal state to unfinished, with no answers
         """
         self.student_answers = {}
+        self.student_answers_history = []
         self.has_saved_answers = False
         self.correct_map = CorrectMap()
+        self.correct_map_history = []
         self.done = False
 
     def set_initial_display(self):
@@ -329,6 +346,7 @@ class LoncapaProblem(object):
                 'student_answers': self.student_answers,
                 'has_saved_answers': self.has_saved_answers,
                 'correct_map': self.correct_map.get_dict(),
+                'correct_map_history': [cmap.get_dict() for cmap in self.correct_map_history],
                 'input_state': self.input_state,
                 'done': self.done}
 
@@ -435,6 +453,7 @@ class LoncapaProblem(object):
         self.student_answers = convert_files_to_filenames(answers)
         new_cmap = self.get_grade_from_current_answers(answers)
         self.correct_map = new_cmap  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.correct_map_history.append(deepcopy(new_cmap))
         return self.correct_map
 
     def supports_rescoring(self):
@@ -456,7 +475,7 @@ class LoncapaProblem(object):
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
 
-    def get_grade_from_current_answers(self, student_answers):
+    def get_grade_from_current_answers(self, student_answers, correct_map: Optional[CorrectMap] = None):
         """
         Gets the grade for the currently-saved problem state, but does not save it
         to the block.
@@ -469,9 +488,14 @@ class LoncapaProblem(object):
         For rescoring, `student_answers` is None.
 
         Calls the Response for each question in this problem, to do the actual grading.
+
+        When the grading method is enabled, this method is used for rescore. In this case,
+        the `correct_map` and the `student_answers` passed as arguments will be used,
+        corresponding to each pair in the fields that store the history (correct_map_history
+        and student_answers_history). The correct map will always be updated, depending on
+        the student answers. The student answers will always remain the same over time.
         """
-        # old CorrectMap
-        oldcmap = self.correct_map
+        oldcmap = correct_map if self.is_grading_method_enabled else self.correct_map
 
         # start new with empty CorrectMap
         newcmap = CorrectMap()
@@ -483,12 +507,17 @@ class LoncapaProblem(object):
             # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
-                _ = get_gettext(self.capa_system.i18n)
+                _ = self.capa_system.i18n.gettext
                 raise Exception(_("Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
             # submission that would not exist in the persisted "student_answers".
-            if 'filesubmission' in responder.allowed_inputfields and student_answers is not None:
+            # If grading method is enabled, we need to pass each student answers and the
+            # correct map in the history fields.
+            if (
+                "filesubmission" in responder.allowed_inputfields
+                and student_answers is not None
+            ) or self.is_grading_method_enabled:
                 results = responder.evaluate_answers(student_answers, oldcmap)
             else:
                 results = responder.evaluate_answers(self.student_answers, oldcmap)
@@ -580,7 +609,7 @@ class LoncapaProblem(object):
             question_nr = int(answer_id.split('_')[-2]) - 1
             return _("Question {}").format(question_nr)
 
-        _ = get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         # Some questions define a prompt with this format:   >>This is a prompt<<
         try:
             prompt = self.problem_data[answer_id].get('label')
@@ -659,7 +688,7 @@ class LoncapaProblem(object):
                 self.find_answer_text(answer_id, answer) for answer in current_answer
             )
 
-        elif isinstance(current_answer, six.string_types) and current_answer.startswith('choice_'):
+        elif isinstance(current_answer, str) and current_answer.startswith('choice_'):
             # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
             # Here we transform it
             elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
@@ -678,7 +707,7 @@ class LoncapaProblem(object):
                 log.warning("Multiple answers found for answer id: %s and choice number: %s", answer_id, current_answer)
                 answer_text = "Multiple answers found"
 
-        elif isinstance(current_answer, six.string_types):
+        elif isinstance(current_answer, str):
             # Already a string with the answer
             answer_text = current_answer
 
@@ -693,7 +722,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
-        _ = get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
@@ -809,7 +838,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file') if six.PY3 else inc.get('file').decode('utf-8')
+            filename = inc.get('file')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filesystem
@@ -962,7 +991,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         """
-        if not isinstance(problemtree.tag, six.string_types):
+        if not isinstance(problemtree.tag, str):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things

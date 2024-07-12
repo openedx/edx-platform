@@ -28,7 +28,7 @@ class SurveyModelsTests(ModuleStoreTestCase):
         self.client = Client()
 
         # Create two accounts
-        self.password = 'abc'
+        self.password = self.TEST_PASSWORD
         self.student = UserFactory.create(
             username='student', email='student@test.com', password=self.password,
         )
@@ -64,7 +64,7 @@ class SurveyModelsTests(ModuleStoreTestCase):
     def test_is_survey_required_for_course(self):
         """
         Assert the a requried course survey is when both the flags is set and a survey name
-        is set on the course descriptor
+        is set on the course block
         """
         assert is_survey_required_for_course(self.course)
 

@@ -1,9 +1,11 @@
 """
 Tests for the Course Home Course Metadata API in the Course Home API
 """
+import json
+from unittest.mock import patch
 
 import ddt
-import mock
+from django.db import transaction
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 
@@ -17,6 +19,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION
 )
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
     EnterpriseCustomerUserFactory
@@ -82,8 +85,11 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         assert self.client.get(self.url).data['username'] == self.user.username
 
     def test_get_unknown_course(self):
+        self.client.logout()
         url = reverse('course-home:course-metadata', args=['course-v1:unknown+course+2T2020'])
-        response = self.client.get(url)
+        # Django TestCase wraps every test in a transaction, so we must specifically wrap this when we expect an error
+        with transaction.atomic():
+            response = self.client.get(url)
         assert response.status_code == 404
 
     def _assert_course_access_response(self, response, expect_course_access, expected_error_code):
@@ -101,7 +107,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
             UPDATES_METHOD_NAME = 'common.djangoapps.student.models.user.UserCelebration.perform_streak_updates'
-            with mock.patch(UPDATES_METHOD_NAME, return_value=3):
+            with patch(UPDATES_METHOD_NAME, return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3
@@ -180,7 +186,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
             self.update_masquerade(role=masquerade_role)
 
         consent_url = 'dump/consent/url' if dsc_required else None
-        with mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
+        with patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
             response = self.client.get(self.url)
 
         self._assert_course_access_response(response, expect_course_access, error_code)
@@ -223,3 +229,21 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         assert not enterprise_customer_user_2.active
         response = self.client.get(self.url)
         self._assert_course_access_response(response, False, 'incorrect_active_enterprise')
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @ddt.data(True, False)
+    def test_discussion_tab_visible(self, visible):
+        """
+        Tests if discussion tab is visible based on Configuration
+        """
+        CourseInstructorRole(self.course.id).add_users(self.user)
+        configuration = DiscussionsConfiguration.get(context_key=self.course.id)
+        configuration.enabled = visible
+        configuration.save()
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode())
+        tab_ids = [tab['tab_id'] for tab in data['tabs']]
+        if visible:
+            assert 'discussion' in tab_ids
+        else:
+            assert 'discussion' not in tab_ids

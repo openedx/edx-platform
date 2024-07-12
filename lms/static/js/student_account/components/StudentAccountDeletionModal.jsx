@@ -1,8 +1,9 @@
 /* globals gettext */
-/* eslint-disable react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon/static';
+import {
+    Button, Modal, Icon, InputText, StatusAlert,
+} from '@edx/paragon/static';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import { deactivate } from '../AccountsClient';
@@ -34,6 +35,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
         window.location.href = this.props.mktgRootLink;
     }
 
+    // eslint-disable-next-line react/sort-comp
     deleteAccount() {
         return this.setState(
             { passwordSubmitted: true },
@@ -92,13 +94,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
             validationMessage,
         } = this.state;
         const { onClose } = this.props;
-        const loseAccessText = StringUtils.interpolate(
-            gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
-            {
-                htmlStart: '<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/OpenSFD_certificates.html#print-a-web-certificate" rel="noopener" target="_blank">',
-                htmlEnd: '</a>',
-            },
-        );
+        const loseAccessText = gettext('You may also lose access to verified certificates and other program credentials. You can make a copy of these for your records before proceeding with deletion.')
 
         const noteDeletion = StringUtils.interpolate(
             gettext('You have selected “Delete my account.” Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.'),
@@ -123,7 +119,6 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
             },
         );
 
-
         return (
             <div className="delete-confirmation-wrapper">
                 <Modal
@@ -134,24 +129,25 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                     open
                     body={(
                         <div>
-                            {responseError &&
-                <StatusAlert
-                    dialog={(
-                        <div className="modal-alert">
-                            <div className="icon-wrapper">
-                                <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                            {responseError
+                && (
+                    <StatusAlert
+                        dialog={(
+                            <div className="modal-alert">
+                                <div className="icon-wrapper">
+                                    <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                                </div>
+                                <div className="alert-content">
+                                    <h3 className="alert-title">{ validationMessage }</h3>
+                                    <p>{ validationErrorDetails }</p>
+                                </div>
                             </div>
-                            <div className="alert-content">
-                                <h3 className="alert-title">{ validationMessage }</h3>
-                                <p>{ validationErrorDetails }</p>
-                            </div>
-                        </div>
-                    )}
-                    alertType="danger"
-                    dismissible={false}
-                    open
-                />
-                            }
+                        )}
+                        alertType="danger"
+                        dismissible={false}
+                        open
+                    />
+                )}
 
                             <StatusAlert
                                 dialog={(
@@ -165,7 +161,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                                                 <span>{bodyDeletion} </span>
                                                 <span>{bodyDeletion2}</span>
                                             </p>
-                                            <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
+                                            {/* eslint-disable-next-line react/no-danger */}
+                                            <p>{loseAccessText}</p>
                                         </div>
                                     </div>
                                 )}
@@ -232,10 +229,10 @@ StudentAccountDeletionConfirmationModal.propTypes = {
 
 StudentAccountDeletionConfirmationModal.defaultProps = {
     onClose: () => {},
-    additionalSiteSpecificDeletionText: "",
-    mktgRootLink: "",
-    platformName: "",
-    siteName: "",
+    additionalSiteSpecificDeletionText: '',
+    mktgRootLink: '',
+    platformName: '',
+    siteName: '',
 };
 
 export default StudentAccountDeletionConfirmationModal;

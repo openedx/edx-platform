@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_play_pause_control.js', [], function() {
     /**
      * Play/pause control module.

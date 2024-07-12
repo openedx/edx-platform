@@ -27,7 +27,7 @@ $(function() {
             /* see if it is a required field and - if so - make sure user presented all information */
             if (typeof $(this).attr('required') !== typeof undefined) {
                 val = $(this).val();
-                if (typeof(val) === 'string') {
+                if (typeof val === 'string') {
                     if (val.trim().length === 0) {
                         fieldLabel = $(this).parent().find('label');
                         $(this).parent().addClass('field-error');
@@ -35,7 +35,7 @@ $(function() {
                         $('.status.message.submission-error .message-copy').append(edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<li class='error-item'>"), fieldLabel.text(), edx.HtmlUtils.HTML('</li>')).toString());
                         cancel_submit = true;
                     }
-                } else if (typeof(val) === 'object') {
+                } else if (typeof val === 'object') {
                     /* for SELECT statements */
                     if (val === null || val.length === 0 || val[0] === '') {
                         fieldLabel = $(this).parent().find('label');
@@ -49,9 +49,9 @@ $(function() {
         });
 
         if (cancel_submit) {
-            $('.status.message.submission-error').
-                removeClass('is-hidden').
-                focus();
+            $('.status.message.submission-error')
+                .removeClass('is-hidden')
+                .focus();
             $('html, body').animate({scrollTop: 0}, 'fast');
             return false;
         }
@@ -72,10 +72,10 @@ $(function() {
         toggleSubmitButton(true);
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
-        $('.status.message.submission-error .message-copy').
-            text(gettext('There has been an error processing your survey.')).
-            stop().
-            css('display', 'block');
+        $('.status.message.submission-error .message-copy')
+            .text(gettext('There has been an error processing your survey.'))
+            .stop()
+            .css('display', 'block');
     });
 });
 
@@ -83,14 +83,14 @@ function toggleSubmitButton(enable) {
     var $submitButton = $('form .form-actions #submit');
 
     if (enable) {
-        $submitButton.
-            removeClass('is-disabled').
-            attr('aria-disabled', false).
-            removeProp('disabled');
+        $submitButton
+            .removeClass('is-disabled')
+            .attr('aria-disabled', false)
+            .removeProp('disabled');
     } else {
-        $submitButton.
-            addClass('is-disabled').
-            attr('aria-disabled', true).
-            prop('disabled', true);
+        $submitButton
+            .addClass('is-disabled')
+            .attr('aria-disabled', true)
+            .prop('disabled', true);
     }
 }

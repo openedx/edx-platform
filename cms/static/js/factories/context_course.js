@@ -1,3 +1,4 @@
 import * as ContextCourse from 'js/models/course';
 
-export {ContextCourse}
+// eslint-disable-next-line import/prefer-default-export
+export {ContextCourse};

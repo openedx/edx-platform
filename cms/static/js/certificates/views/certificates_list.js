@@ -7,6 +7,7 @@ define([
 ],
 function(gettext, ListView, CertificateItemView) {
     'use strict';
+
     var CertificatesListView = ListView.extend({
         tagName: 'div',
         className: 'certificates-list',

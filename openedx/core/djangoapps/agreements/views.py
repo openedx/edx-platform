@@ -3,11 +3,9 @@ Views served by the Agreements app
 """
 
 from django.conf import settings
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from opaque_keys.edx.keys import CourseKey
 
@@ -15,9 +13,10 @@ from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.djangoapps.agreements.api import (
     create_integrity_signature,
+    create_lti_pii_signature,
     get_integrity_signature,
 )
-from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer
+from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer, LTIPIISignatureSerializer
 
 
 def is_user_course_or_global_staff(user, course_id):
@@ -33,7 +32,6 @@ class AuthenticatedAPIView(APIView):
     """
     Authenticated API View.
     """
-    authentication_classes = (SessionAuthentication, JwtAuthentication)
     permission_classes = (IsAuthenticated,)
 
 
@@ -119,3 +117,45 @@ class IntegritySignatureView(AuthenticatedAPIView):
         signature = create_integrity_signature(username, course_id)
         serializer = IntegritySignatureSerializer(signature)
         return Response(serializer.data)
+
+
+class LTIPIISignatureView(AuthenticatedAPIView):
+    """
+    Endpoint for a LTI PII Signature
+    /lti_pii_signature/{course_id}
+
+    HTTP POST
+        * If an LTI PII signature does not exist for the user + course, creates one and
+          returns it. If one does exist, returns the existing signature.
+    """
+
+    def post(self, request, course_id):
+        """
+        Create an LTI PII signature for the requesting user and course. If a signature
+        already exists, returns the existing signature instead of creating a new one.
+
+        /api/agreements/v1/lti_pii_signature/{course_id}
+
+        Example response:
+            {
+                username: "janedoe",
+                course_id: "org.2/course_2/Run_2",
+                created_at: "2021-04-23T18:25:43.511Z"
+            }
+        """
+        if not settings.FEATURES.get('ENABLE_LTI_PII_ACKNOWLEDGEMENT'):
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = LTIPIISignatureSerializer(data=request.data)
+        statusStr = ""
+        if serializer.is_valid():
+            username = request.user.username
+            lti_tools = request.data.get("lti_tools")
+            signature = create_lti_pii_signature(username, course_id, lti_tools)
+            serializer = LTIPIISignatureSerializer(signature)
+            statusStr = status.HTTP_200_OK
+        else:
+            statusStr = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return Response(data=serializer.data, status=statusStr)

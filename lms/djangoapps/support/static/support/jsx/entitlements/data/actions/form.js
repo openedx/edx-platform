@@ -5,7 +5,6 @@ const openReissueForm = entitlement => ({
     entitlement,
 });
 
-
 const openCreationForm = () => ({
     type: formActions.OPEN_CREATION_FORM,
 });

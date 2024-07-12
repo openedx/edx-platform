@@ -64,11 +64,11 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
 
     def test_visible_only_to_global_staff(self):
         # Instructors don't see the certificates section
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         self._assert_certificates_visible(False)
 
         # Global staff can see the certificates section
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         self._assert_certificates_visible(True)
 
     def test_visible_only_when_feature_flag_enabled(self):
@@ -77,17 +77,22 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         cache.clear()
 
         # Now even global staff can't see the certificates section
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         self._assert_certificates_visible(False)
 
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE': True})
+    def test_visible_for_instructors_when_feature_is_enabled(self):
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
+        self._assert_certificates_visible(True)
+
     @ddt.data("started", "error", "success")
-    def test_show_certificate_status(self, status):
-        self.client.login(username=self.global_staff.username, password="test")
-        with self._certificate_status("honor", status):
-            self._assert_certificate_status("honor", status)
+    def test_show_certificate_status(self, certificate_status):
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        with self._certificate_status("honor", certificate_status):
+            self._assert_certificate_status("honor", certificate_status)
 
     def test_show_enabled_button(self):
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
         # Initially, no example certs are generated, so
         # the enable button should be disabled
@@ -104,7 +109,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
             self._assert_enable_certs_button(False)
 
     def test_can_disable_even_after_failure(self):
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
         with self._certificate_status("honor", "error"):
             # When certs are disabled for a course, then don't allow them
@@ -127,7 +132,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.global_staff.id)
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         self.assertContains(response, 'Enable Student-Generated Certificates')
         self.assertContains(response, 'enable-certificates-submit')
@@ -143,7 +148,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.global_staff.id)
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         self.assertContains(response, 'Enable Student-Generated Certificates')
         self.assertContains(response, 'enable-certificates-submit')
@@ -159,18 +164,18 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
             self.assertNotContains(response, "Student-Generated Certificates")
 
     @contextlib.contextmanager
-    def _certificate_status(self, description, status):
+    def _certificate_status(self, description, certificate_status):
         """Configure the certificate status by mocking the certificates API. """
         patched = 'lms.djangoapps.instructor.views.instructor_dashboard.certs_api.example_certificates_status'
         with mock.patch(patched) as certs_api_status:
             cert_status = [{
                 'description': description,
-                'status': status
+                'status': certificate_status
             }]
 
-            if status == 'error':
+            if certificate_status == 'error':
                 cert_status[0]['error_reason'] = self.ERROR_REASON
-            if status == 'success':
+            if certificate_status == 'success':
                 cert_status[0]['download_url'] = self.DOWNLOAD_URL
 
             certs_api_status.return_value = cert_status
@@ -233,18 +238,18 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 
         # Instructors do not have access
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == 403
+        assert response.status_code == 302
 
         # Global staff have access
-        self.client.login(username=self.global_staff.username, password='test')
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
         assert response.status_code == 302
 
     @ddt.data(True, False)
     def test_enable_certificate_generation(self, is_enabled):
-        self.client.login(username=self.global_staff.username, password='test')
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         url = reverse(
             'enable_certificate_generation',
             kwargs={'course_id': str(self.course.id)}
@@ -274,7 +279,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         user who made the request is not member of global staff.
         """
         user = UserFactory.create()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         url = reverse(
             'start_certificate_generation',
             kwargs={'course_id': str(self.course.id)}
@@ -283,16 +288,16 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         response = self.client.post(url)
         assert response.status_code == 403
 
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == 403
+        assert response.status_code == 200
 
     def test_certificate_generation_api_with_global_staff(self):
         """
         Test certificates generation api endpoint returns success status when called with
         valid course key
         """
-        self.client.login(username=self.global_staff.username, password='test')
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         url = reverse(
             'start_certificate_generation',
             kwargs={'course_id': str(self.course.id)}
@@ -319,7 +324,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
         # Login the client and access the url with 'certificate_statuses'
-        self.client.login(username=self.global_staff.username, password='test')
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         url = reverse('start_certificate_regeneration', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, data={'certificate_statuses': [CertificateStatuses.downloadable]})
 
@@ -352,7 +357,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
         # Login the client and access the url without 'certificate_statuses'
-        self.client.login(username=self.global_staff.username, password='test')
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         url = reverse('start_certificate_regeneration', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url)
 
@@ -419,7 +424,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Enable certificate generation
         cache.clear()
         CertificateGenerationConfiguration.objects.create(enabled=True)
-        self.client.login(username=self.global_staff.username, password='test')
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
     def test_certificate_exception_added_successfully(self):
         """
@@ -712,7 +717,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Enable certificate generation
         cache.clear()
         CertificateGenerationConfiguration.objects.create(enabled=True)
-        self.client.login(username=self.global_staff.username, password='test')
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
     def test_generate_certificate_exceptions_all_students(self):
         """
@@ -830,7 +835,7 @@ class TestCertificatesInstructorApiBulkAllowlist(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.enrolled_user_2, self.course.id)
 
         # Global staff can see the certificates section
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
     def test_create_allowlist_exception_record(self):
         """
@@ -883,7 +888,7 @@ class TestCertificatesInstructorApiBulkAllowlist(SharedModuleStoreTestCase):
         """
         Try uploading CSV file with invalid binary data and verify that it is rejected
         """
-        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \xC3\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
@@ -1026,7 +1031,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         )
 
         # Global staff can see the certificates section
-        self.client.login(username=self.global_staff.username, password="test")
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
     def test_invalidate_certificate(self):
         """

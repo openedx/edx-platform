@@ -8,6 +8,7 @@ define([
     'js/edxnotes/views/tab_view'
 ], function($, Backbone, HtmlUtils, TemplateHelpers, TabsCollection, TabsListView, TabView) {
     'use strict';
+
     describe('EdxNotes TabView', function() {
         var TestSubView = Backbone.View.extend({
                 id: 'test-subview-panel',

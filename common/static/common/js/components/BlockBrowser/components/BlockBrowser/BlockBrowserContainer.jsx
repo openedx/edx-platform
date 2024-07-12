@@ -8,11 +8,9 @@ const mapStateToProps = state => ({
     selectedBlock: state.selectedBlock,
 });
 
-
 const mapDispatchToProps = dispatch => ({
     onChangeRoot: blockId => dispatch(changeRoot(blockId)),
 });
-
 
 const BlockBrowserContainer = connect(
     mapStateToProps,

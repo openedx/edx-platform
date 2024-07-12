@@ -56,11 +56,11 @@ def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, r
         if redirect_to in application.redirect_uris:
             login_redirect_whitelist.add(urlparse(redirect_to).netloc)
 
-    is_safe_url = http.is_safe_url(
+    url_has_allowed_host_and_scheme = http.url_has_allowed_host_and_scheme(
         redirect_to, allowed_hosts=login_redirect_whitelist, require_https=require_https
     )
 
-    return is_safe_url
+    return url_has_allowed_host_and_scheme
 
 
 def is_registration_api_v1(request):

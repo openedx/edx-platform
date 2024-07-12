@@ -5,6 +5,7 @@
 define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
     function(BaseView, HtmlUtils) {
         'use strict';
+
         var XBlockAccessEditor = BaseView.extend({
             // takes XBlockInfo as a model
             initialize: function() {

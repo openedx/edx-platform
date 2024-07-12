@@ -73,7 +73,7 @@ from common.djangoapps.util.file import (
     store_uploaded_file,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
-from common.djangoapps.util.views import require_global_staff
+from common.djangoapps.util.views import require_global_staff  # pylint: disable=unused-import
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled, create_course_email
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -129,6 +129,7 @@ from .tools import (
     find_unit,
     get_student_from_identifier,
     handle_dashboard_error,
+    keep_field_private,
     parse_datetime,
     require_student_from_identifier,
     set_due_date_extension,
@@ -151,7 +152,7 @@ def common_exceptions_400(func):
     """
 
     def wrapped(request, *args, **kwargs):
-        use_json = (request.is_ajax() or
+        use_json = (request.headers.get('x-requested-with') == 'XMLHttpRequest' or
                     request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
             return func(request, *args, **kwargs)
@@ -339,7 +340,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = list(csv.reader(upload_file.read().decode('utf-8').splitlines()))
+                students = list(csv.reader(upload_file.read().decode('utf-8-sig').splitlines()))
                 course = get_course_by_id(course_id)
             else:
                 general_errors.append({
@@ -1004,11 +1005,12 @@ def modify_access(request, course_id):
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
+    unique_student_identifier = request.POST.get('unique_student_identifier')
     try:
-        user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
+        user = get_student_from_identifier(unique_student_identifier)
     except User.DoesNotExist:
         response_payload = {
-            'unique_student_identifier': request.POST.get('unique_student_identifier'),
+            'unique_student_identifier': unique_student_identifier,
             'userDoesNotExist': True,
         }
         return JsonResponse(response_payload)
@@ -1043,6 +1045,8 @@ def modify_access(request, course_id):
 
     if action == 'allow':
         allow_access(course, user, rolename)
+        if not is_user_enrolled_in_course(user, course_id):
+            CourseEnrollment.enroll(user, course_id)
     elif action == 'revoke':
         revoke_access(course, user, rolename)
     else:
@@ -1430,6 +1434,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
             'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
         ]
+    keep_field_private(query_features, 'year_of_birth')  # protected information
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1441,7 +1446,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'email': _('Email'),
         'language': _('Language'),
         'location': _('Location'),
-        'year_of_birth': _('Birth Year'),
+        #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683, not to go in reports
         'gender': _('Gender'),
         'level_of_education': _('Level of Education'),
         'mailing_address': _('Mailing Address'),
@@ -1519,7 +1524,7 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
     Verifies that the expected columns are present in the CSV used to add users to cohorts.
     """
     with file_storage.open(file_to_validate) as f:
-        reader = csv.reader(f.read().decode('utf-8').splitlines())
+        reader = csv.reader(f.read().decode('utf-8-sig').splitlines())
 
         try:
             fieldnames = next(reader)
@@ -1659,7 +1664,7 @@ def get_anon_ids(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_ENROLL)
+@require_course_permission(permissions.VIEW_ENROLLMENTS)
 @require_post_params(
     unique_student_identifier="email or username of student for whom to get enrollment status"
 )
@@ -2609,7 +2614,7 @@ def problem_grade_report(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_ENROLL)
+@require_course_permission(permissions.VIEW_FORUM_MEMBERS)
 @require_post_params('rolename')
 def list_forum_members(request, course_id):
     """
@@ -2807,7 +2812,8 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-
+    if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
+        CourseEnrollment.enroll(user, course_id)
     try:
         update_forum_role(course_id, user, rolename, action)
     except Role.DoesNotExist:
@@ -3017,7 +3023,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.START_CERTIFICATE_GENERATION)
 @require_POST
 @common_exceptions_400
 def start_certificate_generation(request, course_id):
@@ -3039,7 +3045,7 @@ def start_certificate_generation(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.START_CERTIFICATE_REGENERATION)
 @require_POST
 @common_exceptions_400
 def start_certificate_regeneration(request, course_id):
@@ -3081,7 +3087,7 @@ def start_certificate_regeneration(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.CERTIFICATE_EXCEPTION_VIEW)
 @require_http_methods(['POST', 'DELETE'])
 def certificate_exception_view(request, course_id):
     """
@@ -3332,7 +3338,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = list(csv.reader(upload_file.read().decode('utf-8').splitlines()))
+                students = list(csv.reader(upload_file.read().decode('utf-8-sig').splitlines()))
             else:
                 general_errors.append(_('Make sure that the file you upload is in CSV format with no '
                                         'extraneous characters or rows.'))
@@ -3392,7 +3398,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(permissions.CERTIFICATE_INVALIDATION_VIEW)
 @require_http_methods(['POST', 'DELETE'])
 def certificate_invalidation_view(request, course_id):
     """

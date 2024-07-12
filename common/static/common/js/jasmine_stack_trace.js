@@ -3,6 +3,7 @@
  initialized we can't override the ExceptionFormatter as Jasmine then uses the stored reference to the function */
 (function() {
     /* globals jasmineRequire */
+
     'use strict';
 
     var OldExceptionFormatter = jasmineRequire.ExceptionFormatter(),

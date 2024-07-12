@@ -8,8 +8,8 @@ from unittest.mock import ANY, MagicMock, patch
 from django.test import TestCase
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
 from common.djangoapps.student.tests.factories import UserFactory
@@ -297,7 +297,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
     Test cases for the assignments_for_problem method in outcomes.py
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -371,48 +371,41 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
         assert count == 3
 
     def test_with_no_graded_assignments(self):
-        with check_mongo_calls(7):
-            assignments = outcomes.get_assignments_for_problem(
-                self.unit, self.user_id, self.course.id
-            )
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit, self.user_id, self.course.id
+        )
         assert len(assignments) == 0
 
     def test_with_graded_unit(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
-        with check_mongo_calls(7):
-            assignments = outcomes.get_assignments_for_problem(
-                self.unit, self.user_id, self.course.id
-            )
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit, self.user_id, self.course.id
+        )
         assert len(assignments) == 1
         assert assignments[0].lis_result_sourcedid == 'graded_unit'
 
     def test_with_graded_vertical(self):
         self.create_graded_assignment(self.vertical, 'graded_vertical', self.outcome_service)
-        with check_mongo_calls(7):
-            assignments = outcomes.get_assignments_for_problem(
-                self.unit, self.user_id, self.course.id
-            )
-        assert len(assignments) == 1
-        assert assignments[0].lis_result_sourcedid == 'graded_vertical'
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit, self.user_id, self.course.id
+        )
+        assert len(assignments) == 0
 
     def test_with_graded_unit_and_vertical(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         self.create_graded_assignment(self.vertical, 'graded_vertical', self.outcome_service)
-        with check_mongo_calls(7):
-            assignments = outcomes.get_assignments_for_problem(
-                self.unit, self.user_id, self.course.id
-            )
-        assert len(assignments) == 2
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit, self.user_id, self.course.id
+        )
+        assert len(assignments) == 1
         assert assignments[0].lis_result_sourcedid == 'graded_unit'
-        assert assignments[1].lis_result_sourcedid == 'graded_vertical'
 
     def test_with_unit_used_twice(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         self.create_graded_assignment(self.unit, 'graded_unit2', self.outcome_service)
-        with check_mongo_calls(7):
-            assignments = outcomes.get_assignments_for_problem(
-                self.unit, self.user_id, self.course.id
-            )
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit, self.user_id, self.course.id
+        )
         assert len(assignments) == 2
         assert assignments[0].lis_result_sourcedid == 'graded_unit'
         assert assignments[1].lis_result_sourcedid == 'graded_unit2'
@@ -420,20 +413,18 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     def test_with_unit_graded_for_different_user(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         other_user = UserFactory.create()
-        with check_mongo_calls(7):
-            assignments = outcomes.get_assignments_for_problem(
-                self.unit, other_user.id, self.course.id
-            )
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit, other_user.id, self.course.id
+        )
         assert len(assignments) == 0
 
     def test_with_unit_graded_for_multiple_consumers(self):
         other_outcome_service = self.create_outcome_service('second_consumer')
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         self.create_graded_assignment(self.unit, 'graded_unit2', other_outcome_service)
-        with check_mongo_calls(7):
-            assignments = outcomes.get_assignments_for_problem(
-                self.unit, self.user_id, self.course.id
-            )
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit, self.user_id, self.course.id
+        )
         assert len(assignments) == 2
         assert assignments[0].lis_result_sourcedid == 'graded_unit'
         assert assignments[1].lis_result_sourcedid == 'graded_unit2'

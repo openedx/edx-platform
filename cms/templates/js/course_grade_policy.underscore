@@ -29,6 +29,53 @@
     <span class="tip tip-stacked"><%- gettext("The number of assignments of this type that will be dropped. The lowest scoring assignments are dropped first.") %></span>
   </div>
 
+  <% if (model.get('type') !== '') { %>
+    <% if (assignmentList.length !== model.get('min_count')){ %>
+       <div class="assignment-count-info assignment-count-warning">
+        <div class="assignment-count-warning-header">
+          <span class="icon fa fa-exclamation-circle" aria-hidden="true"></span>
+          <span class="header-warning"><%- gettext("Warning: ") %></span>
+          <%-
+            edx.StringUtils.interpolate(
+              gettext("The number of {type} assignments defined here does not match the current number of {type} assignments in the course:"),
+              {type: model.get('type')},
+            )
+          %>
+        </div>
+        <div class="assignment-count-warning-content">
+        <% if (assignmentList.length == 0){ %>
+          <div><%- gettext("There are no assignments of this type in the course.") %></div>
+        <% } else { %>
+          <%-
+            edx.StringUtils.interpolate(
+              gettext("{assignment_count} {type} assignment(s) found:"),
+              {
+                assignment_count: assignmentList.length,
+                type: model.get('type')
+              },
+            )
+          %>
+          <ol class="assignment_type_count_list">
+            <% _.each(assignmentList, function (qualifiedSubsectionName){ %>
+              <li><%- qualifiedSubsectionName %></li>
+            <% }) %>
+          </ol>
+        <% } %>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="assignment-count-info assignment-count-matches">
+        <span class="icon fa fa-check-circle-o" aria-hidden="true"></span>
+        <%- 
+          edx.StringUtils.interpolate(
+            gettext("The number of {type} assignments in the course matches the number defined here."),
+            {type: model.get('type')},
+          )
+        %>
+      </div>
+    <% } %>
+  <% } %>
+
   <div class="actions">
   	<a href="#" class="button delete-button standard remove-item remove-grading-data"><span class="delete-icon"></span><%- gettext("Delete") %></a>
   </div>

@@ -23,7 +23,7 @@ class GlobalStatusMessage(ConfigurationModel):
     message = models.TextField(
         blank=True,
         null=True,
-        help_text='<p>The contents of this field will be displayed as a warning banner on all views.</p>'
+        help_text='<p>The contents of this field will be displayed as HTML in a warning banner on all views.</p>'
                   '<p>To override the banner message for a specific course, refer to the Course Message configuration. '  # lint-amnesty, pylint: disable=line-too-long
                   'Course Messages will only work if the global status message is enabled, so if you only want to add '
                   'a banner to specific courses without adding a global status message, you should add a global status '  # lint-amnesty, pylint: disable=line-too-long

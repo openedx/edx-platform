@@ -17,6 +17,7 @@ define([
     'js/views/baseview'
 ], function(BaseView) {
     'use strict';
+
     var ListView = BaseView.extend({
         events: {
             'click .action-add': 'onAddItem',
@@ -49,6 +50,7 @@ define([
             });
             edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.HTML(template));
 
+            // eslint-disable-next-line no-shadow
             this.collection.each(function(model) {
                 this.$(this.listContainerCss).append(
                     this.createItemView({model: model, restrictEditing: this.restrictEditing}).render().el

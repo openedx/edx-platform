@@ -195,7 +195,7 @@ class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-clas
     @mock.patch('cms.djangoapps.contentstore.proctoring.register_special_exams')
     def test_register_exams_failure(self, _mock_register_exams_proctoring, _mock_register_exams_service):
         """ credit requirements update signal fires even if exam registration fails """
-        with mock.patch('openedx.core.djangoapps.credit.signals.on_course_publish') as course_publish:
+        with mock.patch('openedx.core.djangoapps.credit.signals.handlers.on_course_publish') as course_publish:
             _mock_register_exams_proctoring.side_effect = Exception('boom!')
             update_special_exams_and_publish(str(self.course.id))
             course_publish.assert_called()

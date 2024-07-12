@@ -201,7 +201,7 @@ class CourseOutlineView(APIView):
             # Just like in masquerading, set real_user so that the
             # SafeSessions middleware can see that the user didn't
             # change unexpectedly.
-            target_user.real_user = request.user
+            target_user.real_user = request.user  # type: ignore
             return target_user
 
         _course_masquerade, user = setup_masquerade(request, course_key, has_staff_access)

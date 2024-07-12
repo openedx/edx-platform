@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils'],
         function($, _, Backbone, HtmlUtils) {
             return Backbone.View.extend({
@@ -16,8 +17,8 @@
                 initialize: function(data) {
                     this.tpl = $(this.tpl).html();
                     this.hintedProvider = (
-                        _.findWhere(data.thirdPartyAuth.providers, {id: data.hintedProvider}) ||
-                    _.findWhere(data.thirdPartyAuth.secondaryProviders, {id: data.hintedProvider})
+                        _.findWhere(data.thirdPartyAuth.providers, {id: data.hintedProvider})
+                    || _.findWhere(data.thirdPartyAuth.secondaryProviders, {id: data.hintedProvider})
                     );
                 },
 

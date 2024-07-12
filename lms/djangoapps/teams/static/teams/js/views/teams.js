@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'backbone',
         'gettext',

@@ -1,11 +1,11 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-
 import logging
 import re
 import uuid
 from collections import namedtuple
 
 from xblock.core import XBlock
+
 
 DETACHED_XBLOCK_TYPES = {name for name, __ in XBlock.load_tagged_classes("detached")}
 
@@ -15,11 +15,11 @@ def _prefix_only_url_replace_regex(pattern):
     Match urls in quotes pulling out the fields from pattern
     """
     return re.compile("""
-        (?x)                      # flags=re.VERBOSE
         (?P<quote>\\\\?['"])      # the opening quotes
         {}
         (?P=quote)                # the first matching closing quote
-        """.format(pattern))
+        """.format(pattern),
+        flags=re.VERBOSE)
 
 
 def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):

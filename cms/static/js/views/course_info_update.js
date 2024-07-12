@@ -10,6 +10,7 @@ define(['codemirror',
 function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, ValidatingView, CourseUpdateModel,
     PromptView, NotificationView) {
     'use strict';
+
     var CourseInfoUpdateView = ValidatingView.extend({
 
         // collection is CourseUpdateCollection

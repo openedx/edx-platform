@@ -4,9 +4,10 @@
 define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/utils/create_utils_base'],
     function($, gettext, ViewUtils, CreateUtilsFactory) {
         'use strict';
+
         return function(selectors, classes) {
-            var keyLengthViolationMessage = gettext('The combined length of the organization and library code fields' +
-              ' cannot be more than <%- limit %> characters.');
+            var keyLengthViolationMessage = gettext('The combined length of the organization and library code fields'
+              + ' cannot be more than <%- limit %> characters.');
             var keyFieldSelectors = [selectors.org, selectors.number];
             var nonEmptyCheckFieldSelectors = [selectors.name, selectors.org, selectors.number];
 
@@ -26,6 +27,7 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
                             if (detailedReason) {
                                 reason = detailedReason;
                             }
+                        // eslint-disable-next-line no-empty
                         } catch (e) {}
                     }
                     errorHandler(reason);

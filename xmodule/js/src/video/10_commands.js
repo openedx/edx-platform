@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/10_commands.js', [], function() {
         var VideoCommands, Command, playCommand, pauseCommand, togglePlaybackCommand,
             toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand, skipCommand;

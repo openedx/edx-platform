@@ -1,25 +1,16 @@
 """
-Tests for Blockstore-based Content Libraries
+Tests for Learning-Core-based Content Libraries
 """
 from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
-from unittest import mock, skipUnless
-from urllib.parse import urlparse
 
-from django.conf import settings
-from django.test import LiveServerTestCase
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from organizations.models import Organization
-from rest_framework.test import APITestCase, APIClient
-from search.search_engine_base import SearchEngine
+from rest_framework.test import APITransactionTestCase, APIClient
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content_libraries.libraries_index import MAX_SIZE
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from openedx.core.lib import blockstore_api
 
 # Define the URLs here - don't use reverse() because we want to detect
 # backwards-incompatible changes like changed URLs.
@@ -46,87 +37,14 @@ URL_LIB_LTI_LAUNCH = URL_LIB_LTI_PREFIX + 'launch/'
 URL_BLOCK_RENDER_VIEW = '/api/xblock/v2/xblocks/{block_key}/view/{view_name}/'
 URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{handler_name}/'
 URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
+URL_BLOCK_FIELDS_URL = '/api/xblock/v2/xblocks/{block_key}/fields/'
 URL_BLOCK_XBLOCK_HANDLER = '/api/xblock/v2/xblocks/{block_key}/handler/{user_id}-{secure_token}/{handler_name}/'
 
 
-# Decorators for tests that require the blockstore service/app
-requires_blockstore = skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
-
-requires_blockstore_app = skipUnless(settings.BLOCKSTORE_USE_BLOCKSTORE_APP_API, "Requires blockstore app")
-
-
-class BlockstoreAppTestMixin:
-    """
-    Sets up the environment for tests to be run using the installed Blockstore app.
-    """
-    def setUp(self):
-        """
-        Ensure there's an active request, so that bundle file URLs can be made absolute.
-        """
-        super().setUp()
-
-        # Patch the blockstore get_current_request to use our live_server_url
-        mock.patch('blockstore.apps.api.methods.get_current_request',
-                   mock.Mock(return_value=self._get_current_request())).start()
-        self.addCleanup(mock.patch.stopall)
-
-    def _get_current_request(self):
-        """
-        Returns a request object using the live_server_url, if available.
-        """
-        request_args = {}
-        if hasattr(self, 'live_server_url'):
-            live_server_url = urlparse(self.live_server_url)
-            name, port = live_server_url.netloc.split(':')
-            request_args['SERVER_NAME'] = name
-            request_args['SERVER_PORT'] = port or '80'
-            request_args['wsgi.url_scheme'] = live_server_url.scheme
-        return RequestFactory().request(**request_args)
-
-
-def elasticsearch_test(func):
-    """
-    Decorator for tests which connect to elasticsearch when needed
-    """
-    # This is disabled by default. Set to True if the elasticsearch engine is needed to test parts of code.
-    if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
-        func = override_settings(SEARCH_ENGINE="search.elastic.ElasticSearchEngine")(func)
-        func = override_settings(ELASTIC_SEARCH_CONFIG=[{
-            'use_ssl': settings.TEST_ELASTICSEARCH_USE_SSL,
-            'host': settings.TEST_ELASTICSEARCH_HOST,
-            'port': settings.TEST_ELASTICSEARCH_PORT,
-        }])(func)
-        func = mock.patch(
-            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS",
-            new={
-                'refresh': 'wait_for'
-            })(func)
-        return func
-    else:
-        @classmethod
-        def mock_perform(cls, filter_terms, text_search):
-            # pylint: disable=no-member
-            return SearchEngine.get_search_engine(cls.INDEX_NAME).search(
-                field_dictionary=filter_terms,
-                query_string=text_search,
-                size=MAX_SIZE
-            )
-
-        func = mock.patch(
-            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS",
-            new={}
-        )(func)
-        func = mock.patch(
-            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase._perform_elastic_search",
-            new=mock_perform
-        )(func)
-        return func
-
-
 @skip_unless_cms  # Content Libraries REST API is only available in Studio
-class _ContentLibrariesRestApiTestMixin:
+class ContentLibrariesRestApiTest(APITransactionTestCase):
     """
-    Base class for Blockstore-based Content Libraries test that use the REST API
+    Base class for Learning-Core-based Content Libraries test that use the REST API
 
     These tests use the REST API, which in turn relies on the Python API.
     Some tests may use the python API directly if necessary to provide
@@ -148,21 +66,14 @@ class _ContentLibrariesRestApiTestMixin:
     and cached forever.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
-        # Create a collection using Blockstore API directly only because there
-        # is not yet any Studio REST API for doing so:
-        cls.collection = blockstore_api.create_collection("Content Library Test Collection")
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         # Create an organization
-        cls.organization, _ = Organization.objects.get_or_create(
+        self.organization, _ = Organization.objects.get_or_create(
             short_name="CL-TEST",
             defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
         )
-
-    def setUp(self):
-        super().setUp()
         self.clients_by_user = {}
         self.client.login(username=self.user.username, password="edx")
 
@@ -177,6 +88,13 @@ class _ContentLibrariesRestApiTestMixin:
         correct order.
         """
         assert big_dict.items() >= subset_dict.items()
+
+    def assertOrderEqual(self, libraries_list, expected_order):
+        """
+        Assert that the provided list of libraries match the order of expected
+        list by comparing the slugs.
+        """
+        assert [lib["slug"] for lib in libraries_list] == expected_order
 
     # API helpers
 
@@ -216,7 +134,6 @@ class _ContentLibrariesRestApiTestMixin:
             "description": description,
             "type": library_type,
             "license": license_type,
-            "collection_uuid": str(self.collection.uuid),
         }, expect_response)
 
     def _list_libraries(self, query_params_dict=None, expect_response=200):
@@ -362,7 +279,7 @@ class _ContentLibrariesRestApiTestMixin:
         assert response.status_code == expect_response,\
             'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
 
-    def _delete_library_block_asset(self, block_key, file_name, expect_response=200):
+    def _delete_library_block_asset(self, block_key, file_name, expect_response=204):
         """ Delete a static asset file. """
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         return self._api('delete', url, None, expect_response)
@@ -384,26 +301,3 @@ class _ContentLibrariesRestApiTestMixin:
         """
         url = URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name=handler_name)
         return self._api('get', url, None, expect_response=200)["handler_url"]
-
-
-@requires_blockstore
-class ContentLibrariesRestApiBlockstoreServiceTest(_ContentLibrariesRestApiTestMixin, APITestCase):
-    """
-    Base class for Blockstore-based Content Libraries test that use the REST API
-    and the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
-class ContentLibrariesRestApiTest(
-    _ContentLibrariesRestApiTestMixin,
-    BlockstoreAppTestMixin,
-    APITestCase,
-    LiveServerTestCase,
-):
-    """
-    Base class for Blockstore-based Content Libraries test that use the REST API
-    and the installed Blockstore app.
-
-    We run this test with a live server, so that the blockstore asset files can be served.
-    """

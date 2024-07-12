@@ -78,6 +78,23 @@ class CanRetireUserTest(TestCase):
         result = CanRetireUser().has_permission(self.request, None)
         assert not result
 
+    def test_api_permission_staff_without_permission(self):
+        self.request.user = AdminFactory()
+        result = CanRetireUser().has_permission(self.request, None)
+        assert not result
+
+    def test_api_permission_staff_granted_permission(self):
+        self.request.user = AdminFactory()
+        permission = PermissionFactory(
+            codename='add_userretirementrequest',
+            content_type=ContentTypeFactory(
+                app_label='user_api'
+            )
+        )
+        self.request.user.user_permissions.add(permission)
+        result = CanRetireUser().has_permission(self.request, None)
+        assert result
+
 
 class CanCancelUserRetirementTest(TestCase):
     """ Tests for cancel user retirement API permissions """

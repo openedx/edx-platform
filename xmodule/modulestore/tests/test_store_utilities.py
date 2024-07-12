@@ -2,7 +2,6 @@
 Tests for store_utilities.py
 """
 
-
 import unittest
 from unittest.mock import Mock
 

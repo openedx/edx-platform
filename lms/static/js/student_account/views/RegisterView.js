@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -62,15 +63,13 @@
                 this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
                 this.hideAuthWarnings = data.hideAuthWarnings;
                 this.autoRegisterWelcomeMessage = data.thirdPartyAuth.autoRegisterWelcomeMessage || '';
-                this.registerFormSubmitButtonText =
-                        data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
+                this.registerFormSubmitButtonText = data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
                 this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled;
                 this.enableCoppaCompliance = data.enableCoppaCompliance;
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.model, 'validation', this.renderLiveValidations);
             },
-
 
             renderFields: function(fields, className) {
                 var html = [],
@@ -88,7 +87,8 @@
                         requiredStr: this.requiredStr,
                         optionalStr: fields[i].name === 'marketing_emails_opt_in' ? '' : this.optionalStr,
                         supplementalText: fields[i].supplementalText || '',
-                        supplementalLink: fields[i].supplementalLink || ''
+                        supplementalLink: fields[i].supplementalLink || '',
+                        showRegisterLinks: this.showRegisterLinks
                     })));
                 }
                 html.push('</div>');
@@ -135,7 +135,9 @@
 
                 html = this.renderFields(requiredFields, 'required-fields');
 
+                // eslint-disable-next-line prefer-spread
                 html.push.apply(html, this.renderFields(exposedOptionalFields, 'exposed-optional-fields'));
+                // eslint-disable-next-line prefer-spread
                 html.push.apply(html, this.renderFields(
                     optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`
                 ));
@@ -371,12 +373,12 @@
             },
 
             addValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
                 $validation_node.find('.sr-only').text('ERROR:');
             },
 
             removeValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
                 $validation_node.find('.sr-only').text('');
             },
 

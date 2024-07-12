@@ -1,7 +1,9 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
-<%! from django.utils.translation import gettext as _%>
-
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
 <%
 # set doc language direction
 from django.utils.translation import get_language_bidi
@@ -15,10 +17,31 @@ course_mode_class = course_mode if course_mode else ''
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    % if facebook_share_enabled:
+        ## OG (Open Graph) url, title, type, image and description added below to give social media info to display
+        ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
+        <meta property="og:url" content="${share_url}" />
+        <meta property="og:title" content="${document_title}" />
+        <meta property="og:type" content="image/png" />
+        <meta property="og:image" content="${full_course_image_url}" />
+        <meta property="og:description" content="${facebook_share_text}" />
+    %endif
     <title>${document_title}</title>
 
     <%static:css group='style-certificates'/>
+
+
+    <% ga_4_id = static.get_value("GOOGLE_ANALYTICS_4_ID", settings.GOOGLE_ANALYTICS_4_ID) %>
+    % if ga_4_id:
+        <script async src="https://www.googletagmanager.com/gtag/js?id=${ga_4_id}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '${ga_4_id | n, js_escaped_string}');
+        </script>
+    % endif
 </head>
 
 <body class="layout-accomplishment view-valid-accomplishment ${dir_rtl} certificate certificate-${course_mode_class}" data-view="valid-accomplishment">

@@ -121,6 +121,7 @@ class BulkOpsRecord:
         self._active_count = 0
         self.has_publish_item = False
         self.has_library_updated_item = False
+        self._commit_callbacks = []
 
     @property
     def active(self):
@@ -147,6 +148,20 @@ class BulkOpsRecord:
         Return whether the bulk write is at the root (first) level of nesting
         """
         return self._active_count == 1
+
+    def defer_until_commit(self, fn):
+        """
+        Run some code when the changes from this bulk op are committed to the DB
+        """
+        self._commit_callbacks.append(fn)
+
+    def call_commit_callbacks(self):
+        """
+        When the changes have been committed to the DB, call this to run any queued callbacks
+        """
+        for fn in self._commit_callbacks:
+            fn()
+        self._commit_callbacks.clear()
 
 
 class ActiveBulkThread(threading.local):
@@ -290,14 +305,33 @@ class BulkOperationsMixin:
         # So re-nest until the signals are sent.
         bulk_ops_record.nest()
 
-        if emit_signals and dirty:
-            self.send_bulk_published_signal(bulk_ops_record, structure_key)
-            self.send_bulk_library_updated_signal(bulk_ops_record, structure_key)
+        if dirty:
+            # Call any "on commit" callback, regardless of if this was "published" or is still draft:
+            bulk_ops_record.call_commit_callbacks()
+            # Call any "on publish" handlers - emit_signals is usually false for draft-only changes:
+            if emit_signals:
+                self.send_bulk_published_signal(bulk_ops_record, structure_key)
+                self.send_bulk_library_updated_signal(bulk_ops_record, structure_key)
 
         # Signals are sent. Now unnest and clear the bulk op for good.
         bulk_ops_record.unnest()
 
         self._clear_bulk_ops_record(structure_key)
+
+    def on_commit_changes_to(self, course_key, fn):
+        """
+        Call some callback when the currently active bulk operation has saved
+        """
+        # Check if a bulk op is active. If so, defer fn(); otherwise call it immediately.
+        # Note: calling _get_bulk_ops_record() here and then checking .active can have side-effects in some cases
+        # because it creates an entry in the defaultdict if none exists, so we check if the record is active using
+        # the same code as _clear_bulk_ops_record(), which doesn't modify the defaultdict.
+        # so we check it this way:
+        if course_key and course_key.for_branch(None) in self._active_bulk_ops.records:
+            bulk_ops_record = self._active_bulk_ops.records[course_key.for_branch(None)]
+            bulk_ops_record.defer_until_commit(fn)
+        else:
+            fn()  # There is no active bulk operation - call fn() now.
 
     def _is_in_bulk_operation(self, course_key, ignore_case=False):
         """
@@ -922,7 +956,7 @@ class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
     def get_course(self, course_id, depth=0, **kwargs):
         '''
         Look for a specific course by its id (:class:`CourseKey`).
-        Returns the course descriptor, or None if not found.
+        Returns the course block, or None if not found.
         '''
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
@@ -1271,7 +1305,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         result = defaultdict(dict)
         if fields is None:
             return result
-        classes = XBlock.load_class(category)
+        classes = XBlock.load_class(category, default=self.default_class)
         cls = self.mixologist.mix(classes)
         for field_name, value in fields.items():
             field = getattr(cls, field_name)
@@ -1286,8 +1320,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # clone a default 'about' overview block as well
         about_location = self.make_course_key(org, course, run).make_usage_key('about', 'overview')
 
-        about_descriptor = XBlock.load_class('about')
-        overview_template = about_descriptor.get_template('overview.yaml')
+        about_block = XBlock.load_class('about')
+        overview_template = about_block.get_template('overview.yaml')
         self.create_item(
             user_id,
             about_location.course_key,
@@ -1386,10 +1420,3 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         if self.signal_handler:
             self.signal_handler.send("item_deleted", usage_key=usage_key, user_id=user_id)
-
-
-def only_xmodules(identifier, entry_points):
-    """Only use entry_points that are supplied by the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-
-    return default_select(identifier, from_xmodule)

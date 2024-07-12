@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from django.urls import reverse
 from openedx.core.djangolib.js_utils import js_escaped_string
@@ -21,7 +21,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
             $('button[name=verified_mode]').click(function(e){
                 e.preventDefault();
                 window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
-                encodeURIComponent('${sku | n, js_escaped_string}');
+                    encodeURIComponent('${sku | n, js_escaped_string}') +
+                    '&course_run_key=' + encodeURIComponent('${course_run_key | n, js_escaped_string}');
             });
         });
         % endif

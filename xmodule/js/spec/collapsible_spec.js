@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     'use strict';
 
@@ -16,24 +17,24 @@
             };
 
         beforeEach(function() {
-            html = '' +
-                '<section class="collapsible">' +
-                    '<div class="shortform">shortform message</div>' +
-                    '<div class="longform">' +
-                        '<p>longform is visible</p>' +
-                    '</div>' +
-                '</section>';
-            html_custom = '' +
-                '<section class="collapsible">' +
-                    '<div ' +
-                        'class="shortform-custom" ' +
-                        'data-open-text="Show shortform-custom" ' +
-                        'data-close-text="Hide shortform-custom"' +
-                    '>shortform message</div>' +
-                    '<div class="longform">' +
-                        '<p>longform is visible</p>' +
-                    '</div>' +
-                '</section>';
+            html = ''
+                + '<section class="collapsible">'
+                    + '<div class="shortform">shortform message</div>'
+                    + '<div class="longform">'
+                        + '<p>longform is visible</p>'
+                    + '</div>'
+                + '</section>';
+            html_custom = ''
+                + '<section class="collapsible">'
+                    + '<div '
+                        + 'class="shortform-custom" '
+                        + 'data-open-text="Show shortform-custom" '
+                        + 'data-close-text="Hide shortform-custom"'
+                    + '>shortform message</div>'
+                    + '<div class="longform">'
+                        + '<p>longform is visible</p>'
+                    + '</div>'
+                + '</section>';
         });
 
         describe('setCollapsibles', function() {
