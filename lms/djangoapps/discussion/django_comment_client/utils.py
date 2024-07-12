@@ -855,6 +855,11 @@ def prepare_content(
     else:
         # Remove any group information that might remain if the course had previously been divided.
         content.pop('group_id', None)
+    try:
+        extras_user = User.objects.get(username = content["username"])
+        content["username"] = "{0} ({1})".format(extras_user.first_name, extras_user.username)
+    except Exception as e:
+        log.info(e)
 
     return content
 

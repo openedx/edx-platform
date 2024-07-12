@@ -1795,6 +1795,8 @@ INSTALLED_APPS = [
 
     # alternative swagger generator for CMS API
     'drf_spectacular',
+
+    'freetextresponse'
 ]
 
 
