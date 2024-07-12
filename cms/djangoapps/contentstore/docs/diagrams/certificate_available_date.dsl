@@ -1,6 +1,6 @@
 /*
  * This is a high level diagram visualizing how the `CERTIFICATE_AVAILBLE_DATE` update is
- * are updated internally and transmitted to the Credentials IDA.
+ * updated internally and transmitted to the Credentials IDA.
  *
  * It is written using Structurizr DSL (https://structurizr.org/).
  */
