@@ -228,7 +228,7 @@ def run_eslint():
     #import pdb; pdb.set_trace()
     # REPORT_DIR = "/home/runner/work/edx-platform/reports/eslint"
     
-    eslint_report_dir = "/home/runner/work/edx-platform/reports/eslint
+    eslint_report_dir = "/home/runner/work/edx-platform/reports/eslint"
     # eslint_report_dir = (Env.REPORT_DIR / "eslint")
     print(Env.REPORT_DIR)
     # eslint_report = eslint_report_dir / "eslint.report"
