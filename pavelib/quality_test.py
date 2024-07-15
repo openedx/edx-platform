@@ -225,15 +225,17 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-
+    #import pdb; pdb.set_trace()
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
+    print(Env.REPORT_DIR)
     eslint_report = eslint_report_dir / "eslint.report"
+    print(eslint_report_dir)
     _prepare_report_dir(eslint_report_dir)
     violations_limit = 4950
 
     command = (
         f"node --max_old_space_size=4096 node_modules/.bin/eslint "
-        "--ext .js --ext .jsx --format=compact ."
+        f"--ext .js --ext .jsx --format=compact ."
     )
     with open(eslint_report, 'w') as report_file:
         # Run the command
@@ -655,8 +657,9 @@ if __name__ == "__main__":
         print("else condition")
         # run_pep8()
         run_eslint()
+        #/home/runner/work/edx-platform/edx-platform/reports/eslint
         # run_stylelint()
         # run_xsslint()
-        # run_pii_check()
+        #run_pii_check()
         # check_keywords()
         # diff_coverage()
