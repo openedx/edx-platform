@@ -1093,7 +1093,7 @@ py==1.11.0
     #   pytest
     #   pytest-forked
     #   tox
-py2neo==2021.2.3
+py2neo==2021.2.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
