@@ -10,7 +10,6 @@ import argparse
 from utils.envs import Env
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
-from pathlib import Path
 
 try:
     from pygments.console import colorize
@@ -227,13 +226,9 @@ def run_eslint():
     If limit option is passed, fails build if more violations than the limit are found.
     """
     #import pdb; pdb.set_trace()
-    # REPORT_DIR = "/home/runner/work/edx-platform/reports/eslint"
-    
-    eslint_report_dir = Path("/home/runner/work/edx-platform/reports/eslint")
-    # eslint_report_dir = (Env.REPORT_DIR / "eslint")
+    eslint_report_dir = (Env.REPORT_DIR / "eslint")
     print(Env.REPORT_DIR)
-    # eslint_report = eslint_report_dir / "eslint.report"
-    eslint_report = Path("/home/runner/work/edx-platform/reports/eslint/eslint.report")
+    eslint_report = eslint_report_dir / "eslint.report"
     print(eslint_report_dir)
     _prepare_report_dir(eslint_report_dir)
     violations_limit = 4950
