@@ -226,7 +226,8 @@ def run_eslint():
     If limit option is passed, fails build if more violations than the limit are found.
     """
     #import pdb; pdb.set_trace()
-    eslint_report_dir = "/home/runner/work/edx-platform/reports"
+    REPORT_DIR = "/home/runner/work/edx-platform/reports"
+    eslint_report_dir = (REPORT_DIR / "eslint")
     # eslint_report_dir = (Env.REPORT_DIR / "eslint")
     print(Env.REPORT_DIR)
     eslint_report = eslint_report_dir / "eslint.report"
