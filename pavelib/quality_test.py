@@ -125,7 +125,10 @@ def _prepare_report_dir(dir_name):
     """
     Sets a given directory to a created, but empty state
     """
-    dir_name.rmtree_p()
+    path = Path(dir_name)
+    if path.is_dir():
+        dir_name.rmtree_p()
+    
     dir_name.mkdir_p()
 
 
