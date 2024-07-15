@@ -866,11 +866,10 @@ class VideoTranscriptsMixin:
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
 
-        if dest_lang:
-            if dest_lang in other_lang.keys():
-                transcript_language = dest_lang
-            elif dest_lang == 'en' and (not other_lang or (other_lang and sub)):
-                transcript_language = 'en'
+        if dest_lang and dest_lang in other_lang.keys():
+            transcript_language = dest_lang
+        elif dest_lang and dest_lang == 'en' and (not other_lang or (other_lang and sub)):
+            transcript_language = 'en'
         elif self.transcript_language in other_lang:
             transcript_language = self.transcript_language
         elif sub:
