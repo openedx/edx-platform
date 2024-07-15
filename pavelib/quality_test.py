@@ -6,7 +6,8 @@ import re
 import sys
 import subprocess
 
-from pavelib.utils.envs import Env
+import argparse
+from utils.envs import Env
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
@@ -547,7 +548,6 @@ def run_xsslint():
     # Record the metric
     _write_metric(metrics_str, metrics_report)
     # Print number of violations to log.
-    # sh(f"cat {metrics_report}", ignore_error=True)
     command = f"cat {metrics_report}"
     # Print number of violations to log.
     subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -618,14 +618,6 @@ def diff_coverage():
 
         # Generate the diff coverage reports (HTML and console)
         # The --diff-range-notation parameter is a workaround for https://github.com/Bachmann1234/diff_cover/issues/153
-        # sh(
-        #     "diff-cover {xml_report_str} --diff-range-notation '..' --compare-branch={compare_branch} "
-        #     "--html-report {diff_html_path}".format(
-        #         xml_report_str=xml_report_str,
-        #         compare_branch=compare_branch,
-        #         diff_html_path=diff_html_path,
-        #     )
-        # )
         command = (
             f"diff-cover {xml_report_str}"
             f"--diff-range-notation '..'"
@@ -636,10 +628,35 @@ def diff_coverage():
 
 
 if __name__ == "__main__":
-    run_pep8()
-    run_eslint()
-    run_stylelint()
-    run_xsslint()
-    run_pii_check()
-    check_keywords()
-    diff_coverage()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", choices=['pep8','eslint','stylelint','xsslint','pii_check','check_keywords', 'all'])
+    
+    argument = parser.parse_args()
+
+    if argument.command == 'pep8':
+        run_pep8()
+
+    elif argument.command == 'eslint':
+        run_eslint()
+    
+    elif argument.command == 'stylelint':
+        run_stylelint()
+    
+    elif argument.command == 'xsslint':
+        run_xsslint()
+
+    elif argument.command == 'pii_check':
+        run_pii_check()
+
+    elif argument.command == 'check_keywords':
+        check_keywords()
+
+    elif argument.command == 'all':
+        print("else condition")
+        # run_pep8()
+        run_eslint()
+        # run_stylelint()
+        # run_xsslint()
+        # run_pii_check()
+        # check_keywords()
+        # diff_coverage()

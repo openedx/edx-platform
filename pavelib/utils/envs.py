@@ -11,7 +11,7 @@ from lazy import lazy
 from path import Path as path
 # from paver.easy import BuildFailure, sh
 
-from pavelib.utils.cmd import django_cmd
+from utils.cmd import django_cmd
 
 
 def repo_root():
