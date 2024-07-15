@@ -10,6 +10,7 @@ import argparse
 from utils.envs import Env
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
+from pathlib import Path
 
 try:
     from pygments.console import colorize
