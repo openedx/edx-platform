@@ -19,7 +19,6 @@ from opaque_keys.edx.keys import CourseKey
 from requests.exceptions import HTTPError
 
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import available_date_for_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.credentials.api import is_credentials_enabled
