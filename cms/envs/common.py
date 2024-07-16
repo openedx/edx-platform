@@ -1794,9 +1794,7 @@ INSTALLED_APPS = [
     'blockstore.apps.bundles',
 
     # alternative swagger generator for CMS API
-    'drf_spectacular',
-
-    'freetextresponse'
+    'drf_spectacular'
 ]
 
 
