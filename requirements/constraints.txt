@@ -123,3 +123,9 @@ path<16.12.0
 
 # Temporary to Support the python 3.11 Upgrade
 backports.zoneinfo;python_version<"3.9"  # Newer versions have zoneinfo available in the standard library
+
+# Relevant GitHub Issue:  https://github.com/openedx/edx-platform/issues/35126
+# We need to upgrade the version of elasticsearch to atleast 7.15 before we can upgrade to Numpy 2.0.0
+# Otherwise we see a failure while running the following command:
+# export DJANGO_SETTINGS_MODULE=cms.envs.test; python manage.py cms check_reserved_keywords --override_file db_keyword_overrides.yml --report_path reports/reserved_keywords --report_file cms_reserved_keyword_report.csv
+numpy<2.0.0
