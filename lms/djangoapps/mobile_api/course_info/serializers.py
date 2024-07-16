@@ -10,11 +10,8 @@ from rest_framework.reverse import reverse
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
-from common.djangoapps.util.milestones_helpers import (
-    get_pre_requisite_courses_not_completed,
-)
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
+from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user, has_access
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.courses import get_assignments_completions
 from lms.djangoapps.mobile_api.course_info.utils import get_user_certificate_download_url

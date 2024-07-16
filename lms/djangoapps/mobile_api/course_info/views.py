@@ -14,11 +14,12 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
-from common.djangoapps.student.models import CourseEnrollment, User as StudentUser
 from common.djangoapps.static_replace import make_static_urls_absolute
-from lms.djangoapps.courseware.courses import get_assignments_grades, get_course_info_section_block
-from lms.djangoapps.course_goals.models import UserActivity
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import User as StudentUser
 from lms.djangoapps.course_api.blocks.views import BlocksInCourseView
+from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.courseware.courses import get_assignments_grades, get_course_info_section_block
 from lms.djangoapps.mobile_api.course_info.constants import BLOCK_STRUCTURE_CACHE_TIMEOUT
 from lms.djangoapps.mobile_api.course_info.serializers import (
     CourseAccessSerializer,
@@ -406,6 +407,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                         }
                     }
                 )
+
 
 @mobile_view()
 class CourseEnrollmentDetailsView(APIView):
