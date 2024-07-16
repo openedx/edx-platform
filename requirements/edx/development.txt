@@ -1235,8 +1235,9 @@ nodeenv==1.9.1
     #   -r requirements/edx/assets.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-numpy==2.0.0
+numpy==1.26.4
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   chem

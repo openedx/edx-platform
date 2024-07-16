@@ -45,8 +45,9 @@ nltk==3.8.1
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
-numpy==2.0.0
+numpy==1.26.4
     # via
+    #   -c requirements/edx-sandbox/../constraints.txt
     #   chem
     #   contourpy
     #   matplotlib
