@@ -14,7 +14,7 @@ from mock import Mock
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from student.helpers import get_next_url_for_login_page
+from student.helpers import get_next_url_for_login_page, sanitize_next_parameter
 
 LOGGER_NAME = "student.helpers"
 
@@ -156,3 +156,25 @@ class TestLoginHelper(TestCase):
             'LOGIN_REDIRECT_URL': ''  # Falsy or empty URLs should not be used
         }):
             assert '/dashboard' == get_next_url_for_login_page(request), 'Falsy url should default to dashboard'
+
+    def test_sanitize_next_param(self):
+        # Valid URL with plus - change the plus symbol to ASCII code
+        next_param = 'courses/course-v1:abc-sandbox+ACC-PTF+C/course'
+        expected_result = 'courses/course-v1:abc-sandbox%2BACC-PTF%2BC/course'
+        self.assertEqual(sanitize_next_parameter(next_param), expected_result)
+
+        # Valid URL without plus - keep the next_param as it is
+        next_param = 'courses/course-v1:abc-sandbox/course'
+        self.assertEqual(sanitize_next_parameter(next_param), next_param)
+
+        # Empty string - keep the next_param as it is
+        next_param = ''
+        self.assertEqual(sanitize_next_parameter(next_param), next_param)
+
+        # None input - keep the next_param as it is
+        next_param = None
+        self.assertEqual(sanitize_next_parameter(next_param), next_param)
+
+        # Invalid pattern - keep the next_param as it is
+        next_param = 'some/other/path'
+        self.assertEqual(sanitize_next_parameter(next_param), next_param)

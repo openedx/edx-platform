@@ -6,6 +6,7 @@ Helpers for the student app.
 import json
 import logging
 import mimetypes
+import re
 import urllib.parse
 from collections import OrderedDict
 from datetime import datetime
@@ -64,6 +65,8 @@ DISABLE_UNENROLL_CERT_STATES = [
 ]
 EMAIL_EXISTS_MSG_FMT = _("An account with the Email '{email}' already exists.")
 USERNAME_EXISTS_MSG_FMT = _("An account with the Public Username '{username}' already exists.")
+
+COURSE_URL_PATTERN = re.compile(r'courses/course-v1:[^/]+/course')
 
 
 log = logging.getLogger(__name__)
@@ -301,6 +304,7 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
         redirect url if safe else None
     """
     redirect_to = request_params.get('next')
+    redirect_to = sanitize_next_parameter(redirect_to)
     header_accept = request_headers.get('HTTP_ACCEPT', '')
     accepts_text_html = any(
         mime_type in header_accept
@@ -700,3 +704,17 @@ def get_resume_urls_for_enrollments(user, enrollments):
             url_to_block = ''
         resume_course_urls[enrollment.course_id] = url_to_block
     return resume_course_urls
+
+
+def sanitize_next_parameter(next_param):
+    """
+    Check the next parameter pattern and update the + symbol to its ASCII equivalent.
+    """
+    if not next_param:
+        return next_param
+
+    if COURSE_URL_PATTERN.match(next_param):
+        sanitized_next_parameter = re.sub(r'\+', '%2B', next_param)
+        return sanitized_next_parameter
+
+    return next_param
