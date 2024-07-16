@@ -50,7 +50,7 @@ COURSE_CERTIFICATE = "course-run"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def get_completed_programs(site: Site, student: "UserType") -> Set[str]:
+def get_completed_programs(site: Site, student: "UserType") -> Dict:
     """
     Given a set of completed courses, determine which programs are completed.
 
@@ -63,7 +63,7 @@ def get_completed_programs(site: Site, student: "UserType") -> Set[str]:
 
     """
     meter = ProgramProgressMeter(site, student)
-    return set(meter.completed_programs_with_available_dates.keys())
+    return meter.completed_programs_with_available_dates
 
 
 def get_inverted_programs(student: "UserType"):
@@ -110,7 +110,7 @@ def get_certified_programs(student: "UserType", raise_on_error: bool = False) ->
     return certified_programs
 
 
-def get_revokable_program_uuids(course_specific_programs: List[Dict], student: User) -> List[str]:
+def get_revokable_program_uuids(course_specific_programs: List[Dict], student: "UserType") -> List[str]:
     """
     Get program uuids for which certificate to be revoked.
 
@@ -424,8 +424,7 @@ def update_credentials_course_certificate_configuration_available_date(
 ):
     """
     This task will update the CourseCertificate configuration's available date
-    in Credentials. This date will always either be the available date that is
-    set in Studio for a given course, or it will be None.
+    in Credentials.
 
     Arguments:
         course_run_key (str): The course run key to award the certificate for

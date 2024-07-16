@@ -116,6 +116,36 @@ class AwardProgramCertificateTestCase(TestCase):
 
 @skip_unless_lms
 @ddt.ddt
+@override_settings(CREDENTIALS_SERVICE_USERNAME="test-service-username")
+class AwardProgramCertificatesUtilitiesTestCase(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
+    """
+    Tests for the utility methods for the 'award_program_certificates' celery task.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.create_credentials_config()
+        self.student = UserFactory.create(username="test-student")
+        self.site = SiteFactory()
+        self.site_configuration = SiteConfigurationFactory(site=self.site)
+        self.catalog_integration = self.create_catalog_integration()
+        ApplicationFactory.create(name="credentials")
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+
+    def test_get_completed_programs(self):
+        """get_completed_programs returns result of ProgramProgressMeter.completed_programs_with_available_dates"""
+        expected = {1: 1, 2: 2, 3: 3}
+        with mock.patch(
+            TASKS_MODULE + ".ProgramProgressMeter.completed_programs_with_available_dates",
+            new_callable=mock.PropertyMock,
+        ) as mock_completed_programs_with_available_dates:
+            mock_completed_programs_with_available_dates.return_value = expected
+            completed_programs = tasks.get_completed_programs(self.site, self.student)
+            assert expected == completed_programs
+
+
+@skip_unless_lms
+@ddt.ddt
 @mock.patch(TASKS_MODULE + ".award_program_certificate")
 @mock.patch(TASKS_MODULE + ".get_certified_programs")
 @mock.patch(TASKS_MODULE + ".get_completed_programs")
