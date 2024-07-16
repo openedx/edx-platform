@@ -3,7 +3,7 @@ This file contains celery tasks and utility functions responsible for syncing co
 between the monolith and the Credentials IDA.
 """
 
-from typing import TYPE_CHECKING, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Dict, List, Optional
 from urllib.parse import urljoin
 
 from celery import shared_task
@@ -59,7 +59,7 @@ def get_completed_programs(site: Site, student: "UserType") -> Dict:
         student (User): Representing the student whose completed programs to check for.
 
     Returns:
-        set of program_UUIDs
+        Dict of program_UUIDs:availability dates
 
     """
     meter = ProgramProgressMeter(site, student)
