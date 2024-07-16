@@ -1,9 +1,11 @@
 """
 Course Info serializers
 """
+
+from typing import Dict, Union
+
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from typing import Dict, Union
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
