@@ -34,6 +34,8 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+      env:
+        PIP_TRUSTED_HOST: "pypi.python.org pypi.org files.pythonhosted.org"
     - name: Install dependencies
       # TODO: Remove tox-pip-version once we upgrade to Koa+, or whenever we have addressed pip 20.3 strict issues.
       run: |
