@@ -866,8 +866,10 @@ class VideoTranscriptsMixin:
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
 
+        # language in plugin selector exists as transcript
         if dest_lang and dest_lang in other_lang.keys():
             transcript_language = dest_lang
+        # language in plugin selector is english and empty transcripts or transcripts and sub exists
         elif dest_lang and dest_lang == 'en' and (not other_lang or (other_lang and sub)):
             transcript_language = 'en'
         elif self.transcript_language in other_lang:
