@@ -7,7 +7,7 @@ jobs:
     uses: appsembler/action-conflict-counter/.github/workflows/report-via-comment.yml@main
     with:
       local_base_branch: ${{ github.base_ref }}
-      upstream_repo: 'https://github.com/edx/edx-platform.git'
+      upstream_repo: 'https://github.com/openedx/edx-platform.git'
       upstream_branches: 'open-release/nutmeg.master,master'
       exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
     secrets:
