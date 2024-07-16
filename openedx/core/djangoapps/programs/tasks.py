@@ -552,12 +552,6 @@ def award_course_certificate(self, username, course_run_key):
         )
         return
 
-    available_date = available_date_for_certificate(course_overview, certificate)
-    LOGGER.info(
-        f"Task award_course_certificate will award a course certificate to user {user.id} in course run "
-        f"{course_key} with an available date of {available_date}"
-    )
-
     # If the certificate has an associated CertificateDateOverride, send it along
     try:
         date_override = certificate.date_override.date  # type: Optional["datetime"]
