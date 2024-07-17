@@ -127,7 +127,7 @@ If you would like to understand these more deeply, they are defined in
 supported, but their underlying implementations may change without notice.
 
 .. _webpack CLI: https://webpack.js.org/api/cli/
-.. _package.json: ../package.json
+.. _package.json: ../../package.json
 
 Collect assets
 **************
