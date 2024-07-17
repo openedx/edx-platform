@@ -450,7 +450,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.21.5
+edx-enterprise==4.21.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -536,6 +536,7 @@ enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
 event-tracking==2.4.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-completion
     #   edx-proctoring
