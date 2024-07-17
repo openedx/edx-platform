@@ -12,6 +12,11 @@ import json
 
 import pytz
 
+import time
+import hmac
+import base64
+import hashlib
+
 from collections import namedtuple
 from django.conf import settings
 from django.contrib import messages
@@ -1355,3 +1360,59 @@ def _get_active_inactive_courses(user):
         else:
             user_active_inactive_courses.update({user_course["course_details"]["course_id"] : "Dropped"})
     return user_active_inactive_courses
+
+@login_required
+def extras_start_mettl_test(request):
+   test_id = request.GET["test_id"]
+   HTTPVerb = "POST"
+   URL = "https://api.mettl.com/v1/schedules/" + test_id + "/candidates"
+   PUBLICKEY = configuration_helpers.get_value("METTL_PUBLIC_KEY", "95d3af46-0bd7-4610-a759-b46060e80760")
+   PRIVATEKEY = configuration_helpers.get_value("METTL_PRIVATE_KEY", "beedfbbe-b1a8-47c7-aaa8-f11843d29393")
+   registration_details = json.dumps({"registrationDetails":[{"Email Address" : request.user.email, "First Name" : request.user.username}]})
+   timestamp = str(int(time.time()))
+   message = HTTPVerb + URL + '\n' + PUBLICKEY + '\n' + registration_details + '\n' + timestamp
+   sign = urllib.parse.quote(str(base64.b64encode(hmac.new(bytes(PRIVATEKEY, 'UTF-8') ,bytes(message, 'UTF-8') , digestmod=hashlib.sha1).digest()), "utf-8"))
+
+   headers={"Content-Type" : "application/x-www-form-urlencoded"}
+   payload = {"rd" : registration_details, "ak" : PUBLICKEY, "asgn" : sign, "ts" : timestamp}
+   response = requests.post(URL, headers = headers, data = payload).json()
+   log.error(payload)
+   log.error(response)
+   if response["status"] == "SUCCESS":
+      if response["registrationStatus"][0]["url"] is not None:
+           return redirect(response["registrationStatus"][0]["url"])
+      elif response["registrationStatus"][0]["status"] == "Completed":
+           return render(request, 'mettl_test_status.html', {"message" : "You have already completed your exam.Thank you!"})
+      elif response["registrationStatus"][0]["status"] == "InValid":
+           return render(request, 'mettl_test_status.html',{"message" : configuration_helpers.get_value("METTL_ERROR_MESSAGE", "You are not allowed to attend this exam owing to insufficient attendance. Please contact Support team")})
+
+   return render(request, 'mettl_test_status.html', {"message" : "Uh ho! Something went wrong. Please contact support <br><a href=mailto:{0}>{0}</a>".format(configuration_helpers.get_value("contact_mailing_address", ""))})
+
+@login_required
+def extras_get_mettl_report(request):
+
+
+    test_id = request.GET["test_id"]
+
+    if test_id is None:
+        return HttpResponse("Please contact Support")
+
+
+    HTTPVerb = "GET"
+    PUBLICKEY = configuration_helpers.get_value("METTL_PUBLIC_KEY", "95d3af46-0bd7-4610-a759-b46060e80760")
+    PRIVATEKEY = configuration_helpers.get_value("METTL_PRIVATE_KEY", "beedfbbe-b1a8-47c7-aaa8-f11843d29393")
+    URL = "https://api.mettl.com/v1/schedules/{0}/candidates/{1}".format(test_id, request.user.email)
+
+    timestamp = str(int(time.time()))
+    message = HTTPVerb + URL + '\n' + PUBLICKEY + '\n' + timestamp
+    sign = str(base64.b64encode(hmac.new(bytes(PRIVATEKEY, 'UTF-8') ,bytes(message, 'UTF-8') , digestmod=hashlib.sha1).digest()), "utf-8")
+    URL = "{url}?ak={access_key}&ts={timestamp}&asgn={sign}".format(url = URL, access_key = PUBLICKEY, timestamp = timestamp, sign = sign)
+
+    response = requests.get(URL).json()
+
+    log.info(response)
+
+    if response["status"] != "SUCCESS" :
+        return HttpResponse("Please Contact Support")
+
+    return redirect(response["candidate"]["testStatus"]["htmlReport"])

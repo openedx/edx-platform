@@ -1,0 +1,36 @@
+<!-- <%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%inherit file="main.html" />
+-->
+
+
+<style>
+    .confirm{
+
+            color: #00a651;
+            font-size: 50px;
+
+    }
+    .confirmation
+    {
+            margin: 20% 0;
+            text-align: center;
+    }
+    .main_link{
+            text-align: center;
+            font-size: 20px;
+            color: #ff5722;
+            text-decoration: none;
+            border-bottom:1px dashed #ff5722;
+    }
+</style>
+
+
+<div class="confirmation">
+<h1 class="confirm">{{message | safe}}</h1>
+<a href="/dashboard" class="main_link">Go back to Dashboard</a>
+</div>

@@ -21,6 +21,9 @@ urlpatterns = [
 
     re_path(r'^extras/reset_password_link', views.extras_reset_password_link, name = "extras_reset_password_link"),
 
+    re_path(r'^extras/start_mettl_test', views.extras_start_mettl_test, name = "extras_start_mettl_test"),
+    re_path(r'^extras/get_mettl_report', views.extras_get_mettl_report, name = "extras_get_mettl_report"), 
+
     re_path(r'^extras/get_user_enrolled_courses', views.extras_get_user_enrolled_courses, name = "extras_get_user_enrolled_courses"),
 
     re_path(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
