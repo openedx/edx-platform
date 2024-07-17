@@ -3,7 +3,6 @@ Tests for course_info
 """
 from unittest.mock import patch
 
-
 import ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -16,18 +15,18 @@ from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from common.djangoapps.util.course import get_link_for_about_page
+from lms.djangoapps.course_api.blocks.tests.test_views import TestBlocksInCourseView
+from lms.djangoapps.mobile_api.course_info.views import BlocksInfoInCourseView
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
-from lms.djangoapps.mobile_api.course_info.views import BlocksInfoInCourseView
-from lms.djangoapps.course_api.blocks.tests.test_views import TestBlocksInCourseView
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import \
+    SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
-
 
 User = get_user_model()
 
@@ -318,30 +317,7 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin
         else:
             self.assertIsNone(result_user)
 
-    @ddt.data(
-        ({'is_downloadable': True, 'download_url': 'https://test_certificate_url'},
-         {'url': 'https://test_certificate_url'}),
-        ({'is_downloadable': False}, {}),
-    )
-    @ddt.unpack
-    @patch('lms.djangoapps.mobile_api.course_info.views.certificate_downloadable_status')
-    def test_get_certificate(self, certificate_status_return, expected_output, mock_certificate_status):
-        """
-        Test get_certificate utility from the BlocksInfoInCourseView.
-
-        Parameters:
-        certificate_status_return: returned value of the mocked certificate_downloadable_status function.
-        expected_output: return_value of the get_certificate function with specified mock return_value.
-        """
-        mock_certificate_status.return_value = certificate_status_return
-        self.request.user = self.user
-
-        certificate_info = BlocksInfoInCourseView().get_certificate(
-            self.request, self.user, 'course-v1:Test+T101+2021_T1'
-        )
-        self.assertEqual(certificate_info, expected_output)
-
-    @patch('lms.djangoapps.mobile_api.course_info.views.certificate_downloadable_status')
+    @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
     def test_additional_info_response(self, mock_certificate_downloadable_status):
         certificate_url = 'https://test_certificate_url'
         mock_certificate_downloadable_status.return_value = {
@@ -450,3 +426,98 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for block_info in response.data['blocks'].values():
             self.assertNotEqual('assignment_progress', block_info)
+
+
+class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin):  # lint-amnesty, pylint: disable=test-inherits-tests
+    """
+    Test class for CourseEnrollmentDetailsView
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('course-enrollment-details', kwargs={
+            'api_version': 'v1',
+            'course_id': self.course.id
+        })
+        self.login_and_enroll()
+
+    @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
+    def test_response_data(self, mock_certificate_downloadable_status):
+        """ Test course enrollment detail view """
+
+        certificate_url = 'https://test_certificate_url'
+        mock_certificate_downloadable_status.return_value = {
+            'is_downloadable': True,
+            'download_url': certificate_url,
+        }
+
+        response = self.client.get(path=self.url)
+        assert response.status_code == 200
+        assert response.data['id'] == str(self.course.id)
+
+        self.verify_course_info_overview(response)
+        self.verify_certificate(response, mock_certificate_downloadable_status)
+        self.verify_course_access_details(response)
+
+    def verify_course_info_overview(self, response):
+        """ Verify course info overview """
+
+        expected_image_urls = {
+            'image':
+                {
+                    'large': '/static/needed_for_split/images/course_image.jpg',
+                    'raw': '/static/needed_for_split/images/course_image.jpg',
+                    'small': '/static/needed_for_split/images/course_image.jpg'
+                }
+        }
+
+        course_info = response.data['course_info_overview']
+        assert course_info['name'] == self.course.display_name
+        assert course_info['number'] == self.course.display_number_with_default
+        assert course_info['org'] == self.course.display_org_with_default
+        assert course_info['start'] == self.course.start.strftime('%Y-%m-%dT%H:%M:%SZ')
+        assert course_info['start_display'] is None
+        assert course_info['start_type'] == 'empty'
+        assert course_info['end'] == self.course.end.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        assert course_info['media'] == expected_image_urls
+        assert course_info['is_self_paced'] is False
+        expected_course_sharing_utm_parameters = {
+            'facebook': 'utm_medium=social&utm_campaign=social-sharing-db&utm_source=facebook',
+            'twitter': 'utm_medium=social&utm_campaign=social-sharing-db&utm_source=twitter'
+        }
+        self.assertDictEqual(course_info['course_sharing_utm_parameters'], expected_course_sharing_utm_parameters)
+
+        expected_course_modes = [{'slug': 'audit', 'sku': None, 'android_sku': None, 'ios_sku': None, 'min_price': 0}]
+        self.assertListEqual(course_info['course_modes'], expected_course_modes)
+
+        course_overview = CourseOverview.objects.get(id=self.course.course_id)
+        expected_course_about_link = get_link_for_about_page(course_overview)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(course_info['course_about'], expected_course_about_link)
+
+    def verify_course_access_details(self, response):
+        """ Verify access details """
+
+        expected_course_access_details = {
+            'has_unmet_prerequisites': False,
+            'is_too_early': False,
+            'is_staff': False,
+            'audit_access_expires': None,
+            'courseware_access': {
+                'has_access': True,
+                'error_code': None,
+                'developer_message': None,
+                'user_message': None,
+                'additional_context_user_message': None,
+                'user_fragment': None
+            }
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data['course_access_details'], expected_course_access_details)
+
+    def verify_certificate(self, response, mock_certificate_downloadable_status):
+        """ Verify certificate url """
+        mock_certificate_downloadable_status.assert_called_once()
+        certificate_url = 'https://test_certificate_url'
+        assert response.data['certificate'] == {'url': certificate_url}

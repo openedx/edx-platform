@@ -1,17 +1,14 @@
 """
 Tests for serializers for the Mobile Course Info
 """
-from unittest.mock import MagicMock, Mock, patch
 from typing import Dict, List, Tuple, Union
+from unittest.mock import MagicMock, Mock, patch
 
 import ddt
 from django.test import TestCase
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.mobile_api.course_info.serializers import (
-    CourseAccessSerializer,
-    CourseInfoOverviewSerializer,
-)
+from lms.djangoapps.mobile_api.course_info.serializers import CourseAccessSerializer, CourseInfoOverviewSerializer
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
