@@ -4,7 +4,9 @@ Sync certificate_available_date and visible_date for certificates
 Status
 ------
 
-Review
+Superseded by Credentials ADR `0001 Certificate Available Date`_.
+
+.. _0001 Certificate Available Date: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0005-restricted-application-for-SSO.rst
 
 Context
 -------

@@ -37,7 +37,7 @@ def get_credentials_records_url(program_uuid=None):
     return base_url
 
 
-def get_credentials_api_client(user):
+def get_credentials_api_client(user) -> requests.Session:
     """
     Returns an authenticated Credentials API client.
 
