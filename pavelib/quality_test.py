@@ -269,11 +269,12 @@ def run_eslint():
 
         # Write the output to the report file
         report_file.write(result.stdout)
+        
 
     # Check the return code and handle errors if any
     if result.returncode != 0:
         # print(result.stderr)
-        # print(result.stdout)
+        print(result.stdout)
         print(f"Warning: eslint command exited with non-zero status {result.returncode}")
 
     # sh(
