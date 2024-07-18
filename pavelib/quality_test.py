@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import subprocess
+import shutil
 
 import argparse
 from utils.envs import Env
@@ -126,11 +127,10 @@ def _prepare_report_dir(dir_name):
     """
     Sets a given directory to a created, but empty state
     """
-    path = Path(dir_name)
-    if path.is_dir():
-        dir_name.rmtree_p()
+    if os.path.isdir(path):
+        shutil.rmtree(path)
     
-    dir_name.mkdir_p()
+    os.makedirs(dir_name, exist_ok=True)
 
 
 def _write_metric(metric, filename):
@@ -231,11 +231,8 @@ def run_eslint():
     """
 
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
-    print(Env.REPORT_DIR)
     eslint_report = eslint_report_dir / "eslint.report"
-    print(eslint_report_dir)
-    # _prepare_report_dir(eslint_report_dir)
-    os.makedirs(eslint_report_dir, exist_ok=True)
+    _prepare_report_dir(eslint_report_dir)
     violations_limit = 4950
 
     command = (
@@ -254,10 +251,6 @@ def run_eslint():
 
         # Write the output to the report file
         report_file.write(result.stdout)
-
-        # Print stdout and stderr for debugging
-        print(result.stdout)
-        print(result.stderr)
 
     # Check the return code and handle errors if any
     if result.returncode != 0:
