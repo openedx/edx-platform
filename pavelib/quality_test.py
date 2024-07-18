@@ -229,13 +229,13 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    #import pdb; pdb.set_trace()
+
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
     print(Env.REPORT_DIR)
     eslint_report = eslint_report_dir / "eslint.report"
     print(eslint_report_dir)
     # _prepare_report_dir(eslint_report_dir)
-    eslint_report_dir.mkdir(exist_ok=True)
+    os.makedirs(eslint_report_dir, exist_ok=True)
     violations_limit = 4950
 
     command = (
@@ -254,6 +254,10 @@ def run_eslint():
 
         # Write the output to the report file
         report_file.write(result.stdout)
+
+        # Print stdout and stderr for debugging
+        print(result.stdout)
+        print(result.stderr)
 
     # Check the return code and handle errors if any
     if result.returncode != 0:
