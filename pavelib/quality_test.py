@@ -235,7 +235,7 @@ def run_eslint():
     eslint_report = eslint_report_dir / "eslint.report"
     print(eslint_report_dir)
     # _prepare_report_dir(eslint_report_dir)
-    eslint_report_dir.mkdir(parents=True, exist_ok=True)
+    eslint_report_dir.mkdir(exist_ok=True)
     violations_limit = 4950
 
     command = (
