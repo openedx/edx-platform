@@ -66,6 +66,7 @@ def ensure_clean_package_lock():
         print(e.stderr)  # Print any error output from the command
         raise  # Re-raise the exception to propagate the error
 
+
 def clean_dir(directory):
     """
     Delete all the files from the specified directory.

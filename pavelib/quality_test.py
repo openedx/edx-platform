@@ -131,7 +131,6 @@ def _prepare_report_dir(dir_name):
     """
     if os.path.isdir(dir_name):
         shutil.rmtree(dir_name)
-    
     os.makedirs(dir_name, exist_ok=True)
 
 
@@ -287,7 +286,7 @@ def run_stylelint():
     Runs stylelint on Sass files.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    
+
     install_node_prereqs()
 
     violations_limit = 0
@@ -629,8 +628,8 @@ def diff_coverage():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=['pep8','eslint','stylelint','xsslint','pii_check','check_keywords', 'all'])
-    
+    parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint', 'xsslint', 'pii_check', 'check_keywords', 'all'])
+ 
     argument = parser.parse_args()
 
     if argument.command == 'pep8':
@@ -638,10 +637,10 @@ if __name__ == "__main__":
 
     elif argument.command == 'eslint':
         run_eslint()
-    
+
     elif argument.command == 'stylelint':
         run_stylelint()
-    
+
     elif argument.command == 'xsslint':
         run_xsslint()
 
