@@ -254,6 +254,7 @@ def run_eslint():
 
     # Check the return code and handle errors if any
     if result.returncode != 0:
+        print(result.stderr)
         print(f"Warning: eslint command exited with non-zero status {result.returncode}")
 
     # sh(
