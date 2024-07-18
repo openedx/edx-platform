@@ -61,7 +61,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     filter_type = namedtuple('filter_type', ['param_name', 'field_name'])
     supported_filters = [
         filter_type(param_name='mobile', field_name='mobile_available'),
-        filter_type(param_name='category', field_name='category__name'),
+        filter_type(param_name='category', field_name='category_set__name'),
     ]
     mobile = ExtendedNullBooleanField(required=False)
     category = CharField(required=False)
