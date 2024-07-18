@@ -43,6 +43,9 @@ jobs:
       - name: Setup npm
         run: npm i -g npm@8.5.x
 
+      - name: Install dependencies
+        run: npm install  
+
       - name: Get pip cache dir
         id: pip-cache-dir
         run: |
