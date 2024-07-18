@@ -287,6 +287,9 @@ def run_stylelint():
     Runs stylelint on Sass files.
     If limit option is passed, fails build if more violations than the limit are found.
     """
+    
+    install_node_prereqs()
+
     violations_limit = 0
     num_violations = _get_stylelint_violations()
 
@@ -649,10 +652,10 @@ if __name__ == "__main__":
         check_keywords()
 
     elif argument.command == 'all':
-        print("else condition")
-        # run_pep8()
+        run_pep8()
         run_eslint()
-        # run_stylelint()
+        run_stylelint()
+
         # run_xsslint()
         #run_pii_check()
         # check_keywords()
