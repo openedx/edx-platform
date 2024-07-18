@@ -127,8 +127,8 @@ def _prepare_report_dir(dir_name):
     """
     Sets a given directory to a created, but empty state
     """
-    if os.path.isdir(path):
-        shutil.rmtree(path)
+    if os.path.isdir(dir_name):
+        shutil.rmtree(dir_name)
     
     os.makedirs(dir_name, exist_ok=True)
 
