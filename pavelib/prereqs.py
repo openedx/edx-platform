@@ -12,8 +12,8 @@ from distutils import sysconfig  # pylint: disable=deprecated-module
 
 from paver.easy import sh, task  # lint-amnesty, pylint: disable=unused-import
 
-from .utils.envs import Env
-from .utils.timer import timed
+from utils.envs import Env
+from utils.timer import timed
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
