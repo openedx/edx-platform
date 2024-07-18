@@ -251,7 +251,7 @@ def run_eslint():
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
     eslint_report = eslint_report_dir / "eslint.report"
     _prepare_report_dir(eslint_report_dir)
-    violations_limit = 4950
+    violations_limit = 1000
 
     command = (
         f"node --max_old_space_size=4096 node_modules/.bin/eslint "
