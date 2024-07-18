@@ -274,7 +274,7 @@ def is_meilisearch_enabled() -> bool:
     return False
 
 
-# pylint: disable=too-many-statements
+# pylint: disable=too-many-statements disable=too-many-nested-blocks
 def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     """
     Rebuild the Meilisearch index from scratch
@@ -348,13 +348,16 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             try:
                 docs = []
                 for component in lib_api.get_library_components(lib_key):
-                    metadata = lib_api.LibraryXBlockMetadata.from_component(lib_key, component)
-                    doc = {}
-                    doc.update(searchable_doc_for_library_block(metadata))
-                    doc.update(searchable_doc_tags(metadata.usage_key))
-                    docs.append(doc)
-
-                    num_blocks_done += 1
+                    try:
+                        metadata = lib_api.LibraryXBlockMetadata.from_component(lib_key, component)
+                        doc = {}
+                        doc.update(searchable_doc_for_library_block(metadata))
+                        doc.update(searchable_doc_tags(metadata.usage_key))
+                        docs.append(doc)
+                    except Exception as err:  # pylint: disable=broad-except
+                        status_cb(f"Error indexing library component {component}: {err}")
+                    finally:
+                        num_blocks_done += 1
                 if docs:
                     # Add all the docs in this library at once (usually faster than adding one at a time):
                     _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
