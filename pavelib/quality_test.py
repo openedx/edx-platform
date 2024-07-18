@@ -10,6 +10,7 @@ import shutil
 import argparse
 from utils.envs import Env
 from prereqs import install_node_prereqs
+from utils.test.utils import ensure_clean_package_lock
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from pathlib import Path
@@ -225,28 +226,14 @@ def _get_stylelint_violations():
         )
 
 
-def check_package_lock():
-    try:
-        # Run git diff command to check for changes in package-lock.json
-        result = subprocess.run(
-            ["git", "diff", "--name-only", "--exit-code", "package-lock.json"],
-            capture_output=True,  # Capture stdout and stderr
-            text=True,  # Decode output to text
-            check=True  # Raise error for non-zero exit code
-        )
-        # No differences found in package-lock.json
-        print("package-lock.json is clean.")
-    except subprocess.CalledProcessError as e:
-        # Git diff command returned non-zero exit code (changes detected)
-        print("Dirty package-lock.json, run 'npm install' and commit the generated changes.")
-        print(e.stderr)  # Print any error output from the command
-        raise  # Re-raise the exception to propagate the error
-
 def run_eslint():
     """
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
+
+    ensure_clean_package_lock()
+    install_node_prereqs()
 
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
     eslint_report = eslint_report_dir / "eslint.report"
@@ -269,25 +256,9 @@ def run_eslint():
 
         # Write the output to the report file
         report_file.write(result.stdout)
-        
-
-    # Check the return code and handle errors if any
-    if result.returncode != 0:
-        # print(result.stderr)
-        print(result.stdout)
-        print(f"Warning: eslint command exited with non-zero status {result.returncode}")
-
-    # sh(
-    #     "node --max_old_space_size=4096 node_modules/.bin/eslint "
-    #     "--ext .js --ext .jsx --format=compact . | tee {eslint_report}".format(
-    #         eslint_report=eslint_report
-    #     ),
-    #     ignore_error=True
-    # )
 
     try:
         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
-        print(num_violations)
     except TypeError:
         fail_quality(
             'eslint',
@@ -308,7 +279,6 @@ def run_eslint():
             )
         )
     else:
-        print("writing junit xml")
         write_junit_xml('eslint')
 
 
@@ -681,10 +651,7 @@ if __name__ == "__main__":
     elif argument.command == 'all':
         print("else condition")
         # run_pep8()
-        check_package_lock()
-        install_node_prereqs()
         run_eslint()
-        #/home/runner/work/edx-platform/edx-platform/reports/eslint
         # run_stylelint()
         # run_xsslint()
         #run_pii_check()
