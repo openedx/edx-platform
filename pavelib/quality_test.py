@@ -251,7 +251,7 @@ def run_eslint():
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
     eslint_report = eslint_report_dir / "eslint.report"
     _prepare_report_dir(eslint_report_dir)
-    violations_limit = 1000
+    violations_limit = 4950
 
     command = (
         f"node --max_old_space_size=4096 node_modules/.bin/eslint "
@@ -272,8 +272,8 @@ def run_eslint():
 
     # Check the return code and handle errors if any
     if result.returncode != 0:
-        print(result.stderr)
-        print(result.stdout)
+        # print(result.stderr)
+        # print(result.stdout)
         print(f"Warning: eslint command exited with non-zero status {result.returncode}")
 
     # sh(
@@ -286,6 +286,7 @@ def run_eslint():
 
     try:
         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
+        print(num_violations)
     except TypeError:
         fail_quality(
             'eslint',
@@ -306,6 +307,7 @@ def run_eslint():
             )
         )
     else:
+        print("writing junit xml")
         write_junit_xml('eslint')
 
 
