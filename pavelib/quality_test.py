@@ -9,6 +9,7 @@ import shutil
 
 import argparse
 from utils.envs import Env
+from prereqs import install_node_prereqs
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from pathlib import Path
@@ -224,6 +225,23 @@ def _get_stylelint_violations():
         )
 
 
+def check_package_lock():
+    try:
+        # Run git diff command to check for changes in package-lock.json
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "--exit-code", "package-lock.json"],
+            capture_output=True,  # Capture stdout and stderr
+            text=True,  # Decode output to text
+            check=True  # Raise error for non-zero exit code
+        )
+        # No differences found in package-lock.json
+        print("package-lock.json is clean.")
+    except subprocess.CalledProcessError as e:
+        # Git diff command returned non-zero exit code (changes detected)
+        print("Dirty package-lock.json, run 'npm install' and commit the generated changes.")
+        print(e.stderr)  # Print any error output from the command
+        raise  # Re-raise the exception to propagate the error
+
 def run_eslint():
     """
     Runs eslint on static asset directories.
@@ -255,6 +273,7 @@ def run_eslint():
     # Check the return code and handle errors if any
     if result.returncode != 0:
         print(result.stderr)
+        print(result.stdout)
         print(f"Warning: eslint command exited with non-zero status {result.returncode}")
 
     # sh(
@@ -659,6 +678,8 @@ if __name__ == "__main__":
     elif argument.command == 'all':
         print("else condition")
         # run_pep8()
+        check_package_lock()
+        install_node_prereqs()
         run_eslint()
         #/home/runner/work/edx-platform/edx-platform/reports/eslint
         # run_stylelint()
