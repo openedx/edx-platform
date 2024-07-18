@@ -60,15 +60,16 @@ def send_response_endorsed_notifications(thread_id, response_id, course_key_str,
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
     thread = Thread(id=thread_id).retrieve()
-    creator = User.objects.get(id=endorsed_by)
-    course = get_course_with_access(creator, 'load', course_key, check_if_enrolled=True)
     response = Comment(id=response_id).retrieve()
+    creator = User.objects.get(id=response.user_id)
+    endorser = User.objects.get(id=endorsed_by)
+    course = get_course_with_access(creator, 'load', course_key, check_if_enrolled=True)
     notification_sender = DiscussionNotificationSender(thread, course, creator)
     # skip sending notification to author of thread if they are the same as the author of the response
     if response.user_id != thread.user_id:
         # sends notification to author of thread
         notification_sender.send_response_endorsed_on_thread_notification()
     # sends notification to author of response
-    if int(response.user_id) != creator.id:
+    if int(response.user_id) != endorser.id:
         notification_sender.creator = User.objects.get(id=response.user_id)
         notification_sender.send_response_endorsed_notification()
