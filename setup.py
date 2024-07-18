@@ -35,7 +35,7 @@ XBLOCKS = [
     "video = xmodule.video_block:VideoBlock",
     "videoalpha = xmodule.video_block:VideoBlock",
     "videodev = xmodule.template_block:TranslateCustomTagBlock",
-    "word_cloud = xmodule.word_cloud_block:WordCloudBlock",
+    "word_cloud_deprecated = xmodule.word_cloud_block:WordCloudBlock",
     "wrapper = xmodule.wrapper_block:WrapperBlock",
 ]
 XBLOCKS_ASIDES = [
