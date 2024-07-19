@@ -232,29 +232,6 @@ def require_course_permission(permission):
     return decorator
 
 
-def verify_course_permission(permission):
-    """
-        Decorator with argument that requires a specific permission of the requesting
-        user. If the requirement is not satisfied, returns an
-        HttpResponseForbidden (403).
-        Assumes that request is in self.
-        Assumes that course_id is in kwargs['course_id'].
-        """
-    def decorator(func):
-        def wrapped(self, *args, **kwargs):
-            request = self.request
-            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
-
-            if request.user.has_perm(permission, course):
-                return func(self, *args, **kwargs)
-            else:
-                return HttpResponseForbidden()
-
-        return wrapped
-
-    return decorator
-
-
 def require_sales_admin(func):
     """
     Decorator for checking sales administrator access before executing an HTTP endpoint. This decorator
@@ -2398,11 +2375,11 @@ class ListEntranceExamInstructorTasks(APIView):
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.SHOW_TASKS
     http_method_names = ['post']
 
     @method_decorator(ensure_csrf_cookie)
-    @verify_course_permission(permissions.SHOW_TASKS)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     def post(self, request, course_id):
         """
