@@ -212,9 +212,6 @@ def _get_stylelint_violations():
         result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         report_file.write(result.stdout)
 
-    if result.returncode != 0:
-        print(f"Warning: stylelint command exited with non-zero status {result.returncode}")
-
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
     except TypeError:
@@ -356,6 +353,7 @@ def run_pii_check():
     """
     Guarantee that all Django models are PII-annotated.
     """
+    install_python_prereqs()
     pii_report_name = 'pii'
     default_report_dir = (Env.REPORT_DIR / pii_report_name)
     report_dir = default_report_dir
@@ -375,20 +373,10 @@ def run_pii_check():
                 f"--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()} "
                 f"--lint --report --coverage | tee {run_output_file}"
             )
-            # sh(
-            #     "mkdir -p {} && "  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
-            #     "export DJANGO_SETTINGS_MODULE={}; "
-            #     "code_annotations django_find_annotations "
-            #     "--config_file .pii_annotations.yml --report_path {} --app_name {} "
-            #     "--lint --report --coverage | tee {}".format(
-            #         report_dir, env_settings_file, report_dir, env_name.lower(), run_output_file
-            #     )
-            # )
             result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            
             with open(run_output_file, 'w') as f:
                 f.write(result.stdout)
-            if result.returncode != 0:
-                print(f"Warning: Command exited with non-zero status {result.returncode}")
 
             uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
             env_report.append((
@@ -420,8 +408,9 @@ def check_keywords():
     """
     Check Django model fields for names that conflict with a list of reserved keywords
     """
+    
+    install_python_prereqs()
     report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
-    # sh(f"mkdir -p {report_path}")
     os.makedirs(report_path, exist_ok=True)
 
     overall_status = True
@@ -657,8 +646,7 @@ if __name__ == "__main__":
         run_pep8()
         run_eslint()
         run_stylelint()
-
-        # run_xsslint()
-        # run_pii_check()
-        # check_keywords()
-        # diff_coverage()
+        run_xsslint()
+        run_pii_check()
+        check_keywords()
+        diff_coverage()

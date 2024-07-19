@@ -10,7 +10,7 @@ import subprocess
 import sys
 from distutils import sysconfig  # pylint: disable=deprecated-module
 
-from paver.easy import sh, task  # lint-amnesty, pylint: disable=unused-import
+# from paver.easy import sh, task  # lint-amnesty, pylint: disable=unused-import
 
 from utils.envs import Env
 from utils.timer import timed
