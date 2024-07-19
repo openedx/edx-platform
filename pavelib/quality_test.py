@@ -10,6 +10,7 @@ import shutil
 import argparse
 from utils.envs import Env
 from prereqs import install_node_prereqs
+from prereqs import install_python_prereqs
 from utils.test.utils import ensure_clean_package_lock
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
@@ -488,6 +489,8 @@ def run_xsslint():
     Runs xsslint/xss_linter.py on the codebase
     """
     # thresholds_option = getattr(options, 'thresholds', '{}')
+    install_python_prereqs()
+
     try:
         json_file_path = 'scripts/xsslint_thresholds.json'
         # Read the JSON file
@@ -659,4 +662,4 @@ if __name__ == "__main__":
         # run_pii_check()
         # check_keywords()
         # diff_coverage()
-        
+

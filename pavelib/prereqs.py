@@ -293,8 +293,6 @@ def install_coverage_prereqs():
     pip_install_req_file(COVERAGE_REQ_FILE)
 
 
-@task
-@timed
 def install_python_prereqs():
     """
     Installs Python prerequisites.
