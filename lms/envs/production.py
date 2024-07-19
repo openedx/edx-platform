@@ -1063,8 +1063,6 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
-        'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {

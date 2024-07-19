@@ -849,7 +849,7 @@ def _course_uses_available_date(course):
     )
 
 
-def available_date_for_certificate(course, certificate):
+def available_date_for_certificate(course, certificate) -> datetime:
     """
     Returns the available date to use with a certificate
 

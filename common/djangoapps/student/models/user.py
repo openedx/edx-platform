@@ -552,7 +552,10 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
-    phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d*$',
+        message="Phone number must start with '+' (optional) followed by digits (0-9) only.",
+    )
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
 
     @property

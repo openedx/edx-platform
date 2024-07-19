@@ -28,6 +28,18 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track import segment
 
 
+# .. toggle_name: discounts.enable_first_purchase_discount_override
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable the First Purchase Discount to be overriden from
+#   EDXWELCOME/BIENVENIDOAEDX 15% discount to a new code.
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2024-07-18
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: REV-4097
+# .. toggle_warning: This feature toggle does not have a target removal date.
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG = WaffleFlag('discounts.enable_first_purchase_discount_override', __name__)
+
 # .. toggle_name: discounts.enable_discounting
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False

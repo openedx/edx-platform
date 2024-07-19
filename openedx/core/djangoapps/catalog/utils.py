@@ -4,6 +4,7 @@ import copy
 import datetime
 import logging
 import uuid
+from typing import TYPE_CHECKING, Any, List, Union
 
 import pycountry
 import requests
@@ -30,6 +31,9 @@ from openedx.core.djangoapps.catalog.cache import (
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_api_data
+
+if TYPE_CHECKING:
+    from django.contrib.sites.models import Site
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +102,14 @@ def check_catalog_integration_and_get_user(error_message_field):
 
 
 # pylint: disable=redefined-outer-name
-def get_programs(site=None, uuid=None, uuids=None, course=None, catalog_course_uuid=None, organization=None):
+def get_programs(
+    site: "Site" = None,
+    uuid: str = None,
+    uuids: List[str] = None,
+    course: str = None,
+    catalog_course_uuid: str = None,
+    organization: str = None,
+) -> Union[str, List[str]]:
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
@@ -112,7 +123,7 @@ def get_programs(site=None, uuid=None, uuids=None, course=None, catalog_course_u
         organization (string): short name for specific organization to read from the cache.
 
     Returns:
-        list of dict, representing programs.
+        list of str, representing programs.
         dict, if a specific program is requested.
     """
     if len([arg for arg in (site, uuid, uuids, course, catalog_course_uuid, organization) if arg is not None]) != 1:
@@ -194,7 +205,7 @@ def get_programs_by_type_slug(site, program_type_slug):
     return get_programs_by_uuids(uuids)
 
 
-def get_programs_by_uuids(uuids):
+def get_programs_by_uuids(uuids: List[Any]) -> List[str]:
     """
     Gets a list of programs for the provided uuids
     """
