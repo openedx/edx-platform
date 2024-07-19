@@ -180,8 +180,6 @@ def pip_install_req_file(req_file):
     sh(f"{pip_cmd} -r {req_file}")
 
 
-@task
-@timed
 def install_node_prereqs():
     """
     Installs Node prerequisites
