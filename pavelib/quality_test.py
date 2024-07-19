@@ -629,7 +629,7 @@ def diff_coverage():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint', 'xsslint', 'pii_check', 'check_keywords', 'all'])
- 
+
     argument = parser.parse_args()
 
     if argument.command == 'pep8':
@@ -659,3 +659,4 @@ if __name__ == "__main__":
         #run_pii_check()
         # check_keywords()
         # diff_coverage()
+        
