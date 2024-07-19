@@ -235,15 +235,16 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     """
     credentials_api_base_url = get_credentials_api_base_url()
     credentials_api_url = urljoin(f"{credentials_api_base_url}/", "course_certificates/")
+    certificate_config = {
+        "course_id": cert_config["course_id"],
+        "certificate_type": cert_config["mode"],
+        "certificate_available_date": certificate_available_date,
+        "is_active": True,
+    }
 
     response = client.post(
         credentials_api_url,
-        json={
-            "course_id": cert_config["course_id"],
-            "certificate_type": cert_config["mode"],
-            "certificate_available_date": certificate_available_date,
-            "is_active": True,
-        },
+        json=certificate_config,
     )
 
     # Sometimes helpful error context is swallowed when calling `raise_for_status()`. We try to print out any additional
@@ -253,8 +254,8 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     # 201 on a successful call.
     if response.status_code != 201:
         LOGGER.error(
-            "Error creating or updating a course certificate configuration in the Credentials IDA. Additional details: "
-            f"{response.text}"
+            "Error creating or updating a course certificate configuration in the Credentials IDA.\n"
+            f"config sent: {certificate_config}\nAdditional details: {response.text}"
         )
     response.raise_for_status()
 
