@@ -375,7 +375,7 @@ def run_pii_check():
                 f"--lint --report --coverage | tee {run_output_file}"
             )
             result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            
+
             with open(run_output_file, 'w') as f:
                 f.write(result.stdout)
 
@@ -409,7 +409,7 @@ def check_keywords():
     """
     Check Django model fields for names that conflict with a list of reserved keywords
     """
-    
+
     install_python_prereqs()
     report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
     os.makedirs(report_path, exist_ok=True)
