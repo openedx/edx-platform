@@ -92,6 +92,9 @@ WIKI_ENABLED = True
 # Enable a parental consent age limit for testing
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
+# Enable Fist Purchase Discount offer override
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
+
 # Local Directories
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
