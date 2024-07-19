@@ -11,6 +11,7 @@ import argparse
 from utils.envs import Env
 from prereqs import install_node_prereqs
 from prereqs import install_python_prereqs
+from prereqs import install_coverage_prereqs
 from utils.test.utils import ensure_clean_package_lock
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
@@ -586,6 +587,7 @@ def diff_coverage():
     """
     Build the diff coverage reports
     """
+    install_coverage_prereqs()
     # compare_branch = options.get('compare_branch', 'origin/master')
     compare_branch = 'origin/master'
 
