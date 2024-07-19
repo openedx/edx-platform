@@ -656,7 +656,7 @@ if __name__ == "__main__":
         run_stylelint()
 
         # run_xsslint()
-        #run_pii_check()
+        # run_pii_check()
         # check_keywords()
         # diff_coverage()
         
