@@ -178,3 +178,27 @@ class TestLoginHelper(TestCase):
         # Invalid pattern - keep the next_param as it is
         next_param = 'some/other/path'
         self.assertEqual(sanitize_next_parameter(next_param), next_param)
+
+        # Invalid URL with space - replace the ' ' with '+' and encode it
+        expected_result = 'courses/course-v1:abc-sandbox%2BACC-PTF%2BC/course'
+
+        next_param = 'courses/course-v1:abc-sandbox ACC-PTF C/course'
+        self.assertEqual(sanitize_next_parameter(next_param), expected_result)
+
+        next_param = 'courses/course-v1:abc-sandbox ACC-PTF+C/course'
+        self.assertEqual(sanitize_next_parameter(next_param), expected_result)
+
+        next_param = 'courses/course-v1:abc-sandbox+ACC-PTF C/course'
+        self.assertEqual(sanitize_next_parameter(next_param), expected_result)
+
+        # Invalid URL with encoded space - replace the '%20' with '+' and encode it
+        expected_result = 'courses/course-v1:abc-sandbox%2BACC-PTF%2BC/course'
+
+        next_param = 'courses/course-v1:abc-sandbox%20ACC-PTF%20C/course'
+        self.assertEqual(sanitize_next_parameter(next_param), expected_result)
+
+        next_param = 'courses/course-v1:abc-sandbox%20ACC-PTF+C/course'
+        self.assertEqual(sanitize_next_parameter(next_param), expected_result)
+
+        next_param = 'courses/course-v1:abc-sandbox+ACC-PTF%20C/course'
+        self.assertEqual(sanitize_next_parameter(next_param), expected_result)
