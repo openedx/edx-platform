@@ -33,7 +33,7 @@ from common.djangoapps.track import segment
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable the First Purchase Discount to be overriden from
 #   EDXWELCOME/BIENVENIDOAEDX 15% discount to a new code.
-# .. toggle_use_cases: temporary
+# .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2024-07-18
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-4097
