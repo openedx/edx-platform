@@ -600,10 +600,10 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
         self.assertEqual(notification_data.notification_type, 'response_endorsed_on_thread')
 
         expected_context = {
-            'replier_name': self.user_3.username,
+            'replier_name': self.user_2.username,
             'post_title': 'test thread',
             'course_name': self.course.display_name,
-            'sender_id': int(self.user_3.id),
+            'sender_id': int(self.user_2.id),
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
