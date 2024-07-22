@@ -205,7 +205,4 @@ ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip ins
 
 quality:
 	python pavelib/quality_test.py all
-
-pep8_test:
-	 python pavelib/quality_test.py pep8
 	 

@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 import sys
+import shutil
 from distutils import sysconfig  # pylint: disable=deprecated-module
 
 from paver.easy import sh, task  # lint-amnesty, pylint: disable=unused-import
@@ -138,13 +139,18 @@ def node_prereqs_installation():
     #
     # This hack should probably be left in place for at least a year.
     # See ADR 17 for more background on the transition.
-    sh("rm -rf common/static/common/js/vendor/ common/static/common/css/vendor/")
+    # sh("rm -rf common/static/common/js/vendor/ common/static/common/css/vendor/")
+    shutil.rmtree("common/static/common/js/vendor/ common/static/common/css/vendor/")
     # At the time of this writing, the js dir has git-versioned files
     # but the css dir does not, so the latter would have been created
     # as root-owned (in the process of creating the vendor
     # subdirectory). Delete it only if empty, just in case
     # git-versioned files are added later.
-    sh("rmdir common/static/common/css || true")
+    # sh("rmdir common/static/common/css || true")
+    try:
+        os.rmdir("common/static/common/css")
+    except OSError:
+        pass
 
     # NPM installs hang sporadically. Log the installation process so that we
     # determine if any packages are chronic offenders.
