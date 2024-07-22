@@ -806,7 +806,7 @@ class ProblemBlock(
         """
         try:
             course_end_date = self.get_course_end_date()
-        except AttributeError:
+        except (AttributeError, KeyError):
             course_end_date = None
 
         due_date = self.due or course_end_date
