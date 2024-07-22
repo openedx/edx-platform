@@ -655,7 +655,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                    due=self.yesterday_str)
         assert block.closed()
 
-    @patch.object(ProblemBlock,'course_end_date', new_callable=PropertyMock)
+    @patch.object(ProblemBlock, 'course_end_date', new_callable=PropertyMock)
     def test_closed_for_archive(self, mock_course_end_date):
 
         # Utility to create a datetime object in the past
