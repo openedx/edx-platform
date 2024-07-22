@@ -714,7 +714,27 @@ def sanitize_next_parameter(next_param):
         return next_param
 
     if COURSE_URL_PATTERN.match(next_param):
+        # Sometimes the course id received with incorrect encoding/decoding, we need to
+        # replace it to the correct pattern:
+        # course-v1:test-sandbox PREP-CORE C -> course-v1:test-sandbox+PREP-CORE+C
+        #
+        # Note: We are not expect to have any spaces in course URL
+
+        if ' ' in next_param:
+            next_param = next_param.replace(' ', '+')
+        elif '%20' in next_param:
+            next_param = next_param.replace('%20', '+')
+
         sanitized_next_parameter = re.sub(r'\+', '%2B', next_param)
+
+        log.info(
+            u"The course-like next parameter was detected '%(next_param)s'"
+            u" this will be replaced with sanitized version: '%(sanitized_next_parameter)s'",
+            {
+                "next_param": next_param,
+                "sanitized_next_parameter": sanitized_next_parameter,
+            }
+        )
         return sanitized_next_parameter
 
     return next_param
