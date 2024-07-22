@@ -140,7 +140,7 @@ def node_prereqs_installation():
     # This hack should probably be left in place for at least a year.
     # See ADR 17 for more background on the transition.
     # sh("rm -rf common/static/common/js/vendor/ common/static/common/css/vendor/")
-    shutil.rmtree("common/static/common/js/vendor/ common/static/common/css/vendor/")
+    # shutil.rmtree("common/static/common/js/vendor/ common/static/common/css/vendor/")
     # At the time of this writing, the js dir has git-versioned files
     # but the css dir does not, so the latter would have been created
     # as root-owned (in the process of creating the vendor
@@ -148,6 +148,7 @@ def node_prereqs_installation():
     # git-versioned files are added later.
     # sh("rmdir common/static/common/css || true")
     try:
+        shutil.rmtree("common/static/common/js/vendor/ common/static/common/css/vendor/")
         os.rmdir("common/static/common/css")
     except OSError:
         pass
