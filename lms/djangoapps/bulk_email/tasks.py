@@ -26,6 +26,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import override as override_language
 from edx_django_utils.monitoring import set_code_owner_attribute
+from eventtracking import tracker
 from markupsafe import escape
 
 from common.djangoapps.util.date_utils import get_default_time_display
@@ -467,7 +468,14 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             "send."
         )
         raise exc
-
+    tracker.emit(
+        'edx.bulk_email.created',
+        {
+            'course_id': str(course_email.course_id),
+            'to_list': to_list,
+            'total_recipients': total_recipients,
+        }
+    )
     # Exclude optouts (if not a retry):
     # Note that we don't have to do the optout logic at all if this is a retry,
     # because we have presumably already performed the optout logic on the first
