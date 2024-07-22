@@ -808,9 +808,8 @@ class ProblemBlock(
         """
         Return the date submissions should be closed from.
         """
-        course_end_date = self.course_end_date
 
-        due_date = self.due or course_end_date
+        due_date = self.due or self.course_end_date
 
         if self.graceperiod is not None and due_date:
             return due_date + self.graceperiod
