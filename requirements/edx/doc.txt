@@ -611,7 +611,8 @@ edx-rest-api-client==5.6.1
     #   edx-proctoring
 edx-search==3.6.0
     # via -r requirements/edx/base.txt
-edx-sga==0.23.0
+#edx-sga==0.23.0
+git+https://github.com/ts-tech-repo/edx-sga.git@quince.master
     # via -r requirements/edx/base.txt
 edx-submissions==3.6.0
     # via
