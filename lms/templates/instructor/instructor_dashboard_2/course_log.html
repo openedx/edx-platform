@@ -1,0 +1,89 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+	from pytz import timezone
+%>
+
+<script>
+        var current_course_id = "${section_data['course_id']}"
+</script>
+
+    %if section_data["course_logs"]["components"]:
+
+	<div>
+
+	    <table class = "course_log" id='course_log'>
+    		<thead>
+		    <th>Unit</th>
+		    <th>Type</th>
+		    <th>Edited On</th>
+		    <th>Edited By</th>
+		    <th>Status</th>
+		</thead>
+		<tbody>
+			% for block_id, block_data in section_data["course_logs"]["components"].items():
+				% for edited_info in block_data["edited_info"]:
+					<tr>
+						<td>${edited_info["parents_names"][0]} &#x2192; ${edited_info["parents_names"][1]} &#x2192; ${edited_info["parents_names"][2]}</td>
+						<td>${block_data["block_type"]}</td>
+						<td>${edited_info["edited_on"]}</td>
+						<td>${edited_info["edited_by"]}</td>
+						<td>${edited_info["status"]}</td>
+					</tr>
+				% endfor
+
+
+			% endfor
+		</tbody>
+	      </table>
+    %else:
+        <p> Content is not added.. </p>
+    %endif:
+</div>
+
+<script>
+	$(document).ready(function() {	
+		var course_id_name = current_course_id.replaceAll("+", "-")
+                course_id_name = course_id_name.replaceAll(":", "-")
+                var course_log_file_name = "course_log_" + Math.floor(new Date() / 1000) 
+
+		$('table#course_log').DataTable({
+			'columnDefs' : [{ 'targets':2, 'type':'date'},
+					{'targets':1,  "render": function ( data, type, row ) {
+ 						switch (data) {
+						case 'Lti Consumer':
+							return 'Moodle Features';
+							break;
+						case 'Pdf':
+							return 'PDF';
+							break;
+						case 'Discussion':
+							return 'Discussion Forum'
+							break;
+						case 'Encryptplayer':
+							return 'Encrypt Video Player'
+							break;
+						default:
+							return data;
+					}}}],
+			'dom': 'Bfrtip',
+        	        'buttons': [{'extend': 'excel', 'text': 'Download', 'title': course_log_file_name}],
+			'search' : false,
+			'pageLength' : 50,
+			'lengthChange': false,
+			'info': false,
+			'paging': true,
+			'iDisplaylength': 25,
+			'aLengthMenu': [[100, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+			"order": [[ 2, 'desc' ]]
+			//'scrollX': true
+		});
+		 $('label:contains("Search:")').contents().filter(function() {
+                	return this.nodeType === 3; // Text node
+            	  }).remove();
+		  var intervalId_table = setInterval(function () {
+    			$('#course_log.dataTable').wrap('<div class="wrapper_table"></div>');
+    			clearInterval(intervalId_table);
+		}, 100);
+	});
+
+</script>

@@ -85,7 +85,9 @@ from openedx.core.djangolib.markup import HTML
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-
+  <script>
+    document.querySelector('link[rel="icon"]').href="https://static.talentsprint.com/favicon.ico"; 
+  </script>
   % for section_data in sections:
     % if 'fragment' in section_data:
       ${HTML(section_data['fragment'].head_html())}
