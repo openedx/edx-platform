@@ -1379,7 +1379,8 @@ def extras_get_last_login(request):
                 log.info(e)
                 return JsonResponse({"ERROR": "Something went wrong"})
 
-            @login_required
+
+@login_required
 def extras_start_mettl_test(request):
    test_id = request.GET["test_id"]
    HTTPVerb = "POST"
