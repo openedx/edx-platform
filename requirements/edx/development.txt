@@ -828,7 +828,8 @@ edx-search==3.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-sga==0.23.0
+#edx-sga==0.23.0
+git+https://github.com/ts-tech-repo/edx-sga.git@quince.master
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
