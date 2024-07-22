@@ -797,7 +797,8 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.5.5
+#ora2==5.5.5
+git+https://github.com/ts-tech-repo/edx-ora2.git@quince
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
