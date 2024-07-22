@@ -667,7 +667,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             return (datetime.datetime.now(UTC) + datetime.timedelta(days=days))
 
         block = CapaFactory.create(max_attempts="1", attempts="0")
-        
+
         # For active courses without graceperiod
         mock_get_course_end_date.return_value = future_datetime(10)
         assert not block.closed()
