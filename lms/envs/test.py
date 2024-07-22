@@ -92,7 +92,7 @@ WIKI_ENABLED = True
 # Enable a parental consent age limit for testing
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
-# Enable Fist Purchase Discount offer override
+# Enable First Purchase Discount offer override
 FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
 
 # Local Directories
