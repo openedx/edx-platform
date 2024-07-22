@@ -121,3 +121,8 @@ backports.zoneinfo;python_version<"3.9"  # Newer versions have zoneinfo availabl
 # Otherwise we see a failure while running the following command:
 # export DJANGO_SETTINGS_MODULE=cms.envs.test; python manage.py cms check_reserved_keywords --override_file db_keyword_overrides.yml --report_path reports/reserved_keywords --report_file cms_reserved_keyword_report.csv
 numpy<2.0.0
+
+# django-storages==1.14.4 breaks course imports
+# Two lines were added in 1.14.4 that make file_exists_in_storage function always return False,
+# as the default value of AWS_S3_FILE_OVERWRITE is True
+django-storages<1.14.3
