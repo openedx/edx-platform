@@ -614,6 +614,7 @@ enmerkar-underscore==2.3.0
     # via -r requirements/edx/base.txt
 event-tracking==2.4.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-completion
     #   edx-proctoring

@@ -853,6 +853,7 @@ enmerkar-underscore==2.3.0
     #   -r requirements/edx/testing.txt
 event-tracking==2.4.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-completion
