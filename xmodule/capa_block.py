@@ -796,12 +796,21 @@ class ProblemBlock(
                 }
                 yield (user_state.username, report)
 
+    def get_course_end_date(self):
+        course_block_key = self.runtime.course_entry.structure['root']
+        return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
+
     @property
     def close_date(self):
         """
         Return the date submissions should be closed from.
         """
-        due_date = self.due
+        try:
+            course_end_date = self.get_course_end_date()
+        except AttributeError:
+            course_end_date = None
+
+        due_date = self.due or course_end_date
 
         if self.graceperiod is not None and due_date:
             return due_date + self.graceperiod
@@ -1434,18 +1443,6 @@ class ProblemBlock(
         """
         Is the student still allowed to submit answers?
         """
-        # Checking if the course is archived
-        from xmodule.modulestore.django import modulestore
-        try:
-            if isinstance(self.course_id, CourseKey):
-                course = modulestore().get_course(self.course_id)
-                closed_date = (
-                    course.end + self.graceperiod if self.graceperiod is not None else course.end
-                )
-                if closed_date and datetime.datetime.now(utc) > closed_date:
-                    return True
-        except AttributeError:
-            pass
 
         if self.used_all_attempts():
             return True
