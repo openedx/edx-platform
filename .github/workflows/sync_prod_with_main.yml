@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: pull-request-action
-        uses: vsoch/pull-request-action@1.0.19
+        uses: vsoch/pull-request-action@1.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_PREFIX: "main"
           PULL_REQUEST_BRANCH: "prod"
           PULL_REQUEST_TITLE: "Update from `main` (production)"
-          PULL_REQUEST_REVIEWERS: "xscrio amirtds bryanlandia"
+          PULL_REQUEST_REVIEWERS: "VladyslavTy daniilly"
