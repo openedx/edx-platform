@@ -421,7 +421,6 @@ class CourseEnrollmentDetailsView(APIView):
         GET /api/mobile/{api_version}/course_info/enrollment_details/?course_id={}
 
     """
-    # @mobile_course_access()
     def get(self, request, *args, **kwargs):
         """
         Handle the GET request
