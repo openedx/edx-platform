@@ -50,7 +50,6 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ID,
 )
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.markup import HTML, Text
 from .capa.xqueue_interface import XQueueService
 
@@ -1443,7 +1442,6 @@ class ProblemBlock(
         """
         Is the student still allowed to submit answers?
         """
-
         if self.used_all_attempts():
             return True
         if self.is_past_due():

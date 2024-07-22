@@ -36,9 +36,6 @@ from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tests import DATA_DIR
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
@@ -660,11 +657,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     @patch('xmodule.capa_block.ProblemBlock.get_course_end_date')
     def test_closed_for_archive(self, mock_get_course_end_date):
-        # Utility to create a datetime string in the past
+
+        # Utility to create a datetime object in the past
         def past_datetime(days):
             return (datetime.datetime.now(UTC) - datetime.timedelta(days=days))
 
-        # Utility to create a datetime string in the future
+        # Utility to create a datetime object in the future
         def future_datetime(days):
             return (datetime.datetime.now(UTC) + datetime.timedelta(days=days))
 
