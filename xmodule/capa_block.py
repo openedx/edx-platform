@@ -797,10 +797,14 @@ class ProblemBlock(
 
     @property
     def course_end_date(self):
+        """
+        Return the end date of the problem's course
+        """
+
         try:
             course_block_key = self.runtime.course_entry.structure['root']
             return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
-        except:
+        except (AttributeError, KeyError):
             return None
 
     @property
