@@ -795,19 +795,20 @@ class ProblemBlock(
                 }
                 yield (user_state.username, report)
 
-    def get_course_end_date(self):
-        course_block_key = self.runtime.course_entry.structure['root']
-        return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
+    @property
+    def course_end_date(self):
+        try:
+            course_block_key = self.runtime.course_entry.structure['root']
+            return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
+        except:
+            return None
 
     @property
     def close_date(self):
         """
         Return the date submissions should be closed from.
         """
-        try:
-            course_end_date = self.get_course_end_date()
-        except (AttributeError, KeyError):
-            course_end_date = None
+        course_end_date = self.course_end_date
 
         due_date = self.due or course_end_date
 

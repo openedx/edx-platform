@@ -655,8 +655,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                    due=self.yesterday_str)
         assert block.closed()
 
-    @patch('xmodule.capa_block.ProblemBlock.get_course_end_date')
-    def test_closed_for_archive(self, mock_get_course_end_date):
+    @patch.object(ProblemBlock,'course_end_date', new_callable=PropertyMock)
+    def test_closed_for_archive(self, mock_course_end_date):
 
         # Utility to create a datetime object in the past
         def past_datetime(days):
@@ -669,20 +669,20 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block = CapaFactory.create(max_attempts="1", attempts="0")
 
         # For active courses without graceperiod
-        mock_get_course_end_date.return_value = future_datetime(10)
+        mock_course_end_date.return_value = future_datetime(10)
         assert not block.closed()
 
         # For archive courses without graceperiod
-        mock_get_course_end_date.return_value = past_datetime(10)
+        mock_course_end_date.return_value = past_datetime(10)
         assert block.closed()
 
         # For active courses with graceperiod
-        mock_get_course_end_date.return_value = future_datetime(10)
+        mock_course_end_date.return_value = future_datetime(10)
         block.graceperiod = datetime.timedelta(days=2)
         assert not block.closed()
 
         # For archive courses with graceperiod
-        mock_get_course_end_date.return_value = past_datetime(2)
+        mock_course_end_date.return_value = past_datetime(2)
         block.graceperiod = datetime.timedelta(days=3)
         assert not block.closed()
 
