@@ -239,10 +239,6 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and (
 ########################## Authn MFE Context API #######################
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 
-########################## Discount/Coupons #######################
-FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
-FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE = ''
-
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
