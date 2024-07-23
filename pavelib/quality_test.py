@@ -83,7 +83,7 @@ def _get_pep8_violations(clean=True):
     if not report.exists():
         # sh(f'pycodestyle . | tee {report} -a')
         with open(report, 'w') as f:
-            result = subprocess.run(['pycodestyle', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.run(['pycodestyle', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, )
             f.write(result.stdout.decode())
 
     violations_list = _pep8_violations(report)
@@ -209,7 +209,14 @@ def _get_stylelint_violations():
 
     command = f"stylelint **/*.scss --custom-formatter={formatter}"
     with open(stylelint_report, 'w') as report_file:
-        result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(
+            command,
+            shell=True,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
         report_file.write(result.stdout)
 
     try:
@@ -246,7 +253,7 @@ def run_eslint():
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            check=True
+            check=False
         )
 
         # Write the output to the report file
@@ -369,7 +376,14 @@ def run_pii_check():
                 f"--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()} "
                 f"--lint --report --coverage | tee {run_output_file}"
             )
-            result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            result = subprocess.run(
+                command, 
+                shell=True, 
+                check=False, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE, 
+                text=True
+            )
 
             with open(run_output_file, 'w') as f:
                 f.write(result.stdout)
