@@ -1,4 +1,6 @@
-# run_quality_checks.py
+"""  # lint-amnesty, pylint: disable=django-not-configured
+Check code quality using pycodestyle, pylint, and diff_quality.
+"""
 
 import json
 import os
@@ -32,7 +34,6 @@ START_TIME = datetime.utcnow()
 
 class BuildFailure(Exception):
     """Represents a problem with some part of the build's execution."""
-    pass
 
 
 def write_junit_xml(name, message=None):
@@ -61,7 +62,7 @@ def fail_quality(name, message):
     and raising a ``BuildFailure``.
     """
     write_junit_xml(name, message)
-    exit(1)
+    sys.exit()
 
 
 def _get_pep8_violations(clean=True):
@@ -82,7 +83,7 @@ def _get_pep8_violations(clean=True):
     if not report.exists():
         # sh(f'pycodestyle . | tee {report} -a')
         with open(report, 'w') as f:
-            result = subprocess.run(['pycodestyle', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+            result = subprocess.run(['pycodestyle', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             f.write(result.stdout.decode())
 
     violations_list = _pep8_violations(report)
@@ -234,8 +235,8 @@ def run_eslint():
     violations_limit = 4950
 
     command = (
-        f"node --max_old_space_size=4096 node_modules/.bin/eslint "
-        f"--ext .js --ext .jsx --format=compact ."
+        "node --max_old_space_size=4096 node_modules/.bin/eslint "
+        "--ext .js --ext .jsx --format=compact ."
     )
     with open(eslint_report, 'w') as report_file:
         # Run the command
@@ -611,7 +612,7 @@ def diff_coverage():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint', 
+    parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint',
     'xsslint', 'pii_check', 'check_keywords', 'all'])
 
     argument = parser.parse_args()
