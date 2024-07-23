@@ -83,7 +83,13 @@ def _get_pep8_violations(clean=True):
     if not report.exists():
         # sh(f'pycodestyle . | tee {report} -a')
         with open(report, 'w') as f:
-            result = subprocess.run(['pycodestyle', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, )
+            result = subprocess.run(
+                ['pycodestyle', '.'], 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE, 
+                check=False, 
+                text= True
+            )
             f.write(result.stdout.decode())
 
     violations_list = _pep8_violations(report)
@@ -371,10 +377,10 @@ def run_pii_check():
             run_output_file = str(output_file).format(env_name.lower())
             os.makedirs(report_dir, exist_ok=True)
             command = (
-                f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
-                "code_annotations django_find_annotations "
-                f"--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()} "
-                f"--lint --report --coverage | tee {run_output_file}"
+                "export DJANGO_SETTINGS_MODULE={env_settings_file};"
+                "code_annotations django_find_annotations"
+                "--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()}"
+                "--lint --report --coverage | tee {run_output_file}"
             )
             result = subprocess.run(
                 command, 
@@ -428,16 +434,23 @@ def check_keywords():
         override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
         try:
             command = (
-                f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
-                f"python manage.py {env} check_reserved_keywords "
-                f"--override_file {override_file} "
-                f"--report_path {report_path} "
-                f"--report_file {report_file}".format(
+                "export DJANGO_SETTINGS_MODULE={env_settings_file}; "
+                "python manage.py {env} check_reserved_keywords"
+                "--override_file {override_file}"
+                "--report_path {report_path}"
+                "--report_file {report_file}".format(
                     settings_file=env_settings_file, app=env, override_file=override_file,
                     report_path=report_path, report_file=report_file
                 )
             )
-            result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            result = subprocess.run(
+                command, 
+                shell=True, 
+                check=True, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE, 
+                text=True
+            )
         except BuildFailure:
             overall_status = False
 
