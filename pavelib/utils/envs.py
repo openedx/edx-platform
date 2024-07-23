@@ -169,19 +169,6 @@ class Env:
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             value = result.stdout.strip()
-            # value = sh(
-            #     django_cmd(
-            #         system,
-            #         settings,
-            #         "print_setting {django_settings} 2>{log_file} {print_setting_args}".format(
-            #             django_settings=django_settings,
-            #             print_setting_args=print_setting_args,
-            #             log_file=cls.PRINT_SETTINGS_LOG_FILE
-            #         ).strip()
-            #     ),
-            #     capture=True
-            # )
-            # else for cases where values are not found & sh returns one None value
             return tuple(str(value).splitlines()) if value else tuple(None for _ in range(settings_length))
         except subprocess.CalledProcessError:
             print(f"Unable to print the value of the {django_settings} setting:")
