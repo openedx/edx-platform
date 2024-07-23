@@ -1424,7 +1424,7 @@ def extras_get_mettl_report(request):
 
     timestamp = str(int(time.time()))
     message = HTTPVerb + URL + '\n' + PUBLICKEY + '\n' + timestamp
-    sign = str(base64.b64encode(hmac.new(bytes(PRIVATEKEY, 'UTF-8') ,bytes(message, 'UTF-8') , digestmod=hashlib.sha1).digest()), "utf-8")
+    sign = urllib.parse.quote(str(base64.b64encode(hmac.new(bytes(PRIVATEKEY, 'UTF-8') ,bytes(message, 'UTF-8') , digestmod=hashlib.sha1).digest()), "utf-8"))
     URL = "{url}?ak={access_key}&ts={timestamp}&asgn={sign}".format(url = URL, access_key = PUBLICKEY, timestamp = timestamp, sign = sign)
 
     response = requests.get(URL).json()
