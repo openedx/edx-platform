@@ -322,6 +322,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level3,
             Fields.type,
             Fields.access_id,
+            Fields.last_published,
         ])
         # Mark which attributes are used for keyword search, in order of importance:
         client.index(temp_index_name).update_searchable_attributes([
