@@ -63,13 +63,10 @@ jobs:
 
       - name: Run Quality Tests
         env:
-          TEST_SUITE: quality
-          SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
-        run: |
-          ./scripts/all-tests.sh
-
+        run: make quality
+          
       - name: Save Job Artifacts
         if: always()
         uses: actions/upload-artifact@v4

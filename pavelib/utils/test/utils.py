@@ -4,7 +4,7 @@ Helper functions for test tasks
 
 
 import os
-
+import subprocess
 from paver.easy import cmdopts, sh, task
 
 from pavelib.utils.envs import Env
@@ -37,16 +37,37 @@ def clean_test_files():
     sh("rm -rf /tmp/mako_[cl]ms")
 
 
-@task
-@timed
+# @task
+# @timed
+# def ensure_clean_package_lock():
+#     """
+#     Ensure no untracked changes have been made in the current git context.
+#     """
+#     sh("""
+#       git diff --name-only --exit-code package-lock.json ||
+#       (echo \"Dirty package-lock.json, run 'npm install' and commit the generated changes\" && exit 1)
+#     """)
+
+
 def ensure_clean_package_lock():
     """
     Ensure no untracked changes have been made in the current git context.
     """
-    sh("""
-      git diff --name-only --exit-code package-lock.json ||
-      (echo \"Dirty package-lock.json, run 'npm install' and commit the generated changes\" && exit 1)
-    """)
+    try:
+        # Run git diff command to check for changes in package-lock.json
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "--exit-code", "package-lock.json"],
+            capture_output=True,  # Capture stdout and stderr
+            text=True,  # Decode output to text
+            check=True  # Raise error for non-zero exit code
+        )
+        # No differences found in package-lock.json
+        print("package-lock.json is clean.")
+    except subprocess.CalledProcessError as e:
+        # Git diff command returned non-zero exit code (changes detected)
+        print("Dirty package-lock.json, run 'npm install' and commit the generated changes.")
+        print(e.stderr)  # Print any error output from the command
+        raise  # Re-raise the exception to propagate the error
 
 
 def clean_dir(directory):
