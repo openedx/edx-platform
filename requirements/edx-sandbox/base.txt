@@ -16,7 +16,7 @@ codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/base.in
 contourpy==1.2.1
     # via matplotlib
-cryptography==42.0.8
+cryptography==43.0.0
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
@@ -82,7 +82,7 @@ six==1.16.0
     # via
     #   codejail-includes
     #   python-dateutil
-sympy==1.13.0
+sympy==1.13.1
     # via
     #   -r requirements/edx-sandbox/base.in
     #   openedx-calc
