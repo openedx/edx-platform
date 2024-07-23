@@ -81,7 +81,7 @@ bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 camel-converter[pydantic]==3.1.2
     # via meilisearch
-celery==5.3.6
+celery==5.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -227,6 +227,7 @@ django==4.2.14
     #   openedx-filters
     #   openedx-learning
     #   ora2
+    #   social-auth-app-django
     #   super-csv
     #   xblock-google-drive
     #   xss-utils
@@ -374,10 +375,6 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
-dnspython==2.6.1
-    # via
-    #   -r requirements/edx/paver.txt
-    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
@@ -454,7 +451,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.21.5
+edx-enterprise==4.21.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -538,8 +535,9 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
-event-tracking==2.4.1
+event-tracking==2.4.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-completion
     #   edx-proctoring
@@ -866,7 +864,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.txt
-pymongo==4.4.0
+pymongo==3.13.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -1060,14 +1058,12 @@ slumber==0.7.1
     #   edx-rest-api-client
 snowflake-connector-python==3.11.0
     # via edx-enterprise
-social-auth-app-django==5.0.0
+social-auth-app-django==5.4.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
-social-auth-core==4.3.0
+social-auth-core==4.5.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-auth-backends
     #   social-auth-app-django
