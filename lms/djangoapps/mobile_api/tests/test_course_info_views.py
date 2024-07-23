@@ -440,6 +440,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
         super().setUp()
         self.url = reverse('course-enrollment-details', kwargs={
             'api_version': 'v1',
+            'course_id': self.course.id
         })
         self.login_and_enroll()
 
@@ -453,7 +454,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
             'download_url': certificate_url,
         }
 
-        response = self.client.get(path=self.url, data={'course_id': str(self.course.id)})
+        response = self.client.get(path=self.url)
         assert response.status_code == 200
         assert response.data['id'] == str(self.course.id)
 
@@ -542,9 +543,10 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
 
         url = reverse('course-enrollment-details', kwargs={
             'api_version': 'v1',
+            'course_id': course_not_started.id
         })
 
-        response = self.client.get(path=url, data={'course_id': str(course_not_started.id)})
+        response = self.client.get(path=url)
         assert response.status_code == 200
         assert response.data['id'] == str(course_not_started.id)
 
@@ -569,9 +571,10 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
 
         url = reverse('course-enrollment-details', kwargs={
             'api_version': 'v1',
+            'course_id': course_closed.id
         })
 
-        response = self.client.get(path=url, data={'course_id': str(course_closed.id)})
+        response = self.client.get(path=url)
         assert response.status_code == 200
         assert response.data['id'] == str(course_closed.id)
 

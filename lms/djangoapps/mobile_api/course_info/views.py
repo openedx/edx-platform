@@ -418,7 +418,7 @@ class CourseEnrollmentDetailsView(APIView):
 
         This api works with all versions {api_version}, you can use: v0.5, v1, v2 or v3
 
-        GET /api/mobile/{api_version}/course_info/enrollment_details/?course_id={}
+        GET /api/mobile/{api_version}/course_info/{course_id}/enrollment_details
 
     """
     def get(self, request, *args, **kwargs):
@@ -427,7 +427,7 @@ class CourseEnrollmentDetailsView(APIView):
 
         Returns user enrollment and course details.
         """
-        course_key_string = request.query_params.get('course_id')
+        course_key_string = kwargs.get('course_id')
         if not course_key_string:
             return Response(data={'error': 'course_id is required.'}, status=status.HTTP_404_NOT_FOUND)
 

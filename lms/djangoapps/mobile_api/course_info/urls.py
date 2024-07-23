@@ -25,7 +25,11 @@ urlpatterns = [
         CourseUpdatesList.as_view(),
         name='course-updates-list'
     ),
-    path('enrollment_details/', CourseEnrollmentDetailsView.as_view(), name='course-enrollment-details'),
+    re_path(
+        fr'^{settings.COURSE_ID_PATTERN}/enrollment_details$',
+        CourseEnrollmentDetailsView.as_view(),
+        name='course-enrollment-details'
+    ),
     path('record_user_activity', CourseGoalsRecordUserActivity.as_view(), name='record_user_activity'),
     path('blocks/', BlocksInfoInCourseView.as_view(), name="blocks_info_in_course"),
 ]
