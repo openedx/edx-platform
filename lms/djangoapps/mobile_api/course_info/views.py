@@ -428,9 +428,6 @@ class CourseEnrollmentDetailsView(APIView):
         Returns user enrollment and course details.
         """
         course_key_string = kwargs.get('course_id')
-        if not course_key_string:
-            return Response(data={'error': 'course_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError:

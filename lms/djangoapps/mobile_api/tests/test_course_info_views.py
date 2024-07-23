@@ -527,7 +527,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
 
     @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
     def test_course_not_started(self, mock_certificate_downloadable_status):
-        """ Test course data whic is not started yet """
+        """ Test course data which has not started yet """
 
         certificate_url = 'https://test_certificate_url'
         mock_certificate_downloadable_status.return_value = {
@@ -554,7 +554,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
 
     @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
     def test_course_closed(self, mock_certificate_downloadable_status):
-        """ Test course data whic is not started yet """
+        """ Test course data whose end date is in past """
 
         certificate_url = 'https://test_certificate_url'
         mock_certificate_downloadable_status.return_value = {
@@ -582,7 +582,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
 
     @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
     def test_invalid_course_id(self, mock_certificate_downloadable_status):
-        """ Test course data whic is not started yet """
+        """ Test view with invalid course id """
 
         certificate_url = 'https://test_certificate_url'
         mock_certificate_downloadable_status.return_value = {
@@ -590,11 +590,13 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
             'download_url': certificate_url,
         }
 
+        invalid_id = "invalid" + str(self.course.id)
         url = reverse('course-enrollment-details', kwargs={
             'api_version': 'v1',
-            'course_id': "invalid" + str(self.course.id)
+            'course_id': invalid_id
         })
 
         response = self.client.get(path=url)
         assert response.status_code == 400
-        assert response.data['error']
+        expected_error = "'{}' is not a valid course key.".format(invalid_id)
+        assert response.data['error'] == expected_error
