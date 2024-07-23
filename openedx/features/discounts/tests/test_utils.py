@@ -90,9 +90,11 @@ class TestOfferData(TestCase):
 
     def test_override(self):
         with override_settings(FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE='NOTEDXWELCOME'):
-            with override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True):
-                with override_waffle_flag(FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG, active=True):
-                    assert utils.generate_offer_data(self.user, self.overview)['code'] == 'NOTEDXWELCOME'
+            with override_settings(FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE=30):
+                with override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True):
+                    with override_waffle_flag(FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG, active=True):
+                        assert utils.generate_offer_data(self.user, self.overview)['code'] == 'NOTEDXWELCOME'
+                        assert utils.generate_offer_data(self.user, self.overview)['percentage'] == 30
 
     def test_anonymous(self):
         assert utils.generate_offer_data(AnonymousUser(), self.overview) is None

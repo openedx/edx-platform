@@ -4295,6 +4295,10 @@ SOCIAL_PLATFORMS = {
     }
 }
 
+# Enable First Purchase Discount offer override
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE = 15
+
 # E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:8002'
 ECOMMERCE_API_URL = 'http://localhost:8002/api/v2'
