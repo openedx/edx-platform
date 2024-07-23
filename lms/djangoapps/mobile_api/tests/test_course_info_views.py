@@ -579,3 +579,22 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
         assert response.data['id'] == str(course_closed.id)
 
         self.verify_course_access_details(response)
+
+    @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
+    def test_invalid_course_id(self, mock_certificate_downloadable_status):
+        """ Test course data whic is not started yet """
+
+        certificate_url = 'https://test_certificate_url'
+        mock_certificate_downloadable_status.return_value = {
+            'is_downloadable': True,
+            'download_url': certificate_url,
+        }
+
+        url = reverse('course-enrollment-details', kwargs={
+            'api_version': 'v1',
+            'course_id': "invalid" + str(self.course.id)
+        })
+
+        response = self.client.get(path=url)
+        assert response.status_code == 400
+        assert response.data['error']

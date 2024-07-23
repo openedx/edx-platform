@@ -429,13 +429,13 @@ class CourseEnrollmentDetailsView(APIView):
         """
         course_key_string = kwargs.get('course_id')
         if not course_key_string:
-            return Response(data={'error': 'course_id is required.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={'error': 'course_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError:
             error = {'error': f"'{str(course_key_string)}' is not a valid course key."}
-            Response(data=error, status=status.HTTP_404_NOT_FOUND)
+            return Response(data=error, status=status.HTTP_400_BAD_REQUEST)
 
         data = {
             'api_version': self.kwargs.get('api_version'),
