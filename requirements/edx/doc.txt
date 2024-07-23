@@ -396,8 +396,9 @@ django-statici18n==2.5.0
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-django-storages==1.14.4
+django-storages==1.14.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edxval
 django-user-tasks==3.2.0
