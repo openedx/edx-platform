@@ -349,7 +349,7 @@ def run_pii_check():
     """
     Guarantee that all Django models are PII-annotated.
     """
-    
+
     pii_report_name = 'pii'
     default_report_dir = (Env.REPORT_DIR / pii_report_name)
     report_dir = default_report_dir

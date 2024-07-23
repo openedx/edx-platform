@@ -182,8 +182,6 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
-    # sh(f"{pip_cmd} -r {req_file}")
-    
     command = f"{pip_cmd} -r {req_file}"
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
@@ -194,7 +192,7 @@ def pip_install_req_file(req_file):
     else:
         print("Pip install completed successfully.")
 
-
+@task
 def install_node_prereqs():
     """
     Installs Node prerequisites
