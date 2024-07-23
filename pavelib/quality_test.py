@@ -9,13 +9,11 @@ import shutil
 
 import argparse
 from pavelib.utils.envs import Env
-from prereqs import install_node_prereqs
-from prereqs import install_python_prereqs
-from prereqs import install_coverage_prereqs
-from utils.test.utils import ensure_clean_package_lock
+from pavelib.prereqs import install_node_prereqs
+from pavelib.prereqs import install_python_prereqs
+from pavelib.utils.test.utils import ensure_clean_package_lock
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
-from pathlib import Path
 
 try:
     from pygments.console import colorize
@@ -84,7 +82,7 @@ def _get_pep8_violations(clean=True):
     if not report.exists():
         # sh(f'pycodestyle . | tee {report} -a')
         with open(report, 'w') as f:
-            result = subprocess.run(['pycodestyle', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.run(['pycodestyle', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             f.write(result.stdout.decode())
 
     violations_list = _pep8_violations(report)
@@ -246,7 +244,8 @@ def run_eslint():
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
+            check=True
         )
 
         # Write the output to the report file
@@ -474,12 +473,11 @@ def run_xsslint():
     """
 
     try:
-        json_file_path = 'scripts/xsslint_thresholds.json'
+        thresholds_option = 'scripts/xsslint_thresholds.json'
         # Read the JSON file
-        with open(json_file_path, 'r') as file:
+        with open(thresholds_option, 'r') as file:
             violation_thresholds = json.load(file)
 
-        # violation_thresholds = json.loads(thresholds_option)
     except ValueError:
         violation_thresholds = None
     if isinstance(violation_thresholds, dict) is False or \
@@ -613,7 +611,8 @@ def diff_coverage():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint', 'xsslint', 'pii_check', 'check_keywords', 'all'])
+    parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint', 
+    'xsslint', 'pii_check', 'check_keywords', 'all'])
 
     argument = parser.parse_args()
 

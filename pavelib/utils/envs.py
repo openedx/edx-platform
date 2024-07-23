@@ -167,7 +167,7 @@ class Env:
                 ).strip()
             )
 
-            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
             value = result.stdout.strip()
             # value = sh(
             #     django_cmd(

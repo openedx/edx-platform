@@ -183,7 +183,7 @@ def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
     command = f"{pip_cmd} -r {req_file}"
-    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
 
     if result.returncode != 0:
         print(f"Error: pip command exited with non-zero status {result.returncode}")
@@ -191,6 +191,7 @@ def pip_install_req_file(req_file):
         print(f"stderr: {result.stderr}")
     else:
         print("Pip install completed successfully.")
+
 
 @task
 def install_node_prereqs():

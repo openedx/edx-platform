@@ -50,6 +50,9 @@ def clean_test_files():
 
 
 def ensure_clean_package_lock():
+    """
+    Ensure no untracked changes have been made in the current git context.
+    """
     try:
         # Run git diff command to check for changes in package-lock.json
         result = subprocess.run(
