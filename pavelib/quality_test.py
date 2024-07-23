@@ -8,7 +8,7 @@ import subprocess
 import shutil
 
 import argparse
-from utils.envs import Env
+from pavelib.utils.envs import Env
 from prereqs import install_node_prereqs
 from prereqs import install_python_prereqs
 from prereqs import install_coverage_prereqs
@@ -230,9 +230,6 @@ def run_eslint():
     If limit option is passed, fails build if more violations than the limit are found.
     """
 
-    ensure_clean_package_lock()
-    install_node_prereqs()
-
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
     eslint_report = eslint_report_dir / "eslint.report"
     _prepare_report_dir(eslint_report_dir)
@@ -285,8 +282,6 @@ def run_stylelint():
     Runs stylelint on Sass files.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-
-    install_node_prereqs()
 
     violations_limit = 0
     num_violations = _get_stylelint_violations()
@@ -354,7 +349,7 @@ def run_pii_check():
     """
     Guarantee that all Django models are PII-annotated.
     """
-    install_python_prereqs()
+    
     pii_report_name = 'pii'
     default_report_dir = (Env.REPORT_DIR / pii_report_name)
     report_dir = default_report_dir
@@ -410,7 +405,6 @@ def check_keywords():
     Check Django model fields for names that conflict with a list of reserved keywords
     """
 
-    install_python_prereqs()
     report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
     os.makedirs(report_path, exist_ok=True)
 
@@ -478,8 +472,6 @@ def run_xsslint():
     """
     Runs xsslint/xss_linter.py on the codebase
     """
-    # thresholds_option = getattr(options, 'thresholds', '{}')
-    install_python_prereqs()
 
     try:
         json_file_path = 'scripts/xsslint_thresholds.json'
@@ -587,8 +579,7 @@ def diff_coverage():
     """
     Build the diff coverage reports
     """
-    install_coverage_prereqs()
-    # compare_branch = options.get('compare_branch', 'origin/master')
+
     compare_branch = 'origin/master'
 
     # Find all coverage XML files (both Python and JavaScript)
@@ -630,25 +621,34 @@ if __name__ == "__main__":
         run_pep8()
 
     elif argument.command == 'eslint':
+        ensure_clean_package_lock()
+        install_node_prereqs()
         run_eslint()
 
     elif argument.command == 'stylelint':
+        install_node_prereqs()
         run_stylelint()
 
     elif argument.command == 'xsslint':
+        install_python_prereqs()
         run_xsslint()
 
     elif argument.command == 'pii_check':
+        install_python_prereqs()
         run_pii_check()
 
     elif argument.command == 'check_keywords':
+        install_python_prereqs()
         check_keywords()
 
     elif argument.command == 'all':
         run_pep8()
+        ensure_clean_package_lock()
+        install_node_prereqs()
         run_eslint()
         run_stylelint()
         run_xsslint()
+        install_python_prereqs()
         run_pii_check()
         check_keywords()
         diff_coverage()

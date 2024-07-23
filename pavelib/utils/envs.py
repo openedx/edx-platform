@@ -9,9 +9,7 @@ from time import sleep
 
 from lazy import lazy
 from path import Path as path
-# from paver.easy import BuildFailure, sh
-
-from utils.cmd import django_cmd
+from pavelib.utils.cmd import django_cmd
 
 
 def repo_root():
