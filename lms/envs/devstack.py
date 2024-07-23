@@ -241,6 +241,7 @@ ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 
 ########################## Discount/Coupons #######################
 FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE = ''
 
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'

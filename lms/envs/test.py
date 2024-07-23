@@ -94,6 +94,7 @@ PARENTAL_CONSENT_AGE_LIMIT = 13
 
 # Enable First Purchase Discount offer override
 FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE = ''
 
 # Local Directories
 TEST_ROOT = path("test_root")
