@@ -132,7 +132,7 @@ more-itertools==10.3.0
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-
+newrelic==9.12.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
