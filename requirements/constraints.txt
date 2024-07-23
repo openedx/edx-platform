@@ -125,4 +125,4 @@ numpy<2.0.0
 # django-storages==1.14.4 breaks course imports
 # Two lines were added in 1.14.4 that make file_exists_in_storage function always return False,
 # as the default value of AWS_S3_FILE_OVERWRITE is True
-django-storages<1.14.3
+django-storages<1.14.4
