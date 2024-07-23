@@ -84,10 +84,10 @@ def _get_pep8_violations(clean=True):
         # sh(f'pycodestyle . | tee {report} -a')
         with open(report, 'w') as f:
             result = subprocess.run(
-                ['pycodestyle', '.'], 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE, 
-                check=False, 
+                ['pycodestyle', '.'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
                 text= True
             )
             f.write(result.stdout)
@@ -383,11 +383,11 @@ def run_pii_check():
                 "--lint --report --coverage | tee {run_output_file}"
             )
             result = subprocess.run(
-                command, 
-                shell=True, 
-                check=False, 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE, 
+                command,
+                shell=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True
             )
 
@@ -434,21 +434,18 @@ def check_keywords():
         override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
         try:
             command = (
-                "export DJANGO_SETTINGS_MODULE={env_settings_file}; "
+                "export DJANGO_SETTINGS_MODULE={env_settings_file};"
                 "python manage.py {env} check_reserved_keywords"
                 "--override_file {override_file}"
                 "--report_path {report_path}"
-                "--report_file {report_file}".format(
-                    settings_file=env_settings_file, app=env, override_file=override_file,
-                    report_path=report_path, report_file=report_file
-                )
+                "--report_file {report_file}"
             )
             result = subprocess.run(
-                command, 
-                shell=True, 
-                check=True, 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE, 
+                command,
+                shell=True,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True
             )
         except BuildFailure:
