@@ -90,7 +90,7 @@ def _get_pep8_violations(clean=True):
                 check=False, 
                 text= True
             )
-            f.write(result.stdout.decode())
+            f.write(result.stdout)
 
     violations_list = _pep8_violations(report)
 
