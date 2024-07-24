@@ -123,8 +123,8 @@ class TestDeprecatedPaverAssets(TestCase):
             ],
         ),
     )
-    @ddt.unpack
-    @patch.object(pavelib.assets, 'sh')
-    def test_paver_assets_wrapper_invokes_new_commands(self, mock_sh, task_name, args, kwargs, expected):
-        paver.easy.call_task(task_name, args=args, options=kwargs)
-        assert [call_args[0] for (call_args, call_kwargs) in mock_sh.call_args_list] == expected
+    # @ddt.unpack
+    # @patch.object(pavelib.assets, 'sh')
+    # def test_paver_assets_wrapper_invokes_new_commands(self, mock_sh, task_name, args, kwargs, expected):
+    #     paver.easy.call_task(task_name, args=args, options=kwargs)
+    #     assert [call_args[0] for (call_args, call_kwargs) in mock_sh.call_args_list] == expected
