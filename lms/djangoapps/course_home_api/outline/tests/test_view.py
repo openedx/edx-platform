@@ -11,6 +11,7 @@ import ddt  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 from completion.models import BlockCompletion
 from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import override_settings
 from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -33,7 +34,10 @@ from openedx.features.course_experience import (
     DISPLAY_COURSE_SOCK_FLAG,
     ENABLE_COURSE_GOALS
 )
-from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
+from openedx.features.discounts.applicability import (
+    DISCOUNT_APPLICABILITY_FLAG,
+    FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
+)
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -179,17 +183,32 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         welcome_message_html = self.client.get(self.url).data['welcome_message_html']
         assert welcome_message_html == (None if welcome_message_is_dismissed else '<p>Welcome</p>')
 
-    def test_offer(self):
+    @ddt.data(
+        (False, 'EDXWELCOME', 15),
+        (True, 'NOTEDXWELCOME', 30),
+    )
+    @ddt.unpack
+    def test_offer(self, is_fpd_override_waffle_flag_on, fpd_code, fpd_percentage):
+        """
+        Test that the offer data contains the correct code for the first purchase discount,
+        which can be overriden via a waffle flag from the default EDXWELCOME.
+        """
         CourseEnrollment.enroll(self.user, self.course.id)
 
         response = self.client.get(self.url)
         assert response.data['offer'] is None
 
-        with override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True):
-            response = self.client.get(self.url)
+        with override_settings(FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE='NOTEDXWELCOME'):
+            with override_settings(FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE=fpd_percentage):
+                with override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True):
+                    with override_waffle_flag(
+                        FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG, active=is_fpd_override_waffle_flag_on
+                    ):
+                        response = self.client.get(self.url)
 
-            # Just a quick spot check that the dictionary looks like what we expect
-            assert response.data['offer']['code'] == 'EDXWELCOME'
+                        # Just a quick spot check that the dictionary looks like what we expect
+                        assert response.data['offer']['code'] == fpd_code
+                        assert response.data['offer']['percentage'] == fpd_percentage
 
     def test_access_expiration(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)

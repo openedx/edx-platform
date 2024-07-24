@@ -1,6 +1,7 @@
 """
 Tests for course_info
 """
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import ddt
@@ -11,6 +12,7 @@ from django.test import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
+from pytz import utc
 from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
@@ -26,6 +28,7 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import \
     SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
@@ -521,3 +524,79 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
         mock_certificate_downloadable_status.assert_called_once()
         certificate_url = 'https://test_certificate_url'
         assert response.data['certificate'] == {'url': certificate_url}
+
+    @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
+    def test_course_not_started(self, mock_certificate_downloadable_status):
+        """ Test course data which has not started yet """
+
+        certificate_url = 'https://test_certificate_url'
+        mock_certificate_downloadable_status.return_value = {
+            'is_downloadable': True,
+            'download_url': certificate_url,
+        }
+        now = datetime.now(utc)
+        course_not_started = CourseFactory.create(
+            mobile_available=True,
+            static_asset_path="needed_for_split",
+            start=now + timedelta(days=5),
+        )
+
+        url = reverse('course-enrollment-details', kwargs={
+            'api_version': 'v1',
+            'course_id': course_not_started.id
+        })
+
+        response = self.client.get(path=url)
+        assert response.status_code == 200
+        assert response.data['id'] == str(course_not_started.id)
+
+        self.verify_course_access_details(response)
+
+    @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
+    def test_course_closed(self, mock_certificate_downloadable_status):
+        """ Test course data whose end date is in past """
+
+        certificate_url = 'https://test_certificate_url'
+        mock_certificate_downloadable_status.return_value = {
+            'is_downloadable': True,
+            'download_url': certificate_url,
+        }
+        now = datetime.now(utc)
+        course_closed = CourseFactory.create(
+            mobile_available=True,
+            static_asset_path="needed_for_split",
+            start=now - timedelta(days=250),
+            end=now - timedelta(days=50),
+        )
+
+        url = reverse('course-enrollment-details', kwargs={
+            'api_version': 'v1',
+            'course_id': course_closed.id
+        })
+
+        response = self.client.get(path=url)
+        assert response.status_code == 200
+        assert response.data['id'] == str(course_closed.id)
+
+        self.verify_course_access_details(response)
+
+    @patch('lms.djangoapps.mobile_api.course_info.utils.certificate_downloadable_status')
+    def test_invalid_course_id(self, mock_certificate_downloadable_status):
+        """ Test view with invalid course id """
+
+        certificate_url = 'https://test_certificate_url'
+        mock_certificate_downloadable_status.return_value = {
+            'is_downloadable': True,
+            'download_url': certificate_url,
+        }
+
+        invalid_id = "invalid" + str(self.course.id)
+        url = reverse('course-enrollment-details', kwargs={
+            'api_version': 'v1',
+            'course_id': invalid_id
+        })
+
+        response = self.client.get(path=url)
+        assert response.status_code == 400
+        expected_error = "'{}' is not a valid course key.".format(invalid_id)
+        assert response.data['error'] == expected_error
