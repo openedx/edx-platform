@@ -124,6 +124,21 @@ sites)::
   ./manage.py lms collectstatic
   ./manage.py cms collectstatic
 
+Setup Studio SSO for Development::
+
+  ./manage.py lms manage_user studio_worker example@example.com --unusable-password
+  # DO NOT DO THIS IN PRODUCTION it will make your auth insecure
+  ./manage.py lms create_dot_application --grant-type authorization-code --skip-authorization --redirect-uris "http://localhost:18010/complete/edx-oauth2/" --scopes "user_id" studio-sso studio_worker --client-id studio-sso-key --client-secret studio-sso-secret
+
+Setup Studio SSO for Production::
+
+  ./manage.py lms manage_user studio_worker <email@yourcompany.com> --unusable-password
+  ./manage.py lms create_dot_application --grant-type authorization-code --skip-authorization --redirect-uris "http://localhost:18010/complete/edx-oauth2/" --scopes "user_id" studio-sso studio_worker
+  # Login to the django admin site (eg. http://localhost:18000/admin/oauth2_provider/application/)
+  # to view the credentials for the 'studio-sso' app and set them in the config
+  # for your production studio deployment using the `SOCIAL_AUTH_EDX_OAUTH2_KEY`
+  # and `SOCIAL_AUTH_EDX_OAUTH2_SECRET` values in your studio settings.
+
 Run the Platform
 ----------------
 
@@ -131,11 +146,11 @@ First, ensure MySQL, Mongo, and Memcached are running.
 
 Start the LMS::
 
-  ./manage.py lms runserver
+  ./manage.py lms runserver 18000
 
 Start the CMS::
 
-  ./manage.py cms runserver
+  ./manage.py cms runserver 18010
 
 This will give you a mostly-headless Open edX platform. Most frontends have
 been migrated to "Micro-Frontends (MFEs)" which need to be installed and run
