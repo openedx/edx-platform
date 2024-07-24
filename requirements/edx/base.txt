@@ -334,8 +334,9 @@ django-statici18n==2.5.0
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-poll
-django-storages==1.14.4
+django-storages==1.14.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edxval
 django-user-tasks==3.2.0
@@ -451,7 +452,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.21.5
+edx-enterprise==4.21.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -537,6 +538,7 @@ enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
 event-tracking==2.4.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-completion
     #   edx-proctoring
