@@ -80,10 +80,10 @@ def store_uploaded_file(
         stored_file_name = file_storage.save(stored_file_name, uploaded_file)
         if is_private and settings.DEFAULT_FILE_STORAGE == 'storages.backends.s3boto3.S3Boto3Storage':
             S3Boto3Storage().connection.meta.client.put_object_acl(
-+                ACL='private',
-+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-+                Key=stored_file_name,
-+           )
+                ACL='private',
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=stored_file_name,
+            )
 
         if validator:
             try:
