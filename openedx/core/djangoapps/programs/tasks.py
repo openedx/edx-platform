@@ -3,7 +3,7 @@ This file contains celery tasks and utility functions responsible for syncing co
 between the monolith and the Credentials IDA.
 """
 
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 from urllib.parse import urljoin
 
 from celery import shared_task
@@ -19,7 +19,6 @@ from opaque_keys.edx.keys import CourseKey
 from requests.exceptions import HTTPError
 
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import available_date_for_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.credentials.api import is_credentials_enabled
@@ -31,6 +30,12 @@ from openedx.core.djangoapps.credentials.utils import (
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.data import CertificatesDisplayBehaviors
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from django.contrib.auth.models import User as UserType  # pylint: disable=imported-auth-user
+    from requests import Session
 
 User = get_user_model()
 
@@ -44,7 +49,7 @@ COURSE_CERTIFICATE = "course-run"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def get_completed_programs(site, student):
+def get_completed_programs(site: Site, student: "UserType") -> Dict:
     """
     Given a set of completed courses, determine which programs are completed.
 
@@ -53,14 +58,14 @@ def get_completed_programs(site, student):
         student (User): Representing the student whose completed programs to check for.
 
     Returns:
-        dict of {program_UUIDs: visible_dates}
+        Dict of program_UUIDs:availability dates
 
     """
     meter = ProgramProgressMeter(site, student)
     return meter.completed_programs_with_available_dates
 
 
-def get_inverted_programs(student):
+def get_inverted_programs(student: "UserType"):
     """
     Get programs keyed by course run ID.
 
@@ -79,7 +84,7 @@ def get_inverted_programs(student):
     return inverted_programs
 
 
-def get_certified_programs(student: User, raise_on_error: bool = False) -> List[str]:
+def get_certified_programs(student: "UserType", raise_on_error: bool = False) -> List[str]:
     """
     Find the UUIDs of all the programs for which the student has already been awarded
     a certificate.
@@ -104,7 +109,7 @@ def get_certified_programs(student: User, raise_on_error: bool = False) -> List[
     return certified_programs
 
 
-def get_revokable_program_uuids(course_specific_programs: List[Dict], student: User) -> List[str]:
+def get_revokable_program_uuids(course_specific_programs: List[Dict], student: "UserType") -> List[str]:
     """
     Get program uuids for which certificate to be revoked.
 
@@ -133,7 +138,7 @@ def get_revokable_program_uuids(course_specific_programs: List[Dict], student: U
     return program_uuids_to_revoke
 
 
-def award_program_certificate(client, user, program_uuid, visible_date):
+def award_program_certificate(client: "Session", user: "UserType", program_uuid: "str") -> None:
     """
     Issue a new certificate of completion to the given student for the given program.
 
@@ -144,8 +149,6 @@ def award_program_certificate(client, user, program_uuid, visible_date):
             The student's user data
         program_uuid:
             uuid of the completed program
-        visible_date:
-            when the program credential should be visible to user
 
     Returns:
         None
@@ -158,7 +161,6 @@ def award_program_certificate(client, user, program_uuid, visible_date):
             "username": user.username,
             "lms_user_id": user.id,
             "credential": {"type": PROGRAM_CERTIFICATE, "program_uuid": program_uuid},
-            "attributes": [{"name": "visible_date", "value": visible_date.strftime(DATE_FORMAT)}],
         },
     )
     response.raise_for_status()
@@ -190,7 +192,13 @@ def revoke_program_certificate(client, username, program_uuid):
     response.raise_for_status()
 
 
-def post_course_certificate(client, username, certificate, visible_date, date_override=None, org=None):
+def post_course_certificate(
+    client: "Session",
+    username: str,
+    certificate: GeneratedCertificate,
+    date_override: Optional["datetime"] = None,
+    org: Optional[str] = None,
+):
     """
     POST a certificate that has been updated to Credentials
     """
@@ -208,7 +216,6 @@ def post_course_certificate(client, username, certificate, visible_date, date_ov
                 "type": COURSE_CERTIFICATE,
             },
             "date_override": {"date": date_override.strftime(DATE_FORMAT)} if date_override else None,
-            "attributes": [{"name": "visible_date", "value": visible_date.strftime(DATE_FORMAT)}],
         },
     )
     response.raise_for_status()
@@ -228,15 +235,16 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     """
     credentials_api_base_url = get_credentials_api_base_url()
     credentials_api_url = urljoin(f"{credentials_api_base_url}/", "course_certificates/")
+    certificate_config = {
+        "course_id": cert_config["course_id"],
+        "certificate_type": cert_config["mode"],
+        "certificate_available_date": certificate_available_date,
+        "is_active": True,
+    }
 
     response = client.post(
         credentials_api_url,
-        json={
-            "course_id": cert_config["course_id"],
-            "certificate_type": cert_config["mode"],
-            "certificate_available_date": certificate_available_date,
-            "is_active": True,
-        },
+        json=certificate_config,
     )
 
     # Sometimes helpful error context is swallowed when calling `raise_for_status()`. We try to print out any additional
@@ -246,8 +254,8 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
     # 201 on a successful call.
     if response.status_code != 201:
         LOGGER.error(
-            "Error creating or updating a course certificate configuration in the Credentials IDA. Additional details: "
-            f"{response.text}"
+            "Error creating or updating a course certificate configuration in the Credentials IDA.\n"
+            f"config sent: {certificate_config}\nAdditional details: {response.text}"
         )
     response.raise_for_status()
 
@@ -350,13 +358,8 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
 
         failed_program_certificate_award_attempts = []
         for program_uuid in new_program_uuids:
-            visible_date = completed_programs[program_uuid]
             try:
-                LOGGER.info(
-                    f"Visible date for program certificate awarded to user {student} in program {program_uuid} is "
-                    f"{visible_date}"
-                )
-                award_program_certificate(credentials_client, student, program_uuid, visible_date)
+                award_program_certificate(credentials_client, student, program_uuid)
                 LOGGER.info(f"Awarded program certificate to user {student} in program {program_uuid}")
             except HTTPError as exc:
                 if exc.response.status_code == 404:
@@ -421,9 +424,7 @@ def update_credentials_course_certificate_configuration_available_date(
 ):
     """
     This task will update the CourseCertificate configuration's available date
-    in Credentials. This is different from the "visible_date" attribute. This
-    date will always either be the available date that is set in Studio for a
-    given course, or it will be None.
+    in Credentials.
 
     Arguments:
         course_run_key (str): The course run key to award the certificate for
@@ -551,21 +552,15 @@ def award_course_certificate(self, username, course_run_key):
         )
         return
 
-    visible_date = available_date_for_certificate(course_overview, certificate)
-    LOGGER.info(
-        f"Task award_course_certificate will award a course certificate to user {user.id} in course run "
-        f"{course_key} with a visible date of {visible_date}"
-    )
-
     # If the certificate has an associated CertificateDateOverride, send it along
     try:
-        date_override = certificate.date_override.date
+        date_override = certificate.date_override.date  # type: Optional["datetime"]
         LOGGER.info(
             f"Task award_course_certificate will award a course certificate to user {user.id} in course run "
             f"{course_key} with an override date of {date_override}"
         )
     except ObjectDoesNotExist:
-        date_override = None
+        date_override = None  # type: Optional["datetime"]
 
     try:
         credentials_client = get_credentials_api_client(
@@ -575,7 +570,6 @@ def award_course_certificate(self, username, course_run_key):
             credentials_client,
             username,
             certificate,
-            visible_date,
             date_override,
             org=course_key.org,
         )
@@ -732,57 +726,6 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
     retry_jitter=True,
 )
 @set_code_owner_attribute
-def update_certificate_visible_date_on_course_update(self, course_key):
-    """
-    This task is designed to be called whenever a course-run's `certificate_available_date` is updated.
-
-    When executed, this task will first get a list of all learners within the course-run that have earned a certificate.
-    Next, we will enqueue an additional `award_course_certificate` task for each learner in this list. These subtasks
-    will be responsible for updating the `visible_date` attribute on each certificate the Credentials IDA knows about.
-
-    If this function is moved, make sure to update its entry in EXPLICIT_QUEUES in the settings files so it runs in the
-    correct queue.
-
-    Arguments:
-        course_key(str): The course identifier
-    """
-    # If the CredentialsApiConfig configuration model is disabled for this feature, it may indicate a condition where
-    # processing of such tasks has been temporarily disabled. This is a recoverable situation, so let celery retry.
-    if not is_credentials_enabled():
-        error_msg = (
-            "Cannot execute the `update_certificate_visible_date_on_course_update` task. Issuing user credentials "
-            "through the Credentials IDA is disabled."
-        )
-        LOGGER.warning(error_msg)
-        raise MaxRetriesExceededError(
-            f"Failed to update the `visible_date` attribute for certificates in course {course_key}. Reason: "
-            f"{error_msg}"
-        )
-
-    # Retrieve a list of all usernames of learners who have a certificate record in this course-run. The
-    # Credentials IDA REST API still requires a username as the main identifier for the learner.
-    users_with_certificates_in_course = GeneratedCertificate.eligible_available_certificates.filter(
-        course_id=course_key
-    ).values_list("user__username", flat=True)
-
-    LOGGER.info(
-        f"Resending course certificates for learners in course {course_key} to the Credentials service. Queueing "
-        f"{len(users_with_certificates_in_course)} `award_course_certificate` tasks."
-    )
-    for user in users_with_certificates_in_course:
-        award_course_certificate.delay(user, str(course_key))
-
-
-@shared_task(
-    bind=True,
-    ignore_result=True,
-    autoretry_for=(Exception,),
-    max_retries=10,
-    retry_backoff=30,
-    retry_backoff_max=600,
-    retry_jitter=True,
-)
-@set_code_owner_attribute
 def update_certificate_available_date_on_course_update(self, course_key):
     """
     This task is designed to be enqueued whenever a course run's Certificate Display Behavior (CDB) or Certificate
@@ -799,7 +742,7 @@ def update_certificate_available_date_on_course_update(self, course_key):
     # retry instead of failing it.
     if not is_credentials_enabled():
         error_msg = (
-            "Cannot execute the `update_certificate_visible_date_on_course_update` task. Issuing user credentials "
+            "Cannot execute the `update_certificate_available_date_on_course_update` task. Issuing user credentials "
             "through the Credentials IDA is disabled."
         )
         LOGGER.warning(error_msg)

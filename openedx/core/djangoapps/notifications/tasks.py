@@ -20,7 +20,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.events import notification_generated_event
-from openedx.core.djangoapps.notifications.filters import NotificationFilter
+from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,

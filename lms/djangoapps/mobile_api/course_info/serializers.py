@@ -1,18 +1,20 @@
 """
 Course Info serializers
 """
+
+from typing import Dict, Union
+
 from rest_framework import serializers
-from typing import Union
+from rest_framework.reverse import reverse
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
-from common.djangoapps.util.milestones_helpers import (
-    get_pre_requisite_courses_not_completed,
-)
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
+from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user, has_access
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware.courses import get_assignments_completions
+from lms.djangoapps.mobile_api.course_info.utils import get_user_certificate_download_url
 from lms.djangoapps.mobile_api.users.serializers import ModeSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
@@ -31,6 +33,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
     course_sharing_utm_parameters = serializers.SerializerMethodField()
     course_about = serializers.SerializerMethodField('get_course_about_url')
     course_modes = serializers.SerializerMethodField()
+    course_progress = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseOverview
@@ -47,6 +50,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             'course_sharing_utm_parameters',
             'course_about',
             'course_modes',
+            'course_progress',
         )
 
     @staticmethod
@@ -74,6 +78,12 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
             ModeSerializer(mode).data
             for mode in course_modes
         ]
+
+    def get_course_progress(self, obj: CourseOverview) -> Dict[str, int]:
+        """
+        Gets course progress calculated by course completed assignments.
+        """
+        return get_assignments_completions(obj.id, self.context.get('user'))
 
 
 class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):
@@ -127,3 +137,94 @@ class CourseAccessSerializer(serializers.Serializer):
         Determine if the learner has access to the course, otherwise show error message.
         """
         return has_access(data.get('user'), 'load_mobile', data.get('course')).to_json()
+
+
+class CourseDetailSerializer(serializers.Serializer):
+    """
+    Serializer for Course enrollment and overview details.
+    """
+
+    id = serializers.SerializerMethodField()
+    course_access_details = serializers.SerializerMethodField()
+    certificate = serializers.SerializerMethodField()
+    enrollment_details = serializers.SerializerMethodField()
+    course_handouts = serializers.SerializerMethodField()
+    course_updates = serializers.SerializerMethodField()
+    discussion_url = serializers.SerializerMethodField()
+    course_info_overview = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_id(data):
+        """
+        Returns course id.
+        """
+        return str(data['course_id'])
+
+    @staticmethod
+    def get_course_overview(course_id):
+        """
+        Returns course overview.
+        """
+        return CourseOverview.get_from_id(course_id)
+
+    def get_course_info_overview(self, data):
+        """
+        Returns course info overview.
+        """
+        course_overview = self.get_course_overview(data['course_id'])
+        course_info_context = {'user': data['user']}
+        return CourseInfoOverviewSerializer(course_overview, context=course_info_context).data
+
+    @staticmethod
+    def get_discussion_url(data):
+        """
+        Returns discussion url.
+        """
+        course_overview = CourseOverview.get_from_id(data['course_id'])
+        if not course_overview.is_discussion_tab_enabled(data['user']):
+            return
+
+        return reverse('discussion_course', kwargs={'course_id': data['course_id']}, request=data['request'])
+
+    def get_course_access_details(self, data):
+        """
+        Returns course access details.
+        """
+        course_access_data = {
+            'course': self.get_course_overview(data['course_id']),
+            'course_id': data['course_id'],
+            'user': data['user'],
+        }
+        return CourseAccessSerializer(course_access_data).data
+
+    @staticmethod
+    def get_certificate(data):
+        """
+        Returns course certificate url.
+        """
+        return get_user_certificate_download_url(data['request'], data['user'], data['course_id'])
+
+    @staticmethod
+    def get_enrollment_details(data):
+        """
+        Retrieve course enrollment details of the course.
+        """
+        user_enrollment = CourseEnrollment.get_enrollment(user=data['user'], course_key=data['course_id'])
+        return MobileCourseEnrollmentSerializer(user_enrollment).data
+
+    @staticmethod
+    def get_course_handouts(data):
+        """
+        Returns course_handouts.
+        """
+
+        url_params = {'api_version': data['api_version'], 'course_id': data['course_id']}
+        return reverse('course-handouts-list', kwargs=url_params, request=data['request'])
+
+    @staticmethod
+    def get_course_updates(data):
+        """
+        Returns course_updates.
+        """
+        url_params = {'api_version': data['api_version'], 'course_id': data['course_id']}
+        return reverse('course-updates-list', kwargs=url_params, request=data['request'])

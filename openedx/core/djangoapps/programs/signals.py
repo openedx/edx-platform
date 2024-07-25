@@ -2,7 +2,6 @@
 This module contains signals / handlers related to programs.
 """
 
-
 import logging
 
 from django.dispatch import receiver
@@ -14,7 +13,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_CERT_AWARDED,
     COURSE_CERT_CHANGED,
     COURSE_CERT_DATE_CHANGE,
-    COURSE_CERT_REVOKED
+    COURSE_CERT_REVOKED,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -39,11 +38,10 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
     if not is_credentials_enabled():
         return
 
-    LOGGER.debug(
-        f"Handling COURSE_CERT_AWARDED: user={user}, course_key={course_key}, mode={mode}, status={status}"
-    )
+    LOGGER.debug(f"Handling COURSE_CERT_AWARDED: user={user}, course_key={course_key}, mode={mode}, status={status}")
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks import award_program_certificates
+
     award_program_certificates.delay(user.username)
 
 
@@ -68,7 +66,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
     Returns:
         None
     """
-    verbose = kwargs.get('verbose', False)
+    verbose = kwargs.get("verbose", False)
     if verbose:
         LOGGER.info(
             f"Starting handle_course_cert_changed with params: sender [{sender}], user [{user}], course_key "
@@ -87,6 +85,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
     LOGGER.debug(f"Handling COURSE_CERT_CHANGED: user={user}, course_key={course_key}, mode={mode}, status={status}")
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks import award_course_certificate
+
     award_course_certificate.delay(user.username, str(course_key))
 
 
@@ -112,16 +111,16 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
     LOGGER.info(f"Handling COURSE_CERT_REVOKED: user={user}, course_key={course_key}, mode={mode}, status={status}")
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks import revoke_program_certificates
+
     revoke_program_certificates.delay(user.username, str(course_key))
 
 
-@receiver(COURSE_CERT_DATE_CHANGE, dispatch_uid='course_certificate_date_change_handler')
+@receiver(COURSE_CERT_DATE_CHANGE, dispatch_uid="course_certificate_date_change_handler")
 def handle_course_cert_date_change(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     When a course run's configuration has been updated, and the system has detected an update related to the display
     behavior or availability date of the certificates issued in that course, we should enqueue celery tasks responsible
     for:
-        - updating the `visible_date` attribute of any previously awarded certificates the Credentials IDA manages
         - updating the certificate available date of the course run's course certificate configuration in Credentials
 
     Args:
@@ -137,8 +136,7 @@ def handle_course_cert_date_change(sender, course_key, **kwargs):  # pylint: dis
     LOGGER.info(f"Handling COURSE_CERT_DATE_CHANGE for course {course_key}")
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
     from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
-    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
-    update_certificate_visible_date_on_course_update.delay(str(course_key))
+
     update_certificate_available_date_on_course_update.delay(str(course_key))
 
 
@@ -163,6 +161,5 @@ def handle_course_pacing_change(sender, updated_course_overview, **kwargs):  # p
     LOGGER.info(f"Handling COURSE_PACING_CHANGED for course {course_id}")
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
     from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
-    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
+
     update_certificate_available_date_on_course_update.delay(course_id)
-    update_certificate_visible_date_on_course_update.delay(course_id)

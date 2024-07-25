@@ -1,6 +1,6 @@
 /*
- * This is a high level diagram visualizing how the `CERTIFICATE_AVAILBLE_DATE` and "visible date" attribute updates
- * are updated internally and transmit to the Credentials IDA.
+ * This is a high level diagram visualizing how the `CERTIFICATE_AVAILBLE_DATE` update is
+ * updated internally and transmitted to the Credentials IDA.
  *
  * It is written using Structurizr DSL (https://structurizr.org/).
  */
@@ -33,9 +33,7 @@ workspace {
         co_app -> modulestore "Retrieves course details from Mongo"
         co_app -> monolith_db "Updates CourseOverview record"
         co_app -> programs_app "Emits COURSE_CERT_DATE_CHANGED signal"
-        programs_app -> celery "Enqueue UPDATE_CERTIFICATE_VISIBLE_DATE task"
         programs_app -> celery "Enqueue UPDATE_CERTIFICATE_AVAILABLE_DATE task"
-        celery -> credentials "REST requests to update `visible_date` attributes"
         celery -> credentials "REST request to update `certificate_available_date` setting"
     }
 
