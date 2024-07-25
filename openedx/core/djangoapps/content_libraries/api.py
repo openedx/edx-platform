@@ -194,7 +194,10 @@ class LibraryXBlockMetadata:
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
+    created = attr.ib(type=datetime)
+    modified = attr.ib(type=datetime)
     display_name = attr.ib("")
+    last_published = attr.ib(default=None, type=datetime)
     has_unpublished_changes = attr.ib(False)
     tags_count = attr.ib(0)
 
@@ -203,6 +206,8 @@ class LibraryXBlockMetadata:
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
+        last_publish_log = authoring_api.get_last_publish(component.pk)
+
         return cls(
             usage_key=LibraryUsageLocatorV2(
                 library_key,
@@ -210,6 +215,9 @@ class LibraryXBlockMetadata:
                 component.local_key,
             ),
             display_name=component.versioning.draft.title,
+            created=component.created,
+            modified=component.versioning.draft.created,
+            last_published=None if last_publish_log is None else last_publish_log.published_at,
             has_unpublished_changes=component.versioning.has_unpublished_changes
         )
 
@@ -660,13 +668,11 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
     if not draft_version:
         raise ContentLibraryBlockNotFound(usage_key)
 
-    published_version = component.versioning.published
-
-    return LibraryXBlockMetadata(
-        usage_key=usage_key,
-        display_name=draft_version.title,
-        has_unpublished_changes=(draft_version != published_version),
+    xblock_metadata = LibraryXBlockMetadata.from_component(
+        library_key=usage_key.context_key,
+        component=component,
     )
+    return xblock_metadata
 
 
 def set_library_block_olx(usage_key, new_olx_str):

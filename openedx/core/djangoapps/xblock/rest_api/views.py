@@ -21,6 +21,7 @@ from xblock.fields import Scope
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
     get_block_metadata,
@@ -253,6 +254,10 @@ class BlockFieldsView(APIView):
 
         # Save after the callback so any changes made in the callback will get persisted.
         block.save()
+
+        # Signal that we've modified this block
+        context_impl = get_learning_context_impl(usage_key)
+        context_impl.send_updated_event(usage_key)
 
         return Response({
             "id": str(block.location),
