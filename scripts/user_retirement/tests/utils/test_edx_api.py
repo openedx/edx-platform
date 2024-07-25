@@ -499,7 +499,6 @@ class TestDiscoveryApi(OAuth2Mixin, unittest.TestCase):
         )
 
 
-
 class TestLicenseManagerApi(OAuth2Mixin, unittest.TestCase):
     """
     Test the edX License Manager API client.
