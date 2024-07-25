@@ -121,16 +121,17 @@ class TestSearchApi(ModuleStoreTestCase):
         )
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
 
-        # Populate it with a problem, freezing the date so we can verify created date serializes correctly.
+        # Populate it with 2 problems, freezing the date so we can verify created date serializes correctly.
         created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
         with freeze_time(created_date):
-            self.problem = library_api.create_library_block(self.library.key, "problem", "p1")
-        # Update the problem, freezing the date so we can verify modified date serializes correctly.
+            self.problem1 = library_api.create_library_block(self.library.key, "problem", "p1")
+            self.problem2 = library_api.create_library_block(self.library.key, "problem", "p2")
+        # Update problem1, freezing the date so we can verify modified date serializes correctly.
         modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
         with freeze_time(modified_date):
-            library_api.set_library_block_olx(self.problem.usage_key, "<problem />")
+            library_api.set_library_block_olx(self.problem1.usage_key, "<problem />")
 
-        self.doc_problem = {
+        self.doc_problem1 = {
             "id": "lborg1libproblemp1-a698218e",
             "usage_key": "lb:org1:lib:problem:p1",
             "block_id": "p1",
@@ -145,6 +146,22 @@ class TestSearchApi(ModuleStoreTestCase):
             "last_published": None,
             "created": created_date.timestamp(),
             "modified": modified_date.timestamp(),
+        }
+        self.doc_problem2 = {
+            "id": "lborg1libproblemp2-b2f65e29",
+            "usage_key": "lb:org1:lib:problem:p2",
+            "block_id": "p2",
+            "display_name": "Blank Problem",
+            "block_type": "problem",
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "breadcrumbs": [{"display_name": "Library"}],
+            "content": {"problem_types": [], "capa_content": " "},
+            "type": "library_block",
+            "access_id": lib_access.id,
+            "last_published": None,
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
         }
 
         # Create a couple of taxonomies with tags
@@ -172,14 +189,52 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_sequential["tags"] = {}
         doc_vertical = copy.deepcopy(self.doc_vertical)
         doc_vertical["tags"] = {}
-        doc_problem = copy.deepcopy(self.doc_problem)
-        doc_problem["tags"] = {}
+        doc_problem1 = copy.deepcopy(self.doc_problem1)
+        doc_problem1["tags"] = {}
+        doc_problem2 = copy.deepcopy(self.doc_problem2)
+        doc_problem2["tags"] = {}
 
         api.rebuild_index()
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
                 call([doc_sequential, doc_vertical]),
-                call([doc_problem]),
+                call([doc_problem1, doc_problem2]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reindex_meilisearch_library_block_error(self, mock_meilisearch):
+
+        # Add tags field to doc, since reindex calls includes tags
+        doc_sequential = copy.deepcopy(self.doc_sequential)
+        doc_sequential["tags"] = {}
+        doc_vertical = copy.deepcopy(self.doc_vertical)
+        doc_vertical["tags"] = {}
+        doc_problem2 = copy.deepcopy(self.doc_problem2)
+        doc_problem2["tags"] = {}
+
+        orig_from_component = library_api.LibraryXBlockMetadata.from_component
+
+        def mocked_from_component(lib_key, component):
+            # Simulate an error when processing problem 1
+            if component.key == 'xblock.v1:problem:p1':
+                raise Exception('Error')
+
+            return orig_from_component(lib_key, component)
+
+        with patch.object(
+            library_api.LibraryXBlockMetadata,
+            "from_component",
+            new=mocked_from_component,
+        ):
+            api.rebuild_index()
+
+        mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
+            [
+                call([doc_sequential, doc_vertical]),
+                # Problem 1 should not be indexed
+                call([doc_problem2]),
             ],
             any_order=True,
         )
@@ -274,9 +329,9 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         Test indexing a Library Block.
         """
-        api.upsert_library_block_index_doc(self.problem.usage_key)
+        api.upsert_library_block_index_doc(self.problem1.usage_key)
 
-        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem])
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem1])
 
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_index_library_block_tags(self, mock_meilisearch):
@@ -285,19 +340,19 @@ class TestSearchApi(ModuleStoreTestCase):
         """
 
         # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
-        tagging_api.tag_object(str(self.problem.usage_key), self.taxonomyA, ["one", "two"])
-        tagging_api.tag_object(str(self.problem.usage_key), self.taxonomyB, ["three", "four"])
+        tagging_api.tag_object(str(self.problem1.usage_key), self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(self.problem1.usage_key), self.taxonomyB, ["three", "four"])
 
         # Build expected docs with tags at each stage
         doc_problem_with_tags1 = {
-            "id": self.doc_problem["id"],
+            "id": self.doc_problem1["id"],
             "tags": {
                 'taxonomy': ['A'],
                 'level0': ['A > one', 'A > two']
             }
         }
         doc_problem_with_tags2 = {
-            "id": self.doc_problem["id"],
+            "id": self.doc_problem1["id"],
             "tags": {
                 'taxonomy': ['A', 'B'],
                 'level0': ['A > one', 'A > two', 'B > four', 'B > three']
@@ -317,10 +372,10 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         Test deleting a Library Block doc from the index.
         """
-        api.delete_index_doc(self.problem.usage_key)
+        api.delete_index_doc(self.problem1.usage_key)
 
         mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
-            self.doc_problem['id']
+            self.doc_problem1['id']
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
@@ -330,4 +385,6 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         api.upsert_content_library_index_docs(self.library.key)
 
-        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem])
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with(
+            [self.doc_problem1, self.doc_problem2]
+        )
