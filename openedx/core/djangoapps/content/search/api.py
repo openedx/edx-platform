@@ -345,23 +345,26 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
         status_cb("Indexing libraries...")
         for lib_key in lib_keys:
             status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing library {lib_key}")
-            try:
-                docs = []
-                for component in lib_api.get_library_components(lib_key):
+            docs = []
+            for component in lib_api.get_library_components(lib_key):
+                try:
                     metadata = lib_api.LibraryXBlockMetadata.from_component(lib_key, component)
                     doc = {}
                     doc.update(searchable_doc_for_library_block(metadata))
                     doc.update(searchable_doc_tags(metadata.usage_key))
                     docs.append(doc)
-
+                except Exception as err:  # pylint: disable=broad-except
+                    status_cb(f"Error indexing library component {component}: {err}")
+                finally:
                     num_blocks_done += 1
-                if docs:
+            if docs:
+                try:
                     # Add all the docs in this library at once (usually faster than adding one at a time):
                     _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
-            except Exception as err:  # pylint: disable=broad-except
-                status_cb(f"Error indexing library {lib_key}: {err}")
-            finally:
-                num_contexts_done += 1
+                except (TypeError, KeyError, MeilisearchError) as err:
+                    status_cb(f"Error indexing library {lib_key}: {err}")
+
+            num_contexts_done += 1
 
         ############## Courses ##############
         status_cb("Indexing courses...")
