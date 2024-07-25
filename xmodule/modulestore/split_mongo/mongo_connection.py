@@ -279,29 +279,19 @@ class MongoPersistenceBackend:
         #make sure the course index cache is fresh.
         RequestCache(namespace="course_index_cache").clear()
 
-        self.collection = collection
-        self.connection_params = {
-            'db': db,
-            'host': host,
-            'port': port,
-            'tz_aware': tz_aware,
-            'user': user,
-            'password': password,
-            'retry_wait_time': retry_wait_time,
-            **kwargs
-        }
+        self.database = connect_to_mongodb(
+            db, host,
+            port=port, tz_aware=tz_aware, user=user, password=password,
+            retry_wait_time=retry_wait_time, **kwargs
+        )
 
-        self.do_connection()
+        self.course_index = self.database[collection + '.active_versions']
+        self.structures = self.database[collection + '.structures']
+        self.definitions = self.database[collection + '.definitions']
 
         # Is the MySQL subclass in use, passing through some reads/writes to us? If so this will be True.
         # If this MongoPersistenceBackend is being used directly (only MongoDB is involved), this is False.
         self.with_mysql_subclass = with_mysql_subclass
-
-    def do_connection(self):
-        self.database = connect_to_mongodb(**self.connection_params)
-        self.course_index = self.database[self.collection + '.active_versions']
-        self.structures = self.database[self.collection + '.structures']
-        self.definitions = self.database[self.collection + '.definitions']
 
     def heartbeat(self):
         """
@@ -313,24 +303,6 @@ class MongoPersistenceBackend:
             return True
         except pymongo.errors.ConnectionFailure:
             raise HeartbeatFailure(f"Can't connect to {self.database.name}", 'mongo')  # lint-amnesty, pylint: disable=raise-missing-from
-
-    def check_connection(self):
-        """
-        Check if mongodb connection is open or not.
-        """
-        try:
-            self.database.client.admin.command("ping")
-            return True
-        except pymongo.errors.InvalidOperation:
-            return False
-
-    def ensure_connection(self):
-        """
-        Ensure that mongodb connection is open.
-        """
-        if self.check_connection():
-            return
-        self.do_connection()
 
     def get_structure(self, key, course_context=None):
         """
@@ -530,7 +502,6 @@ class MongoPersistenceBackend:
         """
         Delete the course_index from the persistence mechanism whose id is the given course_index
         """
-        self.ensure_connection()
         with TIMER.timer("delete_course_index", course_key):
             query = {
                 key_attr: getattr(course_key, key_attr)
@@ -590,8 +561,7 @@ class MongoPersistenceBackend:
         Closes any open connections to the underlying databases
         """
         RequestCache(namespace="course_index_cache").clear()
-        if self.check_connection():
-            self.database.client.close()
+        self.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -606,8 +576,6 @@ class MongoPersistenceBackend:
         If connections is True, then close the connection to the database as well.
         """
         RequestCache(namespace="course_index_cache").clear()
-
-        self.ensure_connection()
         connection = self.database.client
 
         if database:
