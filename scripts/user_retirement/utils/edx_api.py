@@ -474,28 +474,6 @@ class DiscoveryApi(BaseApiClient):
         return self._request('POST', api_url, json=data)
 
 
-class DemographicsApi(BaseApiClient):
-    """
-    Demographics API client.
-    """
-
-    @_retry_lms_api()
-    def retire_learner(self, learner):
-        """
-        Performs the learner retirement step for Demographics. Passes the learner's LMS User Id instead of username.
-        """
-        data = {'lms_user_id': learner['user']['id']}
-        # If the user we are retiring has no data in the Demographics DB the request will return a 404. We
-        # catch the HTTPError and return True in order to prevent this error getting raised and
-        # incorrectly causing the learner to enter an ERROR state during retirement.
-        try:
-            api_url = self.get_api_url('demographics/api/v1/retire_demographics')
-            return self._request('POST', api_url, log_404_as_error=False, json=data)
-        except HttpDoesNotExistException:
-            LOG.info("No demographics data found for user")
-            return True
-
-
 class LicenseManagerApi(BaseApiClient):
     """
     License Manager API client.
