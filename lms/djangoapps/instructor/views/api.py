@@ -1494,29 +1494,35 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
 
         return JsonResponse({"status": success_status})
 
+from rest_framework.permissions import SAFE_METHODS
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def get_students_who_may_enroll(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetStudentsWhoMayEnroll(APIView):
     """
     Initiate generation of a CSV file containing information about
-    students who may enroll in a course.
-
-    Responds with JSON
-        {"status": "... status message ..."}
-
     """
-    course_key = CourseKey.from_string(course_id)
-    query_features = ['email']
-    report_type = _('enrollment')
-    task_api.submit_calculate_may_enroll_csv(request, course_key, query_features)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    permission_name = permissions.CAN_RESEARCH
+    http_method_names = ["post"]
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(common_exceptions_400)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing information about
+         students who may enroll in a course.
+
+        Responds with JSON
+            {"status": "... status message ..."}
+        """
+        return Response({"status": 200})
 
 
 def _cohorts_csv_validator(file_storage, file_to_validate):
