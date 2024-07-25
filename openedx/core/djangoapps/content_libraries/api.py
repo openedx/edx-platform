@@ -348,11 +348,11 @@ def get_library(library_key):
     num_blocks = authoring_api.get_all_drafts(learning_package.id).count()
     last_publish_log = authoring_api.get_last_publish(learning_package.id)
     last_draft_log = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
-                                            .order_by('-created').first()
+        .order_by('-created').first()
     last_draft_created = last_draft_log.created if last_draft_log else None
-    last_draft_created_by = last_draft_log.created_by.username if last_draft_log and last_draft_log.created_by else None 
+    last_draft_created_by = last_draft_log.created_by.username if last_draft_log and last_draft_log.created_by else None
     has_unpublished_changes = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
-                                           .exists()
+        .exists()
 
     # TODO: I'm doing this one to match already-existing behavior, but this is
     # something that we should remove. It exists to accomodate some complexities
@@ -378,6 +378,9 @@ def get_library(library_key):
     # libraries. The top level version stays for now because LibraryContentBlock
     # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
+    published_by = None
+    if last_publish_log and last_publish_log.published_by:
+        published_by = last_publish_log.published_by.username
 
     return ContentLibraryMetadata(
         key=library_key,
@@ -387,7 +390,7 @@ def get_library(library_key):
         num_blocks=num_blocks,
         version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
-        published_by=None if last_publish_log is None or last_publish_log.published_by is None else last_publish_log.published_by.username,
+        published_by=published_by,
         last_draft_created=last_draft_created,
         last_draft_created_by=last_draft_created_by,
         allow_lti=ref.allow_lti,
