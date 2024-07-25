@@ -256,7 +256,6 @@ class BlockFieldsView(APIView):
         block.save()
 
         # Signal that we've modified this block
-        usage_key = UsageKey.from_string(usage_key_str)
         context_impl = get_learning_context_impl(usage_key)
         context_impl.send_updated_event(usage_key)
 
