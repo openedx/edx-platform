@@ -37,6 +37,7 @@ from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
+from openedx.core.lib.api.serializers import CourseKeyField
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
@@ -134,6 +135,7 @@ from .tools import (
     require_student_from_identifier,
     set_due_date_extension,
     strip_if_string,
+    DashboardError
 )
 from .. import permissions
 
@@ -2924,20 +2926,47 @@ def show_unit_extensions(request, course_id):
     return JsonResponse(dump_block_extensions(course, unit))
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('student')
-def show_student_extensions(request, course_id):
+class ShowStudentExtensionSerializer(serializers.Serializer):
+    """
+    Serializer for validating and processing the student identifier.
+    """
+    student = serializers.CharField(write_only=True, required=True)
+    def validate(self, data):
+        """
+        Validates the student identifier and converts it to a student object.
+        """
+        student_identifier = data.get('student')
+        data['student'] = require_student_from_identifier(student_identifier)
+        return data
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+# @method_decorator(handle_dashboard_error)
+class ShowStudentExtensions(APIView):
     """
     Shows all of the due date extensions granted to a particular student in a
     particular course.
     """
-    student = require_student_from_identifier(request.POST.get('student'))
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    return JsonResponse(dump_student_extensions(course, student))
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowStudentExtensionSerializer
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(handle_dashboard_error)
+    def post(self, request, course_id):
+        data = {
+            'student': request.data.get('student')
+        }
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        student = serializer.validated_data['student']
+        course = get_course_by_id(CourseKey.from_string(course_id))
+        return Response(dump_student_extensions(course, student))
 
 
 def _split_input_list(str_list):

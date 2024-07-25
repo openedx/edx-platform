@@ -1,11 +1,13 @@
 """
 Permissions for the instructor dashboard and associated actions
 """
-
 from bridgekeeper import perms
 from bridgekeeper.rules import is_staff
+from opaque_keys.edx.keys import CourseKey
+from rest_framework.permissions import BasePermission
 
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
+from openedx.core.lib.courses import get_course_by_id
 
 ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM = 'instructor.allow_student_to_bypass_entrance_exam'
 ASSIGN_TO_COHORTS = 'instructor.assign_to_cohorts'
@@ -72,3 +74,15 @@ perms[VIEW_DASHBOARD] = \
 ) | HasAccessRule('staff') | HasAccessRule('instructor')
 perms[VIEW_ENROLLMENTS] = HasAccessRule('staff')
 perms[VIEW_FORUM_MEMBERS] = HasAccessRule('staff')
+
+
+class InstructorPermission(BasePermission):
+    """
+    Custom permission class for verifying user permissions on a specific course.
+    This permission class checks if the user has a specific permission associated
+    with a course. The permission name is expected to be an attribute of the view.
+    """
+    def has_permission(self, request, view):
+        course = get_course_by_id(CourseKey.from_string(view.kwargs.get('course_id')))
+        permission = getattr(view, 'permission_name', None)
+        return request.user.has_perm(permission, course)
