@@ -305,13 +305,10 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
         old_metadata = own_metadata(xblock)
     if old_content is None:
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
-    if hasattr(xblock, "editor_saved"):
-        load_services_for_studio(xblock.runtime, user)
-        xblock.editor_saved(user, old_metadata, old_content)
+    load_services_for_studio(xblock.runtime, user)
+    xblock.editor_saved(user, old_metadata, old_content)
     xblock_updated = modulestore().update_item(xblock, user.id)
-    if hasattr(xblock_updated, "post_editor_saved"):
-        load_services_for_studio(xblock_updated.runtime, user)
-        xblock_updated.post_editor_saved(user, old_metadata, old_content)
+    xblock_updated.post_editor_saved(user, old_metadata, old_content)
     return xblock_updated
 
 
