@@ -32,15 +32,6 @@ STORAGE_BACKING_FOR_CACHE = WaffleSwitch(
 )
 
 
-def enable_storage_backing_for_cache_in_request():
-    """
-    Manually override the value of the STORAGE_BACKING_FOR_CACHE switch in the context of the request.
-    This function should not be replicated, as it accesses a protected member, and it shouldn't.
-    """
-    # pylint: disable=protected-access
-    STORAGE_BACKING_FOR_CACHE._cached_switches[STORAGE_BACKING_FOR_CACHE.name] = True
-
-
 @request_cached()
 def num_versions_to_keep():
     """
