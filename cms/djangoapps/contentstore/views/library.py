@@ -68,6 +68,7 @@ def should_redirect_to_library_authoring_mfe():
         REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND.is_enabled()
     )
 
+
 def user_can_view_create_library_button(user):
     """
     Helper method for displaying the visibilty of the create_library_button.
@@ -90,7 +91,6 @@ def user_can_view_create_library_button(user):
             return not disable_library_creation
         else:
             return not disable_course_creation
-
 
 
 def user_can_create_library(user, org):
