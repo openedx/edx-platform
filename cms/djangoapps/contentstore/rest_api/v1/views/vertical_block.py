@@ -3,6 +3,7 @@
 import logging
 import edx_api_doc_tools as apidocs
 from django.http import HttpResponseBadRequest
+from opaque_keys import InvalidKeyError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,6 +21,7 @@ from cms.djangoapps.contentstore.rest_api.v1.serializers import (
     ContainerHandlerSerializer,
     VerticalContainerSerializer,
 )
+from openedx.core.djangoapps.content_libraries.api import ContentLibraryBlockNotFound
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -198,6 +200,7 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "drag-and-drop-v2",
                     "user_partition_info": {},
                     "user_partitions": {}
+                    "upstream_info": null,
                     "actions": {
                         "can_copy": true,
                         "can_duplicate": true,
@@ -215,6 +218,13 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "video",
                     "user_partition_info": {},
                     "user_partitions": {}
+                    "upstream_info": {
+                        "usage_key": "lb:org:mylib:video:404",
+                        "current_version": 16
+                        "latest_version": null,
+                        "sync_url": "http://...",
+                        "error": "Linked library item not found: lb:org:mylib:video:404",
+                    },
                     "actions": {
                         "can_copy": true,
                         "can_duplicate": true,
@@ -232,6 +242,13 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "html",
                     "user_partition_info": {},
                     "user_partitions": {},
+                    "upstream_info": {
+                        "usage_key": "lb:org:mylib:html:abcd",
+                        "current_version": 43,
+                        "latest_version": 49,
+                        "sync_url": "http://...",
+                        "error": "null",
+                    },
                     "actions": {
                         "can_copy": true,
                         "can_duplicate": true,
@@ -270,6 +287,30 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     validation_messages = get_xblock_validation_messages(child_info)
                     render_error = get_xblock_render_error(request, child_info)
 
+                    if child_info.upstream:
+                        upstream_current = child_info.upstream_version
+                        upstream_latest = None
+                        upstream_error = None
+                        try:
+                            upstream_latest = child_info.get_upstream_meta().version_num
+                        except InvalidKeyError:
+                            upstream_error = f"Linked library item key is malformed: {child_info.upstream}"
+                        except ContentLibraryBlockNotFound:
+                            upstream_error = f"Linked library item not found: {child_info.upstream}"
+                        upstream_info = {
+                            "usage_key": child_info.upstream,
+                            "current_version": upstream_current,
+                            "latest_version": upstream_latest,
+                            "error": upstream_error,
+                            "sync_url": (
+                                child_info.runtime.handler_url(child_info, 'upgrade_and_sync')
+                                if upstream_latest is not None and upstream_current < upstream_latest
+                                else None
+                            )
+                        }
+                    else:
+                        upstream_info = None
+
                     children.append({
                         "xblock": child_info,
                         "name": child_info.display_name_with_default,
@@ -277,6 +318,7 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                         "block_type": child_info.location.block_type,
                         "user_partition_info": user_partition_info,
                         "user_partitions": user_partitions,
+                        "upstream_info": upstream_info,
                         "validation_messages": validation_messages,
                         "render_error": render_error,
                     })

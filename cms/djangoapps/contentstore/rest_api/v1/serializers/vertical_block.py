@@ -103,6 +103,17 @@ class ContainerHandlerSerializer(serializers.Serializer):
         return None
 
 
+class UpstreamInfoSerializer(serializers.Serializer):
+    """
+    Serializer holding info for syncing a block with its upstream (eg, a library block).
+    """
+    usage_key = serializers.CharField()
+    current_version = serializers.IntegerField(allow_null=True)
+    latest_version = serializers.IntegerField(allow_null=True)
+    sync_url = serializers.CharField(allow_null=True)
+    error = serializers.CharField(allow_null=True)
+
+
 class ChildVerticalContainerSerializer(serializers.Serializer):
     """
     Serializer for representing a xblock child of vertical container.
@@ -113,6 +124,7 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
     block_type = serializers.CharField()
     user_partition_info = serializers.DictField()
     user_partitions = serializers.ListField()
+    upstream_info = UpstreamInfoSerializer(allow_null=True)
     actions = serializers.SerializerMethodField()
     validation_messages = MessageValidation(many=True)
     render_error = serializers.CharField()

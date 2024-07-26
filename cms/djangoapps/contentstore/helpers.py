@@ -22,8 +22,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.lib.xblock.upstream_sync import is_valid_upstream
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.content_libraries.sync import is_valid_upstream
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
 
