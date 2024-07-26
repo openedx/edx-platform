@@ -51,27 +51,30 @@ def connect_to_mongodb(
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
 
-    mongo_conn = pymongo.database.Database(
-        pymongo.MongoClient(
-            host=host,
-            port=port,
-            tz_aware=tz_aware,
-            document_class=dict,
-            **kwargs
-        ),
-        db
-    )
+    if 'replicaSet' in kwargs and kwargs['replicaSet'] == '':
+        kwargs['replicaSet'] = None
+
+    connection_params = {
+        'host': host,
+        'port': port,
+        'tz_aware': tz_aware,
+        'document_class': dict,
+        **kwargs,
+    }
+
+    if user is not None and password is not None and not db.startswith('test_'):
+        connection_params.update({'username': user, 'password': password, 'authSource': db})
+
+    mongo_conn = pymongo.MongoClient(**connection_params)
 
     if proxy:
         mongo_conn = MongoProxy(
-            mongo_conn,
+            mongo_conn[db],
             wait_time=retry_wait_time
         )
-    # If credentials were provided, authenticate the user.
-    if user is not None and password is not None:
-        mongo_conn.authenticate(user, password, source=auth_source)
+        return mongo_conn
 
-    return mongo_conn
+    return mongo_conn[db]
 
 
 def create_collection_index(
