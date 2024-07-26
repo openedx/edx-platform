@@ -23,6 +23,7 @@ from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.content_libraries.sync import is_valid_upstream
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
 
@@ -250,7 +251,9 @@ class StaticFileNotices:
     error_files: list[str] = Factory(list)
 
 
-def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> tuple[XBlock | None, StaticFileNotices]:
+def import_staged_content_from_user_clipboard(
+    parent_key: UsageKey, request, *, link_to_upstream: bool = False
+) -> tuple[XBlock | None, StaticFileNotices]:
     """
     Import a block (along with its children and any required static assets) from
     the "staged" OLX in the user's clipboard.
@@ -286,6 +289,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             slug_hint=user_clipboard.source_usage_key.block_id,
             copied_from_block=str(user_clipboard.source_usage_key),
             tags=user_clipboard.content.tags,
+            link_to_upstream=link_to_upstream,
         )
     # Now handle static files that need to go into Files & Uploads:
     notices = _import_files_into_course(
@@ -293,7 +297,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
         staged_content_id=user_clipboard.content.id,
         static_files=static_files,
     )
-
     return new_xblock, notices
 
 
@@ -310,6 +313,8 @@ def _import_xml_node_to_parent(
     copied_from_block: str | None = None,
     # Content tags applied to the source XBlock(s)
     tags: dict[str, str] | None = None,
+    *,
+    link_to_upstream: bool = False,
 ) -> XBlock:
     """
     Given an XML node representing a serialized XBlock (OLX), import it into modulestore 'store' as a child of the
@@ -375,6 +380,10 @@ def _import_xml_node_to_parent(
     if copied_from_block:
         # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
         temp_xblock.copied_from_block = copied_from_block
+        copied_from_key = UsageKey.from_string(copied_from_block)
+        if link_to_upstream and is_valid_upstream(copied_from_key):
+            temp_xblock.assign_upstream(copied_from_key, user_id)
+
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
     new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)

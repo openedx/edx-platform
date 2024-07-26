@@ -539,7 +539,9 @@ def _create_block(request):
         # Paste from the user's clipboard (content_staging app clipboard, not browser clipboard) into 'usage_key':
         try:
             created_xblock, notices = import_staged_content_from_user_clipboard(
-                parent_key=usage_key, request=request
+                parent_key=usage_key,
+                request=request,
+                link_to_upstream=request.json.get("link_to_upstream"),
             )
         except Exception:  # pylint: disable=broad-except
             log.exception(
