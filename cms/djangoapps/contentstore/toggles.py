@@ -159,6 +159,18 @@ def use_new_problem_editor():
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
 
 
+# .. toggle_name: new_core_editors.use_advanced_problem_editor
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new core problem xblock advanced editor as the default
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-07-25
+# .. toggle_target_removal_date: 2024-08-31
+# .. toggle_tickets: TNL-11694
+# .. toggle_warning:
+ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_advanced_problem_editor', __name__)
+
+
 # .. toggle_name: new_editors.add_game_block_button
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False

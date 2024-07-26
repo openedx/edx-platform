@@ -20,7 +20,7 @@ celery>=5.2.2,<6.0.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.21.8
+edx-enterprise==4.21.9
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -32,9 +32,13 @@ django-oauth-toolkit==1.7.1
 # incremental upgrade
 django-simple-history==3.4.0
 
-# constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
-# Major upgrade will be done in separate ticket.
-pymongo<4.0.0
+# Adding pin to avoid any major upgrade
+pymongo<4.4.1
+
+# To override the constraint of edx-lint
+# This can be removed once https://github.com/openedx/edx-platform/issues/34586 is resolved
+# and the upstream constraint in edx-lint has been removed.
+event-tracking==3.0.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0

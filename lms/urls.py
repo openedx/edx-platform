@@ -129,9 +129,6 @@ urlpatterns = [
         ),
     ),
 
-    # Demographics API RESTful endpoints
-    path('api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),
-
     # Courseware search endpoints
     path('search/', include('search.urls')),
 

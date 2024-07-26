@@ -322,6 +322,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level3,
             Fields.type,
             Fields.access_id,
+            Fields.last_published,
         ])
         # Mark which attributes are used for keyword search, in order of importance:
         client.index(temp_index_name).update_searchable_attributes([
@@ -339,6 +340,24 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level1,
             Fields.tags + "." + Fields.tags_level2,
             Fields.tags + "." + Fields.tags_level3,
+        ])
+        # Mark which attributes can be used for sorting search results:
+        client.index(temp_index_name).update_sortable_attributes([
+            Fields.display_name,
+            Fields.created,
+            Fields.modified,
+            Fields.last_published,
+        ])
+
+        # Update the search ranking rules to let the (optional) "sort" parameter take precedence over keyword relevance.
+        # cf https://www.meilisearch.com/docs/learn/core_concepts/relevancy
+        client.index(temp_index_name).update_ranking_rules([
+            "sort",
+            "words",
+            "typo",
+            "proximity",
+            "attribute",
+            "exactness",
         ])
 
         ############## Libraries ##############

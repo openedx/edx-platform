@@ -521,6 +521,7 @@ class GetItemTest(ItemTest):
         problem1 = self.create_xblock(
             parent_usage_key=vert_usage_key, display_name="problem1", category="problem"
         )
+        print(problem1)
         problem_usage_key = self.response_usage_key(problem1)
 
         def assert_xblock_info(xblock, xblock_info):
@@ -556,7 +557,11 @@ class GetItemTest(ItemTest):
                     xblock = parent_xblock
             else:
                 self.assertNotIn("ancestors", response)
-                self.assertEqual(get_block_info(xblock), response)
+                xblock_info = get_block_info(xblock)
+                # TODO: remove after beta testing for the new problem editor parser
+                if xblock_info["category"] == "problem":
+                    xblock_info["metadata"]["default_to_advanced"] = False
+                self.assertEqual(xblock_info, response)
 
 
 @ddt.ddt
