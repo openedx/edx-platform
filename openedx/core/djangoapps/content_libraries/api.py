@@ -359,8 +359,7 @@ def get_library(library_key):
         .order_by('-created').first()
     last_draft_created = last_draft_log.created if last_draft_log else None
     last_draft_created_by = last_draft_log.created_by.username if last_draft_log and last_draft_log.created_by else None
-    has_unpublished_changes = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
-        .exists()
+    has_unpublished_changes = last_draft_log is not None
 
     # TODO: I'm doing this one to match already-existing behavior, but this is
     # something that we should remove. It exists to accomodate some complexities
