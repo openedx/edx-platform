@@ -205,6 +205,7 @@ def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardDat
             block_type=content.block_type,
             display_name=content.display_name,
             tags=content.tags,
+            version_num=content.version_num,
         ),
         source_usage_key=clipboard.source_usage_key,
         source_context_title=clipboard.get_source_context_title(),
