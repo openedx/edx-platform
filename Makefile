@@ -137,8 +137,6 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	sed 's/Django<4.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-	sed 's/event-tracking<2.4.1//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
-	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt
 
