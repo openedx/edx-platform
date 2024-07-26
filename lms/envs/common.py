@@ -1103,7 +1103,7 @@ GENERATE_PROFILE_SCORES = False
 
 # Sets the number of days after which the gradebook will freeze following the course's end.
 GRADEBOOK_FREEZE_TIMEDELTA = 30
- 
+
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 XQUEUE_INTERFACE = {
