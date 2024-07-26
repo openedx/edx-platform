@@ -9,6 +9,7 @@ from mimetypes import guess_type
 
 from attrs import frozen, Factory
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
@@ -22,6 +23,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.lib.xblock.upstream_sync import UpstreamLink, BadUpstream, BadDownstream, fetch_customizable_fields
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
@@ -29,6 +31,10 @@ import openedx.core.djangoapps.content_tagging.api as content_tagging_api
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
 
 log = logging.getLogger(__name__)
+
+
+User = get_user_model()
+
 
 # Note: Grader types are used throughout the platform but most usages are simply in-line
 # strings.  In addition, new grader types can be defined on the fly anytime one is needed
@@ -282,9 +288,10 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             node,
             parent_xblock,
             store,
-            user_id=request.user.id,
+            user=request.user,
             slug_hint=user_clipboard.source_usage_key.block_id,
             copied_from_block=str(user_clipboard.source_usage_key),
+            copied_from_version_num=user_clipboard.content.version_num,
             tags=user_clipboard.content.tags,
         )
     # Now handle static files that need to go into Files & Uploads:
@@ -293,7 +300,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
         staged_content_id=user_clipboard.content.id,
         static_files=static_files,
     )
-
     return new_xblock, notices
 
 
@@ -302,12 +308,15 @@ def _import_xml_node_to_parent(
     parent_xblock: XBlock,
     # The modulestore we're using
     store,
-    # The ID of the user who is performing this operation
-    user_id: int,
+    # The user who is performing this operation
+    user: User,
     # Hint to use as usage ID (block_id) for the new XBlock
     slug_hint: str | None = None,
     # UsageKey of the XBlock that this one is a copy of
     copied_from_block: str | None = None,
+    # Positive int version of source block, if applicable (e.g., library block).
+    # Zero if not applicable (e.g., course block).
+    copied_from_version_num: int = 0,
     # Content tags applied to the source XBlock(s)
     tags: dict[str, str] | None = None,
 ) -> XBlock:
@@ -373,12 +382,32 @@ def _import_xml_node_to_parent(
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
     temp_xblock.parent = parent_key
     if copied_from_block:
-        # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
-        temp_xblock.copied_from_block = copied_from_block
+        # Try to link the pasted block (downstream) to the copied block (upstream).
+        temp_xblock.upstream = copied_from_block
+        try:
+            UpstreamLink.get_for_block(temp_xblock)
+        except (BadDownstream, BadUpstream):
+            # Usually this will fail. For example, if the copied block is a modulestore course block, it can't be an
+            # upstream. That's fine! Instead, we store a reference to where this block was copied from, in the
+            # 'copied_from_block' field (from AuthoringMixin).
+            temp_xblock.upstream = None
+            temp_xblock.copied_from_block = copied_from_block
+        else:
+            # But if it doesn't fail, then populate the `upstream_version` field based on what was copied. Note that
+            # this could be the latest published version, or it could be an an even newer draft version.
+            temp_xblock.upstream_version = copied_from_version_num
+            # Also, fetch upstream values (`upstream_display_name`, etc.).
+            # Recall that the copied block could be a draft. So, rather than fetching from the published upstream (which
+            # could be older), fetch from the copied block itself. That way, if an author customizes a field, but then
+            # later wants to restore it, it will restore to the value that the field had when the block was pasted. Of
+            # course, if the author later syncs updates from a *future* published upstream version, then that will fetch
+            # new values from the published upstream content.
+            fetch_customizable_fields(upstream=temp_xblock, downstream=temp_xblock, user=user)
+
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
-    new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
+    new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)
-    store.update_item(parent_xblock, user_id)
+    store.update_item(parent_xblock, user.id)
 
     children_handled = False
     if hasattr(new_xblock, 'studio_post_paste'):
@@ -394,7 +423,7 @@ def _import_xml_node_to_parent(
                 child_node,
                 new_xblock,
                 store,
-                user_id=user_id,
+                user=user,
                 copied_from_block=str(child_copied_from),
                 tags=tags,
             )

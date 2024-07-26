@@ -7,11 +7,13 @@ import ddt
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
 from openedx_tagging.core.tagging.models import Tag
+from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory, LibraryFactory
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
+from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 
 CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
@@ -389,6 +391,78 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         source_pic2_hash = contentstore().find(source_course.id.make_asset_key("asset", "picture2.jpg")).content_digest
         dest_pic2_hash = contentstore().find(dest_course_key.make_asset_key("asset", "picture2.jpg")).content_digest
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
+
+
+class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
+    """
+    Test Clipboard Paste functionality with a "new" (as of Sumac) library
+    """
+
+    def setUp(self):
+        """
+        Set up a v2 Content Library and a library content block
+        """
+        super().setUp()
+        self.client = APIClient()
+        self.client.login(username=self.user.username, password=self.user_password)
+        self.store = modulestore()
+
+        self.library = library_api.create_library(
+            library_type=library_api.COMPLEX,
+            org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
+            slug="lib",
+            title="Library",
+        )
+
+        self.lib_block_key = library_api.create_library_block(self.library.key, "problem", "p1").usage_key  # v==1
+        library_api.set_library_block_olx(self.lib_block_key, """
+        <problem display_name="MCQ-published" max_attempts="1">
+            <multiplechoiceresponse>
+                <label>Q</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Wrong</choice>
+                    <choice correct="true">Right</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """)  # v==2
+        library_api.publish_changes(self.library.key)
+        library_api.set_library_block_olx(self.lib_block_key, """
+        <problem display_name="MCQ-draft" max_attempts="5">
+            <multiplechoiceresponse>
+                <label>Q</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Wrong</choice>
+                    <choice correct="true">Right</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """)  # v==3
+        lib_block_meta = library_api.get_library_block(self.lib_block_key)
+        assert lib_block_meta.published_version_num == 2
+        assert lib_block_meta.draft_version_num == 3
+
+        self.course = CourseFactory.create(display_name='Course')
+
+    def test_paste_from_library_creates_link(self):
+        """
+        When we copy a v2 lib block into a course, the dest block should be linked up to the lib block.
+        """
+        copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(self.lib_block_key)}, format="json")
+        assert copy_response.status_code == 200
+
+        paste_response = self.client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(self.course.usage_key),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+
+        new_block_key = UsageKey.from_string(paste_response.json()["locator"])
+        new_block = modulestore().get_item(new_block_key)
+        assert new_block.upstream == str(self.lib_block_key)
+        assert new_block.upstream_version == 3
+        assert new_block.upstream_display_name == "MCQ-draft"
+        assert new_block.upstream_max_attempts == 5
 
 
 class ClipboardPasteFromV1LibraryTestCase(ModuleStoreTestCase):
