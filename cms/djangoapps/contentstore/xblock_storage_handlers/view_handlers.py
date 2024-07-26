@@ -1209,8 +1209,6 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock_info["data"] = data
         if metadata is not None:
             xblock_info["metadata"] = metadata
-            # if xblock.category == "problem":
-                # xblock_info["metadata"]["default_to_advanced"] = ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG.is_enabled()
         if include_ancestor_info:
             xblock_info["ancestor_info"] = _create_xblock_ancestor_info(
                 xblock, course_outline, include_child_info=True
