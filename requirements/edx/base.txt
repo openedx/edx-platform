@@ -376,6 +376,10 @@ djangorestframework==3.14.0
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+dnspython==2.6.1
+    # via
+    #   -r requirements/edx/paver.txt
+    #   pymongo
 done-xblock==2.3.0
     # via -r requirements/edx/bundled.in
 drf-jwt==1.19.2
@@ -452,7 +456,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.21.7
+edx-enterprise==4.21.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -536,9 +540,9 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.3.0
     # via -r requirements/edx/kernel.in
-event-tracking==2.4.0
+event-tracking==3.0.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-completion
     #   edx-proctoring
@@ -865,7 +869,7 @@ pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.txt
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

@@ -156,14 +156,51 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
             tz_aware=True,
         )
         self.connection.drop_database(self.DB)
-        self.addCleanup(self.connection.drop_database, self.DB)
-        self.addCleanup(self.connection.close)
+        self.addCleanup(self._drop_database)
+        self.addCleanup(self._close_connection)
 
         # define attrs which get set in initdb to quell pylint
         self.writable_chapter_location = self.store = self.fake_location = None
         self.course_locations = {}
 
         self.user_id = ModuleStoreEnum.UserID.test
+
+    def _check_connection(self):
+        """
+        Check mongodb connection is open or not.
+        """
+        try:
+            self.connection.admin.command('ping')
+            return True
+        except pymongo.errors.InvalidOperation:
+            return False
+
+    def _ensure_connection(self):
+        """
+        Make sure that mongodb connection is open.
+        """
+        if not self._check_connection():
+            self.connection = pymongo.MongoClient(
+                host=self.HOST,
+                port=self.PORT,
+                tz_aware=True,
+            )
+
+    def _drop_database(self):
+        """
+        Drop mongodb database.
+        """
+        self._ensure_connection()
+        self.connection.drop_database(self.DB)
+
+    def _close_connection(self):
+        """
+        Close mongodb connection.
+        """
+        try:
+            self.connection.close()
+        except pymongo.errors.InvalidOperation:
+            pass
 
     def _create_course(self, course_key, asides=None):
         """
