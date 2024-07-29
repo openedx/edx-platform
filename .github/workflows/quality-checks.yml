@@ -60,6 +60,9 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
         run: |
           make test-requirements
+      
+      - name: Clear npm cache
+        run: npm cache clean --force
 
       - name: Run Quality Tests
         env:
