@@ -68,7 +68,7 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
-           npm install
+           npm ci --verbose
            ./scripts/all-tests.sh
 
       - name: Save Job Artifacts
