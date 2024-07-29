@@ -19,26 +19,6 @@ from .transformer_registry import TransformerRegistry
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
-class StubModel:
-    """
-    Stub model to use when storage backing is disabled.
-    By using this stub, we eliminate the need for extra
-    conditional statements in the code.
-    """
-
-    def __init__(self, root_block_usage_key):
-        self.data_usage_key = root_block_usage_key
-
-    def __str__(self):
-        return str(self.data_usage_key)
-
-    def delete(self):
-        """
-        Noop delete method.
-        """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
 class BlockStructureStore:
     """
     Storage for BlockStructure objects.
@@ -216,7 +196,7 @@ class BlockStructureStore:
     def _encode_root_cache_key(bs_model):
         """
         Returns the cache key to use for the given
-        BlockStructureModel or StubModel.
+        BlockStructureModel.
         """
         return str(bs_model)
 
