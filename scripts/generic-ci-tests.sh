@@ -81,6 +81,7 @@ case "$TEST_SUITE" in
         # run_paver_quality run_pep8 || { EXIT=1; }
         echo "Finding ESLint violations and storing report..."
         # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
+        make install-deps
         make lint-css
         # echo "Finding Stylelint violations and storing report..."
         # run_paver_quality run_stylelint || { EXIT=1; }
