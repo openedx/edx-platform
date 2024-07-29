@@ -81,7 +81,7 @@ case "$TEST_SUITE" in
         # run_paver_quality run_pep8 || { EXIT=1; }
         echo "Finding ESLint violations and storing report..."
         # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
-        make node --max_old_space_size=4096 node_modules/.bin/eslint --ext .js --ext .jsx --format=compact .
+        node --max_old_space_size=4096 node_modules/.bin/eslint --ext .js --ext .jsx --format=compact .
         # echo "Finding Stylelint violations and storing report..."
         # run_paver_quality run_stylelint || { EXIT=1; }
         # echo "Running xss linter report."
