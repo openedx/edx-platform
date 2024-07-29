@@ -751,27 +751,30 @@ def set_library_block_olx(usage_key, new_olx_str):
     )
 
 
-def create_library_block(library_key, block_type, definition_id, user_id=None):
+def validate_can_add_block_to_library(
+    library_key: LibraryLocatorV2,
+    block_type: str,
+    block_id: str,
+) -> tuple[ContentLibrary, LibraryUsageLocatorV2]:
     """
-    Create a new XBlock in this library of the specified type (e.g. "html").
-    """
-    # It's in the serializer as ``definition_id``, but for our purposes, it's
-    # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
-    # more details. TODO: Change the param name once we change the serializer.
-    block_id = definition_id
+    Perform checks to validate whether a new block with `block_id` and type `block_type` can be added to
+    the library with key `library_key`.
 
+    Returns the ContentLibrary that has the passed in `library_key` and  newly created LibraryUsageLocatorV2 if
+    validation successful, otherwise raises errors.
+    """
     assert isinstance(library_key, LibraryLocatorV2)
-    ref = ContentLibrary.objects.get_by_key(library_key)
-    if ref.type != COMPLEX:
-        if block_type != ref.type:
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    if content_library.type != COMPLEX:
+        if block_type != content_library.type:
             raise IncompatibleTypesError(
                 _('Block type "{block_type}" is not compatible with library type "{library_type}".').format(
-                    block_type=block_type, library_type=ref.type,
+                    block_type=block_type, library_type=content_library.type,
                 )
             )
 
     # If adding a component would take us over our max, return an error.
-    component_count = authoring_api.get_all_drafts(ref.learning_package.id).count()
+    component_count = authoring_api.get_all_drafts(content_library.learning_package.id).count()
     if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
             _("Library cannot have more than {} Components").format(
@@ -784,7 +787,7 @@ def create_library_block(library_key, block_type, definition_id, user_id=None):
     # Ensure the XBlock type is valid and installed:
     XBlock.load_class(block_type)  # Will raise an exception if invalid
     # Make sure the new ID is not taken already:
-    usage_key = LibraryUsageLocatorV2(
+    usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
         lib_key=library_key,
         block_type=block_type,
         usage_id=block_id,
@@ -793,12 +796,26 @@ def create_library_block(library_key, block_type, definition_id, user_id=None):
     if _component_exists(usage_key):
         raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
 
-    _create_component_for_block(ref, usage_key, user_id=user_id)
+    return content_library, usage_key
+
+
+def create_library_block(library_key, block_type, definition_id, user_id=None):
+    """
+    Create a new XBlock in this library of the specified type (e.g. "html").
+    """
+    # It's in the serializer as ``definition_id``, but for our purposes, it's
+    # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
+    # more details. TODO: Change the param name once we change the serializer.
+    block_id = definition_id
+
+    content_library, usage_key = validate_can_add_block_to_library(library_key, block_type, block_id)
+
+    _create_component_for_block(content_library, usage_key, user_id)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
-            library_key=ref.library_key,
+            library_key=content_library.library_key,
             usage_key=usage_key
         )
     )
@@ -818,6 +835,46 @@ def _component_exists(usage_key: UsageKeyV2) -> bool:
     except ObjectDoesNotExist:
         return False
     return True
+
+
+def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user, block_id) -> XBlock:
+    """
+    Create a new library block and populate it with staged content from clipboard
+
+    Returns the newly created library block
+    """
+    from openedx.core.djangoapps.content_staging import api as content_staging_api
+    if not content_staging_api:
+        raise RuntimeError("The required content_staging app is not installed")
+
+    user_clipboard = content_staging_api.get_user_clipboard(user)
+    if not user_clipboard:
+        return None
+
+    olx_str = content_staging_api.get_staged_content_olx(user_clipboard.content.id)
+
+    # TODO: Handle importing over static assets
+
+    content_library, usage_key = validate_can_add_block_to_library(
+        library_key,
+        user_clipboard.content.block_type,
+        block_id
+    )
+
+    # Create component for block then populate it with clipboard data
+    _create_component_for_block(content_library, usage_key, user.id)
+    set_library_block_olx(usage_key, olx_str)
+
+    # Emit library block created event
+    LIBRARY_BLOCK_CREATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=content_library.library_key,
+            usage_key=usage_key
+        )
+    )
+
+    # Now return the metadata about the new block
+    return get_library_block(usage_key)
 
 
 def get_or_create_olx_media_type(block_type: str) -> MediaType:
