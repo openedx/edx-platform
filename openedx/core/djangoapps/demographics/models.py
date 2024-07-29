@@ -1,3 +1,0 @@
-"""
-Demographics models
-"""
