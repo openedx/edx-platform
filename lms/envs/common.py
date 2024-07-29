@@ -1101,8 +1101,10 @@ DEFAULT_GROUPS = []
 # If this is true, random scores will be generated for the purpose of debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
 
-# Sets the number of days after which the gradebook will freeze following the course's end.
-GRADEBOOK_FREEZE_TIMEDELTA = 30
+# .. setting_name: GRADEBOOK_FREEZE_DAYS
+# .. setting_default: 30
+# .. setting_description: Sets the number of days after which the gradebook will freeze following the course's end.
+GRADEBOOK_FREEZE_DAYS = 30
 
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
