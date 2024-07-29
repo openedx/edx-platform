@@ -204,7 +204,8 @@ ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip ins
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
 
 install-deps:
-	@npm ci --verbose
+	@npx eslint
 
 lint-css:
-	@npx stylelint "**/*.scss" --custom-formatter=node_modules/stylelint-formatter-pretty
+	stylelint "**/*.scss" --custom-formatter=node_modules/stylelint-formatter-pretty
+	
