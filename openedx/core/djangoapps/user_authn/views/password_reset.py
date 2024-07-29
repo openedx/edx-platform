@@ -281,8 +281,8 @@ def request_password_change(email, is_secure):
 
 @csrf_exempt
 @require_POST
-@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE, block=False)
-@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE, block=False)
+# @ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE, block=False)
+# @ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE, block=False)
 def password_reset(request):
     """
     Attempts to send a password reset e-mail.
@@ -299,15 +299,15 @@ def password_reset(request):
     )
     AUDIT_LOG.info("Password reset initiated for email %s.", email)
 
-    if getattr(request, 'limited', False):
-        AUDIT_LOG.warning("Password reset rate limit exceeded for email %s.", email)
-        return JsonResponse(
-            {
-                'success': False,
-                'value': _("Your previous request is in progress, please try again in a few moments.")
-            },
-            status=403
-        )
+    # if getattr(request, 'limited', False):
+    #     AUDIT_LOG.warning("Password reset rate limit exceeded for email %s.", email)
+    #     return JsonResponse(
+    #         {
+    #             'success': False,
+    #             'value': _("Your previous request is in progress, please try again in a few moments.")
+    #         },
+    #         status=403
+    #     )
 
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
