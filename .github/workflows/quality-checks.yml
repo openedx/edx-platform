@@ -16,7 +16,7 @@ jobs:
         os: [ubuntu-20.04]
         python-version:
           - "3.11"
-        node-version: [18]
+        node-version: [20]
 
     steps:
       - uses: actions/checkout@v4
@@ -70,6 +70,9 @@ jobs:
         run: |
            npm ci --verbose
            ./scripts/all-tests.sh
+      
+      - name: List node_modules/.bin
+        run: ls -la node_modules/.bin     
 
       - name: Save Job Artifacts
         if: always()
