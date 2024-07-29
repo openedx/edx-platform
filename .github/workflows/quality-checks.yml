@@ -68,7 +68,8 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
-          ./scripts/all-tests.sh
+           npm install
+           ./scripts/all-tests.sh
 
       - name: Save Job Artifacts
         if: always()
