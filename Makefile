@@ -207,4 +207,4 @@ install-deps:
 	@npm ci --verbose
 
 lint-css:
-	stylelint "**/*.scss" --custom-formatter=node_modules/stylelint-formatter-pretty
+	@npx stylelint "**/*.scss" --custom-formatter=node_modules/stylelint-formatter-pretty
