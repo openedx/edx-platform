@@ -1,3 +1,6 @@
+"""
+Courseware Content Classes
+"""
 import logging
 
 from opaque_keys.edx.keys import CourseKey
@@ -11,6 +14,12 @@ log = logging.getLogger(__name__)
 
 class CoursewareContent:
     def prepare_data(self, item, structure_key):
+        """
+        Prepares data structure.
+        :param item:
+        :param structure_key:
+        :return:
+        """
         location_info = {
             "course": str(structure_key),
             "org": structure_key.org,
@@ -27,6 +36,12 @@ class CoursewareContent:
         return [_index_dictionary] + children
 
     def fetch_course_blocks(self, modulestore, course_key):
+        """
+        Extracts data from module store.
+        :param modulestore:
+        :param course_key:
+        :return:
+        """
         blocks = []
         with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
             structure = modulestore.get_course(course_key, depth=None)
@@ -35,7 +50,14 @@ class CoursewareContent:
                 blocks.extend(self.prepare_data(item, course_key))
         return blocks
 
-    def fetch(self, course_key=None, *args, **kwargs):
+    def fetch(self, *args, course_key=None, **kwargs):
+        """
+        Returns data for indexing.
+        :param course_key:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         modulestore = ModuleStore()
         if not course_key:
             course_keys = CourseOverview.objects.values_list('id', flat=True)
