@@ -964,13 +964,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                 setattr(model, field, provider_value)
 
         # Generate fullname only for IES IDP.
-        # We deliberately left these values hard-coded instead of using Django settings because
-        # it would force us to add custom settings to the edx platform code,
-        # which we try to avoid as we might lose track of that kind of setting.
-        ies_entity_ids = [
-            'https://iam-stage.pearson.com:443/auth/saml-idp-uid',
-            'https://iam.pearson.com:443/auth/saml-idp-uid',
-        ]
+        ies_entity_ids = getattr(settings, 'SAML_IES_ENTITIES_IDS', [])
         first_name = details.get('first_name')
         last_name = details.get('last_name')
 
