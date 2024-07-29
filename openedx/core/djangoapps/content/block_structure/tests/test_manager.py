@@ -208,8 +208,8 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     def test_get_collected_structure_version(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         BlockStructureBlockData.VERSION += 1
-        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
-        assert TestTransformer1.collect_call_count == 2
+        self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
+        assert TestTransformer1.collect_call_count == 1
 
     def test_clear(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
