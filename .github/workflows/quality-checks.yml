@@ -63,6 +63,12 @@ jobs:
       
       - name: Clear npm cache
         run: npm cache clean --force
+      
+      - name: npm install command 
+        run: npm install
+      
+      - name: List node_modules/.bin
+        run: ls -la node_modules/.bin  
 
       - name: Run Quality Tests
         env:
@@ -71,12 +77,8 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
-           npm ci --verbose
            ./scripts/all-tests.sh
       
-      - name: List node_modules/.bin
-        run: ls -la node_modules/.bin     
-
       - name: Save Job Artifacts
         if: always()
         uses: actions/upload-artifact@v4
