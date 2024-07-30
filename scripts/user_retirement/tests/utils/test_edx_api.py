@@ -542,3 +542,42 @@ class TestLicenseManagerApi(OAuth2Mixin, unittest.TestCase):
                 original_username=FAKE_ORIGINAL_USERNAME
             )
         )
+
+
+class TestCommerceCoordinatorApi(OAuth2Mixin, unittest.TestCase):
+    """
+    Test the edX Commerce-Coordinator API client.
+    """
+
+    @responses.activate(registry=OrderedRegistry)
+    def setUp(self):
+        super().setUp()
+        self.mock_access_token_response()
+        self.lms_base_url = 'http://localhost:18000/'
+        self.commerce_coordinator_base_url = 'http://localhost:8140/'
+        self.commerce_coordinator_api = edx_api.CommerceCoordinatorApi(
+            self.lms_base_url,
+            self.commerce_coordinator_base_url,
+            'the_client_id',
+            'the_client_secret'
+        )
+
+    @patch.object(edx_api.CommerceCoordinatorApi, '_request')
+    def test_retire_learner(self, mock_request):
+        learner_data = get_fake_user_retirement()
+        json_data = {
+            'edx_lms_user_id': learner_data['user']['id']
+        }
+        responses.add(
+            POST,
+            urljoin(self.commerce_coordinator_base_url, 'lms/user_retirement'),
+            match=[matchers.json_params_matcher(json_data)]
+        )
+
+        self.commerce_coordinator_api.retire_learner(learner=learner_data)
+
+        mock_request.assert_called_once_with(
+            'POST',
+            urljoin(self.commerce_coordinator_base_url, 'lms/user_retirement/'),
+            json=json_data
+        )
