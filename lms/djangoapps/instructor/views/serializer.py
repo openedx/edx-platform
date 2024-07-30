@@ -1,7 +1,9 @@
+""" Instructor apis serializers. """
+
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
-from rest_framework import serializers, status
+from rest_framework import serializers
 
 from lms.djangoapps.instructor.access import ROLES
 
