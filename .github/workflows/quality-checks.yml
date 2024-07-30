@@ -60,12 +60,18 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
         run: |
           make test-requirements
+      
+      - name: Run Python Quality Tests
+        run: pycodestyle .
 
       - name: Run Quality Tests
         env:
+          TEST_SUITE: quality
+          SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
-        run: make quality
+        run: |
+           ./scripts/all-tests.sh
           
       - name: Save Job Artifacts
         if: always()
