@@ -82,7 +82,7 @@ case "$TEST_SUITE" in
         # run_paver_quality run_pep8 || { EXIT=1; }
         echo "Finding ESLint violations and storing report..."
         # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
-        # node node_modules/.bin/eslint .
+        stylelint **/*.scss --custom-formatter=node_modules/stylelint-formatter-pretty
         # echo "Finding Stylelint violations and storing report..."
         # run_paver_quality run_stylelint || { EXIT=1; }
         # echo "Running xss linter report."
