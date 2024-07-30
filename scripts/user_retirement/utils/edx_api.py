@@ -491,6 +491,7 @@ class LicenseManagerApi(BaseApiClient):
             LOG.info("No license manager data found for user")
             return True
 
+
 class CommerceCoordinatorApi(BaseApiClient):
     """
     Commerce-Coordinator API client.
