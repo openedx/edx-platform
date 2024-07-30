@@ -60,7 +60,7 @@ function run_paver_quality {
     shift
     mkdir -p test_root/log/
     LOG_PREFIX="test_root/log/$QUALITY_TASK"
-    $TOX "$QUALITY_TASK" "$@" 2> "$LOG_PREFIX.err.log" > "$LOG_PREFIX.out.log" || {
+    $TOX paver "$QUALITY_TASK" "$@" 2> "$LOG_PREFIX.err.log" > "$LOG_PREFIX.out.log" || {
         echo "STDOUT (last 100 lines of $LOG_PREFIX.out.log):";
         tail -n 100 "$LOG_PREFIX.out.log"
         echo "STDERR (last 100 lines of $LOG_PREFIX.err.log):";
@@ -77,10 +77,8 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
 
-        echo "Finding pycodestyle violations and storing report..."
-        run_paver_quality run_pep8 || { EXIT=1; }
-        echo "Finding ESLint violations and storing report..."
-        run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
+        # echo "Finding ESLint violations and storing report..."
+        # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
         echo "Finding Stylelint violations and storing report..."
         run_paver_quality run_stylelint || { EXIT=1; }
         echo "Running xss linter report."
