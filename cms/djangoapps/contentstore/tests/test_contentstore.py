@@ -1372,6 +1372,16 @@ class ContentStoreTest(ContentStoreTestCase):
             self.course_data['run'] = '����������'
             self.assert_create_course_failed(error_message)
 
+    @override_settings(DEFAULT_COURSE_INVITATION_ONLY=True)
+    def test_create_course_invitation_only(self):
+        """
+        Test new course creation with setting: DEFAULT_COURSE_INVITATION_ONLY=True.
+        """
+        test_course_data = self.assert_created_course()
+        course_id = _get_course_id(self.store, test_course_data)
+        course = self.store.get_course(course_id)
+        self.assertEqual(course.invitation_only, True)
+
     def assert_course_permission_denied(self):
         """
         Checks that the course did not get created due to a PermissionError.

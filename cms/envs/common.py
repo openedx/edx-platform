@@ -2937,3 +2937,7 @@ MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 # See https://www.meilisearch.com/docs/learn/security/tenant_tokens
 MEILISEARCH_INDEX_PREFIX = ""
 MEILISEARCH_API_KEY = "devkey"
+
+############## Default value for invitation_only when creating courses ##############
+
+DEFAULT_COURSE_INVITATION_ONLY = False
