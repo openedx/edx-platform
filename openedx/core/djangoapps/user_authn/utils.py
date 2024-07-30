@@ -17,6 +17,8 @@ from rest_framework.status import HTTP_408_REQUEST_TIMEOUT
 from common.djangoapps.student.models import username_exists_or_retired
 from openedx.core.djangoapps.password_policy.hibp import PwnedPasswordsAPI
 from openedx.core.djangoapps.user_api.accounts import USERNAME_MAX_LENGTH
+from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def _remove_unsafe_bytes_from_url(url):
@@ -145,3 +147,12 @@ def check_pwned_password(password):
             properties['frequency'] = math.ceil(math.log10(pwned_count))
 
     return properties
+
+
+def should_auto_create_user_account():
+    return False
+    registration_extra_fields = configuration_helpers.get_value(
+        'REGISTRATION_EXTRA_FIELDS',
+        getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+    )
+    return is_auto_generated_username_enabled() and registration_extra_fields.get('country', '') == 'optional'

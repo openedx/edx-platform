@@ -309,6 +309,8 @@ LOGIN_REDIRECT_WHITELIST.extend([
     'localhost:3001',  # frontend-app-library-authoring
     'localhost:18400',  # frontend-app-publisher
     'localhost:1993',  # frontend-app-ora-grading
+    'localhost:5335',
+    'localhost:2999',
     'localhost:1996',  # frontend-app-learner-dashboard
     ENTERPRISE_LEARNER_PORTAL_NETLOC,  # frontend-app-learner-portal-enterprise
     ENTERPRISE_ADMIN_PORTAL_NETLOC,  # frontend-app-admin-portal

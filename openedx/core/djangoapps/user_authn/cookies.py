@@ -143,7 +143,7 @@ def set_logged_in_cookies(request, response, user):
     # that is passed in when needed.
 
     if user.is_authenticated and not user.is_anonymous:
-
+        print(f'\n\n\n user_authn set_logged_in_cookies setting cookies => ')
         # JWT cookies expire at the same time as other login-related cookies
         # so that cookie-based login determination remains consistent.
         cookie_settings = standard_cookie_settings(request)
@@ -153,6 +153,7 @@ def set_logged_in_cookies(request, response, user):
         _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
+    print(f'\n\n\n user_authn set_logged_in_cookies return response => ', response.cookies)
     return response
 
 
@@ -198,6 +199,10 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
     }
     """
     user_info = _get_user_info_cookie_data(request, user)
+    print(f'\n\n\n user_authn set_logged_in_cookies setting cookie => ', (
+        settings.EDXMKTG_USER_INFO_COOKIE_NAME,
+        json.dumps(user_info),
+    ))
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME,
         json.dumps(user_info),
@@ -212,6 +217,10 @@ def _set_deprecated_logged_in_cookie(response, cookie_settings):
     # is logged in.  This is just a boolean value, so it's not very useful.
     # In the future, we should be able to replace this with the "user info"
     # cookie set below.
+    print(f'\n\n\n user_authn set_logged_in_cookies setting cookie => ', (
+        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME,
+        'true',
+    ))
     response.set_cookie(
         settings.EDXMKTG_LOGGED_IN_COOKIE_NAME,
         'true',
@@ -340,6 +349,10 @@ def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_sign
         jwt_header_and_payload,
         **cookie_settings
     )
+    print(f'\n\n\n user_authn set_logged_in_cookies setting cookie => ', (
+        jwt_cookies.jwt_cookie_header_payload_name(),
+        jwt_header_and_payload,
+    ))
 
     cookie_settings['httponly'] = True
     response.set_cookie(
@@ -347,6 +360,10 @@ def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_sign
         jwt_signature,
         **cookie_settings
     )
+    print(f'\n\n\n user_authn set_logged_in_cookies setting cookie => ', (
+        jwt_cookies.jwt_cookie_signature_name(),
+        jwt_signature,
+    ))
 
 
 def _get_login_oauth_client():

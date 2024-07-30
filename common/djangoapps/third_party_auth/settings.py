@@ -13,7 +13,7 @@ If true, it:
 
 from django.conf import settings
 
-from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
+from openedx.core.djangoapps.user_authn.utils import should_auto_create_user_account
 from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 
@@ -23,7 +23,7 @@ def apply_settings(django_settings):
     # Whitelisted URL query parameters retrained in the pipeline session.
     # Params not in this whitelist will be silently dropped.
     django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
-    if is_auto_generated_username_enabled():
+    if should_auto_create_user_account():
         django_settings.FIELDS_STORED_IN_SESSION.append('registration_params')
 
     # Inject exception middleware to make redirects fire.
@@ -38,6 +38,11 @@ def apply_settings(django_settings):
 
     # Where to send the user once social authentication is successful.
     django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+
+    if should_auto_create_user_account() and getattr(settings, 'AUTHN_MICROFRONTEND_WELCOME_PAGE_URL', None):
+        django_settings.SOCIAL_AUTH_NEW_USER_REDIRECT_URL = getattr(
+            settings, 'AUTHN_MICROFRONTEND_WELCOME_PAGE_URL', None
+        )
 
     # Disable sanitizing of redirect urls in social-auth since the platform
     # already does its own sanitization via the LOGIN_REDIRECT_WHITELIST setting.
@@ -72,7 +77,7 @@ def apply_settings(django_settings):
         'common.djangoapps.third_party_auth.pipeline.set_id_verification_status',
         'common.djangoapps.third_party_auth.pipeline.set_logged_in_cookies',
         'common.djangoapps.third_party_auth.pipeline.login_analytics',
-        'common.djangoapps.third_party_auth.pipeline.redirect_to_welcome_page',
+        # 'common.djangoapps.third_party_auth.pipeline.redirect_to_welcome_page',
         'common.djangoapps.third_party_auth.pipeline.ensure_redirect_url_is_safe',
     ]
 

@@ -93,7 +93,7 @@ from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.accounts.utils import username_suffix_generator
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
-from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect, should_auto_create_user_account
 from common.djangoapps.third_party_auth.utils import (
     get_associated_user_by_email_response,
     get_user_from_email,
@@ -105,9 +105,9 @@ from common.djangoapps.third_party_auth.utils import (
 from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password
-from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.models import UserProfile, Registration
 from openedx.core.djangoapps.user_authn.views.utils import (
-    get_auto_generated_username
+    get_auto_generated_username, complete_user_registration
 )
 from . import provider
 
@@ -629,15 +629,17 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
             if should_force_account_creation():
-                print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry login and force account creation => dispatch_to_register')
-                return dispatch_to_register()
+                if not should_auto_create_user_account():
+                    print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry login and force account creation => dispatch_to_register')
+                    return dispatch_to_register()
             print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry login => dispatch_to_login')
             return dispatch_to_login()
         elif auth_entry == AUTH_ENTRY_REGISTER:
             # User has authenticated with the third party provider and now wants to finish
             # creating their edX account.
-            print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry register => dispatch_to_register')
-            # return dispatch_to_register()
+            if not should_auto_create_user_account():
+                print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry register => dispatch_to_register')
+                return dispatch_to_register()
         elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
@@ -675,15 +677,15 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             )
 
 
-def complete_user_creation(strategy, user=None, details=None, *args, **kwargs):
-    auto_generate_username_enabled = True
+def complete_user_creation(strategy, user=None, details=None, is_new=False, *args, **kwargs):
     is_marketable = False
     profile = None
     request = strategy.request if strategy else None
-    print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request: {request}  ')
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.site={request.site} ')
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.data={ strategy.request_data(merge=False)} ')
-    if auto_generate_username_enabled and user:
+    print(f'\n\n\n PIPELINE_STEP: complete_user_creation => is_new={ is_new } ')
+    if should_auto_create_user_account and user and is_new:
+        password = user.password
         if not user.has_usable_password():
             password = normalize_password(generate_password())
             user.set_password(password)
@@ -698,17 +700,26 @@ def complete_user_creation(strategy, user=None, details=None, *args, **kwargs):
                 logger.exception(f"UserProfile creation failed for user {user.id}.")
                 raise
         if strategy.session_get('registration_params', None):
-            registration_params = json.loads(strategy.session_get('registration_params'))
-            print(f'\n\n\n PIPELINE_STEP: complete_user_creation => registration_params: {registration_params}')
+            params = json.loads(strategy.session_get('registration_params'))
+            third_party_provider = None
+            print(f'\n\n\n PIPELINE_STEP: complete_user_creation => registration_params: {params}')
             try:
-                is_marketable = registration_params.get('marketing_emails_opt_in', None) in ['true', '1']
-                print(f'\n\n\n PIPELINE_STEP: complete_user_creation => is_marketable: {is_marketable}')
-                # _record_is_marketable_attribute(is_marketable, user)
-            except Exception:  # pylint: disable=broad-except
-                logger.exception('Error while setting is_marketable attribute.')
+                is_marketable = params.get('marketing_emails_opt_in', None) in [True, 'true', '1']
+                running_pipeline = get(request)
+                if running_pipeline:
+                    third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+                registration = Registration()
+                registration.register(user)
+                print(f'\n\n\n PIPELINE_STEP: complete_user_creation => is_marketable: {is_marketable} registration: {registration} running_pipeline: {running_pipeline} third_party_provider: {third_party_provider} password={password}')
+                new_user = complete_user_registration(
+                    user, profile, params, third_party_provider, registration,
+                    is_marketable, request, running_pipeline, cleaned_password=password
+                )
+            except Exception as e:  # pylint: disable=broad-except
+                logger.exception('Error while tpa account creation: ', e)
         # params = {'marketing_emails_opt_in': strategy.session_get('marketing_emails_opt_in', None)}
         # _track_user_registration(user, profile, params=[], third_party_provider=None, registration=None, is_marketable=is_marketable)
-        return {'user': user}
+        return {'user': new_user}
 
 
 @partial.partial
@@ -753,6 +764,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
             # This ensures that we allow the user to continue to the next
             # pipeline step once he/she has the cookie set by this step.
             has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
+            print(f'\n\n\n PIPELINE_STEP 18: set_logged_in_cookies has_cookie => ', has_cookie)
             if not has_cookie:
                 try:
                     redirect_url = get_complete_url(current_partial.backend)
@@ -762,7 +774,9 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
                     # the user log in successfully than that the cookie is set.
                     pass
                 else:
+                    print(f'\n\n\n PIPELINE_STEP 18: set_logged_in_cookies redirect_url => ', redirect_url)
                     response = redirect(redirect_url)
+                    print(f'\n\n\n PIPELINE_STEP 18: set_logged_in_cookies response => ', response)
                     return user_authn_cookies.set_logged_in_cookies(request, response, user)
 
 
@@ -770,6 +784,8 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
     """ Sends login info to Segment """
     print(f'\n\n\n PIPELINE_STEP 19 Enter: login_analytics => auth_entry={auth_entry} strategy={strategy} current_partial={current_partial}')
+    request = strategy.request if strategy else None
+    print(f'\n\n\n PIPELINE_STEP 19 Enter: login_analytics => request.COOKIES={request.COOKIES}')
 
     event_name = None
     if auth_entry == AUTH_ENTRY_LOGIN:
@@ -1122,21 +1138,30 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
     return {'username': final_username}
 
 
-@partial.partial
-def redirect_to_welcome_page(strategy, user=None, is_new=False, *args, **kwargs):
-    def dispatch_to_welcome_page():
-        """Redirects to the login page."""
-        print(f'\n\n\n PIPELINE_STEP 21 Return: redirect_to_welcome_page => dispatch_to_welcome_page')
-        return redirect(settings.AUTHN_MICROFRONTEND_WELCOME_PAGE_URL)
-
-    print(f'\n\n\n PIPELINE_STEP STEP 21 Enter: redirect_to_welcome_page => user={user} user.is_authenticated={user.is_authenticated} strategy.session_get(visited_welcome_page, False)={strategy.session_get("visited_welcome_page", False)}, is_new_user={getattr(user, "is_new", False)} is_new={is_new}')
-    auto_generate_username_enabled = True
-    if (
-        auto_generate_username_enabled and user and user.is_authenticated
-        and is_new and not strategy.session_get('visited_welcome_page', False)
-    ):
-        strategy.session_set('visited_welcome_page', True)
-        return dispatch_to_welcome_page()
+# @partial.partial
+# def redirect_to_welcome_page(strategy, user=None, is_new=False, *args, **kwargs):
+#     def dispatch_to_welcome_page():
+#         """Redirects to the login page."""
+#         response = redirect(settings.AUTHN_MICROFRONTEND_WELCOME_PAGE_URL)
+#         # response = redirect('/register')
+#
+#         request = strategy.request if strategy else None
+#         print(f'\n\n\n PIPELINE_STEP STEP 21 Enter: redirect_to_welcome_page before redirection => request.COOKIES={request.COOKIES} ')
+#         has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
+#         print(f'\n\n\n PIPELINE_STEP 21: redirect_to_welcome_page has_cookie => ', has_cookie)
+#         if has_cookie:
+#             print(f'\n\n\n PIPELINE_STEP 21 Return: redirect_to_welcome_page has cookie => dispatch_to_welcome_page cookies = ', response.cookies)
+#             return user_authn_cookies.set_logged_in_cookies(request, response, user)
+#         print(f'\n\n\n PIPELINE_STEP 21 Return: redirect_to_welcome_page => dispatch_to_welcome_page cookies = ', response.cookies)
+#         return response
+#
+#     print(f'\n\n\n PIPELINE_STEP STEP 21 Enter: redirect_to_welcome_page => user={user} user.is_authenticated={user.is_authenticated} strategy.session_get(visited_welcome_page, False)={strategy.session_get("visited_welcome_page", False)}, is_new={is_new}')
+#     if (
+#         should_auto_create_user_account() and user and user.is_authenticated
+#         and is_new and not strategy.session_get('visited_welcome_page', False)
+#     ):
+#         strategy.session_set('visited_welcome_page', True)
+#         return dispatch_to_welcome_page()
 
 def ensure_redirect_url_is_safe(strategy, *args, **kwargs):
     """

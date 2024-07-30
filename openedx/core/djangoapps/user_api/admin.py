@@ -16,9 +16,19 @@ from .models import (
     RetirementState,
     UserRetirementPartnerReportingStatus,
     UserRetirementRequest,
-    UserRetirementStatus
+    UserRetirementStatus,
+    UserPreference,
 )
 
+
+@admin.register(UserPreference)
+class UserPreferenceAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the RetirementState model.
+    """
+
+    class Meta:
+        model = UserPreference
 
 @admin.register(RetirementState)
 class RetirementStateAdmin(admin.ModelAdmin):

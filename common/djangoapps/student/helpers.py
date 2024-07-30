@@ -272,6 +272,7 @@ def get_next_url_for_login_page(request, include_host=False):
     This works with both GET and POST requests.
     """
     request_params = request.GET if request.method == 'GET' else request.POST
+    print(f'\n\n\n\n\n get_next_url_for_login_page request_params: {request_params}, request.get_host(): {request.get_host()}, request.META: {request.META}, request.is_secure(): {request.is_secure()}')
     redirect_to = _get_redirect_to(
         request_host=request.get_host(),
         request_headers=request.META,
