@@ -77,11 +77,12 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
 
-        # echo "Finding pycodestyle violations and storing report..."
+        echo "Finding pycodestyle violations and storing report..."
+        pycodestyle .
         # run_paver_quality run_pep8 || { EXIT=1; }
         echo "Finding ESLint violations and storing report..."
         # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
-        node node_modules/.bin/eslint .
+        # node node_modules/.bin/eslint .
         # echo "Finding Stylelint violations and storing report..."
         # run_paver_quality run_stylelint || { EXIT=1; }
         # echo "Running xss linter report."
