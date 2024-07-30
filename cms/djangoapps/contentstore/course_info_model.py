@@ -19,7 +19,6 @@ import re
 from django.http import HttpResponseBadRequest
 from django.utils.translation import gettext as _
 
-from cms.djangoapps.contentstore.config.waffle import ENABLE_COURSE_UPDATE_NOTIFICATIONS
 from cms.djangoapps.contentstore.utils import track_course_update_event, send_course_update_notification
 from openedx.core.lib.xblock_utils import get_course_update_items
 from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
@@ -93,10 +92,9 @@ def update_course_updates(location, update, passed_id=None, user=None, request_m
         track_course_update_event(location.course_key, user, course_update_dict)
 
         # send course update notification
-        if ENABLE_COURSE_UPDATE_NOTIFICATIONS.is_enabled(location.course_key):
-            send_course_update_notification(
-                location.course_key, course_update_dict["content"], user,
-            )
+        send_course_update_notification(
+            location.course_key, course_update_dict["content"], user,
+        )
 
     # remove status key
     if "status" in course_update_dict:
