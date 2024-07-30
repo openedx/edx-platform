@@ -61,10 +61,17 @@ jobs:
         run: |
           make test-requirements
       
+      - name: Install npm
+        env:
+          PIP_SRC: ${{ runner.temp }}
+        run: npm ci  
+
       - name: Run Python Quality Tests
         run: pycodestyle .
       
       - name: Run Eslint Tests
+        env:
+          PIP_SRC: ${{ runner.temp }}
         run: make test-eslint
 
       - name: Run Quality Tests
