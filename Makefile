@@ -202,3 +202,6 @@ migrate: migrate-lms migrate-cms
 # Part of https://github.com/openedx/wg-developer-experience/issues/136
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
+
+test-eslint:
+	node node_modules/.bin/eslint --ext .js --ext .jsx --format=compact .
