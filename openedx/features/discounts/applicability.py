@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 
 import pytz
 from crum import get_current_request, impersonate
+from django.conf import settings
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from edx_toggles.toggles import WaffleFlag
@@ -31,7 +32,7 @@ from common.djangoapps.track import segment
 # .. toggle_name: discounts.enable_first_purchase_discount_override
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Waffle flag to enable the First Purchase Discount to be overriden from
+# .. toggle_description: Waffle flag to enable the First Purchase Discount to be overridden from
 #   EDXWELCOME/BIENVENIDOAEDX 15% discount to a new code.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2024-07-18
@@ -227,6 +228,13 @@ def discount_percentage(course):
     """
     Get the configured discount amount.
     """
+    if FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG.is_enabled():
+        return getattr(
+            settings,
+            'FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE',
+            15
+        )
+
     configured_percentage = DiscountPercentageConfig.current(course_key=course.id).percentage
     if configured_percentage:
         return configured_percentage
