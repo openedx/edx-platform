@@ -209,4 +209,4 @@ test-eslint:
 	node node_modules/.bin/eslint --ext .js --ext .jsx --format=compact .
 
 test-stylelint:
-	stylelint **/*.scss --custom-formatter=node_modules/stylelint-formatter-pretty
+	stylelint '**/*.scss' --custom-formatter=node_modules/stylelint-formatter-pretty
