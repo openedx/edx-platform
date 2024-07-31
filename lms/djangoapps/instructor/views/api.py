@@ -119,8 +119,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
-from rest_framework.authentication import SessionAuthentication
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.api.serializers import CourseKeyField
@@ -230,30 +229,6 @@ def require_course_permission(permission):
             else:
                 return HttpResponseForbidden()
         return wrapped
-    return decorator
-
-
-def verify_course_permission(permission):
-    """
-        Decorator with argument that requires a specific permission of the requesting
-        user. If the requirement is not satisfied, returns an
-        HttpResponseForbidden (403).
-        Assumes that request is in self.
-        Assumes that course_id is in kwargs['course_id'].
-        """
-
-    def decorator(func):
-        def wrapped(self, *args, **kwargs):
-            request = self.request
-            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
-
-            if request.user.has_perm(permission, course):
-                return func(self, *args, **kwargs)
-            else:
-                return HttpResponseForbidden()
-
-        return wrapped
-
     return decorator
 
 
@@ -2185,19 +2160,30 @@ def list_background_email_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class ListEmailContent(APIView):
     """
     List the content of bulk emails sent
     """
-    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication)
-    permission_classes = (IsAuthenticated,)
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EMAIL
 
     @method_decorator(ensure_csrf_cookie)
-    @verify_course_permission(permissions.EMAIL)
-    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     def post(self, request, course_id):
         """
-        List the content of bulk emails sent
+        List the content of bulk emails sent for a specific course.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            course_id (str): The ID of the course for which to list the bulk emails.
+
+        Returns:
+            HttpResponse: A response object containing the list of bulk email contents.
         """
         course_id = CourseKey.from_string(course_id)
         task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
