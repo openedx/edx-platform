@@ -388,7 +388,7 @@ def _record_is_marketable_attribute(is_marketable, user):
 def _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable):
     print(f'\n\n\n _track_user_registration => user: {user} , profile: {profile} , params: {params} , third_party_provider: {third_party_provider} , registration: {registration} ,  is_marketable: {is_marketable}')
     """ Track the user's registration. """
-    if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
+    if True or hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         traits = {
             'email': user.email,
             'username': user.username,
@@ -410,6 +410,10 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
         # .. pii_types: email_address, username, name, birth_date, location, gender
         # .. pii_retirement: third_party
         segment.identify(user.id, traits)
+        print('\n\n\n\n segment identify user: ', (
+            user.id,
+           traits,
+        ), '\n\n\n\n')
         properties = {
             'category': 'conversion',
             # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
@@ -437,6 +441,12 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
         segment_traits = dict(properties)
         segment_traits['user_id'] = user.id
         segment_traits['joined_date'] = user.date_joined.strftime("%Y-%m-%d")
+        print('\n\n\n\n segment event track: ', (
+            user.id,
+            "edx.bi.user.account.registered",
+            properties,
+            segment_traits,
+        ), '\n\n\n\n')
         segment.track(
             user.id,
             "edx.bi.user.account.registered",

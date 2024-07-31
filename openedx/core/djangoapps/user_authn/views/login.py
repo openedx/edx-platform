@@ -320,6 +320,7 @@ def _handle_successful_authentication_and_login(user, request):
     _track_user_login(user, request)
 
     try:
+        print('\n\n\n\n _handle_successful_authentication_and_login user.is_active: ', user.is_active, '\n\n\n\n')
         django_login(request, user)
         request.session.set_expiry(604800 * 4)
         log.debug("Setting user session expiry to 4 weeks")

@@ -150,7 +150,7 @@ def check_pwned_password(password):
 
 
 def should_auto_create_user_account():
-    return False
+    # return False
     registration_extra_fields = configuration_helpers.get_value(
         'REGISTRATION_EXTRA_FIELDS',
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})

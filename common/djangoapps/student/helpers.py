@@ -436,6 +436,7 @@ def authenticate_new_user(request, username, password):
     logged in until they close the browser. They can't log in again until they click
     the activation link from the email.
     """
+    print(f'\n\n\n\n authenticate_new_user:  username={username} password={password} \n\n\n\n')
     password = normalize_password(password)
     backend = load_backend(NEW_USER_AUTH_BACKEND)
     user = backend.authenticate(request=request, username=username, password=password)
@@ -754,7 +755,6 @@ def do_create_account(form, custom_form=None):
         profile.save()
     except Exception:
         log.exception(f"UserProfile creation failed for user {user.id}.")
-        raise
 
     return user, profile, registration
 

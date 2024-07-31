@@ -678,13 +678,12 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
 
 def complete_user_creation(strategy, user=None, details=None, is_new=False, *args, **kwargs):
-    is_marketable = False
     profile = None
     request = strategy.request if strategy else None
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.site={request.site} ')
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.data={ strategy.request_data(merge=False)} ')
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => is_new={ is_new } ')
-    if should_auto_create_user_account and user and is_new:
+    if should_auto_create_user_account() and user and is_new:
         password = user.password
         if not user.has_usable_password():
             password = normalize_password(generate_password())
@@ -698,7 +697,7 @@ def complete_user_creation(strategy, user=None, details=None, is_new=False, *arg
                 print(f'\n\n\n PIPELINE_STEP: complete_user_creation => profile created for user: {user} , profile: {profile}')
             except Exception:
                 logger.exception(f"UserProfile creation failed for user {user.id}.")
-                raise
+                raise AuthException(strategy.request.backend, f'UserProfile creation failed for user {user.id}.')
         if strategy.session_get('registration_params', None):
             params = json.loads(strategy.session_get('registration_params'))
             third_party_provider = None
@@ -711,15 +710,13 @@ def complete_user_creation(strategy, user=None, details=None, is_new=False, *arg
                 registration = Registration()
                 registration.register(user)
                 print(f'\n\n\n PIPELINE_STEP: complete_user_creation => is_marketable: {is_marketable} registration: {registration} running_pipeline: {running_pipeline} third_party_provider: {third_party_provider} password={password}')
-                new_user = complete_user_registration(
+                user = complete_user_registration(
                     user, profile, params, third_party_provider, registration,
                     is_marketable, request, running_pipeline, cleaned_password=password
                 )
             except Exception as e:  # pylint: disable=broad-except
-                logger.exception('Error while tpa account creation: ', e)
-        # params = {'marketing_emails_opt_in': strategy.session_get('marketing_emails_opt_in', None)}
-        # _track_user_registration(user, profile, params=[], third_party_provider=None, registration=None, is_marketable=is_marketable)
-        return {'user': new_user}
+                logger.exception('Error while completing tpa account creation: ', e)
+        return {'user': user}
 
 
 @partial.partial
@@ -956,11 +953,21 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
         # Track any fields that would raise an integrity error if there was a conflict.
         integrity_conflict_fields = {'email': user.email, 'username': user.username}
 
+        print(f'\n\n\n PIPELINE_STEP 16: user_details_force_sync => field_mapping.items():={field_mapping.items()}')
         for provider_field, (model, field) in field_mapping.items():
             provider_value = details.get(provider_field)
             current_value = getattr(model, field)
             if provider_value is not None and current_value != provider_value:
                 if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
+                    print(
+                        f'\n\n\n PIPELINE_STEP 16: user_details_force_sync => ', '[THIRD_PARTY_AUTH] Profile data synchronization conflict. '
+                                   'UserId: {user_id}, Provider: {provider}, ConflictField: {conflict_field}, '
+                                   'ConflictValue: {conflict_value}'.format(
+                                       user_id=user.id,
+                                       provider=current_provider.name,
+                                       conflict_field=field,
+                                       conflict_value=provider_value))
+
                     logger.warning('[THIRD_PARTY_AUTH] Profile data synchronization conflict. '
                                    'UserId: {user_id}, Provider: {provider}, ConflictField: {conflict_field}, '
                                    'ConflictValue: {conflict_value}'.format(
