@@ -73,6 +73,11 @@ jobs:
         env:
           PIP_SRC: ${{ runner.temp }}
         run: make test-eslint
+      
+      - name: Run Stylelint Tests
+        env:
+          PIP_SRC: ${{ runner.temp }}
+        run: make test-stylelint  
 
       - name: Run Quality Tests
         env:

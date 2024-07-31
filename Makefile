@@ -205,3 +205,6 @@ ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip ins
 
 test-eslint:
 	node node_modules/.bin/eslint --ext .js --ext .jsx --format=compact .
+
+test-stylelint:
+	stylelint **/*.scss --custom-formatter=node_modules/stylelint-formatter-pretty
