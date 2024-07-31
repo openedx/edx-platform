@@ -41,6 +41,7 @@ Conventions
 # pylint: disable=invalid-name
 
 import importlib.util
+import socket
 import sys
 import os
 
@@ -2263,8 +2264,9 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 #     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;
 #     frame-ancestors 'self' http://localhost:2000
 # """
-CSP_STATIC_ENFORCE = """
-    frame-ancestors 'self' http://localhost:2000
+domain_name = socket.getfqdn()
+CSP_STATIC_ENFORCE = f"""
+    frame-ancestors 'self' localhost:* {domain_name} *.{domain_name}
 """
 
 import re
