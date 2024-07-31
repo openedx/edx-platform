@@ -72,6 +72,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+from xmodule.data import CertificatesDisplayBehaviors
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
@@ -1547,6 +1548,11 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
 
+# .. setting_name: DEFAULT_CERTIFICATES_DISPLAY_BEHAVIOR
+# .. setting_default: CertificatesDisplayBehaviors.END.value
+# .. setting_description: Default value for the `certificates_display_behavior` course field.
+#      Together with certificate_available_date it will determine when a user can see their certificate for the course.
+DEFAULT_CERTIFICATES_DISPLAY_BEHAVIOR = CertificatesDisplayBehaviors.END.value
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
