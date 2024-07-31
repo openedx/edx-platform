@@ -50,7 +50,6 @@ class EdxXFrameOptionsMiddleware(XFrameOptionsMiddleware):
         headers['X-Frame-Options'] = frame_options
         overrides = getattr(settings, 'X_FRAME_OPTIONS_OVERRIDES', [])
         for override in overrides:
-            print('override', override)
             regex, value = override
             _validate_header_value(value)
             if re.search(regex, request_path):
