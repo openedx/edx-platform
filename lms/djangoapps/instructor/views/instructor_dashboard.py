@@ -602,9 +602,8 @@ def _section_student_admin(course, access):
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': str(course_key)}),
     }
     if is_writable_gradebook_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
-        mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+        section_data['writable_gradebook_url'] = f'{settings.WRITABLE_GRADEBOOK_URL}/{str(course_key)}'
 
-        section_data['writable_gradebook_url'] = f'{mfe_config["WRITABLE_GRADEBOOK_URL"]}/{str(course_key)}'
     return section_data
 
 
