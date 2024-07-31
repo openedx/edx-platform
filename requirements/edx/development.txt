@@ -1303,7 +1303,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning @ git+https://github.com/openedx/openedx-learning.git@jill/get_last_publish_log_for_entity
+openedx-learning==0.10.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
