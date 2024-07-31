@@ -156,14 +156,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     TASK_MAX_RETRIES=5,
 )
 
-
-"""
-Middleware to add correct x-frame-options headers.
-The headers get set to the platform default which we assume is `DENY`.
-However, there's a number of paths that are set to `SAMEORIGIN` which
-we identify via regexes stored in a django setting in the application calling this.
-"""
-
 ############################ FEATURE CONFIGURATION #############################
 
 PLATFORM_NAME = _('Your Platform Name Here')
@@ -979,7 +971,9 @@ MIDDLEWARE = [
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
-    # use custom extension of Django built in clickjacking protection
+    # use custom extension of Django built in clickjacking protection. This
+    # allows the permissiveness of embedded frame usage (the degree of
+    # clickjacking protection) to vary based on route
     'openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
@@ -1001,11 +995,19 @@ MIDDLEWARE = [
 
 EXTRA_MIDDLEWARE_CLASSES = []
 
-# Clickjacking protection can be disabled by setting this to 'ALLOW' or adjusted by setting this to 'SAMEORIGIN'.
-# It is not advised to set this to 'ALLOW' without a Content Security Policy header.
+################# Clickjacking protection ###################
+"""
+X-FRAME-OPTIONS headers are set by default to `DENY`. Select paths, however, are
+overridden to the more permissive `SAMEORIGIN`. We identify these paths via
+override regexes defined below.
+
+At a minimum, this extension supports SCORM XBlocks, which are
+typically rendered in an iframe, and are therefore subject to cross-domain
+issues. This is resolved by using the SAMEORIGIN header.
+"""
 X_FRAME_OPTIONS = 'DENY'
-# You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
-# Content Security Policy in place.
+# The X-FRAME-OPTIONS header is overriden to SAMEORIGIN for certain URLs. Note, however,
+# that it is not advised to override it to 'ALLOW' without a Content Security Policy in place.
 # SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
 X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']]
 

@@ -93,13 +93,12 @@ IDA_LOGOUT_URI_LIST = []
 
 # Clickjacking protection can be disabled by setting this to 'ALLOW' or adjusted by setting this to 'SAMEORIGIN'.
 # It is not advised to set this to 'ALLOW' without a Content Security Policy header.
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'DENY'
+
 # You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
 # Content Security Policy in place.
-# SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
-# X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'ALLOW'], ['.*/xblock/.*', 'ALLOW']]
-# X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'ALLOW']]
-
+# SCORM xblocks require a more permissive cross-domain header to render than the default of 'DENY'
+X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN'], ['.*/xblock/.*', 'SAMEORIGIN']]
 
 # Features
 FEATURES = {
@@ -2491,9 +2490,6 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
-
-# # Clickjacking protection can be disbaled by setting this to 'ALLOW'
-X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
