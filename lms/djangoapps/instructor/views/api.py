@@ -2366,6 +2366,7 @@ def _list_instructor_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class ListEntranceExamInstructorTasks(APIView):
     """
     List entrance exam related instructor tasks.
@@ -2377,10 +2378,8 @@ class ListEntranceExamInstructorTasks(APIView):
     )
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.SHOW_TASKS
-    http_method_names = ['post']
 
     @method_decorator(ensure_csrf_cookie)
-    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     def post(self, request, course_id):
         """
         List entrance exam related instructor tasks.
