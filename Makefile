@@ -210,3 +210,4 @@ test-eslint:
 
 test-stylelint:
 	npx stylelint '**/*.scss' --custom-formatter=node_modules/stylelint-formatter-pretty
+	npx stylelint '**/*.scss' --custom-formatter=node_modules/stylelint-formatter-pretty --config path/to/your/stylelint.config.js
