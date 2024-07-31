@@ -46,13 +46,13 @@ class MakoTemplateBlockBase:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if getattr(self.runtime, 'render_template', None) is None:
-            raise TypeError(
-                '{runtime} must have a render_template function'
-                ' in order to use a MakoDescriptor'.format(
-                    runtime=self.runtime,
-                )
-            )
+        # if getattr(self.runtime, 'render_template', None) is None:
+        #     raise TypeError(
+        #         '{runtime} must have a render_template function'
+        #         ' in order to use a MakoDescriptor'.format(
+        #             runtime=self.runtime,
+        #         )
+        #     )
 
     def get_context(self):
         """
@@ -67,9 +67,10 @@ class MakoTemplateBlockBase:
         """
         View used in Studio.
         """
+        from common.djangoapps.edxmako.services import MakoService
         # pylint: disable=no-member
         fragment = Fragment(
-            self.runtime.render_template(self.mako_template, self.get_context())
+            MakoService().render_template(self.mako_template, self.get_context())
         )
         shim_xmodule_js(fragment, self.js_module_name)
         return fragment
