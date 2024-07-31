@@ -19,7 +19,7 @@ DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
 TEAM_SCHEME = "team"
 TEAMS_NAMESPACE = "teams"
 
-# .. toggle_name: course_teams.content_groups_for_teams
+# .. toggle_name: teams.content_groups_for_teams
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables content groups for teams. Content groups are virtual groupings of learners

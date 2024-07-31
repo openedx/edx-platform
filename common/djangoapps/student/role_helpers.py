@@ -75,4 +75,4 @@ def get_course_roles(user: User) -> list[CourseAccessRole]:
     """
     # pylint: disable=protected-access
     role_cache = get_role_cache(user)
-    return list(role_cache._roles)
+    return list(role_cache.all_roles_set)

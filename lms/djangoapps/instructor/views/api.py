@@ -1603,7 +1603,8 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
                 request, 'uploaded-file', ['.csv'],
                 course_and_time_based_filename_generator(course_key, 'cohorts'),
                 max_file_size=2000000,  # limit to 2 MB
-                validator=_cohorts_csv_validator
+                validator=_cohorts_csv_validator,
+                is_private=True
             )
             task_api.submit_cohort_students(request, course_key, file_name)
         except (FileValidationException, ValueError) as e:

@@ -13,6 +13,7 @@ from django.utils.text import get_valid_filename
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 from pytz import UTC
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class FileValidationException(Exception):
@@ -23,7 +24,7 @@ class FileValidationException(Exception):
 
 
 def store_uploaded_file(
-        request, file_key, allowed_file_types, base_storage_filename, max_file_size, validator=None,
+        request, file_key, allowed_file_types, base_storage_filename, max_file_size, validator=None, is_private=False,
 ):
     """
     Stores an uploaded file to django file storage.
@@ -45,6 +46,8 @@ def store_uploaded_file(
             a `FileValidationException` if the file is not properly formatted. If any exception is thrown, the stored
             file will be deleted before the exception is re-raised. Note that the implementor of the validator function
             should take care to close the stored file if they open it for reading.
+        is_private (Boolean): an optional boolean which if True and the storage backend is S3,
+            sets the ACL for the file object to be private.
 
     Returns:
         Storage: the file storage object where the file can be retrieved from
@@ -75,6 +78,12 @@ def store_uploaded_file(
         file_storage = DefaultStorage()
         # If a file already exists with the supplied name, file_storage will make the filename unique.
         stored_file_name = file_storage.save(stored_file_name, uploaded_file)
+        if is_private and settings.DEFAULT_FILE_STORAGE == 'storages.backends.s3boto3.S3Boto3Storage':
+            S3Boto3Storage().connection.meta.client.put_object_acl(
+                ACL='private',
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=stored_file_name,
+            )
 
         if validator:
             try:

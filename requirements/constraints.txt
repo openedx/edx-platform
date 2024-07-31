@@ -62,14 +62,6 @@ pycodestyle<2.9.0
 
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
 
-# adding these constraints to minimize boto3 and botocore changeset
-social-auth-core==4.3.0
-
-# social-auth-app-django versions after 5.2.0 has a problematic migration that will cause issues deployments with large
-# `social_auth_usersocialauth` tables. 5.1.0 has missing migration and 5.2.0 has that problematic migration.
-social-auth-app-django==5.0.0
-
-
 # urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
 # which require urllib3<2 for now.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222

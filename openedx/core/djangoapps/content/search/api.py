@@ -13,6 +13,7 @@ from typing import Callable, Generator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
@@ -21,10 +22,9 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import get_access_ids_for_request
-
 from openedx.core.djangoapps.content_libraries import api as lib_api
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
 from .documents import (
@@ -292,9 +292,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
     # Get the list of courses
     status_cb("Counting courses...")
-    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-        all_courses = store.get_courses()
-    num_courses = len(all_courses)
+    num_courses = CourseOverview.objects.count()
 
     # Some counters so we can track our progress as indexing progresses:
     num_contexts = num_courses + num_libraries
@@ -327,11 +325,20 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
         ])
         # Mark which attributes are used for keyword search, in order of importance:
         client.index(temp_index_name).update_searchable_attributes([
+            # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
             Fields.display_name,
             Fields.block_id,
             Fields.content,
             Fields.tags,
-            # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
+            # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
+            # are searchable only if at least one document in the index has a value. If we didn't list them here and,
+            # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
+            # these sub-fields: "Attribute `tags.level3` is not searchable."
+            Fields.tags + "." + Fields.tags_taxonomy,
+            Fields.tags + "." + Fields.tags_level0,
+            Fields.tags + "." + Fields.tags_level1,
+            Fields.tags + "." + Fields.tags_level2,
+            Fields.tags + "." + Fields.tags_level3,
         ])
 
         ############## Libraries ##############
@@ -358,30 +365,33 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
         ############## Courses ##############
         status_cb("Indexing courses...")
-        for course in all_courses:
-            status_cb(
-                f"{num_contexts_done + 1}/{num_contexts}. Now indexing course {course.display_name} ({course.id})"
-            )
-            docs = []
+        # To reduce memory usage on large instances, split up the CourseOverviews into pages of 1,000 courses:
+        paginator = Paginator(CourseOverview.objects.only('id', 'display_name'), 1000)
+        for p in paginator.page_range:
+            for course in paginator.page(p).object_list:
+                status_cb(
+                    f"{num_contexts_done + 1}/{num_contexts}. Now indexing course {course.display_name} ({course.id})"
+                )
+                docs = []
 
-            # Pre-fetch the course with all of its children:
-            course = store.get_course(course.id, depth=None)
+                # Pre-fetch the course with all of its children:
+                course = store.get_course(course.id, depth=None)
 
-            def add_with_children(block):
-                """ Recursively index the given XBlock/component """
-                doc = searchable_doc_for_course_block(block)
-                doc.update(searchable_doc_tags(block.usage_key))
-                docs.append(doc)  # pylint: disable=cell-var-from-loop
-                _recurse_children(block, add_with_children)  # pylint: disable=cell-var-from-loop
+                def add_with_children(block):
+                    """ Recursively index the given XBlock/component """
+                    doc = searchable_doc_for_course_block(block)
+                    doc.update(searchable_doc_tags(block.usage_key))
+                    docs.append(doc)  # pylint: disable=cell-var-from-loop
+                    _recurse_children(block, add_with_children)  # pylint: disable=cell-var-from-loop
 
-            # Index course children
-            _recurse_children(course, add_with_children)
+                # Index course children
+                _recurse_children(course, add_with_children)
 
-            if docs:
-                # Add all the docs in this course at once (usually faster than adding one at a time):
-                _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
-            num_contexts_done += 1
-            num_blocks_done += len(docs)
+                if docs:
+                    # Add all the docs in this course at once (usually faster than adding one at a time):
+                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                num_contexts_done += 1
+                num_blocks_done += len(docs)
 
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses and libraries.")
 
