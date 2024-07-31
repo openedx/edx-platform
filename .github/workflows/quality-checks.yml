@@ -69,15 +69,15 @@ jobs:
       - name: Run Python Quality Test
         run: pycodestyle .
       
-      - name: Run Eslint Tests
-        env:
-          PIP_SRC: ${{ runner.temp }}
-        run: make test-eslint
-      
       - name: Run Stylelint Tests
         env:
           PIP_SRC: ${{ runner.temp }}
         run: make test-stylelint  
+      
+      - name: Run Eslint Tests
+        env:
+          PIP_SRC: ${{ runner.temp }}
+        run: make test-eslint  
 
       - name: Run Quality Tests
         env:
