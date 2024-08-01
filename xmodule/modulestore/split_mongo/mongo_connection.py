@@ -17,7 +17,6 @@ from django.core.cache import caches, InvalidCacheBackendError
 from django.db.transaction import TransactionManagementError
 import pymongo
 import pytz
-from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 from edx_django_utils import monitoring
@@ -363,7 +362,6 @@ class MongoPersistenceBackend:
 
             return structure
 
-    @autoretry_read()
     def find_structures_by_id(self, ids, course_context=None):
         """
         Return all structures that specified in ``ids``.
@@ -380,7 +378,6 @@ class MongoPersistenceBackend:
             tagger.measure("structures", len(docs))
             return docs
 
-    @autoretry_read()
     def find_courselike_blocks_by_id(self, ids, block_type, course_context=None):
         """
         Find all structures that specified in `ids`. Among the blocks only return block whose type is `block_type`.
