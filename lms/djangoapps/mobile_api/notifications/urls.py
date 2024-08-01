@@ -1,3 +1,6 @@
+"""
+URLs for the mobile_api.notifications APIs.
+"""
 from django.urls import path
 from .views import GCMDeviceViewSet
 

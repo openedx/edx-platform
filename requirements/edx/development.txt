@@ -4,10 +4,6 @@
 #
 #    make upgrade
 #
--e git+https://github.com/jazzband/django-push-notifications.git@0f7918136b5e6a9aec83d6513aad5b0f12143a9f#egg=django_push_notifications
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via
     #   -r requirements/edx/doc.txt
@@ -20,12 +16,12 @@ acid-xblock==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-aiohappyeyeballs==2.3.4
+aiohappyeyeballs==2.3.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   aiohttp
-aiohttp==3.10.1
+aiohttp==3.10.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -100,7 +96,7 @@ attrs==24.2.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.15.0
+babel==2.16.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -143,14 +139,14 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.34.154
+boto3==1.34.157
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.154
+botocore==1.34.157
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -817,7 +813,7 @@ edx-sga==0.25.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.7.6
+edx-submissions==3.7.7
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -882,7 +878,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.0
     # via -r requirements/edx/testing.txt
-faker==26.2.0
+faker==26.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -955,12 +951,12 @@ google-api-core[grpc]==2.19.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.139.0
+google-api-python-client==2.140.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-auth==2.32.0
+google-auth==2.33.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -986,7 +982,7 @@ google-cloud-firestore==2.17.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-cloud-storage==2.18.0
+google-cloud-storage==2.18.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -997,7 +993,7 @@ google-crc32c==1.5.0
     #   -r requirements/edx/testing.txt
     #   google-cloud-storage
     #   google-resumable-media
-google-resumable-media==2.7.1
+google-resumable-media==2.7.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1262,7 +1258,7 @@ monotonic==1.6
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   py2neo
-more-itertools==10.3.0
+more-itertools==10.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1294,7 +1290,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-newrelic==9.12.0
+newrelic==9.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1782,7 +1778,7 @@ pyuca==1.2
     #   -r requirements/edx/testing.txt
 pywatchman==2.0.0
     # via -r requirements/edx/development.in
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2099,7 +2095,7 @@ tomlkit==0.13.0
     #   -r requirements/edx/testing.txt
     #   pylint
     #   snowflake-connector-python
-tox==4.17.0
+tox==4.17.1
     # via -r requirements/edx/testing.txt
 tqdm==4.66.5
     # via
@@ -2109,7 +2105,7 @@ tqdm==4.66.5
     #   openai
 types-pytz==2024.1.0.20240417
     # via django-stubs
-types-pyyaml==6.0.12.20240724
+types-pyyaml==6.0.12.20240808
     # via
     #   django-stubs
     #   djangorestframework-stubs
