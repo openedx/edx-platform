@@ -1,13 +1,19 @@
 """
 Unit tests for the vertical block.
 """
+
 from django.urls import reverse
 from rest_framework import status
 from edx_toggles.toggles.testutils import override_waffle_flag
+from xblock.validation import ValidationMessage
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.toggles import ENABLE_TAGGING_TAXONOMY_LIST_PAGE
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+from openedx.core.djangoapps.content_tagging.toggles import DISABLE_TAGGING_FEATURE
+from xmodule.partitions.partitions import (
+    ENROLLMENT_TRACK_PARTITION_ID,
+    Group,
+    UserPartition,
+)
 from xmodule.modulestore.django import (
     modulestore,
 )  # lint-amnesty, pylint: disable=wrong-import-order
@@ -96,6 +102,13 @@ class BaseXBlockContainer(CourseTestCase):
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             store.publish(item_location, ModuleStoreEnum.UserID.test)
 
+    def set_group_access(self, xblock, value):
+        """
+        Sets group_access to specified value and calls update_item to persist the change.
+        """
+        xblock.group_access = value
+        self.store.update_item(xblock, self.user.id)
+
 
 class ContainerHandlerViewTest(BaseXBlockContainer):
     """
@@ -140,6 +153,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["children"]), 2)
         self.assertFalse(response.data["is_published"])
+        self.assertTrue(response.data["can_paste_component"])
 
     def test_xblock_is_published(self):
         """
@@ -150,7 +164,6 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         self.assertTrue(response.data["is_published"])
 
-    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, True)
     def test_children_content(self):
         """
         Check that returns valid response with children of vertical container.
@@ -161,7 +174,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         expected_user_partition_info = {
             "selectable_partitions": [],
             "selected_partition_index": -1,
-            "selected_groups_label": ""
+            "selected_groups_label": "",
         }
 
         expected_user_partitions = [
@@ -170,13 +183,8 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                 "name": "Enrollment Track Groups",
                 "scheme": "enrollment_track",
                 "groups": [
-                    {
-                        "id": 1,
-                        "name": "Audit",
-                        "selected": False,
-                        "deleted": False
-                    }
-                ]
+                    {"id": 1, "name": "Audit", "selected": False, "deleted": False}
+                ],
             }
         ]
 
@@ -188,18 +196,32 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                 "user_partition_info": expected_user_partition_info,
                 "user_partitions": expected_user_partitions,
                 "actions": {
+                    "can_copy": True,
+                    "can_duplicate": True,
+                    "can_move": True,
+                    "can_manage_access": True,
+                    "can_delete": True,
                     "can_manage_tags": True,
                 },
+                "validation_messages": [],
+                "render_error": "",
             },
             {
                 "name": self.html_unit_second.display_name_with_default,
                 "block_id": str(self.html_unit_second.location),
                 "block_type": self.html_unit_second.location.block_type,
-                "user_partition_info": expected_user_partition_info,
-                "user_partitions": expected_user_partitions,
                 "actions": {
+                    "can_copy": True,
+                    "can_duplicate": True,
+                    "can_move": True,
+                    "can_manage_access": True,
+                    "can_delete": True,
                     "can_manage_tags": True,
                 },
+                "user_partition_info": expected_user_partition_info,
+                "user_partitions": expected_user_partitions,
+                "validation_messages": [],
+                "render_error": "",
             },
         ]
         self.assertEqual(response.data["children"], expected_response)
@@ -215,7 +237,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @override_waffle_flag(ENABLE_TAGGING_TAXONOMY_LIST_PAGE, False)
+    @override_waffle_flag(DISABLE_TAGGING_FEATURE, True)
     def test_actions_with_turned_off_taxonomy_flag(self):
         """
         Check that action manage_tags for each child item has the same value as taxonomy flag.
@@ -224,3 +246,42 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
         response = self.client.get(url)
         for children in response.data["children"]:
             self.assertFalse(children["actions"]["can_manage_tags"])
+
+    def test_validation_errors(self):
+        """
+        Check that child has an error.
+        """
+        self.course.user_partitions = [
+            UserPartition(
+                0,
+                "first_partition",
+                "Test Partition",
+                [Group("0", "alpha"), Group("1", "beta")],
+            ),
+        ]
+        self.store.update_item(self.course, self.user.id)
+
+        user_partition = self.course.user_partitions[0]
+        vertical = self.store.get_item(self.vertical.location)
+        html_unit_first = self.store.get_item(self.html_unit_first.location)
+
+        group_first = user_partition.groups[0]
+        group_second = user_partition.groups[1]
+
+        # Set access settings so html will contradict vertical
+        self.set_group_access(vertical, {user_partition.id: [group_second.id]})
+        self.set_group_access(html_unit_first, {user_partition.id: [group_first.id]})
+
+        # update vertical/html
+        vertical = self.store.get_item(self.vertical.location)
+        html_unit_first = self.store.get_item(self.html_unit_first.location)
+
+        url = self.get_reverse_url(self.vertical.location)
+        response = self.client.get(url)
+        children_response = response.data["children"]
+
+        # Verify that html_unit_first access settings contradict its parent's access settings.
+        self.assertEqual(children_response[0]["validation_messages"][0]["type"], ValidationMessage.ERROR)
+
+        # Verify that html_unit_second has no validation messages.
+        self.assertFalse(children_response[1]["validation_messages"])

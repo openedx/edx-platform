@@ -56,7 +56,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
     SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.features.enterprise_support.api import add_enterprise_customer_to_session
 from enterprise.api.v1.serializers import EnterpriseCustomerSerializer
 from openedx.features.enterprise_support.tests.factories import (
@@ -288,9 +288,9 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         """
         # Note about UserPartition and UserPartition Group IDs: these must not conflict with IDs used
         # by dynamic user partitions.
-        partition_id = MINIMUM_STATIC_PARTITION_ID
-        group_0_id = MINIMUM_STATIC_PARTITION_ID + 1
-        group_1_id = MINIMUM_STATIC_PARTITION_ID + 2
+        partition_id = MINIMUM_UNUSED_PARTITION_ID
+        group_0_id = MINIMUM_UNUSED_PARTITION_ID + 1
+        group_1_id = MINIMUM_UNUSED_PARTITION_ID + 2
         user_partition = UserPartition(
             partition_id, 'Test User Partition', '',
             [Group(group_0_id, 'Group 1'), Group(group_1_id, 'Group 2')],
@@ -903,7 +903,6 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
     def test_course_catalog_access_num_queries_enterprise(self, user_attr_name, course_attr_name):
         """
         Similar to test_course_catalog_access_num_queries_no_enterprise, except enable enterprise features and make the

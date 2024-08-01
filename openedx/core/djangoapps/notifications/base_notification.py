@@ -3,10 +3,13 @@ Base setup for Notification Apps and Types.
 """
 from django.utils.translation import gettext_lazy as _
 
+from .email_notifications import EmailCadence
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
+
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
@@ -56,6 +59,7 @@ COURSE_NOTIFICATION_TYPES = {
         'info': '',
         'web': False,
         'email': False,
+        'email_cadence': EmailCadence.DAILY,
         'push': False,
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{username}</{strong}> posted <{strong}>{post_title}</{strong}></{p}>'),
@@ -73,6 +77,7 @@ COURSE_NOTIFICATION_TYPES = {
         'info': '',
         'web': False,
         'email': False,
+        'email_cadence': EmailCadence.DAILY,
         'push': False,
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{username}</{strong}> asked <{strong}>{post_title}</{strong}></{p}>'),
@@ -121,6 +126,7 @@ COURSE_NOTIFICATION_TYPES = {
         'info': '',
         'web': True,
         'email': True,
+        'email_cadence': EmailCadence.DAILY,
         'push': True,
         'non_editable': [],
         'content_template': _('<p><strong>{username}’s </strong> {content_type} has been reported <strong> {'
@@ -140,11 +146,11 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'info': '',
         'non_editable': [],
-        'content_template': _('<{p}><{strong}>{username}</{strong}> response has been endorsed in your post '
+        'content_template': _('<{p}><{strong}>{replier_name}\'s</{strong}> response has been endorsed in your post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
-            'username': 'Response author name',
+            'replier_name': 'replier name',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
@@ -155,7 +161,8 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'info': '',
         'non_editable': [],
-        'content_template': _('<{p}><Your response has been endorsed <{strong}>{post_title}</{strong}></{p}>'),
+        'content_template': _('<{p}>Your response has been endorsed on the post <{strong}>{post_title}</{strong}></{'
+                              'p}>'),
         'content_context': {
             'post_title': 'Post title',
         },
@@ -170,6 +177,7 @@ COURSE_NOTIFICATION_TYPES = {
         'web': True,
         'email': True,
         'push': True,
+        'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
         'content_template': _('<{p}>You have a new course update: '
                               '<{strong}>{course_update_content}</{strong}></{p}>'),
@@ -178,6 +186,25 @@ COURSE_NOTIFICATION_TYPES = {
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
+    },
+    'ora_staff_notification': {
+        'notification_app': 'grading',
+        'name': 'ora_staff_notification',
+        'is_core': False,
+        'info': '',
+        'web': False,
+        'email': False,
+        'push': False,
+        'email_cadence': EmailCadence.DAILY,
+        'non_editable': [],
+        'content_template': _('<{p}>You have a new open response submission awaiting for review for : '
+                              '<{strong}>{ora_name}</{strong}></{p}>'),
+        'content_context': {
+            'ora_name': 'Name of ORA in course',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
+        'visible_to': [CourseStaffRole.ROLE, CourseInstructorRole.ROLE]
     },
 }
 
@@ -189,6 +216,7 @@ COURSE_NOTIFICATION_APPS = {
         'core_web': True,
         'core_email': True,
         'core_push': True,
+        'core_email_cadence': EmailCadence.DAILY,
         'non_editable': ['web']
     },
     'updates': {
@@ -197,6 +225,16 @@ COURSE_NOTIFICATION_APPS = {
         'core_web': True,
         'core_email': True,
         'core_push': True,
+        'core_email_cadence': EmailCadence.DAILY,
+        'non_editable': []
+    },
+    'grading': {
+        'enabled': True,
+        'core_info': _('Notifications for submission grading.'),
+        'core_web': True,
+        'core_email': True,
+        'core_push': True,
+        'core_email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
 }
@@ -263,7 +301,7 @@ class NotificationPreferenceSyncManager:
                 'web': preference.get('web'),
                 'push': preference.get('push'),
                 'email': preference.get('email'),
-                'info': preference.get('info'),
+                'email_cadence': preference.get('email_cadence'),
             }
         return denormalized_preferences
 
@@ -298,8 +336,8 @@ class NotificationPreferenceSyncManager:
             app_name = preference.get('app_name')
             pref = find_pref_in_normalized_prefs(pref_name, app_name, old_preferences.get('preferences'))
             if pref:
-                for channel in ['web', 'email', 'push']:
-                    preference[channel] = pref[channel]
+                for channel in ['web', 'email', 'push', 'email_cadence']:
+                    preference[channel] = pref.get(channel, preference.get(channel))
         return NotificationPreferenceSyncManager.denormalize_preferences(new_prefs)
 
 
@@ -357,6 +395,7 @@ class NotificationTypeManager:
                 'web': notification_type.get('web', False),
                 'email': notification_type.get('email', False),
                 'push': notification_type.get('push', False),
+                'email_cadence': notification_type.get('email_cadence', 'Daily'),
             }
         return non_core_notification_type_preferences
 
@@ -388,6 +427,7 @@ class NotificationAppManager:
             'web': notification_app_attrs.get('core_web', False),
             'email': notification_app_attrs.get('core_email', False),
             'push': notification_app_attrs.get('core_push', False),
+            'email_cadence': notification_app_attrs.get('core_email_cadence', 'Daily'),
         }
 
     def add_core_notification_non_editable(self, notification_app_attrs, non_editable_channels):

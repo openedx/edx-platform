@@ -8,9 +8,9 @@ import os
 import time
 import unicodedata
 from datetime import date
+from unittest.mock import DEFAULT, patch
 
 from click.testing import CliRunner
-from mock import DEFAULT, patch
 from six import PY2, itervalues
 
 from scripts.user_retirement.retirement_partner_report import \

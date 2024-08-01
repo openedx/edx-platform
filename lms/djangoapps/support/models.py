@@ -22,7 +22,7 @@ class CourseResetCourseOptIn(TimeStampedModel):
     """
     Model that represents a course which has opted in to the course reset feature.
     """
-    course_id = CourseKeyField(max_length=255)
+    course_id = CourseKeyField(max_length=255, unique=True)
     active = BooleanField()
 
     def __str__(self):
@@ -65,6 +65,7 @@ class CourseResetAudit(TimeStampedModel):
         default=CourseResetStatus.ENQUEUED,
     )
     completed_at = DateTimeField(default=None, null=True, blank=True)
+    comment = CharField(max_length=255, default="", blank=True)
 
     def status_message(self):
         """ Return a string message about the status of this audit """

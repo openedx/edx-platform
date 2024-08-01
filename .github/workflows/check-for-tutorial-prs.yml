@@ -14,7 +14,7 @@ on:
   pull_request:
     types: [opened]
     paths:
-      - 'lms/templates/dashboard.html'
+      - "lms/templates/dashboard.html"
 
 jobs:
   # Provide helpful bot comment
@@ -23,7 +23,7 @@ jobs:
     name: provide helpful bot comment
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2

@@ -1,8 +1,9 @@
 """
 Unit tests for Contentstore Proctored Exam Settings.
 """
+from unittest.mock import patch
+
 import ddt
-from mock import patch
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse

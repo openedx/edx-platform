@@ -122,6 +122,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
+from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
     dump_block_extensions,
@@ -1005,11 +1006,12 @@ def modify_access(request, course_id):
     course = get_course_with_access(
         request.user, 'instructor', course_id, depth=None
     )
+    unique_student_identifier = request.POST.get('unique_student_identifier')
     try:
-        user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
+        user = get_student_from_identifier(unique_student_identifier)
     except User.DoesNotExist:
         response_payload = {
-            'unique_student_identifier': request.POST.get('unique_student_identifier'),
+            'unique_student_identifier': unique_student_identifier,
             'userDoesNotExist': True,
         }
         return JsonResponse(response_payload)
@@ -1044,6 +1046,8 @@ def modify_access(request, course_id):
 
     if action == 'allow':
         allow_access(course, user, rolename)
+        if not is_user_enrolled_in_course(user, course_id):
+            CourseEnrollment.enroll(user, course_id)
     elif action == 'revoke':
         revoke_access(course, user, rolename)
     else:
@@ -1600,7 +1604,8 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
                 request, 'uploaded-file', ['.csv'],
                 course_and_time_based_filename_generator(course_key, 'cohorts'),
                 max_file_size=2000000,  # limit to 2 MB
-                validator=_cohorts_csv_validator
+                validator=_cohorts_csv_validator,
+                is_private=True
             )
             task_api.submit_cohort_students(request, course_key, file_name)
         except (FileValidationException, ValueError) as e:
@@ -1714,15 +1719,35 @@ def get_student_enrollment_status(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@require_post_params(
-    unique_student_identifier="email or username of student for whom to get progress url"
-)
-@common_exceptions_400
-def get_student_progress_url(request, course_id):
+class StudentProgressUrlSerializer(serializers.Serializer):
+    """Serializer for course renders"""
+    unique_student_identifier = serializers.CharField(write_only=True)
+    course_id = CourseKeyField(required=False)
+    progress_url = serializers.SerializerMethodField()
+
+    def get_progress_url(self, obj):    # pylint: disable=unused-argument
+        """
+        Return the progress URL for the student.
+        Args:
+            obj (dict): The dictionary containing data for the serializer.
+        Returns:
+            str: The URL for the progress of the student in the course.
+        """
+        user = get_student_from_identifier(obj.get('unique_student_identifier'))
+        course_id = obj.get('course_id')  # Adjust based on your data structure
+
+        if course_home_mfe_progress_tab_is_active(course_id):
+            progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
+            if user is not None:
+                progress_url += '/{}/'.format(user.id)
+        else:
+            progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
+
+        return progress_url
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class StudentProgressUrl(APIView):
     """
     Get the progress url of a student.
     Limited to staff access.
@@ -1732,21 +1757,25 @@ def get_student_progress_url(request, course_id):
         'progress_url': '/../...'
     }
     """
-    course_id = CourseKey.from_string(course_id)
-    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = StudentProgressUrlSerializer
+    permission_name = permissions.ENROLLMENT_REPORT
 
-    if course_home_mfe_progress_tab_is_active(course_id):
-        progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
-        if user is not None:
-            progress_url += '/{}/'.format(user.id)
-    else:
-        progress_url = reverse('student_progress', kwargs={'course_id': str(course_id), 'student_id': user.id})
-
-    response_payload = {
-        'course_id': str(course_id),
-        'progress_url': progress_url,
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """Post method for validating incoming data and generating progress URL"""
+        data = {
+            'course_id': course_id,
+            'unique_student_identifier': request.data.get('unique_student_identifier')
+        }
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
 
 
 @transaction.non_atomic_requests
@@ -2809,7 +2838,8 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-
+    if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
+        CourseEnrollment.enroll(user, course_id)
     try:
         update_forum_role(course_id, user, rolename, action)
     except Role.DoesNotExist:

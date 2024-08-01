@@ -1,13 +1,14 @@
 """
 Management command for compiling sass.
+
+DEPRECATED in favor of `npm run compile-sass`.
 """
+import shlex
 
+from django.core.management import BaseCommand
+from django.conf import settings
 
-from django.core.management import BaseCommand, CommandError
-from paver.easy import call_task
-
-from openedx.core.djangoapps.theming.helpers import get_theme_base_dirs, get_themes, is_comprehensive_theming_enabled
-from pavelib.assets import ALL_SYSTEMS
+from pavelib.assets import run_deprecated_command_wrapper
 
 
 class Command(BaseCommand):
@@ -15,7 +16,7 @@ class Command(BaseCommand):
     Compile theme sass and collect theme assets.
     """
 
-    help = 'Compile and collect themed assets...'
+    help = "DEPRECATED. Use 'npm run compile-sass' instead."
 
     # NOTE (CCB): This allows us to compile static assets in Docker containers without database access.
     requires_system_checks = []
@@ -28,7 +29,7 @@ class Command(BaseCommand):
                 parser (django.core.management.base.CommandParser): parsed for parsing command line arguments.
         """
         parser.add_argument(
-            'system', type=str, nargs='*', default=ALL_SYSTEMS,
+            'system', type=str, nargs='*', default=["lms", "cms"],
             help="lms or studio",
         )
 
@@ -55,7 +56,7 @@ class Command(BaseCommand):
             '--force',
             action='store_true',
             default=False,
-            help="Force full compilation",
+            help="DEPRECATED. Full recompilation is now always forced.",
         )
         parser.add_argument(
             '--debug',
@@ -64,77 +65,48 @@ class Command(BaseCommand):
             help="Disable Sass compression",
         )
 
-    @staticmethod
-    def parse_arguments(*args, **options):  # pylint: disable=unused-argument
-        """
-        Parse and validate arguments for compile_sass command.
-
-        Args:
-            *args: Positional arguments passed to the update_assets command
-            **options: optional arguments passed to the update_assets command
-        Returns:
-            A tuple containing parsed values for themes, system, source comments and output style.
-            1. system (list): list of system names for whom to compile theme sass e.g. 'lms', 'cms'
-            2. theme_dirs (list): list of Theme objects
-            3. themes (list): list of Theme objects
-            4. force (bool): Force full compilation
-            5. debug (bool): Disable Sass compression
-        """
-        system = options.get("system", ALL_SYSTEMS)
-        given_themes = options.get("themes", ["all"])
-        theme_dirs = options.get("theme_dirs", None)
-
-        force = options.get("force", True)
-        debug = options.get("debug", True)
-
-        if theme_dirs:
-            available_themes = {}
-            for theme_dir in theme_dirs:
-                available_themes.update({t.theme_dir_name: t for t in get_themes([theme_dir])})
-        else:
-            theme_dirs = get_theme_base_dirs()
-            available_themes = {t.theme_dir_name: t for t in get_themes()}
-
-        if 'no' in given_themes or 'all' in given_themes:
-            # Raise error if 'all' or 'no' is present and theme names are also given.
-            if len(given_themes) > 1:
-                raise CommandError("Invalid themes value, It must either be 'all' or 'no' or list of themes.")
-        # Raise error if any of the given theme name is invalid
-        # (theme name would be invalid if it does not exist in themes directory)
-        elif (not set(given_themes).issubset(list(available_themes.keys()))) and is_comprehensive_theming_enabled():
-            raise CommandError(
-                "Given themes '{themes}' do not exist inside any of the theme directories '{theme_dirs}'".format(
-                    themes=", ".join(set(given_themes) - set(available_themes.keys())),
-                    theme_dirs=theme_dirs,
-                ),
-            )
-
-        if "all" in given_themes:
-            themes = list(available_themes.values())
-        elif "no" in given_themes:
-            themes = []
-        else:
-            # convert theme names to Theme objects, this will remove all themes if theming is disabled
-            themes = [available_themes.get(theme) for theme in given_themes if theme in available_themes]
-
-        return system, theme_dirs, themes, force, debug
-
     def handle(self, *args, **options):
         """
         Handle compile_sass command.
         """
-        system, theme_dirs, themes, force, debug = self.parse_arguments(*args, **options)
-        themes = [theme.theme_dir_name for theme in themes]
-
-        if options.get("themes", None) and not is_comprehensive_theming_enabled():
-            # log a warning message to let the user know that asset compilation for themes is skipped
-            self.stdout.write(
-                self.style.WARNING(
-                    "Skipping theme asset compilation: enable theming to process themed assets"
+        systems = set(
+            {"lms": "lms", "cms": "cms", "studio": "cms"}[sys]
+            for sys in options.get("system", ["lms", "cms"])
+        )
+        theme_dirs = options.get("theme_dirs") or settings.COMPREHENSIVE_THEME_DIRS or []
+        themes_option = options.get("themes") or []  # '[]' means 'all'
+        if not settings.ENABLE_COMPREHENSIVE_THEMING:
+            compile_themes = False
+            themes = []
+        elif "no" in themes_option:
+            compile_themes = False
+            themes = []
+        elif "all" in themes_option:
+            compile_themes = True
+            themes = []
+        else:
+            compile_themes = True
+            themes = themes_option
+        run_deprecated_command_wrapper(
+            old_command="./manage.py [lms|cms] compile_sass",
+            ignored_old_flags=list(set(["force"]) & set(options)),
+            new_command=shlex.join([
+                "npm",
+                "run",
+                ("compile-sass-dev" if options.get("debug") else "compile-sass"),
+                "--",
+                *(["--skip-lms"] if "lms" not in systems else []),
+                *(["--skip-cms"] if "cms" not in systems else []),
+                *(["--skip-themes"] if not compile_themes else []),
+                *(
+                    arg
+                    for theme_dir in theme_dirs
+                    for arg in ["--theme-dir", str(theme_dir)]
                 ),
-            )
-
-        call_task(
-            'pavelib.assets.compile_sass',
-            options={'system': system, 'theme_dirs': theme_dirs, 'themes': themes, 'force': force, 'debug': debug},
+                *(
+                    arg
+                    for theme in themes
+                    for arg in ["--theme", theme]
+                ),
+            ]),
         )

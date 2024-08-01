@@ -23,12 +23,12 @@ import textwrap
 import unittest
 import xml.sax.saxutils as saxutils
 from collections import OrderedDict
+from unittest.mock import ANY, patch
 
 import pytest
 import six
 from lxml import etree
 from lxml.html import fromstring
-from mock import ANY, patch
 from pyparsing import ParseException
 from six.moves import zip
 
@@ -916,7 +916,7 @@ class MatlabTest(unittest.TestCase):
         }
         elt = etree.fromstring(self.xml)
         the_input = self.input_class(test_capa_system(), elt, state)
-        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        expected = ""
         assert the_input.queue_msg == expected
 
     def test_matlab_sanitize_msg(self):
@@ -925,7 +925,7 @@ class MatlabTest(unittest.TestCase):
         """
         not_allowed_tag = 'script'
         self.the_input.msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
-        expected = "&lt;script&gt;Test message&lt;/script&gt;"
+        expected = ""
         assert self.the_input._get_render_context()['msg'] == expected  # pylint: disable=protected-access
 
 

@@ -1,7 +1,7 @@
 User Retirement Scripts
 =======================
 
-`This <https://github.com/openedx/edx-platform/tree/master/scripts/user_retirement>`_ directory contains python scripts which are migrated from the `tubular <https://github.com/openedx/tubular/tree/master/scripts>`_ respository. 
+`This <https://github.com/openedx/edx-platform/tree/master/scripts/user_retirement>`_ directory contains python scripts which are migrated from the `tubular <https://github.com/openedx/tubular/tree/master/scripts>`_ respository.
 These scripts are intended to drive the user retirement workflow which involves handling the deactivation or removal of user accounts as part of the platform's management process.
 
 These scripts could be called from any automation/CD framework.
@@ -49,9 +49,9 @@ In-depth Documentation and Configuration Steps
 
 For in-depth documentation and essential configurations follow these docs
 
-`Documentation <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/index.html>`_
+`Documentation <https://docs.openedx.org/projects/edx-platform/en/latest/references/docs/scripts/user_retirement/docs/index.html>`_
 
-`Configuration Docs <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/driver_setup.html>`_
+`Configuration Docs <https://docs.openedx.org/projects/edx-platform/en/latest/references/docs/scripts/user_retirement/docs/driver_setup.html>`_
 
 
 Execute Script

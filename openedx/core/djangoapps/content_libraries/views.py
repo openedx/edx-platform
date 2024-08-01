@@ -58,7 +58,8 @@ the api module instead.
     block.
 
     Historical note: These views used to be wrapped with @atomic because we
-    wanted to make all views that operated on Blockstore data atomic:
+    wanted to make all views that operated on Blockstore (the predecessor
+    to Learning Core) atomic:
         https://github.com/openedx/edx-platform/pull/30456
 """
 
@@ -89,11 +90,11 @@ from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import GenericAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
@@ -152,13 +153,10 @@ def convert_exceptions(fn):
     return wrapped_fn
 
 
-class LibraryApiPagination(PageNumberPagination):
+class LibraryApiPaginationDocs:
     """
-    Paginates over ContentLibraryMetadata objects.
+    API docs for query params related to paginating ContentLibraryMetadata objects.
     """
-    page_size = 50
-    page_size_query_param = 'page_size'
-
     apidoc_params = [
         apidocs.query_parameter(
             'pagination',
@@ -180,14 +178,14 @@ class LibraryApiPagination(PageNumberPagination):
 
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
-class LibraryRootView(APIView):
+class LibraryRootView(GenericAPIView):
     """
     Views to list, search for, and create content libraries.
     """
 
     @apidocs.schema(
         parameters=[
-            *LibraryApiPagination.apidoc_params,
+            *LibraryApiPaginationDocs.apidoc_params,
             apidocs.query_parameter(
                 'org',
                 str,
@@ -197,6 +195,13 @@ class LibraryRootView(APIView):
                 'text_search',
                 str,
                 description="The string used to filter libraries by searching in title, id, org, or description",
+            ),
+            apidocs.query_parameter(
+                'order',
+                str,
+                description=(
+                    "Name of the content library field to sort the results by. Prefix with a '-' to sort descending."
+                ),
             ),
         ],
     )
@@ -209,22 +214,23 @@ class LibraryRootView(APIView):
         org = serializer.validated_data['org']
         library_type = serializer.validated_data['type']
         text_search = serializer.validated_data['text_search']
+        order = serializer.validated_data['order']
 
-        paginator = LibraryApiPagination()
         queryset = api.get_libraries_for_user(
             request.user,
             org=org,
             library_type=library_type,
             text_search=text_search,
+            order=order,
         )
-        paginated_qs = paginator.paginate_queryset(queryset, request)
+        paginated_qs = self.paginate_queryset(queryset)
         result = api.get_metadata(paginated_qs)
 
         serializer = ContentLibraryMetadataSerializer(result, many=True)
         # Verify `pagination` param to maintain compatibility with older
         # non pagination-aware clients
         if request.GET.get('pagination', 'false').lower() == 'true':
-            return paginator.get_paginated_response(serializer.data)
+            return self.get_paginated_response(serializer.data)
         return Response(serializer.data)
 
     def post(self, request):
@@ -253,13 +259,6 @@ class LibraryRootView(APIView):
             )
         org = Organization.objects.get(short_name=org_name)
 
-        # Backwards compatibility: ignore the no-longer used "collection_uuid"
-        # parameter. This was necessary with Blockstore, but not used for
-        # Learning Core. TODO: This can be removed once the frontend stops
-        # sending it to us. This whole bit of deserialization is kind of weird
-        # though, with the renames and such. Look into this later for clennup.
-        data.pop("collection_uuid", None)
-
         try:
             with atomic():
                 result = api.create_library(org=org, **data)
@@ -285,7 +284,8 @@ class LibraryDetailsView(APIView):
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_library(key)
-        return Response(ContentLibraryMetadataSerializer(result).data)
+        serializer = ContentLibraryMetadataSerializer(result, context={'request': self.request})
+        return Response(serializer.data)
 
     @convert_exceptions
     def patch(self, request, lib_key_str):
@@ -504,13 +504,14 @@ class LibraryCommitView(APIView):
 
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
-class LibraryBlocksView(APIView):
+class LibraryBlocksView(GenericAPIView):
     """
     Views to work with XBlocks in a specific content library.
     """
+
     @apidocs.schema(
         parameters=[
-            *LibraryApiPagination.apidoc_params,
+            *LibraryApiPaginationDocs.apidoc_params,
             apidocs.query_parameter(
                 'text_search',
                 str,
@@ -536,13 +537,12 @@ class LibraryBlocksView(APIView):
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         components = api.get_library_components(key, text_search=text_search, block_types=block_types)
 
-        paginator = LibraryApiPagination()
         paginated_xblock_metadata = [
             api.LibraryXBlockMetadata.from_component(key, component)
-            for component in paginator.paginate_queryset(components, request)
+            for component in self.paginate_queryset(components)
         ]
         serializer = LibraryXBlockMetadataSerializer(paginated_xblock_metadata, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
     @convert_exceptions
     def post(self, request, lib_key_str):
@@ -708,9 +708,12 @@ class LibraryBlockAssetView(APIView):
         )
         file_wrapper = request.data['content']
         if file_wrapper.size > 20 * 1024 * 1024:  # > 20 MiB
-            # In the future, we need a way to use file_wrapper.chunks() to read
-            # the file in chunks and stream that to Blockstore, but Blockstore
-            # currently lacks an API for streaming file uploads.
+            # TODO: This check was written when V2 Libraries were backed by the Blockstore micro-service.
+            #       Now that we're on Learning Core, do we still need it? Here's the original comment:
+            #         In the future, we need a way to use file_wrapper.chunks() to read
+            #         the file in chunks and stream that to Blockstore, but Blockstore
+            #         currently lacks an API for streaming file uploads.
+            #       Ref:  https://github.com/openedx/edx-platform/issues/34737
             raise ValidationError("File too big")
         file_content = file_wrapper.read()
         try:
@@ -737,7 +740,7 @@ class LibraryBlockAssetView(APIView):
 
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
-class LibraryImportTaskViewSet(ViewSet):
+class LibraryImportTaskViewSet(GenericViewSet):
     """
     Import blocks from Courseware through modulestore.
     """
@@ -755,9 +758,9 @@ class LibraryImportTaskViewSet(ViewSet):
         )
         queryset = api.ContentLibrary.objects.get_by_key(library_key).import_tasks
         result = ContentLibraryBlockImportTaskSerializer(queryset, many=True).data
-        paginator = LibraryApiPagination()
-        return paginator.get_paginated_response(
-            paginator.paginate_queryset(result, request)
+
+        return self.get_paginated_response(
+            self.paginate_queryset(result)
         )
 
     @convert_exceptions

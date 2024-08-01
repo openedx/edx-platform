@@ -1,5 +1,6 @@
 """ API Views for unit page """
 
+import logging
 import edx_api_doc_tools as apidocs
 from django.http import HttpResponseBadRequest
 from rest_framework.request import Request
@@ -10,6 +11,8 @@ from cms.djangoapps.contentstore.utils import (
     get_container_handler_context,
     get_user_partition_info,
     get_visibility_partition_info,
+    get_xblock_validation_messages,
+    get_xblock_render_error,
 )
 from cms.djangoapps.contentstore.views.component import _get_item_in_course
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
@@ -22,6 +25,9 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from cms.djangoapps.contentstore.rest_api.v1.mixins import ContainerHandlerMixin
+
+
+log = logging.getLogger(__name__)
 
 
 @view_auth_classes(is_authenticated=True)
@@ -193,8 +199,15 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "user_partition_info": {},
                     "user_partitions": {}
                     "actions": {
+                        "can_copy": true,
+                        "can_duplicate": true,
+                        "can_move": true,
+                        "can_manage_access": true,
+                        "can_delete": true,
                         "can_manage_tags": true,
-                    }
+                    },
+                    "has_validation_error": false,
+                    "validation_errors": [],
                 },
                 {
                     "name": "Video",
@@ -203,8 +216,15 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "user_partition_info": {},
                     "user_partitions": {}
                     "actions": {
+                        "can_copy": true,
+                        "can_duplicate": true,
+                        "can_move": true,
+                        "can_manage_access": true,
+                        "can_delete": true,
                         "can_manage_tags": true,
                     }
+                    "validation_messages": [],
+                    "render_error": "",
                 },
                 {
                     "name": "Text",
@@ -213,34 +233,64 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "user_partition_info": {},
                     "user_partitions": {},
                     "actions": {
+                        "can_copy": true,
+                        "can_duplicate": true,
+                        "can_move": true,
+                        "can_manage_access": true,
+                        "can_delete": true,
                         "can_manage_tags": true,
-                    }
+                    },
+                    "validation_messages": [
+                        {
+                            "text": "This component's access settings contradict its parent's access settings.",
+                            "type": "error"
+                        }
+                    ],
+                    "render_error": "Unterminated control keyword: 'if' in file '../problem.html'",
                 },
             ],
-            "is_published": false
+            "is_published": false,
+            "can_paste_component": true,
         }
         ```
         """
         usage_key = self.get_object(usage_key_string)
         current_xblock = get_xblock(usage_key, request.user)
+        is_course = current_xblock.scope_ids.usage_id.context_key.is_course
 
         with modulestore().bulk_operations(usage_key.course_key):
             # load course once to reuse it for user_partitions query
             course = modulestore().get_course(current_xblock.location.course_key)
             children = []
-            for child in current_xblock.children:
-                child_info = modulestore().get_item(child)
-                user_partition_info = get_visibility_partition_info(child_info, course=course)
-                user_partitions = get_user_partition_info(child_info, course=course)
-                children.append({
-                    "name": child_info.display_name_with_default,
-                    "block_id": child_info.location,
-                    "block_type": child_info.location.block_type,
-                    "user_partition_info": user_partition_info,
-                    "user_partitions": user_partitions,
-                })
+            if hasattr(current_xblock, "children"):
+                for child in current_xblock.children:
+                    child_info = modulestore().get_item(child)
+                    user_partition_info = get_visibility_partition_info(child_info, course=course)
+                    user_partitions = get_user_partition_info(child_info, course=course)
+                    validation_messages = get_xblock_validation_messages(child_info)
+                    render_error = get_xblock_render_error(request, child_info)
 
-            is_published = not modulestore().has_changes(current_xblock)
-            container_data = {"children": children, "is_published": is_published}
+                    children.append({
+                        "xblock": child_info,
+                        "name": child_info.display_name_with_default,
+                        "block_id": child_info.location,
+                        "block_type": child_info.location.block_type,
+                        "user_partition_info": user_partition_info,
+                        "user_partitions": user_partitions,
+                        "validation_messages": validation_messages,
+                        "render_error": render_error,
+                    })
+
+            is_published = False
+            try:
+                is_published = not modulestore().has_changes(current_xblock)
+            except ItemNotFoundError:
+                logging.error('Could not find any changes for block [%s]', usage_key)
+
+            container_data = {
+                "children": children,
+                "is_published": is_published,
+                "can_paste_component": is_course,
+            }
             serializer = VerticalContainerSerializer(container_data)
             return Response(serializer.data)

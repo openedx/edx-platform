@@ -7,7 +7,6 @@ import logging
 import random
 import re
 import string
-from collections import defaultdict
 from typing import Dict
 
 import django.utils
@@ -53,7 +52,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
     GlobalStaff,
     UserBasedRole,
-    OrgStaffRole
+    OrgStaffRole,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
@@ -63,8 +62,6 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from organizations.models import Organization
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseBlock, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
@@ -72,12 +69,10 @@ from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wron
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import DuplicateCourseError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..course_group_config import (
     COHORT_SCHEME,
-    ENROLLMENT_SCHEME,
     RANDOM_SCHEME,
     GroupConfiguration,
     GroupConfigurationsValidationError
@@ -92,25 +87,28 @@ from ..toggles import (
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
-    use_new_schedule_details_page,
     use_new_textbooks_page,
+    use_new_group_configurations_page,
+    use_new_schedule_details_page
 )
 from ..utils import (
     add_instructor,
-    get_course_settings,
+    get_advanced_settings_url,
     get_course_grading,
+    get_course_index_context,
+    get_course_outline_url,
+    get_course_rerun_context,
+    get_course_settings,
+    get_grading_url,
+    get_group_configurations_context,
+    get_group_configurations_url,
     get_home_context,
     get_library_context,
-    get_course_index_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
-    get_course_outline_url,
+    get_schedule_details_url,
     get_studio_home_url,
     get_updates_url,
-    get_advanced_settings_url,
-    get_grading_url,
-    get_schedule_details_url,
-    get_course_rerun_context,
     get_textbooks_context,
     get_textbooks_url,
     initialize_permissions,
@@ -880,6 +878,7 @@ def _create_or_rerun_course(request):
         display_name = request.json.get('display_name')
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
+        end = request.json.get('end', CourseFields.end.default)
         run = request.json.get('run')
         has_course_creator_role = is_content_creator(request.user, org)
 
@@ -894,7 +893,7 @@ def _create_or_rerun_course(request):
                     status=400
                 )
 
-        fields = {'start': start}
+        fields = {'start': start, 'end': end}
         if display_name is not None:
             fields['display_name'] = display_name
 
@@ -1030,6 +1029,12 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     # verify org course and run don't already exist
     if store.has_course(destination_course_key, ignore_case=True):
         raise DuplicateCourseError(source_course_key, destination_course_key)
+
+    # if org or name of source course don't match the destination course,
+    # verify user has access to the destination course
+    if source_course_key.org != destination_course_key.org or source_course_key.course != destination_course_key.course:
+        if not has_studio_write_access(user, destination_course_key):
+            raise PermissionDenied()
 
     # Make sure user has instructor and staff access to the destination course
     # so the user can see the updated status for that course
@@ -1636,59 +1641,10 @@ def group_configurations_list_handler(request, course_key_string):
         course = get_course_and_check_access(course_key, request.user)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-            group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
-            course_outline_url = reverse_course_url('course_handler', course_key)
-            should_show_experiment_groups = are_content_experiments_enabled(course)
-            if should_show_experiment_groups:
-                experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(store, course)
-            else:
-                experiment_group_configurations = None
-
-            all_partitions = GroupConfiguration.get_all_user_partition_details(store, course)
-            should_show_enrollment_track = False
-            has_content_groups = False
-            displayable_partitions = []
-            for partition in all_partitions:
-                partition['read_only'] = getattr(UserPartition.get_scheme(partition['scheme']), 'read_only', False)
-
-                if partition['scheme'] == COHORT_SCHEME:
-                    has_content_groups = True
-                    displayable_partitions.append(partition)
-                elif partition['scheme'] == CONTENT_TYPE_GATING_SCHEME:
-                    # Add it to the front of the list if it should be shown.
-                    if ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
-                        displayable_partitions.append(partition)
-                elif partition['scheme'] == ENROLLMENT_SCHEME:
-                    should_show_enrollment_track = len(partition['groups']) > 1
-
-                    # Add it to the front of the list if it should be shown.
-                    if should_show_enrollment_track:
-                        displayable_partitions.insert(0, partition)
-                elif partition['scheme'] != RANDOM_SCHEME:
-                    # Experiment group configurations are handled explicitly above. We don't
-                    # want to display their groups twice.
-                    displayable_partitions.append(partition)
-
-            # Set the sort-order. Higher numbers sort earlier
-            scheme_priority = defaultdict(lambda: -1, {
-                ENROLLMENT_SCHEME: 1,
-                CONTENT_TYPE_GATING_SCHEME: 0
-            })
-            displayable_partitions.sort(key=lambda p: scheme_priority[p['scheme']], reverse=True)
-            # Add empty content group if there is no COHORT User Partition in the list.
-            # This will add ability to add new groups in the view.
-            if not has_content_groups:
-                displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
-            return render_to_response('group_configurations.html', {
-                'context_course': course,
-                'group_configuration_url': group_configuration_url,
-                'course_outline_url': course_outline_url,
-                'experiment_group_configurations': experiment_group_configurations,
-                'should_show_experiment_groups': should_show_experiment_groups,
-                'all_group_configurations': displayable_partitions,
-                'should_show_enrollment_track': should_show_enrollment_track,
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
-            })
+            if use_new_group_configurations_page(course_key):
+                return redirect(get_group_configurations_url(course_key))
+            group_configurations_context = get_group_configurations_context(course, store)
+            return render_to_response('group_configurations.html', group_configurations_context)
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
                 # create a new group configuration for the course

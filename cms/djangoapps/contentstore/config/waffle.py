@@ -35,7 +35,7 @@ SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=togg
 # .. toggle_creation_date: 2020-08-03
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and ENABLE_LIBRARY_AUTHORING_MICROFRONTEND.
-# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
+# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4106944527/Libraries+Relaunch+Proposal+For+Product+Review
 REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
     f'{WAFFLE_NAMESPACE}.library_authoring_mfe', __name__, LOG_PREFIX
 )
@@ -53,16 +53,3 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
 # .. toggle_warning: Flag course_experience.relative_dates should also be active for relative dates functionalities to work.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-844
 CUSTOM_RELATIVE_DATES = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.custom_relative_dates', __name__)
-
-
-# .. toggle_name: studio.enable_course_update_notifications
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable course update notifications.
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 14-Feb-2024
-# .. toggle_target_removal_date: 14-Mar-2024
-ENABLE_COURSE_UPDATE_NOTIFICATIONS = CourseWaffleFlag(
-    f'{WAFFLE_NAMESPACE}.enable_course_update_notifications',
-    __name__
-)

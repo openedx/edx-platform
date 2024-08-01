@@ -49,17 +49,6 @@ var firefox = require('selenium-webdriver/firefox');
 
 var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 
-// The following crazy bit is to work around the webpack.optimize.CommonsChunkPlugin
-// plugin. The problem is that it it factors out the code that defines webpackJsonp
-// and puts in in the commons JS, which Karma doesn't know to load first. This is a
-// workaround recommended in the karma-webpack bug report that basically just removes
-// the plugin for the purposes of Karma testing (the plugin is meant to be an
-// optimization only).
-//     https://github.com/webpack-contrib/karma-webpack/issues/24#issuecomment-257613167
-//
-// This should be fixed in v3 of karma-webpack
-var commonsChunkPluginIndex = webpackConfig[0].plugins.findIndex(function(plugin) { return plugin.chunkNames; });
-
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
     libraryFiles: [
@@ -82,10 +71,6 @@ var commonFiles = {
         {pattern: 'common/templates/**/*.underscore'}
     ]
 };
-
-webpackConfig[0].plugins.splice(commonsChunkPluginIndex, 1);
-
-delete webpackConfig[0].entry;
 
 /**
  * Customize the name attribute in xml testcase element

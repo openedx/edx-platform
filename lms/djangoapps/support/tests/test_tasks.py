@@ -4,6 +4,8 @@ Unit tests for reset_student_course task
 
 from unittest.mock import patch, Mock, call
 
+from django.conf import settings
+from django.core import mail
 from xmodule.modulestore.tests.factories import BlockFactory
 
 from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
@@ -15,6 +17,7 @@ from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import SupportStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.video_block import VideoBlock
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class ResetStudentCourse(TestSubmittingProblems):
@@ -43,6 +46,21 @@ class ResetStudentCourse(TestSubmittingProblems):
         self.p2 = ''
         self.p3 = ''
         self.video = ''
+
+        # Patch BlockCompletion for the whole test
+        completion_patcher = patch('lms.djangoapps.support.tasks.BlockCompletion')
+        self.mock_block_completion = completion_patcher.start()
+        self.addCleanup(completion_patcher.stop)
+
+        # Patch clear_user_course_grades for the whole test
+        grades_patcher = patch('lms.djangoapps.support.tasks.clear_user_course_grades')
+        self.mock_clear_user_course_grades = grades_patcher.start()
+        self.addCleanup(grades_patcher.stop)
+
+    @property
+    def mock_clear_block_completion(self):
+        """ Helper property to access the two-mock-layers-deep clear_learning_context_completion """
+        return self.mock_block_completion.objects.clear_learning_context_completion
 
     def basic_setup(self):
         """
@@ -94,6 +112,20 @@ class ResetStudentCourse(TestSubmittingProblems):
 
         self.refresh_course()
 
+    def assert_email_sent_successfully(self, expected):
+        """
+        Verify that the course reset email has been sent to the user.
+        """
+        from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        sent_message = mail.outbox[-1]
+        body = sent_message.body
+
+        assert expected['subject'] in sent_message.subject
+        assert expected['body'] in body
+        assert sent_message.from_email == from_email
+        assert len(sent_message.to) == 1
+        assert self.student_user.email in sent_message.to
+
     def test_reset_student_course(self):
         """ Test that it resets student attempts  """
         with patch(
@@ -108,34 +140,44 @@ class ResetStudentCourse(TestSubmittingProblems):
                     self.student_user,
                     self.p1.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p2.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p3.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.video.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 )
             ])
 
+            self.mock_clear_block_completion.assert_called_once_with(self.student_user, self.course.id)
+            self.mock_clear_user_course_grades.assert_called_once_with(self.student_user.id, self.course.id)
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNotNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.COMPLETE)
+            self.assert_email_sent_successfully({
+                'subject': f'The course { self.course.display_name } has been reset !',
+                'body': f'Your progress in course { self.course.display_name } has been reset on your behalf.'
+            })
 
     def test_reset_student_course_student_module_not_found(self):
 
@@ -151,24 +193,29 @@ class ResetStudentCourse(TestSubmittingProblems):
                     self.student_user,
                     self.p1.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p2.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 ),
                 call(
                     self.course.id,
                     self.student_user,
                     self.p3.location,
                     self.user,
-                    True
+                    delete_module=True,
+                    emit_signals_and_events=False,
                 )
             ])
 
+            self.mock_clear_block_completion.assert_called_once_with(self.student_user, self.course.id)
+            self.mock_clear_user_course_grades.assert_called_once_with(self.student_user.id, self.course.id)
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertRaises(StudentModule.DoesNotExist, mock_reset_student_attempts)
             self.assertIsNotNone(course_reset_audit.completed_at)
@@ -182,6 +229,8 @@ class ResetStudentCourse(TestSubmittingProblems):
         ):
             reset_student_course(self.course_id, self.student_user.email, self.user.email)
             mock_reset_student_attempts.assert_not_called()
+            self.mock_clear_block_completion.assert_not_called()
+            self.mock_clear_user_course_grades.assert_not_called()
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.FAILED)
@@ -194,6 +243,8 @@ class ResetStudentCourse(TestSubmittingProblems):
             self.basic_setup()
             reset_student_course(self.course_id, self.student_user.email, self.user.email)
             mock_reset_student_attempts.assert_called_once()
+            self.mock_clear_block_completion.assert_not_called()
+            self.mock_clear_user_course_grades.assert_not_called()
             course_reset_audit = CourseResetAudit.objects.get(course_enrollment=self.enrollment)
             self.assertIsNone(course_reset_audit.completed_at)
             self.assertEqual(course_reset_audit.status, CourseResetAudit.CourseResetStatus.FAILED)

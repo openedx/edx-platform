@@ -11,6 +11,7 @@ from pprint import pformat
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 
+from lms.djangoapps.verify_student.api import send_approval_email
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 
@@ -21,7 +22,7 @@ log = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     This command manually approves ID verification attempts for a provided set of learners whose ID verification
-    attempt is in the submitted state.
+    attempt is in the submitted or must_retry state.
 
     This command differs from the similar manual_verifications command in that it approves the
     SoftwareSecurePhotoVerification instance instead of creating a ManualVerification instance. This is advantageous
@@ -32,7 +33,7 @@ class Command(BaseCommand):
     Example usage:
         $ ./manage.py lms idv_verifications <absolute path of file with user IDs (one per line)>
     """
-    help = 'Manually approves ID verifications for users with an ID verification attempt in the submitted state.'
+    help = 'Manually approve ID verifications for users with an attempt in the submitted or must_retry state.'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -125,8 +126,8 @@ class Command(BaseCommand):
 
     def _approve_id_verifications(self, user_ids):
         """
-        This command manually approves ID verification attempts for a provided set of learners whose ID verification
-        attempt is in the submitted state.
+        This method manually approves ID verification attempts for a provided set of user IDs so long as the attempt
+        is in the submitted or must_retry state. This method also send an IDV approval email to the user.
 
         Arguments:
             user_ids (list): user IDs of the users whose ID verification attempt should be manually approved
@@ -136,7 +137,7 @@ class Command(BaseCommand):
         """
         existing_id_verifications = SoftwareSecurePhotoVerification.objects.filter(
             user_id__in=user_ids,
-            status='submitted',
+            status__in=['submitted', 'must_retry'],
             created_at__gte=earliest_allowed_verification_date(),
         )
 
@@ -148,5 +149,6 @@ class Command(BaseCommand):
 
         for verification in existing_id_verifications:
             verification.approve(service='idv_verifications command')
+            send_approval_email(verification)
 
         return list(failed_user_ids)

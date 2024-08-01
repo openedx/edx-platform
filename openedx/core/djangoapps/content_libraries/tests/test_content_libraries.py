@@ -1,5 +1,5 @@
 """
-Tests for Blockstore-based Content Libraries
+Tests for Learning-Core-based Content Libraries
 """
 from unittest.mock import Mock, patch
 from unittest import skip
@@ -37,7 +37,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 @ddt.ddt
 class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
     """
-    General tests for Blockstore-based Content Libraries
+    General tests for Learning-Core-based Content Libraries
 
     These tests use the REST API, which in turn relies on the Python API.
     Some tests may use the python API directly if necessary to provide
@@ -137,7 +137,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         }
 
     @skip("This endpoint shouldn't support num_blocks and has_unpublished_*.")
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootView.pagination_class.page_size", new=2)
     def test_list_library(self):
         """
         Test the /libraries API and its pagination
@@ -230,6 +230,27 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                                          'text_search': 'library-title-4'})) == 1
         assert len(self._list_libraries({'type': VIDEO})) == 3
 
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'title'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-title'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'created'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-created'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        # An invalid order doesn't apply any specific ordering to the result, so just
+        # check if successfully returned libraries
+        assert len(self._list_libraries({'order': 'invalid'})) == 5
+        assert len(self._list_libraries({'order': '-invalid'})) == 5
+
     # General Content Library XBlock tests:
 
     def test_library_blocks(self):
@@ -278,7 +299,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -300,7 +321,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         # Now view the XBlock's student_view (including draft changes):
         fragment = self._render_block_view(block_id, "student_view")
         assert 'resources' in fragment
-        assert 'Blockstore is designed to store.' in fragment['content']
+        assert 'Learning Core is designed to store.' in fragment['content']
 
         # Also call a handler to make sure that's working:
         handler_url = self._get_block_handler_url(block_id, "xmodule_handler") + "problem_get"
@@ -374,7 +395,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert 'resources' in fragment
         assert 'Hello world!' in fragment['content']
 
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryBlocksView.pagination_class.page_size", new=2)
     def test_list_library_blocks(self):
         """
         Test the /libraries/{lib_key_str}/blocks API and its pagination
@@ -806,7 +827,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -956,7 +977,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
-    """Tests only focused on service validation, no Blockstore needed."""
+    """Tests only focused on service validation, no Learning Core interactions here."""
 
     @ddt.data(
         (URL_BLOCK_METADATA_URL, dict(block_key='totally_invalid_key')),

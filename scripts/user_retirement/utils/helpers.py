@@ -18,7 +18,7 @@ import yaml
 from six import text_type
 
 from scripts.user_retirement.utils.edx_api import LmsApi  # pylint: disable=wrong-import-position
-from scripts.user_retirement.utils.edx_api import CredentialsApi, DemographicsApi, EcommerceApi, LicenseManagerApi
+from scripts.user_retirement.utils.edx_api import CredentialsApi, EcommerceApi, LicenseManagerApi
 from scripts.user_retirement.utils.thirdparty_apis.amplitude_api import \
     AmplitudeApi  # pylint: disable=wrong-import-position
 from scripts.user_retirement.utils.thirdparty_apis.braze_api import BrazeApi  # pylint: disable=wrong-import-position
@@ -143,17 +143,16 @@ def _setup_lms_api_or_exit(fail_func, fail_code, config):
 
 def _setup_all_apis_or_exit(fail_func, fail_code, config):
     """
-    Performs setup of EdxRestClientApi instances for LMS, E-Commerce, Credentials, and
-    Demographics, as well as fetching the learner's record from LMS and validating that
-    it is in a state to work on. Returns the learner dict and their current stage in the
-    retirement flow.
+    Performs setup of EdxRestClientApi instances for LMS, E-Commerce, and Credentials,
+    as well as fetching the learner's record from LMS and validating that it is
+    in a state to work on. Returns the learner dict and their current stage in
+    the retirement flow.
     """
     try:
         lms_base_url = config['base_urls']['lms']
         ecommerce_base_url = config['base_urls'].get('ecommerce', None)
         credentials_base_url = config['base_urls'].get('credentials', None)
         segment_base_url = config['base_urls'].get('segment', None)
-        demographics_base_url = config['base_urls'].get('demographics', None)
         license_manager_base_url = config['base_urls'].get('license_manager', None)
         client_id = config['client_id']
         client_secret = config['client_secret']
@@ -181,7 +180,6 @@ def _setup_all_apis_or_exit(fail_func, fail_code, config):
                 ('CREDENTIALS', credentials_base_url),
                 ('SEGMENT', segment_base_url),
                 ('HUBSPOT', hubspot_api_key),
-                ('DEMOGRAPHICS', demographics_base_url)
             ):
                 if state[2] == service and service_url is None:
                     fail_func(fail_code, 'Service URL is not configured, but required for state {}'.format(state))
@@ -222,9 +220,6 @@ def _setup_all_apis_or_exit(fail_func, fail_code, config):
 
         if credentials_base_url:
             config['CREDENTIALS'] = CredentialsApi(lms_base_url, credentials_base_url, client_id, client_secret)
-
-        if demographics_base_url:
-            config['DEMOGRAPHICS'] = DemographicsApi(lms_base_url, demographics_base_url, client_id, client_secret)
 
         if license_manager_base_url:
             config['LICENSE_MANAGER'] = LicenseManagerApi(

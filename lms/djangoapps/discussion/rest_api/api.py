@@ -13,7 +13,6 @@ from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
 from pytz import UTC
 
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -34,7 +33,6 @@ from common.djangoapps.student.roles import (
 )
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
@@ -82,6 +80,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 from xmodule.course_block import CourseBlock
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
 
@@ -130,7 +129,6 @@ from .utils import (
     set_attribute,
     is_posting_allowed
 )
-
 
 User = get_user_model()
 
@@ -281,7 +279,7 @@ def get_thread_list_url(request, course_key, topic_id_list=None, following=False
     return request.build_absolute_uri(urlunparse(("", "", path, "", urlencode(query_list), "")))
 
 
-def get_course(request, course_key):
+def get_course(request, course_key, check_tab=True):
     """
     Return general discussion information for the course.
 
@@ -291,6 +289,7 @@ def get_course(request, course_key):
           determining the requesting user.
 
         course_key: The key of the course to get information for
+        check_tab: Whether to check if the discussion tab is enabled for the course
 
     Returns:
 
@@ -324,7 +323,7 @@ def get_course(request, course_key):
         """
         return dt.isoformat().replace('+00:00', 'Z')
 
-    course = _get_course(course_key, request.user)
+    course = _get_course(course_key, request.user, check_tab=check_tab)
     user_roles = get_user_role_names(request.user, course_key)
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
@@ -333,7 +332,7 @@ def get_course(request, course_key):
         course_config.posting_restrictions,
         course.get_discussion_blackout_datetimes()
     )
-
+    discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
     return {
         "id": str(course_key),
         "is_posting_enabled": is_posting_enabled,
@@ -372,7 +371,7 @@ def get_course(request, course_key):
             {"code": reason_code, "label": label}
             for (reason_code, label) in CLOSE_REASON_CODES.items()
         ],
-
+        'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
     }
 
 
@@ -418,6 +417,7 @@ def get_courseware_topics(
         Required arguments:
         category_list -- list of categories.
         """
+
         def convert(text):
             if text.isdigit():
                 return int(text)
@@ -697,11 +697,19 @@ def get_course_topics_v2(
             FORUM_ROLE_ADMINISTRATOR,
         ]
     ).exists()
-    course_blocks = get_course_blocks(user, store.make_course_usage_key(course_key))
-    accessible_vertical_keys = [
-        block for block in course_blocks.get_block_keys()
-        if block.block_type == 'vertical'
-    ] + [None]
+
+    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+        blocks = store.get_items(
+            course_key,
+            qualifiers={'category': 'vertical'},
+            fields=['usage_key', 'discussion_enabled', 'display_name'],
+        )
+        accessible_vertical_keys = []
+        for block in blocks:
+            if block.discussion_enabled and (not block.visible_to_staff_only or user_is_privileged):
+                accessible_vertical_keys.append(block.usage_key)
+        accessible_vertical_keys.append(None)
+
     topics_query = DiscussionTopicLink.objects.filter(
         context_key=course_key,
         provider_id=provider_type,

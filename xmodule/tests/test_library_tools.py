@@ -28,7 +28,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
     """
     Tests for LibraryToolsService.
 
-    Tests interaction with blockstore-based (V2) and mongo-based (V1) content libraries.
+    Tests interaction with learning-core-based (V2) and mongo-based (V1) content libraries.
     """
     def setUp(self):
         super().setUp()

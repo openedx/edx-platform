@@ -7,8 +7,6 @@ Specific overrides to the base prod settings to make development easier.
 import logging
 from os.path import abspath, dirname, join
 
-from corsheaders.defaults import default_headers as corsheaders_default_headers
-
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 #####################################################################
 from edx_django_utils.plugins import add_plugins
@@ -137,7 +135,7 @@ REQUIRE_DEBUG = DEBUG
 
 PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
-# Load development webpack donfiguration
+# Load development webpack configuration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################
@@ -264,9 +262,6 @@ TOKEN_SIGNING.update({
     )
 })
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
-
 ########################## PROGRAMS LEARNER PORTAL ##############################
 LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 
@@ -295,9 +290,6 @@ FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-    'use-jwt-cookie',
-)
 
 LOGIN_REDIRECT_WHITELIST.extend([
     CMS_BASE,
@@ -554,12 +546,16 @@ AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 # MFEs that will call this service in devstack
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:2000',  # frontend-app-learning
+    'http://localhost:2001',  # frontend-app-course-authoring
     'http://localhost:1997',  # frontend-app-account
     'http://localhost:1995',  # frontend-app-profile
     'http://localhost:1992',  # frontend-app-ora
     'http://localhost:2002',  # frontend-app-discussions
     'http://localhost:1991',  # frontend-app-admin-portal
     'http://localhost:1999',  # frontend-app-authn
+    'http://localhost:18450',  # frontend-app-support-tools
+    'http://localhost:1994',  # frontend-app-gradebook
+    'http://localhost:1996',  # frontend-app-learner-dashboard
 ]
 
 

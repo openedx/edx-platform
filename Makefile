@@ -27,16 +27,11 @@ clean: ## archive and delete most git-ignored files
 
 SWAGGER = docs/lms-openapi.yaml
 
-docs: guides technical-docs ## build all the developer documentation for this repository
+docs: swagger guides technical-docs ## build the documentation for this repository
+	$(MAKE) -C docs html
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
-
-technical-docs:  ## build the technical docs
-	$(MAKE) -C docs/technical html
-
-guides:	swagger ## build the developer guide docs
-	cd docs/guides; make clean html
 
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract --no-segment -v
@@ -53,10 +48,13 @@ pull_xblock_translations:  ## pull xblock translations via atlas
 	python manage.py lms compile_xblock_translations
 	python manage.py cms compile_xblock_translations
 
-pull_translations: ## pull translations via atlas
-	# Clean up the existing translations
-	git clean -fdX conf/locale
+clean_translations: ## Remove existing translations to prepare for a fresh pull
+	# Removes core edx-platform translations but keeps config files and Esperanto (eo) test translations
+	find conf/locale/ -type f \! -path '*/eo/*' \( -name '*.mo' -o -name '*.po' \) -delete
+	# Removes the xblocks/plugins and js-compiled translations
 	rm -rf conf/plugins-locale cms/static/js/i18n/ lms/static/js/i18n/ cms/static/js/xblock.v1-i18n/ lms/static/js/xblock.v1-i18n/
+
+pull_translations: clean_translations  ## pull translations via atlas
 	make pull_xblock_translations
 	make pull_plugin_translations
 	atlas pull $(ATLAS_OPTIONS) \
@@ -107,12 +105,12 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 REQ_FILES = \
 	requirements/edx/coverage \
 	requirements/edx/paver \
-	requirements/edx-sandbox/py38 \
+	requirements/edx-sandbox/base \
 	requirements/edx/base \
 	requirements/edx/doc \
 	requirements/edx/testing \
-	requirements/edx/development \
 	requirements/edx/assets \
+	requirements/edx/development \
 	requirements/edx/semgrep \
 	scripts/xblock/requirements \
 	scripts/user_retirement/requirements/base \
@@ -127,7 +125,7 @@ endef
 COMMON_CONSTRAINTS_TXT=requirements/common_constraints.txt
 .PHONY: $(COMMON_CONSTRAINTS_TXT)
 $(COMMON_CONSTRAINTS_TXT):
-	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+	curl -L https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt > "$(@)"
 	printf "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
@@ -138,6 +136,8 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	sed '/^django-simple-history==/d' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	sed 's/Django<4.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+	sed 's/event-tracking<2.4.1//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt

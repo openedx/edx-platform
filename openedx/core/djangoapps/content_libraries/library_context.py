@@ -6,11 +6,14 @@ import logging
 
 from django.core.exceptions import PermissionDenied
 
+from openedx_events.content_authoring.data import LibraryBlockData
+from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED
+
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.xblock.api import LearningContext
 
-from openedx_learning.core.components import api as components_api
+from openedx_learning.api import authoring as authoring_api
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +22,7 @@ class LibraryContextImpl(LearningContext):
     """
     Implements content libraries as a learning context.
 
-    This is the *new* content libraries based on Blockstore, not the old content
+    This is the *new* content libraries based on Learning Core, not the old content
     libraries based on modulestore.
     """
 
@@ -87,9 +90,22 @@ class LibraryContextImpl(LearningContext):
         if learning_package is None:
             return False
 
-        return components_api.component_exists_by_key(
+        return authoring_api.component_exists_by_key(
             learning_package.id,
             namespace='xblock.v1',
             type_name=usage_key.block_type,
             local_key=usage_key.block_id,
+        )
+
+    def send_block_updated_event(self, usage_key):
+        """
+        Send a "block updated" event for the library block with the given usage_key.
+
+        usage_key: the UsageKeyV2 subclass used for this learning context
+        """
+        LIBRARY_BLOCK_UPDATED.send_event(
+            library_block=LibraryBlockData(
+                library_key=usage_key.lib_key,
+                usage_key=usage_key,
+            )
         )

@@ -7,10 +7,8 @@ Other Django apps should use the API functions defined here in this module; othe
 certificates models or any other certificates modules.
 """
 
-
 import logging
 from datetime import datetime
-from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -18,18 +16,18 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.keys import CourseKey
 from organizations.api import get_course_organization_id
+from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
-from lms.djangoapps.certificates.generation_handler import (
-    generate_certificate_task as _generate_certificate_task,
-    is_on_certificate_allowlist as _is_on_certificate_allowlist
-)
 from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION as _AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.generation_handler import generate_certificate_task as _generate_certificate_task
+from lms.djangoapps.certificates.generation_handler import is_on_certificate_allowlist as _is_on_certificate_allowlist
 from lms.djangoapps.certificates.models import (
     CertificateAllowlist,
     CertificateDateOverride,
@@ -41,16 +39,13 @@ from lms.djangoapps.certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate,
 )
-from lms.djangoapps.certificates.utils import (
-    get_certificate_url as _get_certificate_url,
-    has_html_certificates_enabled as _has_html_certificates_enabled,
-    should_certificate_be_visible as _should_certificate_be_visible,
-    certificate_status as _certificate_status,
-    certificate_status_for_student as _certificate_status_for_student,
-)
+from lms.djangoapps.certificates.utils import certificate_status as _certificate_status
+from lms.djangoapps.certificates.utils import certificate_status_for_student as _certificate_status_for_student
+from lms.djangoapps.certificates.utils import get_certificate_url as _get_certificate_url
+from lms.djangoapps.certificates.utils import has_html_certificates_enabled as _has_html_certificates_enabled
+from lms.djangoapps.certificates.utils import should_certificate_be_visible as _should_certificate_be_visible
 from lms.djangoapps.instructor import access
 from lms.djangoapps.utils import _get_key
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
@@ -83,8 +78,8 @@ def _format_certificate_for_user(username, cert):
             "is_passing": CertificateStatuses.is_passing_status(cert.status),
             "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
-                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, uuid=cert.verify_uuid,
-                                                         user_certificate=cert)
+                cert.download_url
+                or get_certificate_url(cert.user.id, cert.course_id, uuid=cert.verify_uuid, user_certificate=cert)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
@@ -139,10 +134,7 @@ def get_certificate_for_user(username, course_key, format_results=True):
         the GeneratedCertificate object itself.
     """
     try:
-        cert = GeneratedCertificate.eligible_certificates.get(
-            user__username=username,
-            course_id=course_key
-        )
+        cert = GeneratedCertificate.eligible_certificates.get(user__username=username, course_id=course_key)
     except GeneratedCertificate.DoesNotExist:
         return None
 
@@ -178,13 +170,8 @@ def get_certificates_for_user_by_course_keys(user, course_keys):
         Course keys for courses for which the user does not have a certificate
         will be omitted.
     """
-    certs = GeneratedCertificate.eligible_certificates.filter(
-        user=user, course_id__in=course_keys
-    )
-    return {
-        cert.course_id: _format_certificate_for_user(user.username, cert)
-        for cert in certs
-    }
+    certs = GeneratedCertificate.eligible_certificates.filter(user=user, course_id__in=course_keys)
+    return {cert.course_id: _format_certificate_for_user(user.username, cert) for cert in certs}
 
 
 def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None, user_ids=None):
@@ -195,30 +182,28 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     cert_filter_args = {}
 
     if course_keys:
-        cert_filter_args['course_id__in'] = course_keys
+        cert_filter_args["course_id__in"] = course_keys
 
     if start_date:
-        cert_filter_args['modified_date__gte'] = start_date
+        cert_filter_args["modified_date__gte"] = start_date
 
     if end_date:
-        cert_filter_args['modified_date__lte'] = end_date
+        cert_filter_args["modified_date__lte"] = end_date
 
     if user_ids:
-        cert_filter_args['user__id__in'] = user_ids
+        cert_filter_args["user__id__in"] = user_ids
 
     # Include certificates with a CertificateDateOverride modified within the
     # given time range.
     if start_date or end_date:
         certs_with_modified_overrides = get_certs_with_modified_overrides(course_keys, start_date, end_date, user_ids)
-        return GeneratedCertificate.objects.filter(
-            **cert_filter_args
-        ).union(
-            certs_with_modified_overrides
-        ).order_by(
-            'modified_date'
+        return (
+            GeneratedCertificate.objects.filter(**cert_filter_args)
+            .union(certs_with_modified_overrides)
+            .order_by("modified_date")
         )
 
-    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
+    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by("modified_date")
 
 
 def get_certs_with_modified_overrides(course_keys=None, start_date=None, end_date=None, user_ids=None):
@@ -229,9 +214,9 @@ def get_certs_with_modified_overrides(course_keys=None, start_date=None, end_dat
     """
     override_filter_args = {}
     if start_date:
-        override_filter_args['history_date__gte'] = start_date
+        override_filter_args["history_date__gte"] = start_date
     if end_date:
-        override_filter_args['history_date__lte'] = end_date
+        override_filter_args["history_date__lte"] = end_date
 
     # Get the HistoricalCertificateDateOverrides that have entries within the
     # given date range. We check the history table to catch deleted overrides
@@ -239,16 +224,16 @@ def get_certs_with_modified_overrides(course_keys=None, start_date=None, end_dat
     overrides = CertificateDateOverride.history.filter(**override_filter_args)
 
     # Get the associated GeneratedCertificate ids.
-    override_cert_ids = overrides.values_list('generated_certificate', flat=True)
+    override_cert_ids = overrides.values_list("generated_certificate", flat=True)
 
     # Build the args for the GeneratedCertificate query. First, filter by all
     # certs identified in override_cert_ids; then by the other arguments passed,
     # if present.
-    cert_filter_args = {'pk__in': override_cert_ids}
+    cert_filter_args = {"pk__in": override_cert_ids}
     if course_keys:
-        cert_filter_args['course_id__in'] = course_keys
+        cert_filter_args["course_id__in"] = course_keys
     if user_ids:
-        cert_filter_args['user__id__in'] = user_ids
+        cert_filter_args["user__id__in"] = user_ids
 
     return GeneratedCertificate.objects.filter(**cert_filter_args)
 
@@ -287,14 +272,17 @@ def certificate_downloadable_status(student, course_key):
     # If the certificate status is an error user should view that status is "generating".
     # On the back-end, need to monitor those errors and re-submit the task.
 
+    # pylint: disable=simplifiable-if-expression
     response_data = {
-        'is_downloadable': False,
-        'is_generating': True if current_status['status'] in [CertificateStatuses.generating,  # pylint: disable=simplifiable-if-expression
-                                                              CertificateStatuses.error] else False,
-        'is_unverified': True if current_status['status'] == CertificateStatuses.unverified else False,  # pylint: disable=simplifiable-if-expression
-        'download_url': None,
-        'uuid': None,
+        "is_downloadable": False,
+        "is_generating": (
+            True if current_status["status"] in [CertificateStatuses.generating, CertificateStatuses.error] else False
+        ),
+        "is_unverified": (True if current_status["status"] == CertificateStatuses.unverified else False),
+        "download_url": None,
+        "uuid": None,
     }
+    # pylint: enable=simplifiable-if-expression
 
     course_overview = get_course_overview_or_none(course_key)
 
@@ -306,28 +294,28 @@ def certificate_downloadable_status(student, course_key):
         display_behavior_is_valid = True
 
     if (
-        not certificates_viewable_for_course(course_overview) and
-        CertificateStatuses.is_passing_status(current_status['status']) and
-        display_behavior_is_valid and
-        course_overview.certificate_available_date
+        not certificates_viewable_for_course(course_overview)
+        and CertificateStatuses.is_passing_status(current_status["status"])
+        and display_behavior_is_valid
+        and course_overview.certificate_available_date
     ):
-        response_data['earned_but_not_available'] = True
-        response_data['certificate_available_date'] = course_overview.certificate_available_date
+        response_data["earned_but_not_available"] = True
+        response_data["certificate_available_date"] = course_overview.certificate_available_date
 
     may_view_certificate = _should_certificate_be_visible(
         course_overview.certificates_display_behavior,
         course_overview.certificates_show_before_end,
         course_overview.has_ended(),
         course_overview.certificate_available_date,
-        course_overview.self_paced
+        course_overview.self_paced,
     )
-    if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
-        response_data['is_downloadable'] = True
-        response_data['download_url'] = current_status['download_url'] or get_certificate_url(
-            student.id, course_key, current_status['uuid']
+    if current_status["status"] == CertificateStatuses.downloadable and may_view_certificate:
+        response_data["is_downloadable"] = True
+        response_data["download_url"] = current_status["download_url"] or get_certificate_url(
+            student.id, course_key, current_status["uuid"]
         )
-        response_data['is_pdf_certificate'] = bool(current_status['download_url'])
-        response_data['uuid'] = current_status['uuid']
+        response_data["is_pdf_certificate"] = bool(current_status["download_url"])
+        response_data["uuid"] = current_status["uuid"]
 
     return response_data
 
@@ -356,11 +344,14 @@ def set_cert_generation_enabled(course_key, is_enabled):
 
     """
     CertificateGenerationCourseSetting.set_self_generation_enabled_for_course(course_key, is_enabled)
-    cert_event_type = 'enabled' if is_enabled else 'disabled'
-    event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
-    tracker.emit(event_name, {
-        'course_id': str(course_key),
-    })
+    cert_event_type = "enabled" if is_enabled else "disabled"
+    event_name = ".".join(["edx", "certificate", "generation", cert_event_type])
+    tracker.emit(
+        event_name,
+        {
+            "course_id": str(course_key),
+        },
+    )
     if is_enabled:
         log.info("Enabled self-generated certificates for course '%s'.", str(course_key))
     else:
@@ -407,8 +398,8 @@ def has_self_generated_certificates_enabled(course_key):
 
     """
     return (
-        CertificateGenerationConfiguration.current().enabled and
-        CertificateGenerationCourseSetting.is_self_generation_enabled_for_course(course_key)
+        CertificateGenerationConfiguration.current().enabled
+        and CertificateGenerationCourseSetting.is_self_generation_enabled_for_course(course_key)
     )
 
 
@@ -458,10 +449,10 @@ def get_active_web_certificate(course, is_preview_mode=None):
     """
     Retrieves the active web certificate configuration for the specified course
     """
-    certificates = getattr(course, 'certificates', {})
-    configurations = certificates.get('certificates', [])
+    certificates = getattr(course, "certificates", {})
+    configurations = certificates.get("certificates", [])
     for config in configurations:
-        if config.get('is_active') or is_preview_mode:
+        if config.get("is_active") or is_preview_mode:
             return config
     return None
 
@@ -478,32 +469,19 @@ def get_certificate_template(course_key, mode, language):
     active_templates = CertificateTemplate.objects.filter(is_active=True)
 
     if org_id and mode:  # get template by org, mode, and key
-        org_mode_and_key_templates = active_templates.filter(
-            organization_id=org_id,
-            mode=mode,
-            course_key=course_key
-        )
+        org_mode_and_key_templates = active_templates.filter(organization_id=org_id, mode=mode, course_key=course_key)
         template = _get_language_specific_template_or_default(language, org_mode_and_key_templates)
 
     # since no template matched that course_key, only consider templates with empty course_key
     empty_course_key_templates = active_templates.filter(course_key=CourseKeyField.Empty)
     if not template and org_id and mode:  # get template by org and mode
-        org_and_mode_templates = empty_course_key_templates.filter(
-            organization_id=org_id,
-            mode=mode
-        )
+        org_and_mode_templates = empty_course_key_templates.filter(organization_id=org_id, mode=mode)
         template = _get_language_specific_template_or_default(language, org_and_mode_templates)
     if not template and org_id:  # get template by only org
-        org_templates = empty_course_key_templates.filter(
-            organization_id=org_id,
-            mode=None
-        )
+        org_templates = empty_course_key_templates.filter(organization_id=org_id, mode=None)
         template = _get_language_specific_template_or_default(language, org_templates)
     if not template and mode:  # get template by only mode
-        mode_templates = empty_course_key_templates.filter(
-            organization_id=None,
-            mode=mode
-        )
+        mode_templates = empty_course_key_templates.filter(organization_id=None, mode=mode)
         template = _get_language_specific_template_or_default(language, mode_templates)
     return template if template else None
 
@@ -515,10 +493,10 @@ def _get_language_specific_template_or_default(language, templates):
     """
     two_letter_language = _get_two_letter_language_code(language)
 
-    language_or_default_templates = list(templates.filter(Q(language=two_letter_language)
-                                                          | Q(language=None) | Q(language='')))
-    language_specific_template = _get_language_specific_template(two_letter_language,
-                                                                 language_or_default_templates)
+    language_or_default_templates = list(
+        templates.filter(Q(language=two_letter_language) | Q(language=None) | Q(language=""))
+    )
+    language_specific_template = _get_language_specific_template(two_letter_language, language_or_default_templates)
     if language_specific_template:
         return language_specific_template
     else:
@@ -537,7 +515,7 @@ def _get_all_languages_or_default_template(templates):
     Returns the first template that isn't language specific
     """
     for template in templates:
-        if template.language == '':
+        if template.language == "":
             return template
 
     return templates[0] if templates else None
@@ -550,8 +528,8 @@ def _get_two_letter_language_code(language_code):
     """
     if language_code is None:
         return None
-    elif language_code == '':
-        return ''
+    elif language_code == "":
+        return ""
     else:
         return language_code[:2]
 
@@ -560,7 +538,7 @@ def get_asset_url_by_slug(asset_slug):
     """
     Returns certificate template asset url for given asset_slug.
     """
-    asset_url = ''
+    asset_url = ""
     try:
         template_asset = CertificateTemplateAsset.objects.get(asset_slug=asset_slug)
         asset_url = template_asset.asset.url
@@ -592,17 +570,17 @@ def get_certificate_footer_context():
     # get Terms of Service and Honor Code page url
     terms_of_service_and_honor_code = branding_api.get_tos_and_honor_code_url()
     if terms_of_service_and_honor_code != branding_api.EMPTY_URL:
-        data.update({'company_tos_url': terms_of_service_and_honor_code})
+        data.update({"company_tos_url": terms_of_service_and_honor_code})
 
     # get Privacy Policy page url
     privacy_policy = branding_api.get_privacy_url()
     if privacy_policy != branding_api.EMPTY_URL:
-        data.update({'company_privacy_url': privacy_policy})
+        data.update({"company_privacy_url": privacy_policy})
 
     # get About page url
     about = branding_api.get_about_url()
     if about != branding_api.EMPTY_URL:
-        data.update({'company_about_url': about})
+        data.update({"company_about_url": about})
 
     return data
 
@@ -631,7 +609,7 @@ def certificates_viewable_for_course(course):
         course.certificates_show_before_end,
         course.has_ended(),
         course.certificate_available_date,
-        course.self_paced
+        course.self_paced,
     )
 
 
@@ -650,9 +628,9 @@ def create_or_update_certificate_allowlist_entry(user, course_key, notes, enable
         user=user,
         course_id=course_key,
         defaults={
-            'allowlist': enabled,
-            'notes': notes,
-        }
+            "allowlist": enabled,
+            "notes": notes,
+        },
     )
 
     log.info(f"Updated the allowlist of course {course_key} with student {user.id} and enabled={enabled}")
@@ -675,7 +653,7 @@ def remove_allowlist_entry(user, course_key):
         certificate = get_certificate_for_user(user.username, course_key, False)
         if certificate:
             log.info(f"Invalidating certificate for student {user.id} in course {course_key} before allowlist removal.")
-            certificate.invalidate(source='allowlist_removal')
+            certificate.invalidate(source="allowlist_removal")
 
         log.info(f"Removing student {user.id} from the allowlist in course {course_key}.")
         allowlist_entry.delete()
@@ -735,10 +713,10 @@ def create_certificate_invalidation_entry(certificate, user_requesting_invalidat
     certificate_invalidation, __ = CertificateInvalidation.objects.update_or_create(
         generated_certificate=certificate,
         defaults={
-            'active': True,
-            'invalidated_by': user_requesting_invalidation,
-            'notes': notes,
-        }
+            "active": True,
+            "invalidated_by": user_requesting_invalidation,
+            "notes": notes,
+        },
     )
 
     return certificate_invalidation
@@ -772,10 +750,7 @@ def get_enrolled_allowlisted_users(course_key):
     - are allowlisted in this course run
     """
     users = CourseEnrollment.objects.users_enrolled_in(course_key)
-    return users.filter(
-        certificateallowlist__course_id=course_key,
-        certificateallowlist__allowlist=True
-    )
+    return users.filter(certificateallowlist__course_id=course_key, certificateallowlist__allowlist=True)
 
 
 def get_enrolled_allowlisted_not_passing_users(course_key):
@@ -787,8 +762,7 @@ def get_enrolled_allowlisted_not_passing_users(course_key):
     """
     users = get_enrolled_allowlisted_users(course_key)
     return users.exclude(
-        generatedcertificate__course_id=course_key,
-        generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
+        generatedcertificate__course_id=course_key, generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
     )
 
 
@@ -796,10 +770,10 @@ def certificate_info_for_user(user, course_id, grade, user_is_allowlisted, user_
     """
     Returns the certificate info for a user for grade report.
     """
-    certificate_is_delivered = 'N'
-    certificate_type = 'N/A'
+    certificate_is_delivered = "N"
+    certificate_type = "N/A"
     status = _certificate_status(user_certificate)
-    certificate_generated = status['status'] == CertificateStatuses.downloadable
+    certificate_generated = status["status"] == CertificateStatuses.downloadable
     course_overview = get_course_overview_or_none(course_id)
     if not course_overview:
         return None
@@ -808,18 +782,17 @@ def certificate_info_for_user(user, course_id, grade, user_is_allowlisted, user_
         course_overview.certificates_show_before_end,
         course_overview.has_ended(),
         course_overview.certificate_available_date,
-        course_overview.self_paced
+        course_overview.self_paced,
     )
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_id)
     mode_is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
     user_is_verified = grade is not None and mode_is_verified
 
-    eligible_for_certificate = 'Y' if (user_is_allowlisted or user_is_verified or certificate_generated) \
-        else 'N'
+    eligible_for_certificate = "Y" if (user_is_allowlisted or user_is_verified or certificate_generated) else "N"
 
     if certificate_generated and can_have_certificate:
-        certificate_is_delivered = 'Y'
-        certificate_type = status['mode']
+        certificate_is_delivered = "Y"
+        certificate_type = status["mode"]
 
     return [eligible_for_certificate, certificate_is_delivered, certificate_type]
 
@@ -854,11 +827,11 @@ def can_show_certificate_message(course, student, course_grade, certificates_ena
     has_passed_or_is_allowlisted = _has_passed_or_is_allowlisted(course, student, course_grade)
 
     return (
-        (auto_cert_gen_enabled or certificates_enabled_for_course) and
-        has_active_enrollment and
-        certificates_are_viewable and
-        has_passed_or_is_allowlisted and
-        (not is_beta_tester)
+        (auto_cert_gen_enabled or certificates_enabled_for_course)
+        and has_active_enrollment
+        and certificates_are_viewable
+        and has_passed_or_is_allowlisted
+        and (not is_beta_tester)
     )
 
 
@@ -876,7 +849,7 @@ def _course_uses_available_date(course):
     )
 
 
-def available_date_for_certificate(course, certificate):
+def available_date_for_certificate(course, certificate) -> datetime:
     """
     Returns the available date to use with a certificate
 
@@ -935,21 +908,34 @@ def invalidate_certificate(user_id, course_key_or_id, source):
     """
     course_key = _get_key(course_key_or_id, CourseKey)
     if _is_on_certificate_allowlist(user_id, course_key):
-        log.info(f'User {user_id} is on the allowlist for {course_key}. The certificate will not be invalidated.')
+        log.info(f"User {user_id} is on the allowlist for {course_key}. The certificate will not be invalidated.")
         return False
 
     try:
-        generated_certificate = GeneratedCertificate.objects.get(
-            user=user_id,
-            course_id=course_key
-        )
+        generated_certificate = GeneratedCertificate.objects.get(user=user_id, course_id=course_key)
         generated_certificate.invalidate(source=source)
     except ObjectDoesNotExist:
         log.warning(
-            'Invalidation failed because a certificate for user %d in course %s does not exist.',
-            user_id,
-            course_key
+            "Invalidation failed because a certificate for user %d in course %s does not exist.", user_id, course_key
         )
         return False
 
     return True
+
+
+def clear_pii_from_certificate_records_for_user(user):
+    """
+    Utility function to remove PII from certificate records when a learner's account is being retired. Used by the
+    `AccountRetirementView` in the `user_api` Django app (invoked by the /api/user/v1/accounts/retire endpoint).
+
+    The update is performed using a bulk SQL update via the Django ORM. This will not trigger the GeneratedCertificate
+    model's custom `save()` function, nor fire any Django signals (which is desired at the time of writing). There is
+    nothing to update in our external systems by this update.
+
+    Args:
+        user (User): The User instance of the learner actively being retired.
+
+    Returns:
+        None
+    """
+    GeneratedCertificate.objects.filter(user=user).update(name="")

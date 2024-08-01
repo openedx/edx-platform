@@ -21,6 +21,7 @@ from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TEAM_SCHEME
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -57,6 +58,7 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -90,7 +92,6 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_editor,
     use_new_video_uploads_page,
     use_new_custom_pages,
-    use_tagging_taxonomy_list_page,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -456,7 +457,7 @@ def get_textbooks_url(course_locator) -> str:
     textbooks_url = None
     if use_new_textbooks_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/pages-and-resources/textbooks'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/textbooks'
         if mfe_base_url:
             textbooks_url = course_mfe_url
     return textbooks_url
@@ -488,16 +489,19 @@ def get_custom_pages_url(course_locator) -> str:
     return custom_pages_url
 
 
-def get_taxonomy_list_url():
+def get_taxonomy_list_url() -> str | None:
     """
     Gets course authoring microfrontend URL for taxonomy list page view.
     """
-    taxonomy_list_url = None
-    if use_tagging_taxonomy_list_page():
-        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        if mfe_base_url:
-            taxonomy_list_url = f'{mfe_base_url}/taxonomies'
-    return taxonomy_list_url
+    if is_tagging_feature_disabled():
+        return None
+
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+
+    if not mfe_base_url:
+        return None
+
+    return f'{mfe_base_url}/taxonomies'
 
 
 def get_taxonomy_tags_widget_url(course_locator=None) -> str | None:
@@ -506,15 +510,18 @@ def get_taxonomy_tags_widget_url(course_locator=None) -> str | None:
 
     The `content_id` needs to be appended to the end of the URL when using it.
     """
-    taxonomy_tags_widget_url = None
-    # Uses the same waffle flag as taxonomy list page
-    if use_tagging_taxonomy_list_page():
+    if is_tagging_feature_disabled():
+        return None
+
+    if course_locator:
+        mfe_base_url = get_course_authoring_url(course_locator)
+    else:
         mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        if course_locator:
-            mfe_base_url = get_course_authoring_url(course_locator)
-        if mfe_base_url:
-            taxonomy_tags_widget_url = f'{mfe_base_url}/tagging/components/widget/'
-    return taxonomy_tags_widget_url
+
+    if not mfe_base_url:
+        return None
+
+    return f'{mfe_base_url}/tagging/components/widget/'
 
 
 def course_import_olx_validation_is_enabled():
@@ -838,6 +845,9 @@ def get_visibility_partition_info(xblock, course=None):
     for partition in enrollment_user_partitions:
         if len(partition["groups"]) > 1 or any(group["selected"] for group in partition["groups"]):
             selectable_partitions.append(partition)
+
+    team_user_partitions = get_user_partition_info(xblock, schemes=["team"], course=course)
+    selectable_partitions += team_user_partitions
 
     course_key = xblock.scope_ids.usage_id.course_key
     is_library = isinstance(course_key, LibraryLocator)
@@ -1482,7 +1492,8 @@ def get_course_grading(course_key):
         'grading_url': reverse_course_url('grading_handler', course_key),
         'is_credit_course': is_credit_course(course_key),
         'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
-        'course_assignment_lists': dict(course_assignment_lists)
+        'course_assignment_lists': dict(course_assignment_lists),
+        'default_grade_designations': settings.DEFAULT_GRADE_DESIGNATIONS
     }
 
     return grading_context
@@ -1659,7 +1670,7 @@ def get_home_context(request, no_course=False):
         LIBRARY_AUTHORING_MICROFRONTEND_URL,
         LIBRARIES_ENABLED,
         should_redirect_to_library_authoring_mfe,
-        user_can_create_library,
+        user_can_view_create_library_button,
     )
 
     active_courses = []
@@ -1683,12 +1694,13 @@ def get_home_context(request, no_course=False):
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
-        'taxonomies_enabled': use_tagging_taxonomy_list_page(),
+        'taxonomies_enabled': not is_tagging_feature_disabled(),
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         'taxonomy_list_mfe_url': get_taxonomy_list_url(),
         'libraries': libraries,
-        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+        'show_new_library_button': user_can_view_create_library_button(user)
+        and not should_redirect_to_library_authoring_mfe(),
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
@@ -1979,7 +1991,7 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
     prev_url = quote_plus(prev_url) if prev_url else None
     next_url = quote_plus(next_url) if next_url else None
 
-    show_unit_tags = use_tagging_taxonomy_list_page()
+    show_unit_tags = not is_tagging_feature_disabled()
     unit_tags = None
     if show_unit_tags and is_unit_page:
         unit_tags = get_unit_tags(usage_key)
@@ -2049,6 +2061,136 @@ def get_textbooks_context(course):
     }
 
 
+def get_certificates_context(course, user):
+    """
+    Utils is used to get context for container xblock requests.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.certificates import CertificateManager
+
+    course_key = course.id
+    certificate_url = reverse_course_url('certificates_list_handler', course_key)
+    course_outline_url = reverse_course_url('course_handler', course_key)
+    upload_asset_url = reverse_course_url('assets_handler', course_key)
+    activation_handler_url = reverse_course_url(
+        handler_name='certificate_activation_handler',
+        course_key=course_key
+    )
+    course_modes = [
+        mode.slug for mode in CourseMode.modes_for_course(
+            course_id=course_key, include_expired=True
+        ) if mode.slug != 'audit'
+    ]
+
+    has_certificate_modes = len(course_modes) > 0
+
+    if has_certificate_modes:
+        certificate_web_view_url = get_lms_link_for_certificate_web_view(
+            course_key=course_key,
+            mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
+        )
+    else:
+        certificate_web_view_url = None
+
+    is_active, certificates = CertificateManager.is_activated(course)
+    context = {
+        'context_course': course,
+        'certificate_url': certificate_url,
+        'course_outline_url': course_outline_url,
+        'upload_asset_url': upload_asset_url,
+        'certificates': certificates,
+        'has_certificate_modes': has_certificate_modes,
+        'course_modes': course_modes,
+        'certificate_web_view_url': certificate_web_view_url,
+        'is_active': is_active,
+        'is_global_staff': GlobalStaff().has_user(user),
+        'certificate_activation_handler_url': activation_handler_url,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
+    }
+
+    return context
+
+
+def get_group_configurations_context(course, store):
+    """
+    Utils is used to get context for course's group configurations.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.course_group_config import (
+        COHORT_SCHEME, ENROLLMENT_SCHEME, GroupConfiguration, RANDOM_SCHEME
+    )
+    from cms.djangoapps.contentstore.views.course import (
+        are_content_experiments_enabled
+    )
+    from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+
+    course_key = course.id
+    group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+    course_outline_url = reverse_course_url('course_handler', course_key)
+    should_show_experiment_groups = are_content_experiments_enabled(course)
+    if should_show_experiment_groups:
+        experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(store, course)
+    else:
+        experiment_group_configurations = None
+
+    all_partitions = GroupConfiguration.get_all_user_partition_details(store, course)
+    should_show_enrollment_track = False
+    has_content_groups = False
+    displayable_partitions = []
+    for partition in all_partitions:
+        partition['read_only'] = getattr(UserPartition.get_scheme(partition['scheme']), 'read_only', False)
+
+        if partition['scheme'] == COHORT_SCHEME:
+            has_content_groups = True
+            displayable_partitions.append(partition)
+        elif partition['scheme'] == CONTENT_TYPE_GATING_SCHEME:
+            # Add it to the front of the list if it should be shown.
+            if ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
+                displayable_partitions.append(partition)
+        elif partition['scheme'] == ENROLLMENT_SCHEME:
+            should_show_enrollment_track = len(partition['groups']) > 1
+
+            # Add it to the front of the list if it should be shown.
+            if should_show_enrollment_track:
+                displayable_partitions.insert(0, partition)
+        elif partition['scheme'] == TEAM_SCHEME:
+            should_show_team_partitions = len(partition['groups']) > 0 and CONTENT_GROUPS_FOR_TEAMS.is_enabled(
+                course_key
+            )
+            if should_show_team_partitions:
+                displayable_partitions.append(partition)
+        elif partition['scheme'] != RANDOM_SCHEME:
+            # Experiment group configurations are handled explicitly above. We don't
+            # want to display their groups twice.
+            displayable_partitions.append(partition)
+
+    # Set the sort-order. Higher numbers sort earlier
+    scheme_priority = defaultdict(lambda: -1, {
+        ENROLLMENT_SCHEME: 1,
+        CONTENT_TYPE_GATING_SCHEME: 0
+    })
+    displayable_partitions.sort(key=lambda p: scheme_priority[p['scheme']], reverse=True)
+    # Add empty content group if there is no COHORT User Partition in the list.
+    # This will add ability to add new groups in the view.
+    if not has_content_groups:
+        displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
+
+    context = {
+        'context_course': course,
+        'group_configuration_url': group_configuration_url,
+        'course_outline_url': course_outline_url,
+        'experiment_group_configurations': experiment_group_configurations,
+        'should_show_experiment_groups': should_show_experiment_groups,
+        'all_group_configurations': displayable_partitions,
+        'should_show_enrollment_track': should_show_enrollment_track,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
+    }
+
+    return context
+
+
 class StudioPermissionsService:
     """
     Service that can provide information about a user's permissions.
@@ -2070,11 +2212,19 @@ class StudioPermissionsService:
         return has_studio_write_access(self._user, course_key)
 
 
-def track_course_update_event(course_key, user, event_data=None):
+def track_course_update_event(course_key, user, course_update_content=None):
     """
     Track course update event
     """
     event_name = 'edx.contentstore.course_update'
+    event_data = {}
+    html_content = course_update_content.get("content", "")
+    str_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(html_content))
+
+    event_data['content'] = str_content
+    event_data['date'] = course_update_content.get("date", "")
+    event_data['id'] = course_update_content.get("id", "")
+    event_data['status'] = course_update_content.get("status", "")
     event_data['course_id'] = str(course_key)
     event_data['user_id'] = str(user.id)
     event_data['user_forums_roles'] = [
@@ -2083,6 +2233,7 @@ def track_course_update_event(course_key, user, event_data=None):
     event_data['user_course_roles'] = [
         role.role for role in user.courseaccessrole_set.filter(course_id=str(course_key))
     ]
+
     context = contexts.course_context_from_course_id(course_key)
     with tracker.get_tracker().context(event_name, context):
         tracker.emit(event_name, event_data)
@@ -2101,7 +2252,7 @@ def send_course_update_notification(course_key, content, user):
     notification_data = CourseNotificationData(
         course_key=course_key,
         content_context={
-            "course_update_content": text_content,
+            "course_update_content": text_content if len(text_content.strip()) < 10 else "Click here to view",
             **extra_context,
         },
         notification_type="course_update",
@@ -2110,3 +2261,60 @@ def send_course_update_notification(course_key, content, user):
         audience_filters={},
     )
     COURSE_NOTIFICATION_REQUESTED.send_event(course_notification_data=notification_data)
+
+
+def get_xblock_validation_messages(xblock):
+    """
+    Retrieves validation messages for a given xblock.
+
+    Args:
+        xblock: The xblock object to validate.
+
+    Returns:
+        list: A list of validation error messages.
+    """
+    validation_json = xblock.validate().to_json()
+    return validation_json['messages']
+
+
+def get_xblock_render_error(request, xblock):
+    """
+    Checks if there are any rendering errors for a given block and return these.
+
+    Args:
+        request: WSGI request object
+        xblock: The xblock object to rendering.
+
+    Returns:
+        str: Error message which happened while rendering of xblock.
+    """
+    from cms.djangoapps.contentstore.views.preview import _load_preview_block
+    from xmodule.studio_editable import has_author_view
+    from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
+
+    def get_xblock_render_context(request, block):
+        """
+        Return a dict of the data needs for render of each block.
+        """
+        can_edit = has_studio_write_access(request.user, block.usage_key.course_key)
+
+        return {
+            "is_unit_page": False,
+            "can_edit": can_edit,
+            "root_xblock": xblock,
+            "reorderable_items": set(),
+            "paging": None,
+            "force_render": None,
+            "item_url": "/container/{block.location}",
+            "tags_count_map": {},
+        }
+
+    try:
+        block = _load_preview_block(request, xblock)
+        preview_view = AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
+        render_context = get_xblock_render_context(request, block)
+        block.render(preview_view, render_context)
+    except Exception as exc:  # pylint: disable=broad-except
+        return str(exc)
+
+    return ""

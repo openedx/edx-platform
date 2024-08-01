@@ -63,8 +63,12 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
+from openedx.core.djangoapps.user_authn.views.utils import get_auto_generated_username
 from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
-from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
+from openedx.core.djangoapps.user_authn.toggles import (
+    is_require_third_party_auth_enabled,
+    is_auto_generated_username_enabled
+)
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
@@ -389,6 +393,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
             'activation_key': registration.activation_key if registration else None,
             'host': params.get('host', ''),
+            'app_name': params.get('app_name', ''),
             'utm_campaign': params.get('utm_campaign', ''),
         }
         # VAN-738 - added below properties to experiment marketing emails opt in/out events on Braze.
@@ -573,6 +578,9 @@ class RegistrationView(APIView):
 
         data = request.POST.copy()
         self._handle_terms_of_service(data)
+
+        if is_auto_generated_username_enabled() and 'username' not in data:
+            data['username'] = get_auto_generated_username(data)
 
         try:
             data = StudentRegistrationRequested.run_filter(form_data=data)

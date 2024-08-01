@@ -2,12 +2,13 @@
 Tests for django admin commands in the verify_student module
 
 """
-
+import ddt
 import logging
 import os
 import tempfile
 
 import pytest
+from django.core import mail
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 from testfixtures import LogCapture
@@ -18,6 +19,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.approve_id_verifications'
 
 
+@ddt.ddt
 class TestApproveIDVerificationsCommand(TestCase):
     """
     Tests for django admin commands in the verify_student module
@@ -50,7 +52,8 @@ class TestApproveIDVerificationsCommand(TestCase):
         with open(file_path, 'w') as temp_file:
             temp_file.write(str("\n".join(user_ids)))
 
-    def test_approve_id_verifications(self):
+    @ddt.data('submitted', 'must_retry')
+    def test_approve_id_verifications(self, status):
         """
         Tests that the approve_id_verifications management command executes successfully.
         """
@@ -59,7 +62,7 @@ class TestApproveIDVerificationsCommand(TestCase):
             SoftwareSecurePhotoVerification.objects.create(
                 user=user.user,
                 name=user.name,
-                status='submitted',
+                status=status,
             )
 
         assert SoftwareSecurePhotoVerification.objects.filter(status='approved').count() == 0
@@ -67,6 +70,35 @@ class TestApproveIDVerificationsCommand(TestCase):
         call_command('approve_id_verifications', self.tmp_file_path)
 
         assert SoftwareSecurePhotoVerification.objects.filter(status='approved').count() == 3
+
+    @ddt.data('submitted', 'must_retry')
+    def test_approve_id_verifications_email(self, status):
+        """
+        Tests that the approve_id_verifications management command correctly sends approval emails.
+        """
+        # Create SoftwareSecurePhotoVerification instances for the users.
+        for user in [self.user1_profile, self.user2_profile]:
+            SoftwareSecurePhotoVerification.objects.create(
+                user=user.user,
+                name=user.name,
+                status=status,
+            )
+        SoftwareSecurePhotoVerification.objects.create(
+            user=self.user3_profile.user,
+            name=self.user3_profile.name,
+            status='denied',
+        )
+
+        call_command('approve_id_verifications', self.tmp_file_path)
+
+        assert len(mail.outbox) == 2
+
+        # All three emails should have equal expiration dates, so just pick one from an attempt.
+        expiration_date = SoftwareSecurePhotoVerification.objects.first().expiration_datetime
+        for email in mail.outbox:
+            assert email.subject == 'Your édX ID verification was approved!'
+            assert 'Your édX ID verification photos have been approved' in email.body
+            assert expiration_date.strftime("%m/%d/%Y") in email.body
 
     def test_user_does_not_exist_log(self):
         """

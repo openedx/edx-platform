@@ -64,6 +64,9 @@ class StagedContent(models.Model):
     # a new url_name instead.
     suggested_url_name = models.CharField(max_length=1024)
 
+    # Tags applied to the original source block(s) will be copied to the new block(s) on paste.
+    tags = models.JSONField(null=True, help_text=_("Content tags applied to these blocks"))
+
     @property
     def olx_filename(self) -> str:
         """ Get a filename that can be used for the OLX content of this staged content """

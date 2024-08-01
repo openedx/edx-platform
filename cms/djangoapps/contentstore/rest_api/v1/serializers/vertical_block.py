@@ -5,11 +5,20 @@ API Serializers for unit page
 from django.urls import reverse
 from rest_framework import serializers
 
-from cms.djangoapps.contentstore.toggles import use_tagging_taxonomy_list_page
 from cms.djangoapps.contentstore.helpers import (
     xblock_studio_url,
     xblock_type_display_name,
 )
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
+
+
+class MessageValidation(serializers.Serializer):
+    """
+    Serializer for representing XBlock error.
+    """
+
+    text = serializers.CharField()
+    type = serializers.CharField()
 
 
 class ChildAncestorSerializer(serializers.Serializer):
@@ -105,14 +114,31 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
     user_partition_info = serializers.DictField()
     user_partitions = serializers.ListField()
     actions = serializers.SerializerMethodField()
+    validation_messages = MessageValidation(many=True)
+    render_error = serializers.CharField()
 
     def get_actions(self, obj):  # pylint: disable=unused-argument
         """
         Method to get actions for each child xlock of the unit.
         """
 
-        can_manage_tags = use_tagging_taxonomy_list_page()
+        can_manage_tags = not is_tagging_feature_disabled()
+        xblock = obj["xblock"]
+        is_course = xblock.scope_ids.usage_id.context_key.is_course
+        xblock_url = xblock_studio_url(xblock)
+        # Responsible for the ability to edit container xblock(copy, duplicate, move and manage access).
+        # It was used in the legacy and transferred here with simplification.
+        # After the investigation it was determined that the "show_other_action"
+        # condition below is sufficient to enable/disable actions on each xblock.
+        show_inline = xblock.has_children and not xblock_url
+        # All except delete and manage tags
+        show_other_action = not show_inline and is_course
         actions = {
+            "can_copy": show_other_action,
+            "can_duplicate": show_other_action,
+            "can_move": show_other_action,
+            "can_manage_access": show_other_action,
+            "can_delete": is_course,
             "can_manage_tags": can_manage_tags,
         }
 
@@ -126,3 +152,4 @@ class VerticalContainerSerializer(serializers.Serializer):
 
     children = ChildVerticalContainerSerializer(many=True)
     is_published = serializers.BooleanField()
+    can_paste_component = serializers.BooleanField()

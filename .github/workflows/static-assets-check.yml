@@ -12,11 +12,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
-        python-version: [ 3.8 ]
-        node-version: [ 16 ]
-        npm-version: [ 8.5.x ]
-        mongo-version: ["4.4", "7.0"]
+        os: [ubuntu-20.04]
+        python-version:
+          - "3.11"
+        node-version: [18, 20]
+        npm-version: [10.5.x]
+        mongo-version:
+          - "7.0"
 
     services:
       mongo:
@@ -32,55 +34,73 @@ jobs:
           --health-retries 3
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install system Packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install libxmlsec1-dev pkg-config
+      - name: Install system Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install libxmlsec1-dev pkg-config
 
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Setup npm
-      run: npm i -g npm@${{ matrix.npm-version }}
+      - name: Setup npm
+        run: npm i -g npm@${{ matrix.npm-version }}
 
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: |
+          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
 
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
 
-    - name: Install Required Python Dependencies
-      run: |
-        make base-requirements
+      - name: Install Limited Python Deps for Build
+        run: |
+          pip install -r requirements/edx/assets.txt
 
-    - name: Initiate Mongo DB Service
-      run: sudo systemctl start mongod
+      - name: Initiate Mongo DB Service
+        run: sudo systemctl start mongod
 
-    - name: Add node_modules bin to $Path
-      run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
+      - name: Add node_modules bin to $Path
+        run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
 
-    - name: Run Static Assets Check
-      env:
-        LMS_CFG: lms/envs/minimal.yml
-        CMS_CFG: lms/envs/minimal.yml
+      - name: Check Dev Assets Build
+        env:
+          COMPREHENSIVE_THEMES_DIR: ./themes
+        run: |
+          npm clean-install --dev
+          npm run build-dev
 
-      run: |
-        paver update_assets lms
-        paver update_assets cms
+      - name: Check Prod Assets Build
+        env:
+          COMPREHENSIVE_THEMES_DIR: ./themes
+        run: |
+          npm clean-install
+          npm run build
+
+      - name: Install Full Python Deps for Collection
+        run: |
+          pip install -r requirements/edx/base.txt -e .
+
+      - name: Check Assets Collection
+        env:
+          LMS_CFG: lms/envs/minimal.yml
+          CMS_CFG: lms/envs/minimal.yml
+          DJANGO_SETTINGS_MODULE: lms.envs.production
+        run: |
+          ./manage.py lms collectstatic --noinput
+          ./manage.py cms collectstatic --noinput

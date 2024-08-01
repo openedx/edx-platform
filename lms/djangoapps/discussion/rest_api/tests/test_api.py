@@ -189,6 +189,10 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         with pytest.raises(DiscussionDisabledError):
             get_course(self.request, _discussion_disabled_course_for(self.user).id)
 
+    def test_discussions_disabled_v2(self):
+        data = get_course(self.request, _discussion_disabled_course_for(self.user).id, False)
+        assert data['show_discussions'] is False
+
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
@@ -211,6 +215,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'user_roles': {'Student'},
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
+            'show_discussions': True,
         }
 
     @ddt.data(
@@ -2123,19 +2128,6 @@ class CreateThreadTest(
         assert cs_request.method == 'POST'
         assert parsed_body(cs_request) == {'source_type': ['thread'], 'source_id': ['test_id']}
 
-    def test_voted(self):
-        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
-        self.register_thread_votes_response("test_id")
-        data = self.minimal_data.copy()
-        data["voted"] = "True"
-        with self.assert_signal_sent(api, 'thread_voted', sender=None, user=self.user, exclude_args=('post',)):
-            result = create_thread(self.request, data)
-        assert result['voted'] is True
-        cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/votes'  # lint-amnesty, pylint: disable=no-member
-        assert cs_request.method == 'PUT'
-        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)], 'value': ['up']}
-
     def test_abuse_flagged(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_thread_flag_response("test_id")
@@ -2273,7 +2265,7 @@ class CreateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
             "child_count": 0,
             "can_delete": True,
             "anonymous": False,
@@ -2349,7 +2341,7 @@ class CreateCommentTest(
             "abuse_flagged",
             "anonymous",
             "raw_body",
-            "voted",
+            "voted"
         ]
         if parent_id:
             data["parent_id"] = parent_id
@@ -2479,19 +2471,6 @@ class CreateCommentTest(
             assert not expected_error
         except ValidationError:
             assert expected_error
-
-    def test_voted(self):
-        self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
-        self.register_comment_votes_response("test_comment")
-        data = self.minimal_data.copy()
-        data["voted"] = "True"
-        with self.assert_signal_sent(api, 'comment_voted', sender=None, user=self.user, exclude_args=('post',)):
-            result = create_comment(self.request, data)
-        assert result['voted'] is True
-        cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/votes'  # lint-amnesty, pylint: disable=no-member
-        assert cs_request.method == 'PUT'
-        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)], 'value': ['up']}
 
     def test_abuse_flagged(self):
         self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
@@ -2636,6 +2615,17 @@ class UpdateThreadTest(
         cs_data.update(overrides or {})
         self.register_get_thread_response(cs_data)
         self.register_put_thread_response(cs_data)
+
+    def create_user_with_request(self):
+        """
+        Create a user and an associated request for a specific course enrollment.
+        """
+        user = UserFactory.create()
+        self.register_get_user_response(user)
+        request = RequestFactory().get("/test_path")
+        request.user = user
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+        return user, request
 
     def test_empty(self):
         """Check that an empty update does not make any modifying requests."""
@@ -2808,12 +2798,15 @@ class UpdateThreadTest(
         are the same, no update should be made. Otherwise, a vote should be PUT
         or DELETEd according to the new_vote_status value.
         """
+        #setup
+        user1, request1 = self.create_user_with_request()
+
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
         self.register_thread_votes_response("test_thread")
         self.register_thread()
         data = {"voted": new_vote_status}
-        result = update_thread(self.request, "test_thread", data)
+        result = update_thread(request1, "test_thread", data)
         assert result['voted'] == new_vote_status
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         votes_url = "/api/v1/threads/test_thread/votes"
@@ -2827,7 +2820,7 @@ class UpdateThreadTest(
                 parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
-            expected_request_data = {"user_id": [str(self.user.id)]}
+            expected_request_data = {"user_id": [str(user1.id)]}
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             assert actual_request_data == expected_request_data
@@ -2853,21 +2846,22 @@ class UpdateThreadTest(
         """
         #setup
         starting_vote_count = 0
+        user, request = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            self.register_get_user_response(user, upvoted_ids=["test_thread"])
             starting_vote_count = 1
         self.register_thread_votes_response("test_thread")
         self.register_thread(overrides={"votes": {"up_count": starting_vote_count}})
 
         #first vote
         data = {"voted": first_vote}
-        result = update_thread(self.request, "test_thread", data)
+        result = update_thread(request, "test_thread", data)
         self.register_thread(overrides={"voted": first_vote})
         assert result['vote_count'] == (1 if first_vote else 0)
 
         #second vote
         data = {"voted": second_vote}
-        result = update_thread(self.request, "test_thread", data)
+        result = update_thread(request, "test_thread", data)
         assert result['vote_count'] == (1 if second_vote else 0)
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
@@ -2883,22 +2877,19 @@ class UpdateThreadTest(
         Tests vote_count increases and decreases correctly from different users
         """
         #setup
-        user2 = UserFactory.create()
-        self.register_get_user_response(user2)
-        request2 = RequestFactory().get("/test_path")
-        request2.user = user2
-        CourseEnrollmentFactory.create(user=user2, course_id=self.course.id)
+        user1, request1 = self.create_user_with_request()
+        user2, request2 = self.create_user_with_request()
 
         vote_count = 0
         if current_user1_vote:
-            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
             vote_count += 1
         if current_user2_vote:
             self.register_get_user_response(user2, upvoted_ids=["test_thread"])
             vote_count += 1
 
         for (current_vote, user_vote, request) in \
-                [(current_user1_vote, user1_vote, self.request),
+                [(current_user1_vote, user1_vote, request1),
                  (current_user2_vote, user2_vote, request2)]:
 
             self.register_thread_votes_response("test_thread")
@@ -3197,6 +3188,17 @@ class UpdateCommentTest(
         self.register_get_comment_response(cs_comment_data)
         self.register_put_comment_response(cs_comment_data)
 
+    def create_user_with_request(self):
+        """
+        Create a user and an associated request for a specific course enrollment.
+        """
+        user = UserFactory.create()
+        self.register_get_user_response(user)
+        request = RequestFactory().get("/test_path")
+        request.user = user
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+        return user, request
+
     def test_empty(self):
         """Check that an empty update does not make any modifying requests."""
         self.register_comment()
@@ -3230,7 +3232,7 @@ class UpdateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
             "child_count": 0,
             "can_delete": True,
             "last_edit": None,
@@ -3389,13 +3391,14 @@ class UpdateCommentTest(
         or DELETEd according to the new_vote_status value.
         """
         vote_count = 0
+        user1, request1 = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
             vote_count = 1
         self.register_comment_votes_response("test_comment")
         self.register_comment(overrides={"votes": {"up_count": vote_count}})
         data = {"voted": new_vote_status}
-        result = update_comment(self.request, "test_comment", data)
+        result = update_comment(request1, "test_comment", data)
         assert result['vote_count'] == (1 if new_vote_status else 0)
         assert result['voted'] == new_vote_status
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
@@ -3410,7 +3413,7 @@ class UpdateCommentTest(
                 parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
-            expected_request_data = {"user_id": [str(self.user.id)]}
+            expected_request_data = {"user_id": [str(user1.id)]}
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             assert actual_request_data == expected_request_data
@@ -3437,21 +3440,22 @@ class UpdateCommentTest(
         """
         #setup
         starting_vote_count = 0
+        user1, request1 = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
             starting_vote_count = 1
         self.register_comment_votes_response("test_comment")
         self.register_comment(overrides={"votes": {"up_count": starting_vote_count}})
 
         #first vote
         data = {"voted": first_vote}
-        result = update_comment(self.request, "test_comment", data)
+        result = update_comment(request1, "test_comment", data)
         self.register_comment(overrides={"voted": first_vote})
         assert result['vote_count'] == (1 if first_vote else 0)
 
         #second vote
         data = {"voted": second_vote}
-        result = update_comment(self.request, "test_comment", data)
+        result = update_comment(request1, "test_comment", data)
         assert result['vote_count'] == (1 if second_vote else 0)
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
@@ -3466,22 +3470,19 @@ class UpdateCommentTest(
         """
         Tests vote_count increases and decreases correctly from different users
         """
-        user2 = UserFactory.create()
-        self.register_get_user_response(user2)
-        request2 = RequestFactory().get("/test_path")
-        request2.user = user2
-        CourseEnrollmentFactory.create(user=user2, course_id=self.course.id)
+        user1, request1 = self.create_user_with_request()
+        user2, request2 = self.create_user_with_request()
 
         vote_count = 0
         if current_user1_vote:
-            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
             vote_count += 1
         if current_user2_vote:
             self.register_get_user_response(user2, upvoted_ids=["test_comment"])
             vote_count += 1
 
         for (current_vote, user_vote, request) in \
-                [(current_user1_vote, user1_vote, self.request),
+                [(current_user1_vote, user1_vote, request1),
                  (current_user2_vote, user2_vote, request2)]:
 
             self.register_comment_votes_response("test_comment")
