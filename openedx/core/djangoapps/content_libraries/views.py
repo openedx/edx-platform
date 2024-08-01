@@ -487,7 +487,7 @@ class LibraryCommitView(APIView):
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.publish_changes(key)
+        api.publish_changes(key, request.user.id)
         return Response({})
 
     @convert_exceptions
@@ -556,7 +556,7 @@ class LibraryBlocksView(GenericAPIView):
 
         # Create a new regular top-level block:
         try:
-            result = api.create_library_block(library_key, **serializer.validated_data)
+            result = api.create_library_block(library_key, user_id=request.user.id, **serializer.validated_data)
         except api.IncompatibleTypesError as err:
             raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 detail={'block_type': str(err)},
