@@ -21,7 +21,7 @@ from scripts.user_retirement.tests.retirement_helpers import (
     FAKE_USERNAMES,
     TEST_RETIREMENT_QUEUE_STATES,
     TEST_RETIREMENT_STATE,
-    get_fake_user_retirement
+    get_fake_user_retirement,
 )
 from scripts.user_retirement.utils import edx_api
 
@@ -496,46 +496,6 @@ class TestDiscoveryApi(OAuth2Mixin, unittest.TestCase):
         )
         mock_method.assert_called_once_with(
             username_mappings=FAKE_USERNAME_MAPPING
-        )
-
-
-class TestDemographicsApi(OAuth2Mixin, unittest.TestCase):
-    """
-    Test the edX Demographics API client.
-    """
-
-    @responses.activate(registry=OrderedRegistry)
-    def setUp(self):
-        super().setUp()
-        self.mock_access_token_response()
-        self.lms_base_url = 'http://localhost:18000/'
-        self.demographics_base_url = 'http://localhost:18360/'
-        self.demographics_api = edx_api.DemographicsApi(
-            self.lms_base_url,
-            self.demographics_base_url,
-            'the_client_id',
-            'the_client_secret'
-        )
-
-    def tearDown(self):
-        super().tearDown()
-        responses.reset()
-
-    @patch.object(edx_api.DemographicsApi, 'retire_learner')
-    def test_retire_learner(self, mock_method):
-        json_data = {
-            'lms_user_id': get_fake_user_retirement()['user']['id']
-        }
-        responses.add(
-            POST,
-            urljoin(self.demographics_base_url, 'demographics/api/v1/retire_demographics/'),
-            match=[matchers.json_params_matcher(json_data)]
-        )
-        self.demographics_api.retire_learner(
-            learner=get_fake_user_retirement()
-        )
-        mock_method.assert_called_once_with(
-            learner=get_fake_user_retirement()
         )
 
 

@@ -211,7 +211,7 @@ class LibraryXBlockMetadata:
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
-        last_publish_log = authoring_api.get_last_publish(component.pk)
+        last_publish_log = component.versioning.last_publish_log
 
         return cls(
             usage_key=LibraryUsageLocatorV2(
