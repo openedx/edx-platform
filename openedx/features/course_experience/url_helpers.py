@@ -18,6 +18,8 @@ from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 User = get_user_model()
 
 
@@ -160,7 +162,7 @@ def make_learning_mfe_courseware_url(
     `params` is an optional QueryDict object (e.g. request.GET)
     """
 
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'{mfe_config["LEARNING_MICROFRONTEND_URL"]}/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -190,8 +192,10 @@ def get_learning_mfe_home_url(
     `url_fragment` is an optional string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
-    
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+
+    mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+
+    mfe_link = f'{mfe_config["LEARNING_MICROFRONTEND_URL"]}/course/{course_key}'
 
     if url_fragment:
         mfe_link += f'/{url_fragment}'
@@ -209,6 +213,9 @@ def is_request_from_learning_mfe(request: HttpRequest):
     if not settings.LEARNING_MICROFRONTEND_URL:
         return False
 
-    url = urlparse(settings.LEARNING_MICROFRONTEND_URL) 
+    mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+
+    url = urlparse(mfe_config["LEARNING_MICROFRONTEND_URL"])
+
     mfe_url_base = f'{url.scheme}://{url.netloc}'
     return request.META.get('HTTP_REFERER', '').startswith(mfe_url_base)
