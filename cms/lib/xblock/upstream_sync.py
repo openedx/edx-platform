@@ -26,7 +26,12 @@ from openedx.core.djangoapps.content_libraries.api import (
     LibraryXBlockMetadata,
 )
 
-def get_upstream_info(usage_key: UsageKey | str) -> UsageKey:
+
+class UnsupportedUpstreamKeyType(Exception):
+    pass
+
+
+def validate_upstream_key(usage_key: UsageKey | str) -> UsageKey:
     """
     Raise an error if the provided key is not valid upstream reference.
 
@@ -46,64 +51,25 @@ def get_upstream_info(usage_key: UsageKey | str) -> UsageKey:
 
 
 @dataclass(frozen=True)
-class Upstream:
-
-    @property
-    def can_sync(self) -> bool:
-        return False
-
-
-@dataclass(frozen=True)
-class NoUpstream(Upstream):
-    pass
-
-
-@dataclass(frozen=True)
-class SomeUpstream(Upstream):
-    current_version: int | None
-    usage_key_string: str
-
-
-@dataclass(frozen=True)
-class BadUpstream(SomeUpstream):
-    pass
-
-
-@dataclass(frozen=True)
-class BadUpstreamKeyString(BadUpstream):
-    pass
-
-
-@dataclass(frozen=True)
-class BadUpstreamKeyType(BadUpstream):
+class UpstreamInfo:
+    """
+    Metadata about a block's relationship with an upstream.
+    """
     usage_key: UsageKey
-
-
-@dataclass(frozen=True)
-class BadUpstreamBlock(BadUpstream):
-    usage_key: UsageKey
-    error: str
-
-
-@dataclass(frozen=True)
-class GoodUpstream(Upstream):
-    current_version: int | None
-    usage_key: None
-
-
-@dataclass(frozen=True)
-class GoodUpstreamNoUpdates(GoodUpstream):
-    pass
-
-
-@dataclass(frozen=True)
-class GoodUpstreamWithUpdates(GoodUpstream):
-    latest_version: int
+    current_version: int
+    latest_version: int | None
     sync_url: str
+    error: str | None
 
-    @property
-    def can_sync(self) -> bool
-        return True
+    def sync_available(self) -> bool:
+        """
+        Should the user be prompted to sync this block with upstream?
+        """
+        return (
+            self.latest_version
+            and self.current_version < self.latest_version
+            and not error
+        )
 
 
 class UpstreamSyncMixin(XBlockMixin):
@@ -171,91 +137,14 @@ class UpstreamSyncMixin(XBlockMixin):
         """
         if request.method != "POST":
             return Response(status_code=405)
-        upstream_info = self.get_upstream_info()
-        if upstream_info["sync_url"]:
-
-            upstream_info = self.get_upstream_info()
-        return upstream_info
-            return Rseponse(
         if not self.upstream:
             return Response("no linked upstream", response=400)
-        try:
-            self.sync_from_upstream(user=request.user, apply_updates=True)
-        except (InvalidKeyError, UnsupportedUpstreamKeyType):
-            return Response(f"erene not a valid: {self.upstream}", status_code=400)
-        except XBlockNotFoundError:
-            return Response(f"could not load upstream block: {self.upstream}", status_code=400)
-        self.save()
-        return Response(status_code=200)
-
-    @XBlock.handler
-    def upstream_info(self, request: Request, _suffix=None) -> Response:
-        """
-        @@TODO docstring
-
-        GET: Retrieve upstream link
-        PUT: Set upstream link
-        DELETE: Remove upstream link
-
-        200: Success, with JSON data on upstream link
-        204: Success, no upstream link
-        400: Bad request data
-        401: Unauthenticated
-        405: Bad method
-        """
-        if request.method == "DELETE":
-            self.upstream = None
-            self.sync_with_upstream(apply_updates=False)
-        elif request.method == "PUT":
-            try:
-                usage_key_string = json.loads(request.data["usage_key"])
-            except json.JSONDecodeError:
-                return Response("bad json", status_code=400)
-            except KeyError:
-                return Response("missing top-level key in json body: usage_key", status_code=400)
-            try:
-                validate_upstream_key(usage_key_string)
-            except InvalidKeyError:
-                return Response(f"not a valid usage key: {usage_key_string}", status_code=400)
-            except UnsupportedUpstreamKeyType as exc:
-                return Response(str(exc), status_code=400)
-            self.upstream = usage_key_string
-            try:
-                self.sync_from_upstream(user=request.user, usage_key)
-            except XBlockNotFoundError:
-                return Response(f"could not load library block metadata: {usage_key}", status_code=400)
-        elif request.method == "GET":
-            pass
-        else
-            return Response(status_code=405)
         upstream_info = self.get_upstream_info()
-        if upstream_info:
-            return Response(json.dumps(upstream_info, indent=4))
-        else:
-            return Response(status_code=204)
-
-    def get_upstream_info(self) -> Upstream:
-        """
-        """
-        if not self.upstream:
-            return NoUpstream()
-        latest: int | None = None
-        error: str | None = None
-        try:
-            latest = self._lib_block.version_num
-        except InvalidKeyError:
-            error = _("Reference to linked library item is malformed: {}").format(block.upstream)
-            latest = None
-        except XBlockNotFoundError:
-            error = _("Linked library item was not found in the system: {}").format(block.upstream)
-            latest = None
-        return UpstreamInfo(
-            usage_key=self.upstream,
-            current_version=self.upstream_version,
-            latest_version=latest,
-            sync_url=self.runtime.handler_url(self, 'sync_updates')
-            error=error,
-        )
+        if upstream_info["error"]:
+            return Response(upstream_info["error"], status_code=400)
+        self.sync_from_upstream(user=request.user, apply_updates=True)
+        self.save()
+        return Response(json.dumps(self.get_upstream_info()), indent=4)
 
     def sync_from_upstream(self, *, user: User, apply_updates: bool):
         """
@@ -291,6 +180,30 @@ class UpstreamSyncMixin(XBlockMixin):
         # @@TODO why isn't self.save() sufficient? do we really need to invoke modulestore here?
         from xmodule.modulestore.django import modulestore  # pylint: disable=wrong-import-order
         modulestore().update_item(self, user.id)
+
+    def get_upstream_info(self) -> UpstreamInfo | None:
+        """
+        @@TODO
+        """
+        if not self.upstream:
+            return None
+        latest: int | None = None
+        error: str | None = None
+        try:
+            latest = self._lib_block.version_num
+        except InvalidKeyError:
+            error = _("Reference to linked library item is malformed: {}").format(self.upstream)
+            latest = None
+        except XBlockNotFoundError:
+            error = _("Linked library item was not found in the system: {}").format(self.upstream)
+            latest = None
+        return UpstreamInfo(
+            usage_key=self.upstream,
+            current_version=self.upstream_version,
+            latest_version=latest,
+            sync_url=self.runtime.handler_url(self, 'sync_updates')
+            error=error,
+        )
 
     @cached_property
     def _lib_block(self) -> LibraryXBlockMetadata | None:

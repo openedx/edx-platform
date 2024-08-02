@@ -112,7 +112,7 @@ class UpstreamInfoSerializer(serializers.Serializer):
     latest_version = serializers.IntegerField(allow_null=True)
     sync_url = serializers.CharField()
     error = serializers.CharField(allow_null=True)
-    can_sync = serializers.BooleanField()
+    sync_available = serializers.BooleanField()
 
 
 class ChildVerticalContainerSerializer(serializers.Serializer):
