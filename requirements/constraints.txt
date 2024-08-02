@@ -20,7 +20,7 @@ celery>=5.2.2,<6.0.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.21.9
+edx-enterprise==4.22.2
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -87,7 +87,7 @@ libsass==0.10.0
 click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.10.0
+openedx-learning==0.10.1
 
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
 openai<=0.28.1
