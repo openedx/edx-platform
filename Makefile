@@ -210,3 +210,6 @@ test-eslint:
 
 test-stylelint:
 	npx stylelint '**/*.scss' --custom-formatter=node_modules/stylelint-formatter-pretty
+
+test-lint:
+	pycodestyle .

@@ -67,7 +67,9 @@ jobs:
         run: npm ci  
 
       - name: Run Python Quality Test
-        run: pycodestyle .
+        env:
+          PIP_SRC: ${{ runner.temp }}
+        run: make test-lint
       
       - name: Run Stylelint Tests
         env:
