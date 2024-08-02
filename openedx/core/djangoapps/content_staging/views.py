@@ -10,12 +10,14 @@ from django.utils.decorators import method_decorator
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocatorV2
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
+from openedx.core.djangoapps.content_libraries import api as lib_api
+from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -89,18 +91,31 @@ class ClipboardEndpoint(APIView):
         if usage_key.block_type in ('course', 'chapter', 'sequential'):
             raise ValidationError('Requested XBlock tree is too large')
         course_key = usage_key.context_key
-        if not isinstance(course_key, CourseLocator):
-            # In the future, we'll support libraries too but for now we don't.
-            raise ValidationError('Invalid usage key: not a modulestore course')
-        # Make sure the user has permission on that course
-        if not has_studio_read_access(request.user, course_key):
-            raise PermissionDenied("You must be a member of the course team in Studio to export OLX using this API.")
 
         # Load the block and copy it to the user's clipboard
         try:
-            block = modulestore().get_item(usage_key)
+            if isinstance(course_key, CourseLocator):
+                # Make sure the user has permission on that course
+                if not has_studio_read_access(request.user, course_key):
+                    raise PermissionDenied(
+                        "You must be a member of the course team in Studio to export OLX using this API."
+                    )
+                block = modulestore().get_item(usage_key)
+
+            elif isinstance(course_key, LibraryLocatorV2):
+                lib_api.require_permission_for_library_key(
+                    usage_key,
+                    request.user,
+                    lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+                )
+                block = xblock_api.load_block(usage_key, user=None)
+
+            else:
+                raise ValidationError("Invalid usage_key for the content.")
+
         except ItemNotFoundError as exc:
             raise NotFound("The requested usage key does not exist.") from exc
+
         clipboard = api.save_xblock_to_user_clipboard(block=block, user_id=request.user.id)
 
         # Return the current clipboard exactly as if GET was called:
