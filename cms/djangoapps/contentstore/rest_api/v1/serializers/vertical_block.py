@@ -110,8 +110,9 @@ class UpstreamInfoSerializer(serializers.Serializer):
     usage_key = serializers.CharField()
     current_version = serializers.IntegerField(allow_null=True)
     latest_version = serializers.IntegerField(allow_null=True)
-    sync_url = serializers.CharField(allow_null=True)
+    sync_url = serializers.CharField()
     error = serializers.CharField(allow_null=True)
+    can_sync = serializers.BooleanField()
 
 
 class ChildVerticalContainerSerializer(serializers.Serializer):

@@ -6,8 +6,11 @@ and downstream blocks will generally belong to courses. However, the system is d
 to be mostly agnostic to exact type of upstream context and type of downstream context.
 """
 import json
+from dataclasses import dataclass
 
 from django.contrib.auth import get_user_model
+from django.util.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryUsageLocatorV2
@@ -22,6 +25,85 @@ from openedx.core.djangoapps.content_libraries.api import (
     get_library_block,
     LibraryXBlockMetadata,
 )
+
+def get_upstream_info(usage_key: UsageKey | str) -> UsageKey:
+    """
+    Raise an error if the provided key is not valid upstream reference.
+
+    Currently, only Learning-Core-backed Content Library blocks are valid upstreams, although this may
+    change in the future.
+
+    Raises: InvalidKeyError, UnsupporteUpstreamKeyType
+    """
+    if isinstance(usage_key, str):
+        usage_key = UsageKey.from_string(usage_key)
+    if not isinstance(usage_key, LibraryUsageLocatorV2):
+        raise UnsupportedUpstreamKeyType(
+            "upstream key must be of type LibraryUsageLocatorV2; "
+            f"provided key '{usage_key}' is of type '{type(usage_key)}'"
+        )
+    return usage_key
+
+
+@dataclass(frozen=True)
+class Upstream:
+
+    @property
+    def can_sync(self) -> bool:
+        return False
+
+
+@dataclass(frozen=True)
+class NoUpstream(Upstream):
+    pass
+
+
+@dataclass(frozen=True)
+class SomeUpstream(Upstream):
+    current_version: int | None
+    usage_key_string: str
+
+
+@dataclass(frozen=True)
+class BadUpstream(SomeUpstream):
+    pass
+
+
+@dataclass(frozen=True)
+class BadUpstreamKeyString(BadUpstream):
+    pass
+
+
+@dataclass(frozen=True)
+class BadUpstreamKeyType(BadUpstream):
+    usage_key: UsageKey
+
+
+@dataclass(frozen=True)
+class BadUpstreamBlock(BadUpstream):
+    usage_key: UsageKey
+    error: str
+
+
+@dataclass(frozen=True)
+class GoodUpstream(Upstream):
+    current_version: int | None
+    usage_key: None
+
+
+@dataclass(frozen=True)
+class GoodUpstreamNoUpdates(GoodUpstream):
+    pass
+
+
+@dataclass(frozen=True)
+class GoodUpstreamWithUpdates(GoodUpstream):
+    latest_version: int
+    sync_url: str
+
+    @property
+    def can_sync(self) -> bool
+        return True
 
 
 class UpstreamSyncMixin(XBlockMixin):
@@ -67,13 +149,13 @@ class UpstreamSyncMixin(XBlockMixin):
             "@@TODO helptext"
         ),
         hidden=True,
-        default={},
-        enforce_type=True,
+        default={}, enforce_type=True,
     )
 
     def save(self, *args, **kwargs):
         """
-        @@TODO docstring
+        Upon save, ensure that upstream_overriden tracks all upstream-provided fields which downstream has overridden.
+
         @@TODO use is_dirty instead of getattr for efficiency?
         """
         for field_name, value in self.upstream_settings.items():
@@ -82,22 +164,32 @@ class UpstreamSyncMixin(XBlockMixin):
                     self.upstream_overridden.append(field_name)
         super().save()
 
-    def assign_upstream(self, upstream_key: LibraryUsageLocatorV2 | None) -> LibraryXBlockMetadata | None:
+    @XBlock.handler
+    def sync_updates(self, request: Request, suffix=None) -> Response:
         """
-        Assign an upstream to this block and fetch upstream settings.
+        XBlock handler
+        """
+        if request.method != "POST":
+            return Response(status_code=405)
+        upstream_info = self.get_upstream_info()
+        if upstream_info["sync_url"]:
 
-        Raises: XBlockNotFoundError
-        """
-        old_upstream = self.upstream
-        self.upstream = str(upstream_key)
+            upstream_info = self.get_upstream_info()
+        return upstream_info
+            return Rseponse(
+        if not self.upstream:
+            return Response("no linked upstream", response=400)
         try:
-            return self._sync_with_upstream(apply=False)
-        except (InvalidKeyError, XBlockNotFoundError):
-            self.upstream = old_upstream
-            raise
+            self.sync_from_upstream(user=request.user, apply_updates=True)
+        except (InvalidKeyError, UnsupportedUpstreamKeyType):
+            return Response(f"erene not a valid: {self.upstream}", status_code=400)
+        except XBlockNotFoundError:
+            return Response(f"could not load upstream block: {self.upstream}", status_code=400)
+        self.save()
+        return Response(status_code=200)
 
     @XBlock.handler
-    def upstream_link(self, request: Request, _suffix=None) -> Response:
+    def upstream_info(self, request: Request, _suffix=None) -> Response:
         """
         @@TODO docstring
 
@@ -112,82 +204,76 @@ class UpstreamSyncMixin(XBlockMixin):
         405: Bad method
         """
         if request.method == "DELETE":
-            self.assign_upstream(None)
-            return Response(status_code=204)
-        if request.method in ["PUT", "GET"]:
-            if request.method == "PUT":
-                try:
-                    usage_key_string = json.loads(request.data["usage_key"])
-                except json.JSONDecodeError:
-                    return Response("bad json", status_code=400)
-                except KeyError:
-                    return Response("missing top-level key in json body: usage_key", status_code=400)
-                try:
-                    usage_key = LibraryUsageLocatorV2.from_string(usage_key_string)
-                except InvalidKeyError:
-                    return Response(f"not a valid library block usage key: {usage_key_string}", status_code=400)
-                try:
-                    upstream_meta = self.assign_upstream(usage_key)  # type: ignore[assignment]
-                except XBlockNotFoundError:
-                    return Response(f"could not load library block metadata: {usage_key}", status_code=400)
-            if request.method == "GET":
-                try:
-                    upstream_meta = self.get_upstream_meta()
-                except InvalidKeyError:
-                    return Response(f"upstream is not a valid usage key: {self.upstream}", status_code=400)
-                except XBlockNotFoundError:
-                    return Response(f"could not load upstream block metadata: {self.upstream}", status_code=400)
-                if not upstream_meta:
-                    return Response(status_code=204)
-            return Response(
-                json.dumps(
-                    {
-                        "usage_key": self.upstream,
-                        "version_current": self.upstream_version,
-                        "version_latest": upstream_meta.version_num if upstream_meta else None,
-                    },
-                    indent=4,
-                ),
-            )
-        return Response(status_code=405)
-
-    @XBlock.handler
-    def upgrade_and_sync(self, request: Request, suffix=None) -> Response:
-        """
-        @@TODO docstring
-        """
-        if request.method != "POST":
+            self.upstream = None
+            self.sync_with_upstream(apply_updates=False)
+        elif request.method == "PUT":
+            try:
+                usage_key_string = json.loads(request.data["usage_key"])
+            except json.JSONDecodeError:
+                return Response("bad json", status_code=400)
+            except KeyError:
+                return Response("missing top-level key in json body: usage_key", status_code=400)
+            try:
+                validate_upstream_key(usage_key_string)
+            except InvalidKeyError:
+                return Response(f"not a valid usage key: {usage_key_string}", status_code=400)
+            except UnsupportedUpstreamKeyType as exc:
+                return Response(str(exc), status_code=400)
+            self.upstream = usage_key_string
+            try:
+                self.sync_from_upstream(user=request.user, usage_key)
+            except XBlockNotFoundError:
+                return Response(f"could not load library block metadata: {usage_key}", status_code=400)
+        elif request.method == "GET":
+            pass
+        else
             return Response(status_code=405)
-        if not self.upstream:
-            return Response("no linked upstream", response=400)
-        try:
-            self._sync_with_upstream(apply=True)
-        except InvalidKeyError:
-            return Response(f"upstream is not a valid usage key: {self.upstream}", status_code=400)
-        except XBlockNotFoundError:
-            return Response(f"could not load upstream block: {self.upstream}", status_code=400)
-        self.save()
-        return Response(status_code=200)
+        upstream_info = self.get_upstream_info()
+        if upstream_info:
+            return Response(json.dumps(upstream_info, indent=4))
+        else:
+            return Response(status_code=204)
 
-    def _sync_with_upstream(self, *, apply: bool) -> LibraryXBlockMetadata | None:
+    def get_upstream_info(self) -> Upstream:
+        """
+        """
+        if not self.upstream:
+            return NoUpstream()
+        latest: int | None = None
+        error: str | None = None
+        try:
+            latest = self._lib_block.version_num
+        except InvalidKeyError:
+            error = _("Reference to linked library item is malformed: {}").format(block.upstream)
+            latest = None
+        except XBlockNotFoundError:
+            error = _("Linked library item was not found in the system: {}").format(block.upstream)
+            latest = None
+        return UpstreamInfo(
+            usage_key=self.upstream,
+            current_version=self.upstream_version,
+            latest_version=latest,
+            sync_url=self.runtime.handler_url(self, 'sync_updates')
+            error=error,
+        )
+
+    def sync_from_upstream(self, *, user: User, apply_updates: bool):
         """
         @@TODO docstring
 
-        Raises: InvalidKeyError, XBlockNotFoundError
+        Raises: InvalidKeyError, UnsupportedUpstreamKeyType, XBlockNotFoundError
         """
-        upstream_meta = self.get_upstream_meta()
-        if not upstream_meta:
+        if not self.upstream:
+            self.upstream_settings = {}
             self.upstream_overridden = []
             self.upstream_version = None
-            return None
+        upstream_key = usage_key = validate_upstream_key(self.upstream)
         self.upstream_settings = {}
-        # @@TODO: do we need user_id to get the block? if so, is there a better way to get it?
-        user_id = self.runtime.service(self, "user")._django_user.id  # pylint: disable=protected-access
         try:
-            upstream_block = xblock_api.load_block(upstream_meta.usage_key, get_user_model().objects.get(id=user_id))
+            upstream_block = xblock_api.load_block(upstream_key, user)
         except NotFound as exc:
             raise XBlockNotFoundError(
-                f"failed to load upstream block for user id={user_id}: {self.upstream}"
+                f"failed to load upstream ({self.upstream)} for block ({self.usage_key)} for user id={user.id}"
             ) from exc
         for field_name, field in upstream_block.fields.items():
             if field.scope not in [Scope.settings, Scope.content]:
@@ -200,32 +286,25 @@ class UpstreamSyncMixin(XBlockMixin):
             if not apply:
                 continue
             setattr(self, field_name, value)
-        self.upstream_version = upstream_meta.version_num
+        self.upstream_version = self._lib_block.version_num
         self.save()
         # @@TODO why isn't self.save() sufficient? do we really need to invoke modulestore here?
         from xmodule.modulestore.django import modulestore  # pylint: disable=wrong-import-order
-        modulestore().update_item(self, user_id)
-        return upstream_meta
+        modulestore().update_item(self, user.id)
 
-    def get_upstream_meta(self) -> LibraryXBlockMetadata | None:
+    @cached_property
+    def _lib_block(self) -> LibraryXBlockMetadata | None:
         """
-        Get metadata about the upstream XBlock, or None if there is none.
+        Internal cache of the upstream XBlock metadata, or None if there is none.
 
-        Currently, this always returns LibraryXBlockMetadata; in the future, it could
-        return other metadata, so callers should check the return type.
+        We assume, for now, that upstreams are always Learning-Core-backed Content Library blocks.
+        That is an INTERNAL ASSUMPTION that may change at some point; hence, this is a private
+        property; callers should use the public API methods which don't assume that the upstream is
+        a from a content library.
 
         Raises: InvalidKeyError, XBlockNotFoundError
         """
         if not self.upstream:
             return None
-        upstream_key = LibraryUsageLocatorV2.from_string(self.upstream)
+        upstream_key = validate_upstream_key(self.upstream)
         return get_library_block(upstream_key)
-
-
-def is_valid_upstream(usage_key: UsageKey) -> bool:
-    """
-    Does this key refer to a block that can be used as an upstream?
-
-    Currently, only Learning-Core-backed Content Library blocks are valid upstreams.
-    """
-    return isinstance(usage_key, LibraryUsageLocatorV2)
