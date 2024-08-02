@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from crum import set_current_request
 
+import openedx.core.djangoapps.content.block_structure.api as bs_api
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -76,6 +77,9 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         CourseEnrollment.enroll(self.student, self.course.id)
         self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password=self.TEST_PASSWORD)
         self.refresh_course()
+        # Since this doesn't happen automatically and we don't want to run all the publish signal handlers
+        # Just make sure we have the latest version of the course in cache before we test the problem.
+        bs_api.update_course_in_cache(self.course.id)
 
     @patch('lms.djangoapps.grades.events.tracker')
     def test_submit_answer(self, events_tracker):
