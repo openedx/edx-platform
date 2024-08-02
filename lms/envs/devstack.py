@@ -522,6 +522,10 @@ course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
 ]
 course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
 
+lc_enrollment_revoked_setting = \
+    EVENT_BUS_PRODUCER_CONFIG['org.openedx.enterprise.learner_credit_course_enrollment.revoked.v1']
+lc_enrollment_revoked_setting['learner-credit-course-enrollment-lifecycle']['enabled'] = True
+
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
