@@ -104,7 +104,7 @@ class ClipboardEndpoint(APIView):
 
             elif isinstance(course_key, LibraryLocatorV2):
                 lib_api.require_permission_for_library_key(
-                    usage_key,
+                    course_key,
                     request.user,
                     lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
                 )
