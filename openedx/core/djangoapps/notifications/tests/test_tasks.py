@@ -390,7 +390,7 @@ class TestDeleteNotificationTask(ModuleStoreTestCase):
         """
         assert not Notification.objects.all()
         create_notification(self.user, self.course_1.id, app_name='discussion', notification_type='new_comment')
-        create_notification(self.user, self.course_1.id, app_name='updates', notification_type='course_update')
+        create_notification(self.user, self.course_1.id, app_name='updates', notification_type='course_updates')
         delete_notifications({'app_name': 'discussion'})
         assert not Notification.objects.filter(app_name='discussion')
         assert Notification.objects.filter(app_name='updates')
