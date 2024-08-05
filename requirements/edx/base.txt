@@ -532,7 +532,8 @@ edx-search==3.6.0
 #edx-sga==0.23.0
 git+https://github.com/ts-tech-repo/edx-sga.git@quince.master
     # via -r requirements/edx/bundled.in
-edx-submissions==3.6.0
+#edx-submissions==3.6.0
+git+https://github.com/ts-tech-repo/edx-submissions.git@quince.master
     # via
     #   -r requirements/edx/kernel.in
     #   ora2
