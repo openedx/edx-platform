@@ -257,7 +257,7 @@ class BlockFieldsView(APIView):
 
         # Signal that we've modified this block
         context_impl = get_learning_context_impl(usage_key)
-        context_impl.send_updated_event(usage_key)
+        context_impl.send_block_updated_event(usage_key)
 
         return Response({
             "id": str(block.location),
