@@ -10,7 +10,7 @@ import os
 import random
 import textwrap
 import unittest
-from unittest.mock import DEFAULT, Mock, patch
+from unittest.mock import DEFAULT, Mock, patch, PropertyMock
 
 import pytest
 import ddt
