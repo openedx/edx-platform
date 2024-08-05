@@ -489,7 +489,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
     print(f"\n\n\n PIPELINE_STEP 1 Enter: parse_query_params => strategy={strategy} response={response}")
     # If auth_entry is not in the session, we got here by a non-standard workflow.
     # We simply assume 'login' in that case.
-    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY) or AUTH_ENTRY_LOGIN
+    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY) or AUTH_ENTRY_REGISTER
     if auth_entry not in _AUTH_ENTRY_CHOICES:
         raise AuthEntryError(strategy.request.backend, 'auth_entry invalid')
 
@@ -629,7 +629,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
             if should_force_account_creation():
-                if not should_auto_create_user_account():
+                if not should_auto_create_user_account() or is_provider_saml():
                     print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry login and force account creation => dispatch_to_register')
                     return dispatch_to_register()
             print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry login => dispatch_to_login')
@@ -637,7 +637,8 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         elif auth_entry == AUTH_ENTRY_REGISTER:
             # User has authenticated with the third party provider and now wants to finish
             # creating their edX account.
-            if not should_auto_create_user_account():
+            print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth_entry === register => inside')
+            if not should_auto_create_user_account() or is_provider_saml():
                 print(f'\n\n\n PIPELINE_STEP 11 Return: ensure_user_information auth entry register => dispatch_to_register')
                 return dispatch_to_register()
         elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
@@ -677,11 +678,13 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             )
 
 
-def complete_user_creation(strategy, user=None, details=None, is_new=False, *args, **kwargs):
+def complete_user_creation(strategy, auth_entry, user=None, details=None, is_new=False, *args, **kwargs):
     profile = None
     request = strategy.request if strategy else None
+    print(f'\n\n\n PIPELINE_STEP: complete_user_creation => auth_entry={auth_entry} ')
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.site={request.site} ')
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => request.data={ strategy.request_data(merge=False)} ')
+    print(f'\n\n\n PIPELINE_STEP: complete_user_creation => details={ details } ')
     print(f'\n\n\n PIPELINE_STEP: complete_user_creation => is_new={ is_new } ')
     if should_auto_create_user_account() and user and is_new:
         password = user.password
@@ -691,12 +694,13 @@ def complete_user_creation(strategy, user=None, details=None, is_new=False, *arg
             user.save()
             print(f'\n\n\n PIPELINE_STEP: complete_user_creation => password set for user: {user}')
         if not hasattr(user, 'profile'):
-            profile = UserProfile(user=user, **{'name': details.get('fullname', '')})
+            profile = UserProfile(user=user, **{'name': details.get('fullname', '') or ''})
             try:
                 profile.save()
                 print(f'\n\n\n PIPELINE_STEP: complete_user_creation => profile created for user: {user} , profile: {profile}')
             except Exception:
                 logger.exception(f"UserProfile creation failed for user {user.id}.")
+                print(f'\n\n\n PIPELINE_STEP: complete_user_creation => UserProfile creation failed for user {user.id} , backend: {strategy.request.backend}')
                 raise AuthException(strategy.request.backend, f'UserProfile creation failed for user {user.id}.')
         if strategy.session_get('registration_params', None):
             params = json.loads(strategy.session_get('registration_params'))
@@ -1143,32 +1147,6 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
     )
     print(f'\n\n\n PIPELINE_STEP 9 Return: get_username => ', {'username': final_username})
     return {'username': final_username}
-
-
-# @partial.partial
-# def redirect_to_welcome_page(strategy, user=None, is_new=False, *args, **kwargs):
-#     def dispatch_to_welcome_page():
-#         """Redirects to the login page."""
-#         response = redirect(settings.AUTHN_MICROFRONTEND_WELCOME_PAGE_URL)
-#         # response = redirect('/register')
-#
-#         request = strategy.request if strategy else None
-#         print(f'\n\n\n PIPELINE_STEP STEP 21 Enter: redirect_to_welcome_page before redirection => request.COOKIES={request.COOKIES} ')
-#         has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
-#         print(f'\n\n\n PIPELINE_STEP 21: redirect_to_welcome_page has_cookie => ', has_cookie)
-#         if has_cookie:
-#             print(f'\n\n\n PIPELINE_STEP 21 Return: redirect_to_welcome_page has cookie => dispatch_to_welcome_page cookies = ', response.cookies)
-#             return user_authn_cookies.set_logged_in_cookies(request, response, user)
-#         print(f'\n\n\n PIPELINE_STEP 21 Return: redirect_to_welcome_page => dispatch_to_welcome_page cookies = ', response.cookies)
-#         return response
-#
-#     print(f'\n\n\n PIPELINE_STEP STEP 21 Enter: redirect_to_welcome_page => user={user} user.is_authenticated={user.is_authenticated} strategy.session_get(visited_welcome_page, False)={strategy.session_get("visited_welcome_page", False)}, is_new={is_new}')
-#     if (
-#         should_auto_create_user_account() and user and user.is_authenticated
-#         and is_new and not strategy.session_get('visited_welcome_page', False)
-#     ):
-#         strategy.session_set('visited_welcome_page', True)
-#         return dispatch_to_welcome_page()
 
 def ensure_redirect_url_is_safe(strategy, *args, **kwargs):
     """

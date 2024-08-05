@@ -27,11 +27,14 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
         # in the pipeline stack, we'd need to validate this value because it
         # would be an injection point for attacker data.
         auth_entry = request.session.get(pipeline.AUTH_ENTRY_KEY)
+        print(f'\n\n\n PIPELINE ExceptionMiddleware: get_redirect_uri => auth_entry: {auth_entry}')
+        print(f'\n\n\n PIPELINE ExceptionMiddleware: get_redirect_uri => pipeline.AUTH_DISPATCH_URLS: {pipeline.AUTH_DISPATCH_URLS}')
 
         # Check if we have an auth entry key we can use instead
         if auth_entry and auth_entry in pipeline.AUTH_DISPATCH_URLS:
             redirect_uri = pipeline.AUTH_DISPATCH_URLS[auth_entry]
 
+        print(f'\n\n\n PIPELINE ExceptionMiddleware: return redirect_uri => {redirect_uri}')
         return redirect_uri
 
     def process_exception(self, request, exception):

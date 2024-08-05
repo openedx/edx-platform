@@ -233,13 +233,17 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         unless self.conf[conf_key] overrides the default by specifying
         another attribute to use.
         """
+        print(f'\n\n\n\n\n saml.py SAMLIdentityProvider get_attr conf_key={conf_key} default_attribute={default_attribute} \n\n\n\n\n')
+        print(f'\n\n\n\n\n saml.py SAMLIdentityProvider get_attr self.conf[attr_defaults]={self.conf["attr_defaults"]} \n\n\n\n\n')
         key = self.conf.get(conf_key, default_attribute)
         if key in attributes:
             try:
+                print(f'\n\n\n\n\n saml.py SAMLIdentityProvider get_attr key={key} value={attributes[key][0]} \n\n\n\n\n')
                 return attributes[key][0]
             except IndexError:
                 log.warning('[THIRD_PARTY_AUTH] SAML attribute value not found. '
                             'SamlAttribute: {attribute}'.format(attribute=key))
+        print(f'\n\n\n\n\n saml.py SAMLIdentityProvider get_attr key={key} value={self.conf["attr_defaults"].get(conf_key)} \n\n\n\n\n')
         return self.conf['attr_defaults'].get(conf_key) or None
 
     @property
