@@ -66,6 +66,10 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
         run: npm ci  
 
+      - name: Debug Environment
+        run: |
+          python --version
+          pycodestyle --version  
       # - name: Run Python Quality Test
       #   working-directory: ${{ github.workspace }}
       #   env:
