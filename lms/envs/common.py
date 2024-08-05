@@ -1101,6 +1101,11 @@ DEFAULT_GROUPS = []
 # If this is true, random scores will be generated for the purpose of debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
 
+# .. setting_name: GRADEBOOK_FREEZE_DAYS
+# .. setting_default: 30
+# .. setting_description: Sets the number of days after which the gradebook will freeze following the course's end.
+GRADEBOOK_FREEZE_DAYS = 30
+
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 XQUEUE_INTERFACE = {
@@ -3350,9 +3355,6 @@ INSTALLED_APPS = [
     # Management of external user ids
     'openedx.core.djangoapps.external_user_ids',
 
-    # Provides api for Demographics support
-    'openedx.core.djangoapps.demographics',
-
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
 
@@ -4295,6 +4297,10 @@ SOCIAL_PLATFORMS = {
     }
 }
 
+# Enable First Purchase Discount offer override
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE = 15
+
 # E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:8002'
 ECOMMERCE_API_URL = 'http://localhost:8002/api/v2'
@@ -4682,7 +4688,8 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
 ]
 
 # Setting for Open API key and prompts used by edx-enterprise.
-OPENAI_API_KEY = ''
+CHAT_COMPLETION_API = 'https://example.com/chat/completion'
+CHAT_COMPLETION_API_KEY = 'i am a key'
 LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
 LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
 LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
@@ -5381,7 +5388,7 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 ############## NOTIFICATIONS ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
-NOTIFICATION_CREATION_BATCH_SIZE = 83
+NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""

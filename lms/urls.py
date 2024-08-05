@@ -129,9 +129,6 @@ urlpatterns = [
         ),
     ),
 
-    # Demographics API RESTful endpoints
-    path('api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),
-
     # Courseware search endpoints
     path('search/', include('search.urls')),
 
@@ -221,7 +218,7 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
-        re_path(r'^api/mobile/(?P<api_version>v(3|2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
+        re_path(r'^api/mobile/(?P<api_version>v(4|3|2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
     ]
 
 urlpatterns += [

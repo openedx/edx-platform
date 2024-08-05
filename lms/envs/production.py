@@ -922,7 +922,8 @@ ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
 
-OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
+CHAT_COMPLETION_API = ENV_TOKENS.get('CHAT_COMPLETION_API', '')
+CHAT_COMPLETION_API_KEY = ENV_TOKENS.get('CHAT_COMPLETION_API_KEY', '')
 LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
 LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
     'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
@@ -1061,8 +1062,6 @@ EXPLICIT_QUEUES = {
     'openedx.core.djangoapps.programs.tasks.award_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
-        'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},

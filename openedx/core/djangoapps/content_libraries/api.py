@@ -156,6 +156,9 @@ class ContentLibraryMetadata:
     version = attr.ib(0)
     type = attr.ib(default=COMPLEX)
     last_published = attr.ib(default=None, type=datetime)
+    last_draft_created = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib(default=None, type=datetime)
+    published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     # has_unpublished_deletes will be true when the draft version of the library's bundle
     # contains deletes of any XBlocks that were in the most recently published version
@@ -168,6 +171,8 @@ class ContentLibraryMetadata:
     # Studio, use it in their courses, and copy content out of this library.
     allow_public_read = attr.ib(False)
     license = attr.ib("")
+    created = attr.ib(default=None, type=datetime)
+    updated = attr.ib(default=None, type=datetime)
 
 
 class AccessLevel:
@@ -194,7 +199,10 @@ class LibraryXBlockMetadata:
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
+    created = attr.ib(type=datetime)
+    modified = attr.ib(type=datetime)
     display_name = attr.ib("")
+    last_published = attr.ib(default=None, type=datetime)
     has_unpublished_changes = attr.ib(False)
     tags_count = attr.ib(0)
 
@@ -203,6 +211,8 @@ class LibraryXBlockMetadata:
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
+        last_publish_log = component.versioning.last_publish_log
+
         return cls(
             usage_key=LibraryUsageLocatorV2(
                 library_key,
@@ -210,6 +220,9 @@ class LibraryXBlockMetadata:
                 component.local_key,
             ),
             display_name=component.versioning.draft.title,
+            created=component.created,
+            modified=component.versioning.draft.created,
+            last_published=None if last_publish_log is None else last_publish_log.published_at,
             has_unpublished_changes=component.versioning.has_unpublished_changes
         )
 
@@ -242,7 +255,7 @@ class LibraryXBlockType:
 # ============
 
 
-def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
+def get_libraries_for_user(user, org=None, library_type=None, text_search=None, order=None):
     """
     Return content libraries that the user has permission to view.
     """
@@ -263,7 +276,22 @@ def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
             Q(learning_package__description__icontains=text_search)
         )
 
-    return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+
+    if order:
+        order_query = 'learning_package__'
+        valid_order_fields = ['title', 'created', 'updated']
+        # If order starts with a -, that means order descending (default is ascending)
+        if order.startswith('-'):
+            order_query = f"-{order_query}"
+            order = order[1:]
+
+        if order in valid_order_fields:
+            return filtered.order_by(f"{order_query}{order}")
+        else:
+            log.exception(f"Error ordering libraries by {order}: Invalid order field")
+
+    return filtered
 
 
 def get_metadata(queryset, text_search=None):
@@ -327,8 +355,11 @@ def get_library(library_key):
     learning_package = ref.learning_package
     num_blocks = authoring_api.get_all_drafts(learning_package.id).count()
     last_publish_log = authoring_api.get_last_publish(learning_package.id)
-    has_unpublished_changes = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
-                                           .exists()
+    last_draft_log = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
+        .order_by('-created').first()
+    last_draft_created = last_draft_log.created if last_draft_log else None
+    last_draft_created_by = last_draft_log.created_by.username if last_draft_log and last_draft_log.created_by else None
+    has_unpublished_changes = last_draft_log is not None
 
     # TODO: I'm doing this one to match already-existing behavior, but this is
     # something that we should remove. It exists to accomodate some complexities
@@ -354,6 +385,9 @@ def get_library(library_key):
     # libraries. The top level version stays for now because LibraryContentBlock
     # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
+    published_by = None
+    if last_publish_log and last_publish_log.published_by:
+        published_by = last_publish_log.published_by.username
 
     return ContentLibraryMetadata(
         key=library_key,
@@ -363,12 +397,17 @@ def get_library(library_key):
         num_blocks=num_blocks,
         version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
+        published_by=published_by,
+        last_draft_created=last_draft_created,
+        last_draft_created_by=last_draft_created_by,
         allow_lti=ref.allow_lti,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
         has_unpublished_deletes=has_unpublished_deletes,
         license=ref.license,
+        created=learning_package.created,
+        updated=learning_package.updated,
     )
 
 
@@ -645,13 +684,11 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
     if not draft_version:
         raise ContentLibraryBlockNotFound(usage_key)
 
-    published_version = component.versioning.published
-
-    return LibraryXBlockMetadata(
-        usage_key=usage_key,
-        display_name=draft_version.title,
-        has_unpublished_changes=(draft_version != published_version),
+    xblock_metadata = LibraryXBlockMetadata.from_component(
+        library_key=usage_key.context_key,
+        component=component,
     )
+    return xblock_metadata
 
 
 def set_library_block_olx(usage_key, new_olx_str):
@@ -714,7 +751,7 @@ def set_library_block_olx(usage_key, new_olx_str):
     )
 
 
-def create_library_block(library_key, block_type, definition_id):
+def create_library_block(library_key, block_type, definition_id, user_id=None):
     """
     Create a new XBlock in this library of the specified type (e.g. "html").
     """
@@ -756,7 +793,7 @@ def create_library_block(library_key, block_type, definition_id):
     if _component_exists(usage_key):
         raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
 
-    _create_component_for_block(ref, usage_key)
+    _create_component_for_block(ref, usage_key, user_id=user_id)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
@@ -795,7 +832,7 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def _create_component_for_block(content_lib, usage_key):
+def _create_component_for_block(content_lib, usage_key, user_id=None):
     """
     Create a Component for an XBlock type, and initialize it.
 
@@ -826,7 +863,7 @@ def _create_component_for_block(content_lib, usage_key):
             local_key=usage_key.block_id,
             title=display_name,
             created=now,
-            created_by=None,
+            created_by=user_id,
         )
         content = authoring_api.get_or_create_text_content(
             learning_package.id,
@@ -930,13 +967,13 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     return info
 
 
-def publish_changes(library_key):
+def publish_changes(library_key, user_id=None):
     """
     Publish all pending changes to the specified library.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
 
-    authoring_api.publish_all_drafts(learning_package.id)
+    authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(

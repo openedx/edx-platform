@@ -20,7 +20,7 @@ celery>=5.2.2,<6.0.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.20.8
+edx-enterprise==4.22.2
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -32,9 +32,13 @@ django-oauth-toolkit==1.7.1
 # incremental upgrade
 django-simple-history==3.4.0
 
-# constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
-# Major upgrade will be done in separate ticket.
-pymongo<4.0.0
+# Adding pin to avoid any major upgrade
+pymongo<4.4.1
+
+# To override the constraint of edx-lint
+# This can be removed once https://github.com/openedx/edx-platform/issues/34586 is resolved
+# and the upstream constraint in edx-lint has been removed.
+event-tracking==3.0.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
@@ -58,14 +62,6 @@ markdown<3.4.0
 pycodestyle<2.9.0
 
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
-
-# adding these constraints to minimize boto3 and botocore changeset
-social-auth-core==4.3.0
-
-# social-auth-app-django versions after 5.2.0 has a problematic migration that will cause issues deployments with large
-# `social_auth_usersocialauth` tables. 5.1.0 has missing migration and 5.2.0 has that problematic migration.
-social-auth-app-django==5.0.0
-
 
 # urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
 # which require urllib3<2 for now.
@@ -91,7 +87,7 @@ libsass==0.10.0
 click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.10.0
+openedx-learning==0.10.1
 
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
 openai<=0.28.1
@@ -123,3 +119,14 @@ path<16.12.0
 
 # Temporary to Support the python 3.11 Upgrade
 backports.zoneinfo;python_version<"3.9"  # Newer versions have zoneinfo available in the standard library
+
+# Relevant GitHub Issue:  https://github.com/openedx/edx-platform/issues/35126
+# We need to upgrade the version of elasticsearch to atleast 7.15 before we can upgrade to Numpy 2.0.0
+# Otherwise we see a failure while running the following command:
+# export DJANGO_SETTINGS_MODULE=cms.envs.test; python manage.py cms check_reserved_keywords --override_file db_keyword_overrides.yml --report_path reports/reserved_keywords --report_file cms_reserved_keyword_report.csv
+numpy<2.0.0
+
+# django-storages==1.14.4 breaks course imports
+# Two lines were added in 1.14.4 that make file_exists_in_storage function always return False,
+# as the default value of AWS_S3_FILE_OVERWRITE is True
+django-storages<1.14.4

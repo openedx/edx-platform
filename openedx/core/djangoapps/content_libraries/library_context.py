@@ -6,6 +6,9 @@ import logging
 
 from django.core.exceptions import PermissionDenied
 
+from openedx_events.content_authoring.data import LibraryBlockData
+from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED
+
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.xblock.api import LearningContext
@@ -92,4 +95,17 @@ class LibraryContextImpl(LearningContext):
             namespace='xblock.v1',
             type_name=usage_key.block_type,
             local_key=usage_key.block_id,
+        )
+
+    def send_block_updated_event(self, usage_key):
+        """
+        Send a "block updated" event for the library block with the given usage_key.
+
+        usage_key: the UsageKeyV2 subclass used for this learning context
+        """
+        LIBRARY_BLOCK_UPDATED.send_event(
+            library_block=LibraryBlockData(
+                library_key=usage_key.lib_key,
+                usage_key=usage_key,
+            )
         )

@@ -5,16 +5,18 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import generics, status
+from rest_framework.decorators import api_view
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     get_course_notification_preference_config_version
@@ -35,7 +37,7 @@ from .serializers import (
     NotificationCourseEnrollmentSerializer,
     NotificationSerializer,
     UserCourseNotificationPreferenceSerializer,
-    UserNotificationPreferenceUpdateSerializer, UserNotificationChannelPreferenceUpdateSerializer,
+    UserNotificationPreferenceUpdateSerializer,
 )
 from .utils import get_show_notifications_tray
 
@@ -237,55 +239,6 @@ class UserNotificationPreferenceView(APIView):
 
 
 @allow_any_authenticated_user()
-class UserNotificationChannelPreferenceView(APIView):
-    """
-    Supports retrieving and patching the UserNotificationPreference
-    model.
-    **Example Requests**
-        PATCH /api/notifications/configurations/{course_id}
-    """
-
-    def patch(self, request, course_key_string):
-        """
-        Update an existing user notification preference for an entire channel with the data in the request body.
-
-        Parameters:
-            request (Request): The request object
-            course_key_string (int): The ID of the course of the notification preference to be updated.
-        Returns:
-            200: The updated preference, serialized using the UserNotificationPreferenceSerializer
-            404: If the preference does not exist
-            403: If the user does not have permission to update the preference
-            400: Validation error
-        """
-        course_id = CourseKey.from_string(course_key_string)
-        user_course_notification_preference = CourseNotificationPreference.objects.get(
-            user=request.user,
-            course_id=course_id,
-            is_active=True,
-        )
-        if user_course_notification_preference.config_version != get_course_notification_preference_config_version():
-            return Response(
-                {'error': _('The notification preference config version is not up to date.')},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        preference_update = UserNotificationChannelPreferenceUpdateSerializer(
-            user_course_notification_preference, data=request.data, partial=True
-        )
-        preference_update.is_valid(raise_exception=True)
-        updated_notification_preferences = preference_update.save()
-        notification_preference_update_event(request.user, course_id, preference_update.validated_data)
-        serializer_context = {
-            'course_id': course_id,
-            'user': request.user
-        }
-        serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences,
-                                                                context=serializer_context)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@allow_any_authenticated_user()
 class NotificationListAPIView(generics.ListAPIView):
     """
     API view for listing notifications for a user.
@@ -375,7 +328,7 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
-        show_notifications_tray = get_show_notifications_tray(request.user)
+        show_notifications_tray = get_show_notifications_tray(self.request.user)
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
@@ -479,3 +432,16 @@ class NotificationReadAPIView(APIView):
             return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
 
         return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST'])
+def preference_update_from_encrypted_username_view(request, username, patch):
+    """
+    View to update user preferences from encrypted username and patch.
+    username and patch must be string
+    """
+    update_user_preferences_from_patch(username, patch)
+    context = {
+        "notification_preferences_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/notifications"
+    }
+    return render(request, "notifications/email_digest_preference_update.html", context=context)

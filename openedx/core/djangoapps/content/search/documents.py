@@ -27,6 +27,9 @@ class Fields:
     type = "type"  # DocType.course_block or DocType.library_block (see below)
     block_id = "block_id"  # The block_id part of the usage key. Sometimes human-readable, sometimes a random hex ID
     display_name = "display_name"
+    modified = "modified"
+    created = "created"
+    last_published = "last_published"
     block_type = "block_type"
     context_key = "context_key"
     org = "org"
@@ -221,6 +224,9 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, so that the given library block can be
     found using faceted search.
+
+    Datetime fields (created, modified, last_published) are serialized to POSIX timestamps so that they can be used to
+    sort the search results.
     """
     library_name = lib_api.get_library(xblock_metadata.usage_key.context_key).title
     block = xblock_api.load_block(xblock_metadata.usage_key, user=None)
@@ -228,7 +234,10 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     doc = {
         Fields.id: meili_id_from_opaque_key(xblock_metadata.usage_key),
         Fields.type: DocType.library_block,
-        Fields.breadcrumbs: []
+        Fields.breadcrumbs: [],
+        Fields.created: xblock_metadata.created.timestamp(),
+        Fields.modified: xblock_metadata.modified.timestamp(),
+        Fields.last_published: xblock_metadata.last_published.timestamp() if xblock_metadata.last_published else None,
     }
 
     doc.update(_fields_from_block(block))

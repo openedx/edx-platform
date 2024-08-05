@@ -1,7 +1,6 @@
 """
 Tests for Learning-Core-based Content Libraries
 """
-import uuid
 from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
@@ -90,6 +89,13 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """
         assert big_dict.items() >= subset_dict.items()
 
+    def assertOrderEqual(self, libraries_list, expected_order):
+        """
+        Assert that the provided list of libraries match the order of expected
+        list by comparing the slugs.
+        """
+        assert [lib["slug"] for lib in libraries_list] == expected_order
+
     # API helpers
 
     def _api(self, method, url, data, expect_response):
@@ -128,10 +134,6 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             "description": description,
             "type": library_type,
             "license": license_type,
-            # We're not actually using this value any more, but we're keeping it
-            # in the API testing for backwards compatibility for just a little
-            # longer. TODO: Remove this once the frontend stops sending it.
-            "collection_uuid": uuid.uuid4(),
         }, expect_response)
 
     def _list_libraries(self, query_params_dict=None, expect_response=200):

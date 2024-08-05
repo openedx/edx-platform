@@ -146,11 +146,11 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'info': '',
         'non_editable': [],
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> response has been endorsed in your post '
+        'content_template': _('<{p}><{strong}>{replier_name}\'s</{strong}> response has been endorsed in your post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
-            'replier_name': 'Endorsed by',
+            'replier_name': 'replier name',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
@@ -161,7 +161,8 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'info': '',
         'non_editable': [],
-        'content_template': _('<{p}><Your response has been endorsed <{strong}>{post_title}</{strong}></{p}>'),
+        'content_template': _('<{p}>Your response has been endorsed on the post <{strong}>{post_title}</{strong}></{'
+                              'p}>'),
         'content_context': {
             'post_title': 'Post title',
         },
@@ -196,7 +197,7 @@ COURSE_NOTIFICATION_TYPES = {
         'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new open response submission awaiting for review for : '
+        'content_template': _('<{p}>You have a new open response submission awaiting for review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',

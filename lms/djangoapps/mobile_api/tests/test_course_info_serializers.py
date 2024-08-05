@@ -1,17 +1,14 @@
 """
 Tests for serializers for the Mobile Course Info
 """
-from unittest.mock import MagicMock, Mock, patch
 from typing import Dict, List, Tuple, Union
+from unittest.mock import MagicMock, Mock, patch
 
 import ddt
 from django.test import TestCase
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.mobile_api.course_info.serializers import (
-    CourseAccessSerializer,
-    CourseInfoOverviewSerializer,
-)
+from lms.djangoapps.mobile_api.course_info.serializers import CourseAccessSerializer, CourseInfoOverviewSerializer
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
@@ -147,7 +144,8 @@ class TestCourseInfoOverviewSerializer(TestCase):
         self.user = UserFactory()
         self.course_overview = CourseOverviewFactory()
 
-    def test_get_media(self):
+    @patch('lms.djangoapps.mobile_api.course_info.serializers.get_assignments_completions')
+    def test_get_media(self, get_assignments_completions_mock: MagicMock) -> None:
         output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data
 
         self.assertIn('media', output_data)
@@ -156,16 +154,53 @@ class TestCourseInfoOverviewSerializer(TestCase):
         self.assertIn('small', output_data['media']['image'])
         self.assertIn('large', output_data['media']['image'])
 
-    @patch('lms.djangoapps.mobile_api.course_info.serializers.get_link_for_about_page', return_value='mock_about_link')
-    def test_get_course_sharing_utm_parameters(self, mock_get_link_for_about_page: MagicMock) -> None:
+    @patch('lms.djangoapps.mobile_api.course_info.serializers.get_assignments_completions')
+    @patch(
+        'lms.djangoapps.mobile_api.course_info.serializers.get_link_for_about_page',
+        return_value='mock_about_link'
+    )
+    def test_get_course_sharing_utm_parameters(
+        self,
+        mock_get_link_for_about_page: MagicMock,
+        get_assignments_completions_mock: MagicMock,
+    ) -> None:
         output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data
 
         self.assertEqual(output_data['course_about'], mock_get_link_for_about_page.return_value)
         mock_get_link_for_about_page.assert_called_once_with(self.course_overview)
 
-    def test_get_course_modes(self):
+    @patch('lms.djangoapps.mobile_api.course_info.serializers.get_assignments_completions')
+    def test_get_course_modes(self, get_assignments_completions_mock: MagicMock) -> None:
         expected_course_modes = [{'slug': 'audit', 'sku': None, 'android_sku': None, 'ios_sku': None, 'min_price': 0}]
 
         output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data
 
         self.assertListEqual(output_data['course_modes'], expected_course_modes)
+
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
+    def test_get_course_progress_no_assignments(self, get_course_assignment_mock: MagicMock) -> None:
+        expected_course_progress = {'total_assignments_count': 0, 'assignments_completed': 0}
+
+        output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data
+
+        self.assertIn('course_progress', output_data)
+        self.assertDictEqual(output_data['course_progress'], expected_course_progress)
+        get_course_assignment_mock.assert_called_once_with(
+            self.course_overview.id, self.user, include_without_due=True
+        )
+
+    @patch('lms.djangoapps.courseware.courses.get_course_assignments')
+    def test_get_course_progress_with_assignments(self, get_course_assignment_mock: MagicMock) -> None:
+        assignments_mock = [
+            Mock(complete=False), Mock(complete=False), Mock(complete=True), Mock(complete=True), Mock(complete=True)
+        ]
+        get_course_assignment_mock.return_value = assignments_mock
+        expected_course_progress = {'total_assignments_count': 5, 'assignments_completed': 3}
+
+        output_data = CourseInfoOverviewSerializer(self.course_overview, context={'user': self.user}).data
+
+        self.assertIn('course_progress', output_data)
+        self.assertDictEqual(output_data['course_progress'], expected_course_progress)
+        get_course_assignment_mock.assert_called_once_with(
+            self.course_overview.id, self.user, include_without_due=True
+        )

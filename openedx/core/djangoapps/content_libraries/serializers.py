@@ -12,9 +12,11 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LICENSE_OPTIONS,
 )
 from openedx.core.djangoapps.content_libraries.models import (
-    ContentLibraryPermission, ContentLibraryBlockImportTask
+    ContentLibraryPermission, ContentLibraryBlockImportTask,
+    ContentLibrary
 )
 from openedx.core.lib.api.serializers import CourseKeyField
+from . import permissions
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
@@ -34,18 +36,40 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     org = serializers.SlugField(source="key.org")
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
-    collection_uuid = serializers.UUIDField(format='hex_verbose', write_only=True)
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     num_blocks = serializers.IntegerField(read_only=True)
     version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    published_by = serializers.CharField(read_only=True)
+    last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    last_draft_created_by = serializers.CharField(read_only=True)
     allow_lti = serializers.BooleanField(default=False, read_only=True)
     allow_public_learning = serializers.BooleanField(default=False)
     allow_public_read = serializers.BooleanField(default=False)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
     has_unpublished_deletes = serializers.BooleanField(read_only=True)
     license = serializers.ChoiceField(choices=LICENSE_OPTIONS, default=ALL_RIGHTS_RESERVED)
+    can_edit_library = serializers.SerializerMethodField()
+    created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    updated = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+
+    def get_can_edit_library(self, obj):
+        """
+        Verifies if the user in request has permission
+        to edit a library.
+        """
+        request = self.context.get('request', None)
+        if request is None:
+            return False
+
+        user = request.user
+
+        if not user:
+            return False
+
+        library_obj = ContentLibrary.objects.get_by_key(obj.key)
+        return user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
 
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):
@@ -95,6 +119,7 @@ class BaseFilterSerializer(serializers.Serializer):
     """
     text_search = serializers.CharField(default=None, required=False)
     org = serializers.CharField(default=None, required=False)
+    order = serializers.CharField(default=None, required=False)
 
 
 class ContentLibraryFilterSerializer(BaseFilterSerializer):
