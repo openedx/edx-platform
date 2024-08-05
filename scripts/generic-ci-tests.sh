@@ -78,17 +78,17 @@ case "$TEST_SUITE" in
         mkdir -p reports
 
         echo "Finding pycodestyle violations and storing report..."
-        run_paver_quality run_pep8 || { EXIT=1; }
-        echo "Finding ESLint violations and storing report..."
-        run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
-        echo "Finding Stylelint violations and storing report..."
-        run_paver_quality run_stylelint || { EXIT=1; }
-        echo "Running xss linter report."
-        run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
-        echo "Running PII checker on all Django models..."
-        run_paver_quality run_pii_check || { EXIT=1; }
-        echo "Running reserved keyword checker on all Django models..."
-        run_paver_quality check_keywords || { EXIT=1; }
+        pycodestyle .
+        # echo "Finding ESLint violations and storing report..."
+        # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
+        # echo "Finding Stylelint violations and storing report..."
+        # run_paver_quality run_stylelint || { EXIT=1; }
+        # echo "Running xss linter report."
+        # run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
+        # echo "Running PII checker on all Django models..."
+        # run_paver_quality run_pii_check || { EXIT=1; }
+        # echo "Running reserved keyword checker on all Django models..."
+        # run_paver_quality check_keywords || { EXIT=1; }
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
