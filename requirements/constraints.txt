@@ -130,3 +130,7 @@ numpy<2.0.0
 # Two lines were added in 1.14.4 that make file_exists_in_storage function always return False,
 # as the default value of AWS_S3_FILE_OVERWRITE is True
 django-storages<1.14.4
+
+# social-auth-app-django 5.4.2 introduces a new migration that will not play nicely with large installations.
+# We are pinning this until after all the smaller migrations get handled and then we can migrate this all at once.
+social-auth-app-django<=5.4.1
