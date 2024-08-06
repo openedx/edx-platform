@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-attrs==23.2.0
+attrs==24.2.0
     # via
     #   glom
     #   jsonschema
@@ -15,7 +15,7 @@ boltons==21.0.0
     #   face
     #   glom
     #   semgrep
-bracex==2.4
+bracex==2.5
     # via wcmatch
 certifi==2024.7.4
     # via requests
@@ -62,7 +62,7 @@ requests==2.32.3
     # via semgrep
 rich==13.7.1
     # via semgrep
-rpds-py==0.19.0
+rpds-py==0.19.1
     # via
     #   jsonschema
     #   referencing
