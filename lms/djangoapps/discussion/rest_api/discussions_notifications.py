@@ -118,9 +118,10 @@ class DiscussionNotificationSender:
             self.parent_response and
             self.creator.id != int(self.thread.user_id)
         ):
+            author_name = f"{self.parent_response.username}'s"
             # use your if author of response is same as author of post.
             # use 'their' if comment author is also response author.
-            author_name = (
+            author_pronoun = (
                 # Translators: Replier commented on "your" response to your post
                 _("your")
                 if self._response_and_thread_has_same_creator()
@@ -129,10 +130,12 @@ class DiscussionNotificationSender:
                     _("their")
                     if self._response_and_comment_has_same_creator()
                     else f"{self.parent_response.username}'s"
+
                 )
             )
             context = {
                 "author_name": str(author_name),
+                "author_pronoun": str(author_pronoun),
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 

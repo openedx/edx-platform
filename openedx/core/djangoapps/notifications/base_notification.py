@@ -457,6 +457,16 @@ class NotificationAppManager:
         return course_notification_preference_config
 
 
+def get_notification_type_content_function(notification_type):
+    """
+        Returns the content function for the given notification if it exists.
+    """
+    try:
+        return globals()[f"get_{notification_type}_notification_content"]
+    except KeyError:
+        return None
+
+
 def get_notification_content(notification_type, context):
     """
     Returns notification content for the given notification type with provided context.
@@ -465,11 +475,37 @@ def get_notification_content(notification_type, context):
         'strong': 'strong',
         'p': 'p',
     }
+    content_function = get_notification_type_content_function(notification_type)
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
     if notification_type:
+        if content_function:
+            return content_function(notification_type, context)
         notification_type_content_template = notification_type.get('content_template', None)
         if notification_type_content_template:
             return notification_type_content_template.format(**context, **html_tags_context)
+    return ''
+
+
+def get_new_comment_notification_content(notification_type, context):
+    """
+        Returns notification content for the new_comment notification.
+    """
+    return get_notification_content_with_author_pronoun(notification_type,context)
+
+
+def get_notification_content_with_author_pronoun(notification_type, context):
+    """
+        Helper function to get notification content with author's pronoun.
+    """
+    html_tags_context = {
+        'strong': 'strong',
+        'p': 'p',
+    }
+    notification_type_content_template = notification_type.get('content_template', None)
+    if 'author_pronoun' in context:
+        context['author_name'] = context['author_pronoun']
+    if notification_type_content_template:
+        return notification_type_content_template.format(**context, **html_tags_context)
     return ''
 
 

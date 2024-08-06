@@ -119,7 +119,7 @@ class Notification(TimeStampedModel):
         """
         Returns the content for the notification.
         """
-        return get_notification_content(self.notification_type, self.content_context)
+        return get_notification_content(self.notification_type, self.content_context.copy())
 
 
 class CourseNotificationPreference(TimeStampedModel):
