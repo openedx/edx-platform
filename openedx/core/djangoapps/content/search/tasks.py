@@ -80,4 +80,5 @@ def update_content_library_index_docs(library_key_str: str) -> None:
 
     log.info("Updating content index documents for library with id: %s", library_key)
 
+    api.delete_content_library_index_docs(library_key)
     api.upsert_content_library_index_docs(library_key)
