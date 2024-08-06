@@ -40,7 +40,7 @@ urlpatterns = [
     path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
          name='reset_student_attempts_for_entrance_exam'),
     path('rescore_entrance_exam', api.rescore_entrance_exam, name='rescore_entrance_exam'),
-    path('list_entrance_exam_instructor_tasks', api.list_entrance_exam_instructor_tasks,
+    path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),
          name='list_entrance_exam_instructor_tasks'),
     path('mark_student_can_skip_entrance_exam', api.mark_student_can_skip_entrance_exam,
          name='mark_student_can_skip_entrance_exam'),

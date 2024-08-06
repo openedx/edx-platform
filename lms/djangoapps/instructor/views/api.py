@@ -2366,46 +2366,51 @@ def _list_instructor_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.SHOW_TASKS)
-def list_entrance_exam_instructor_tasks(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListEntranceExamInstructorTasks(APIView):
     """
     List entrance exam related instructor tasks.
-
-    Takes either of the following query parameters
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    student = request.POST.get('unique_student_identifier', None)
-    if student is not None:
-        student = get_student_from_identifier(student)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.SHOW_TASKS
 
-    try:
-        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
-    except InvalidKeyError:
-        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
-    if student:
-        # Specifying for a single student's entrance exam history
-        tasks = task_api.get_entrance_exam_instructor_task_history(
-            course_id,
-            entrance_exam_key,
-            student
-        )
-    else:
-        # Specifying for all student's entrance exam history
-        tasks = task_api.get_entrance_exam_instructor_task_history(
-            course_id,
-            entrance_exam_key
-        )
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List entrance exam related instructor tasks.
 
-    response_payload = {
-        'tasks': list(map(extract_task_features, tasks)),
-    }
-    return JsonResponse(response_payload)
+        Takes either of the following query parameters
+            - unique_student_identifier is an email or username
+            - all_students is a boolean
+        """
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_id)
+        student = request.POST.get('unique_student_identifier', None)
+        if student is not None:
+            student = get_student_from_identifier(student)
+
+        try:
+            entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
+        except InvalidKeyError:
+            return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+        if student:
+            # Specifying for a single student's entrance exam history
+            tasks = task_api.get_entrance_exam_instructor_task_history(
+                course_id,
+                entrance_exam_key,
+                student
+            )
+        else:
+            # Specifying for all student's entrance exam history
+            tasks = task_api.get_entrance_exam_instructor_task_history(
+                course_id,
+                entrance_exam_key
+            )
+
+        response_payload = {
+            'tasks': list(map(extract_task_features, tasks)),
+        }
+        return JsonResponse(response_payload)
 
 
 class ReportDownloadSerializer(serializers.Serializer):  # pylint: disable=abstract-method
