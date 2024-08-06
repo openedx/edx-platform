@@ -10,5 +10,5 @@ class BulkEmailConfig(AppConfig):
 
     def ready(self):
         import lms.djangoapps.bulk_email.signals
-        from edx_ace.signals import ACE_EMAIL_SENT
+        from edx_ace.signals import ACE_MESSAGE_SENT
 

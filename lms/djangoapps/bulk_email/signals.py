@@ -35,19 +35,17 @@ def ace_email_sent_handler(sender, **kwargs):
     # Fetch the message object from kwargs, defaulting to None if not present
     message = kwargs.get('message', None)
 
-    # Check if message is not None and has the attribute 'message_type'
-    if message and hasattr(message, 'name') and message.name == 'bulkemail':
-        user_model = get_user_model()
-        try:
-            user_id = user_model.objects.get(email=message.recipient.email_address).id
-        except user_model.DoesNotExist:
-            user_id = None
+    user_model = get_user_model()
+    try:
+        user_id = user_model.objects.get(email=message.recipient.email_address).id
+    except user_model.DoesNotExist:
+        user_id = None
 
-        tracker.emit(
-            'edx.bulk_email.sent',
-            {
-                'message_type': message.name,
-                'course_id': str(message.context['course_email'].course_id),
-                'user_id': user_id,
-            }
-        )
+    tracker.emit(
+        'edx.bulk_email.sent',
+        {
+            'message_type': message.name,
+            'course_id': str(message.context['course_email'].course_id),
+            'user_id': user_id,
+        }
+    )
