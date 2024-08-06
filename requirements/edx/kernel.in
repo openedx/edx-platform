@@ -158,5 +158,5 @@ unicodecsv                          # Easier support for CSV files with unicode 
 user-util                           # Functionality for retiring users (GDPR compliance)
 webob
 web-fragments                       # Provides the ability to render fragments of web pages
-XBlock[django]                      # Courseware component architecture
+-e git+https://github.com/kdmccormick/XBlock.git@kdmccormick/types2#egg=XBlock[django]
 xss-utils                           # https://github.com/openedx/edx-platform/pull/20633 Fix XSS via Translations
