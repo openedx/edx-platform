@@ -8,17 +8,17 @@ asgiref==3.8.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-attrs==23.2.0
+attrs==24.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.34.144
+boto3==1.34.154
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.34.144
+botocore==1.34.154
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -45,7 +45,7 @@ click==8.1.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-cryptography==42.0.8
+cryptography==43.0.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
@@ -76,7 +76,7 @@ google-api-core==2.19.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.137.0
+google-api-python-client==2.139.0
     # via -r scripts/user_retirement/requirements/base.txt
 google-auth==2.32.0
     # via
@@ -152,7 +152,7 @@ proto-plus==1.24.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==5.27.2
+protobuf==5.27.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -175,7 +175,7 @@ pycparser==2.22
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   cffi
-pyjwt[crypto]==2.8.0
+pyjwt[crypto]==2.9.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
@@ -188,7 +188,7 @@ pyparsing==3.1.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
-pytest==8.2.2
+pytest==8.3.2
     # via -r scripts/user_retirement/requirements/testing.in
 python-dateutil==2.9.0.post0
     # via

@@ -6,13 +6,13 @@
 #
 asgiref==3.8.1
     # via django
-attrs==23.2.0
+attrs==24.1.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.34.144
+boto3==1.34.154
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.34.144
+botocore==1.34.154
     # via
     #   boto3
     #   s3transfer
@@ -33,7 +33,7 @@ click==8.1.6
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==42.0.8
+cryptography==43.0.0
     # via pyjwt
 django==4.2.14
     # via
@@ -52,7 +52,7 @@ edx-rest-api-client==5.7.1
     # via -r scripts/user_retirement/requirements/base.in
 google-api-core==2.19.1
     # via google-api-python-client
-google-api-python-client==2.137.0
+google-api-python-client==2.139.0
     # via -r scripts/user_retirement/requirements/base.in
 google-auth==2.32.0
     # via
@@ -91,7 +91,7 @@ platformdirs==4.2.2
     # via zeep
 proto-plus==1.24.0
     # via google-api-core
-protobuf==5.27.2
+protobuf==5.27.3
     # via
     #   google-api-core
     #   googleapis-common-protos
@@ -106,7 +106,7 @@ pyasn1-modules==0.4.0
     # via google-auth
 pycparser==2.22
     # via cffi
-pyjwt[crypto]==2.8.0
+pyjwt[crypto]==2.9.0
     # via
     #   edx-rest-api-client
     #   simple-salesforce
