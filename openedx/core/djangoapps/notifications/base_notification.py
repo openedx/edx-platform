@@ -109,8 +109,9 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'info': '',
         'non_editable': [],
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}\'s response in '
-                              'a post you’re following <{strong}>{post_title}</{strong}></{p}>'),
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
+                              '</{strong}> response in a post you’re following <{strong}>{post_title}'
+                              '</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'author_name': 'author name',
@@ -491,6 +492,13 @@ def get_new_comment_notification_content(notification_type, context):
         Returns notification content for the new_comment notification.
     """
     return get_notification_content_with_author_pronoun(notification_type,context)
+
+
+def get_comment_on_followed_post_notification_content(notification_type, context):
+    """
+        Returns notification content for the comment_on_followed_post notification.
+    """
+    return get_notification_content_with_author_pronoun(notification_type, context)
 
 
 def get_notification_content_with_author_pronoun(notification_type, context):
