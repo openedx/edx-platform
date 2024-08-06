@@ -2371,11 +2371,6 @@ class ListEntranceExamInstructorTasks(APIView):
     """
     List entrance exam related instructor tasks.
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.SHOW_TASKS
 
