@@ -18,7 +18,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
@@ -467,6 +467,26 @@ def delete_index_doc(usage_key: UsageKey) -> None:
     _wait_for_meili_tasks(tasks)
 
 
+def delete_index_docs(meili_ids: list[str]) -> None:
+    """
+    Deletes documents for the given XBlocks from the search index
+
+    Args:
+        meili_ids (list[str]): List of meili_ids from usage keys of the XBlocks to be removed from the index
+    """
+    current_rebuild_index_name = _get_running_rebuild_index_name()
+
+    client = _get_meilisearch_client()
+
+    tasks = []
+    if current_rebuild_index_name:
+        # If there is a rebuild in progress, the document will also be deleted from the new index.
+        tasks.append(client.index(current_rebuild_index_name).delete_documents(meili_ids))
+    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(meili_ids))
+
+    _wait_for_meili_tasks(tasks)
+
+
 def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     """
     Creates or updates the document for the given Library Block in the search index
@@ -493,6 +513,21 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
         docs.append(doc)
 
     _update_index_docs(docs)
+
+
+def delete_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
+    """
+    Deletes the discarded draft documents for the given Content Library in the search index
+    """
+    meili_ids = []
+    for component in lib_api.get_library_components(library_key, draft=False, published=False):
+        usage_key = LibraryUsageLocatorV2(
+            library_key,
+            component.component_type.name,
+            component.local_key,
+        )
+        meili_ids.append(meili_id_from_opaque_key(usage_key))
+    delete_index_docs(meili_ids)
 
 
 def upsert_block_tags_index_docs(usage_key: UsageKey):
