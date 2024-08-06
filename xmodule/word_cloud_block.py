@@ -257,7 +257,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
             'ajax_url': self.ajax_url,
             'display_name': self.display_name,
             'instructions': self.instructions,
-            'element_class': self.location.block_type,
+            'element_class': 'word_cloud_deprecated',
             'element_id': self.location.html_id(),
             'num_inputs': self.num_inputs,
             'submitted': self.submitted,
