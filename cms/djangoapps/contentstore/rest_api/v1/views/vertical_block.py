@@ -3,7 +3,6 @@
 import logging
 import edx_api_doc_tools as apidocs
 from django.http import HttpResponseBadRequest
-from opaque_keys import InvalidKeyError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -287,7 +286,6 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     user_partitions = get_user_partition_info(child_info, course=course)
                     validation_messages = get_xblock_validation_messages(child_info)
                     render_error = get_xblock_render_error(request, child_info)
-
 
                     children.append({
                         "xblock": child_info,

@@ -9,6 +9,7 @@ from mimetypes import guess_type
 
 from attrs import frozen, Factory
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
@@ -22,7 +23,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.upstream_sync import is_valid_upstream
+from cms.lib.xblock.upstream_sync import validate_upstream_key, UnsupportedUpstreamKeyType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
@@ -30,6 +31,10 @@ import openedx.core.djangoapps.content_tagging.api as content_tagging_api
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
 
 log = logging.getLogger(__name__)
+
+
+User = get_user_model()
+
 
 # Note: Grader types are used throughout the platform but most usages are simply in-line
 # strings.  In addition, new grader types can be defined on the fly anytime one is needed
@@ -285,7 +290,7 @@ def import_staged_content_from_user_clipboard(
             node,
             parent_xblock,
             store,
-            user_id=request.user.id,
+            user=request.user,
             slug_hint=user_clipboard.source_usage_key.block_id,
             copied_from_block=str(user_clipboard.source_usage_key),
             tags=user_clipboard.content.tags,
@@ -305,8 +310,8 @@ def _import_xml_node_to_parent(
     parent_xblock: XBlock,
     # The modulestore we're using
     store,
-    # The ID of the user who is performing this operation
-    user_id: int,
+    # The user who is performing this operation
+    user: User,
     # Hint to use as usage ID (block_id) for the new XBlock
     slug_hint: str | None = None,
     # UsageKey of the XBlock that this one is a copy of
@@ -380,14 +385,20 @@ def _import_xml_node_to_parent(
     if copied_from_block:
         # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
         temp_xblock.copied_from_block = copied_from_block
-        copied_from_key = UsageKey.from_string(copied_from_block)
-        if link_to_upstream and is_valid_upstream(copied_from_key):
-            temp_xblock.assign_upstream(copied_from_key, user_id)
+    if copied_from_block and link_to_upstream:
+        # If requested, link this block as a downstream of where it was copied from
+        try:
+            validate_upstream_key(copied_from_block)
+        except UnsupportedUpstreamKeyType:
+            pass  # @@TODO - should we let this error bubble up?
+        else:
+            temp_xblock.upstream = copied_from_block
+            temp_xblock.sync_from_upstream(user=user, apply_updates=False)
 
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
-    new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
+    new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)
-    store.update_item(parent_xblock, user_id)
+    store.update_item(parent_xblock, user.id)
 
     children_handled = False
     if hasattr(new_xblock, 'studio_post_paste'):
@@ -403,7 +414,7 @@ def _import_xml_node_to_parent(
                 child_node,
                 new_xblock,
                 store,
-                user_id=user_id,
+                user=user,
                 copied_from_block=str(child_copied_from),
                 tags=tags,
             )

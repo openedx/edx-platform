@@ -9,7 +9,7 @@ import json
 from dataclasses import dataclass
 
 from django.contrib.auth import get_user_model
-from django.util.functional import cached_property
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
@@ -25,6 +25,9 @@ from openedx.core.djangoapps.content_libraries.api import (
     get_library_block,
     LibraryXBlockMetadata,
 )
+
+
+User = get_user_model()
 
 
 class UnsupportedUpstreamKeyType(Exception):
@@ -68,7 +71,7 @@ class UpstreamInfo:
         return (
             self.latest_version
             and self.current_version < self.latest_version
-            and not error
+            and not self.error
         )
 
 
@@ -146,7 +149,7 @@ class UpstreamSyncMixin(XBlockMixin):
         self.save()
         return Response(json.dumps(self.get_upstream_info()), indent=4)
 
-    def sync_from_upstream(self, *, user: User, apply_updates: bool):
+    def sync_from_upstream(self, *, user: User, apply_updates: bool) -> None:
         """
         @@TODO docstring
 
@@ -156,13 +159,14 @@ class UpstreamSyncMixin(XBlockMixin):
             self.upstream_settings = {}
             self.upstream_overridden = []
             self.upstream_version = None
+            return
         upstream_key = usage_key = validate_upstream_key(self.upstream)
         self.upstream_settings = {}
         try:
             upstream_block = xblock_api.load_block(upstream_key, user)
         except NotFound as exc:
             raise XBlockNotFoundError(
-                f"failed to load upstream ({self.upstream)} for block ({self.usage_key)} for user id={user.id}"
+                f"failed to load upstream ({self.upstream}) for block ({self.usage_key}) for user id={user.id}"
             ) from exc
         for field_name, field in upstream_block.fields.items():
             if field.scope not in [Scope.settings, Scope.content]:
@@ -172,7 +176,7 @@ class UpstreamSyncMixin(XBlockMixin):
                 self.upstream_settings[field_name] = value
                 if field_name in self.upstream_overridden:
                     continue
-            if not apply:
+            if not apply_updates:
                 continue
             setattr(self, field_name, value)
         self.upstream_version = self._lib_block.version_num
@@ -201,14 +205,14 @@ class UpstreamSyncMixin(XBlockMixin):
             usage_key=self.upstream,
             current_version=self.upstream_version,
             latest_version=latest,
-            sync_url=self.runtime.handler_url(self, 'sync_updates')
+            sync_url=self.runtime.handler_url(self, 'sync_updates'),
             error=error,
         )
 
     @cached_property
     def _lib_block(self) -> LibraryXBlockMetadata | None:
         """
-        Internal cache of the upstream XBlock metadata, or None if there is none.
+        Internal cache of the upstream library XBlock metadata, or None if there is no upstream assigned.
 
         We assume, for now, that upstreams are always Learning-Core-backed Content Library blocks.
         That is an INTERNAL ASSUMPTION that may change at some point; hence, this is a private
