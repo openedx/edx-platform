@@ -34,7 +34,7 @@ def connect_to_mongodb(
     # Convert the lowercased authsource parameter to the camel-cased authSource expected by MongoClient.
     auth_source = db
     if auth_source_key := {'authSource', 'authsource'}.intersection(set(kwargs.keys())):
-        auth_source = kwargs.pop(auth_source_key)
+        auth_source = kwargs.pop(auth_source_key.pop()) or db
 
     # sanitize a kwarg which may be present and is no longer expected
     # AED 2020-03-02 TODO: Remove this when 'auth_source' will no longer exist in kwargs
