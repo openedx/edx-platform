@@ -427,7 +427,7 @@ edx-django-release-util==1.4.0
     #   edxval
 edx-django-sites-extensions==4.2.0
     # via -r requirements/edx/kernel.in
-edx-django-utils==5.14.2
+edx-django-utils==5.15.0
     # via
     #   -r requirements/edx/kernel.in
     #   django-config-models
