@@ -474,7 +474,7 @@ def delete_all_draft_docs_for_library(library_key: LibraryLocatorV2) -> None:
     current_rebuild_index_name = _get_running_rebuild_index_name()
     client = _get_meilisearch_client()
     # Delete all documents where last_published is null i.e. never published before.
-    filter = [
+    delete_filter = [
         f'{Fields.context_key}="{library_key}"',
         # inner arrays are connected by an OR
         [f'{Fields.last_published} IS EMPTY', f'{Fields.last_published} IS NULL'],
@@ -483,8 +483,8 @@ def delete_all_draft_docs_for_library(library_key: LibraryLocatorV2) -> None:
     tasks = []
     if current_rebuild_index_name:
         # If there is a rebuild in progress, the documents will also be deleted from the new index.
-        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=filter))
-    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=filter))
+        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=delete_filter))
+    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=delete_filter))
 
     _wait_for_meili_tasks(tasks)
 
