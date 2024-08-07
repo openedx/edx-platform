@@ -136,8 +136,7 @@ def content_library_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    if content_library_data.update_blocks:
-        update_content_library_index_docs.delay(str(content_library_data.library_key))
+    update_content_library_index_docs.delay(str(content_library_data.library_key))
 
 
 @receiver(CONTENT_OBJECT_TAGS_CHANGED)
