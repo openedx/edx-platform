@@ -275,9 +275,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                     'enabled': True,
                     'core_notification_types': [],
                     'notification_types': {
-                        'course_update': {
+                        'course_updates': {
                             'web': True,
-                            'email': True,
+                            'email': False,
                             'push': True,
                             'email_cadence': 'Daily',
                             'info': ''

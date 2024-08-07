@@ -65,7 +65,7 @@
     "react-slick": "0.29.0",
     "redux": "3.7.2",
     "redux-thunk": "2.2.0",
-    "requirejs": "2.3.6",
+    "requirejs": "2.3.7",
     "rtlcss": "2.6.2",
     "sass": "^1.54.8",
     "sass-loader": "^14.1.1",

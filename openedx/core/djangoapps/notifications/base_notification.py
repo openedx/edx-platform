@@ -169,13 +169,13 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
-    'course_update': {
+    'course_updates': {
         'notification_app': 'updates',
-        'name': 'course_update',
+        'name': 'course_updates',
         'is_core': False,
         'info': '',
         'web': True,
-        'email': True,
+        'email': False,
         'push': True,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
@@ -197,7 +197,7 @@ COURSE_NOTIFICATION_TYPES = {
         'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new open response submission awaiting for review for : '
+        'content_template': _('<{p}>You have a new open response submission awaiting for review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',

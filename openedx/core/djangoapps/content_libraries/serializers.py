@@ -36,12 +36,14 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     org = serializers.SlugField(source="key.org")
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
-    #collection_uuid = serializers.UUIDField(format='hex_verbose', write_only=True)
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     num_blocks = serializers.IntegerField(read_only=True)
     version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    published_by = serializers.CharField(read_only=True)
+    last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    last_draft_created_by = serializers.CharField(read_only=True)
     allow_lti = serializers.BooleanField(default=False, read_only=True)
     allow_public_learning = serializers.BooleanField(default=False)
     allow_public_read = serializers.BooleanField(default=False)
@@ -49,6 +51,8 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     has_unpublished_deletes = serializers.BooleanField(read_only=True)
     license = serializers.ChoiceField(choices=LICENSE_OPTIONS, default=ALL_RIGHTS_RESERVED)
     can_edit_library = serializers.SerializerMethodField()
+    created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    updated = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
 
     def get_can_edit_library(self, obj):
         """
