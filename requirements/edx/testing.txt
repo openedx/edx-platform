@@ -1646,8 +1646,9 @@ wrapt==1.16.0
     # via
     #   -r requirements/edx/base.txt
     #   astroid
-xblock[django]==5.0.0
+xblock[django]==4.0.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   acid-xblock
     #   crowdsourcehinter-xblock
