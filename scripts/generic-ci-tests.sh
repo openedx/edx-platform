@@ -82,7 +82,7 @@ case "$TEST_SUITE" in
         # echo "Finding ESLint violations and storing report..."
         # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
         echo "Finding Stylelint violations and storing report..."
-        python quality_tests.py stylelint
+        python scripts/quality_tests.py stylelint
         # run_paver_quality run_stylelint || { EXIT=1; }
         # echo "Running xss linter report."
         # run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
