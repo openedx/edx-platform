@@ -30,6 +30,8 @@ JUNIT_XML_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 """
 JUNIT_XML_FAILURE_TEMPLATE = '<failure message={message}/>'
 START_TIME = datetime.utcnow()
+PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
+NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 
 
 class BuildFailure(Exception):
