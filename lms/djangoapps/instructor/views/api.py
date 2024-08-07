@@ -105,6 +105,7 @@ from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
+from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -1064,15 +1065,11 @@ def modify_access(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EDIT_COURSE_ACCESS)
-@require_post_params(rolename="'instructor', 'staff', or 'beta'")
-def list_course_role_members(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListCourseRoleMembersView(APIView):
     """
-    List instructors and staff.
-    Requires instructor access.
+    View to list instructors and staff for a specific course.
+    Requires the user to have instructor access.
 
     rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
 
@@ -1088,33 +1085,41 @@ def list_course_role_members(request, course_id):
         ]
     }
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'instructor', course_id, depth=None
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EDIT_COURSE_ACCESS
 
-    rolename = request.POST.get('rolename')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handles POST request to list instructors and staff.
 
-    if rolename not in ROLES:
-        return HttpResponseBadRequest()
+        Args:
+            request (HttpRequest): The request object containing user data.
+            course_id (str): The ID of the course to list instructors and staff for.
 
-    def extract_user_info(user):
-        """ convert user into dicts for json view """
+        Returns:
+            Response: A Response object containing the list of instructors and staff or an error message.
 
-        return {
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
+        Raises:
+            Http404: If the course does not exist.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_with_access(
+            request.user, 'instructor', course_id, depth=None
+        )
+        role_serializer = RoleNameSerializer(data=request.data)
+        role_serializer.is_valid(raise_exception=True)
+        rolename = role_serializer.data['rolename']
+
+        users = list_with_level(course.id, rolename)
+        serializer = UserSerializer(users, many=True)
+
+        response_payload = {
+            'course_id': str(course_id),
+            rolename: serializer.data,
         }
 
-    response_payload = {
-        'course_id': str(course_id),
-        rolename: list(map(extract_user_info, list_with_level(
-            course.id, rolename
-        ))),
-    }
-    return JsonResponse(response_payload)
+        return Response(response_payload, status=status.HTTP_200_OK)
 
 
 class ProblemResponseReportPostParamsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
