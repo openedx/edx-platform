@@ -1085,11 +1085,6 @@ class ListCourseRoleMembersView(APIView):
         ]
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.EDIT_COURSE_ACCESS
 
