@@ -18,7 +18,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
@@ -231,7 +231,7 @@ def _recurse_children(block, fn, status_cb: Callable[[str], None] | None = None)
                 fn(child)
 
 
-def _update_index_docs(docs) -> list[TaskInfo]:
+def _update_index_docs(docs) -> None:
     """
     Helper function that updates the documents in the search index
 
@@ -467,13 +467,18 @@ def delete_index_doc(usage_key: UsageKey) -> None:
     _wait_for_meili_tasks(tasks)
 
 
-def delete_all_index_docs_for_library(library_key: LibraryLocatorV2) -> None:
+def delete_all_draft_docs_for_library(library_key: LibraryLocatorV2) -> None:
     """
-    Deletes documents for the given XBlocks from the search index
+    Deletes draft documents for the given XBlocks from the search index
     """
     current_rebuild_index_name = _get_running_rebuild_index_name()
     client = _get_meilisearch_client()
-    filter = f'{Fields.context_key}="{library_key}"'
+    # Delete all documents where last_published is null i.e. never published before.
+    filter = [
+        f'{Fields.context_key}="{library_key}"',
+        # inner arrays are connected by an OR
+        [f'{Fields.last_published} IS EMPTY', f'{Fields.last_published} IS NULL'],
+    ]
 
     tasks = []
     if current_rebuild_index_name:
@@ -509,7 +514,7 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
         doc = searchable_doc_for_library_block(metadata)
         docs.append(doc)
 
-    return _update_index_docs(docs)
+    _update_index_docs(docs)
 
 
 def upsert_block_tags_index_docs(usage_key: UsageKey):

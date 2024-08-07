@@ -642,7 +642,7 @@ def _get_library_component_tags_count(library_key) -> dict:
     return get_object_tag_counts(library_key_pattern, count_implicit=True)
 
 
-def get_library_components(library_key, text_search=None, block_types=None, draft=True, published=None) -> QuerySet[Component]:
+def get_library_components(library_key, text_search=None, block_types=None) -> QuerySet[Component]:
     """
     Get the library components and filter.
 
@@ -653,8 +653,7 @@ def get_library_components(library_key, text_search=None, block_types=None, draf
     learning_package = lib.learning_package
     components = authoring_api.get_components(
         learning_package.id,
-        draft=draft,
-        published=published,
+        draft=True,
         namespace='xblock.v1',
         type_names=block_types,
         draft_title=text_search,
