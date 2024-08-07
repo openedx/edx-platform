@@ -670,18 +670,18 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data, **users_counts)
 
-    def _get_user_count(self, query_args, cache_time=3600, annotations=None):
+    def _get_user_count(self, course_key, query_args, cache_time=600, annotations=None):
         """
         Return the user count for the given query arguments to CourseEnrollment.
 
-        caches the count for cache_time seconds.
+        Caches the count for cache_time seconds, the default value is 10 minutes.
         """
         queryset = CourseEnrollment.objects
         if annotations:
             queryset = queryset.annotate(**annotations)
         queryset = queryset.filter(*query_args)
 
-        cache_key = 'usercount.%s' % queryset.query
+        cache_key = 'usercount.{course_key}.{queryset.query}'
         user_count = cache.get(cache_key, None)
         if user_count is None:
             user_count = queryset.count()
@@ -710,7 +710,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             Q(course_id=course_key) & Q(is_active=True)
         ]
 
-        total_users_count = self._get_user_count(filter_args)
+        total_users_count = self._get_user_count(course_key, filter_args)
 
         filter_args.extend(course_enrollment_filters or [])
 
@@ -718,7 +718,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         filtered_users_count = (
             total_users_count
             if not course_enrollment_filters
-            else self._get_user_count(filter_args, annotations=annotations)
+            else self._get_user_count(course_key, filter_args, annotations=annotations)
         )
 
         return {
