@@ -23,6 +23,7 @@ from lms.djangoapps.courseware.block_render import (
     xblock_view,
     xqueue_callback
 )
+from lms.djangoapps.courseware.unit_render import get_unit_blocks
 from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
@@ -288,6 +289,14 @@ urlpatterns += [
         name='xblock_handler',
     ),
     re_path(
+        r'^xblock/{usage_key}/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(
+            usage_key=settings.USAGE_ID_PATTERN,
+        ),
+        handle_xblock_callback,
+        {"course_id": None},
+        name='xblock_handler_no_course',
+    ),
+    re_path(
         r'^courses/{course_key}/xblock/{usage_key}/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
@@ -326,6 +335,16 @@ urlpatterns += [
         fr'^videos/{settings.USAGE_KEY_PATTERN}$',
         courseware_views.PublicVideoXBlockView.as_view(),
         name=RENDER_VIDEO_XBLOCK_NAME,
+    ),
+
+    # NEW API to render all of the XBlocks in a given unit. Returns JSON data so
+    # that the frontend (or mobile app) can render the XBlock.
+    re_path(
+        r'^api/xblock/v1/{usage_key}/unit_contents$'.format(
+            usage_key=settings.USAGE_ID_PATTERN,
+        ),
+        get_unit_blocks,
+        name='get_unit_blocks',
     ),
 
 

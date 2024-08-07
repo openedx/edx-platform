@@ -792,9 +792,21 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     request.user.known = request.user.is_authenticated
 
     try:
-        course_key = CourseKey.from_string(course_id)
+        usage_key = UsageKey.from_string(usage_id)
     except InvalidKeyError:
-        raise Http404(f'{course_id} is not a valid course key')  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404(f'{usage_id} is not a valid usage key')  # lint-amnesty, pylint: disable=raise-missing-from
+    course_key = usage_key.context_key
+    if course_id:
+        # This API used to require specifying _both_ the course and usage keys, even though the course key can be
+        # trivially derived from the usage key. If both are set, verify that they match:
+        try:
+            course_key_explicit = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            raise Http404(f'{course_id} is not a valid course key')  # lint-amnesty, pylint: disable=raise-missing-from
+        if course_key_explicit != course_key:
+            raise Http404(f'{course_id} does not match the course of the usage key {usage_id}')
+    else:
+        course_id = str(course_key)
 
     with modulestore().bulk_operations(course_key):
         try:
