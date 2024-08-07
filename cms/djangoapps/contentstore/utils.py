@@ -2255,7 +2255,7 @@ def send_course_update_notification(course_key, content, user):
             "course_update_content": text_content if len(text_content.strip()) < 10 else "Click here to view",
             **extra_context,
         },
-        notification_type="course_update",
+        notification_type="course_updates",
         content_url=f"{settings.LMS_ROOT_URL}/courses/{str(course_key)}/course/updates",
         app_name="updates",
         audience_filters={},
