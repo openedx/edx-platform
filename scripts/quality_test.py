@@ -60,6 +60,32 @@ def install_node_prereqs():
     prereq_cache("Node prereqs", ["package.json", "package-lock.json"], node_prereqs_installation)
 
 
+def compute_fingerprint(path_list):
+    """
+    Hash the contents of all the files and directories in `path_list`.
+    Returns the hex digest.
+    """
+
+    hasher = hashlib.sha1()
+
+    for path_item in path_list:
+
+        # For directories, create a hash based on the modification times
+        # of first-level subdirectories
+        if os.path.isdir(path_item):
+            for dirname in sorted(os.listdir(path_item)):
+                path_name = os.path.join(path_item, dirname)
+                if os.path.isdir(path_name):
+                    hasher.update(str(os.stat(path_name).st_mtime).encode('utf-8'))
+
+        # For files, hash the contents of the file
+        if os.path.isfile(path_item):
+            with open(path_item, "rb") as file_handle:
+                hasher.update(file_handle.read())
+
+    return hasher.hexdigest()
+    
+
 def prereq_cache(cache_name, paths, install_func):
     """
     Conditionally execute `install_func()` only if the files/directories
