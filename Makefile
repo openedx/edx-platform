@@ -206,7 +206,7 @@ ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip ins
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
 
 test-eslint:
-	node node_modules/.bin/eslint --ext .js --ext .jsx --format=compact .
+	npx node_modules/.bin/eslint --ext .js --ext .jsx --format=compact .
 
 test-stylelint:
 	npx stylelint '**/*.scss' --custom-formatter=node_modules/stylelint-formatter-pretty
