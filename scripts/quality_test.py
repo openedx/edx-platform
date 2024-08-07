@@ -87,6 +87,15 @@ def compute_fingerprint(path_list):
     return hasher.hexdigest()
 
 
+def create_prereqs_cache_dir():
+    """Create the directory for storing the hashes, if it doesn't exist already."""
+    try:
+        os.makedirs(PREREQS_STATE_DIR)
+    except OSError:
+        if not os.path.isdir(PREREQS_STATE_DIR):
+            raise
+
+
 def prereq_cache(cache_name, paths, install_func):
     """
     Conditionally execute `install_func()` only if the files/directories
