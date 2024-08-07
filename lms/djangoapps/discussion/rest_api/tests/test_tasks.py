@@ -338,6 +338,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
             'author_name': 'dummy\'s',
+            'author_pronoun': 'dummy\'s',
             'course_name': self.course.display_name,
             'sender_id': self.user_3.id
         }
@@ -399,7 +400,8 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
-            'author_name': 'your',
+            'author_name': 'dummy\'s',
+            'author_pronoun': 'your',
             'course_name': self.course.display_name,
             'sender_id': self.user_3.id,
         }
@@ -441,7 +443,8 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'sender_id': self.user_2.id,
         }
         if parent_id:
-            expected_context['author_name'] = 'dummy'
+            expected_context['author_name'] = 'dummy\'s'
+            expected_context['author_pronoun'] = 'dummy\'s'
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
             args.content_url,
@@ -531,7 +534,8 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
         send_response_notifications(thread.id, str(self.course.id), self.user_2.id, parent_id=response.id)
         handler.assert_called_once()
         context = handler.call_args[1]['notification_data'].context
-        self.assertEqual(context['author_name'], 'their')
+        self.assertEqual(context['author_name'], 'dummy\'s')
+        self.assertEqual(context['author_pronoun'], 'their')
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
