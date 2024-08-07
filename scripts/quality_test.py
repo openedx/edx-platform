@@ -2,6 +2,7 @@
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
+import hashlib
 import json
 import os
 import re
@@ -84,7 +85,7 @@ def compute_fingerprint(path_list):
                 hasher.update(file_handle.read())
 
     return hasher.hexdigest()
-    
+
 
 def prereq_cache(cache_name, paths, install_func):
     """
