@@ -642,6 +642,25 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             last_name='Student'
         )
 
+    def test_api_without_login(self):
+        """
+        verify in case of no authentication it returns 401.
+        """
+        self.client.logout()
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        assert response.status_code == 401
+
+    def test_api_without_permission(self):
+        """
+        verify in case of no authentication it returns 403.
+        """
+        # removed role from course for instructor
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        assert response.status_code == 403
+
     @patch('lms.djangoapps.instructor.views.api.log.info')
     @ddt.data(
         b"test_student@example.com,test_student_1,tester1,USA",  # Typical use case.
