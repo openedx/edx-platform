@@ -548,7 +548,14 @@ class LoncapaProblem(object):
             return answer_id[0]
         if xml_element.tag == 'optioninput':
             return xml_element.xpath('@correct')[0]
-        return ', '.join(xml_element.xpath('*[@correct="true"]/text()'))
+
+        answers_list = xml_element.xpath('*[@correct="true"]//text()')
+        cleaned_answers = [answer for answer in answers_list if re.sub(r'[^a-zA-Z0-9\s]', '', answer).strip()]
+
+        if not cleaned_answers:
+            cleaned_answers = xml_element.getparent().xpath('@answer')
+
+        return ', '.join(cleaned_answers)
 
     def find_question_label(self, answer_id):
         """
@@ -625,7 +632,9 @@ class LoncapaProblem(object):
             if questiontext_elem is not None and questiontext_elem.tag in LABEL_ELEMS:
                 question_text = questiontext_elem.text
             else:
-                question_text = generate_default_question_label()
+                # Course authoring store a question inside <p> tag within the problem
+                problem_title = xml_elem.xpath('p') or xml_elem.getparent().xpath('p')
+                question_text = problem_title[0].text if len(problem_title) == 1 else generate_default_question_label()
 
         return question_text
 
