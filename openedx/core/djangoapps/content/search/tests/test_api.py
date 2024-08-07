@@ -388,3 +388,18 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with(
             [self.doc_problem1, self.doc_problem2]
         )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_delete_all_drafts(self, mock_meilisearch):
+        """
+        Test deleting all draft documents from the index.
+        """
+        api.delete_all_draft_docs_for_library(self.library.key)
+
+        delete_filter = [
+            f'context_key="{self.library.key}"',
+            ['last_published IS EMPTY', 'last_published IS NULL'],
+        ]
+        mock_meilisearch.return_value.index.return_value.delete_documents.assert_called_once_with(
+            filter=delete_filter
+        )
