@@ -348,6 +348,7 @@ def _get_stylelint_violations():
     """
     Returns the number of Stylelint violations.
     """
+    
     stylelint_report_dir = (Env.REPORT_DIR / "stylelint")
     stylelint_report = stylelint_report_dir / "stylelint.report"
     _prepare_report_dir(stylelint_report_dir)
@@ -364,6 +365,7 @@ def _get_stylelint_violations():
             text=True
         )
         report_file.write(result.stdout)
+        print("_get_stylelint_violations")
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
