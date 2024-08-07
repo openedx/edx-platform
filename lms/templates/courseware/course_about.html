@@ -62,11 +62,10 @@ from openedx.core.lib.courses import course_image_url
       <div class="table">
       <section class="intro">
         <div class="heading-group">
-          <h1>
-            ${course.display_name_with_default}
-          </h1>
+          <p><small>${course.display_org_with_default}</small></p>
+          <h1>${course.display_name_with_default}</h1>
           <br />
-          <span>${course.display_org_with_default}</span>
+          <p>${get_course_about_section(request, course, 'short_description')}</p>
         </div>
 
         <div class="main-cta">
@@ -160,7 +159,11 @@ from openedx.core.lib.courses import course_image_url
 
         <%block name="course_about_important_dates">
         <ol class="important-dates">
-          <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default}</span></li>
+          <li class="important-dates-item">
+              <span class="icon fa fa-info-circle" aria-hidden="true"></span>
+              <p class="important-dates-item-title">${_("Course Number")}</p>
+              <span class="important-dates-item-text course-number">${course.display_number_with_default}</span>
+          </li>
           % if not course.start_date_is_still_default:
               <%
                   course_start_date = course.advertised_start or course.start
@@ -231,7 +234,11 @@ from openedx.core.lib.courses import course_image_url
           % endif
 
           % if get_course_about_section(request, course, "prerequisites"):
-            <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
+            <li class="important-dates-item">
+              <span class="icon fa fa-book" aria-hidden="true"></span>
+              <p class="important-dates-item-title">${_("Requirements")}</p>
+              <span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span>
+            </li>
           % endif
         </ol>
         </%block>
