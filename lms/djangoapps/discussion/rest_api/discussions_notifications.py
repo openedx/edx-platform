@@ -195,16 +195,15 @@ class DiscussionNotificationSender:
             author_name = f"{self.parent_response.username}'s"
             # use 'their' if comment author is also response author.
             author_pronoun = (
-                    # Translators: Replier commented on "their" response in a post you're following
-                    _("their")
-                    if self._response_and_comment_has_same_creator()
-                    else f"{self.parent_response.username}'s"
+                # Translators: Replier commented on "their" response in a post you're following
+                _("their")
+                if self._response_and_comment_has_same_creator()
+                else f"{self.parent_response.username}'s"
             )
             self._send_notification(
                 users,
                 "comment_on_followed_post",
-                extra_context=
-                {
+                extra_context={
                     "author_name": str(author_name),
                     "author_pronoun": str(author_pronoun),
                 }

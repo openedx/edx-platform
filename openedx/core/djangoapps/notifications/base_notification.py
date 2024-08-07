@@ -491,7 +491,7 @@ def get_new_comment_notification_content(notification_type, context):
     """
         Returns notification content for the new_comment notification.
     """
-    return get_notification_content_with_author_pronoun(notification_type,context)
+    return get_notification_content_with_author_pronoun(notification_type, context)
 
 
 def get_comment_on_followed_post_notification_content(notification_type, context):
