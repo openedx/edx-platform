@@ -2170,11 +2170,6 @@ class ListEmailContent(APIView):
     """
     List the content of bulk emails sent
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.EMAIL
 
