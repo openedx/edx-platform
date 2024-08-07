@@ -80,6 +80,5 @@ def update_content_library_index_docs(library_key_str: str) -> None:
 
     log.info("Updating content index documents for library with id: %s", library_key)
 
-    tasks = api.delete_content_library_index_docs(library_key, wait=False) + \
-        api.upsert_content_library_index_docs(library_key, wait=False)
-    api.wait_for_meili_tasks(tasks)
+    api.delete_all_index_docs_for_library(library_key)
+    api.upsert_content_library_index_docs(library_key)
