@@ -124,6 +124,21 @@ sites)::
   ./manage.py lms collectstatic
   ./manage.py cms collectstatic
 
+Setup Studio SSO for Development::
+
+  ./manage.py lms manage_user studio_worker example@example.com --unusable-password
+  # The command below creates the application that studio uses to login. For
+  # convenience the command below sets up the application with the development
+  # mode default values for the client-id and client secret. For production
+  # system do not provide the id and sceret. They will be created by the command
+  # to be random and cryptographically strong. In a production system, after you
+  # run this command, you will need to login to the django admin
+  # (eg. http://localhost:18000/admin/oauth2_provider/application/) site to view the
+  # credentials and set them in the config for your production studio deployment
+  # using the `SOCIAL_AUTH_EDX_OAUTH2_KEY` and `SOCIAL_AUTH_EDX_OAUTH2_SECRET`
+  # values in your studio settings.
+  ./manage.py lms create_dot_application --grant-type authorization-code --skip-authorization --redirect-uris "http://localhost:18010/complete/edx-oauth2/" --scopes "user_id" studio-sso studio_worker --client-id studio-sso-key --client-secret studio-sso-secret
+
 Run the Platform
 ----------------
 
@@ -131,11 +146,11 @@ First, ensure MySQL, Mongo, and Memcached are running.
 
 Start the LMS::
 
-  ./manage.py lms runserver
+  ./manage.py lms runserver 18000
 
 Start the CMS::
 
-  ./manage.py cms runserver
+  ./manage.py cms runserver 18010
 
 This will give you a mostly-headless Open edX platform. Most frontends have
 been migrated to "Micro-Frontends (MFEs)" which need to be installed and run

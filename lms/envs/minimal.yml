@@ -36,3 +36,6 @@ LMS_INTERNAL_ROOT_URL: "http://localhost"
 
 # So that Swagger config code doesn't complain
 API_ACCESS_MANAGER_EMAIL: "api-access@example.com"
+
+# So that you can login to studio on bare-metal
+SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT: 'http://localhost:18000'
