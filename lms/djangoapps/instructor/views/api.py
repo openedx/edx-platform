@@ -288,11 +288,6 @@ class RegisterAndEnrollStudents(APIView):
     """
     Create new account and Enroll students in this course.
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.CAN_ENROLL
 
