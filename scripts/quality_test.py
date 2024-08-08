@@ -318,8 +318,6 @@ def _get_stylelint_violations():
             text=True
         )
         report_file.write(result.stdout)
-        print("_get_stylelint_violations ")
-        print(result.stdout)
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
@@ -383,7 +381,8 @@ def run_eslint():
             )
         )
     else:
-        print("successfully run eslint")
+        print("successfully run eslint with violations")
+        print(num_violations)
         # write_junit_xml('eslint')
 
 
@@ -409,7 +408,8 @@ def run_stylelint():
             )
         )
     else:
-        print("script ran successfully")
+        print("successfully run stylelint with violations")
+        print(num_violations)
     #     write_junit_xml('stylelint')
 
 
