@@ -10,6 +10,7 @@ from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx_filters.content_authoring.filters import LmsUrlCreationStarted
 
 log = logging.getLogger(__name__)
 
@@ -54,12 +55,34 @@ def get_link_for_about_page(course):
     elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):
         course_about_url = course.marketing_url
     else:
+        about_base = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+
+        try:
+            ## .. filter_implemented_name: LmsUrlCreationStarted
+            ## .. filter_type: org.openedx.course_authoring.lms.url.creation.started.v1
+            about_base = LmsUrlCreationStarted.run_filter(
+                context=about_base,
+                org=course.id.org,
+                val_name='LMS_ROOT_URL',
+                default=settings.LMS_ROOT_URL
+            )
+        except LmsUrlCreationStarted.PreventLmsUrlCreationRender as exc:
+            raise LmsUrlCreationNotAllowed(str(exc)) from exc
+
         course_about_url = '{about_base_url}/courses/{course_key}/about'.format(
-            about_base_url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+            about_base_url=about_base,
             course_key=str(course.id),
         )
 
     return course_about_url
+
+
+class LmsUrlCreationException(Exception):
+    pass
+
+
+class LmsUrlCreationNotAllowed(LmsUrlCreationException):
+    pass
 
 
 def has_certificates_enabled(course):
