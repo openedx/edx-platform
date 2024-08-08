@@ -38,6 +38,7 @@ NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 class BuildFailure(Exception):
     """Represents a problem with some part of the build's execution."""
 
+
 def str2bool(s):
     s = str(s)
     return s.lower() in ('yes', 'true', 't', '1')
@@ -176,6 +177,7 @@ def node_prereqs_installation():
         npm_log_file_path
     ))
 
+
 def ensure_clean_package_lock():
     """
     Ensure no untracked changes have been made in the current git context.
@@ -301,7 +303,7 @@ def _get_stylelint_violations():
     """
     Returns the number of Stylelint violations.
     """
-    
+
     stylelint_report_dir = (Env.REPORT_DIR / "stylelint")
     stylelint_report = stylelint_report_dir / "stylelint.report"
     _prepare_report_dir(stylelint_report_dir)
@@ -736,11 +738,10 @@ def run_xsslint():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint',
-    'xsslint', 'pii_check', 'check_keywords', 'all'])
+                                            'xsslint', 'pii_check', 'check_keywords', 'all'])
 
     argument = parser.parse_args()
 
-    
     if argument.command == 'eslint':
         ensure_clean_package_lock()
         install_node_prereqs()
