@@ -168,7 +168,7 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    
+
     REPO_ROOT = repo_root()
     REPORT_DIR = REPO_ROOT / 'reports'
     eslint_report_dir = (REPORT_DIR / "eslint")
@@ -574,3 +574,4 @@ if __name__ == "__main__":
 
     # elif argument.command == 'check_keywords':
     #     check_keywords()
+    
