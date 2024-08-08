@@ -1,3 +1,7 @@
+"""
+Helper functions for overriding notification content for given notification type.
+"""
+
 
 def get_notification_type_content_function(notification_type):
     """
