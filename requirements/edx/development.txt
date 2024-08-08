@@ -1040,11 +1040,6 @@ httplib2==0.22.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   httpx
-httplib2==0.22.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
     #   google-api-python-client
     #   google-auth-httplib2
 httpretty==1.1.4
