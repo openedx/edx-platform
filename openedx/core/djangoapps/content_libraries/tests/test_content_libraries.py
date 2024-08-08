@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 from unittest import skip
 
 import ddt
+from uuid import uuid4
 from django.contrib.auth.models import Group
 from django.test.client import Client
 from organizations.models import Organization
@@ -29,6 +30,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY
+from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -973,6 +975,52 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             },
             event_receiver.call_args.kwargs
         )
+
+    def test_library_paste_clipboard(self):
+        """
+        Check the a new block is created in the library after pasting from clipboard.
+        The content of the new block should match the content of the block in the clipboard.
+        """
+        # Importing here since this was failing when tests ran in the LMS
+        from openedx.core.djangoapps.content_staging.api import save_xblock_to_user_clipboard
+
+        # Create user to perform tests on
+        author = UserFactory.create(username="Author", email="author@example.com")
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_paste_clipboard",
+                title="Paste Clipboard Test Library",
+                description="Testing pasting clipboard in library"
+            )
+            lib_id = lib["id"]
+
+            # Add a 'problem' XBlock to the library:
+            block_data = self._add_block_to_library(lib_id, "problem", "problem1")
+
+            # Get the usage_key of the created block
+            library_key = LibraryLocatorV2.from_string(lib_id)
+            usage_key = LibraryUsageLocatorV2(
+                lib_key=library_key,
+                block_type="problem",
+                usage_id="problem1"
+            )
+
+            # Get the XBlock created in the previous step
+            block = xblock_api.load_block(usage_key, user=author)
+
+            # Copy the block to the user's clipboard
+            save_xblock_to_user_clipboard(block, author.id)
+
+            # Paste the content of the clipboard into the library
+            pasted_block_id = str(uuid4())
+            paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
+
+            # Check that the new block was created after the paste and it's content matches
+            # the the block in the clipboard
+            self.assertDictContainsEntries(self._get_library_block(paste_data["id"]), {
+                **block_data,
+                "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
+            })
 
 
 @ddt.ddt
