@@ -41,7 +41,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import json
 import os
-import sys
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
@@ -972,8 +971,10 @@ MIDDLEWARE = [
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
-    # use Django built in clickjacking protection
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # use custom extension of Django built in clickjacking protection. This
+    # allows the permissiveness of embedded frame usage (the degree of
+    # clickjacking protection) to vary based on route
+    'openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 
@@ -994,8 +995,22 @@ MIDDLEWARE = [
 
 EXTRA_MIDDLEWARE_CLASSES = []
 
-# Clickjacking protection can be disabled by setting this to 'ALLOW'
+################# Clickjacking protection ###################
+"""
+X-FRAME-OPTIONS headers are set by default to `DENY`. Select paths, however, are
+overridden to the more permissive `SAMEORIGIN`. We identify these paths via
+override regexes defined below.
+
+At a minimum, this extension supports SCORM XBlocks, which are
+typically rendered in an iframe, and are therefore subject to cross-domain
+issues. This is resolved by using the SAMEORIGIN header.
+"""
 X_FRAME_OPTIONS = 'DENY'
+# The X-FRAME-OPTIONS header is overriden to SAMEORIGIN for certain URLs. Note, however,
+# that it is not advised to override it to 'ALLOW' without a Content Security Policy in place.
+# SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
+X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']]
+
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
@@ -1247,8 +1262,6 @@ COURSE_METADATA_EXPORT_BUCKET = ''
 ALTERNATE_WORKER_QUEUES = 'lms'
 
 STATIC_URL_BASE = '/static/'
-
-X_FRAME_OPTIONS = 'DENY'
 
 # .. setting_name: GIT_REPO_EXPORT_DIR
 # .. setting_default: '/edx/var/edxapp/export_course_repos'
