@@ -40,12 +40,13 @@ def ace_email_sent_handler(sender, **kwargs):
         user_id = user_model.objects.get(email=message.recipient.email_address).id
     except user_model.DoesNotExist:
         user_id = None
-
+    course_email = message.context.get('course_email', None)
+    course_id = course_email.course_id if course_email else None
     tracker.emit(
         'edx.bulk_email.sent',
         {
             'message_type': message.name,
-            'course_id': str(message.context['course_email'].course_id),
+            'course_id': course_id,
             'user_id': user_id,
         }
     )
