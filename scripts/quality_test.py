@@ -14,7 +14,7 @@ import argparse
 from pavelib.utils.envs import Env
 # from pavelib.prereqs import install_node_prereqs
 from pavelib.prereqs import install_python_prereqs
-from pavelib.utils.test.utils import ensure_clean_package_lock
+# from pavelib.utils.test.utils import ensure_clean_package_lock
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
@@ -176,6 +176,26 @@ def node_prereqs_installation():
         npm_log_file_path
     ))
 
+def ensure_clean_package_lock():
+    """
+    Ensure no untracked changes have been made in the current git context.
+    """
+    try:
+        # Run git diff command to check for changes in package-lock.json
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "--exit-code", "package-lock.json"],
+            capture_output=True,  # Capture stdout and stderr
+            text=True,  # Decode output to text
+            check=True  # Raise error for non-zero exit code
+        )
+        # No differences found in package-lock.json
+        print("package-lock.json is clean.")
+    except subprocess.CalledProcessError as e:
+        # Git diff command returned non-zero exit code (changes detected)
+        print("Dirty package-lock.json, run 'npm install' and commit the generated changes.")
+        print(e.stderr)  # Print any error output from the command
+        raise  # Re-raise the exception to propagate the error
+
 # def write_junit_xml(name, message=None):
 #     """
 #     Write a JUnit results XML file describing the outcome of a quality check.
@@ -203,73 +223,6 @@ def fail_quality(name, message):
     """
     # write_junit_xml(name, message)
     sys.exit()
-
-
-# def _get_pep8_violations(clean=True):
-#     """
-#     Runs pycodestyle. Returns a tuple of (number_of_violations, violations_string)
-#     where violations_string is a string of all PEP 8 violations found, separated
-#     by new lines.
-#     """
-#     report_dir = (Env.REPORT_DIR / 'pep8')
-#     if clean:
-#         report_dir.rmtree(ignore_errors=True)
-#     report_dir.makedirs_p()
-#     report = report_dir / 'pep8.report'
-
-#     # Make sure the metrics subdirectory exists
-#     Env.METRICS_DIR.makedirs_p()
-
-#     if not report.exists():
-#         # sh(f'pycodestyle . | tee {report} -a')
-#         with open(report, 'w') as f:
-#             result = subprocess.run(
-#                 ['pycodestyle', '.'],
-#                 stdout=subprocess.PIPE,
-#                 stderr=subprocess.PIPE,
-#                 check=False,
-#                 text= True
-#             )
-#             f.write(result.stdout)
-
-#     violations_list = _pep8_violations(report)
-
-#     return len(violations_list), violations_list
-
-
-# def _pep8_violations(report_file):
-#     """
-#     Returns the list of all PEP 8 violations in the given report_file.
-#     """
-#     with open(report_file) as f:
-#         return f.readlines()
-
-
-# def run_pep8():  # pylint: disable=unused-argument
-#     """
-#     Run pycodestyle on system code.
-#     Fail the task if any violations are found.
-#     """
-#     (count, violations_list) = _get_pep8_violations()
-#     violations_list = ''.join(violations_list)
-
-#     # Print number of violations to log
-#     violations_count_str = f"Number of PEP 8 violations: {count}"
-#     print(violations_count_str)
-#     print(violations_list)
-
-#     # Also write the number of violations to a file
-#     with open(Env.METRICS_DIR / "pep8", "w") as f:
-#         f.write(violations_count_str + '\n\n')
-#         f.write(violations_list)
-
-#     # Fail if any violations are found
-#     if count:
-#         failure_string = "FAILURE: Too many PEP 8 violations. " + violations_count_str
-#         failure_string += f"\n\nViolations:\n{violations_list}"
-#         fail_quality('pep8', failure_string)
-#     else:
-#         write_junit_xml('pep8')
 
 
 def _prepare_report_dir(dir_name):
@@ -379,58 +332,59 @@ def _get_stylelint_violations():
         )
 
 
-# def run_eslint():
-#     """
-#     Runs eslint on static asset directories.
-#     If limit option is passed, fails build if more violations than the limit are found.
-#     """
+def run_eslint():
+    """
+    Runs eslint on static asset directories.
+    If limit option is passed, fails build if more violations than the limit are found.
+    """
 
-#     eslint_report_dir = (Env.REPORT_DIR / "eslint")
-#     eslint_report = eslint_report_dir / "eslint.report"
-#     _prepare_report_dir(eslint_report_dir)
-#     violations_limit = 4950
+    eslint_report_dir = (Env.REPORT_DIR / "eslint")
+    eslint_report = eslint_report_dir / "eslint.report"
+    _prepare_report_dir(eslint_report_dir)
+    violations_limit = 4950
 
-#     command = (
-#         "node --max_old_space_size=4096 node_modules/.bin/eslint "
-#         "--ext .js --ext .jsx --format=compact ."
-#     )
-#     with open(eslint_report, 'w') as report_file:
-#         # Run the command
-#         result = subprocess.run(
-#             command,
-#             shell=True,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#             text=True,
-#             check=False
-#         )
+    command = (
+        "node --max_old_space_size=4096 node_modules/.bin/eslint "
+        "--ext .js --ext .jsx --format=compact ."
+    )
+    with open(eslint_report, 'w') as report_file:
+        # Run the command
+        result = subprocess.run(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False
+        )
 
-#         # Write the output to the report file
-#         report_file.write(result.stdout)
+        # Write the output to the report file
+        report_file.write(result.stdout)
 
-#     try:
-#         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
-#     except TypeError:
-#         fail_quality(
-#             'eslint',
-#             "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
-#                 eslint_report=eslint_report
-#             )
-#         )
+    try:
+        num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
+    except TypeError:
+        fail_quality(
+            'eslint',
+            "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
+                eslint_report=eslint_report
+            )
+        )
 
-#     # Record the metric
-#     _write_metric(num_violations, (Env.METRICS_DIR / "eslint"))
+    # Record the metric
+    _write_metric(num_violations, (Env.METRICS_DIR / "eslint"))
 
-#     # Fail if number of violations is greater than the limit
-#     if num_violations > violations_limit > -1:
-#         fail_quality(
-#             'eslint',
-#             "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
-#                 count=num_violations, violations_limit=violations_limit
-#             )
-#         )
-#     else:
-#         write_junit_xml('eslint')
+    # Fail if number of violations is greater than the limit
+    if num_violations > violations_limit > -1:
+        fail_quality(
+            'eslint',
+            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations, violations_limit=violations_limit
+            )
+        )
+    else:
+        print("successfully run eslint")
+        # write_junit_xml('eslint')
 
 
 def run_stylelint():
@@ -788,12 +742,12 @@ if __name__ == "__main__":
     # if argument.command == 'pep8':
     #     run_pep8()
 
-    # elif argument.command == 'eslint':
-    #     ensure_clean_package_lock()
-    #     install_node_prereqs()
-    #     run_eslint()
+    if argument.command == 'eslint':
+        ensure_clean_package_lock()
+        install_node_prereqs()
+        run_eslint()
 
-    if argument.command == 'stylelint':
+    elif argument.command == 'stylelint':
         install_node_prereqs()
         run_stylelint()
 

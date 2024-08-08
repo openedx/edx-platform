@@ -79,10 +79,11 @@ case "$TEST_SUITE" in
 
         # echo "Finding pycodestyle violations and storing report..."
         # run_paver_quality run_pep8 || { EXIT=1; }
-        # echo "Finding ESLint violations and storing report..."
+        echo "Finding ESLint violations and storing report..."
+        make test-eslint
         # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
-        echo "Finding Stylelint violations and storing report..."
-        python scripts/quality_test.py stylelint
+        # echo "Finding Stylelint violations and storing report..."
+        # make test-stylelint
         # run_paver_quality run_stylelint || { EXIT=1; }
         # echo "Running xss linter report."
         # run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
