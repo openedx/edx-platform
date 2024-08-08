@@ -198,6 +198,7 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "drag-and-drop-v2",
                     "user_partition_info": {},
                     "user_partitions": {}
+                    "upstream_info": null,
                     "actions": {
                         "can_copy": true,
                         "can_duplicate": true,
@@ -215,6 +216,14 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "video",
                     "user_partition_info": {},
                     "user_partitions": {}
+                    "upstream_info": {
+                        "usage_key": "lb:org:mylib:video:404",
+                        "current_version": 16
+                        "latest_version": null,
+                        "sync_url": "http://...",
+                        "error": "Linked library item not found: lb:org:mylib:video:404",
+                        "can_sync": false,
+                    },
                     "actions": {
                         "can_copy": true,
                         "can_duplicate": true,
@@ -232,6 +241,14 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                     "block_type": "html",
                     "user_partition_info": {},
                     "user_partitions": {},
+                    "upstream_info": {
+                        "usage_key": "lb:org:mylib:html:abcd",
+                        "current_version": 43,
+                        "latest_version": 49,
+                        "sync_url": "http://...",
+                        "error": "null",
+                        "can_sync": true,
+                    },
                     "actions": {
                         "can_copy": true,
                         "can_duplicate": true,
@@ -277,6 +294,7 @@ class VerticalContainerView(APIView, ContainerHandlerMixin):
                         "block_type": child_info.location.block_type,
                         "user_partition_info": user_partition_info,
                         "user_partitions": user_partitions,
+                        "upstream_info": child_info.get_upstream_info(),
                         "validation_messages": validation_messages,
                         "render_error": render_error,
                     })
