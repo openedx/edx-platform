@@ -468,6 +468,8 @@ def get_notification_content(notification_type, context):
         'p': 'p',
     }
     content_function = get_notification_type_content_function(notification_type)
+    if notification_type == 'course_update':
+        notification_type = 'course_updates'
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
     if notification_type:
         if content_function:
