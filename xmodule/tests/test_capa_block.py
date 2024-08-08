@@ -11,7 +11,7 @@ import os
 import random
 import textwrap
 import unittest
-from unittest.mock import DEFAULT, Mock, patch
+from unittest.mock import DEFAULT, Mock, patch, PropertyMock
 
 import pytest
 import ddt
@@ -655,6 +655,37 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         block = CapaFactory.create(max_attempts="1", attempts="0",
                                    due=self.yesterday_str)
         assert block.closed()
+
+    @patch.object(ProblemBlock, 'course_end_date', new_callable=PropertyMock)
+    def test_closed_for_archive(self, mock_course_end_date):
+
+        # Utility to create a datetime object in the past
+        def past_datetime(days):
+            return (datetime.datetime.now(UTC) - datetime.timedelta(days=days))
+
+        # Utility to create a datetime object in the future
+        def future_datetime(days):
+            return (datetime.datetime.now(UTC) + datetime.timedelta(days=days))
+
+        block = CapaFactory.create(max_attempts="1", attempts="0")
+
+        # For active courses without graceperiod
+        mock_course_end_date.return_value = future_datetime(10)
+        assert not block.closed()
+
+        # For archive courses without graceperiod
+        mock_course_end_date.return_value = past_datetime(10)
+        assert block.closed()
+
+        # For active courses with graceperiod
+        mock_course_end_date.return_value = future_datetime(10)
+        block.graceperiod = datetime.timedelta(days=2)
+        assert not block.closed()
+
+        # For archive courses with graceperiod
+        mock_course_end_date.return_value = past_datetime(2)
+        block.graceperiod = datetime.timedelta(days=3)
+        assert not block.closed()
 
     def test_parse_get_params(self):
 
