@@ -2,7 +2,7 @@
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
-import hashlib
+import argparse
 import json
 import os
 import re
@@ -10,13 +10,8 @@ import sys
 import subprocess
 import shutil
 
-import argparse
-from pavelib.utils.envs import Env
-# from pavelib.prereqs import install_node_prereqs
-# from pavelib.prereqs import install_python_prereqs
-# from pavelib.utils.test.utils import ensure_clean_package_lock
-from datetime import datetime
-from xml.sax.saxutils import quoteattr
+from path import Path as path
+from time import sleep
 
 try:
     from pygments.console import colorize
@@ -24,206 +19,14 @@ except ImportError:
     colorize = lambda color, text: text
 
 
-JUNIT_XML_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="{name}" tests="1" errors="0" failures="{failure_count}" skip="0">
-<testcase classname="pavelib.quality" name="{name}" time="{seconds}">{failure_element}</testcase>
-</testsuite>
-"""
-JUNIT_XML_FAILURE_TEMPLATE = '<failure message={message}/>'
-START_TIME = datetime.utcnow()
-PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
-NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
-
-
 class BuildFailure(Exception):
     """Represents a problem with some part of the build's execution."""
 
 
-# def str2bool(s):
-#     s = str(s)
-#     return s.lower() in ('yes', 'true', 't', '1')
-
-
-# def no_prereq_install():
-#     """
-#     Determine if NO_PREREQ_INSTALL should be truthy or falsy.
-#     """
-#     return str2bool(os.environ.get('NO_PREREQ_INSTALL', 'False'))
-
-
-# def install_node_prereqs():
-#     """
-#     Installs Node prerequisites
-#     """
-#     if no_prereq_install():
-#         print(NO_PREREQ_MESSAGE)
-#         return
-
-#     prereq_cache("Node prereqs", ["package.json", "package-lock.json"], node_prereqs_installation)
-
-
-# def compute_fingerprint(path_list):
-#     """
-#     Hash the contents of all the files and directories in `path_list`.
-#     Returns the hex digest.
-#     """
-
-#     hasher = hashlib.sha1()
-
-#     for path_item in path_list:
-
-#         # For directories, create a hash based on the modification times
-#         # of first-level subdirectories
-#         if os.path.isdir(path_item):
-#             for dirname in sorted(os.listdir(path_item)):
-#                 path_name = os.path.join(path_item, dirname)
-#                 if os.path.isdir(path_name):
-#                     hasher.update(str(os.stat(path_name).st_mtime).encode('utf-8'))
-
-#         # For files, hash the contents of the file
-#         if os.path.isfile(path_item):
-#             with open(path_item, "rb") as file_handle:
-#                 hasher.update(file_handle.read())
-
-#     return hasher.hexdigest()
-
-
-# def create_prereqs_cache_dir():
-#     """Create the directory for storing the hashes, if it doesn't exist already."""
-#     try:
-#         os.makedirs(PREREQS_STATE_DIR)
-#     except OSError:
-#         if not os.path.isdir(PREREQS_STATE_DIR):
-#             raise
-
-
-# def prereq_cache(cache_name, paths, install_func):
-#     """
-#     Conditionally execute `install_func()` only if the files/directories
-#     specified by `paths` have changed.
-
-#     If the code executes successfully (no exceptions are thrown), the cache
-#     is updated with the new hash.
-#     """
-#     # Retrieve the old hash
-#     cache_filename = cache_name.replace(" ", "_")
-#     cache_file_path = os.path.join(PREREQS_STATE_DIR, f"{cache_filename}.sha1")
-#     old_hash = None
-#     if os.path.isfile(cache_file_path):
-#         with open(cache_file_path) as cache_file:
-#             old_hash = cache_file.read()
-
-#     # Compare the old hash to the new hash
-#     # If they do not match (either the cache hasn't been created, or the files have changed),
-#     # then execute the code within the block.
-#     new_hash = compute_fingerprint(paths)
-#     if new_hash != old_hash:
-#         install_func()
-
-#         # Update the cache with the new hash
-#         # If the code executed within the context fails (throws an exception),
-#         # then this step won't get executed.
-#         create_prereqs_cache_dir()
-#         with open(cache_file_path, "wb") as cache_file:
-#             # Since the pip requirement files are modified during the install
-#             # process, we need to store the hash generated AFTER the installation
-#             post_install_hash = compute_fingerprint(paths)
-#             cache_file.write(post_install_hash.encode('utf-8'))
-#     else:
-#         print(f'{cache_name} unchanged, skipping...')
-
-
-# def node_prereqs_installation():
-#     """
-#     Configures npm and installs Node prerequisites
-#     """
-#     # Before July 2023, these directories were created and written to
-#     # as root. Afterwards, they are created as being owned by the
-#     # `app` user -- but also need to be deleted by that user (due to
-#     # how npm runs post-install scripts.) Developers with an older
-#     # devstack installation who are reprovisioning will see errors
-#     # here if the files are still owned by root. Deleting the files in
-#     # advance prevents this error.
-#     #
-#     # This hack should probably be left in place for at least a year.
-#     # See ADR 17 for more background on the transition.
-#     # sh("rm -rf common/static/common/js/vendor/ common/static/common/css/vendor/")
-#     # At the time of this writing, the js dir has git-versioned files
-#     # but the css dir does not, so the latter would have been created
-#     # as root-owned (in the process of creating the vendor
-#     # subdirectory). Delete it only if empty, just in case
-#     # git-versioned files are added later.
-#     # sh("rmdir common/static/common/css || true")
-#     try:
-#         shutil.rmtree("common/static/common/js/vendor/ common/static/common/css/vendor/")
-#         os.rmdir("common/static/common/css")
-#     except OSError:
-#         pass
-
-#     # NPM installs hang sporadically. Log the installation process so that we
-#     # determine if any packages are chronic offenders.
-#     npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.log'
-#     npm_log_file = open(npm_log_file_path, 'wb')  # lint-amnesty, pylint: disable=consider-using-with
-#     npm_command = 'npm ci --verbose'.split()
-
-#     # The implementation of Paver's `sh` function returns before the forked
-#     # actually returns. Using a Popen object so that we can ensure that
-#     # the forked process has returned
-#     proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
-#     retcode = proc.wait()
-#     if retcode == 1:
-#         raise Exception(f"npm install failed: See {npm_log_file_path}")
-#     print("Successfully clean-installed NPM packages. Log found at {}".format(
-#         npm_log_file_path
-#     ))
-
-
-# def ensure_clean_package_lock():
-#     """
-#     Ensure no untracked changes have been made in the current git context.
-#     """
-#     try:
-#         # Run git diff command to check for changes in package-lock.json
-#         result = subprocess.run(
-#             ["git", "diff", "--name-only", "--exit-code", "package-lock.json"],
-#             capture_output=True,  # Capture stdout and stderr
-#             text=True,  # Decode output to text
-#             check=True  # Raise error for non-zero exit code
-#         )
-#         # No differences found in package-lock.json
-#         print("package-lock.json is clean.")
-#     except subprocess.CalledProcessError as e:
-#         # Git diff command returned non-zero exit code (changes detected)
-#         print("Dirty package-lock.json, run 'npm install' and commit the generated changes.")
-#         print(e.stderr)  # Print any error output from the command
-#         raise  # Re-raise the exception to propagate the error
-
-# def write_junit_xml(name, message=None):
-#     """
-#     Write a JUnit results XML file describing the outcome of a quality check.
-#     """
-#     if message:
-#         failure_element = JUNIT_XML_FAILURE_TEMPLATE.format(message=quoteattr(message))
-#     else:
-#         failure_element = ''
-#     data = {
-#         'failure_count': 1 if message else 0,
-#         'failure_element': failure_element,
-#         'name': name,
-#         'seconds': (datetime.utcnow() - START_TIME).total_seconds(),
-#     }
-#     Env.QUALITY_DIR.makedirs_p()
-#     filename = Env.QUALITY_DIR / f'{name}.xml'
-#     with open(filename, 'w') as f:
-#         f.write(JUNIT_XML_TEMPLATE.format(**data))
-
-
 def fail_quality(name, message):
     """
-    Fail the specified quality check by generating the JUnit XML results file
-    and raising a ``BuildFailure``.
+    Fail the specified quality check.
     """
-    # write_junit_xml(name, message)
     sys.exit()
 
 
@@ -236,16 +39,43 @@ def _prepare_report_dir(dir_name):
     os.makedirs(dir_name, exist_ok=True)
 
 
-def _write_metric(metric, filename):
+def repo_root():
     """
-    Write a given metric to a given file
-    Used for things like reports/metrics/eslint, which will simply tell you the number of
-    eslint violations found
-    """
-    Env.METRICS_DIR.makedirs_p()
+    Get the root of the git repository (edx-platform).
 
-    with open(filename, "w") as metric_file:
-        metric_file.write(str(metric))
+    This sometimes fails on Docker Devstack, so it's been broken
+    down with some additional error handling.  It usually starts
+    working within 30 seconds or so; for more details, see
+    https://openedx.atlassian.net/browse/PLAT-1629 and
+    https://github.com/docker/for-mac/issues/1509
+    """
+    file_path = path(__file__)
+    attempt = 1
+    while True:
+        try:
+            absolute_path = file_path.abspath()
+            break
+        except OSError:
+            print(f'Attempt {attempt}/180 to get an absolute path failed')
+            if attempt < 180:
+                attempt += 1
+                sleep(1)
+            else:
+                print('Unable to determine the absolute path of the edx-platform repo, aborting')
+                raise
+    return absolute_path.parent.parent.parent
+
+
+# def _write_metric(metric, filename):
+#     """
+#     Write a given metric to a given file
+#     Used for things like reports/metrics/eslint, which will simply tell you the number of
+#     eslint violations found
+#     """
+#     Env.METRICS_DIR.makedirs_p()
+
+#     with open(filename, "w") as metric_file:
+#         metric_file.write(str(metric))
 
 
 def _get_report_contents(filename, report_name, last_line_only=False):
@@ -303,8 +133,9 @@ def _get_stylelint_violations():
     """
     Returns the number of Stylelint violations.
     """
-
-    stylelint_report_dir = (Env.REPORT_DIR / "stylelint")
+    REPO_ROOT = repo_root()
+    REPORT_DIR = REPO_ROOT / 'reports'
+    stylelint_report_dir = (REPORT_DIR / "stylelint")
     stylelint_report = stylelint_report_dir / "stylelint.report"
     _prepare_report_dir(stylelint_report_dir)
     formatter = 'node_modules/stylelint-formatter-pretty'
@@ -337,8 +168,10 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-
-    eslint_report_dir = (Env.REPORT_DIR / "eslint")
+    
+    REPO_ROOT = repo_root()
+    REPORT_DIR = REPO_ROOT / 'reports'
+    eslint_report_dir = (REPORT_DIR / "eslint")
     eslint_report = eslint_report_dir / "eslint.report"
     _prepare_report_dir(eslint_report_dir)
     violations_limit = 4950
@@ -371,9 +204,6 @@ def run_eslint():
             )
         )
 
-    # Record the metric
-    _write_metric(num_violations, (Env.METRICS_DIR / "eslint"))
-
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
         fail_quality(
@@ -385,7 +215,6 @@ def run_eslint():
     else:
         print("successfully run eslint with violations")
         print(num_violations)
-        # write_junit_xml('eslint')
 
 
 def run_stylelint():
@@ -396,9 +225,6 @@ def run_stylelint():
 
     violations_limit = 0
     num_violations = _get_stylelint_violations()
-
-    # Record the metric
-    _write_metric(num_violations, (Env.METRICS_DIR / "stylelint"))
 
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit:
@@ -412,7 +238,6 @@ def run_stylelint():
     else:
         print("successfully run stylelint with violations")
         print(num_violations)
-    #     write_junit_xml('stylelint')
 
 
 # def _extract_missing_pii_annotations(filename):
@@ -618,13 +443,15 @@ def run_xsslint():
         )
 
     xsslint_script = "xss_linter.py"
-    xsslint_report_dir = (Env.REPORT_DIR / "xsslint")
+    REPO_ROOT = repo_root()
+    REPORT_DIR = REPO_ROOT / 'reports'
+    xsslint_report_dir = (REPORT_DIR / "xsslint")
     xsslint_report = xsslint_report_dir / "xsslint.report"
     _prepare_report_dir(xsslint_report_dir)
 
     # Prepare the command to run the xsslint script
     command = (
-        f"{Env.REPO_ROOT}/scripts/xsslint/{xsslint_script} "
+        f"{REPO_ROOT}/scripts/xsslint/{xsslint_script} "
         f"--rule-totals --config=scripts.xsslint_config >> {xsslint_report}"
     )
 
@@ -650,14 +477,6 @@ def run_xsslint():
                 xsslint_script=xsslint_script, xsslint_report=xsslint_report
             )
         )
-
-    metrics_report = (Env.METRICS_DIR / "xsslint")
-    # Record the metric
-    _write_metric(metrics_str, metrics_report)
-    # Print number of violations to log.
-    command = f"cat {metrics_report}"
-    # Print number of violations to log.
-    subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     error_message = ""
     # Test total violations against threshold.
@@ -696,7 +515,6 @@ def run_xsslint():
         )
     else:
         print("successfully run xsslint")
-        # write_junit_xml('xsslint')
 
 
 # def diff_coverage():
@@ -737,40 +555,22 @@ def run_xsslint():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=['pep8', 'eslint', 'stylelint',
-                                            'xsslint', 'pii_check', 'check_keywords', 'all'])
+    parser.add_argument("command", choices=['eslint', 'stylelint',
+                                            'xsslint', 'pii_check', 'check_keywords'])
 
     argument = parser.parse_args()
 
     if argument.command == 'eslint':
-        # ensure_clean_package_lock()
-        # install_node_prereqs()
         run_eslint()
 
     elif argument.command == 'stylelint':
-        # install_node_prereqs()
         run_stylelint()
 
     elif argument.command == 'xsslint':
-        # install_python_prereqs()
         run_xsslint()
 
     # elif argument.command == 'pii_check':
-    #     install_python_prereqs()
     #     run_pii_check()
 
     # elif argument.command == 'check_keywords':
-    #     install_python_prereqs()
     #     check_keywords()
-
-    # elif argument.command == 'all':
-    #     run_pep8()
-    #     ensure_clean_package_lock()
-    #     install_node_prereqs()
-    #     run_eslint()
-    #     run_stylelint()
-    #     run_xsslint()
-    #     install_python_prereqs()
-    #     run_pii_check()
-    #     check_keywords()
-    #     diff_coverage()
