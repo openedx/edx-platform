@@ -77,15 +77,14 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
 
-        # echo "Finding pycodestyle violations and storing report..."
-        # run_paver_quality run_pep8 || { EXIT=1; }
+        echo "Finding pycodestyle violations..."
+        make test-lint
         echo "Finding ESLint violations and storing report..."
         make test-eslint
-        # run_paver_quality run_eslint -l "$ESLINT_THRESHOLD" || { EXIT=1; }
         echo "Finding Stylelint violations and storing report..."
         make test-stylelint
-        # run_paver_quality run_stylelint || { EXIT=1; }
-        # echo "Running xss linter report."
+        echo "Running xss linter report."
+        make test-xsslint
         # run_paver_quality run_xsslint -t "$XSSLINT_THRESHOLDS" || { EXIT=1; }
         # echo "Running PII checker on all Django models..."
         # run_paver_quality run_pii_check || { EXIT=1; }

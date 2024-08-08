@@ -211,5 +211,8 @@ test-eslint:
 test-stylelint:
 	python scripts/quality_test.py stylelint
 
+test-xsslint:
+	python scripts/quality_test.py xsslint
+
 test-lint:
 	pycodestyle .
