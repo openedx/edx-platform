@@ -645,6 +645,9 @@ class VideoBlock(
                 if val_youtube_id and self.youtube_id_1_0 != val_youtube_id:
                     self.youtube_id_1_0 = val_youtube_id
 
+            if not self.edx_video_id and self.youtube_id_1_0:
+                self.thumbnail = f"https://img.youtube.com/vi/{self.youtube_id_1_0}/sddefault.jpg"
+
             manage_video_subtitles_save(
                 self,
                 user,
@@ -1120,6 +1123,7 @@ class VideoBlock(
         xblock_body = super().index_dictionary()
         video_body = {
             "display_name": self.display_name,
+            "thumbnail": self.thumbnail,
         }
 
         def _update_transcript_for_index(language=None):
