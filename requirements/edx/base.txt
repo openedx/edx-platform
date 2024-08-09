@@ -8,9 +8,9 @@
     # via -r requirements/edx/github.in
 acid-xblock==0.3.1
     # via -r requirements/edx/kernel.in
-aiohappyeyeballs==2.3.4
+aiohappyeyeballs==2.3.5
     # via aiohttp
-aiohttp==3.10.1
+aiohttp==3.10.2
     # via
     #   geoip2
     #   openai
@@ -45,7 +45,7 @@ attrs==24.2.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.15.0
+babel==2.16.0
     # via
     #   -r requirements/edx/kernel.in
     #   enmerkar
@@ -68,13 +68,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.34.154
+boto3==1.34.157
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.154
+botocore==1.34.157
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -319,7 +319,9 @@ django-object-actions==4.2.0
 django-pipeline==3.1.0
     # via -r requirements/edx/kernel.in
 django-push-notifications==3.1.0
-    # via edx-ace
+    # via
+    #   -r requirements/edx/kernel.in
+    #   edx-ace
 django-ratelimit==4.1.0
     # via -r requirements/edx/kernel.in
 django-sekizai==4.1.0
@@ -515,7 +517,7 @@ edx-search==4.0.0
     # via -r requirements/edx/kernel.in
 edx-sga==0.25.0
     # via -r requirements/edx/bundled.in
-edx-submissions==3.7.6
+edx-submissions==3.7.7
     # via
     #   -r requirements/edx/kernel.in
     #   ora2
@@ -589,9 +591,9 @@ google-api-core[grpc]==2.19.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.139.0
+google-api-python-client==2.140.0
     # via firebase-admin
-google-auth==2.32.0
+google-auth==2.33.0
     # via
     #   google-api-core
     #   google-api-python-client
@@ -607,13 +609,13 @@ google-cloud-core==2.4.1
     #   google-cloud-storage
 google-cloud-firestore==2.17.0
     # via firebase-admin
-google-cloud-storage==2.18.0
+google-cloud-storage==2.18.2
     # via firebase-admin
 google-crc32c==1.5.0
     # via
     #   google-cloud-storage
     #   google-resumable-media
-google-resumable-media==2.7.1
+google-resumable-media==2.7.2
     # via google-cloud-storage
 googleapis-common-protos==1.63.2
     # via
@@ -757,7 +759,7 @@ monotonic==1.6
     # via
     #   analytics-python
     #   py2neo
-more-itertools==10.3.0
+more-itertools==10.4.0
     # via cssutils
 mpmath==1.3.0
     # via sympy
@@ -769,7 +771,7 @@ multidict==6.0.5
     #   yarl
 mysqlclient==2.2.4
     # via -r requirements/edx/kernel.in
-newrelic==9.12.0
+newrelic==9.13.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -1024,7 +1026,7 @@ pytz==2024.1
     #   xblock
 pyuca==1.2
     # via -r requirements/edx/kernel.in
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r requirements/edx/kernel.in
     #   code-annotations
