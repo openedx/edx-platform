@@ -60,6 +60,33 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
         run: |
           make test-requirements
+      
+      - name: Install npm
+        env:
+          PIP_SRC: ${{ runner.temp }}
+        run: npm ci  
+      
+      - name: Install python packages
+        env:
+          PIP_SRC: ${{ runner.temp }}
+        run: |
+            pip install -e .
+      
+      # - name: Run Python Quality Test
+      #   working-directory: ${{ github.workspace }}
+      #   env:
+      #     PIP_SRC: ${{ runner.temp }}
+      #   run: make test-lint
+      
+      # - name: Run Stylelint Tests
+      #   env:
+      #     PIP_SRC: ${{ runner.temp }}
+      #   run: make test-stylelint  
+      
+      # - name: Run Eslint Tests
+      #   env:
+      #     PIP_SRC: ${{ runner.temp }}
+      #   run: make test-eslint
 
       - name: Run Quality Tests
         env:
@@ -68,8 +95,14 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
-          ./scripts/all-tests.sh
-
+            make test-lint
+            make test-eslint
+            make test-stylelint
+            make test-xsslint
+            make test-pi_check
+            make test-check_keyword
+            ./scripts/all-tests.sh
+          
       - name: Save Job Artifacts
         if: always()
         uses: actions/upload-artifact@v4

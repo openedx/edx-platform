@@ -6,7 +6,7 @@
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
   pre-requirements pull pull_xblock_translations pull_translations push_translations \
   requirements shell swagger \
-  technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
+  technical-docs test-requirements ubuntu-requirements upgrade-package upgrade pep8_test
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -204,3 +204,29 @@ migrate: migrate-lms migrate-cms
 # Part of https://github.com/openedx/wg-developer-experience/issues/136
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
+
+test-eslint:
+	python scripts/quality_test.py eslint
+
+test-stylelint:
+	python scripts/quality_test.py stylelint
+
+test-xsslint:
+	python scripts/quality_test.py xsslint
+
+test-lint:
+	pycodestyle .
+
+test-pi_check:
+	python scripts/quality_test.py pii_check
+
+test-check_keyword:
+	python scripts/quality_test.py check_keywords
+
+quality-test:
+	test-lint
+	test-eslint
+	test-stylelint
+	test-xsslint
+	test-pi_check
+	test-check_keyword
