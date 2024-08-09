@@ -7,6 +7,8 @@
 # link to other information that will help people in the future to remove the
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
+# For further details on how to properly write constraints here please consult
+# https://2u-internal.atlassian.net/wiki/spaces/AT/pages/1247772779/Adding+pinned+dependencies+in+constraint+file
 
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
