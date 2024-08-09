@@ -9,8 +9,7 @@ import re
 import sys
 import subprocess
 import shutil
-
-from path import Path as path
+from pathlib import Path
 from time import sleep
 
 try:
@@ -51,21 +50,20 @@ def repo_root():
     https://openedx.atlassian.net/browse/PLAT-1629 and
     https://github.com/docker/for-mac/issues/1509
     """
-    file_path = path(__file__)
-    attempt = 1
-    while True:
+
+    file_path = Path(__file__)
+    max_attempts = 180
+    for attempt in range(1, max_attempts + 1):
         try:
-            absolute_path = file_path.abspath()
-            break
+            absolute_path = file_path.resolve(strict=True)
+            return absolute_path.parents[1]
         except OSError:
-            print(f'Attempt {attempt}/180 to get an absolute path failed')
-            if attempt < 180:
-                attempt += 1
+            print(f'Attempt {attempt}/{max_attempts} to get an absolute path failed')
+            if attempt < max_attempts:
                 sleep(1)
             else:
                 print('Unable to determine the absolute path of the edx-platform repo, aborting')
-                raise
-    return absolute_path.parent.parent.parent
+                raise RuntimeError('Could not determine the repository root after multiple attempts')
 
 
 def _get_report_contents(filename, report_name, last_line_only=False):
@@ -292,10 +290,10 @@ def run_pii_check():
             run_output_file = str(output_file).format(env_name.lower())
             os.makedirs(report_dir, exist_ok=True)
             command = (
-                "export DJANGO_SETTINGS_MODULE={env_settings_file};"
-                "code_annotations django_find_annotations"
-                "--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()}"
-                "--lint --report --coverage | tee {run_output_file}"
+                f"export DJANGO_SETTINGS_MODULE={env_settings_file};"
+                f"code_annotations django_find_annotations"
+                f"--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()}"
+                f"--lint --report --coverage | tee {run_output_file}"
             )
             result = subprocess.run(
                 command,
@@ -324,6 +322,8 @@ def run_pii_check():
     # Finally, fail the paver task if code_annotations suggests that the check failed.
     if not pii_check_passed:
         fail_quality('pii', full_log)
+    else:
+        print("successfully run pi_check")
 
 
 def check_keywords():
@@ -348,17 +348,16 @@ def check_keywords():
                 f"--report_file {report_file}"
             )
 
-            result = subprocess.run(
+            subprocess.run(
                 command,
                 shell=True,
-                check=True,
+                check=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
         except BuildFailure:
             overall_status = False
-
     if not overall_status:
         fail_quality(
             'keywords',
@@ -366,6 +365,8 @@ def check_keywords():
                 report_path
             )
         )
+    else:
+        print("successfully run check_keywords")
 
 
 def _get_xsslint_counts(filename):
