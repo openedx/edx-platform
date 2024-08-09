@@ -19,7 +19,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-from lms.djangoapps.discussion.tasks import _is_first_comment, _should_send_message, _track_notification_sent
+from lms.djangoapps.discussion.tasks import (
+    _is_first_comment,
+    _should_send_message,
+    _track_notification_sent,
+)
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
@@ -342,7 +346,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         })
 
         should_email_send = _is_first_comment(comment_dict['id'], thread['id'])
-        assert should_email_send is False
+        assert not should_email_send
         assert not self.mock_ace_send.called
 
     def test_subcomment_should_not_send_email(self):

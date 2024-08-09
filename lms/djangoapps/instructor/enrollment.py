@@ -125,7 +125,7 @@ def get_user_email_language(user):
     return UserPreference.get_value(user, LANGUAGE_KEY)
 
 
-def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, email_params=None, language=None):
+def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, message_params=None, language=None):
     """
     Enroll a student by email.
 
@@ -134,7 +134,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if auto_enroll is set, then when the email registers, they will be
         enrolled in the course automatically.
     `email_students` determines if student should be notified of action by email.
-    `email_params` parameters used while parsing email templates (a `dict`).
+    `message_params` parameters used while parsing message templates (a `dict`).
     `language` is the language used to render the email.
 
     returns two EmailEnrollmentState's
@@ -142,8 +142,8 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
     enrollment_obj = None
-    if email_params:
-        email_params.update({
+    if message_params:
+        message_params.update({
             'app_label': 'instructor',
             'push_notification_extra_context': {
                 'notification_type': 'enroll',
@@ -168,22 +168,22 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
 
         enrollment_obj = CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
         if email_students:
-            email_params['message_type'] = 'enrolled_enroll'
-            email_params['email_address'] = student_email
-            email_params['user_id'] = previous_state.user.id
-            email_params['full_name'] = previous_state.full_name
-            send_mail_to_student(student_email, email_params, language=language)
+            message_params['message_type'] = 'enrolled_enroll'
+            message_params['email_address'] = student_email
+            message_params['user_id'] = previous_state.user.id
+            message_params['full_name'] = previous_state.full_name
+            send_mail_to_student(student_email, message_params, language=language)
 
     elif not is_email_retired(student_email):
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
         cea.save()
         if email_students:
-            email_params['message_type'] = 'allowed_enroll'
-            email_params['email_address'] = student_email
+            message_params['message_type'] = 'allowed_enroll'
+            message_params['email_address'] = student_email
             if previous_state.user:
-                email_params['user_id'] = previous_state.user.id
-            send_mail_to_student(student_email, email_params, language=language)
+                message_params['user_id'] = previous_state.user.id
+            send_mail_to_student(student_email, message_params, language=language)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 

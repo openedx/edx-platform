@@ -76,9 +76,7 @@ class ReportedContentNotification(BaseMessageType):
 
 
 class CommentNotification(BaseMessageType):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.options['transactional'] = True
+    pass
 
 
 @shared_task(base=LoggedTask)
