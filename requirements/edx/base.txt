@@ -399,7 +399,7 @@ drf-yasg==1.21.7
     # via
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.11.0
+edx-ace==1.11.1
     # via -r requirements/edx/kernel.in
 edx-api-doc-tools==1.8.0
     # via
@@ -465,7 +465,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.22.4
+edx-enterprise==4.23.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -1258,8 +1258,9 @@ webob==1.8.7
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/paver.txt
-xblock[django]==5.0.0
+xblock[django]==4.0.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   acid-xblock
     #   crowdsourcehinter-xblock

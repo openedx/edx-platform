@@ -20,7 +20,7 @@ celery>=5.2.2,<6.0.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.22.4
+edx-enterprise==4.23.3
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -136,3 +136,7 @@ django-storages<1.14.4
 # We are pinning this until after all the smaller migrations get handled and then we can migrate this all at once.
 # Ticket to unpin: https://github.com/edx/edx-arch-experiments/issues/760
 social-auth-app-django<=5.4.1
+
+# Xblock==5.0.0 changed how entrypoints were loaded, breaking a workaround for overriding blocks.
+# See ticket: https://github.com/openedx/XBlock/issues/777
+xblock[django]==4.0.1
