@@ -185,26 +185,26 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': 'Homework 1 - Test Sequential X with an & Ampersand - 50% (1/2)',
+                    'detail': 'Homework 1 - Test Sequential X with an & Ampersand - 50.00% (1/2)',
                     'label': 'HW 01',
                     'percent': 0.5
                 },
                 {
                     'category': 'Homework',
-                    'detail': 'Homework 2 - Test Sequential A - 0% (0/1)',
+                    'detail': 'Homework 2 - Test Sequential A - 0.00% (0/1)',
                     'label': 'HW 02',
                     'percent': 0.0
                 },
                 {
                     'category': 'Homework',
-                    'detail': 'Homework Average = 25%',
+                    'detail': 'Homework Average = 25.00%',
                     'label': 'HW Avg',
                     'percent': 0.25,
                     'prominent': True
                 },
                 {
                     'category': 'NoCredit',
-                    'detail': 'NoCredit Average = 0%',
+                    'detail': 'NoCredit Average = 0.00%',
                     'label': 'NC Avg',
                     'percent': 0,
                     'prominent': True
