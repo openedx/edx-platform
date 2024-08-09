@@ -216,3 +216,17 @@ test-xsslint:
 
 test-lint:
 	pycodestyle .
+
+test-pi_check:
+	python scripts/quality_test.py pii_check
+
+test-check_keyword:
+	python scripts/quality_test.py check_keywords
+
+quality-test:
+	test-lint
+	test-eslint
+	test-stylelint
+	test-xsslint
+	test-pi_check
+	test-check_keyword

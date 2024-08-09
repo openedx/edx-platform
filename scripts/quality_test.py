@@ -27,6 +27,8 @@ def fail_quality(name, message):
     """
     Fail the specified quality check.
     """
+    print(name)
+    print(message)
     sys.exit()
 
 
@@ -64,18 +66,6 @@ def repo_root():
                 print('Unable to determine the absolute path of the edx-platform repo, aborting')
                 raise
     return absolute_path.parent.parent.parent
-
-
-# def _write_metric(metric, filename):
-#     """
-#     Write a given metric to a given file
-#     Used for things like reports/metrics/eslint, which will simply tell you the number of
-#     eslint violations found
-#     """
-#     Env.METRICS_DIR.makedirs_p()
-
-#     with open(filename, "w") as metric_file:
-#         metric_file.write(str(metric))
 
 
 def _get_report_contents(filename, report_name, last_line_only=False):
@@ -240,149 +230,141 @@ def run_stylelint():
         print(num_violations)
 
 
-# def _extract_missing_pii_annotations(filename):
-#     """
-#     Returns the number of uncovered models from the stdout report of django_find_annotations.
+def _extract_missing_pii_annotations(filename):
+    """
+    Returns the number of uncovered models from the stdout report of django_find_annotations.
 
-#     Arguments:
-#         filename: Filename where stdout of django_find_annotations was captured.
+    Arguments:
+        filename: Filename where stdout of django_find_annotations was captured.
 
-#     Returns:
-#         three-tuple containing:
-#             1. The number of uncovered models,
-#             2. A bool indicating whether the coverage is still below the threshold, and
-#             3. The full report as a string.
-#     """
-#     uncovered_models = 0
-#     pii_check_passed = True
-#     if os.path.isfile(filename):
-#         with open(filename) as report_file:
-#             lines = report_file.readlines()
+    Returns:
+        three-tuple containing:
+            1. The number of uncovered models,
+            2. A bool indicating whether the coverage is still below the threshold, and
+            3. The full report as a string.
+    """
+    uncovered_models = 0
+    pii_check_passed = True
+    if os.path.isfile(filename):
+        with open(filename) as report_file:
+            lines = report_file.readlines()
 
-#             # Find the count of uncovered models.
-#             uncovered_regex = re.compile(r'^Coverage found ([\d]+) uncovered')
-#             for line in lines:
-#                 uncovered_match = uncovered_regex.match(line)
-#                 if uncovered_match:
-#                     uncovered_models = int(uncovered_match.groups()[0])
-#                     break
+            # Find the count of uncovered models.
+            uncovered_regex = re.compile(r'^Coverage found ([\d]+) uncovered')
+            for line in lines:
+                uncovered_match = uncovered_regex.match(line)
+                if uncovered_match:
+                    uncovered_models = int(uncovered_match.groups()[0])
+                    break
 
-#             # Find a message which suggests the check failed.
-#             failure_regex = re.compile(r'^Coverage threshold not met!')
-#             for line in lines:
-#                 failure_match = failure_regex.match(line)
-#                 if failure_match:
-#                     pii_check_passed = False
-#                     break
+            # Find a message which suggests the check failed.
+            failure_regex = re.compile(r'^Coverage threshold not met!')
+            for line in lines:
+                failure_match = failure_regex.match(line)
+                if failure_match:
+                    pii_check_passed = False
+                    break
 
-#             # Each line in lines already contains a newline.
-#             full_log = ''.join(lines)
-#     else:
-#         fail_quality('pii', f'FAILURE: Log file could not be found: {filename}')
+            # Each line in lines already contains a newline.
+            full_log = ''.join(lines)
+    else:
+        fail_quality('pii', f'FAILURE: Log file could not be found: {filename}')
 
-#     return (uncovered_models, pii_check_passed, full_log)
-
-
-# def run_pii_check():
-#     """
-#     Guarantee that all Django models are PII-annotated.
-#     """
-
-#     pii_report_name = 'pii'
-#     default_report_dir = (Env.REPORT_DIR / pii_report_name)
-#     report_dir = default_report_dir
-#     output_file = os.path.join(report_dir, 'pii_check_{}.report')
-#     env_report = []
-#     pii_check_passed = True
-#     for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
-#         try:
-#             print()
-#             print(f"Running {env_name} PII Annotation check and report")
-#             print("-" * 45)
-#             run_output_file = str(output_file).format(env_name.lower())
-#             os.makedirs(report_dir, exist_ok=True)
-#             command = (
-#                 "export DJANGO_SETTINGS_MODULE={env_settings_file};"
-#                 "code_annotations django_find_annotations"
-#                 "--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()}"
-#                 "--lint --report --coverage | tee {run_output_file}"
-#             )
-#             result = subprocess.run(
-#                 command,
-#                 shell=True,
-#                 check=False,
-#                 stdout=subprocess.PIPE,
-#                 stderr=subprocess.PIPE,
-#                 text=True
-#             )
-
-#             with open(run_output_file, 'w') as f:
-#                 f.write(result.stdout)
-
-#             uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
-#             env_report.append((
-#                 uncovered_model_count,
-#                 full_log,
-#             ))
-
-#         except BuildFailure as error_message:
-#             fail_quality(pii_report_name, f'FAILURE: {error_message}')
-
-#         if not pii_check_passed_env:
-#             pii_check_passed = False
-
-#     # Determine which suite is the worst offender by obtaining the max() keying off uncovered_count.
-#     uncovered_count, full_log = max(env_report, key=lambda r: r[0])
-
-#     # Write metric file.
-#     if uncovered_count is None:
-#         uncovered_count = 0
-#     metrics_str = f"Number of PII Annotation violations: {uncovered_count}\n"
-#     _write_metric(metrics_str, (Env.METRICS_DIR / pii_report_name))
-
-#     # Finally, fail the paver task if code_annotations suggests that the check failed.
-#     if not pii_check_passed:
-#         fail_quality('pii', full_log)
+    return (uncovered_models, pii_check_passed, full_log)
 
 
-# def check_keywords():
-#     """
-#     Check Django model fields for names that conflict with a list of reserved keywords
-#     """
+def run_pii_check():
+    """
+    Guarantee that all Django models are PII-annotated.
+    """
+    REPO_ROOT = repo_root()
+    REPORT_DIR = REPO_ROOT / 'reports'
+    pii_report_name = 'pii'
+    default_report_dir = (REPORT_DIR / pii_report_name)
+    report_dir = default_report_dir
+    output_file = os.path.join(report_dir, 'pii_check_{}.report')
+    env_report = []
+    pii_check_passed = True
+    for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
+        try:
+            print(f"Running {env_name} PII Annotation check and report")
+            print("-" * 45)
+            run_output_file = str(output_file).format(env_name.lower())
+            os.makedirs(report_dir, exist_ok=True)
+            command = (
+                "export DJANGO_SETTINGS_MODULE={env_settings_file};"
+                "code_annotations django_find_annotations"
+                "--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()}"
+                "--lint --report --coverage | tee {run_output_file}"
+            )
+            result = subprocess.run(
+                command,
+                shell=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
 
-#     report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
-#     os.makedirs(report_path, exist_ok=True)
+            with open(run_output_file, 'w') as f:
+                f.write(result.stdout)
 
-#     overall_status = True
-#     for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
-#         report_file = f"{env}_reserved_keyword_report.csv"
-#         override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
-#         try:
-#             command = (
-#                 "export DJANGO_SETTINGS_MODULE={env_settings_file};"
-#                 "python manage.py {env} check_reserved_keywords"
-#                 "--override_file {override_file}"
-#                 "--report_path {report_path}"
-#                 "--report_file {report_file}"
-#             )
-#             result = subprocess.run(
-#                 command,
-#                 shell=True,
-#                 check=True,
-#                 stdout=subprocess.PIPE,
-#                 stderr=subprocess.PIPE,
-#                 text=True
-#             )
-#         except BuildFailure:
-#             overall_status = False
+            uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
+            env_report.append((
+                uncovered_model_count,
+                full_log,
+            ))
 
-#     if not overall_status:
-#         fail_quality(
-#             'keywords',
-#             'Failure: reserved keyword checker failed. Reports can be found here: {}'.format(
-#                 report_path
-#             )
-#         )
+        except BuildFailure as error_message:
+            fail_quality(pii_report_name, f'FAILURE: {error_message}')
+
+        if not pii_check_passed_env:
+            pii_check_passed = False
+
+    # Finally, fail the paver task if code_annotations suggests that the check failed.
+    if not pii_check_passed:
+        fail_quality('pii', full_log)
+
+
+def check_keywords():
+    """
+    Check Django model fields for names that conflict with a list of reserved keywords
+    """
+    REPO_ROOT = repo_root()
+    REPORT_DIR = REPO_ROOT / 'reports'
+    report_path = os.path.join(REPORT_DIR, 'reserved_keywords')
+    os.makedirs(report_path, exist_ok=True)
+
+    overall_status = True
+    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+        report_file = f"{env}_reserved_keyword_report.csv"
+        override_file = os.path.join(REPO_ROOT, "db_keyword_overrides.yml")
+        try:
+            command = (
+                f"export DJANGO_SETTINGS_MODULE={env_settings_file};"
+                f"python manage.py {env} check_reserved_keywords"
+                f"--override_file {override_file}"
+                f"--report_path {report_path}"
+                f"--report_file {report_file}"
+            )
+            result = subprocess.run(
+                command,
+                shell=True,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+        except BuildFailure:
+            overall_status = False
+
+    if not overall_status:
+        fail_quality(
+            'keywords',
+            'Failure: reserved keyword checker failed. Reports can be found here: {}'.format(
+                report_path
+            )
+        )
 
 
 def _get_xsslint_counts(filename):
@@ -517,40 +499,41 @@ def run_xsslint():
         print("successfully run xsslint")
 
 
-# def diff_coverage():
-#     """
-#     Build the diff coverage reports
-#     """
+def diff_coverage():
+    """
+    Build the diff coverage reports
+    """
 
-#     compare_branch = 'origin/master'
+    compare_branch = 'origin/master'
 
-#     # Find all coverage XML files (both Python and JavaScript)
-#     xml_reports = []
+    # Find all coverage XML files (both Python and JavaScript)
+    xml_reports = []
+    REPO_ROOT = repo_root()
+    REPORT_DIR = REPO_ROOT / 'reports'
+    for filepath in REPORT_DIR.walk():
+        if bool(re.match(r'^coverage.*\.xml$', filepath.basename())):
+            xml_reports.append(filepath)
 
-#     for filepath in Env.REPORT_DIR.walk():
-#         if bool(re.match(r'^coverage.*\.xml$', filepath.basename())):
-#             xml_reports.append(filepath)
+    if not xml_reports:
+        err_msg = colorize(
+            'red',
+            "No coverage info found.  Run `quality test` before running "
+            "`coverage test`.\n"
+        )
+        sys.stderr.write(err_msg)
+    else:
+        xml_report_str = ' '.join(xml_reports)
+        diff_html_path = os.path.join(REPORT_DIR, 'diff_coverage_combined.html')
 
-#     if not xml_reports:
-#         err_msg = colorize(
-#             'red',
-#             "No coverage info found.  Run `paver test` before running "
-#             "`paver coverage`.\n"
-#         )
-#         sys.stderr.write(err_msg)
-#     else:
-#         xml_report_str = ' '.join(xml_reports)
-#         diff_html_path = os.path.join(Env.REPORT_DIR, 'diff_coverage_combined.html')
-
-#         # Generate the diff coverage reports (HTML and console)
-#         # The --diff-range-notation parameter is a workaround for https://github.com/Bachmann1234/diff_cover/issues/153
-#         command = (
-#             f"diff-cover {xml_report_str}"
-#             f"--diff-range-notation '..'"
-#             f"--compare-branch={compare_branch} "
-#             f"--html-report {diff_html_path}"
-#         )
-#         subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # Generate the diff coverage reports (HTML and console)
+        # The --diff-range-notation parameter is a workaround for https://github.com/Bachmann1234/diff_cover/issues/153
+        command = (
+            f"diff-cover {xml_report_str}"
+            f"--diff-range-notation '..'"
+            f"--compare-branch={compare_branch} "
+            f"--html-report {diff_html_path}"
+        )
+        subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
 
 if __name__ == "__main__":
@@ -569,8 +552,8 @@ if __name__ == "__main__":
     elif argument.command == 'xsslint':
         run_xsslint()
 
-    # elif argument.command == 'pii_check':
-    #     run_pii_check()
+    elif argument.command == 'pii_check':
+        run_pii_check()
 
-    # elif argument.command == 'check_keywords':
-    #     check_keywords()
+    elif argument.command == 'check_keywords':
+        check_keywords()

@@ -99,6 +99,8 @@ jobs:
             make test-eslint
             make test-stylelint
             make test-xsslint
+            make test-pi_check
+            make test-check_keyword
             ./scripts/all-tests.sh
           
       - name: Save Job Artifacts
