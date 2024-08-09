@@ -23,7 +23,6 @@ from uuid import uuid4
 import pymongo
 from bson.son import SON
 from fs.osfs import OSFS
-from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
@@ -578,7 +577,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         if connections:
             connection.close()
 
-    @autoretry_read()
     def fill_in_run(self, course_key):
         """
         In mongo some course_keys are used without runs. This helper function returns
@@ -737,7 +735,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for item in items
         ]
 
-    @autoretry_read()
     def get_course_summaries(self, **kwargs):
         """
         Returns a list of `CourseSummary`. This accepts an optional parameter of 'org' which
@@ -786,7 +783,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         return courses_summaries
 
-    @autoretry_read()
     def get_courses(self, **kwargs):
         '''
         Returns a list of course descriptors. This accepts an optional parameter of 'org' which
@@ -821,7 +817,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         return [course for course in base_list if not isinstance(course, ErrorBlock)]
 
-    @autoretry_read()
     def _find_one(self, location):
         '''Look for a given location in the collection. If the item is not present, raise
         ItemNotFoundError.
@@ -867,7 +862,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         except ItemNotFoundError:
             return None
 
-    @autoretry_read()
     def has_course(self, course_key, ignore_case=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the course_id of the course if it was found, else None
@@ -962,7 +956,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for key in ('tag', 'org', 'course', 'category', 'name', 'revision')
         ])
 
-    @autoretry_read()
     def get_items(  # lint-amnesty, pylint: disable=arguments-differ
             self,
             course_id,
