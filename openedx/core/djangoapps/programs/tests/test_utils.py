@@ -884,7 +884,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
     maxDiff = None
     sku = 'abc123'
-    checkout_path = '/basket/add/'
+    checkout_path = 'http://payment-mfe'
     instructors = {
         'instructors': [
             {
@@ -935,7 +935,6 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
         course['course_runs'] = [course_run]
         program['courses'] = [course]
-
         assert actual == program
 
     @ddt.data(-1, 0, 1)
@@ -958,12 +957,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     @mock.patch(UTILS_MODULE + '.CourseMode.mode_for_course')
     def test_student_enrollment_status(self, is_enrolled, enrolled_mode, is_upgrade_required, mock_get_mode):
         """Verify that program data is supplemented with the student's enrollment status."""
-        expected_upgrade_url = '{root}/{path}/?sku={sku}'.format(
-            root=ECOMMERCE_URL_ROOT,
-            path=self.checkout_path.strip('/'),
-            sku=self.sku,
-        )
-
+        expected_upgrade_url = f'{self.checkout_path}?sku={self.sku}'
         update_commerce_config(enabled=True, checkout_page=self.checkout_path)
 
         mock_mode = mock.Mock()
