@@ -4,6 +4,10 @@
 #
 #    make upgrade
 #
+amqp==5.2.0
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   kombu
 asgiref==3.8.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
@@ -14,11 +18,15 @@ attrs==24.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.34.154
+billiard==4.2.0
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   celery
+boto3==1.34.157
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.34.154
+botocore==1.34.157
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -28,6 +36,8 @@ cachetools==5.4.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
+celery==5.4.0
+    # via -r scripts/user_retirement/requirements/base.txt
 certifi==2024.7.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
@@ -44,7 +54,23 @@ charset-normalizer==2.0.12
 click==8.1.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
     #   edx-django-utils
+click-didyoumean==0.3.1
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   celery
+click-plugins==1.1.1
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   celery
+click-repl==0.3.0
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   celery
 cryptography==43.0.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
@@ -52,6 +78,8 @@ cryptography==43.0.0
     #   pyjwt
 ddt==1.7.2
     # via -r scripts/user_retirement/requirements/testing.in
+defusedxml==0.7.1
+    # via -r scripts/user_retirement/requirements/base.txt
 django==4.2.15
     # via
     #   -r scripts/user_retirement/requirements/base.txt
@@ -76,9 +104,9 @@ google-api-core==2.19.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.139.0
+google-api-python-client==2.140.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.32.0
+google-auth==2.33.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -116,6 +144,10 @@ jmespath==1.0.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   botocore
+kombu==5.4.0
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   celery
 lxml==4.9.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
@@ -126,13 +158,13 @@ markupsafe==2.1.5
     #   werkzeug
 mock==5.1.0
     # via -r scripts/user_retirement/requirements/testing.in
-more-itertools==10.3.0
+more-itertools==10.4.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==9.12.0
+newrelic==9.13.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -148,6 +180,10 @@ platformdirs==4.2.2
     #   zeep
 pluggy==1.5.0
     # via pytest
+prompt-toolkit==3.0.47
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   click-repl
 proto-plus==1.24.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
@@ -194,13 +230,14 @@ python-dateutil==2.9.0.post0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   botocore
+    #   celery
     #   moto
 pytz==2024.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi
     #   zeep
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   responses
@@ -266,6 +303,10 @@ typing-extensions==4.12.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
+tzdata==2024.1
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   celery
 unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.txt
 uritemplate==4.1.1
@@ -278,6 +319,16 @@ urllib3==1.26.19
     #   botocore
     #   requests
     #   responses
+vine==5.1.0
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   amqp
+    #   celery
+    #   kombu
+wcwidth==0.2.13
+    # via
+    #   -r scripts/user_retirement/requirements/base.txt
+    #   prompt-toolkit
 werkzeug==3.0.3
     # via moto
 xmltodict==0.13.0
