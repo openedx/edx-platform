@@ -60,6 +60,9 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
         run: |
           make test-requirements
+      
+      - name: Clear npm cache
+        run: npm cache clean --force
 
       - name: Run Quality Tests
         env:
@@ -68,8 +71,9 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
-          ./scripts/all-tests.sh
-
+          npm install
+           ./scripts/all-tests.sh
+      
       - name: Save Job Artifacts
         if: always()
         uses: actions/upload-artifact@v4

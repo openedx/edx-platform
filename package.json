@@ -111,6 +111,7 @@
     "sinon": "2.4.1",
     "squirejs": "0.1.0",
     "string-replace-loader": "^3.1.0",
+    "stylelint": "^14.0.0",
     "stylelint-formatter-pretty": "1.1.4",
     "webpack-cli": "^5.1.4"
   }
