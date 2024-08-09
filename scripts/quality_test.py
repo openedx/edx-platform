@@ -341,12 +341,13 @@ def check_keywords():
         override_file = os.path.join(REPO_ROOT, "db_keyword_overrides.yml")
         try:
             command = (
-                f"export DJANGO_SETTINGS_MODULE={env_settings_file};"
-                f"python manage.py {env} check_reserved_keywords"
-                f"--override_file {override_file}"
-                f"--report_path {report_path}"
+                f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
+                f"python manage.py {env} check_reserved_keywords "
+                f"--override_file {override_file} "
+                f"--report_path {report_path} "
                 f"--report_file {report_file}"
             )
+
             result = subprocess.run(
                 command,
                 shell=True,
