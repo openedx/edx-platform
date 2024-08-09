@@ -70,10 +70,12 @@ def get_user_preferences_for_courses(course_ids, user):
     return new_preferences
 
 
-def send_digest_email_to_user(user, cadence_type, course_language='en', courses_data=None):
+def send_digest_email_to_user(user, cadence_type, start_date, end_date, course_language='en', courses_data=None):
     """
     Send [cadence_type] email to user.
     Cadence Type can be EmailCadence.DAILY or EmailCadence.WEEKLY
+    start_date: Datetime object
+    end_date: Datetime object
     """
     if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
@@ -81,7 +83,6 @@ def send_digest_email_to_user(user, cadence_type, course_language='en', courses_
     if not is_email_notification_flag_enabled(user):
         logger.info(f'<Email Cadence> Flag disabled for {user.username} ==Temp Log==')
         return
-    start_date, end_date = get_start_end_date(cadence_type)
     notifications = Notification.objects.filter(user=user, email=True,
                                                 created__gte=start_date, created__lte=end_date)
     if not notifications:
@@ -115,6 +116,7 @@ def send_digest_email_to_all_users(cadence_type):
     logger.info(f'<Email Cadence> Sending cadence email of type {cadence_type}')
     users = get_audience_for_cadence_email(cadence_type)
     courses_data = {}
+    start_date, end_date = get_start_end_date(cadence_type)
     logger.info(f'<Email Cadence> Email Cadence Audience {len(users)}')
     for user in users:
-        send_digest_email_to_user(user, cadence_type, courses_data=courses_data)
+        send_digest_email_to_user(user, cadence_type, start_date, end_date, courses_data=courses_data)
