@@ -125,7 +125,14 @@ def get_user_email_language(user):
     return UserPreference.get_value(user, LANGUAGE_KEY)
 
 
-def enroll_email(course_id, student_email, auto_enroll=False, message_students=False, message_params=None, language=None):
+def enroll_email(
+    course_id,
+    student_email,
+    auto_enroll=False,
+    message_students=False,
+    message_params=None,
+    language=None
+):
     """
     Enroll a student by email.
 
