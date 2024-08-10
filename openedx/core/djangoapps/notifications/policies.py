@@ -16,7 +16,7 @@ class CoursePushNotificationOptout(Policy):
         """
         Check if the user has opted out of push notifications for the given course.
         :param message:
-        :return:
+        :return: PolicyResult
         """
         course_ids = message.context.get('course_ids', [])
         app_label = message.context.get('app_label')

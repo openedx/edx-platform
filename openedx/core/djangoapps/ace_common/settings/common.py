@@ -40,7 +40,7 @@ def plugin_settings(settings):  # lint-amnesty, pylint: disable=missing-function
 
     if getattr(settings, 'FIREBASE_APP', None):
         settings.ACE_ENABLED_CHANNELS.append(settings.ACE_CHANNEL_DEFAULT_PUSH)
-        settings.ACE_ENABLED_POLICIES.append('bulk_push_notification_optout')
+        settings.ACE_ENABLED_POLICIES.append('course_push_notification_optout')
 
         settings.PUSH_NOTIFICATIONS_SETTINGS = {
             'CONFIG': 'push_notifications.conf.AppConfig',
