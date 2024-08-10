@@ -47,7 +47,6 @@ django-mptt
 django-mysql
 django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
-django-push-notifications
 django-ratelimit
 django-sekizai
 django-simple-history
