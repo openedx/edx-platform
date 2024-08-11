@@ -269,7 +269,13 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 log.info("%s", error)
                 errors.append(error)
                 break
-            enroll_email(course_key, email, auto_enroll=True, message_students=email_students, message_params=email_params)
+            enroll_email(
+                course_key,
+                email,
+                auto_enroll=True,
+                message_students=email_students,
+                message_params=email_params
+            )
     elif action == 'Unenroll' or action == 'revoke':  # lint-amnesty, pylint: disable=consider-using-in
         for identifier in identifiers:
             try:
