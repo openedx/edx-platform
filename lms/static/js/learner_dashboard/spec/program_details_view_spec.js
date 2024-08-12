@@ -739,8 +739,8 @@ describe('Program Details View', () => {
         );
     });
 
-    it('should render appropriate subscription text when subscription is active with trial', () => {
-        testSubscriptionState(
+    it('should not render appropriate subscription text when subscription is active with trial', () => {
+        testSubscriptionSunsetting(
             'active',
             'Manage my subscription',
             'Trial ends',
@@ -748,8 +748,8 @@ describe('Program Details View', () => {
         );
     });
 
-    it('should render appropriate subscription text when subscription is active', () => {
-        testSubscriptionState(
+    it('should not render appropriate subscription text when subscription is active', () => {
+        testSubscriptionSunsetting(
             'active',
             'Manage my subscription',
             'Your next billing date is',
