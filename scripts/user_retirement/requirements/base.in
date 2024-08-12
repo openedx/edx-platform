@@ -1,15 +1,12 @@
 -c ../../../requirements/constraints.txt
 
 boto3
-celery  # required because we're using the LMS's settings file for config options
 click
-defusedxml  # required because we're using the LMS's settings file for config options
 pyyaml
 backoff
 requests
 edx-rest-api-client
 jenkinsapi
-kombu  # required because we're using the LMS's settings file for config options
 unicodecsv
 simplejson
 simple-salesforce
