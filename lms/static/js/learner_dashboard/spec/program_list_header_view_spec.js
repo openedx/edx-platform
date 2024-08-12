@@ -50,7 +50,6 @@ describe('Program List Header View', () => {
                 all_unenrolled: true,
             },
         ],
-        isUserB2CSubscriptionsEnabled: true,
     };
 
     beforeEach(() => {
