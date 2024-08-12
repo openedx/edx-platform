@@ -242,7 +242,7 @@ def _setup_all_apis_or_exit(fail_func, fail_code, config):
                 segment_workspace_slug
             )
 
-        for service_config in extra_services:
+        for service_config in settings.EXTRA_SERVICES_TO_RETIRE_FROM:
             service_name = service_config['name']
             config[service_name] = GenericRetirementApi(
                 lms_base_url,
