@@ -1213,4 +1213,5 @@ class VerificationAttempt(TimeStampedModel):
     expiration_datetime = models.DateTimeField(
         null=True,
         blank=True,
+        db_index=True,
     )
