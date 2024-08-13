@@ -24,7 +24,8 @@ class CoursewareContent:
             "course": str(structure_key),
             "org": structure_key.org,
             "item_id": item.scope_ids.usage_id.block_id,
-            "usage_key": str(item.scope_ids.usage_id)
+            "usage_key": str(item.scope_ids.usage_id),
+            "location": self.get_location(item)
         }
         _index_dictionary = item.index_dictionary()
         _index_dictionary.update(location_info)
@@ -34,6 +35,11 @@ class CoursewareContent:
                 children.extend(self.prepare_data(child_item, structure_key))
 
         return [_index_dictionary] + children
+
+    def get_location(self, item):
+        if item.get_parent():
+            return self.get_location(item.get_parent()) + [item.display_name]
+        return []
 
     def fetch_course_blocks(self, modulestore, course_key):
         """
