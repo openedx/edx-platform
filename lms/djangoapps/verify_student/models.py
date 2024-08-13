@@ -1214,3 +1214,13 @@ class VerificationAttempt(TimeStampedModel):
         null=True,
         blank=True,
     )
+
+    @property
+    def expiration_datetime(self):
+        """Backwards compatibility with existing IDVerification models"""
+        return self.expiration_date
+
+    @property
+    def updated_at(self):
+        """Backwards compatibility with existing IDVerification models"""
+        return self.modified

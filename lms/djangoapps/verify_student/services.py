@@ -17,7 +17,7 @@ from common.djangoapps.student.models import User
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification, VerificationAttempt
 from .utils import most_recent_verification
 
 log = logging.getLogger(__name__)
@@ -75,7 +75,8 @@ class IDVerificationService:
         Return a list of all verifications associated with the given user.
         """
         verifications = []
-        for verification in chain(SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-created_at'),
+        for verification in chain(VerificationAttempt.objects.filter(user=user).order_by('-created'),
+                                  SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-created_at'),
                                   SSOVerification.objects.filter(user=user).order_by('-created_at'),
                                   ManualVerification.objects.filter(user=user).order_by('-created_at')):
             verifications.append(verification)
@@ -92,6 +93,11 @@ class IDVerificationService:
             'created_at__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         }
         return chain(
+            VerificationAttempt.objects.filter(**{
+                'user__in': users,
+                'status': 'approved',
+                'created__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+            }).values_list('user_id', flat=True),
             SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
             SSOVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
             ManualVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True)
@@ -117,11 +123,14 @@ class IDVerificationService:
             'status__in': statuses,
         }
 
+        id_verifications = VerificationAttempt.objects.filter(**filter_kwargs)
         photo_id_verifications = SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs)
         sso_id_verifications = SSOVerification.objects.filter(**filter_kwargs)
         manual_id_verifications = ManualVerification.objects.filter(**filter_kwargs)
 
-        attempt = most_recent_verification((photo_id_verifications, sso_id_verifications, manual_id_verifications))
+        attempt = most_recent_verification(
+            (photo_id_verifications, sso_id_verifications, manual_id_verifications, id_verifications)
+        )
         return attempt and attempt.expiration_datetime
 
     @classmethod
@@ -244,6 +253,9 @@ class IDVerificationService:
         If the verification object cannot be found, returns None
         """
         verification = None
+
+        # TODO: Not updated for new model since we can't query multiple tables
+        # by id.
         verification_models = [
             SoftwareSecurePhotoVerification,
             SSOVerification,
