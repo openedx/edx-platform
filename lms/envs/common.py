@@ -2262,7 +2262,7 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 ################################# Middleware ###################################
 # Reference:
 # CSP_STATIC_ENFORCE = """
-#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/ 
+#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/
 #       https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net;
 #     style-src 'self' https://fonts.googleapis.com 'unsafe-inline'
 #     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;

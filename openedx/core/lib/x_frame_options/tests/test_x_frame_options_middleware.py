@@ -14,8 +14,8 @@ from openedx.core.lib.x_frame_options.middleware import EdxXFrameOptionsMiddlewa
 class TestEdxXFrameOptionsMiddleware(TestCase):
     """Test the actual middleware."""
 
-    @patch('edx_django_utils.security.clickjacking.middleware._validate_header_value')
-    @patch('edx_django_utils.security.clickjacking.middleware.settings')
+    @patch('openedx.core.lib.x_frame_options.middleware._validate_header_value')
+    @patch('openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware')
     def test_x_frame_setting_must_apply_on_no_override(self, settings, validate_header):
         """
         If the setting `X_FRAME_OPTIONS` is set but no overrides are specified,
@@ -34,8 +34,8 @@ class TestEdxXFrameOptionsMiddleware(TestCase):
         assert response.headers['X-Frame-Options'] == 'SAMEORIGIN'
         validate_header.assert_called_once_with('SAMEORIGIN')
 
-    @patch('edx_django_utils.security.clickjacking.middleware._validate_header_value')
-    @patch('edx_django_utils.security.clickjacking.middleware.settings')
+    @patch('openedx.core.lib.x_frame_options.middleware._validate_header_value')
+    @patch('openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware')
     def test_on_override_with_valid_regex_is_sameorigin(self, settings, validate_header):
         """
         If the URL matches one of the overrides, the header should be set to
@@ -55,8 +55,8 @@ class TestEdxXFrameOptionsMiddleware(TestCase):
 
         assert response.headers['X-Frame-Options'] == 'SAMEORIGIN'
 
-    @patch('edx_django_utils.security.clickjacking.middleware._validate_header_value')
-    @patch('edx_django_utils.security.clickjacking.middleware.settings')
+    @patch('openedx.core.lib.x_frame_options.middleware._validate_header_value')
+    @patch('openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware')
     def test_on_override_for_non_matching_urls_is_deny(self, settings, validate_header):
         """
         If the URL does not match any of the overrides, the header should be set to

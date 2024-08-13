@@ -8,7 +8,7 @@ In any case, this middleware allows you both to set the ``X-Frame-Options`` head
 ``DENY``, ``SAMEORIGIN``, ``ALLOW`` per django setting - but defaults to ``DENY``.
 It also allows you to override the header for specific urls defined via regex.
 
-- Add the middleware ``'edx_django_utils.security.clickjacking.middleware.EdxXFrameOptionsMiddleware'`` near the end of your ``MIDDLEWARE`` list.
+- Add the middleware ``'openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware'`` near the end of your ``MIDDLEWARE`` list.
 - This will add an `X-Frame-Options` header to all responses.
 - Add ``X_FRAME_OPTIONS = value`` to your django settings file with "value" being ``DENY``, ``SAMEORIGIN``, or ``ALLOW``.
 - Optionally, add ``X_FRAME_OPTIONS_OVERRIDES = [[regex, value]]`` where ``[[regex, value]]`` is a list of
