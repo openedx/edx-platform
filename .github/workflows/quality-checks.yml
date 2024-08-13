@@ -90,8 +90,6 @@ jobs:
 
       - name: Run Quality Tests
         env:
-          TEST_SUITE: quality
-          SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
@@ -101,7 +99,6 @@ jobs:
             make test-xsslint
             make test-pi_check
             make test-check_keyword
-            ./scripts/all-tests.sh
           
       - name: Save Job Artifacts
         if: always()

@@ -2,12 +2,9 @@
 Javascript test tasks
 """
 
-
-from paver import tasks
-
-from pavelib.utils.envs import Env
-from pavelib.utils.test import utils as test_utils
-from pavelib.utils.test.suites.suite import TestSuite
+from utils.envs import Env
+from utils import utils as test_utils
+from .suite import TestSuite
 
 __test__ = False  # do not collect
 
@@ -28,15 +25,15 @@ class JsTestSuite(TestSuite):
 
     def __enter__(self):
         super().__enter__()
-        if tasks.environment.dry_run:
-            tasks.environment.info("make report_dir")
-        else:
-            self.report_dir.makedirs_p()
-        if not self.skip_clean:
-            test_utils.clean_test_files()
+        # if tasks.environment.dry_run:
+        #     tasks.environment.info("make report_dir")
+        # else:
+        self.report_dir.makedirs_p()
+        # if not self.skip_clean:
+            # test_utils.clean_test_files()
 
-        if self.mode == 'run' and not self.run_under_coverage:
-            test_utils.clean_dir(self.report_dir)
+        # if self.mode == 'run' and not self.run_under_coverage:
+            # test_utils.clean_dir(self.report_dir)
 
     @property
     def _default_subsuites(self):

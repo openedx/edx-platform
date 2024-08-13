@@ -6,10 +6,8 @@ A class used for defining and running test suites
 import os
 import subprocess
 import sys
-
-from paver import tasks
-
-from pavelib.utils.process import kill_process
+import signal
+import psutil
 
 try:
     from pygments.console import colorize
@@ -62,6 +60,18 @@ class TestSuite:
         The command to run tests (as a string). For this base class there is none.
         """
         return None
+    
+    @staticmethod
+    def kill_process(proc):
+        """
+        Kill the process `proc` created with `subprocess`.
+        """
+        p1_group = psutil.Process(proc.pid)
+        child_pids = p1_group.children(recursive=True)
+
+        for child_pid in child_pids:
+            os.kill(child_pid.pid, signal.SIGKILL)
+
 
     @staticmethod
     def is_success(exit_code):
@@ -79,9 +89,9 @@ class TestSuite:
         """
         cmd = " ".join(self.cmd)
 
-        if tasks.environment.dry_run:
-            tasks.environment.info(cmd)
-            return
+        # if tasks.environment.dry_run:
+        #     tasks.environment.info(cmd)
+        #     return
 
         sys.stdout.write(cmd)
 
@@ -102,7 +112,7 @@ class TestSuite:
             process = subprocess.Popen(cmd, **kwargs)  # lint-amnesty, pylint: disable=consider-using-with
             return self.is_success(process.wait())
         except KeyboardInterrupt:
-            kill_process(process)
+            self.kill_process(process)
             sys.exit(1)
 
     def run_suite_tests(self):
@@ -140,8 +150,8 @@ class TestSuite:
         """
         self.run_suite_tests()
 
-        if tasks.environment.dry_run:
-            return
+        # if tasks.environment.dry_run:
+        #     return
 
         self.report_test_results()
 

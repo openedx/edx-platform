@@ -206,27 +206,24 @@ ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip ins
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
 
 test-eslint:
-	python scripts/quality_test.py eslint
+	python scripts/quality_test/quality_test.py eslint
 
 test-stylelint:
-	python scripts/quality_test.py stylelint
+	python scripts/quality_test/quality_test.py stylelint
 
 test-xsslint:
-	python scripts/quality_test.py xsslint
+	python scripts/quality_test/quality_test.py xsslint
 
 test-lint:
 	pycodestyle .
 
 test-pi_check:
-	python scripts/quality_test.py pii_check
+	python scripts/quality_test/quality_test.py pii_check
 
 test-check_keyword:
-	python scripts/quality_test.py check_keywords
+	python scripts/quality_test/quality_test.py check_keywords
 
-quality-test:
-	test-lint
-	test-eslint
-	test-stylelint
-	test-xsslint
-	test-pi_check
-	test-check_keyword
+test-js:
+	python scripts/quality_test/js_test.py
+
+quality-test: test-lint test-eslint test-stylelint test-xsslint test-pi_check test-check_keyword
