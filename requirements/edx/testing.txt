@@ -569,7 +569,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.23.3
+edx-enterprise==4.23.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -808,9 +808,7 @@ idna==3.7
 import-linter==2.0
     # via -r requirements/edx/testing.in
 importlib-metadata==6.11.0
-    # via
-    #   -c requirements/edx/../common_constraints.txt
-    #   -r requirements/edx/base.txt
+    # via -r requirements/edx/base.txt
 inflection==0.5.1
     # via
     #   -r requirements/edx/base.txt
