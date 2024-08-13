@@ -129,15 +129,6 @@ def get_program_marketing_url(programs_config, mobile_only=False):
     return marketing_url
 
 
-def get_program_subscriptions_marketing_url():
-    """Build a URL used to link to subscription eligible programs on the marketing site."""
-    marketing_urls = settings.MKTG_URLS
-    return urljoin(
-        marketing_urls.get("ROOT"),
-        marketing_urls.get("PROGRAM_SUBSCRIPTIONS"),
-    )
-
-
 def attach_program_detail_url(programs, mobile_only=False):
     """Extend program representations by attaching a URL to be used when linking to program details.
 
@@ -1054,39 +1045,3 @@ def get_subscription_api_client(user):
     client.auth = SuppliedJwtAuth(jwt)
 
     return client
-
-
-def get_programs_subscription_data(user, program_uuid=None):
-    """
-    Returns the subscription data for a user's program if uuid is specified
-    else return data for user's all subscriptions.
-    """
-    client = get_subscription_api_client(user)
-    api_path = f"{settings.SUBSCRIPTIONS_API_PATH}"
-    subscription_data = []
-
-    log.info(
-        f"B2C_SUBSCRIPTIONS: Requesting Program subscription data for user: {user}"
-        + (f" for program_uuid: {program_uuid}" if program_uuid is not None else "")
-    )
-
-    try:
-        if program_uuid:
-            response = client.get(api_path, params={"resource_id": program_uuid, "most_active_and_recent": "true"})
-            response.raise_for_status()
-            subscription_data = response.json().get("results", [])
-        else:
-            next_page = 1
-            while next_page:
-                response = client.get(api_path, params=dict(page=next_page))
-                response.raise_for_status()
-                subscription_data.extend(response.json().get("results", []))
-                next_page = response.json().get("next")
-    except Exception as exc:  # pylint: disable=broad-except
-        log.exception(
-            f"B2C_SUBSCRIPTIONS: Failed to retrieve Program Subscription Data for user: {user} with error: {exc}"
-            + f" for program_uuid: {str(program_uuid)}"
-            if program_uuid is not None
-            else ""
-        )
-    return subscription_data
