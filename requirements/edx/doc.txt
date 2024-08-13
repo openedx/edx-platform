@@ -10,11 +10,11 @@ accessible-pygments==0.0.5
     # via pydata-sphinx-theme
 acid-xblock==0.3.1
     # via -r requirements/edx/base.txt
-aiohappyeyeballs==2.3.4
+aiohappyeyeballs==2.3.5
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-aiohttp==3.10.1
+aiohttp==3.10.3
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -65,7 +65,7 @@ attrs==24.2.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.15.0
+babel==2.16.0
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar
@@ -100,13 +100,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.34.154
+boto3==1.34.159
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.154
+botocore==1.34.159
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -596,7 +596,7 @@ edx-search==4.0.0
     # via -r requirements/edx/base.txt
 edx-sga==0.25.0
     # via -r requirements/edx/base.txt
-edx-submissions==3.7.6
+edx-submissions==3.7.7
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -689,11 +689,11 @@ google-api-core[grpc]==2.19.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.139.0
+google-api-python-client==2.140.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-auth==2.32.0
+google-auth==2.33.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -711,11 +711,11 @@ google-cloud-core==2.4.1
     #   -r requirements/edx/base.txt
     #   google-cloud-firestore
     #   google-cloud-storage
-google-cloud-firestore==2.17.0
+google-cloud-firestore==2.17.1
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-cloud-storage==2.18.0
+google-cloud-storage==2.18.2
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
@@ -724,7 +724,7 @@ google-crc32c==1.5.0
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
     #   google-resumable-media
-google-resumable-media==2.7.1
+google-resumable-media==2.7.2
     # via
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
@@ -742,7 +742,7 @@ grpcio-status==1.62.3
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
-gunicorn==22.0.0
+gunicorn==23.0.0
     # via -r requirements/edx/base.txt
 help-tokens==2.4.0
     # via -r requirements/edx/base.txt
@@ -766,7 +766,7 @@ idna==3.7
     #   yarl
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==6.11.0
+importlib-metadata==8.2.0
     # via -r requirements/edx/base.txt
 inflection==0.5.1
     # via
@@ -902,7 +902,7 @@ monotonic==1.6
     #   -r requirements/edx/base.txt
     #   analytics-python
     #   py2neo
-more-itertools==10.3.0
+more-itertools==10.4.0
     # via
     #   -r requirements/edx/base.txt
     #   cssutils
@@ -921,13 +921,13 @@ multidict==6.0.5
     #   yarl
 mysqlclient==2.2.4
     # via -r requirements/edx/base.txt
-newrelic==9.12.0
+newrelic==9.13.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
 nh3==0.2.18
     # via -r requirements/edx/base.txt
-nltk==3.8.1
+nltk==3.8.2
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1005,7 +1005,7 @@ pansi==2020.7.3
     # via
     #   -r requirements/edx/base.txt
     #   py2neo
-paramiko==3.4.0
+paramiko==3.4.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1227,7 +1227,7 @@ pytz==2024.1
     #   xblock
 pyuca==1.2
     # via -r requirements/edx/base.txt
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1447,7 +1447,7 @@ super-csv==3.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
-sympy==1.13.1
+sympy==1.13.2
     # via
     #   -r requirements/edx/base.txt
     #   openedx-calc
@@ -1521,7 +1521,7 @@ walrus==0.9.4
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-redis
-watchdog==4.0.1
+watchdog==4.0.2
     # via -r requirements/edx/base.txt
 wcwidth==0.2.13
     # via
@@ -1585,7 +1585,7 @@ yarl==1.9.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-zipp==3.19.2
+zipp==3.20.0
     # via
     #   -r requirements/edx/base.txt
     #   importlib-metadata

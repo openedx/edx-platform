@@ -14,11 +14,11 @@ attrs==24.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.34.154
+boto3==1.34.159
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.34.154
+botocore==1.34.159
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -76,9 +76,9 @@ google-api-core==2.19.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.139.0
+google-api-python-client==2.140.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.32.0
+google-auth==2.33.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -126,13 +126,13 @@ markupsafe==2.1.5
     #   werkzeug
 mock==5.1.0
     # via -r scripts/user_retirement/requirements/testing.in
-more-itertools==10.3.0
+more-itertools==10.4.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==9.12.0
+newrelic==9.13.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -200,7 +200,7 @@ pytz==2024.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi
     #   zeep
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   responses
