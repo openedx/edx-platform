@@ -2270,6 +2270,7 @@ CSP_STATIC_ENFORCE = f"""
 
 import re
 
+
 def _load_headers() -> dict:
     from django.conf import settings
     """
