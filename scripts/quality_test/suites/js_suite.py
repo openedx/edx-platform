@@ -28,7 +28,8 @@ class JsTestSuite(TestSuite):
         # if tasks.environment.dry_run:
         #     tasks.environment.info("make report_dir")
         # else:
-        self.report_dir.makedirs_p()
+        # self.report_dir.makedirs_p()
+        self.report_dir.mkdir(parents=True, exist_ok=True)
         # if not self.skip_clean:
         # test_utils.clean_test_files()
 
