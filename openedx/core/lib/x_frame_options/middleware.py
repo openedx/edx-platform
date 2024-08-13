@@ -18,7 +18,6 @@ PERMISSIBLE_VALUES = ['DENY', 'SAMEORIGIN', 'ALLOW']
 
 class InvalidHeaderValueError(ValueError):
     """ A custom error that is thrown when we try to set an invalid value for a header """
-    pass
 
 
 def _validate_header_value(value):
