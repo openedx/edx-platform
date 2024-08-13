@@ -1065,7 +1065,6 @@ import-linter==2.0
     # via -r requirements/edx/testing.txt
 importlib-metadata==6.11.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 inflection==0.5.1

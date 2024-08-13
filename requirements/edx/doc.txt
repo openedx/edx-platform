@@ -767,9 +767,7 @@ idna==3.7
 imagesize==1.4.1
     # via sphinx
 importlib-metadata==6.11.0
-    # via
-    #   -c requirements/edx/../common_constraints.txt
-    #   -r requirements/edx/base.txt
+    # via -r requirements/edx/base.txt
 inflection==0.5.1
     # via
     #   -r requirements/edx/base.txt
