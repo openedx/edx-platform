@@ -9,7 +9,7 @@ import sys
 from time import sleep
 
 from path import Path as path
-
+from pathlib import Path
 
 def repo_root():
     """
@@ -21,21 +21,20 @@ def repo_root():
     https://openedx.atlassian.net/browse/PLAT-1629 and
     https://github.com/docker/for-mac/issues/1509
     """
-    file_path = path(__file__)
-    attempt = 1
-    while True:
+
+    file_path = Path(__file__)
+    max_attempts = 180
+    for attempt in range(1, max_attempts + 1):
         try:
-            absolute_path = file_path.abspath()
-            break
+            absolute_path = file_path.resolve(strict=True)
+            return absolute_path.parents[1]
         except OSError:
-            print(f'Attempt {attempt}/180 to get an absolute path failed')
-            if attempt < 180:
-                attempt += 1
+            print(f'Attempt {attempt}/{max_attempts} to get an absolute path failed')
+            if attempt < max_attempts:
                 sleep(1)
             else:
                 print('Unable to determine the absolute path of the edx-platform repo, aborting')
-                raise
-    return absolute_path.parent.parent.parent
+                raise RuntimeError('Could not determine the repository root after multiple attempts')
 
 
 class Env:
