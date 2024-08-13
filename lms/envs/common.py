@@ -44,6 +44,7 @@ import importlib.util
 import socket
 import sys
 import os
+import re
 
 import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
@@ -2261,7 +2262,8 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 ################################# Middleware ###################################
 # Reference:
 # CSP_STATIC_ENFORCE = """
-#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/ https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net;
+#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/ 
+#       https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net;
 #     style-src 'self' https://fonts.googleapis.com 'unsafe-inline'
 #     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;
 #     frame-ancestors 'self' http://localhost:2000
@@ -2271,14 +2273,12 @@ CSP_STATIC_ENFORCE = f"""
     frame-ancestors 'self' localhost:* {domain_name} *.{domain_name}
 """
 
-import re
-
 
 def _load_headers() -> dict:
-    from django.conf import settings
     """
     Return a dict of headers to append to every response, based on settings.
     """
+    from django.conf import settings
     # .. setting_name: CSP_STATIC_ENFORCE
     # .. setting_default: None
     # .. setting_description: Content-Security-Policy header to attach to all responses.
@@ -2364,10 +2364,12 @@ def _append_headers(response_headers, more_headers):
 
 class MiddlewareNotUsed(Exception):
     """This middleware is not used in this server configuration"""
-    pass
 
 
 def conditional_content_security_policy_middleware(get_response):
+    """
+    Return middleware handler based on CSP headers.
+    """
     csp_headers = _load_headers()
     if not csp_headers:
         raise MiddlewareNotUsed()  # tell Django to skip this middleware
