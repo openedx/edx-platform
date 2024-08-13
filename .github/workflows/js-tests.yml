@@ -64,6 +64,10 @@ jobs:
           make base-requirements
 
       - uses: c-hive/gha-npm-cache@v1
+
+      - name: Install npm
+        run: npm ci  
+
       - name: Run JS Tests
         run: |
           npm install -g jest
