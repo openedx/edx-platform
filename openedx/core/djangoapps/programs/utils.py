@@ -64,15 +64,6 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
     return program_data, course_data
 
 
-def get_buy_subscription_url(program_uuid, skus):
-    """
-    Returns the URL to the Subscription Purchase page for the given program UUID and course Skus.
-    """
-    formatted_skus = urlencode({"sku": skus}, doseq=True)
-    url = f"{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}{program_uuid}/?{formatted_skus}"
-    return url
-
-
 def get_program_urls(program_data):
     """Returns important urls of program."""
     from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
@@ -92,10 +83,6 @@ def get_program_urls(program_data):
         "commerce_api_url": reverse("commerce_api:v0:baskets:create"),
         "buy_button_url": ecommerce_service.get_checkout_page_url(*skus),
         "program_record_url": program_record_url,
-        "buy_subscription_url": get_buy_subscription_url(program_uuid, skus),
-        "manage_subscription_url": settings.SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL,
-        "orders_and_subscriptions_url": settings.ORDER_HISTORY_MICROFRONTEND_URL,
-        "subscriptions_learner_help_center_url": settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL,
     }
     return urls
 
@@ -1033,15 +1020,3 @@ def is_user_enrolled_in_program_type(
         elif course_run_id in course_runs:
             return True
     return False
-
-
-def get_subscription_api_client(user):
-    """
-    Returns an API client which can be used to make Subscriptions API requests.
-    """
-    scopes = ["user_id", "email", "profile"]
-    jwt = create_jwt_for_user(user, scopes=scopes)
-    client = requests.Session()
-    client.auth = SuppliedJwtAuth(jwt)
-
-    return client
