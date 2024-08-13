@@ -10,6 +10,7 @@ from .envs import Env
 
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 
+
 def clean_test_files():
     """
     Clean fixture files used by tests and .pyc files

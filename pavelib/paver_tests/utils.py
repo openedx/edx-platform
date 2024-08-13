@@ -13,6 +13,7 @@ class PaverTestCase(TestCase):
     """
     Base class for Paver test cases.
     """
+
     def setUp(self):
         super().setUp()
 

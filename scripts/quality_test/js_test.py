@@ -46,7 +46,7 @@ def test_js(suite, mode, coverage, port, skip_clean):
     """
     Run the JavaScript tests
     """
-    
+
     if (suite != 'all') and (suite not in Env.JS_TEST_ID_KEYS):
         sys.stderr.write(
             "Unknown test suite. Please choose from ({suites})\n".format(
@@ -64,12 +64,10 @@ def test_js(suite, mode, coverage, port, skip_clean):
         test_suite.run()
 
 
-
 # @cmdopts([
 #     ("suite=", "s", "Test suite to run"),
 #     ("coverage", "c", "Run test under coverage"),
 # ])
-
 def test_js_run(options):
     """
     Run the JavaScript tests and print results to the console

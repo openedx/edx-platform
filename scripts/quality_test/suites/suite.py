@@ -60,7 +60,7 @@ class TestSuite:
         The command to run tests (as a string). For this base class there is none.
         """
         return None
-    
+
     @staticmethod
     def kill_process(proc):
         """
@@ -71,7 +71,6 @@ class TestSuite:
 
         for child_pid in child_pids:
             os.kill(child_pid.pid, signal.SIGKILL)
-
 
     @staticmethod
     def is_success(exit_code):
