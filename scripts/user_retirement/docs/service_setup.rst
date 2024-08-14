@@ -36,13 +36,13 @@ defining *derived* settings specific to Open edX. Read more about it in
      - ``'retired.invalid'``
      - The domain part of hashed emails. Used in ``RETIRED_EMAIL_FMT``.
    * - RETIRED_USERNAME_FMT
-     - ``lambda settings: 
+     - ``lambda settings:
        settings.RETIRED_USERNAME_PREFIX + '{}'``
      - The username field for a retired user gets transformed into this format,
        where ``{}`` is replaced with the hash of their username.
    * - RETIRED_EMAIL_FMT
-     - ``lambda settings: 
-       settings.RETIRED_EMAIL_PREFIX + '{}@' + 
+     - ``lambda settings:
+       settings.RETIRED_EMAIL_PREFIX + '{}@' +
        settings.RETIRED_EMAIL_DOMAIN``
      - The email field for a retired user gets transformed into this format, where
        ``{}`` is replaced with the hash of their email.
@@ -60,6 +60,23 @@ defining *derived* settings specific to Open edX. Read more about it in
    * - FEATURES['ENABLE_ACCOUNT_DELETION']
      - True
      - Whether to display the "Delete My Account" section the account settings page.
+   * - EXTRA_SERVICES_TO_RETIRE_FROM
+     - None
+     - A list of additional services from which user data should be retired. Each entry in the list should be a dictionary with the following keys:
+       - ``name``: The name of the service.
+       - ``service_base_url``: The base URL of the service's API.
+       - ``retirement_url_path``: The API path for the user retirement endpoint.
+      This setting allows the retirement process to interact with external services not covered by default. For example:
+     .. code-block:: python
+        EXTRA_SERVICES_TO_RETIRE_FROM = [
+            {
+                'name': 'MOCK_SERVICE',
+                'service_base_url': 'http://fake_service_base_url',
+                'retirement_url_path': 'fake_retirement_url_path'
+            },
+            # Add more services as needed
+        ]
+    By default, this setting is empty, meaning no additional services are included. This can be overridden in `https://github.com/openedx/edx-platform/blob/master/lms/envs/common.py.
 
 
 =================
@@ -79,10 +96,10 @@ state at the beginning, and ``COMPLETED``, ``ERRORED``, and ``ABORTED`` states
 at the end of the list.  Also, for every ``RETIRING_foo`` state, there must be
 a corresponding ``foo_COMPLETE`` state.
 
-Override these states if you need to add any states.  Typically, these 
+Override these states if you need to add any states.  Typically, these
 settings are set in ``lms.yml``.
 
-After you have defined any custom states, populate the states table with the 
+After you have defined any custom states, populate the states table with the
 following management command:
 
 .. code-block:: bash
@@ -120,7 +137,7 @@ Retirement Service User
 
 The user retirement driver scripts authenticate with the LMS and IDAs as the
 retirement service user with oauth client credentials.  Therefore, to use the
-driver scripts, you must create a retirement service user, and generate a DOT 
+driver scripts, you must create a retirement service user, and generate a DOT
 application and client credentials, as in the following command.
 
 .. code-block:: bash
@@ -162,7 +179,7 @@ that relate to user retirement.
      - ``/admin/user_api/retirementstate/``
      - Represents the table of states defined in ``RETIREMENT_STATES`` and
        populated with ``populate_retirement_states``.
-   * - User Retirement Requests 
+   * - User Retirement Requests
      - ``/admin/user_api/userretirementrequest/``
      - Represents the table that tracks the user IDs of every learner who
        has ever requested account deletion. This table is primarily used for
@@ -173,7 +190,7 @@ that relate to user retirement.
 
 In special cases where you may need to manually intervene with the pipeline,
 you can use the User Retirement Statuses management page to change the
-state for an individual user.  For more information about how to handle these 
+state for an individual user.  For more information about how to handle these
 cases, see :ref:`handling-special-cases`.
 
 .. include:: ../../../../links/links.rst
