@@ -22,19 +22,21 @@ def repo_root():
     https://github.com/docker/for-mac/issues/1509
     """
     import pdb; pdb.set_trace()
-    file_path = Path(__file__)
-    max_attempts = 180
-    for attempt in range(1, max_attempts + 1):
+    file_path = path(__file__)
+    attempt = 1
+    while True:
         try:
-            absolute_path = file_path.resolve(strict=True)
-            return absolute_path.parents[2]
+            absolute_path = file_path.abspath()
+            break
         except OSError:
-            print(f'Attempt {attempt}/{max_attempts} to get an absolute path failed')
-            if attempt < max_attempts:
+            print(f'Attempt {attempt}/180 to get an absolute path failed')
+            if attempt < 180:
+                attempt += 1
                 sleep(1)
             else:
                 print('Unable to determine the absolute path of the edx-platform repo, aborting')
-                raise RuntimeError('Could not determine the repository root after multiple attempts')
+                raise
+    return absolute_path.parent.parent.parent
 
 
 class Env:
