@@ -24,3 +24,8 @@
   @extend .sr-only;
 }
 
+// Hide element when rendered in iFrame
+.hidden-in-iframe {
+    display: none !important;
+}
+
