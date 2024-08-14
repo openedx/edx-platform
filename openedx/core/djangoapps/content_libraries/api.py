@@ -86,7 +86,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, MediaType
+from openedx_learning.api.authoring_models import Component, MediaType, LearningPackage
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -150,6 +150,7 @@ class ContentLibraryMetadata:
     Class that represents the metadata about a content library.
     """
     key = attr.ib(type=LibraryLocatorV2)
+    learning_package = attr.ib(type=LearningPackage)
     title = attr.ib("")
     description = attr.ib("")
     num_blocks = attr.ib(0)
@@ -323,6 +324,7 @@ def get_metadata(queryset, text_search=None):
             has_unpublished_changes=False,
             has_unpublished_deletes=False,
             license=lib.license,
+            learning_package=lib.learning_package,
         )
         for lib in queryset
     ]
@@ -408,6 +410,7 @@ def get_library(library_key):
         license=ref.license,
         created=learning_package.created,
         updated=learning_package.updated,
+        learning_package=learning_package
     )
 
 
@@ -479,6 +482,7 @@ def create_library(
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         license=library_license,
+        learning_package=ref.learning_package
     )
 
 
