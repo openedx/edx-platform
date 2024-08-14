@@ -63,20 +63,24 @@ defining *derived* settings specific to Open edX. Read more about it in
    * - EXTRA_SERVICES_TO_RETIRE_FROM
      - None
      - A list of additional services from which user data should be retired. Each entry in the list should be a dictionary with the following keys:
+
        - ``name``: The name of the service.
        - ``service_base_url``: The base URL of the service's API.
        - ``retirement_url_path``: The API path for the user retirement endpoint.
-      This setting allows the retirement process to interact with external services not covered by default. For example:
-     .. code-block:: python
-        EXTRA_SERVICES_TO_RETIRE_FROM = [
-            {
-                'name': 'MOCK_SERVICE',
-                'service_base_url': 'http://fake_service_base_url',
-                'retirement_url_path': 'fake_retirement_url_path'
-            },
-            # Add more services as needed
-        ]
-    By default, this setting is empty, meaning no additional services are included. This can be overridden in `https://github.com/openedx/edx-platform/blob/master/lms/envs/common.py.
+
+       This setting allows the retirement process to interact with external services not covered by default. For example:
+
+       .. code-block:: python
+
+         EXTRA_SERVICES_TO_RETIRE_FROM = [
+             {
+                 'name': 'MOCK_SERVICE',
+                 'service_base_url': 'http://fake_service_base_url',
+                 'retirement_url_path': 'fake_retirement_url_path'
+             }
+         ]
+
+       By default, this setting is empty, meaning no additional services are included. This can be overridden in `common.py <https://github.com/openedx/edx-platform/blob/master/lms/envs/common.py>`_.
 
 
 =================
