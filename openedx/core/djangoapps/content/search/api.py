@@ -476,7 +476,8 @@ def delete_all_draft_docs_for_library(library_key: LibraryLocatorV2) -> None:
     # Delete all documents where last_published is null i.e. never published before.
     delete_filter = [
         f'{Fields.context_key}="{library_key}"',
-        # inner arrays are connected by an OR
+        # This field should only be NULL or have a value, but we're also checking IS EMPTY just in case.
+        # Inner arrays are connected by an OR
         [f'{Fields.last_published} IS EMPTY', f'{Fields.last_published} IS NULL'],
     ]
 
