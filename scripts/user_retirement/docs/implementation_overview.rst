@@ -53,15 +53,18 @@ the platform to handle the retirement of PII in custom or internal services that
 part of the standard Open edX installation but are crucial for specific deployments.
 
 Here is an example of how the ``EXTRA_SERVICES_TO_RETIRE_FROM`` setting can be configured:
+
 .. code-block:: python
-    EXTRA_SERVICES_TO_RETIRE_FROM = [
+
+     EXTRA_SERVICES_TO_RETIRE_FROM = [
         {
             'name': 'MOCK_SERVICE',
             'service_base_url': 'http://fake_service_base_url',
             'retirement_url_path': 'fake_retirement_url_path'
         }
-    ]
-This setting defines a list of services, each with a name, service_base_url, and retirement_url_path,
+     ]
+
+This setting defines a list of services, each with a ``name``, ``service_base_url``, and ``retirement_url_path``,
 allowing the user retirement process to include these additional services.
 
 This example state diagram outlines the pathways users follow throughout the
