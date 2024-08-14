@@ -86,7 +86,9 @@ class TestSuite:
         It returns False if errors or failures occur. Otherwise, it
         returns True.
         """
-        cmd = " ".join(self.cmd)
+        # cmd = " ".join(self.cmd)
+        cmd = " ".join(str(part) for part in self.cmd)
+
 
         # if tasks.environment.dry_run:
         #     tasks.environment.info(cmd)
