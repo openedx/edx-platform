@@ -21,7 +21,6 @@ def repo_root():
     https://openedx.atlassian.net/browse/PLAT-1629 and
     https://github.com/docker/for-mac/issues/1509
     """
-    import pdb; pdb.set_trace()
     file_path = path(__file__)
     attempt = 1
     while True:
