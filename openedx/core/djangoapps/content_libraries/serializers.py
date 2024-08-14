@@ -5,6 +5,8 @@ Serializers for the content libraries REST API
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
 
+
+from openedx_learning.api.authoring_models import Collection
 from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES,
     COMPLEX,
@@ -245,3 +247,22 @@ class ContentLibraryBlockImportTaskCreateSerializer(serializers.Serializer):
     """
 
     course_key = CourseKeyField()
+
+
+class ContentLibraryCollectionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for a Content Library Collection
+    """
+
+    class Meta:
+        model = Collection
+        fields = '__all__'
+
+
+class ContentLibraryCollectionCreateOrUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for add/update a Collection in a Content Library
+    """
+
+    title = serializers.CharField()
+    description = serializers.CharField()
