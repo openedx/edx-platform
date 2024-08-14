@@ -35,7 +35,7 @@ def repo_root():
             else:
                 print('Unable to determine the absolute path of the edx-platform repo, aborting')
                 raise
-    return absolute_path.parent.parent.parent
+    return absolute_path.parent.parent.parent.parent
 
 
 class Env:
