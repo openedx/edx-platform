@@ -1,5 +1,5 @@
 // List of the classes to hide while rendered in an iframe
-const classesToHide = ['.global-header', '.wrapper-course-material', 'a--footer'];
+const classesToHide = ['.global-header', '.wrapper-course-material', '.a--footer'];
 
 document.addEventListener('DOMContentLoaded', function () {
   // Check if rendered in iframe
