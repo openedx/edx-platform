@@ -21,13 +21,13 @@ def repo_root():
     https://openedx.atlassian.net/browse/PLAT-1629 and
     https://github.com/docker/for-mac/issues/1509
     """
-
+    import pdb; pdb.set_trace()
     file_path = Path(__file__)
     max_attempts = 180
     for attempt in range(1, max_attempts + 1):
         try:
             absolute_path = file_path.resolve(strict=True)
-            return absolute_path.parents[1]
+            return absolute_path.parents[2]
         except OSError:
             print(f'Attempt {attempt}/{max_attempts} to get an absolute path failed')
             if attempt < max_attempts:
