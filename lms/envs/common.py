@@ -4996,8 +4996,6 @@ RETIREMENT_STATES = [
     'COMPLETE',
 ]
 
-EXTRA_SERVICES_TO_RETIRE_FROM = []
-
 USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
 ############## Settings for Microfrontends  #########################

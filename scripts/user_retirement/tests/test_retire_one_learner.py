@@ -4,8 +4,6 @@ Test the retire_one_learner.py script
 from unittest.mock import DEFAULT, patch
 
 from click.testing import CliRunner
-from django.conf import settings
-from django.test.utils import override_settings
 
 from scripts.user_retirement.retire_one_learner import (
     END_STATES,
@@ -63,8 +61,8 @@ def test_successful_retirement(*args, **kwargs):
 
     result = _call_script(username, fetch_ecom_segment_id=True)
 
-    # Called once per API we instantiate (LMS, ECommerce, Credentials, Additional Services)
-    assert mock_get_access_token.call_count == 3 + len(settings.EXTRA_SERVICES_TO_RETIRE_FROM)
+    # Called once per API we instantiate (LMS, ECommerce, Credentials)
+    assert mock_get_access_token.call_count == 3
     mock_get_retirement_state.assert_called_once_with(username)
     assert mock_update_learner_state.call_count == 9
 
@@ -99,7 +97,7 @@ def test_user_does_not_exist(*args, **kwargs):
 
     result = _call_script(username)
 
-    assert mock_get_access_token.call_count == 3 + len(settings.EXTRA_SERVICES_TO_RETIRE_FROM)
+    assert mock_get_access_token.call_count == 3
     mock_get_retirement_state.assert_called_once_with(username)
     mock_update_learner_state.assert_not_called()
 
@@ -134,7 +132,7 @@ def test_bad_learner(*args, **kwargs):
     mock_get_retirement_state.side_effect = HttpDoesNotExistException
     result = _call_script(username)
 
-    assert mock_get_access_token.call_count == 3 + len(settings.EXTRA_SERVICES_TO_RETIRE_FROM)
+    assert mock_get_access_token.call_count == 3
     mock_get_retirement_state.assert_called_once_with(username)
     mock_update_learner_state.assert_not_called()
 
@@ -162,7 +160,7 @@ def test_user_in_working_state(*args, **kwargs):
 
     result = _call_script(username)
 
-    assert mock_get_access_token.call_count == 3 + len(settings.EXTRA_SERVICES_TO_RETIRE_FROM)
+    assert mock_get_access_token.call_count == 3
     mock_get_retirement_state.assert_called_once_with(username)
     mock_update_learner_state.assert_not_called()
 
@@ -190,7 +188,7 @@ def test_user_in_bad_state(*args, **kwargs):
     )
     result = _call_script(username)
 
-    assert mock_get_access_token.call_count == 3 + len(settings.EXTRA_SERVICES_TO_RETIRE_FROM)
+    assert mock_get_access_token.call_count == 3
     mock_get_retirement_state.assert_called_once_with(username)
     mock_update_learner_state.assert_not_called()
 
@@ -225,7 +223,7 @@ def test_user_in_end_state(*args, **kwargs):
 
         result = _call_script(username)
 
-        assert mock_get_access_token.call_count == 3 + len(settings.EXTRA_SERVICES_TO_RETIRE_FROM)
+        assert mock_get_access_token.call_count == 3
         mock_get_retirement_state.assert_called_once_with(username)
         mock_update_learner_state.assert_not_called()
 
@@ -267,7 +265,7 @@ def test_skipping_states(*args, **kwargs):
     result = _call_script(username)
 
     # Called once per API we instantiate (LMS, ECommerce, Credentials)
-    assert mock_get_access_token.call_count == 3 + len(settings.EXTRA_SERVICES_TO_RETIRE_FROM)
+    assert mock_get_access_token.call_count == 3
     mock_get_retirement_state.assert_called_once_with(username)
     assert mock_update_learner_state.call_count == 5
 
