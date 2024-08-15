@@ -1053,7 +1053,3 @@ urlpatterns += [
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]
-
-urlpatterns += [
-    path('api/search/', include('openedx_search_api.urls')),
-]
