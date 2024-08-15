@@ -99,7 +99,10 @@ X_FRAME_OPTIONS = 'DENY'
 # You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
 # Content Security Policy in place.
 # SCORM xblocks require a more permissive cross-domain header to render than the default of 'DENY'
-X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN'], ['.*/xblock/.*', 'SAMEORIGIN']]
+CUSTOM_CSPS = [
+    ['.*/media/scorm/.*', "frame-ancestors 'self' http://localhost:2000"],
+    ['.*/xblock/.*', "frame-ancestors 'self' http://localhost:2000"]
+]
 
 # Features
 FEATURES = {
@@ -2267,11 +2270,11 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 # """
 domain_name = socket.getfqdn()
 CSP_STATIC_ENFORCE = f"""
-    frame-ancestors 'self' localhost:* {domain_name} *.{domain_name}
+    frame-ancestors 'self' http://localhost:2000
 """
 
 
-def _load_headers() -> dict:
+def _load_headers(override=None) -> dict:
     """
     Return a dict of headers to append to every response, based on settings.
     """
@@ -2288,7 +2291,7 @@ def _load_headers() -> dict:
     #   with the reporting settings) and only move or copy the policies into ``CSP_STATIC_ENFORCE`` after
     #   confirming that the received CSP reports only represent false positives. (The report-only
     #   and enforcement headers may be used at the same time.)
-    enforce_policies = getattr(settings, 'CSP_STATIC_ENFORCE', None)
+    enforce_policies = override or CSP_STATIC_ENFORCE or None
 
     # .. setting_name: CSP_STATIC_REPORT_ONLY
     # .. setting_default: None
@@ -2363,27 +2366,53 @@ class MiddlewareNotUsed(Exception):
     """This middleware is not used in this server configuration"""
 
 
-def conditional_content_security_policy_middleware(get_response):
+def url_specific_content_security_policy_middleware(get_response):
     """
     Return middleware handler based on CSP headers.
+    These are specified in the environment variables `CSP_STATIC_ENFORCE`,
+    `CSP_STATIC_REPORT_ONLY`, `CSP_STATIC_REPORTING_URI`, and `CSP_STATIC_REPORTING_NAME`.
+
+    It is possible to override the CSP headers for specific URLs by setting the
+    `CUSTOM_CSPS` environment variable to a list of tuples. Each tuple should
+    contain a regex and a string. If the regex matches the request URL, the
+    CSP header part specified in `CSP_STATIC_ENFORCE` will be overwritten with the provided string.
     """
     csp_headers = _load_headers()
-    if not csp_headers:
+    if not csp_headers and not CUSTOM_CSPS:
         raise MiddlewareNotUsed()  # tell Django to skip this middleware
+
+    def _get_override(request):
+        """
+        Check the CUSTOM_CSPS environment variable for a match to the request url.
+        If a regex is included that matches the request url, that means that the CSP header
+        should be overwritten with the provided string for this url.
+        """
+        if not CUSTOM_CSPS:
+            return None
+        # TODO: handle errors for when env variable has wrong format
+        for csp in CUSTOM_CSPS:
+            regex, custom_csp = csp
+            if re.search(regex, request.path):
+                return custom_csp
+        return None
 
     def middleware_handler(request):
         response = get_response(request)
         # Reporting-Endpoints, CSP, and CSP-RO can all be multi-valued
         # (comma-separated) headers, though the CSP spec says "SHOULD NOT"
         # for the latter two.
-        _append_headers(response.headers, csp_headers)
+        override = _get_override(request)
+
+        csp_headers = _load_headers(override=override)
+        if csp_headers:
+            _append_headers(response.headers, csp_headers)
         return response
 
     return middleware_handler
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-    'lms.envs.common.conditional_content_security_policy_middleware',
+    'lms.envs.common.url_specific_content_security_policy_middleware',
 
     'crum.CurrentRequestUserMiddleware',
 
@@ -2467,7 +2496,7 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
     # use custom extension of Django built in clickjacking protection
-    'openedx.core.lib.x_frame_options.middleware.EdxXFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
     'lms.djangoapps.courseware.middleware.CacheCourseIdMiddleware',
