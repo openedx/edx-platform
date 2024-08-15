@@ -492,19 +492,16 @@ class LicenseManagerApi(BaseApiClient):
             return True
 
 
-class GenericRetirementApi(BaseApiClient):
+class CommerceCoordinatorApi(BaseApiClient):
     """
-    Generic API client.
+    Commerce-Coordinator API client.
     """
-    def __init__(self, lms_base_url, api_base_url, client_id, client_secret, retirement_url_path):
-        super().__init__(lms_base_url, api_base_url, client_id, client_secret)
-        self.retirement_url_path = retirement_url_path
-
     @_retry_lms_api()
     def retire_learner(self, learner):
         """
-        Performs the learner retirement step for additonal services.
+        Performs the learner retirement step for Commerce-Coordinator.
+        Passes the learner's LMS User Id instead of username.
         """
         data = {'edx_lms_user_id': learner['user']['id']}
-        api_url = self.get_api_url(self.retirement_url_path)
+        api_url = self.get_api_url('lms/user_retirement')
         return self._request('POST', api_url, json=data)

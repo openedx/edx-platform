@@ -544,9 +544,9 @@ class TestLicenseManagerApi(OAuth2Mixin, unittest.TestCase):
         )
 
 
-class TestGenericApi(OAuth2Mixin, unittest.TestCase):
+class TestCommerceCoordinatorApi(OAuth2Mixin, unittest.TestCase):
     """
-    Test the Generic API client.
+    Test the edX Commerce-Coordinator API client.
     """
 
     @responses.activate(registry=OrderedRegistry)
@@ -554,17 +554,15 @@ class TestGenericApi(OAuth2Mixin, unittest.TestCase):
         super().setUp()
         self.mock_access_token_response()
         self.lms_base_url = 'http://localhost:18000/'
-        self.service_api_base_url = 'http://mock_service_url/'
-        self.retirement_url = 'mock/retirement_url'
-        self.generic_api = edx_api.GenericRetirementApi(
+        self.commerce_coordinator_base_url = 'http://localhost:8140/'
+        self.commerce_coordinator_api = edx_api.CommerceCoordinatorApi(
             self.lms_base_url,
-            self.service_api_base_url,
+            self.commerce_coordinator_base_url,
             'the_client_id',
-            'the_client_secret',
-            self.retirement_url
+            'the_client_secret'
         )
 
-    @patch.object(edx_api.GenericRetirementApi, '_request')
+    @patch.object(edx_api.CommerceCoordinatorApi, '_request')
     def test_retire_learner(self, mock_request):
         learner_data = get_fake_user_retirement()
         json_data = {
@@ -572,14 +570,14 @@ class TestGenericApi(OAuth2Mixin, unittest.TestCase):
         }
         responses.add(
             POST,
-            urljoin(self.service_api_base_url, 'mock/retirement_url'),
+            urljoin(self.commerce_coordinator_base_url, 'lms/user_retirement'),
             match=[matchers.json_params_matcher(json_data)]
         )
 
-        self.generic_api.retire_learner(learner=learner_data)
+        self.commerce_coordinator_api.retire_learner(learner=learner_data)
 
         mock_request.assert_called_once_with(
             'POST',
-            urljoin(self.service_api_base_url, 'mock/retirement_url/'),
+            urljoin(self.commerce_coordinator_base_url, 'lms/user_retirement/'),
             json=json_data
         )

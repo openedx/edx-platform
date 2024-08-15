@@ -4,8 +4,6 @@ Test the retire_one_learner.py script
 from unittest.mock import DEFAULT, patch
 
 from click.testing import CliRunner
-from django.conf import settings
-from django.test.utils import override_settings
 
 from scripts.user_retirement.retire_one_learner import (
     END_STATES,
@@ -21,13 +19,6 @@ from scripts.user_retirement.tests.retirement_helpers import fake_config_file, g
 from scripts.user_retirement.utils.exception import HttpDoesNotExistException
 
 
-@override_settings(EXTRA_SERVICES_TO_RETIRE_FROM=[
-    {
-        'name': 'MOCK_SERVICE',
-        'service_base_url': 'http://fake_service_base_url',
-        'retirement_url_path': 'fake_retirement_url_path'
-    }
-])
 def _call_script(username, fetch_ecom_segment_id=False):
     """
     Call the retired learner script with the given username and a generic, temporary config file.
