@@ -526,7 +526,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.23.8
+edx-enterprise==4.23.4
     # via -r scripts/user_retirement/requirements/base.txt
 edx-event-bus-kafka==5.8.1
     # via -r scripts/user_retirement/requirements/base.txt

@@ -534,7 +534,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.23.8
+edx-enterprise==4.23.4
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   -r scripts/user_retirement/requirements/../../../requirements/edx/base.txt
