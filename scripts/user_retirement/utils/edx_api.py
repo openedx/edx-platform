@@ -490,17 +490,3 @@ class LicenseManagerApi(BaseApiClient):
         except HttpDoesNotExistException:
             LOG.info("No license manager data found for user")
             return True
-
-class CommerceCoordinatorApi(BaseApiClient):
-    """
-    Commerce-Coordinator API client.
-    """
-    @_retry_lms_api()
-    def retire_learner(self, learner):
-        """
-        Performs the learner retirement step for Commerce-Coordinator.
-        Passes the learner's LMS User Id instead of username.
-        """
-        data = {'edx_lms_user_id': learner['user']['id']}
-        api_url = self.get_api_url('lms/user_retirement')
-        return self._request('POST', api_url, json=data)
