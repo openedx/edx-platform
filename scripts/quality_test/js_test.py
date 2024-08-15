@@ -29,7 +29,7 @@ __test__ = False  # do not collect
 )
 @click.option(
     '--coverage', 'coverage',
-    default=False,
+    default=True,
     help='Run test under coverage'
 )
 @click.option(

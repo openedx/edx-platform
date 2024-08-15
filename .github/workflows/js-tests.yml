@@ -66,13 +66,9 @@ jobs:
       - uses: c-hive/gha-npm-cache@v1
 
       - name: Install npm
-        env:
-          PIP_SRC: ${{ runner.temp }}
         run: npm ci  
 
       - name: Run JS Tests
-        env:
-          PIP_SRC: ${{ runner.temp }}
         run: |
           npm install -g jest
           make test-js
