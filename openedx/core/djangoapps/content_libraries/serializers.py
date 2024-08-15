@@ -179,6 +179,17 @@ class LibraryXBlockCreationSerializer(serializers.Serializer):
     # slugs at the moment, but hopefully we can change this soon.
     definition_id = serializers.CharField(validators=(validate_unicode_slug, ))
 
+    # Optional param specified when pasting data from clipboard instead of
+    # creating new block from scratch
+    staged_content = serializers.CharField(required=False)
+
+
+class LibraryPasteClipboardSerializer(serializers.Serializer):
+    """
+    Serializer for pasting clipboard data into library
+    """
+    block_id = serializers.CharField(validators=(validate_unicode_slug, ))
+
 
 class LibraryXBlockOlxSerializer(serializers.Serializer):
     """
