@@ -11,8 +11,8 @@ these services. As a consequence, to remove a user's PII, you must be able
 to request each service containing PII to remove, delete, or unlink the
 data for that user in that service.
 
-In the user retirement feature, a centralized process (the *driver* scripts)
-orchestrates all of these requests. For information about how to configure the
+In the user retirement feature, a centralized process (the *driver* scripts) 
+orchestrates all of these requests. For information about how to configure the 
 driver scripts, see :ref:`driver-setup`.
 
 ****************************
@@ -45,24 +45,6 @@ retirement process, and the arbiter of state progressions, using the
 table of the states themselves (the ``RetirementState`` model), rather than
 hard-coding the states.  This was done because we cannot predict all the
 possible states required by all members of the Open edX community.
-
-The workflow also allows the inclusion of additional services that may need to be
-retired alongside the core services. These extra services can now be configured within
-the Django settings under the ``EXTRA_SERVICES_TO_RETIRE_FROM`` setting. This setting allows
-the platform to handle the retirement of PII in custom or internal services that are not
-part of the standard Open edX installation but are crucial for specific deployments.
-
-Here is an example of how the ``EXTRA_SERVICES_TO_RETIRE_FROM`` setting can be configured:
-.. code-block:: python
-    EXTRA_SERVICES_TO_RETIRE_FROM = [
-        {
-            'name': 'MOCK_SERVICE',
-            'service_base_url': 'http://fake_service_base_url',
-            'retirement_url_path': 'fake_retirement_url_path'
-        }
-    ]
-This setting defines a list of services, each with a name, service_base_url, and retirement_url_path,
-allowing the user retirement process to include these additional services.
 
 This example state diagram outlines the pathways users follow throughout the
 workflow:
