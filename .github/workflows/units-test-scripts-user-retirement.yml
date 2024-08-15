@@ -31,5 +31,4 @@ jobs:
 
       - name: Run pytest
         run: |
-          export DJANGO_SETTINGS_MODULE=lms.envs.test
           pytest scripts/user_retirement
