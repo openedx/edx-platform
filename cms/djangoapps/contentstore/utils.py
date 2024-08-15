@@ -1651,7 +1651,7 @@ def get_course_context_v2(request):
     return courses_iter, in_process_course_actions
 
 
-def get_home_context(request, no_course=False):
+def get_home_context(request, no_course=False, hide_library_button_for_mfe=True):
     """
     Utils is used to get context of course home.
     It is used for both DRF and django views.
@@ -1688,6 +1688,11 @@ def get_home_context(request, no_course=False):
     if not split_library_view_on_dashboard() and LIBRARIES_ENABLED and not no_course:
         libraries = get_library_context(request, True)['libraries']
 
+    show_new_library_button = user_can_view_create_library_button(user)
+
+    if hide_library_button_for_mfe:
+        show_new_library_button = show_new_library_button and not should_redirect_to_library_authoring_mfe()
+
     home_context = {
         'courses': active_courses,
         'split_studio_home': split_library_view_on_dashboard(),
@@ -1699,8 +1704,7 @@ def get_home_context(request, no_course=False):
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         'taxonomy_list_mfe_url': get_taxonomy_list_url(),
         'libraries': libraries,
-        'show_new_library_button': user_can_view_create_library_button(user)
-        and not should_redirect_to_library_authoring_mfe(),
+        'show_new_library_button': show_new_library_button,
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
