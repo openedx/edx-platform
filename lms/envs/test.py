@@ -662,6 +662,14 @@ SUBSCRIPTIONS_TRIAL_LENGTH = 7
 CSRF_TRUSTED_ORIGINS = ['.example.com']
 CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://*.example.com']
 
+EXTRA_SERVICES_TO_RETIRE_FROM = [
+    {
+        'name': 'MOCK_SERVICE',
+        'service_base_url': 'http://fake_service_base_url',
+        'retirement_url_path': 'fake_retirement_url_path'
+    }
+]
+
 # values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
 # case of new django version these values will override.
 if django.VERSION[0] >= 4:  # for greater than django 3.2 use with schemes.

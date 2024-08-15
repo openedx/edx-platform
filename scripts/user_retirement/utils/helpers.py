@@ -16,9 +16,11 @@ import unicodedata
 
 import yaml
 from six import text_type
+from django.conf import settings
 
 from scripts.user_retirement.utils.edx_api import LmsApi  # pylint: disable=wrong-import-position
-from scripts.user_retirement.utils.edx_api import CredentialsApi, EcommerceApi, LicenseManagerApi
+from scripts.user_retirement.utils.edx_api import CredentialsApi, EcommerceApi, GenericRetirementApi, \
+    LicenseManagerApi
 from scripts.user_retirement.utils.thirdparty_apis.amplitude_api import \
     AmplitudeApi  # pylint: disable=wrong-import-position
 from scripts.user_retirement.utils.thirdparty_apis.braze_api import BrazeApi  # pylint: disable=wrong-import-position
@@ -172,15 +174,19 @@ def _setup_all_apis_or_exit(fail_func, fail_code, config):
         hubspot_from_address = config.get('hubspot_from_address', None)
         hubspot_alert_email = config.get('hubspot_alert_email', None)
 
+        required_services = [
+            ('BRAZE', braze_api_key),
+            ('AMPLITUDE', amplitude_api_key),
+            ('ECOMMERCE', ecommerce_base_url),
+            ('CREDENTIALS', credentials_base_url),
+            ('SEGMENT', segment_base_url),
+            ('HUBSPOT', hubspot_api_key),
+        ]
+        extra_services = [(service['name'], service['service_base_url']) for service in settings.EXTRA_SERVICES_TO_RETIRE_FROM]
+        all_services = required_services + extra_services
+
         for state in config['retirement_pipeline']:
-            for service, service_url in (
-                ('BRAZE', braze_api_key),
-                ('AMPLITUDE', amplitude_api_key),
-                ('ECOMMERCE', ecommerce_base_url),
-                ('CREDENTIALS', credentials_base_url),
-                ('SEGMENT', segment_base_url),
-                ('HUBSPOT', hubspot_api_key),
-            ):
+            for service, service_url in (all_services):
                 if state[2] == service and service_url is None:
                     fail_func(fail_code, 'Service URL is not configured, but required for state {}'.format(state))
 
@@ -234,6 +240,16 @@ def _setup_all_apis_or_exit(fail_func, fail_code, config):
                 segment_base_url,
                 segment_auth_token,
                 segment_workspace_slug
+            )
+
+        for service_config in settings.EXTRA_SERVICES_TO_RETIRE_FROM:
+            service_name = service_config['name']
+            config[service_name] = GenericRetirementApi(
+                lms_base_url,
+                service_config['service_base_url'],
+                client_id,
+                client_secret,
+                service_config['retirement_url_path']
             )
     except Exception as exc:  # pylint: disable=broad-except
         fail_func(fail_code, 'Unexpected error occurred!', exc)
