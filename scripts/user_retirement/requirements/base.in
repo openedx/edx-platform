@@ -1,5 +1,4 @@
 -c ../../../requirements/constraints.txt
--r ../../../requirements/edx/base.txt
 
 boto3
 click
