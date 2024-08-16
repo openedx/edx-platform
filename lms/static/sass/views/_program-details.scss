@@ -449,42 +449,6 @@ $btn-color-primary: $primary-dark;
     }
   }
 
-  .upgrade-subscription {
-    margin: 16px 0 10px;
-    row-gap: 16px;
-    column-gap: 24px;
-  }
-
-  .subscription-icon-launch {
-    width: 22.5px;
-    height: 22.5px;
-    margin-inline-start: 8px;
-  }
-
-  .subscription-icon-restart {
-    width: 22.5px;
-    height: 22.5px;
-    margin-inline-end: 8px;
-  }
-
-  .subscription-icon-arrow-upright {
-    display: inline-flex;
-    align-items: center;
-    width: 15px;
-    height: 15px;
-    margin-inline-start: 8px;
-  }
-
-  .subscription-info-brief {
-    font-size: 0.9375em;
-    color: $gray-500;
-  }
-
-  .subscription-info-upsell {
-    margin-top: 0.25rem;
-    font-size: 0.8125em;
-  }
-
   .program-course-card {
     width: 100%;
     padding: 15px 15px 15px 0px;
