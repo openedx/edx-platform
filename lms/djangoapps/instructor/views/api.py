@@ -1535,6 +1535,7 @@ class GetStudentsWhoMayEnroll(DeveloperErrorViewMixin, APIView):
     def get(self, request, *args, **kwargs):
         raise MethodNotAllowed('GET')
 
+
 def _cohorts_csv_validator(file_storage, file_to_validate):
     """
     Verifies that the expected columns are present in the CSV used to add users to cohorts.
