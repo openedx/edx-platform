@@ -64,16 +64,23 @@ def test_js(suite, mode, coverage, port, skip_clean):
         test_suite.run()
 
 
-# @cmdopts([
-#     ("suite=", "s", "Test suite to run"),
-#     ("coverage", "c", "Run test under coverage"),
-# ])
-def test_js_run(options):
+@click.command("test_js_run")
+@click.option(
+    '--s', 'suite',
+    default='all',
+    help='Test suite to run.'
+)
+@click.option(
+    '--coverage', 'coverage',
+    default=True,
+    help='Run test under coverage'
+)
+def test_js_run(suite, coverage):
     """
     Run the JavaScript tests and print results to the console
     """
-    options.mode = 'run'
-    test_js(options)
+
+    test_js(suite, 'run', coverage)
 
 
 # @cmdopts([
