@@ -6,7 +6,6 @@ import json
 from abc import ABC, abstractmethod
 from urllib.parse import quote
 
-from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 from django.template.loader import render_to_string

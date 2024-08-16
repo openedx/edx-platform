@@ -6,7 +6,6 @@ import logging
 import uuid
 from datetime import datetime, timedelta
 from unittest.mock import patch
-from uuid import uuid4
 
 from django.conf import settings
 from django.urls import reverse
@@ -1366,30 +1365,3 @@ class RevokeSubscriptionsVerifiedAccessViewTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
         assert course_entitlement.expired_at is None
         assert course_entitlement.enrollment_course_run.mode == CourseMode.VERIFIED
-
-    @patch('common.djangoapps.entitlements.tasks.retry_revoke_subscriptions_verified_access.apply_async')
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_courses_completion_status')
-    def test_course_completion_exception_triggers_task(self, mock_get_courses_completion_status, mock_task):
-        mock_get_courses_completion_status.return_value = ([], True)
-        enrollment = CourseEnrollmentFactory.create(
-            user=self.user,
-            course_id=self.course.id,  # pylint: disable=no-member
-            is_active=True,
-            mode=CourseMode.VERIFIED
-        )
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, enrollment_course_run=enrollment)
-
-        url = reverse(self.REVOKE_VERIFIED_ACCESS_PATH)
-
-        response = self.client.post(
-            url,
-            data={
-                "entitlement_uuids": [str(course_entitlement.uuid)],
-                "lms_user_id": self.user.id
-            },
-            content_type='application/json',
-        )
-        assert response.status_code == 204
-        mock_task.assert_called_once_with(args=([str(course_entitlement.uuid)],
-                                                [str(enrollment.course_id)],
-                                                self.user.username))

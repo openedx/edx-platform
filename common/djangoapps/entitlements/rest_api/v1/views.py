@@ -15,7 +15,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import (  # lint-amnesty, pylint: disable=line-too-long
@@ -26,16 +25,11 @@ from common.djangoapps.entitlements.models import (  # lint-amnesty, pylint: dis
 from common.djangoapps.entitlements.rest_api.v1.filters import CourseEntitlementFilter
 from common.djangoapps.entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
-from common.djangoapps.entitlements.tasks import retry_revoke_subscriptions_verified_access
-from common.djangoapps.entitlements.utils import (
-    is_course_run_entitlement_fulfillable,
-    revoke_entitlements_and_downgrade_courses_to_audit
-)
+from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.core.djangoapps.credentials.utils import get_courses_completion_status
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
 User = get_user_model()

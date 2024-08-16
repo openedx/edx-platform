@@ -6,7 +6,6 @@ import uuid
 from collections import namedtuple
 from copy import deepcopy
 from unittest import mock
-from urllib.parse import urlencode
 
 import ddt
 import httpretty
