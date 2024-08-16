@@ -38,7 +38,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework.exceptions import MethodNotAllowed
-from rest_framework.permissions import SAFE_METHODS
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1529,7 +1528,7 @@ class GetStudentsWhoMayEnroll(DeveloperErrorViewMixin, APIView):
             task_api.submit_calculate_may_enroll_csv(request, course_key, query_features)
             success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
         except Exception as e:
-            raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'failed-validation')
+            raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'Requested task is already running')
 
         return JsonResponse({"status": success_status})
 
