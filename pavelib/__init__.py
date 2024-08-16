@@ -3,4 +3,4 @@ paver commands
 """
 
 
-from . import assets, prereqs, quality
+from . import assets
