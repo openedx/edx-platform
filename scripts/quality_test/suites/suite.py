@@ -88,12 +88,6 @@ class TestSuite:
         """
         # cmd = " ".join(self.cmd)
         cmd = " ".join(str(part) for part in self.cmd)
-
-
-        # if tasks.environment.dry_run:
-        #     tasks.environment.info(cmd)
-        #     return
-
         sys.stdout.write(cmd)
 
         msg = colorize(
