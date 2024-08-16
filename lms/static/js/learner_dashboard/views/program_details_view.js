@@ -10,7 +10,6 @@ import CourseCardView from './course_card_view';
 // eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
-import AlertListView from './program_alert_list_view';
 
 import launchIcon from '../../../images/launch-icon.svg';
 import restartIcon from '../../../images/restart-icon.svg';
@@ -111,17 +110,6 @@ class ProgramDetailsView extends Backbone.View {
             model: new Backbone.Model(this.options),
         });
 
-        const { enrollmentAlerts } = this.getAlerts();
-
-        if (enrollmentAlerts.length) {
-            this.alertListView = new AlertListView({
-                context: {
-                    enrollmentAlerts,
-                    pageType: 'programDetails',
-                },
-            });
-        }
-
         if (this.remainingCourseCollection.length > 0) {
             new CollectionListView({
                 el: '.js-course-list-remaining',
@@ -175,18 +163,6 @@ class ProgramDetailsView extends Backbone.View {
                 hasIframe = true;
             }
         }).bind(this);
-    }
-
-    getAlerts() {
-        const alerts = {
-            enrollmentAlerts: [],
-        };
-        if (this.courseData.get('all_unenrolled')) {
-            alerts.enrollmentAlerts.push({
-                title: this.programModel.get('title'),
-            });
-        }
-        return alerts;
     }
 
     trackPurchase() {
