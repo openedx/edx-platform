@@ -314,7 +314,7 @@ class DiscussionNotificationSender:
         content_type = thread_types[self.thread.type][getattr(self.thread, 'depth', 0)]
 
         context = {
-            'username': self.creator.username,
+            'username': self.thread.username,
             'content_type': content_type,
             'content': thread_body
         }

@@ -44,7 +44,7 @@ class TestDiscussionNotificationSender(unittest.TestCase):
 
         self.assertEqual(notification_type, "content_reported")
         self.assertEqual(context, {
-            'username': 'test_user',
+            'username': self.thread.username,
             'content_type': expected_content_type,
             'content': 'Thread body'
         })
