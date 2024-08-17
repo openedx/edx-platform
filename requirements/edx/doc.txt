@@ -545,7 +545,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.23.3
+edx-enterprise==4.23.8
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -767,9 +767,7 @@ idna==3.7
 imagesize==1.4.1
     # via sphinx
 importlib-metadata==6.11.0
-    # via
-    #   -c requirements/edx/../common_constraints.txt
-    #   -r requirements/edx/base.txt
+    # via -r requirements/edx/base.txt
 inflection==0.5.1
     # via
     #   -r requirements/edx/base.txt
