@@ -1404,15 +1404,6 @@ def get_issued_certificates(request, course_id):
         return JsonResponse(response_payload)
 
 
-# @transaction.non_atomic_requests
-# @require_POST
-# @ensure_csrf_cookie
-# @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-# @require_course_permission(permissions.CAN_RESEARCH)
-# @common_exceptions_400
-#
-
-
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
@@ -1430,7 +1421,19 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
-    def post(self, request, course_id):
+    def post(self, request, course_id, csv=False):
+        """
+        Handle POST requests to retrieve student profile information for a specific course.
+
+        Args:
+            request: The HTTP request object.
+            course_id: The ID of the course for which to retrieve student information.
+            csv: Optional; if 'csv' is present in the URL, it indicates that the response should be in CSV format.
+            Defaults to None.
+
+        Returns:
+            Response: A JSON response containing student profile information, or CSV if the `csv` parameter is provided.
+        """
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key)
         report_type = _('enrolled learner profile')
