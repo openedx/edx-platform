@@ -43,6 +43,8 @@ urlpatterns = [
             path('team/group/<str:group_name>/', views.LibraryTeamGroupView.as_view()),
             # Import blocks into this library.
             path('import_blocks/', include(import_blocks_router.urls)),
+            # Paste contents of clipboard into library
+            path('paste_clipboard/', views.LibraryPasteClipboardView.as_view()),
         ])),
         path('blocks/<str:usage_key_str>/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:
