@@ -19,6 +19,7 @@ from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
@@ -31,8 +32,9 @@ from .documents import (
     Fields,
     meili_id_from_opaque_key,
     searchable_doc_for_course_block,
+    searchable_doc_for_collection,
     searchable_doc_for_library_block,
-    searchable_doc_tags
+    searchable_doc_tags,
 )
 
 log = logging.getLogger(__name__)
@@ -294,12 +296,16 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     status_cb("Counting courses...")
     num_courses = CourseOverview.objects.count()
 
+    # Get the list of collections
+    status_cb("Counting collections...")
+    num_collections = authoring_api.get_collections().count()
+
     # Some counters so we can track our progress as indexing progresses:
-    num_contexts = num_courses + num_libraries
+    num_contexts = num_courses + num_libraries + num_collections
     num_contexts_done = 0  # How many courses/libraries we've indexed
     num_blocks_done = 0  # How many individual components/XBlocks we've indexed
 
-    status_cb(f"Found {num_courses} courses and {num_libraries} libraries.")
+    status_cb(f"Found {num_courses} courses, {num_libraries} libraries and {num_collections} collections.")
     with _using_temp_index(status_cb) as temp_index_name:
         ############## Configure the index ##############
 
@@ -415,7 +421,35 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 num_contexts_done += 1
                 num_blocks_done += len(docs)
 
-    status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses and libraries.")
+        ############## Collections ##############
+        status_cb("Indexing collections...")
+        # To reduce memory usage on large instances, split up the Collections into pages of 1,00 collections:
+        paginator = Paginator(authoring_api.get_collections(), 100)
+        for p in paginator.page_range:
+            docs = []
+            for collection in paginator.page(p).object_list:
+                status_cb(
+                    f"{num_contexts_done + 1}/{num_contexts}. Now indexing collection {collection.name} ({collection.id})"
+                )
+                try:
+                    doc = searchable_doc_for_collection(collection)
+                    # Uncomment below line once collections are tagged.
+                    # doc.update(searchable_doc_tags(metadata.usage_key))
+                    docs.append(doc)
+                except Exception as err:  # pylint: disable=broad-except
+                    status_cb(f"Error indexing collection {collection}: {err}")
+
+            if docs:
+                try:
+                    # Add docs in batch of 100 at once (usually faster than adding one at a time):
+                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                except (TypeError, KeyError, MeilisearchError) as err:
+                    status_cb(f"Error indexing collection {collection}: {err}")
+
+                num_contexts_done += len(docs)
+
+
+    status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 
 
 def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None:

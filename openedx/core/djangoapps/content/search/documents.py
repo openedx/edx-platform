@@ -65,6 +65,7 @@ class DocType:
     """
     course_block = "course_block"
     library_block = "library_block"
+    collection = "collection"
 
 
 def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
@@ -273,5 +274,27 @@ def searchable_doc_for_course_block(block) -> dict:
     }
 
     doc.update(_fields_from_block(block))
+
+    return doc
+
+
+def searchable_doc_for_collection(collection) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, so that the given collection can be
+    found using faceted search.
+    """
+    # TODO: Add collection key once new collectionKey type is added to opaque_keys
+    doc = {
+        Fields.id: collection.id,
+        Fields.type: DocType.collection,
+        Fields.display_name: collection.name,
+        Fields.created: collection.created.timestamp(),
+        Fields.modified: collection.modified.timestamp(),
+        # Using learning_package.key as context key.
+        Fields.context_key: str(collection.learning_package.key),
+        # TODO: Get org value from collection_key.context_key.org
+        # Fields.org: str(collection.collection_key.context_key.org),
+    }
 
     return doc
