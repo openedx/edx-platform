@@ -1415,7 +1415,6 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
 
     TO DO accept requests for different attribute sets.
     """
-
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.CAN_RESEARCH
 
