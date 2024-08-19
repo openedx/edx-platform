@@ -423,13 +423,14 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
         ############## Collections ##############
         status_cb("Indexing collections...")
-        # To reduce memory usage on large instances, split up the Collections into pages of 1,00 collections:
+        # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
         paginator = Paginator(authoring_api.get_collections(), 100)
         for p in paginator.page_range:
             docs = []
             for collection in paginator.page(p).object_list:
                 status_cb(
-                    f"{num_contexts_done + 1}/{num_contexts}. Now indexing collection {collection.name} ({collection.id})"
+                    f"{num_contexts_done + 1}/{num_contexts}. "
+                    f"Now indexing collection {collection.name} ({collection.id})"
                 )
                 try:
                     doc = searchable_doc_for_collection(collection)
@@ -444,10 +445,9 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     # Add docs in batch of 100 at once (usually faster than adding one at a time):
                     _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
                 except (TypeError, KeyError, MeilisearchError) as err:
-                    status_cb(f"Error indexing collection {collection}: {err}")
+                    status_cb(f"Error indexing collection batch {p}: {err}")
 
                 num_contexts_done += len(docs)
-
 
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 
