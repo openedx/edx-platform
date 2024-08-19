@@ -1421,7 +1421,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(common_exceptions_400)
-    def post(self, request, course_id, csv=False):
+    def post(self, request, course_id, csv=False):  # pylint: disable=redefined-outer-name
         """
         Handle POST requests to retrieve student profile information for a specific course.
 
@@ -1467,7 +1467,8 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'email': _('Email'),
             'language': _('Language'),
             'location': _('Location'),
-            #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683, not to go in reports
+            #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683,
+            #  not to go in reports
             'gender': _('Gender'),
             'level_of_education': _('Level of Education'),
             'mailing_address': _('Mailing Address'),
