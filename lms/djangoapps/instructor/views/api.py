@@ -1420,7 +1420,6 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
-    @method_decorator(common_exceptions_400)
     def post(self, request, course_id, csv=False):  # pylint: disable=redefined-outer-name
         """
         Handle POST requests to retrieve student profile information for a specific course.
@@ -1507,12 +1506,15 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             return JsonResponse(response_payload)
 
         else:
-            task_api.submit_calculate_students_features_csv(
-                request,
-                course_key,
-                query_features
-            )
-            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            try:
+                task_api.submit_calculate_students_features_csv(
+                    request,
+                    course_key,
+                    query_features
+                )
+                success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            except Exception as e:
+                raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'Requested task is already running')
 
             return JsonResponse({"status": success_status})
 
@@ -1631,6 +1633,7 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
             task_api.submit_cohort_students(request, course_key, file_name)
         except (FileValidationException, ValueError) as e:
             raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'failed-validation')
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
