@@ -1421,6 +1421,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(common_exceptions_400)
     def post(self, request, course_id, csv=False):
         """
         Handle POST requests to retrieve student profile information for a specific course.
