@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import UsageKey
 import ddt
 from django.test import override_settings
 from freezegun import freeze_time
+from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -174,6 +175,23 @@ class TestSearchApi(ModuleStoreTestCase):
         tagging_api.add_tag_to_taxonomy(self.taxonomyB, "three")
         tagging_api.add_tag_to_taxonomy(self.taxonomyB, "four")
 
+        # Create a collection:
+        self.learning_package = authoring_api.get_learning_package_by_key(self.library.key)
+        self.collection_dict = {
+            'id': 1,
+            'type': 'collection',
+            'display_name': 'my_collection',
+            'context_key': 'lib:org1:lib',
+            'created': created_date.timestamp(),
+            'modified': created_date.timestamp(),
+        }
+        with freeze_time(created_date):
+            self.collection = authoring_api.create_collection(
+                learning_package_id=self.learning_package.id,
+                name="my_collection",
+                description="my collection description"
+            )
+
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
         with self.assertRaises(RuntimeError):
@@ -199,6 +217,7 @@ class TestSearchApi(ModuleStoreTestCase):
             [
                 call([doc_sequential, doc_vertical]),
                 call([doc_problem1, doc_problem2]),
+                call([self.collection_dict]),
             ],
             any_order=True,
         )
