@@ -51,7 +51,8 @@
                     courseId: $.url('?course_id'),
                     courseMode: $.url('?course_mode'),
                     emailOptIn: $.url('?email_opt_in'),
-                    purchaseWorkflow: $.url('?purchase_workflow')
+                    purchaseWorkflow: $.url('?purchase_workflow'),
+                    hideElements: $.url('?hide_elements')
                 };
                 for (var key in queryParams) {
                     if (queryParams[key]) {
@@ -64,6 +65,7 @@
                 this.emailOptIn = queryParams.emailOptIn;
                 this.nextUrl = this.urls.defaultNextUrl;
                 this.purchaseWorkflow = queryParams.purchaseWorkflow;
+                this.hideElements = queryParams.hideElements;
                 if (queryParams.next) {
                     // Ensure that the next URL is internal for security reasons
                     if (! window.isExternal(queryParams.next)) {
@@ -76,6 +78,9 @@
                 try {
                     var next = _.bind(this.enrollment, this);
                     this.checkEmailOptIn(next);
+                    if (this.hideElements) {
+                        document.cookie = 'hideElements=' + this.hideElements + '; path=/';
+                    }
                 } catch (err) {
                     this.updateTaskDescription(gettext('Error') + ': ' + err.message);
                     this.redirect(this.nextUrl);
