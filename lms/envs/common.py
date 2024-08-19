@@ -102,10 +102,16 @@ X_FRAME_OPTIONS = 'DENY'
 # You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
 # Content Security Policy in place.
 # SCORM xblocks require a more permissive cross-domain header to render than the default of 'DENY'
-CUSTOM_CSPS = [
-    ['.*/media/scorm/.*', "frame-ancestors 'self' http://localhost:2000"],
-    ['.*/xblock/.*', "frame-ancestors 'self' http://localhost:2000"]
-]
+def _get_custom_csps():
+    from django.conf import settings
+    learning_url = getattr(settings, 'LEARNING_MICROFRONTEND_URL', None)
+    preview_url = getattr(settings, 'COURSE_PREVIEW_URL', None)
+    return [
+        ['.*/media/scorm/.*', f"frame-ancestors 'self' {learning_url} {preview_url}"],
+        ['.*/xblock/.*', f"frame-ancestors 'self' {learning_url} {preview_url}"]
+    ]
+
+GET_CUSTOM_CSPS = _get_custom_csps
 
 # Features
 FEATURES = {
@@ -2263,20 +2269,6 @@ FOOTER_BROWSER_CACHE_MAX_AGE = 5 * 60
 CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 ################################# Middleware ###################################
-# Reference:
-# CSP_STATIC_ENFORCE = """
-#     default-src 'self' 'unsafe-inline' https://www.tia-ai.com/
-#       https://trainingportal.linuxfoundation.org https://www.tia-ai.com https://cdn.jsdelivr.net;
-#     style-src 'self' https://fonts.googleapis.com 'unsafe-inline'
-#     font-src 'self' http://localhost:18000 https://fonts.gstatic.com;
-#     frame-ancestors 'self' http://localhost:2000
-# """
-domain_name = socket.getfqdn()
-CSP_STATIC_ENFORCE = f"""
-    frame-ancestors 'self' http://localhost:2000
-"""
-
-
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
     'openedx.core.lib.content_security_policy.middleware.content_security_policy_middleware',

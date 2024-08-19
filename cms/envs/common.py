@@ -902,10 +902,9 @@ XQUEUE_INTERFACE = {
 }
 
 ################################# Middleware ###################################
-
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+    'openedx.core.lib.content_security_policy.middleware.content_security_policy_middleware',
 
     'crum.CurrentRequestUserMiddleware',
 
@@ -1011,6 +1010,17 @@ X_FRAME_OPTIONS = 'DENY'
 # SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
 X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']]
 
+# You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
+# Content Security Policy in place.
+# SCORM xblocks require a more permissive cross-domain header to render than the default of 'DENY'
+def _get_custom_csps():
+    from django.conf import settings
+    course_authoring_url = getattr(settings, 'COURSE_AUTHORING_MICROFRONTEND_URL', None)
+    return [
+        ['.*/media/scorm/.*', f"frame-ancestors 'self' {course_authoring_url}"],
+    ]
+
+GET_CUSTOM_CSPS = _get_custom_csps
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'

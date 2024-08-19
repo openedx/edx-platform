@@ -127,7 +127,8 @@ def content_security_policy_middleware(get_response):
     CSP header part specified in `CSP_STATIC_ENFORCE` will be overwritten with the provided string.
     """
     csp_headers = _load_headers()
-    url_specific_csps = getattr(settings, 'CUSTOM_CSPS', None)
+    get_csp_override = getattr(settings, 'GET_CUSTOM_CSPS', None)
+    url_specific_csps = get_csp_override() if get_csp_override else None
     if not csp_headers and not url_specific_csps:
         raise MiddlewareNotUsed()  # tell Django to skip this middleware
 
