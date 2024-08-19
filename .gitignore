@@ -149,6 +149,7 @@ dist
 
 # Locally generated PII reports
 pii_report
+venv
 
 # Pyenv Python version file
 .python-version

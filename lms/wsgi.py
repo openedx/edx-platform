@@ -13,7 +13,7 @@ from openedx.core.lib.safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
 import os  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.aws")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.test")
 
 import lms.startup as startup  # lint-amnesty, pylint: disable=wrong-import-position
 startup.run()

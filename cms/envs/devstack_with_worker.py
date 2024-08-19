@@ -1,5 +1,5 @@
 """
-This config file follows the devstack enviroment, but adds the
+This config file follows the devstack environment, but adds the
 requirement of a celery worker running in the background to process
 celery tasks.
 
