@@ -2232,7 +2232,6 @@ wrapt==1.16.0
     #   astroid
 xblock[django]==5.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   acid-xblock

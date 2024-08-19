@@ -1258,7 +1258,6 @@ wrapt==1.16.0
     # via -r requirements/edx/paver.txt
 xblock[django]==5.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   acid-xblock
     #   crowdsourcehinter-xblock
