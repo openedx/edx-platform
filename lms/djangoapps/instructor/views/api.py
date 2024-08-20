@@ -2333,12 +2333,11 @@ class ListInstructorTasks(APIView):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-
     @method_decorator(ensure_csrf_cookie)
-    """
-    List instructor tasks.
-    """
     def post(self, request, course_id):
+        """
+        List instructor tasks.
+        """
         return _list_instructor_tasks(request=request, course_id=course_id)
 
 
