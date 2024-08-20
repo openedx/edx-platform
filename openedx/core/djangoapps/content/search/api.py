@@ -435,10 +435,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 try:
                     doc = searchable_doc_for_collection(collection)
                     # Uncomment below line once collections are tagged.
-                    # doc.update(searchable_doc_tags(metadata.usage_key))
+                    # doc.update(searchable_doc_tags(collection.id))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing collection {collection}: {err}")
+                finally:
+                    num_contexts_done += 1
 
             if docs:
                 try:
@@ -447,7 +449,6 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 except (TypeError, KeyError, MeilisearchError) as err:
                     status_cb(f"Error indexing collection batch {p}: {err}")
 
-                num_contexts_done += len(docs)
 
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 

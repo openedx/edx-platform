@@ -27,6 +27,7 @@ class Fields:
     type = "type"  # DocType.course_block or DocType.library_block (see below)
     block_id = "block_id"  # The block_id part of the usage key. Sometimes human-readable, sometimes a random hex ID
     display_name = "display_name"
+    description = "description"
     modified = "modified"
     created = "created"
     last_published = "last_published"
@@ -284,17 +285,24 @@ def searchable_doc_for_collection(collection) -> dict:
     like Meilisearch or Elasticsearch, so that the given collection can be
     found using faceted search.
     """
-    # TODO: Add collection key once new collectionKey type is added to opaque_keys
     doc = {
         Fields.id: collection.id,
         Fields.type: DocType.collection,
         Fields.display_name: collection.name,
+        Fields.description: collection.description,
         Fields.created: collection.created.timestamp(),
         Fields.modified: collection.modified.timestamp(),
-        # Using learning_package.key as context key.
-        Fields.context_key: str(collection.learning_package.key),
-        # TODO: Get org value from collection_key.context_key.org
-        # Fields.org: str(collection.collection_key.context_key.org),
     }
+    # Just in case learning_package is not related to a library
+    if hasattr(collection.learning_package, 'contentlibrary'):
+        context_key = collection.learning_package.contentlibrary.library_key
+        org = str(context_key.org)
+        doc.update({
+            Fields.context_key: str(context_key),
+            Fields.org: org,
+            Fields.access_id: _meili_access_id_from_context_key(context_key),
+        })
+    # Add the breadcrumbs.
+    doc[Fields.breadcrumbs] = [{"display_name": collection.learning_package.title}]
 
     return doc
