@@ -126,9 +126,6 @@ from ..utils import (
 )
 from .component import ADVANCED_COMPONENT_TYPES
 
-#SA | progressTabIssueFix
-from lms.djangoapps.courseware.tabs import ProgressTab
-
 import requests
 
 log = logging.getLogger(__name__)
@@ -1218,13 +1215,6 @@ def _refresh_course_tabs(user: User, course_block: CourseBlock):
             tab_enabled = tab_type.is_enabled(course_block, user=user)
             update_tab(course_tabs, tab_type, tab_enabled)
 
-    #SA | progressTabIssueFix
-    # Update ProgressTab's is_hidden value to False | by default it should be False
-    for tab in course_tabs:
-        if isinstance(tab, ProgressTab):
-            if tab.is_hidden:
-                tab.is_hidden = False
-    
     CourseTabList.validate_tabs(course_tabs)
 
     # Save the tabs into the course if they have been changed
