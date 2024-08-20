@@ -1022,6 +1022,8 @@ def _get_custom_csps():
 
 GET_CUSTOM_CSPS = _get_custom_csps
 
+# GET_CUSTOM_CSPS = _get_custom_csps
+
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
