@@ -2322,9 +2322,8 @@ class InstructorTasks(DeveloperErrorViewMixin, APIView):
         return _list_instructor_tasks(request=request, course_id=course_id)
 
 
-@require_POST
-@ensure_csrf_cookie
-def list_instructor_tasks(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListInstructorTasks(APIView):
     """
     List instructor tasks.
 
@@ -2334,7 +2333,13 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-    return _list_instructor_tasks(request=request, course_id=course_id)
+
+    @method_decorator(ensure_csrf_cookie)
+    """
+    List instructor tasks.
+    """
+    def post(self, request, course_id):
+        return _list_instructor_tasks(request=request, course_id=course_id)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
