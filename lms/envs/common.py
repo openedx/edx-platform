@@ -112,6 +112,7 @@ these custom CSPs are set in the return value of a callback function passed via 
 # It is not advised to set this to 'ALLOW' without a Content Security Policy header.
 X_FRAME_OPTIONS = 'DENY'
 
+
 def _get_custom_csps():
     from django.conf import settings
     learning_url = getattr(settings, 'LEARNING_MICROFRONTEND_URL', None)

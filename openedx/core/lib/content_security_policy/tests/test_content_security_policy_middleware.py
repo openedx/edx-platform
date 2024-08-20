@@ -13,6 +13,7 @@ import openedx.core.lib.content_security_policy.middleware as csp
 
 MiddlewareNotUsed = csp.MiddlewareNotUsed
 
+
 @ddt.ddt
 class TestLoadHeaders(TestCase):
     """Test loading of headers from settings."""

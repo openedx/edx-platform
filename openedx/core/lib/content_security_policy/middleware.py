@@ -6,6 +6,7 @@ import re
 
 from django.conf import settings
 
+
 def _load_headers(override=None) -> dict:
     """
     Return a dict of headers to append to every response, based on settings.
