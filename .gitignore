@@ -37,7 +37,7 @@ codekit-config.json
 /other.xml
 /packages.xml
 /web-browsers.xml
-
+/venv
 ### NFS artifacts
 .nfs*
 
