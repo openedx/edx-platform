@@ -1011,6 +1011,7 @@ these custom CSPs are set in the return value of a callback function passed via 
 """
 X_FRAME_OPTIONS = 'DENY'
 
+
 def _get_custom_csps():
     # pylint: disable=import-error
     from django.conf import settings
