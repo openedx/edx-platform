@@ -6,7 +6,7 @@ from __future__ import annotations
 import copy
 
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, Mock, call, patch
 from opaque_keys.edx.keys import UsageKey
 
 import ddt
@@ -181,9 +181,13 @@ class TestSearchApi(ModuleStoreTestCase):
             'id': 1,
             'type': 'collection',
             'display_name': 'my_collection',
+            'description': 'my collection description',
             'context_key': 'lib:org1:lib',
+            'org': 'org1',
             'created': created_date.timestamp(),
             'modified': created_date.timestamp(),
+            "access_id": lib_access.id,
+            'breadcrumbs': [{'display_name': 'Library'}]
         }
         with freeze_time(created_date):
             self.collection = authoring_api.create_collection(
@@ -220,6 +224,22 @@ class TestSearchApi(ModuleStoreTestCase):
                 call([self.collection_dict]),
             ],
             any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    @patch(
+        "openedx.core.djangoapps.content.search.api.searchable_doc_for_collection",
+        Mock(side_effect=Exception("Failed to generate document")),
+    )
+    def test_reindex_meilisearch_collection_error(self, mock_meilisearch):
+
+        mock_logger = Mock()
+        api.rebuild_index(mock_logger)
+        assert call(
+            [self.collection_dict]
+        ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
+        mock_logger.assert_any_call(
+            f"Error indexing collection {self.collection}: Failed to generate document"
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
