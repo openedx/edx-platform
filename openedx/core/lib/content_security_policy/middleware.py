@@ -129,6 +129,7 @@ def content_security_policy_middleware(get_response):
     csp_headers = _load_headers()
     get_csp_override = getattr(settings, 'GET_CUSTOM_CSPS', None)
     url_specific_csps = get_csp_override() if get_csp_override else None
+    # import pdb; pdb.set_trace()
     if not csp_headers and not url_specific_csps:
         raise MiddlewareNotUsed()  # tell Django to skip this middleware
 
