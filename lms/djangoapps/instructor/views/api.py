@@ -3010,11 +3010,8 @@ class ShowStudentExtensions(APIView):
 
         student = serializer_data.validated_data.get('student')
         if not student:
-            response_payload = {
-                'student': request.data.get('student'),
-                'userDoesNotExist': True,
-            }
-            return JsonResponse(response_payload)
+            response_payload = f'Could not find student matching identifier: {request.data.get("student")}'
+            return HttpResponseBadRequest(response_payload)
 
         course = get_course_by_id(CourseKey.from_string(course_id))
         return Response(dump_student_extensions(course, student))
