@@ -7,7 +7,6 @@ import json
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from pytz import utc
 from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
 
@@ -20,7 +19,10 @@ from openedx.core.djangoapps.notifications.base_notification import (
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
+from openedx.core.djangoapps.notifications.models import (
+    CourseNotificationPreference,
+    get_course_notification_preference_config_version
+)
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
@@ -71,15 +73,7 @@ def get_unsubscribe_link(username, patch):
     """
     encrypted_username = encrypt_string(username)
     encrypted_patch = encrypt_object(patch)
-    kwargs = {
-        'username': encrypted_username,
-        'patch': encrypted_patch
-    }
-    relative_url = reverse('preference_update_from_encrypted_username_view', kwargs=kwargs)
-    protocol = 'https://'
-    if settings.DEBUG:
-        protocol = 'http://'
-    return f"{protocol}{settings.LMS_BASE}{relative_url}"
+    return f"{settings.LEARNING_MICROFRONTEND_URL}/preferences-unsubscribe/{encrypted_username}/{encrypted_patch}"
 
 
 def create_email_template_context(username):
@@ -363,6 +357,14 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
             return COURSE_NOTIFICATION_APPS[app_name]['core_email_cadence']
         return COURSE_NOTIFICATION_TYPES[notification_type]['email_cadence']
 
+    def get_updated_preference(pref):
+        """
+        Update preference if config version doesn't match
+        """
+        if pref.config_version != get_course_notification_preference_config_version():
+            pref = pref.get_user_course_preference(pref.user_id, pref.course_id)
+        return pref
+
     course_ids = CourseEnrollment.objects.filter(user=user).values_list('course_id', flat=True)
     CourseNotificationPreference.objects.bulk_create(
         [
@@ -375,6 +377,7 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
 
     # pylint: disable=too-many-nested-blocks
     for preference in preferences:
+        preference = get_updated_preference(preference)
         preference_json = preference.notification_preference_config
         for app_name, app_prefs in preference_json.items():
             if not is_name_match(app_name, app_value):
