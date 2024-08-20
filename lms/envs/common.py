@@ -92,13 +92,26 @@ LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
+################# Clickjacking protection ###################
+"""
+X-FRAME-OPTIONS headers are set by default to `DENY`.
+This means that the page cannot be displayed in a frame, regardless
+of the site attempting to do so. This is a security measure to prevent clickjacking attacks.
+
+In some cases, like for the SCORM xblock, we need to allow SAMEORIGIN as well
+as Microfrontend MFE URLs to render the content. For this, a Content-Security-Policy (CSP) is needed.
+To implement this only for endpoints where it is needed, we have a custom
+middleware that allows us to set a specific CSP for URLs matching a regex.
+This will override the default CSP which you can set via the `CSP_STATIC_ENFORCE` setting.
+
+Since this needs access to the MFE URLs set via config, which are not available when this file is executed,
+these custom CSPs are set in the return value of a callback function passed via the `GET_CUSTOM_CSPS` setting.
+"""
+
 # Clickjacking protection can be disabled by setting this to 'ALLOW' or adjusted by setting this to 'SAMEORIGIN'.
 # It is not advised to set this to 'ALLOW' without a Content Security Policy header.
 X_FRAME_OPTIONS = 'DENY'
 
-# You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
-# Content Security Policy in place.
-# SCORM xblocks require a more permissive cross-domain header to render than the default of 'DENY'
 def _get_custom_csps():
     from django.conf import settings
     learning_url = getattr(settings, 'LEARNING_MICROFRONTEND_URL', None)

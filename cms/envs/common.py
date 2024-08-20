@@ -996,24 +996,23 @@ EXTRA_MIDDLEWARE_CLASSES = []
 
 ################# Clickjacking protection ###################
 """
-X-FRAME-OPTIONS headers are set by default to `DENY`. Select paths, however, are
-overridden to the more permissive `SAMEORIGIN`. We identify these paths via
-override regexes defined below.
+X-FRAME-OPTIONS headers are set by default to `DENY`.
+This means that the page cannot be displayed in a frame, regardless
+of the site attempting to do so. This is a security measure to prevent clickjacking attacks.
 
-At a minimum, this extension supports SCORM XBlocks, which are
-typically rendered in an iframe, and are therefore subject to cross-domain
-issues. This is resolved by using the SAMEORIGIN header.
+In some cases, like for the SCORM xblock, we need to allow SAMEORIGIN as well
+as Microfrontend MFE URLs to render the content. For this, a Content-Security-Policy (CSP) is needed.
+To implement this only for endpoints where it is needed, we have a custom
+middleware that allows us to set a specific CSP for URLs matching a regex.
+This will override the default CSP which you can set via the `CSP_STATIC_ENFORCE` setting.
+
+Since this needs access to the MFE URLs set via config, which are not available when this file is executed,
+these custom CSPs are set in the return value of a callback function passed via the `GET_CUSTOM_CSPS` setting.
 """
 X_FRAME_OPTIONS = 'DENY'
-# The X-FRAME-OPTIONS header is overriden to SAMEORIGIN for certain URLs. Note, however,
-# that it is not advised to override it to 'ALLOW' without a Content Security Policy in place.
-# SCORM xblocks will not able to render their content if the relevant endpoints respond with `DENY`.
-X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']]
 
-# You can override this header for certain URLs using regexes. However, do not set it to 'ALLOW' without having a
-# Content Security Policy in place.
-# SCORM xblocks require a more permissive cross-domain header to render than the default of 'DENY'
 def _get_custom_csps():
+    # pylint: disable=import-error
     from django.conf import settings
     course_authoring_url = getattr(settings, 'COURSE_AUTHORING_MICROFRONTEND_URL', None)
     return [
@@ -1022,7 +1021,7 @@ def _get_custom_csps():
 
 GET_CUSTOM_CSPS = _get_custom_csps
 
-# GET_CUSTOM_CSPS = _get_custom_csps
+################# Privace Preferences ###################
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
