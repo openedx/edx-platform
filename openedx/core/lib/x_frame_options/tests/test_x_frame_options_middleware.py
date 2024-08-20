@@ -19,7 +19,7 @@ class TestEdxXFrameOptionsMiddleware(TestCase):
         if hasattr(settings, 'X_FRAME_OPTIONS'):
             del settings.X_FRAME_OPTIONS
         if hasattr(settings, 'X_FRAME_OPTIONS_OVERRIDES'):
-            del settings.X_FRAME_OPTIONS_OVERRIDES 
+            del settings.X_FRAME_OPTIONS_OVERRIDES
 
     @override_settings(X_FRAME_OPTIONS='SAMEORIGIN')
     @patch('openedx.core.lib.x_frame_options.middleware._validate_header_value')
@@ -40,7 +40,7 @@ class TestEdxXFrameOptionsMiddleware(TestCase):
         assert response.headers['X-Frame-Options'] == 'SAMEORIGIN'
         validate_header.assert_called_once_with('SAMEORIGIN')
 
-    @override_settings(X_FRAME_OPTIONS='DENY', X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']])
+    @override_settings(X_FRAME_OPTIONS='DENY', X_FRAME_OPTIONS_OVERRIDES=[['.*/media/scorm/.*', 'SAMEORIGIN']])
     @patch('openedx.core.lib.x_frame_options.middleware._validate_header_value')
     def test_on_override_with_valid_regex_is_sameorigin(self, validate_header):
         """
@@ -59,7 +59,7 @@ class TestEdxXFrameOptionsMiddleware(TestCase):
 
         assert response.headers['X-Frame-Options'] == 'SAMEORIGIN'
 
-    @override_settings(X_FRAME_OPTIONS='DENY', X_FRAME_OPTIONS_OVERRIDES = [['.*/media/scorm/.*', 'SAMEORIGIN']])
+    @override_settings(X_FRAME_OPTIONS='DENY', X_FRAME_OPTIONS_OVERRIDES=[['.*/media/scorm/.*', 'SAMEORIGIN']])
     @patch('openedx.core.lib.x_frame_options.middleware._validate_header_value')
     def test_on_override_for_non_matching_urls_is_deny(self, validate_header):
         """
