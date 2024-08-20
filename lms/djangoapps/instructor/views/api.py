@@ -2980,7 +2980,6 @@ class ShowStudentExtensions(APIView):
     permission_name = permissions.GIVE_STUDENT_EXTENSION
 
     @method_decorator(ensure_csrf_cookie)
-    @method_decorator(handle_dashboard_error)
     def post(self, request, course_id):
         """
         Handles POST requests to retrieve due date extensions for a specific student
