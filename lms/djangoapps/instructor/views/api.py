@@ -2970,7 +2970,6 @@ def show_unit_extensions(request, course_id):
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
-# @method_decorator(handle_dashboard_error)
 class ShowStudentExtensions(APIView):
     """
     Shows all of the due date extensions granted to a particular student in a
