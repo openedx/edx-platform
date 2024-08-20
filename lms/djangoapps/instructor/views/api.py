@@ -106,7 +106,7 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, Queue
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
-    RoleNameSerializer, UserSerializer, ShowStudentExtensionSerializer, AccessSerializer
+    RoleNameSerializer, UserSerializer, ShowStudentExtensionSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2976,13 +2976,39 @@ class ShowStudentExtensions(APIView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(handle_dashboard_error)
     def post(self, request, course_id):
+        """
+        Handles POST requests to retrieve due date extensions for a specific student
+        within a specified course.
+
+        Parameters:
+        - `request`: The HTTP request object containing user-submitted data.
+        - `course_id`: The ID of the course for which the extensions are being queried.
+
+        Data expected in the request:
+        - `student`: A required field containing the identifier of the student for whom
+          the due date extensions are being retrieved. This data is extracted from the
+          request body.
+
+        Returns:
+        - A JSON response containing the details of the due date extensions granted to
+          the specified student in the specified course.
+        """
         data = {
             'student': request.data.get('student')
         }
-        serializer = self.serializer_class(data=data)
+        serializer_data = self.serializer_class(data=data)
 
-        serializer.is_valid(raise_exception=True)
-        student = serializer.validated_data['student']
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('student')
+        if not student:
+            response_payload = {
+                'student': request.data.get('student'),
+                'userDoesNotExist': True,
+            }
+            return JsonResponse(response_payload)
+
         course = get_course_by_id(CourseKey.from_string(course_id))
         return Response(dump_student_extensions(course, student))
 
