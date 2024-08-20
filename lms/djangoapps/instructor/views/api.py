@@ -105,7 +105,7 @@ from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
-from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer
+from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer, AccessSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -987,17 +987,8 @@ def bulk_beta_modify_access(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EDIT_COURSE_ACCESS)
-@require_post_params(
-    unique_student_identifier="email or username of user to change access",
-    rolename="'instructor', 'staff', 'beta', or 'ccx_coach'",
-    action="'allow' or 'revoke'"
-)
-@common_exceptions_400
-def modify_access(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ModifyAccess(APIView):
     """
     Modify staff/instructor access of other user.
     Requires instructor access.
@@ -1009,66 +1000,76 @@ def modify_access(request, course_id):
     rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
     action is one of ['allow', 'revoke']
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'instructor', course_id, depth=None
-    )
-    unique_student_identifier = request.POST.get('unique_student_identifier')
-    try:
-        user = get_student_from_identifier(unique_student_identifier)
-    except User.DoesNotExist:
-        response_payload = {
-            'unique_student_identifier': unique_student_identifier,
-            'userDoesNotExist': True,
-        }
-        return JsonResponse(response_payload)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EDIT_COURSE_ACCESS
+    serializer_class = AccessSerializer
 
-    # Check that user is active, because add_users
-    # in common/djangoapps/student/roles.py fails
-    # silently when we try to add an inactive user.
-    if not user.is_active:
-        response_payload = {
-            'unique_student_identifier': user.username,
-            'inactiveUser': True,
-        }
-        return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Modify staff/instructor access of other user.
+        Requires instructor access.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_with_access(
+            request.user, 'instructor', course_id, depth=None
+        )
 
-    rolename = request.POST.get('rolename')
-    action = request.POST.get('action')
+        serializer_data = AccessSerializer(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    if rolename not in ROLES:
-        error = strip_tags(f"unknown rolename '{rolename}'")
-        log.error(error)
-        return HttpResponseBadRequest(error)
+        user = serializer_data.validated_data.get('unique_student_identifier')
+        if not user:
+            response_payload = {
+                'unique_student_identifier': request.data.get('unique_student_identifier'),
+                'userDoesNotExist': True,
+            }
+            return JsonResponse(response_payload)
 
-    # disallow instructors from removing their own instructor access.
-    if rolename == 'instructor' and user == request.user and action != 'allow':
+        if not user.is_active:
+            response_payload = {
+                'unique_student_identifier': user.username,
+                'inactiveUser': True,
+            }
+            return JsonResponse(response_payload)
+
+        rolename = serializer_data.data['rolename']
+        action = serializer_data.data['action']
+
+        if rolename not in ROLES:
+            error = strip_tags(f"unknown rolename '{rolename}'")
+            log.error(error)
+            return HttpResponseBadRequest(error)
+
+        # disallow instructors from removing their own instructor access.
+        if rolename == 'instructor' and user == request.user and action != 'allow':
+            response_payload = {
+                'unique_student_identifier': user.username,
+                'rolename': rolename,
+                'action': action,
+                'removingSelfAsInstructor': True,
+            }
+            return JsonResponse(response_payload)
+
+        if action == 'allow':
+            allow_access(course, user, rolename)
+            if not is_user_enrolled_in_course(user, course_id):
+                CourseEnrollment.enroll(user, course_id)
+        elif action == 'revoke':
+            revoke_access(course, user, rolename)
+        else:
+            return HttpResponseBadRequest(strip_tags(
+                f"unrecognized action u'{action}'"
+            ))
+
         response_payload = {
             'unique_student_identifier': user.username,
             'rolename': rolename,
             'action': action,
-            'removingSelfAsInstructor': True,
+            'success': 'yes',
         }
         return JsonResponse(response_payload)
-
-    if action == 'allow':
-        allow_access(course, user, rolename)
-        if not is_user_enrolled_in_course(user, course_id):
-            CourseEnrollment.enroll(user, course_id)
-    elif action == 'revoke':
-        revoke_access(course, user, rolename)
-    else:
-        return HttpResponseBadRequest(strip_tags(
-            f"unrecognized action u'{action}'"
-        ))
-
-    response_payload = {
-        'unique_student_identifier': user.username,
-        'rolename': rolename,
-        'action': action,
-        'success': 'yes',
-    }
-    return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
