@@ -16,15 +16,16 @@ acid-xblock==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-aiohappyeyeballs==2.3.4
+aiohappyeyeballs==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   aiohttp
-aiohttp==3.10.1
+aiohttp==3.10.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   algoliasearch
     #   geoip2
     #   openai
 aiosignal==1.3.1
@@ -36,7 +37,7 @@ alabaster==1.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-algoliasearch==3.0.0
+algoliasearch==4.0.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -85,6 +86,11 @@ astroid==2.13.5
     #   -r requirements/edx/testing.txt
     #   pylint
     #   pylint-celery
+async-timeout==4.0.3
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   algoliasearch
 attrs==24.2.0
     # via
     #   -r requirements/edx/doc.txt
@@ -96,7 +102,7 @@ attrs==24.2.0
     #   openedx-events
     #   openedx-learning
     #   referencing
-babel==2.15.0
+babel==2.16.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -139,14 +145,14 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.34.154
+boto3==1.35.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.34.154
+botocore==1.35.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -165,7 +171,7 @@ cachecontrol==0.14.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-cachetools==5.4.0
+cachetools==5.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -813,7 +819,7 @@ edx-sga==0.25.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.7.6
+edx-submissions==3.7.7
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -876,13 +882,13 @@ execnet==2.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-xdist
-factory-boy==3.3.0
+factory-boy==3.3.1
     # via -r requirements/edx/testing.txt
-faker==26.2.0
+faker==27.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.112.0
+fastapi==0.112.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -951,12 +957,12 @@ google-api-core[grpc]==2.19.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.139.0
+google-api-python-client==2.141.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-auth==2.32.0
+google-auth==2.34.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -977,12 +983,12 @@ google-cloud-core==2.4.1
     #   -r requirements/edx/testing.txt
     #   google-cloud-firestore
     #   google-cloud-storage
-google-cloud-firestore==2.17.0
+google-cloud-firestore==2.17.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-cloud-storage==2.18.0
+google-cloud-storage==2.18.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -993,7 +999,7 @@ google-crc32c==1.5.0
     #   -r requirements/edx/testing.txt
     #   google-cloud-storage
     #   google-resumable-media
-google-resumable-media==2.7.1
+google-resumable-media==2.7.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1008,18 +1014,18 @@ grimp==3.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
-grpcio==1.65.4
+grpcio==1.65.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.62.3
+grpcio-status==1.65.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   google-api-core
-gunicorn==22.0.0
+gunicorn==23.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1063,7 +1069,7 @@ imagesize==1.4.1
     #   sphinx
 import-linter==2.0
     # via -r requirements/edx/testing.txt
-importlib-metadata==6.11.0
+importlib-metadata==8.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1257,7 +1263,7 @@ monotonic==1.6
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   py2neo
-more-itertools==10.3.0
+more-itertools==10.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1289,7 +1295,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-newrelic==9.12.0
+newrelic==9.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1298,7 +1304,7 @@ nh3==0.2.18
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-nltk==3.8.1
+nltk==3.9.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1411,7 +1417,7 @@ pansi==2020.7.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   py2neo
-paramiko==3.4.0
+paramiko==3.4.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1491,7 +1497,7 @@ proto-plus==1.24.0
     #   -r requirements/edx/testing.txt
     #   google-api-core
     #   google-cloud-firestore
-protobuf==4.25.4
+protobuf==5.27.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1550,6 +1556,7 @@ pydantic==2.8.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   algoliasearch
     #   camel-converter
     #   fastapi
 pydantic-core==2.20.1
@@ -1711,6 +1718,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   algoliasearch
     #   analytics-python
     #   botocore
     #   celery
@@ -1777,7 +1785,7 @@ pyuca==1.2
     #   -r requirements/edx/testing.txt
 pywatchman==2.0.0
     # via -r requirements/edx/development.in
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1817,7 +1825,6 @@ requests==2.32.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   algoliasearch
     #   analytics-python
     #   cachecontrol
     #   django-oauth-toolkit
@@ -1888,11 +1895,11 @@ semantic-version==2.10.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-drf-extensions
-shapely==2.0.5
+shapely==2.0.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-simplejson==3.19.2
+simplejson==3.19.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1980,7 +1987,7 @@ sortedcontainers==2.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   snowflake-connector-python
-soupsieve==2.5
+soupsieve==2.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2048,7 +2055,7 @@ staff-graded-xblock==2.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-starlette==0.37.2
+starlette==0.38.2
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
@@ -2066,7 +2073,7 @@ super-csv==3.2.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-bulk-grades
-sympy==1.13.1
+sympy==1.13.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2088,13 +2095,13 @@ tinycss2==1.2.1
     #   bleach
 tomli==2.0.1
     # via django-stubs
-tomlkit==0.13.0
+tomlkit==0.13.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pylint
     #   snowflake-connector-python
-tox==4.17.0
+tox==4.18.0
     # via -r requirements/edx/testing.txt
 tqdm==4.66.5
     # via
@@ -2104,7 +2111,7 @@ tqdm==4.66.5
     #   openai
 types-pytz==2024.1.0.20240417
     # via django-stubs
-types-pyyaml==6.0.12.20240724
+types-pyyaml==6.0.12.20240808
     # via
     #   django-stubs
     #   djangorestframework-stubs
@@ -2155,6 +2162,7 @@ urllib3==1.26.19
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   algoliasearch
     #   botocore
     #   elasticsearch
     #   py2neo
@@ -2163,7 +2171,7 @@ user-util==1.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-uvicorn==0.30.5
+uvicorn==0.30.6
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -2190,7 +2198,7 @@ walrus==0.9.4
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-redis
-watchdog==4.0.1
+watchdog==4.0.2
     # via
     #   -r requirements/edx/development.in
     #   -r requirements/edx/doc.txt
@@ -2216,7 +2224,7 @@ webencodings==0.5.1
     #   bleach
     #   html5lib
     #   tinycss2
-webob==1.8.7
+webob==1.8.8
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2281,7 +2289,7 @@ yarl==1.9.4
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   pact-python
-zipp==3.19.2
+zipp==3.20.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
