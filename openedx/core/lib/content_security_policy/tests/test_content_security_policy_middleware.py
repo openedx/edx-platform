@@ -1,17 +1,17 @@
 """
-Tests for Content-Security-Policy middleware.
+Tests for Content-Security-Policy middleware with custom CSP overrides.
 """
 
 from unittest import TestCase
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import ddt
 import pytest
-from django.core.exceptions import MiddlewareNotUsed
 from django.test import override_settings
 
-import edx_django_utils.security.csp.middleware as csp
+import openedx.core.lib.content_security_policy.middleware as csp
 
+MiddlewareNotUsed = csp.MiddlewareNotUsed
 
 @ddt.ddt
 class TestLoadHeaders(TestCase):
@@ -125,15 +125,18 @@ class TestCSPMiddleware(TestCase):
         self.fake_response = Mock()
         self.fake_response.headers = {'Existing': 'something'}
 
+    @override_settings(GET_CUSTOM_CSPS=None, CSP_STATIC_ENFORCE=None)
     def test_make_middleware_unused(self):
         with pytest.raises(MiddlewareNotUsed):
             csp.content_security_policy_middleware(lambda _: self.fake_response)
 
-    @override_settings(CSP_STATIC_ENFORCE="default-src: https:")
+    @override_settings(GET_CUSTOM_CSPS=None, CSP_STATIC_ENFORCE="default-src: https:")
     def test_make_middleware_configured(self):
         handler = csp.content_security_policy_middleware(lambda _: self.fake_response)
 
-        assert handler(Mock()) is self.fake_response
+        request = Mock()
+        request.path = "/some-path"  # Set a valid string for the request path
+        assert handler(request) is self.fake_response
 
         # Headers have been mutated in place (if flag enabled)
         assert self.fake_response.headers == {
@@ -141,18 +144,99 @@ class TestCSPMiddleware(TestCase):
             'Content-Security-Policy': 'default-src: https:',
         }
 
-########### New Test Cases #############
+    @override_settings(GET_CUSTOM_CSPS=None, CSP_STATIC_ENFORCE=None)
+    def test_no_custom_csps_no_static_enforce(self):
+        """Test that MiddlewareNotUsed is raised if neither GET_CUSTOM_CSPS nor CSP_STATIC_ENFORCE is set."""
+        with pytest.raises(MiddlewareNotUsed):
+            csp.content_security_policy_middleware(lambda _: self.fake_response)
 
-'''
-- If GET_CUSTOM_CSPS and CSP_STATIC_ENFORCE are not set, the middleware should raise MiddlewareNotUsed.
-- If GET_CUSTOM_CSPS is set, but returns None, the middleware should raise MiddlewareNotUsed.
-- If GET_CUSTOM_CSPS is set, but returns an empty list, the middleware should raise MiddlewareNotUsed.
-- If GET_CUSTOM_CSPS or CSP_STATIC_ENFORCE are set, the middleware should not raise MiddlewareNotUsed.
-- If GET_CUSTOM_CSPS and CSP_STATIC_ENFORCE are set, GET_CUSTOM_CSPS should take precedence.
-- Test that when GET_CUSTOM_CSPS is set and the current path matches one of the
-regexes in the list, the value of the custom CSP is used.
-- Test that when GET_CUSTOM_CSPS and CSP_STATIC_ENFORCE are set and the current path does not match any of the
-regexes in the list, the value of the default CSP is used.
-- Test that when GET_CUSTOM_CSPS is set and the current path does not match any of the
-regexes in the list, the middleware does not append any headers.
-'''
+    @override_settings(GET_CUSTOM_CSPS=lambda: None, CSP_STATIC_ENFORCE=None)
+    def test_custom_csps_returns_none(self):
+        """Test that MiddlewareNotUsed is raised if GET_CUSTOM_CSPS is set
+        but returns None and CSP_STATIC_ENFORCE is unset."""
+        with pytest.raises(MiddlewareNotUsed):
+            csp.content_security_policy_middleware(lambda _: self.fake_response)
+
+    @override_settings(GET_CUSTOM_CSPS=lambda: [], CSP_STATIC_ENFORCE=None)
+    def test_custom_csps_returns_empty_list(self):
+        """Test that MiddlewareNotUsed is raised if GET_CUSTOM_CSPS is set
+        but returns an empty list and CSP_STATIC_ENFORCE is unset."""
+        with pytest.raises(MiddlewareNotUsed):
+            csp.content_security_policy_middleware(lambda _: self.fake_response)
+
+    @override_settings(GET_CUSTOM_CSPS=lambda: [['.*', "default-src 'self'"]], CSP_STATIC_ENFORCE=None)
+    def test_custom_csps_set_middleware_used(self):
+        """Test that middleware is used if GET_CUSTOM_CSPS is set."""
+        request = Mock()
+        request.path = "/some-path"  # Set a valid string for the request path
+        handler = csp.content_security_policy_middleware(lambda _: self.fake_response)
+        assert handler(request) is self.fake_response
+
+    @override_settings(CSP_STATIC_ENFORCE="default-src: https:", GET_CUSTOM_CSPS=None)
+    def test_static_enforce_set_middleware_used(self):
+        """Test that middleware is used if CSP_STATIC_ENFORCE is set."""
+        request = Mock()
+        request.path = "/some-path"  # Set a valid string for the request path
+        handler = csp.content_security_policy_middleware(lambda _: self.fake_response)
+        assert handler(request) is self.fake_response
+
+    @override_settings(GET_CUSTOM_CSPS=lambda: [['.*', "default-src 'self'"]], CSP_STATIC_ENFORCE="default-src: https:")
+    def test_custom_csps_takes_precedence(self):
+        """Test that GET_CUSTOM_CSPS takes precedence over CSP_STATIC_ENFORCE."""
+        request = Mock()
+        request.path = "/some-path"  # Set a valid string for the request path
+        handler = csp.content_security_policy_middleware(lambda _: self.fake_response)
+        assert handler(request) is self.fake_response
+
+        # Headers have been mutated in place with the custom CSP
+        assert self.fake_response.headers == {
+            'Existing': 'something',
+            'Content-Security-Policy': "default-src 'self'",
+        }
+
+    @override_settings(
+        GET_CUSTOM_CSPS=lambda: [['.*/specific-path/.*', "default-src 'self'"]],
+        CSP_STATIC_ENFORCE="default-src: https:"
+    )
+    def test_custom_csps_applied_on_specific_path(self):
+        """Test that custom CSP is applied when the request path matches a regex in GET_CUSTOM_CSPS."""
+        request = Mock()
+        request.path = "/specific-path/resource"
+        handler = csp.content_security_policy_middleware(lambda _: self.fake_response)
+        assert handler(request) is self.fake_response
+
+        assert self.fake_response.headers == {
+            'Existing': 'something',
+            'Content-Security-Policy': "default-src 'self'",
+        }
+
+    @override_settings(
+        GET_CUSTOM_CSPS=lambda: [['.*/non-matching-path/.*', "default-src 'self'"]],
+        CSP_STATIC_ENFORCE="default-src: https:"
+    )
+    def test_default_csp_applied_when_no_custom_csp_matches(self):
+        """Test that the default CSP is applied when no custom CSP regex matches the request path."""
+        request = Mock()
+        request.path = "/some-other-path"
+        handler = csp.content_security_policy_middleware(lambda _: self.fake_response)
+        assert handler(request) is self.fake_response
+
+        assert self.fake_response.headers == {
+            'Existing': 'something',
+            'Content-Security-Policy': 'default-src: https:',
+        }
+
+    @override_settings(
+        GET_CUSTOM_CSPS=lambda: [['.*/non-matching-path/.*', "default-src 'self'"]],
+        CSP_STATIC_ENFORCE=None
+    )
+    def test_no_csp_headers_applied_when_no_match_and_no_static_enforce(self):
+        """Test that no CSP headers are applied when no custom CSP matches and no static enforce is set."""
+        request = Mock()
+        request.path = "/some-other-path"
+        handler = csp.content_security_policy_middleware(lambda _: self.fake_response)
+        assert handler(request) is self.fake_response
+
+        assert self.fake_response.headers == {
+            'Existing': 'something',
+        }
