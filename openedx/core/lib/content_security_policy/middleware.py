@@ -100,9 +100,10 @@ class MiddlewareNotUsed(Exception):
 
 def _get_override(request, url_specific_csps):
     """
-    Check the CUSTOM_CSPS environment variable for a match to the request url.
+    Check url_specific_csps list for a match to the request url.
     If a regex is included that matches the request url, that means that the CSP header
     should be overwritten with the provided string for this url.
+    url_specific_csps: [[regex, custom_csp], ...]
     """
     if not url_specific_csps or not isinstance(url_specific_csps, list):
         return None
@@ -123,14 +124,13 @@ def content_security_policy_middleware(get_response):
     `CSP_STATIC_REPORT_ONLY`, `CSP_STATIC_REPORTING_URI`, and `CSP_STATIC_REPORTING_NAME`.
 
     It is possible to override the CSP headers for specific URLs by setting the
-    `CUSTOM_CSPS` environment variable to a list of tuples. Each tuple should
+    `GET_CUSTOM_CSPS` environment variable to callback function returning a list of pairs. Each pair should
     contain a regex and a string. If the regex matches the request URL, the
     CSP header part specified in `CSP_STATIC_ENFORCE` will be overwritten with the provided string.
     """
     csp_headers = _load_headers()
     get_csp_override = getattr(settings, 'GET_CUSTOM_CSPS', None)
     url_specific_csps = get_csp_override() if get_csp_override else None
-    # import pdb; pdb.set_trace()
     if not csp_headers and not url_specific_csps:
         raise MiddlewareNotUsed()  # tell Django to skip this middleware
 
