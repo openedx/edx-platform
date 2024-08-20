@@ -85,6 +85,7 @@ class LibraryContentBlock(
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
+    XBlock,
 ):
     """
     An XBlock whose children are chosen dynamically from a content library.

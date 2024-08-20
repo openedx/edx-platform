@@ -28,6 +28,7 @@ class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):
     """
     A block which provides templates for CustomTagBlock. The template name
@@ -122,6 +123,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 class TranslateCustomTagBlock(  # pylint: disable=abstract-method
     XModuleToXBlockMixin,
     XModuleMixin,
+    XBlock,
 ):
     """
     Converts olx of the form `<$custom_tag attr="" attr=""/>` to CustomTagBlock

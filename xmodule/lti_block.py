@@ -284,6 +284,7 @@ class LTIBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):  # pylint: disable=abstract-method
     """
     THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/openedx/xblock-lti-consumer

@@ -7,6 +7,7 @@ from unittest.mock import Mock
 import dateutil.parser
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import Any, Boolean, Dict, Float, Integer, List, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
@@ -65,7 +66,7 @@ class InheritingFieldDataTest(unittest.TestCase):
     Tests of InheritingFieldData.
     """
 
-    class TestableInheritingXBlock(XmlMixin):  # lint-amnesty, pylint: disable=abstract-method
+    class TestableInheritingXBlock(XmlMixin, XBlock):  # lint-amnesty, pylint: disable=abstract-method
         """
         An XBlock we can use in these tests.
         """
@@ -227,7 +228,7 @@ class InheritingFieldDataTest(unittest.TestCase):
 
 
 class EditableMetadataFieldsTest(unittest.TestCase):
-    class TestableXmlXBlock(XmlMixin, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
+    class TestableXmlXBlock(XmlMixin, XModuleMixin, XBlock):  # lint-amnesty, pylint: disable=abstract-method
         """
         This is subclassing `XModuleMixin` to use metadata fields in the unmixed class.
         """

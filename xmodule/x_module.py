@@ -17,7 +17,7 @@ from pkg_resources import resource_isdir, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
-from xblock.core import XBlock, XBlockAside
+from xblock.core import XBlock, XBlockAside, XBlockMixin
 from xblock.fields import (
     Dict,
     Float,
@@ -232,8 +232,8 @@ class XModuleFields:
     )
 
 
-@XBlock.needs("i18n")
-class XModuleMixin(XModuleFields, XBlock):
+@XBlockMixin.needs("i18n")
+class XModuleMixin(XModuleFields, XBlockMixin):
     """
     Fields and methods used by XModules internally.
 
@@ -736,7 +736,7 @@ class XModuleMixin(XModuleFields, XBlock):
         return Fragment(alert_html.format(display_text))
 
 
-class XModuleToXBlockMixin:
+class XModuleToXBlockMixin(XBlockMixin):
     """
     Common code needed by XModule and XBlocks converted from XModules.
     """
@@ -747,7 +747,7 @@ class XModuleToXBlockMixin:
         """
         return self.runtime.handler_url(self, 'xmodule_handler', '', '').rstrip('/?')
 
-    @XBlock.handler
+    @XBlockMixin.handler
     def xmodule_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`

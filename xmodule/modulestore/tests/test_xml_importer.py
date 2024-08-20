@@ -12,6 +12,7 @@ from unittest import mock
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from path import Path as path
+from xblock.core import XBlock
 from xblock.fields import List, Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 
@@ -107,7 +108,7 @@ def render_to_template_mock(*args):
     pass
 
 
-class StubXBlock(XModuleMixin, InheritanceMixin):
+class StubXBlock(XModuleMixin, InheritanceMixin, XBlock):
     """
     Stub XBlock used for testing.
     """

@@ -18,6 +18,7 @@ class HiddenBlock(
     XmlMixin,
     XModuleToXBlockMixin,
     XModuleMixin,
+    XBlock,
 ):
     """
     XBlock class loaded by the runtime when another XBlock type has been disabled

@@ -42,6 +42,7 @@ class PollBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):  # pylint: disable=abstract-method
     """Poll Block"""
     # Name of poll to use in links to this poll

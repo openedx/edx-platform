@@ -48,6 +48,7 @@ class ErrorBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):  # pylint: disable=abstract-method
     """
     Block that gets shown to staff when there has been an error while
