@@ -102,10 +102,9 @@ X_FRAME_OPTIONS = 'DENY'
 def _get_custom_csps():
     from django.conf import settings
     learning_url = getattr(settings, 'LEARNING_MICROFRONTEND_URL', None)
-    preview_url = getattr(settings, 'COURSE_PREVIEW_URL', None)
     return [
-        ['.*/media/scorm/.*', f"frame-ancestors 'self' {learning_url} {preview_url}"],
-        ['.*/xblock/.*', f"frame-ancestors 'self' {learning_url} {preview_url}"]
+        ['.*/media/scorm/.*', f"frame-ancestors 'self' {learning_url}"],
+        ['.*/xblock/.*', f"frame-ancestors 'self' {learning_url}"]
     ]
 
 GET_CUSTOM_CSPS = _get_custom_csps
