@@ -52,18 +52,18 @@ class Env:
     QUALITY_DIR = REPORT_DIR / 'quality_junitxml'
 
     # Generic log dir
-    GEN_LOG_DIR = REPO_ROOT / "test_root" / "log"
+    # GEN_LOG_DIR = REPO_ROOT / "test_root" / "log"
 
     # Python unittest dirs
-    PYTHON_COVERAGERC = REPO_ROOT / ".coveragerc"
+    # PYTHON_COVERAGERC = REPO_ROOT / ".coveragerc"
 
     # Which Python version should be used in xdist workers?
-    PYTHON_VERSION = os.environ.get("PYTHON_VERSION", "2.7")
+    # PYTHON_VERSION = os.environ.get("PYTHON_VERSION", "2.7")
 
     # Directory that videos are served from
-    VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
+    # VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
 
-    PRINT_SETTINGS_LOG_FILE = GEN_LOG_DIR / "print_settings.log"
+    # PRINT_SETTINGS_LOG_FILE = GEN_LOG_DIR / "print_settings.log"
 
     # Detect if in a Docker container, and if so which one
     FRONTEND_TEST_SERVER_HOST = os.environ.get('FRONTEND_TEST_SERVER_HOSTNAME', '0.0.0.0')
@@ -113,15 +113,15 @@ class Env:
     JS_REPORT_DIR = REPORT_DIR / 'javascript'
 
     # Directories used for pavelib/ tests
-    IGNORED_TEST_DIRS = ('__pycache__', '.cache', '.pytest_cache')
-    LIB_TEST_DIRS = [path("pavelib/paver_tests"), path("scripts/xsslint/tests")]
+    # IGNORED_TEST_DIRS = ('__pycache__', '.cache', '.pytest_cache')
+    # LIB_TEST_DIRS = [path("pavelib/paver_tests"), path("scripts/xsslint/tests")]
 
     # Directory for i18n test reports
-    I18N_REPORT_DIR = REPORT_DIR / 'i18n'
+    # I18N_REPORT_DIR = REPORT_DIR / 'i18n'
 
     # Directory for keeping src folder that comes with pip installation.
     # Setting this is equivalent to passing `--src <dir>` to pip directly.
-    PIP_SRC = os.environ.get("PIP_SRC")
+    # PIP_SRC = os.environ.get("PIP_SRC")
 
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.

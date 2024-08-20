@@ -72,22 +72,6 @@ jobs:
         run: |
             pip install -e .
       
-      # - name: Run Python Quality Test
-      #   working-directory: ${{ github.workspace }}
-      #   env:
-      #     PIP_SRC: ${{ runner.temp }}
-      #   run: make test-lint
-      
-      # - name: Run Stylelint Tests
-      #   env:
-      #     PIP_SRC: ${{ runner.temp }}
-      #   run: make test-stylelint  
-      
-      # - name: Run Eslint Tests
-      #   env:
-      #     PIP_SRC: ${{ runner.temp }}
-      #   run: make test-eslint
-
       - name: Run Quality Tests
         env:
           PIP_SRC: ${{ runner.temp }}

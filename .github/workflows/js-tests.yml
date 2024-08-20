@@ -72,6 +72,7 @@ jobs:
         run: |
           npm install -g jest
           make test-js
+          make test-coverage
 
       - name: Save Job Artifacts
         uses: actions/upload-artifact@v4

@@ -501,43 +501,6 @@ def run_xsslint():
         print("successfully run xsslint")
 
 
-def diff_coverage():
-    """
-    Build the diff coverage reports
-    """
-
-    compare_branch = 'origin/master'
-
-    # Find all coverage XML files (both Python and JavaScript)
-    xml_reports = []
-    REPO_ROOT = repo_root()
-    REPORT_DIR = REPO_ROOT / 'reports'
-    for filepath in REPORT_DIR.walk():
-        if bool(re.match(r'^coverage.*\.xml$', filepath.basename())):
-            xml_reports.append(filepath)
-
-    if not xml_reports:
-        err_msg = colorize(
-            'red',
-            "No coverage info found.  Run `quality test` before running "
-            "`coverage test`.\n"
-        )
-        sys.stderr.write(err_msg)
-    else:
-        xml_report_str = ' '.join(xml_reports)
-        diff_html_path = os.path.join(REPORT_DIR, 'diff_coverage_combined.html')
-
-        # Generate the diff coverage reports (HTML and console)
-        # The --diff-range-notation parameter is a workaround for https://github.com/Bachmann1234/diff_cover/issues/153
-        command = (
-            f"diff-cover {xml_report_str}"
-            f"--diff-range-notation '..'"
-            f"--compare-branch={compare_branch} "
-            f"--html-report {diff_html_path}"
-        )
-        subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=['eslint', 'stylelint',

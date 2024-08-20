@@ -224,6 +224,9 @@ test-check_keyword:
 	python scripts/quality_test/quality_test.py check_keywords
 
 test-js:
-	 xvfb-run --auto-servernum python scripts/quality_test/js_test.py
+	 xvfb-run --auto-servernum python scripts/quality_test/js_test.py --option jstest
+
+test-coverage:
+	python scripts/quality_test/js_test.py --option coverage
 
 quality-test: test-lint test-eslint test-stylelint test-xsslint test-pi_check test-check_keyword
