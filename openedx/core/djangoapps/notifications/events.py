@@ -159,6 +159,9 @@ def notification_tray_opened_event(user, unseen_notifications_count):
 
 
 def notification_preference_unsubscribe_event(user):
+    """
+    Emits an event when user clicks on one-click-unsubscribe url
+    """
     event_data = {
         'user_id': user.id,
         'username': user.username,
