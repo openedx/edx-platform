@@ -449,7 +449,6 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 except (TypeError, KeyError, MeilisearchError) as err:
                     status_cb(f"Error indexing collection batch {p}: {err}")
 
-
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 
 
