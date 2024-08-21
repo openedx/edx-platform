@@ -76,11 +76,11 @@
 
             render: function() {
                 try {
-                    var next = _.bind(this.enrollment, this);
-                    this.checkEmailOptIn(next);
                     if (this.hideElements) {
                         document.cookie = 'hideElements=' + this.hideElements + '; path=/';
                     }
+                    var next = _.bind(this.enrollment, this);
+                    this.checkEmailOptIn(next);
                 } catch (err) {
                     this.updateTaskDescription(gettext('Error') + ': ' + err.message);
                     this.redirect(this.nextUrl);
