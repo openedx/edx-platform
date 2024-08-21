@@ -47,6 +47,7 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
     CACHE_VIDEO_DURATIONS = 'video.durations'
     DEFAULT_WPM = 265  # words per minute
+    DEFAULT_VIDEO_DURATION = 60
 
     class MissingEstimationData(Exception):
         pass
@@ -107,7 +108,7 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
         # Check if we have a duration. If not, raise an exception that will stop this transformer from affecting
         # this course.
-        duration = cache[cls.CACHE_VIDEO_DURATIONS].get(xblock.edx_video_id, 0)
+        duration = cache[cls.CACHE_VIDEO_DURATIONS].get(xblock.edx_video_id, cls.DEFAULT_VIDEO_DURATION)
         if duration <= 0:
             raise cls.MissingEstimationData()
 
@@ -148,12 +149,12 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
             time, activities = estimations[category](usage_info, block_structure, block_key)
 
-            if time is not None:
-                # We take the ceiling of the estimate here just for cleanliness. Losing the fractional seconds does
-                # technically make our estimate less accurate, especially as we combine these values in parents.
-                # But easier to present a simple integer to any consumers, and precise to-the-second accuracy on our
-                # estimate is not a primary goal.
-                block_structure.override_xblock_field(block_key, self.EFFORT_TIME, math.ceil(time))
+            #if time is not None:
+            # We take the ceiling of the estimate here just for cleanliness. Losing the fractional seconds does
+            # technically make our estimate less accurate, especially as we combine these values in parents.
+            # But easier to present a simple integer to any consumers, and precise to-the-second accuracy on our
+            # estimate is not a primary goal.
+            #block_structure.override_xblock_field(block_key, self.EFFORT_TIME, math.ceil(time))
 
             if activities is not None:
                 block_structure.override_xblock_field(block_key, self.EFFORT_ACTIVITIES, activities)
@@ -186,10 +187,10 @@ class EffortEstimationTransformer(BlockStructureTransformer):
         cls = EffortEstimationTransformer
         word_count = block_structure.get_transformer_block_field(block_key, cls, self.HTML_WORD_COUNT)
         if not word_count:
-            return None, 0
+            return None, 1
 
         time = word_count / self.DEFAULT_WPM * 60  # in seconds
-        return time, 0
+        return time, 1
 
     def _estimate_vertical_effort(self, usage_info, block_structure, block_key):
         """A vertical is either an amount of time if we know it, or an activity"""
@@ -209,13 +210,13 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
         if self._is_on_mobile:
             if only_on_web:
-                return None, 0
+                return None, 1
             clip_duration = None  # mobile can't do clips
 
         user_duration = clip_duration or duration
         if not user_duration:
-            return None, 0
+            return None, 1
 
         # We are intentionally only looking at global_speed, not speed (which is last speed user used on this video)
         # because this estimate is meant to be somewhat static.
-        return user_duration / global_speed, 0
+        return user_duration / global_speed, 1
