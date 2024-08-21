@@ -25,7 +25,6 @@ aiohttp==3.10.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   algoliasearch
     #   geoip2
     #   openai
 aiosignal==1.3.1
@@ -37,8 +36,9 @@ alabaster==1.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
-algoliasearch==4.0.2
+algoliasearch==3.0.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 amqp==5.2.0
@@ -86,11 +86,6 @@ astroid==2.13.5
     #   -r requirements/edx/testing.txt
     #   pylint
     #   pylint-celery
-async-timeout==4.0.3
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   algoliasearch
 attrs==24.2.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1556,7 +1551,6 @@ pydantic==2.8.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   algoliasearch
     #   camel-converter
     #   fastapi
 pydantic-core==2.20.1
@@ -1718,7 +1712,6 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   algoliasearch
     #   analytics-python
     #   botocore
     #   celery
@@ -1825,6 +1818,7 @@ requests==2.32.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   algoliasearch
     #   analytics-python
     #   cachecontrol
     #   django-oauth-toolkit
@@ -2162,7 +2156,6 @@ urllib3==1.26.19
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   algoliasearch
     #   botocore
     #   elasticsearch
     #   py2neo
