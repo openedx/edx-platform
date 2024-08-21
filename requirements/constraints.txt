@@ -12,12 +12,6 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
-# Date: 2024-08-21
-# Description: This is the major upgrade of algoliasearch python client and it will
-# break one of the edX' platform plugin, so we need to make that compatible first.
-# Ticket: https://github.com/openedx/edx-platform/issues/35334
-algoliasearch<4.0.0
-
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
 celery>=5.2.2,<6.0.0
