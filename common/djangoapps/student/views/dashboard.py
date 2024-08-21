@@ -522,7 +522,8 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         return redirect(reverse('account_settings'))
 
     if should_redirect_to_learner_home_mfe(user):
-        return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
+        mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+        return redirect(mfe_config["LEARNER_HOME_MICROFRONTEND_URL"])
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
