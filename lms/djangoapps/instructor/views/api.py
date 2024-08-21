@@ -106,7 +106,7 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, Queue
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
-    RoleNameSerializer, UserSerializer, AccessSerializer
+    AccessSerializer, ListInstructorSerializer, RoleNameSerializer, UserSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2335,13 +2335,17 @@ class ListInstructorTasks(APIView):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.SHOW_TASKS
+    serializer_class = ListInstructorSerializer
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
         List instructor tasks.
         """
-        # serializer_data = AccessSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         return _list_instructor_tasks(
             request=request, course_id=course_id
@@ -2350,7 +2354,7 @@ class ListInstructorTasks(APIView):
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.SHOW_TASKS)
-def _list_instructor_tasks(request, course_id, problem_location_str=None, unique_student_identifier=None):
+def _list_instructor_tasks(request, course_id):
     """
     List instructor tasks.
 
