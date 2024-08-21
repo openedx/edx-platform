@@ -3808,11 +3808,9 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         assert actual_tasks == expected_tasks
 
     @patch('lms.djangoapps.instructor_task.api.get_instructor_task_history')
-    def test_list_instructor_tasks_problem_student(self, act):
+    @ddt.data('list_instructor_tasks', 'instructor_api_v1:list_instructor_tasks')
+    def test_list_instructor_tasks_problem_student(self, endpoint, act):
         """ Test list task history for problem AND student. """
-        endpoint = 'list_instructor_tasks'
-        import pdb;
-        pdb.set_trace()
         act.return_value = self.tasks
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
         mock_factory = MockCompletionInfo()

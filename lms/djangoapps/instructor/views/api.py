@@ -105,7 +105,9 @@ from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
-from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer, AccessSerializer
+from lms.djangoapps.instructor.views.serializer import (
+    RoleNameSerializer, UserSerializer, AccessSerializer
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -2333,17 +2335,22 @@ class ListInstructorTasks(APIView):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
+
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
         List instructor tasks.
         """
-        return _list_instructor_tasks(request=request, course_id=course_id)
+        # serializer_data = AccessSerializer(data=request.data)
+
+        return _list_instructor_tasks(
+            request=request, course_id=course_id
+        )
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.SHOW_TASKS)
-def _list_instructor_tasks(request, course_id):
+def _list_instructor_tasks(request, course_id, problem_location_str=None, unique_student_identifier=None):
     """
     List instructor tasks.
 
@@ -2351,8 +2358,14 @@ def _list_instructor_tasks(request, course_id):
     """
     course_id = CourseKey.from_string(course_id)
     params = getattr(request, 'query_params', request.POST)
+
     problem_location_str = strip_if_string(params.get('problem_location_str', False))
     student = params.get('unique_student_identifier', None)
+
+    if not student and not problem_location_str:    # APIVIEW is not sending data as query_params
+        problem_location_str = strip_if_string(request.data.get('problem_location_str'))
+        student = request.data.get('unique_student_identifier')
+
     if student is not None:
         student = get_student_from_identifier(student)
 
