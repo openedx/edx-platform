@@ -2362,7 +2362,7 @@ def _list_instructor_tasks(request, course_id, problem_location_str=None, unique
     problem_location_str = strip_if_string(params.get('problem_location_str', False))
     student = params.get('unique_student_identifier', None)
 
-    if not student and not problem_location_str:    # APIVIEW is not sending data as query_params
+    if not student and not problem_location_str:    # DRF is not receiving data as query_params:QueryDict
         problem_location_str = strip_if_string(request.data.get('problem_location_str'))
         student = request.data.get('unique_student_identifier')
 
