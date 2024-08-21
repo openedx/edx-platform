@@ -288,10 +288,14 @@ def searchable_doc_for_collection(collection) -> dict:
     doc = {
         Fields.id: collection.id,
         Fields.type: DocType.collection,
-        Fields.display_name: collection.name,
+        Fields.display_name: collection.title,
         Fields.description: collection.description,
         Fields.created: collection.created.timestamp(),
         Fields.modified: collection.modified.timestamp(),
+        # Add related learning_package.key as context_key by default.
+        # If related contentlibrary is found, it will override this value below.
+        # Mostly contentlibrary.library_key == learning_package.key
+        Fields.context_key: collection.learning_package.key,
     }
     # Just in case learning_package is not related to a library
     if hasattr(collection.learning_package, 'contentlibrary'):
@@ -300,8 +304,8 @@ def searchable_doc_for_collection(collection) -> dict:
         doc.update({
             Fields.context_key: str(context_key),
             Fields.org: org,
-            Fields.access_id: _meili_access_id_from_context_key(context_key),
         })
+    doc[Fields.access_id] = _meili_access_id_from_context_key(doc[Fields.context_key])
     # Add the breadcrumbs.
     doc[Fields.breadcrumbs] = [{"display_name": collection.learning_package.title}]
 

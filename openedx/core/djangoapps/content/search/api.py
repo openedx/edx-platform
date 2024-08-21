@@ -424,13 +424,13 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
         ############## Collections ##############
         status_cb("Indexing collections...")
         # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
-        paginator = Paginator(authoring_api.get_collections(), 100)
+        paginator = Paginator(authoring_api.get_collections(enabled=True), 100)
         for p in paginator.page_range:
             docs = []
             for collection in paginator.page(p).object_list:
                 status_cb(
                     f"{num_contexts_done + 1}/{num_contexts}. "
-                    f"Now indexing collection {collection.name} ({collection.id})"
+                    f"Now indexing collection {collection.title} ({collection.id})"
                 )
                 try:
                     doc = searchable_doc_for_collection(collection)
