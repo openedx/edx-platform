@@ -161,6 +161,7 @@ def make_learning_mfe_courseware_url(
     strings. They're only ever used to concatenate a URL string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
+    mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
 
     mfe_link = f'{mfe_config["LEARNING_MICROFRONTEND_URL"]}/course/{course_key}'
 
