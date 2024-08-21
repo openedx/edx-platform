@@ -22,9 +22,9 @@ v1_api_urls = [
 
 urlpatterns = [
     path('students_update_enrollment', api.students_update_enrollment, name='students_update_enrollment'),
-    path('register_and_enroll_students', api.register_and_enroll_students, name='register_and_enroll_students'),
-    path('list_course_role_members', api.list_course_role_members, name='list_course_role_members'),
-    path('modify_access', api.modify_access, name='modify_access'),
+    path('register_and_enroll_students', api.RegisterAndEnrollStudents.as_view(), name='register_and_enroll_students'),
+    path('list_course_role_members', api.ListCourseRoleMembersView.as_view(), name='list_course_role_members'),
+    path('modify_access', api.ModifyAccess.as_view(), name='modify_access'),
     path('bulk_beta_modify_access', api.bulk_beta_modify_access, name='bulk_beta_modify_access'),
     path('get_problem_responses', api.get_problem_responses, name='get_problem_responses'),
     path('get_grading_config', api.get_grading_config, name='get_grading_config'),
@@ -40,7 +40,7 @@ urlpatterns = [
     path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
          name='reset_student_attempts_for_entrance_exam'),
     path('rescore_entrance_exam', api.rescore_entrance_exam, name='rescore_entrance_exam'),
-    path('list_entrance_exam_instructor_tasks', api.list_entrance_exam_instructor_tasks,
+    path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),
          name='list_entrance_exam_instructor_tasks'),
     path('mark_student_can_skip_entrance_exam', api.mark_student_can_skip_entrance_exam,
          name='mark_student_can_skip_entrance_exam'),

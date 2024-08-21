@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
@@ -442,4 +441,4 @@ def preference_update_from_encrypted_username_view(request, username, patch):
     username and patch must be string
     """
     update_user_preferences_from_patch(username, patch)
-    return HttpResponse("<!DOCTYPE html><html><body>Success</body></html>", status=status.HTTP_200_OK)
+    return Response({"result": "success"}, status=status.HTTP_200_OK)
