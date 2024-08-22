@@ -337,6 +337,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.block_id,
             Fields.content,
             Fields.tags,
+            Fields.description,
             # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
             # are searchable only if at least one document in the index has a value. If we didn't list them here and,
             # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
@@ -368,8 +369,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
         ############## Libraries ##############
         status_cb("Indexing libraries...")
-        for lib_key in lib_keys:
-            status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing library {lib_key}")
+
+        def index_library(lib_key: str) -> list:
             docs = []
             for component in lib_api.get_library_components(lib_key):
                 try:
@@ -380,54 +381,60 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing library component {component}: {err}")
-                finally:
-                    num_blocks_done += 1
             if docs:
                 try:
                     # Add all the docs in this library at once (usually faster than adding one at a time):
                     _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
                 except (TypeError, KeyError, MeilisearchError) as err:
                     status_cb(f"Error indexing library {lib_key}: {err}")
+            return docs
 
+        for lib_key in lib_keys:
+            status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing library {lib_key}")
+            lib_docs = index_library(lib_key)
+            num_blocks_done += len(lib_docs)
             num_contexts_done += 1
 
         ############## Courses ##############
         status_cb("Indexing courses...")
         # To reduce memory usage on large instances, split up the CourseOverviews into pages of 1,000 courses:
+
+        def index_course(course: CourseOverview) -> list:
+            docs = []
+            # Pre-fetch the course with all of its children:
+            course = store.get_course(course.id, depth=None)
+
+            def add_with_children(block):
+                """ Recursively index the given XBlock/component """
+                doc = searchable_doc_for_course_block(block)
+                doc.update(searchable_doc_tags(block.usage_key))
+                docs.append(doc)  # pylint: disable=cell-var-from-loop
+                _recurse_children(block, add_with_children)  # pylint: disable=cell-var-from-loop
+
+            # Index course children
+            _recurse_children(course, add_with_children)
+
+            if docs:
+                # Add all the docs in this course at once (usually faster than adding one at a time):
+                _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+            return docs
+
         paginator = Paginator(CourseOverview.objects.only('id', 'display_name'), 1000)
         for p in paginator.page_range:
             for course in paginator.page(p).object_list:
                 status_cb(
                     f"{num_contexts_done + 1}/{num_contexts}. Now indexing course {course.display_name} ({course.id})"
                 )
-                docs = []
-
-                # Pre-fetch the course with all of its children:
-                course = store.get_course(course.id, depth=None)
-
-                def add_with_children(block):
-                    """ Recursively index the given XBlock/component """
-                    doc = searchable_doc_for_course_block(block)
-                    doc.update(searchable_doc_tags(block.usage_key))
-                    docs.append(doc)  # pylint: disable=cell-var-from-loop
-                    _recurse_children(block, add_with_children)  # pylint: disable=cell-var-from-loop
-
-                # Index course children
-                _recurse_children(course, add_with_children)
-
-                if docs:
-                    # Add all the docs in this course at once (usually faster than adding one at a time):
-                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                course_docs = index_course(course)
                 num_contexts_done += 1
-                num_blocks_done += len(docs)
+                num_blocks_done += len(course_docs)
 
         ############## Collections ##############
         status_cb("Indexing collections...")
-        # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
-        paginator = Paginator(authoring_api.get_collections(enabled=True), 100)
-        for p in paginator.page_range:
+
+        def index_collection_batch(batch, num_contexts_done) -> int:
             docs = []
-            for collection in paginator.page(p).object_list:
+            for collection in batch:
                 status_cb(
                     f"{num_contexts_done + 1}/{num_contexts}. "
                     f"Now indexing collection {collection.title} ({collection.id})"
@@ -448,6 +455,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
                 except (TypeError, KeyError, MeilisearchError) as err:
                     status_cb(f"Error indexing collection batch {p}: {err}")
+            return num_contexts_done
+
+        # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
+        paginator = Paginator(authoring_api.get_collections(enabled=True), 100)
+        for p in paginator.page_range:
+            num_contexts_done = index_collection_batch(paginator.page(p).object_list, num_contexts_done)
 
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 
