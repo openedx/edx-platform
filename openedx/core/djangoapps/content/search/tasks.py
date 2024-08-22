@@ -9,9 +9,9 @@ import logging
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from edx_django_utils.monitoring import set_code_owner_attribute
+from meilisearch.errors import MeilisearchError
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from meilisearch.errors import MeilisearchError
 
 from . import api
 
@@ -81,3 +81,6 @@ def update_content_library_index_docs(library_key_str: str) -> None:
     log.info("Updating content index documents for library with id: %s", library_key)
 
     api.upsert_content_library_index_docs(library_key)
+    # Delete all documents in this library that were not published by above function
+    # as this task is also triggered on discard event.
+    api.delete_all_draft_docs_for_library(library_key)
