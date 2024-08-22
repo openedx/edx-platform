@@ -61,7 +61,7 @@ urllib3==1.26.19
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-watchdog==4.0.1
+watchdog==4.0.2
     # via -r requirements/edx/paver.in
 wrapt==1.16.0
     # via -r requirements/edx/paver.in
