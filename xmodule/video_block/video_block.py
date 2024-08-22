@@ -122,7 +122,8 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
-        ResourceTemplates, XModuleMixin, LicenseMixin):
+        ResourceTemplates, XModuleMixin, LicenseMixin,
+        XBlock):
     """
     XML source example:
         <video show_captions="true"

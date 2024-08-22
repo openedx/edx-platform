@@ -254,6 +254,7 @@ class SequenceBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):
     """
     Layout module which lays out content in a temporal sequence

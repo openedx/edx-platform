@@ -6,6 +6,7 @@ import random
 from django.utils.functional import cached_property
 from lxml import etree
 from web_fragments.fragment import Fragment
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.seq_block import SequenceMixin
@@ -27,6 +28,7 @@ class RandomizeBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):
     """
     Chooses a random child xblock. Chooses the same one every time for each student.

@@ -35,6 +35,7 @@ class AnnotatableBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):
     """
     Annotatable XBlock.

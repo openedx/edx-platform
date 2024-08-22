@@ -142,6 +142,7 @@ class ProblemBlock(
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):
     """
     An XBlock representing a "problem".

@@ -134,6 +134,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
+    XBlock,
 ):
     """
     Show the user the appropriate child.  Uses the ExperimentState

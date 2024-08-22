@@ -353,7 +353,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
 
 
 @edxnotes
-class HtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class HtmlBlock(HtmlBlockMixin, XBlock):  # lint-amnesty, pylint: disable=abstract-method
     """
     This is the actual HTML XBlock.
     Nothing extra is required; this is just a wrapper to include edxnotes support.
@@ -374,7 +374,7 @@ class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
 
 
 @XBlock.tag("detached")
-class AboutBlock(AboutFields, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class AboutBlock(AboutFields, HtmlBlockMixin, XBlock):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
@@ -409,7 +409,7 @@ class StaticTabFields:
 
 
 @XBlock.tag("detached")
-class StaticTabBlock(StaticTabFields, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class StaticTabBlock(StaticTabFields, HtmlBlockMixin, XBlock):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
@@ -435,7 +435,7 @@ class CourseInfoFields:
 
 @XBlock.tag("detached")
 @XBlock.needs('replace_urls')
-class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin, XBlock):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlock but we need to overload where the templates are located
     in order to be able to create new ones

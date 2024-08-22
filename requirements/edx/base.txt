@@ -6,6 +6,22 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/github.in
+-e git+https://github.com/kdmccormick/XBlock.git@kdmccormick/types2#egg=XBlock[django]
+    # via
+    #   -r requirements/edx/kernel.in
+    #   acid-xblock
+    #   crowdsourcehinter-xblock
+    #   done-xblock
+    #   edx-completion
+    #   edx-sga
+    #   edx-when
+    #   lti-consumer-xblock
+    #   ora2
+    #   staff-graded-xblock
+    #   xblock
+    #   xblock-drag-and-drop-v2
+    #   xblock-google-drive
+    #   xblock-utils
 acid-xblock==0.3.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.4.0
@@ -1258,22 +1274,6 @@ webob==1.8.8
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/paver.txt
-xblock[django]==4.0.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/kernel.in
-    #   acid-xblock
-    #   crowdsourcehinter-xblock
-    #   done-xblock
-    #   edx-completion
-    #   edx-sga
-    #   edx-when
-    #   lti-consumer-xblock
-    #   ora2
-    #   staff-graded-xblock
-    #   xblock-drag-and-drop-v2
-    #   xblock-google-drive
-    #   xblock-utils
 xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/bundled.in
 xblock-google-drive==0.7.0

@@ -48,6 +48,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
     XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
+    XBlock,
 ):
     """
     Word Cloud XBlock.

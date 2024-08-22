@@ -45,6 +45,7 @@ class ConditionalBlock(
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
+    XBlock,
 ):
     """
     Blocks child blocks from showing unless certain conditions are met.
