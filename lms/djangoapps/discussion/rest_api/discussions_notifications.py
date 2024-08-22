@@ -118,9 +118,10 @@ class DiscussionNotificationSender:
             self.parent_response and
             self.creator.id != int(self.thread.user_id)
         ):
+            author_name = f"{self.parent_response.username}'s"
             # use your if author of response is same as author of post.
             # use 'their' if comment author is also response author.
-            author_name = (
+            author_pronoun = (
                 # Translators: Replier commented on "your" response to your post
                 _("your")
                 if self._response_and_thread_has_same_creator()
@@ -129,10 +130,12 @@ class DiscussionNotificationSender:
                     _("their")
                     if self._response_and_comment_has_same_creator()
                     else f"{self.parent_response.username}'s"
+
                 )
             )
             context = {
                 "author_name": str(author_name),
+                "author_pronoun": str(author_pronoun),
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
@@ -189,10 +192,21 @@ class DiscussionNotificationSender:
         if not self.parent_id:
             self._send_notification(users, "response_on_followed_post")
         else:
+            author_name = f"{self.parent_response.username}'s"
+            # use 'their' if comment author is also response author.
+            author_pronoun = (
+                # Translators: Replier commented on "their" response in a post you're following
+                _("their")
+                if self._response_and_comment_has_same_creator()
+                else f"{self.parent_response.username}'s"
+            )
             self._send_notification(
                 users,
                 "comment_on_followed_post",
-                extra_context={"author_name": self.parent_response.username}
+                extra_context={
+                    "author_name": str(author_name),
+                    "author_pronoun": str(author_pronoun),
+                }
             )
 
     def _create_cohort_course_audience(self):
@@ -300,7 +314,7 @@ class DiscussionNotificationSender:
         content_type = thread_types[self.thread.type][getattr(self.thread, 'depth', 0)]
 
         context = {
-            'username': self.creator.username,
+            'username': self.thread.username,
             'content_type': content_type,
             'content': thread_body
         }
