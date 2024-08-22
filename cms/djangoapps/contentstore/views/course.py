@@ -866,6 +866,10 @@ def _create_or_rerun_course(request):
         else:
             try:
                 new_course = create_new_course(request.user, org, course, run, fields)
+                #KC create course in moodle
+                api_data = {"wstoken" : configuration_helpers.get_value("MOODLE_TOKEN", ""), "wsfunction" : "core_course_create_courses", "moodlewsrestformat" : "json", "courses[0][fullname]" : display_name, "courses[0][categoryid]" : 1, "courses[0][shortname]" : "{0}|{1}".format(course, run), "courses[0][summary]" : "", "courses[0][customfields][0][shortname]" : "sites", "courses[0][customfields][0][value]" : org, "courses[0][customfields][1][shortname]" : "instances", "courses[0][customfields][1][value]" : settings.CMS_BASE, "courses[0][startdate]" : new_course.start.strftime("%s"), "courses[0][enddate]" : new_course.end.strftime("%s") if new_course.end is not None else 0}
+                response = _api_request_to_moodle(api_data)
+                log.info("Created Course in moodle {0}".format(response))
                 return JsonResponse({
                     'url': reverse_course_url('course_handler', new_course.id),
                     'course_key': str(new_course.id),
@@ -1127,6 +1131,10 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             else:
                 try:
                     update_data = update_course_details(request, course_key, request.json, course_block)
+                    #KC to update start and end dates
+                    api_data = {"wstoken" : configuration_helpers.get_value("MOODLE_TOKEN", ""), "wsfunction" : "core_course_update_courses", "moodlewsrestformat" : "json", "courses[0][startdate]" : course_block.start.strftime('%s') if course_block.start is not None else 0, "courses[0][enddate]" : course_block.end.strftime('%s') if course_block.end is not None else 0, "courses[0][shortname]" : "{0}|{1}".format(course_block.location.course, course_block.location.run)}
+                    response = _api_request_to_moodle(api_data)
+                    log.info("Updated start and end dates in moodle {0}".format(response))
                 except DjangoValidationError as err:
                     return JsonResponseBadRequest({"error": err.message})
 
@@ -1330,6 +1338,10 @@ def update_course_advanced_settings(course_block: CourseBlock, data: Dict, user:
 
         # now update mongo
         modulestore().update_item(course_block, user.id)
+        #KC to update name
+        api_data = {"wstoken" : configuration_helpers.get_value("MOODLE_TOKEN", ""), "wsfunction" : "core_course_update_courses", "moodlewsrestformat" : "json", "courses[0][fullname]" : course_block.display_name, "courses[0][shortname]" : "{0}|{1}".format(course_block.location.course, course_block.location.run)}
+        response = _api_request_to_moodle(api_data)
+        log.info("Updated shortname {0}".format(response))
 
         return updated_data
 
@@ -1894,4 +1906,8 @@ def extras_get_moodle_login_url(request):
     login_link = json.loads(response.text)["loginurl"]
     log.info(login_link)
     return redirect(login_link)
+
+
+def _api_request_to_moodle(request_body):
+    return requests.request("POST", configuration_helpers.get_value("MOODLE_URL") + "/webservice/rest/server.php", headers = {  'content-type': "text/plain" }, params = request_body).text
 
