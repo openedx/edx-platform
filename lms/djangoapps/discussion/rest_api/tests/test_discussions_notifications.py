@@ -137,7 +137,7 @@ class TestCleanThreadHtmlBody(unittest.TestCase):
         """ * 20  # Repeat to exceed 500 characters
 
         result = clean_thread_html_body(html_body)
-        self.assertEqual(len(result) <= 500)
+        self.assertGreaterEqual(500, len(result))
 
     def test_no_tags_to_remove(self):
         """
