@@ -1549,9 +1549,8 @@ webob==1.8.8
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/base.txt
-xblock[django]==4.0.1
+xblock[django]==5.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   acid-xblock
     #   crowdsourcehinter-xblock
