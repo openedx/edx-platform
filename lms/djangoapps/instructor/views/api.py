@@ -2514,8 +2514,6 @@ class ReportDownloads(DeveloperErrorViewMixin, APIView):
         return _list_report_downloads(request=request, course_id=course_id)
 
 
-@require_POST
-@ensure_csrf_cookie
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class ListReportDownloads(APIView):
 
