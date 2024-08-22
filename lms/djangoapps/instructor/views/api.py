@@ -2853,11 +2853,7 @@ class UpdateForumRoleMembership(APIView):
 
         user = serializer_data.validated_data.get('unique_student_identifier')
         if not user:
-            response_payload = {
-                'unique_student_identifier': request.data.get('unique_student_identifier'),
-                'userDoesNotExist': True,
-            }
-            return JsonResponse(response_payload)
+            return JsonResponse({'error': 'User does not exist.'}, status=400)
 
         rolename = serializer_data.data['rolename']
         action = serializer_data.data['action']
