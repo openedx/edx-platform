@@ -1881,6 +1881,9 @@ def get_course_discussion_user_stats(
 
     course_stats_response = get_course_user_stats(course_key, params)
 
+    for user_stat in course_stats_response["user_stats"]:
+        user_stat["user_first_name"] = get_user_first_name(user_stat["username"])
+
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(
             course_stats_response["user_stats"],
@@ -1904,6 +1907,12 @@ def get_course_discussion_user_stats(
         "results": serializer.data,
     })
 
+def get_user_first_name(username: str) -> str:
+    try:
+        user = User.objects.get(username=username)
+        return user.first_name
+    except User.DoesNotExist:
+        return ""
 
 def get_users_without_stats(
     username_search_string,
