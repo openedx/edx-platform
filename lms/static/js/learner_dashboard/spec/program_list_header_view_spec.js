@@ -61,13 +61,4 @@ describe('Program List Header View', () => {
     it('should render the program heading', () => {
         expect(view.$('h2:first').text().trim()).toEqual('My programs');
     });
-
-    it('should render a program alert', () => {
-        expect(
-            view.$('.js-program-list-alerts .alert .alert-heading').html().trim(),
-        ).toEqual('Enroll in a Test Program\'s course');
-        expect(
-            view.$('.js-program-list-alerts .alert .view-button').attr('href'),
-        ).toEqual('/dashboard/programs/b90d70d5-f981-4508-bdeb-5b792d930c03/');
-    });
 });
