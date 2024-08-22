@@ -2870,12 +2870,6 @@ class UpdateForumRoleMembership(APIView):
         if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
             return HttpResponseBadRequest("Operation requires instructor access.")
 
-        if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                            FORUM_ROLE_COMMUNITY_TA]:
-            return HttpResponseBadRequest(strip_tags(
-                f"Unrecognized rolename '{rolename}'."
-            ))
-
         if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
             CourseEnrollment.enroll(user, course_id)
         try:
