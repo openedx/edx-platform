@@ -2814,17 +2814,8 @@ def send_email(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EDIT_FORUM_ROLES)
-@require_post_params(
-    unique_student_identifier="email or username of user to change access",
-    rolename="the forum role",
-    action="'allow' or 'revoke'",
-)
-@common_exceptions_400
-def update_forum_role_membership(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class UpdateForumRoleMembership(APIView):
     """
     Modify user's forum role.
 
@@ -2833,52 +2824,72 @@ def update_forum_role_membership(request, course_id):
         which is limited to instructors.
     No one can revoke an instructors FORUM_ROLE_ADMINISTRATOR status.
 
-    Query parameters:
-    - `email` is the target users email
-    - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_GROUP_MODERATOR,
-        FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
-    - `action` is one of ['allow', 'revoke']
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
-    has_forum_admin = has_forum_access(
-        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EDIT_FORUM_ROLES
+    serializer_class = AccessSerializer
 
-    unique_student_identifier = request.POST.get('unique_student_identifier')
-    rolename = request.POST.get('rolename')
-    action = request.POST.get('action')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handles role modification requests for a forum user.
 
-    # default roles require either (staff & forum admin) or (instructor)
-    if not (has_forum_admin or has_instructor_access):
-        return HttpResponseBadRequest(
-            "Operation requires staff & forum admin or instructor access"
+        Query parameters:
+        - `email` is the target users email
+        - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_GROUP_MODERATOR,
+            FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+        - `action` is one of ['allow', 'revoke']
+        """
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_id)
+        has_instructor_access = has_access(request.user, 'instructor', course)
+        has_forum_admin = has_forum_access(
+            request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         )
 
-    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-        return HttpResponseBadRequest("Operation requires instructor access.")
+        serializer_data = AccessSerializer(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                        FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest(strip_tags(
-            f"Unrecognized rolename '{rolename}'."
-        ))
+        user = serializer_data.validated_data.get('unique_student_identifier')
+        if not user:
+            response_payload = {
+                'unique_student_identifier': request.data.get('unique_student_identifier'),
+                'userDoesNotExist': True,
+            }
+            return JsonResponse(response_payload)
 
-    user = get_student_from_identifier(unique_student_identifier)
-    if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
-        CourseEnrollment.enroll(user, course_id)
-    try:
-        update_forum_role(course_id, user, rolename, action)
-    except Role.DoesNotExist:
-        return HttpResponseBadRequest("Role does not exist.")
+        rolename = serializer_data.data['rolename']
+        action = serializer_data.data['action']
 
-    response_payload = {
-        'course_id': str(course_id),
-        'action': action,
-    }
-    return JsonResponse(response_payload)
+        # default roles require either (staff & forum admin) or (instructor)
+        if not (has_forum_admin or has_instructor_access):
+            return HttpResponseBadRequest(
+                "Operation requires staff & forum admin or instructor access"
+            )
+
+        # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
+        if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+            return HttpResponseBadRequest("Operation requires instructor access.")
+
+        if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
+                            FORUM_ROLE_COMMUNITY_TA]:
+            return HttpResponseBadRequest(strip_tags(
+                f"Unrecognized rolename '{rolename}'."
+            ))
+
+        if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
+            CourseEnrollment.enroll(user, course_id)
+        try:
+            update_forum_role(course_id, user, rolename, action)
+        except Role.DoesNotExist:
+            return HttpResponseBadRequest("Role does not exist.")
+
+        response_payload = {
+            'course_id': str(course_id),
+            'action': action,
+        }
+        return JsonResponse(response_payload)
 
 
 @require_POST
