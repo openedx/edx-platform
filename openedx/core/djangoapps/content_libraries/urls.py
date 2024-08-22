@@ -20,7 +20,9 @@ import_blocks_router = routers.DefaultRouter()
 import_blocks_router.register(r'tasks', views.LibraryImportTaskViewSet, basename='import-block-task')
 
 library_collections_router = routers.DefaultRouter()
-library_collections_router.register(r'collections', collection_views.LibraryCollectionsView, basename="library-collections")
+library_collections_router.register(
+    r'collections', collection_views.LibraryCollectionsView, basename="library-collections"
+)
 
 # These URLs are only used in Studio. The LMS already provides all the
 # API endpoints needed to serve XBlocks from content libraries using the
