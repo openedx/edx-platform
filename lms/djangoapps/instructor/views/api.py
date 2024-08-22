@@ -105,7 +105,9 @@ from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
-from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer, AccessSerializer
+from lms.djangoapps.instructor.views.serializer import (
+    RoleNameSerializer, UserSerializer, AccessSerializer, UpdateForumRoleMembershipSerializer
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -2827,7 +2829,7 @@ class UpdateForumRoleMembership(APIView):
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.EDIT_FORUM_ROLES
-    serializer_class = AccessSerializer
+    serializer_class = UpdateForumRoleMembershipSerializer
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
@@ -2847,7 +2849,7 @@ class UpdateForumRoleMembership(APIView):
             request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         )
 
-        serializer_data = AccessSerializer(data=request.data)
+        serializer_data = UpdateForumRoleMembershipSerializer(data=request.data)
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
 

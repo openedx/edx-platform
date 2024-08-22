@@ -4,9 +4,16 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from .tools import get_student_from_identifier
 
 from lms.djangoapps.instructor.access import ROLES
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR
+)
+
+from .tools import get_student_from_identifier
 
 
 class RoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -59,3 +66,25 @@ class AccessSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class UpdateForumRoleMembershipSerializer(AccessSerializer):
+    """
+    Serializer for managing user's forum role.
+
+    This serializer extends the AccessSerializer to allow for different action
+    choices specific to this API. It validates and processes the data required
+    to modify user access within a system.
+
+    Attributes:
+        unique_student_identifier (str): The email or username of the user whose access is being modified.
+        rolename (str): The role name to assign to the user.
+        action (str): The specific action to perform on the user's access, with options 'activate' or 'deactivate'.
+    """
+    rolename = serializers.ChoiceField(
+        choices=[
+            FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+        ],
+        help_text="Rolename assign to given user."
+    )
