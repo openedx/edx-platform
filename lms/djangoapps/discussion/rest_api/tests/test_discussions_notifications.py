@@ -6,7 +6,6 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 import pytest
-from bs4 import BeautifulSoup
 
 from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender, \
     clean_thread_html_body
@@ -138,7 +137,7 @@ class TestCleanThreadHtmlBody(unittest.TestCase):
         """ * 20  # Repeat to exceed 500 characters
 
         result = clean_thread_html_body(html_body)
-        self.assertTrue(len(result) <= 500)
+        self.assertEqual(len(result) <= 500)
 
     def test_no_tags_to_remove(self):
         """
