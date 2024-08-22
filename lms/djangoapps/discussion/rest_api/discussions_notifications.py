@@ -2,7 +2,6 @@
 Discussion notifications sender util.
 """
 import re
-from lib2to3.fixes.fix_input import context
 
 from bs4 import BeautifulSoup
 from django.conf import settings
