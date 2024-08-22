@@ -156,6 +156,9 @@ class ContentLibraryMetadata:
     version = attr.ib(0)
     type = attr.ib(default=COMPLEX)
     last_published = attr.ib(default=None, type=datetime)
+    last_draft_created = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib(default=None, type=datetime)
+    published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     # has_unpublished_deletes will be true when the draft version of the library's bundle
     # contains deletes of any XBlocks that were in the most recently published version
@@ -168,6 +171,8 @@ class ContentLibraryMetadata:
     # Studio, use it in their courses, and copy content out of this library.
     allow_public_read = attr.ib(False)
     license = attr.ib("")
+    created = attr.ib(default=None, type=datetime)
+    updated = attr.ib(default=None, type=datetime)
 
 
 class AccessLevel:
@@ -206,7 +211,7 @@ class LibraryXBlockMetadata:
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
-        last_publish_log = authoring_api.get_last_publish(component.pk)
+        last_publish_log = component.versioning.last_publish_log
 
         return cls(
             usage_key=LibraryUsageLocatorV2(
@@ -350,8 +355,11 @@ def get_library(library_key):
     learning_package = ref.learning_package
     num_blocks = authoring_api.get_all_drafts(learning_package.id).count()
     last_publish_log = authoring_api.get_last_publish(learning_package.id)
-    has_unpublished_changes = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
-                                           .exists()
+    last_draft_log = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
+        .order_by('-created').first()
+    last_draft_created = last_draft_log.created if last_draft_log else None
+    last_draft_created_by = last_draft_log.created_by.username if last_draft_log and last_draft_log.created_by else None
+    has_unpublished_changes = last_draft_log is not None
 
     # TODO: I'm doing this one to match already-existing behavior, but this is
     # something that we should remove. It exists to accomodate some complexities
@@ -377,6 +385,9 @@ def get_library(library_key):
     # libraries. The top level version stays for now because LibraryContentBlock
     # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
+    published_by = None
+    if last_publish_log and last_publish_log.published_by:
+        published_by = last_publish_log.published_by.username
 
     return ContentLibraryMetadata(
         key=library_key,
@@ -386,12 +397,17 @@ def get_library(library_key):
         num_blocks=num_blocks,
         version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
+        published_by=published_by,
+        last_draft_created=last_draft_created,
+        last_draft_created_by=last_draft_created_by,
         allow_lti=ref.allow_lti,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
         has_unpublished_deletes=has_unpublished_deletes,
         license=ref.license,
+        created=learning_package.created,
+        updated=learning_package.updated,
     )
 
 
@@ -735,27 +751,30 @@ def set_library_block_olx(usage_key, new_olx_str):
     )
 
 
-def create_library_block(library_key, block_type, definition_id):
+def validate_can_add_block_to_library(
+    library_key: LibraryLocatorV2,
+    block_type: str,
+    block_id: str,
+) -> tuple[ContentLibrary, LibraryUsageLocatorV2]:
     """
-    Create a new XBlock in this library of the specified type (e.g. "html").
-    """
-    # It's in the serializer as ``definition_id``, but for our purposes, it's
-    # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
-    # more details. TODO: Change the param name once we change the serializer.
-    block_id = definition_id
+    Perform checks to validate whether a new block with `block_id` and type `block_type` can be added to
+    the library with key `library_key`.
 
+    Returns the ContentLibrary that has the passed in `library_key` and  newly created LibraryUsageLocatorV2 if
+    validation successful, otherwise raises errors.
+    """
     assert isinstance(library_key, LibraryLocatorV2)
-    ref = ContentLibrary.objects.get_by_key(library_key)
-    if ref.type != COMPLEX:
-        if block_type != ref.type:
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    if content_library.type != COMPLEX:
+        if block_type != content_library.type:
             raise IncompatibleTypesError(
                 _('Block type "{block_type}" is not compatible with library type "{library_type}".').format(
-                    block_type=block_type, library_type=ref.type,
+                    block_type=block_type, library_type=content_library.type,
                 )
             )
 
     # If adding a component would take us over our max, return an error.
-    component_count = authoring_api.get_all_drafts(ref.learning_package.id).count()
+    component_count = authoring_api.get_all_drafts(content_library.learning_package.id).count()
     if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
             _("Library cannot have more than {} Components").format(
@@ -768,7 +787,7 @@ def create_library_block(library_key, block_type, definition_id):
     # Ensure the XBlock type is valid and installed:
     XBlock.load_class(block_type)  # Will raise an exception if invalid
     # Make sure the new ID is not taken already:
-    usage_key = LibraryUsageLocatorV2(
+    usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
         lib_key=library_key,
         block_type=block_type,
         usage_id=block_id,
@@ -777,12 +796,26 @@ def create_library_block(library_key, block_type, definition_id):
     if _component_exists(usage_key):
         raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
 
-    _create_component_for_block(ref, usage_key)
+    return content_library, usage_key
+
+
+def create_library_block(library_key, block_type, definition_id, user_id=None):
+    """
+    Create a new XBlock in this library of the specified type (e.g. "html").
+    """
+    # It's in the serializer as ``definition_id``, but for our purposes, it's
+    # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
+    # more details. TODO: Change the param name once we change the serializer.
+    block_id = definition_id
+
+    content_library, usage_key = validate_can_add_block_to_library(library_key, block_type, block_id)
+
+    _create_component_for_block(content_library, usage_key, user_id)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
-            library_key=ref.library_key,
+            library_key=content_library.library_key,
             usage_key=usage_key
         )
     )
@@ -804,6 +837,46 @@ def _component_exists(usage_key: UsageKeyV2) -> bool:
     return True
 
 
+def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user, block_id) -> XBlock:
+    """
+    Create a new library block and populate it with staged content from clipboard
+
+    Returns the newly created library block
+    """
+    from openedx.core.djangoapps.content_staging import api as content_staging_api
+    if not content_staging_api:
+        raise RuntimeError("The required content_staging app is not installed")
+
+    user_clipboard = content_staging_api.get_user_clipboard(user)
+    if not user_clipboard:
+        return None
+
+    olx_str = content_staging_api.get_staged_content_olx(user_clipboard.content.id)
+
+    # TODO: Handle importing over static assets
+
+    content_library, usage_key = validate_can_add_block_to_library(
+        library_key,
+        user_clipboard.content.block_type,
+        block_id
+    )
+
+    # Create component for block then populate it with clipboard data
+    _create_component_for_block(content_library, usage_key, user.id)
+    set_library_block_olx(usage_key, olx_str)
+
+    # Emit library block created event
+    LIBRARY_BLOCK_CREATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=content_library.library_key,
+            usage_key=usage_key
+        )
+    )
+
+    # Now return the metadata about the new block
+    return get_library_block(usage_key)
+
+
 def get_or_create_olx_media_type(block_type: str) -> MediaType:
     """
     Get or create a MediaType for the block type.
@@ -816,7 +889,7 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def _create_component_for_block(content_lib, usage_key):
+def _create_component_for_block(content_lib, usage_key, user_id=None):
     """
     Create a Component for an XBlock type, and initialize it.
 
@@ -847,7 +920,7 @@ def _create_component_for_block(content_lib, usage_key):
             local_key=usage_key.block_id,
             title=display_name,
             created=now,
-            created_by=None,
+            created_by=user_id,
         )
         content = authoring_api.get_or_create_text_content(
             learning_package.id,
@@ -951,13 +1024,13 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     return info
 
 
-def publish_changes(library_key):
+def publish_changes(library_key, user_id=None):
     """
     Publish all pending changes to the specified library.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
 
-    authoring_api.publish_all_drafts(learning_package.id)
+    authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(

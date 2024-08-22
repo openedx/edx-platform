@@ -642,6 +642,25 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             last_name='Student'
         )
 
+    def test_api_without_login(self):
+        """
+        verify in case of no authentication it returns 401.
+        """
+        self.client.logout()
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        assert response.status_code == 401
+
+    def test_api_without_permission(self):
+        """
+        verify in case of no authentication it returns 403.
+        """
+        # removed role from course for instructor
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        assert response.status_code == 403
+
     @patch('lms.djangoapps.instructor.views.api.log.info')
     @ddt.data(
         b"test_student@example.com,test_student_1,tester1,USA",  # Typical use case.
@@ -2945,7 +2964,37 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, data)
         assert response.status_code == 200
         res_json = json.loads(response.content.decode('utf-8'))
-        assert 'progress_url' in res_json
+        expected_data = {
+            'course_id': str(self.course.id),
+            'progress_url': f'/courses/{self.course.id}/progress/{self.students[0].id}/'
+        }
+
+        for key, value in expected_data.items():
+            self.assertIn(key, res_json)
+            self.assertEqual(res_json[key], value)
+
+    def test_get_student_progress_url_response_headers(self):
+        """
+        Test that the progress_url endpoint returns the correct headers.
+        """
+        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        data = {'unique_student_identifier': self.students[0].email}
+        response = self.client.post(url, data)
+        assert response.status_code == 200
+
+        expected_headers = {
+            'Allow': 'POST, OPTIONS',  # drf view brings this key.
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Content-Language': 'en',
+            'Content-Length': str(len(response.content.decode('utf-8'))),
+            'Content-Type': 'application/json',
+            'Vary': 'Cookie, Accept-Language, origin',
+            'X-Frame-Options': 'DENY'
+        }
+
+        for key, value in expected_headers.items():
+            self.assertIn(key, response.headers)
+            self.assertEqual(response.headers[key], value)
 
     def test_get_student_progress_url_from_uname(self):
         """ Test that progress_url is in the successful response. """
@@ -2955,6 +3004,14 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         assert response.status_code == 200
         res_json = json.loads(response.content.decode('utf-8'))
         assert 'progress_url' in res_json
+        expected_data = {
+            'course_id': str(self.course.id),
+            'progress_url': f'/courses/{self.course.id}/progress/{self.students[0].id}/'
+        }
+
+        for key, value in expected_data.items():
+            self.assertIn(key, res_json)
+            self.assertEqual(res_json[key], value)
 
     def test_get_student_progress_url_noparams(self):
         """ Test that the endpoint 404's without the required query params. """
@@ -2967,6 +3024,17 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url)
         assert response.status_code == 400
+
+    def test_get_student_progress_url_without_permissions(self):
+        """ Test that progress_url returns 403 without credentials. """
+
+        # removed both roles from courses for instructor
+        CourseDataResearcherRole(self.course.id).remove_users(self.instructor)
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        data = {'unique_student_identifier': self.students[0].email}
+        response = self.client.post(url, data)
+        assert response.status_code == 403
 
 
 class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):

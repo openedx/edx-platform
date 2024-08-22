@@ -12,6 +12,12 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
+# Date: 2024-08-21
+# Description: This is the major upgrade of algoliasearch python client and it will
+# break one of the edX' platform plugin, so we need to make that compatible first.
+# Ticket: https://github.com/openedx/edx-platform/issues/35334
+algoliasearch<4.0.0
+
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
 celery>=5.2.2,<6.0.0
@@ -20,7 +26,7 @@ celery>=5.2.2,<6.0.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.21.9
+edx-enterprise==4.23.9
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -87,7 +93,7 @@ libsass==0.10.0
 click==8.1.6
 
 # pinning this version to avoid updates while the library is being developed
-openedx-learning==0.10.0
+openedx-learning==0.10.1
 
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
 openai<=0.28.1
@@ -130,3 +136,13 @@ numpy<2.0.0
 # Two lines were added in 1.14.4 that make file_exists_in_storage function always return False,
 # as the default value of AWS_S3_FILE_OVERWRITE is True
 django-storages<1.14.4
+
+# social-auth-app-django 5.4.2 introduces a new migration that will not play nicely with large installations. This will touch
+# user tables, which are quite large, especially on instances like edx.org.
+# We are pinning this until after all the smaller migrations get handled and then we can migrate this all at once.
+# Ticket to unpin: https://github.com/edx/edx-arch-experiments/issues/760
+social-auth-app-django<=5.4.1
+
+# Xblock==5.0.0 changed how entrypoints were loaded, breaking a workaround for overriding blocks.
+# See ticket: https://github.com/openedx/XBlock/issues/777
+xblock[django]==4.0.1
