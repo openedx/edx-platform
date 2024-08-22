@@ -2362,13 +2362,8 @@ def _list_instructor_tasks(request, course_id):
     """
     course_id = CourseKey.from_string(course_id)
     params = getattr(request, 'query_params', request.POST)
-
     problem_location_str = strip_if_string(params.get('problem_location_str', False))
     student = params.get('unique_student_identifier', None)
-
-    if not student and not problem_location_str:    # DRF is not receiving data as query_params:QueryDict
-        problem_location_str = strip_if_string(request.data.get('problem_location_str'))
-        student = request.data.get('unique_student_identifier')
 
     if student is not None:
         student = get_student_from_identifier(student)
