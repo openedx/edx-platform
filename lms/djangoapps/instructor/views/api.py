@@ -2666,12 +2666,8 @@ def problem_grade_report(request, course_id):
     return JsonResponse({"status": success_status})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_FORUM_MEMBERS)
-@require_post_params('rolename')
-def list_forum_members(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListForumMembers(APIView):
     """
     Lists forum members of a certain rolename.
     Limited to staff access.
@@ -2682,59 +2678,64 @@ def list_forum_members(request, course_id):
 
     Takes query parameter `rolename`.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
-    has_forum_admin = has_forum_access(
-        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_FORUM_MEMBERS
 
-    rolename = request.POST.get('rolename')
-
-    # default roles require either (staff & forum admin) or (instructor)
-    if not (has_forum_admin or has_instructor_access):
-        return HttpResponseBadRequest(
-            "Operation requires staff & forum admin or instructor access"
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_id)
+        has_instructor_access = has_access(request.user, 'instructor', course)
+        has_forum_admin = has_forum_access(
+            request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         )
 
-    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-        return HttpResponseBadRequest("Operation requires instructor access.")
+        rolename = request.POST.get('rolename')
 
-    # filter out unsupported for roles
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                        FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest(strip_tags(
-            f"Unrecognized rolename '{rolename}'."
-        ))
+        # default roles require either (staff & forum admin) or (instructor)
+        if not (has_forum_admin or has_instructor_access):
+            return HttpResponseBadRequest(
+                "Operation requires staff & forum admin or instructor access"
+            )
 
-    try:
-        role = Role.objects.get(name=rolename, course_id=course_id)
-        users = role.users.all().order_by('username')
-    except Role.DoesNotExist:
-        users = []
+        # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
+        if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+            return HttpResponseBadRequest("Operation requires instructor access.")
 
-    course_discussion_settings = CourseDiscussionSettings.get(course_id)
+        # filter out unsupported for roles
+        if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
+                            FORUM_ROLE_COMMUNITY_TA]:
+            return HttpResponseBadRequest(strip_tags(
+                f"Unrecognized rolename '{rolename}'."
+            ))
 
-    def extract_user_info(user):
-        """ Convert user to dict for json rendering. """
-        group_id = get_group_id_for_user(user, course_discussion_settings)
-        group_name = get_group_name(group_id, course_discussion_settings)
+        try:
+            role = Role.objects.get(name=rolename, course_id=course_id)
+            users = role.users.all().order_by('username')
+        except Role.DoesNotExist:
+            users = []
 
-        return {
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'group_name': group_name,
+        course_discussion_settings = CourseDiscussionSettings.get(course_id)
+
+        def extract_user_info(user):
+            """ Convert user to dict for json rendering. """
+            group_id = get_group_id_for_user(user, course_discussion_settings)
+            group_name = get_group_name(group_id, course_discussion_settings)
+
+            return {
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'group_name': group_name,
+            }
+
+        response_payload = {
+            'course_id': str(course_id),
+            rolename: list(map(extract_user_info, users)),
+            'division_scheme': course_discussion_settings.division_scheme,
         }
-
-    response_payload = {
-        'course_id': str(course_id),
-        rolename: list(map(extract_user_info, users)),
-        'division_scheme': course_discussion_settings.division_scheme,
-    }
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
