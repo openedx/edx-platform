@@ -105,7 +105,9 @@ from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
-from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer, AccessSerializer
+from lms.djangoapps.instructor.views.serializer import (
+    RoleNameSerializer, UserSerializer, AccessSerializer, ForumRoleNameSerializer
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -2680,17 +2682,21 @@ class ListForumMembers(APIView):
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.VIEW_FORUM_MEMBERS
+    serializer_class = ForumRoleNameSerializer
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
+
+        role_serializer = ForumRoleNameSerializer(data=request.data)
+        role_serializer.is_valid(raise_exception=True)
+        rolename = role_serializer.data['rolename']
+
         course_id = CourseKey.from_string(course_id)
         course = get_course_by_id(course_id)
         has_instructor_access = has_access(request.user, 'instructor', course)
         has_forum_admin = has_forum_access(
             request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         )
-
-        rolename = request.POST.get('rolename')
 
         # default roles require either (staff & forum admin) or (instructor)
         if not (has_forum_admin or has_instructor_access):
@@ -2737,6 +2743,8 @@ class ListForumMembers(APIView):
         }
         return JsonResponse(response_payload)
 
+    # def get(self, request, *args, **kwargs):
+    #     raise MethodNotAllowed(method='GET')
 
 @transaction.non_atomic_requests
 @require_POST

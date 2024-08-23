@@ -4,9 +4,16 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from .tools import get_student_from_identifier
 
 from lms.djangoapps.instructor.access import ROLES
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR
+)
+
+from .tools import get_student_from_identifier
 
 
 class RoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -59,3 +66,21 @@ class AccessSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class ForumRoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer for forum rolename.
+    """
+
+    rolename = serializers.CharField(help_text=_("Role name"))
+
+    def validate_rolename(self, value):
+        """
+        Check that the rolename is valid.
+        """
+        if value not in [
+            FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_MODERATOR
+        ]:
+            raise ValidationError(_("Invalid role name."))
+        return value
