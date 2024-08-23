@@ -641,7 +641,7 @@ class DeactivateLogoutView(APIView):
         if user and LoginFailures.is_feature_enabled():
             if LoginFailures.is_user_locked_out(user):
                 raise AuthFailedError(
-                    _("This account has been temporarily locked due " "to excessive login failures. Try again later.")
+                    _("This account has been temporarily locked due to excessive login failures. Try again later.")
                 )
 
     def _handle_failed_authentication(self, user):
