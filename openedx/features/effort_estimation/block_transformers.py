@@ -128,8 +128,8 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
         # Skip any transformation if our collection phase said to
         cls = EffortEstimationTransformer
-        if block_structure.get_transformer_data(cls, cls.DISABLE_ESTIMATION, default=False):
-            return
+        #if block_structure.get_transformer_data(cls, cls.DISABLE_ESTIMATION, default=False):
+        #    return
 
         # These estimation methods should return a tuple of (a number in seconds, an activity count)
         estimations = {
