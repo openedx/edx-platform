@@ -2360,10 +2360,20 @@ def _list_instructor_tasks(request, course_id):
 
     Internal function with common code for both DRF and and tradition views.
     """
+    # This method is also used by other APIs with the GET method.
+    # The query_params attribute is utilized for GET requests,
+    # where parameters are passed as query strings.
+
     course_id = CourseKey.from_string(course_id)
     params = getattr(request, 'query_params', request.POST)
     problem_location_str = strip_if_string(params.get('problem_location_str', False))
     student = params.get('unique_student_identifier', None)
+
+    # For the DRF POST method, retrieve the data from request.data
+    if not student and not problem_location_str:
+        params = getattr(request, 'data', request.POST)
+        problem_location_str = strip_if_string(params.get('problem_location_str'))
+        student = params.get('unique_student_identifier')
 
     if student is not None:
         student = get_student_from_identifier(student)
