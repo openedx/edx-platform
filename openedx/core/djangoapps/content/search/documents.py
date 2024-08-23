@@ -307,7 +307,7 @@ def searchable_doc_for_collection(collection) -> dict:
             Fields.org: org,
         })
     except LearningPackage.contentlibrary.RelatedObjectDoesNotExist:
-        log.warning(f"Related library not found for collection: {collection.title} <{collection.id}>")
+        log.warning(f"Related library not found for {collection}")
     doc[Fields.access_id] = _meili_access_id_from_context_key(doc[Fields.context_key])
     # Add the breadcrumbs.
     doc[Fields.breadcrumbs] = [{"display_name": collection.learning_package.title}]
