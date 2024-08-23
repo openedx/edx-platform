@@ -78,7 +78,6 @@ Attributes:
         required=False
     )
     problem_location_str = serializers.CharField(
-        max_length=255,
         help_text="Problem location",
         required=False
     )
