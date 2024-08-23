@@ -331,7 +331,7 @@ def get_metadata(queryset, text_search=None):
     return libraries
 
 
-def require_permission_for_library_key(library_key, user, permission):
+def require_permission_for_library_key(library_key, user, permission) -> ContentLibrary:
     """
     Given any of the content library permission strings defined in
     openedx.core.djangoapps.content_libraries.permissions,
@@ -341,9 +341,11 @@ def require_permission_for_library_key(library_key, user, permission):
     Raises django.core.exceptions.PermissionDenied if the user doesn't have
     permission.
     """
-    library_obj = ContentLibrary.objects.get_by_key(library_key)
+    library_obj = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     if not user.has_perm(permission, obj=library_obj):
         raise PermissionDenied
+
+    return library_obj
 
 
 def get_library(library_key):
