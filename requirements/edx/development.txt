@@ -1372,7 +1372,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.11.1
+openedx-learning @ git+https://github.com/openedx/openedx-learning/@jill/collection-components
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
