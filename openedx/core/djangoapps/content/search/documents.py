@@ -13,6 +13,7 @@ from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx_learning.api.authoring_models import LearningPackage
 
 log = logging.getLogger(__name__)
 
@@ -298,13 +299,15 @@ def searchable_doc_for_collection(collection) -> dict:
         Fields.context_key: collection.learning_package.key,
     }
     # Just in case learning_package is not related to a library
-    if hasattr(collection.learning_package, 'contentlibrary'):
+    try:
         context_key = collection.learning_package.contentlibrary.library_key
         org = str(context_key.org)
         doc.update({
             Fields.context_key: str(context_key),
             Fields.org: org,
         })
+    except LearningPackage.contentlibrary.RelatedObjectDoesNotExist:
+        log.warning(f"Related library not found for collection: {collection.title} <{collection.id}>")
     doc[Fields.access_id] = _meili_access_id_from_context_key(doc[Fields.context_key])
     # Add the breadcrumbs.
     doc[Fields.breadcrumbs] = [{"display_name": collection.learning_package.title}]
