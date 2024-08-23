@@ -2372,8 +2372,8 @@ def _list_instructor_tasks(request, course_id):
     # For the DRF POST method, retrieve the data from request.data
     if not student and not problem_location_str:
         params = getattr(request, 'data', request.POST)
-        problem_location_str = strip_if_string(params.get('problem_location_str'))
-        student = params.get('unique_student_identifier')
+        problem_location_str = strip_if_string(params.get('problem_location_str', False))
+        student = params.get('unique_student_identifier', None)
 
     if student is not None:
         student = get_student_from_identifier(student)
