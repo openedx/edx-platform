@@ -143,6 +143,8 @@ iframe[seamless] {
 }
 
 .inline-error {
+  // TODO: Replace with following in the compiled CSS
+  // color: darken(var(--error-color), 11%);
   color: darken($error-color, 11%);
 }
 
@@ -1239,6 +1241,8 @@ div.problem {
 
   div.capa_reset {
     padding: 25px;
+    // TODO: Replace with following in the compiled CSS
+    // background-color: lighten(var(--error-color), 25%);
     background-color: lighten($error-color, 25%);
     border: 1px solid var(--error-color);
     border-radius: 3px;
