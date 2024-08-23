@@ -605,7 +605,7 @@
                             state.videoCaption.playing = true;
                             $('.subtitles-menu span[data-index]:first')
                                 .parent()
-                                .attr('aria-current', 'true')
+                                
                                 .addClass('current');
                             $('.subtitles-menu').trigger(jQuery.Event('mouseout'));
                         });
@@ -981,7 +981,7 @@
             describe('when the index is not the same', function() {
                 beforeEach(function() {
                     state.videoCaption.currentIndex = 1;
-                    $('.subtitles li span[data-index=5]').attr('aria-current', 'true').addClass('current');
+                    $('.subtitles li span[data-index=5]').addClass('current');
                     state.videoCaption.updatePlayTime(25.000);
                 });
 
@@ -1007,7 +1007,7 @@
             describe('when the index is the same', function() {
                 it('does not change current subtitle', function() {
                     state.videoCaption.currentIndex = 1;
-                    $('.subtitles li span[data-index=3]').attr('aria-current', 'true').addClass('current');
+                    $('.subtitles li span[data-index=3]').addClass('current');
                     state.videoCaption.updatePlayTime(15.000);
                     expect($('.subtitles li span[data-index=3]'))
                         .toHaveClass('current');
@@ -1022,7 +1022,7 @@
                 jasmine.waitUntil(function() {
                     return state.videoCaption.rendered;
                 }).then(function() {
-                    $('.subtitles li span[data-index=1]').attr('aria-current', 'true').addClass('current');
+                    $('.subtitles li span[data-index=1]').addClass('current');
                     state.videoCaption.onResize();
                 }).always(done);
             });
@@ -1098,7 +1098,7 @@
                 it('does not scroll the transcript', function() {
                     runs(function() {
                         state.videoCaption.frozen = true;
-                        $('.subtitles li span[data-index=1]').attr('aria-current', 'true').addClass('current');
+                        $('.subtitles li span[data-index=1]').addClass('current');
                         state.videoCaption.scrollCaption();
                         expect($.fn.scrollTo).not.toHaveBeenCalled();
                     });
@@ -1124,7 +1124,7 @@
                 describe('when there is a current transcript', function() {
                     it('scroll to current transcript', function() {
                         runs(function() {
-                            $('.subtitles li span[data-index=1]').attr('aria-current', 'true').addClass('current');
+                            $('.subtitles li span[data-index=1]').addClass('current');
                             state.videoCaption.scrollCaption();
                             expect($.fn.scrollTo).toHaveBeenCalled();
                         });
@@ -1183,7 +1183,7 @@
         describe('toggleTranscript', function() {
             beforeEach(function() {
                 state = jasmine.initializePlayer();
-                $('.subtitles li span[data-index=1]').attr('aria-current', 'true').addClass('current');
+                $('.subtitles li span[data-index=1]').addClass('current');
             });
 
             describe('when the transcript is visible', function() {
