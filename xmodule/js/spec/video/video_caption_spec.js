@@ -1183,7 +1183,7 @@
         describe('toggleTranscript', function() {
             beforeEach(function() {
                 state = jasmine.initializePlayer();
-                $('.subtitles li span[data-index=1]'.attr('aria-current', 'true').addClass('current');
+                $('.subtitles li span[data-index=1]').attr('aria-current', 'true').addClass('current');
             });
 
             describe('when the transcript is visible', function() {
