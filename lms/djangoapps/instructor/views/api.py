@@ -2743,8 +2743,6 @@ class ListForumMembers(APIView):
         }
         return JsonResponse(response_payload)
 
-    # def get(self, request, *args, **kwargs):
-    #     raise MethodNotAllowed(method='GET')
 
 @transaction.non_atomic_requests
 @require_POST
