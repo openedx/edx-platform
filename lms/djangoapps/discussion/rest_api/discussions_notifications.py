@@ -114,7 +114,7 @@ class DiscussionNotificationSender:
         """
         if not self.parent_id and self.creator.id != int(self.thread.user_id):
             context = {
-                'email_content': self.comment.body,
+                'email_content': clean_thread_html_body(self.comment.body),
             }
             self._send_notification([self.thread.user_id], "new_response", extra_context=context)
 
@@ -153,7 +153,7 @@ class DiscussionNotificationSender:
             context = {
                 "author_name": str(author_name),
                 "author_pronoun": str(author_pronoun),
-                "email_content": self.comment.body,
+                "email_content": clean_thread_html_body(self.comment.body),
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
@@ -168,7 +168,7 @@ class DiscussionNotificationSender:
             self._response_and_thread_has_same_creator()
         ):
             context = {
-                "email_content": self.comment.body,
+                "email_content": clean_thread_html_body(self.comment.body),
             }
             self._send_notification(
                 [self.parent_response.user_id],
@@ -219,7 +219,7 @@ class DiscussionNotificationSender:
                 users,
                 "response_on_followed_post",
                 extra_context={
-                    "email_content": self.comment.body,
+                    "email_content": clean_thread_html_body(self.comment.body),
                 })
         else:
             author_name = f"{self.parent_response.username}'s"
@@ -236,7 +236,7 @@ class DiscussionNotificationSender:
                 extra_context={
                     "author_name": str(author_name),
                     "author_pronoun": str(author_pronoun),
-                    "email_content": self.comment.body,
+                    "email_content": clean_thread_html_body(self.comment.body),
                 }
             )
 
@@ -321,7 +321,7 @@ class DiscussionNotificationSender:
         context = {
             'username': self.creator.username,
             'post_title': self.thread.title,
-            "post_body": clean_thread_html_body(self.thread.body),
+            "email_content": clean_thread_html_body(self.thread.body),
         }
         self._send_course_wide_notification(notification_type, audience_filters, context)
 
