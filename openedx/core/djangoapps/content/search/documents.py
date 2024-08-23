@@ -31,6 +31,7 @@ class Fields:
     created = "created"
     last_published = "last_published"
     block_type = "block_type"
+    problem_types = "problem_types"
     context_key = "context_key"
     org = "org"
     access_id = "access_id"  # .models.SearchAccess.id
