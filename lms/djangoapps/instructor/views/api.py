@@ -2668,18 +2668,6 @@ def problem_grade_report(request, course_id):
     return JsonResponse({"status": success_status})
 
 
-
-def has_forum_access(uname, course_id, rolename):
-    """
-    Boolean operation which tests a user's role-based permissions (not actually forums-specific)
-    """
-    try:
-        role = Role.objects.get(name=rolename, course_id=course_id)
-    except Role.DoesNotExist:
-        return False
-    return role.users.filter(username=uname).exists()
-
-
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class ListForumMembers(APIView):
     """
@@ -2711,24 +2699,7 @@ class ListForumMembers(APIView):
             ValidationError: If the provided `rolename` is not valid according to the serializer.
         """
         course_id = CourseKey.from_string(course_id)
-        course = get_course_by_id(course_id)
-
-        has_forum_admin = has_forum_access(
-            request.user, course_id, FORUM_ROLE_ADMINISTRATOR
-        )
-
-        has_instructor_access = has_access(request.user, 'instructor', course)
         course_discussion_settings = CourseDiscussionSettings.get(course_id)
-
-        # default roles require either (staff & forum admin) or (instructor)
-        if not (has_forum_admin or has_instructor_access):
-            return HttpResponseBadRequest(
-                "Operation requires staff & forum admin or instructor access"
-            )
-
-        # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-        if request.data.get('rolename') == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-            return HttpResponseBadRequest("Operation requires instructor access.")
 
         role_serializer = ForumRoleNameSerializer(
             data=request.data,

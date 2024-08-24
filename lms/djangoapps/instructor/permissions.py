@@ -7,6 +7,11 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import BasePermission
 
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    get_group_id_for_user,
+    get_group_name,
+    has_forum_access
+)
 from openedx.core.lib.courses import get_course_by_id
 
 ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM = 'instructor.allow_student_to_bypass_entrance_exam'
@@ -82,3 +87,37 @@ class InstructorPermission(BasePermission):
         course = get_course_by_id(CourseKey.from_string(view.kwargs.get('course_id')))
         permission = getattr(view, 'permission_name', None)
         return request.user.has_perm(permission, course)
+
+
+class ForumAdminRequiresInstructorAccess(BasePermission):
+    """
+    Permission class to ensure that certain actions are restricted to users
+    who have both an admin role and instructor access.
+
+    This permission class checks if the request's role is set to
+    FORUM_ROLE_ADMINISTRATOR. If it is, the user must also have
+    instructor-level access to proceed. If the user lacks the necessary
+    instructor access, a PermissionDenied exception is raised with a
+    specific error message.
+
+    """
+    def has_permission(self, request, view):
+        rolename = request.data.get('rolename')
+        course = get_course_by_id(CourseKey.from_string(view.kwargs.get('course_id')))
+        has_forum_admin = has_forum_access(
+            request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+        )
+
+        has_instructor_access = has_access(request.user, 'instructor', course)
+
+        # default roles require either (staff & forum admin) or (instructor)
+        if not (has_forum_admin or has_instructor_access):
+            return HttpResponseBadRequest(
+                "Operation requires staff & forum admin or instructor access"
+            )
+
+        # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
+        if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+            raise "Operation requires instructor access."
+
+        return True
