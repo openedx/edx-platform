@@ -2668,6 +2668,18 @@ def problem_grade_report(request, course_id):
     return JsonResponse({"status": success_status})
 
 
+
+def has_forum_access(uname, course_id, rolename):
+    """
+    Boolean operation which tests a user's role-based permissions (not actually forums-specific)
+    """
+    try:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+    except Role.DoesNotExist:
+        return False
+    return role.users.filter(username=uname).exists()
+
+
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class ListForumMembers(APIView):
     """
@@ -2698,16 +2710,15 @@ class ListForumMembers(APIView):
         Raises:
             ValidationError: If the provided `rolename` is not valid according to the serializer.
         """
-        role_serializer = ForumRoleNameSerializer(data=request.data)
-        role_serializer.is_valid(raise_exception=True)
-        rolename = role_serializer.data['rolename']
-
         course_id = CourseKey.from_string(course_id)
         course = get_course_by_id(course_id)
-        has_instructor_access = has_access(request.user, 'instructor', course)
+
         has_forum_admin = has_forum_access(
             request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         )
+
+        has_instructor_access = has_access(request.user, 'instructor', course)
+        course_discussion_settings = CourseDiscussionSettings.get(course_id)
 
         # default roles require either (staff & forum admin) or (instructor)
         if not (has_forum_admin or has_instructor_access):
@@ -2716,40 +2727,23 @@ class ListForumMembers(APIView):
             )
 
         # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-        if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+        if request.data.get('rolename') == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
             return HttpResponseBadRequest("Operation requires instructor access.")
 
-        # filter out unsupported for roles
-        if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                            FORUM_ROLE_COMMUNITY_TA]:
-            return HttpResponseBadRequest(strip_tags(
-                f"Unrecognized rolename '{rolename}'."
-            ))
-
-        try:
-            role = Role.objects.get(name=rolename, course_id=course_id)
-            users = role.users.all().order_by('username')
-        except Role.DoesNotExist:
-            users = []
-
-        course_discussion_settings = CourseDiscussionSettings.get(course_id)
-
-        def extract_user_info(user):
-            """ Convert user to dict for json rendering. """
-            group_id = get_group_id_for_user(user, course_discussion_settings)
-            group_name = get_group_name(group_id, course_discussion_settings)
-
-            return {
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'group_name': group_name,
+        role_serializer = ForumRoleNameSerializer(
+            data=request.data,
+            context={
+                'course_discussion_settings': course_discussion_settings,
+                'course_id': course_id
             }
+        )
+
+        role_serializer.is_valid(raise_exception=True)
+        rolename = role_serializer.data['rolename']
 
         response_payload = {
             'course_id': str(course_id),
-            rolename: list(map(extract_user_info, users)),
+            rolename: role_serializer.data.get('users'),
             'division_scheme': course_discussion_settings.division_scheme,
         }
         return JsonResponse(response_payload)
