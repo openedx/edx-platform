@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
+/* line 1, /openedx/edx-platform/xmodule/assets/WordCloudBlockDisplay.scss */
+.xmodule_display.xmodule_WordCloudBlock {
+  /* stylelint-disable-line */
+  /* stylelint-disable-line */ }
+  /* line 6, /openedx/edx-platform/xmodule/assets/word_cloud/_display.scss */
+  .xmodule_display.xmodule_WordCloudBlock .input-cloud {
+    margin: calc((var(--baseline)/4)); }
+  /* line 10, /openedx/edx-platform/xmodule/assets/word_cloud/_display.scss */
+  .xmodule_display.xmodule_WordCloudBlock .result_cloud_section {
+    display: none;
+    width: 0px;
+    height: 0px; }
+  /* line 16, /openedx/edx-platform/xmodule/assets/word_cloud/_display.scss */
+  .xmodule_display.xmodule_WordCloudBlock .result_cloud_section.active {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 1em; }
+    /* line 22, /openedx/edx-platform/xmodule/assets/word_cloud/_display.scss */
+    .xmodule_display.xmodule_WordCloudBlock .result_cloud_section.active h3 {
+      font-size: 100%; }
+  /* line 27, /openedx/edx-platform/xmodule/assets/word_cloud/_display.scss */
+  .xmodule_display.xmodule_WordCloudBlock .your_words {
+    font-size: 0.85em;
+    display: block; }
