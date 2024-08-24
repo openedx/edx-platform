@@ -2678,7 +2678,6 @@ class ListForumMembers(APIView):
     Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
         which is limited to instructors.
 
-    Takes query parameter `rolename`.
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.VIEW_FORUM_MEMBERS
@@ -2686,7 +2685,19 @@ class ListForumMembers(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
+        """
+        Handle the POST request to list forum members with a certain role name for the given course.
 
+        Args:
+            request (HttpRequest): The request object containing the data sent by the client.
+            course_id (int): The ID of the course for which the role is being assigned or managed.
+
+        Returns:
+            Response: The Json constians lists of members.
+
+        Raises:
+            ValidationError: If the provided `rolename` is not valid according to the serializer.
+        """
         role_serializer = ForumRoleNameSerializer(data=request.data)
         role_serializer.is_valid(raise_exception=True)
         rolename = role_serializer.data['rolename']
