@@ -10,6 +10,13 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from openedx.core.djangoapps.theming.helpers_static import get_static_file_url
+import importlib.resources
+
+
+def add_css_to_fragment(fragment, css_file_name):
+    css_absolute_path = Path(settings.REPO_ROOT) / "xmodule" / "assets" / css_file_name
+    css_string = importlib.resources.files(__package__).joinpath(css_absolute_path).read_text(encoding="utf-8")
+    fragment.add_css(css_string)
 
 
 def add_sass_to_fragment(fragment, sass_relative_path):
