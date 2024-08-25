@@ -9,7 +9,7 @@
 @import 'bootstrap/scss/variables';
 @import 'lms/theme/variables-v1';
 
-$annotatable--border-color: $gray-l3;
+$annotatable--border-color: var(--gray-l3);
 $annotatable--body-font-size: em(14);
 
 .annotatable-wrapper {
@@ -116,18 +116,18 @@ $annotatable--body-font-size: em(14);
   border: 1px solid #333;
   border-radius: 1em;
   background-color: rgba(0, 0, 0, 0.85);
-  color: $white;
+  color: var(--white);
   -webkit-font-smoothing: antialiased;
 
   .ui-tooltip-titlebar {
     font-size: em(16);
     color: inherit;
     background-color: transparent;
-    padding: ($baseline/4) ($baseline/2);
+    padding: calc((var(--baseline)/4)) calc((var(--baseline)/2));
     border: none;
 
     .ui-tooltip-title {
-      padding: ($baseline/4) 0;
+      padding: calc((var(--baseline)/4)) 0;
       border-bottom: 2px solid #333;
       font-weight: bold;
     }
@@ -139,7 +139,7 @@ $annotatable--body-font-size: em(14);
 
     .ui-state-hover {
       color: inherit;
-      border: 1px solid $gray-l3;
+      border: 1px solid var(--gray-l3);
     }
   }
 
@@ -148,7 +148,7 @@ $annotatable--body-font-size: em(14);
     font-size: em(14);
     text-align: left;
     font-weight: 400;
-    padding: 0 ($baseline/2) ($baseline/2) ($baseline/2);
+    padding: 0 calc((var(--baseline)/2)) calc((var(--baseline)/2)) calc((var(--baseline)/2));
     background-color: transparent;
     border-color: transparent;
   }
@@ -163,11 +163,11 @@ $annotatable--body-font-size: em(14);
   max-width: 375px;
 
   .ui-tooltip-content {
-    padding: 0 ($baseline/2);
+    padding: 0 calc((var(--baseline)/2));
 
     .annotatable-comment {
       display: block;
-      margin: 0 0 ($baseline/2) 0;
+      margin: 0 0 calc((var(--baseline)/2)) 0;
       max-height: 225px;
       overflow: auto;
       line-height: normal;
@@ -176,7 +176,7 @@ $annotatable--body-font-size: em(14);
     .annotatable-reply {
       display: block;
       border-top: 2px solid #333;
-      padding: ($baseline/4) 0;
+      padding: calc((var(--baseline)/4)) 0;
       margin: 0;
       text-align: center;
     }
@@ -190,7 +190,7 @@ $annotatable--body-font-size: em(14);
     left: 50%;
     height: 0;
     width: 0;
-    margin-left: -($baseline/4);
+    margin-left: calc(-1 * (var(--baseline) / 4));
     border: 10px solid transparent;
     border-top-color: rgba(0, 0, 0, 0.85);
   }
