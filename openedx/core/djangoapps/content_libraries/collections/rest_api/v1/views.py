@@ -12,6 +12,12 @@ from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 
 from opaque_keys.edx.locator import LibraryLocatorV2
 
+from openedx_events.content_authoring.data import LibraryCollectionData
+from openedx_events.content_authoring.signals import (
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_UPDATED,
+)
+
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionSerializer,
@@ -104,6 +110,15 @@ class LibraryCollectionsView(ModelViewSet):
             create_serializer.validated_data["description"]
         )
         serializer = self.get_serializer(collection)
+
+        # Emit event for library content collection creation
+        LIBRARY_COLLECTION_CREATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_id=collection.id
+            )
+        )
+
         return Response(serializer.data)
 
     def partial_update(self, request, lib_key_str, pk=None):
@@ -126,6 +141,15 @@ class LibraryCollectionsView(ModelViewSet):
         update_serializer.is_valid(raise_exception=True)
         updated_collection = authoring_api.update_collection(pk, **update_serializer.validated_data)
         serializer = self.get_serializer(updated_collection)
+
+        # Emit event for library content collection updated
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_id=collection.id
+            )
+        )
+
         return Response(serializer.data)
 
     def destroy(self, request, lib_key_str, pk=None):
@@ -134,4 +158,6 @@ class LibraryCollectionsView(ModelViewSet):
 
         Note: (currently not allowed)
         """
+        # TODO: Implement the deletion logic and emit event signal
+
         return Response(None, status=HTTP_405_METHOD_NOT_ALLOWED)
