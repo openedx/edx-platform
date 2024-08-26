@@ -247,3 +247,15 @@ Content Authoring Events
    * - `CONTENT_OBJECT_TAGS_CHANGED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L207>`_
      - org.openedx.content_authoring.content.object.tags.changed.v1
      - 2024-03-31
+
+   * - `LIBRARY_COLLECTION_CREATED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L219>`_
+     - org.openedx.content_authoring.content.library.collection.created.v1
+     - 2024-08-23
+
+   * - `LIBRARY_COLLECTION_UPDATED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L230>`_
+     - org.openedx.content_authoring.content.library.collection.updated.v1
+     - 2024-08-23
+
+   * - `LIBRARY_COLLECTION_DELETED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L241>`_
+     - org.openedx.content_authoring.content.library.collection.deleted.v1
+     - 2024-08-23
