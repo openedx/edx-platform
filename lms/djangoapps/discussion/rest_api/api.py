@@ -1882,7 +1882,7 @@ def get_course_discussion_user_stats(
     course_stats_response = get_course_user_stats(course_key, params)
 
     for user_stat in course_stats_response["user_stats"]:
-        user_stat["user_first_name"] = User.objects.get(user_stat["username"]).first_name
+        user_stat["user_first_name"] = User.objects.get(username=user_stat["username"]).first_name
 
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(
