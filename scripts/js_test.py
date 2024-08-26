@@ -8,6 +8,8 @@ import re
 import sys
 import subprocess
 
+from path import Path as path
+
 try:
     from pygments.console import colorize
 except ImportError:
@@ -20,7 +22,7 @@ class Env:
     """
     Load information about the execution environment.
     """
-    
+
     @staticmethod
     def repo_root():
         """
@@ -54,11 +56,10 @@ class Env:
     # Reports Directory
     REPORT_DIR = REPO_ROOT / 'reports'
 
-
     # Detect if in a Docker container, and if so which one
     FRONTEND_TEST_SERVER_HOST = os.environ.get('FRONTEND_TEST_SERVER_HOSTNAME', '0.0.0.0')
     USING_DOCKER = FRONTEND_TEST_SERVER_HOST != '0.0.0.0'
-    
+
     # Configured browser to use for the js test suites
     SELENIUM_BROWSER = os.environ.get('SELENIUM_BROWSER', 'firefox')
     if USING_DOCKER:
