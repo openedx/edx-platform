@@ -71,7 +71,7 @@ jobs:
       - name: Run JS Tests
         run: |
           npm install -g jest
-          xvfb-run --auto-servernum make test-js
+          make test-js
           make test-coverage
 
       - name: Save Job Artifacts
