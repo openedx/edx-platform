@@ -63,7 +63,7 @@
         if ($.isFunction(onSwitchFunction)) {
           onSwitchFunction();
         }
-        this.$tabs.attr('aria-current', 'false').removeClass('current'));
+        this.$tabs.attr('aria-current', 'false').removeClass('current');
         $currentTarget.attr('aria-current', 'true').addClass('current');
 
         /*
