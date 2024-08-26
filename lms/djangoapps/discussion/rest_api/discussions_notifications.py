@@ -3,7 +3,10 @@ Discussion notifications sender util.
 """
 import re
 
+from bs4 import BeautifulSoup
 from django.conf import settings
+from django.utils.text import Truncator
+
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from openedx_events.learning.data import UserNotificationData, CourseNotificationData
 from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED, COURSE_NOTIFICATION_REQUESTED
@@ -27,13 +30,24 @@ class DiscussionNotificationSender:
     Class to send notifications to users who are subscribed to the thread.
     """
 
-    def __init__(self, thread, course, creator, parent_id=None):
+    def __init__(self, thread, course, creator, parent_id=None, comment_id=None):
         self.thread = thread
         self.course = course
         self.creator = creator
         self.parent_id = parent_id
+        self.comment_id = comment_id
         self.parent_response = None
+        self.comment = None
         self._get_parent_response()
+        self._get_comment()
+
+    def _get_comment(self):
+        """
+        Get comment object
+        """
+        if not self.comment_id:
+            return
+        self.comment = Comment(id=self.comment_id).retrieve()
 
     def _send_notification(self, user_ids, notification_type, extra_context=None):
         """
@@ -99,7 +113,10 @@ class DiscussionNotificationSender:
         there is a response to the main thread.
         """
         if not self.parent_id and self.creator.id != int(self.thread.user_id):
-            self._send_notification([self.thread.user_id], "new_response")
+            context = {
+                'email_content': clean_thread_html_body(self.comment.body),
+            }
+            self._send_notification([self.thread.user_id], "new_response", extra_context=context)
 
     def _response_and_thread_has_same_creator(self) -> bool:
         """
@@ -136,6 +153,7 @@ class DiscussionNotificationSender:
             context = {
                 "author_name": str(author_name),
                 "author_pronoun": str(author_pronoun),
+                "email_content": clean_thread_html_body(self.comment.body),
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
@@ -149,7 +167,14 @@ class DiscussionNotificationSender:
             self.creator.id != int(self.parent_response.user_id) and not
             self._response_and_thread_has_same_creator()
         ):
-            self._send_notification([self.parent_response.user_id], "new_comment_on_response")
+            context = {
+                "email_content": clean_thread_html_body(self.comment.body),
+            }
+            self._send_notification(
+                [self.parent_response.user_id],
+                "new_comment_on_response",
+                extra_context=context
+            )
 
     def _check_if_subscriber_is_not_thread_or_content_creator(self, subscriber_id) -> bool:
         """
@@ -190,7 +215,12 @@ class DiscussionNotificationSender:
         # Remove duplicate users from the list of users to send notification
         users = list(set(users))
         if not self.parent_id:
-            self._send_notification(users, "response_on_followed_post")
+            self._send_notification(
+                users,
+                "response_on_followed_post",
+                extra_context={
+                    "email_content": clean_thread_html_body(self.comment.body),
+                })
         else:
             author_name = f"{self.parent_response.username}'s"
             # use 'their' if comment author is also response author.
@@ -206,6 +236,7 @@ class DiscussionNotificationSender:
                 extra_context={
                     "author_name": str(author_name),
                     "author_pronoun": str(author_pronoun),
+                    "email_content": clean_thread_html_body(self.comment.body),
                 }
             )
 
@@ -289,7 +320,8 @@ class DiscussionNotificationSender:
             ]
         context = {
             'username': self.creator.username,
-            'post_title': self.thread.title
+            'post_title': self.thread.title,
+            "email_content": clean_thread_html_body(self.thread.body),
         }
         self._send_course_wide_notification(notification_type, audience_filters, context)
 
@@ -339,3 +371,26 @@ def is_discussion_cohorted(course_key_str):
 def remove_html_tags(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
+
+
+def clean_thread_html_body(html_body):
+    """
+    Get post body with tags removed and limited to 500 characters
+    """
+    html_body = BeautifulSoup(Truncator(html_body).chars(500, html=True), 'html.parser')
+
+    tags_to_remove = [
+        "a", "link",  # Link Tags
+        "img", "picture", "source",  # Image Tags
+        "video", "track",  # Video Tags
+        "audio",  # Audio Tags
+        "embed", "object", "iframe",  # Embedded Content
+        "script"
+    ]
+
+    # Remove the specified tags while keeping their content
+    for tag in tags_to_remove:
+        for match in html_body.find_all(tag):
+            match.unwrap()
+
+    return str(html_body)

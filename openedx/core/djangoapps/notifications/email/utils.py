@@ -19,6 +19,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
+from openedx.core.djangoapps.notifications.events import notification_preference_unsubscribe_event
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     get_course_notification_preference_config_version
@@ -395,3 +396,4 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
                                 if pref_value else EmailCadence.NEVER
                             type_prefs['email_cadence'] = cadence_value
         preference.save()
+    notification_preference_unsubscribe_event(user)
