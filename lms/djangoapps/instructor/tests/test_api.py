@@ -24,18 +24,12 @@ from django.test import RequestFactory, TestCase
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse as django_reverse
 from django.utils.translation import gettext as _
-from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
 from testfixtures import LogCapture
-from xmodule.fields import Date
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
-)
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -58,19 +52,21 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
-    CourseInstructorRole,
+    CourseInstructorRole
 )
-from common.djangoapps.student.tests.factories import BetaTesterFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import InstructorFactory
-from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    AdminFactory,
+    BetaTesterFactory,
+    CourseAccessRoleFactory,
+    CourseEnrollmentFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    StaffFactory,
+    UserFactory
+)
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.data import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import (
-    GeneratedCertificateFactory
-)
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
@@ -92,7 +88,7 @@ from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTask
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -100,6 +96,14 @@ from openedx.core.djangoapps.user_api.preferences.api import delete_user_prefere
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from xmodule.fields import Date
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .test_tools import msk_from_problem_urlname
 
@@ -2218,7 +2222,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 email_address=self.beta_tester.email,
             ) in body
 
-
+@ddt.ddt
 class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -2440,8 +2444,11 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def assert_update_forum_role_membership(self, current_user, identifier, rolename, action):
         """
-        Test update forum role membership.
-        Get unique_student_identifier, rolename and action and update forum role.
+        default roles require either (staff & forum admin) or (instructor)
+        User should be forum-admin and staff to access this endpoint.
+
+        But if request rolename is  FORUM_ROLE_ADMINISTRATOR, then user must also have
+        instructor-level access to proceed.
         """
         url = reverse('update_forum_role_membership', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(
@@ -2474,6 +2481,97 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             assert CourseEnrollment.is_enrolled(user, self.course.id)
             self.assert_update_forum_role_membership(user, user.email, rolename, "revoke")
             CourseEnrollment.unenroll(user, self.course.id)
+
+    def create_forum_roles(self, role_name, user):
+            role, __ = Role.objects.get_or_create(
+                course_id=self.course.id,
+                name=role_name
+            )
+            role.users.add(user)
+
+    def access_list_forum(self, user):
+        for role_name in ["Group Moderator", "Moderator", "Community TA", "Administrator"]:
+            self.create_forum_roles(role_name, user)
+
+            url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
+            return self.client.post(url, {'rolename': role_name})
+
+
+    def test_staff_without_forum_admin_access(self):
+        """
+        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
+        Allowed Role is either (staff & forum admin) or (instructor).
+
+        In this test case user has staff permissions but his forum admin role is missing.
+        """
+        self.client.logout() #
+        user = UserFactory()
+
+        # access as enrolled users
+        CourseEnrollment.enroll(user, self.course.id)  # user is also enrolled in a course.
+
+        # add specific and assign user to that.
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+
+        role_name = "staff"
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role=role_name,
+            org=self.course.id.org
+        )
+
+        response = self.access_list_forum(user)
+        assert response.status_code == 403
+
+        if role_name in ["Administrator"]:
+            # if the rolename is `Administrator` then user must need `Administrator` access.
+            assert (response.__dict__['data'].get('detail') ==
+                    "Operation requires instructor access.")
+        else:
+            assert (response.__dict__['data'].get('detail') ==
+                    "Operation requires staff & forum admin or instructor access")
+
+
+
+    def test_staff_with_forum_admin_access(self):
+        """
+        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
+        Allowed Role is either (staff & forum admin) or (instructor)
+
+        In this test case user has staff permissions and forum admin role also.
+        """
+        self.client.logout() #
+        user = UserFactory()
+
+        # access as enrolled users
+        CourseEnrollment.enroll(user, self.course.id)  # user is also enrolled in a course.
+
+        # add specific and assign user to that.
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role="staff",
+            org=self.course.id.org
+        )
+
+        # make user staff and administrator
+        role, __ = Role.objects.get_or_create(
+            course_id=self.course.id,
+            name="Administrator"
+        )
+        role.users.add(user)
+        response = self.access_list_forum(user)
+        import pdb
+        pdb.set_trace()
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+
+        assert data['course_id'] == str(self.course.id)
+
+
 
 
 @ddt.ddt

@@ -2679,7 +2679,9 @@ class ListForumMembers(APIView):
         which is limited to instructors.
 
     """
-    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_classes = (
+        IsAuthenticated, permissions.InstructorPermission, permissions.ForumAdminRequiresInstructorAccess
+    )
     permission_name = permissions.VIEW_FORUM_MEMBERS
     serializer_class = ForumRoleNameSerializer
 
