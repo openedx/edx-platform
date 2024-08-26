@@ -41,8 +41,8 @@ class LibraryCollectionsView(ModelViewSet):
         """
         try:
             library_obj = api.require_permission_for_library_key(library_key, user, permission)
-        except api.ContentLibraryNotFound:
-            raise Http404
+        except api.ContentLibraryNotFound as exc:
+            raise Http404 from exc
 
         collection = None
         if library_obj.learning_package_id:
@@ -51,10 +51,15 @@ class LibraryCollectionsView(ModelViewSet):
             ).filter(id=collection_id).first()
         return collection
 
-    def retrieve(self, request, lib_key_str, pk=None):
+    def retrieve(self, request, *args, **kwargs):
         """
         Retrieve the Content Library Collection
         """
+        lib_key_str = kwargs.pop('lib_key_str', None)
+        if not lib_key_str:
+            raise Http404
+
+        pk = kwargs.pop("pk", None)
         library_key = LibraryLocatorV2.from_string(lib_key_str)
 
         # Check if user has permissions to view this collection by checking if
@@ -69,10 +74,14 @@ class LibraryCollectionsView(ModelViewSet):
         serializer = self.get_serializer(collection)
         return Response(serializer.data)
 
-    def list(self, request, lib_key_str):
+    def list(self, request, *args, **kwargs):
         """
         List Collections that belong to Content Library
         """
+        lib_key_str = kwargs.pop('lib_key_str', None)
+        if not lib_key_str:
+            raise Http404
+
         # Check if user has permissions to view collections by checking if user
         # has permission to view the Content Library they belong to
         library_key = LibraryLocatorV2.from_string(lib_key_str)
@@ -80,17 +89,21 @@ class LibraryCollectionsView(ModelViewSet):
             content_library = api.require_permission_for_library_key(
                 library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
             )
-        except api.ContentLibraryNotFound:
-            raise Http404
+        except api.ContentLibraryNotFound as exc:
+            raise Http404 from exc
 
         collections = authoring_api.get_learning_package_collections(content_library.learning_package.id)
         serializer = self.get_serializer(collections, many=True)
         return Response(serializer.data)
 
-    def create(self, request, lib_key_str):
+    def create(self, request, *args, **kwargs):
         """
         Create a Collection that belongs to a Content Library
         """
+        lib_key_str = kwargs.pop('lib_key_str', None)
+        if not lib_key_str:
+            raise Http404
+
         # Check if user has permissions to create a collection in the Content Library
         # by checking if user has permission to edit the Content Library
         library_key = LibraryLocatorV2.from_string(lib_key_str)
@@ -98,8 +111,8 @@ class LibraryCollectionsView(ModelViewSet):
             content_library = api.require_permission_for_library_key(
                 library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
             )
-        except api.ContentLibraryNotFound:
-            raise Http404
+        except api.ContentLibraryNotFound as exc:
+            raise Http404 from exc
 
         create_serializer = ContentLibraryCollectionCreateOrUpdateSerializer(data=request.data)
         create_serializer.is_valid(raise_exception=True)
@@ -121,10 +134,15 @@ class LibraryCollectionsView(ModelViewSet):
 
         return Response(serializer.data)
 
-    def partial_update(self, request, lib_key_str, pk=None):
+    def partial_update(self, request, *args, **kwargs):
         """
         Update a Collection that belongs to a Content Library
         """
+        lib_key_str = kwargs.pop('lib_key_str', None)
+        if not lib_key_str:
+            raise Http404
+
+        pk = kwargs.pop('pk', None)
         library_key = LibraryLocatorV2.from_string(lib_key_str)
         # Check if user has permissions to update a collection in the Content Library
         # by checking if user has permission to edit the Content Library
@@ -152,7 +170,7 @@ class LibraryCollectionsView(ModelViewSet):
 
         return Response(serializer.data)
 
-    def destroy(self, request, lib_key_str, pk=None):
+    def destroy(self, request, *args, **kwargs):
         """
         Deletes a Collection that belongs to a Content Library
 
