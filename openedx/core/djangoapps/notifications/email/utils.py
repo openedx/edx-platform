@@ -4,6 +4,7 @@ Email Notifications Utils
 import datetime
 import json
 
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -195,6 +196,18 @@ def get_time_ago(datetime_obj):
     return f"{days_diff}d"
 
 
+def add_zero_margin_to_root(html_string):
+    """
+    Adds to zero margin to root element of html string
+    """
+    soup = BeautifulSoup(html_string, 'html.parser')
+    element = soup.find()
+    if not element:
+        return html_string
+    element['style'] = "margin: 0;"
+    return str(soup)
+
+
 def add_additional_attributes_to_notifications(notifications, courses_data=None):
     """
     Add attributes required for email content to notification instance
@@ -214,6 +227,8 @@ def add_additional_attributes_to_notifications(notifications, courses_data=None)
         notification.course_name = course_info.get('name', '')
         notification.icon = get_icon_url_for_notification_type(notification_type)
         notification.time_ago = get_time_ago(notification.created)
+        notification.email_content = add_zero_margin_to_root(notification.content)
+        notification.details = add_zero_margin_to_root(notification.content_context.get('email_content', ''))
     return notifications
 
 
