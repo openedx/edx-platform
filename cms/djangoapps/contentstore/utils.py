@@ -21,6 +21,8 @@ from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
+
+from lms.djangoapps.discussion.rest_api.discussions_notifications import clean_thread_html_body
 from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TEAM_SCHEME
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
@@ -2248,6 +2250,7 @@ def send_course_update_notification(course_key, content, user):
     extra_context = {
         'author_id': user.id,
         'course_name': course.display_name,
+        'email_content': clean_thread_html_body(content)
     }
     notification_data = CourseNotificationData(
         course_key=course_key,
