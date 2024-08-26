@@ -2222,7 +2222,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 email_address=self.beta_tester.email,
             ) in body
 
-@ddt.ddt
+
 class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -2502,7 +2502,6 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
             return self.client.post(url, {'rolename': role_name})
 
-
     def test_staff_without_forum_admin_access(self):
         """
         Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
@@ -2510,7 +2509,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
         In this test case user has staff permissions but his forum admin role is missing.
         """
-        self.client.logout() #
+        self.client.logout()
         user = UserFactory()
 
         # access as enrolled users
@@ -2538,8 +2537,6 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             assert (response.__dict__['data'].get('detail') ==
                     "Operation requires staff & forum admin or instructor access")
 
-
-
     def test_staff_with_forum_admin_access(self):
         """
         Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
@@ -2547,7 +2544,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
         In this test case user has staff permissions and forum admin role also.
         """
-        self.client.logout() #
+        self.client.logout()
         user = UserFactory()
 
         # access as enrolled users
@@ -2570,14 +2567,10 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         )
         role.users.add(user)
         response = self.access_list_forum(user)
-        import pdb
-        pdb.set_trace()
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
 
         assert data['course_id'] == str(self.course.id)
-
-
 
 
 @ddt.ddt
