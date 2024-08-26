@@ -605,7 +605,6 @@
                             state.videoCaption.playing = true;
                             $('.subtitles-menu span[data-index]:first')
                                 .parent()
-                                
                                 .addClass('current');
                             $('.subtitles-menu').trigger(jQuery.Event('mouseout'));
                         });
