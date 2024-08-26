@@ -23,6 +23,7 @@ from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFac
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.models import StudentModule
@@ -937,6 +938,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         )
         cls.course_about_url = cls.course_url + 'about'
         cls.registration_url = f'https://{site}/register'
+        cls.logo_url = get_logo_url_for_email()
 
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
@@ -947,6 +949,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         assert result['course_about_url'] == self.course_about_url
         assert result['registration_url'] == self.registration_url
         assert result['course_url'] == self.course_url
+        assert result['logo_url'] == self.logo_url
 
     def test_marketing_params(self):
         # For a site with a marketing front end, what do we expect to get for the URLs?
@@ -959,6 +962,19 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         assert result['course_about_url'] is None
         assert result['registration_url'] == self.registration_url
         assert result['course_url'] == self.course_url
+        assert result['logo_url'] == self.logo_url
+
+    @patch('lms.djangoapps.instructor.enrollment.get_logo_url_for_email', return_value='https://www.logo.png')
+    def test_logo_url_params(self, mock_get_logo_url_for_email):
+        # Verify that the logo_url is correctly set in the email params
+        result = get_email_params(self.course, False)
+
+        assert result['auto_enroll'] is False
+        assert result['course_about_url'] == self.course_about_url
+        assert result['registration_url'] == self.registration_url
+        assert result['course_url'] == self.course_url
+        mock_get_logo_url_for_email.assert_called_once()
+        assert result['logo_url'] == 'https://www.logo.png'
 
 
 @ddt.ddt
