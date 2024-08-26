@@ -13,8 +13,9 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.api import (
     create_verification_attempt,
     send_approval_email,
-    update_verification_status,
+    update_verification_attempt_status,
 )
+from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationAttempt
 from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
 
@@ -53,7 +54,7 @@ class TestSendApprovalEmail(TestCase):
 @ddt.ddt
 class CreateVerificationAttempt(TestCase):
     """
-    Test cases for the send_approval_email API method.
+    Test cases for the create_verification_attempt API method.
     """
 
     def setUp(self):
@@ -86,11 +87,28 @@ class CreateVerificationAttempt(TestCase):
         self.assertEqual(verification_attempt.status, VerificationAttemptStatus.created)
         self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo=timezone.utc))
 
+    def test_create_verification_attempt_no_expiration_datetime(self):
+        expected_id = 2
+        self.assertEqual(
+            create_verification_attempt(
+                user=self.user,
+                name='Tester McTest',
+                status=VerificationAttemptStatus.created,
+            ),
+            expected_id
+        )
+        verification_attempt = VerificationAttempt.objects.get(id=expected_id)
+
+        self.assertEqual(verification_attempt.user, self.user)
+        self.assertEqual(verification_attempt.name, 'Tester McTest')
+        self.assertEqual(verification_attempt.status, VerificationAttemptStatus.created)
+        self.assertEqual(verification_attempt.expiration_datetime, None)
+
 
 @ddt.ddt
-class UpdateVerificationStatus(TestCase):
+class UpdateVerificationAttemptStatus(TestCase):
     """
-    Test cases for the update_verification_status API method.
+    Test cases for the update_verification_attempt_status API method.
     """
 
     def setUp(self):
@@ -110,8 +128,8 @@ class UpdateVerificationStatus(TestCase):
         VerificationAttemptStatus.approved,
         VerificationAttemptStatus.denied,
     )
-    def test_update_verification_status(self, to_status):
-        update_verification_status(attempt_id=self.attempt.id, status=to_status)
+    def test_update_verification_attempt_status(self, to_status):
+        update_verification_attempt_status(attempt_id=self.attempt.id, status=to_status)
 
         verification_attempt = VerificationAttempt.objects.get(id=self.attempt.id)
 
@@ -122,3 +140,27 @@ class UpdateVerificationStatus(TestCase):
 
         # This field's value should change as a result of this update.
         self.assertEqual(verification_attempt.status, to_status)
+
+    # These are statuses used in edx-name-affirmation's VerifiedName model and persona-integration's unique
+    # VerificationAttempt model, and not by verify_student's VerificationAttempt model.
+    @ddt.data(
+        'completed',
+        'failed',
+        'submitted',
+        'expired',
+    )
+    def test_update_verification_attempt_status_invalid(self, to_status):
+        self.assertRaises(
+            VerificationAttemptInvalidStatus,
+            update_verification_attempt_status,
+            attempt_id=self.attempt.id,
+            status=to_status,
+        )
+
+    def test_update_verification_attempt_status_not_found(self):
+        self.assertRaises(
+            VerificationAttempt.DoesNotExist,
+            update_verification_attempt_status,
+            attempt_id=999999,
+            status=VerificationAttemptStatus.approved,
+        )

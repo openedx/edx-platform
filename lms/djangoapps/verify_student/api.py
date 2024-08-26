@@ -1,12 +1,18 @@
 """
 API module.
 """
+import logging
+
 from django.conf import settings
 from django.utils.translation import gettext as _
 
 from lms.djangoapps.verify_student.emails import send_verification_approved_email
+from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import VerificationAttempt
+from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
+
+log = logging.getLogger(__name__)
 
 
 def send_approval_email(attempt):
@@ -40,14 +46,16 @@ def create_verification_attempt(user, name, status, expiration_datetime=None):
     """
     Create a verification attempt.
 
+    This method is intended to be used by IDV implementation plugins to create VerificationAttempt instances.
+
     Args:
-        user (User): the user (usually a learner) performing the verfication attempt
-        name (string): the name of the user
+        user (User): the user (usually a learner) performing the verification attempt
+        name (string): the name being ID verified
         status (string): the initial status of the verification attempt
         expiration_datetime (datetime, optional): When the verification attempt expires. Defaults to None.
 
     Returns:
-        VerificationAttempt (VerificationAttempt): The created VerificationAttempt instance
+        id (int): The id of the created VerificationAttempt instance
     """
     verification_attempt = VerificationAttempt.objects.create(
         user=user,
@@ -56,20 +64,40 @@ def create_verification_attempt(user, name, status, expiration_datetime=None):
         expiration_datetime=expiration_datetime,
     )
 
+
     return verification_attempt.id
 
 
-def update_verification_status(attempt_id, status):
+def update_verification_attempt_status(attempt_id, status):
     """
-    Update the VerificationAttempt status.
+    Update the status of a verification attempt.
+
+    This method is intended to be used by IDV implementation plugins to update VerificationAttempt instances.
 
     Arguments:
-        * id (str): the verification attempt id
+        * id (str): the verification attempt id of the attempt to update
         * status (str): the new status
 
     Returns:
         * None
     """
-    attempt = VerificationAttempt.objects.get(id=attempt_id)
+    status_list = [attr for attr in dir(VerificationAttemptStatus) if not attr.startswith('__')]
+
+    if status not in status_list:
+        log.error(
+            f'update_verification_attempt_status called with invalid status. '
+            f'Status must be one of: {status_list}',
+        )
+        raise VerificationAttemptInvalidStatus
+
+    try:
+        attempt = VerificationAttempt.objects.get(id=attempt_id)
+    except VerificationAttempt.DoesNotExist:
+        log.error(
+            f'VerificationAttempt with id {attempt_id} was not found '
+            f'when updating the attempt to status={status}',
+        )
+        raise VerificationAttempt.DoesNotExist  # pylint: disable=raise-missing-from
+
     attempt.status = status
     attempt.save()
