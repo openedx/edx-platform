@@ -251,7 +251,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     # Whether this module can be displayed in read-only mode.  It is safe to set this to True if
     # all user state is handled through the FieldData API.
-    show_in_read_only_mode = False
+    show_in_read_only_mode = True
 
     # Class level variable
 
