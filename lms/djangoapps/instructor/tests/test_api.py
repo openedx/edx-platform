@@ -2483,13 +2483,19 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             CourseEnrollment.unenroll(user, self.course.id)
 
     def create_forum_roles(self, role_name, user):
-            role, __ = Role.objects.get_or_create(
-                course_id=self.course.id,
-                name=role_name
-            )
-            role.users.add(user)
+        """
+        Utility method for adding roles.
+        """
+        role, __ = Role.objects.get_or_create(
+            course_id=self.course.id,
+            name=role_name
+        )
+        role.users.add(user)
 
     def access_list_forum(self, user):
+        """
+        Utility method for adding forums rules and hitting the url.
+        """
         for role_name in ["Group Moderator", "Moderator", "Community TA", "Administrator"]:
             self.create_forum_roles(role_name, user)
 
