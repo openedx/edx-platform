@@ -11,10 +11,12 @@ from datetime import datetime, timezone
 from urllib.parse import quote_plus
 from uuid import uuid4
 
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
+from django.utils.text import Truncator
 from django.utils.translation import gettext as _
 from eventtracking import tracker
 from help_tokens.core import HelpUrlExpert
@@ -22,7 +24,6 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
 
-from lms.djangoapps.discussion.rest_api.discussions_notifications import clean_thread_html_body
 from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TEAM_SCHEME
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
@@ -2241,6 +2242,29 @@ def track_course_update_event(course_key, user, course_update_content=None):
         tracker.emit(event_name, event_data)
 
 
+def clean_html_body(html_body):
+    """
+    Get html body, remove tags and limit to 500 characters
+    """
+    html_body = BeautifulSoup(Truncator(html_body).chars(500, html=True), 'html.parser')
+
+    tags_to_remove = [
+        "a", "link",  # Link Tags
+        "img", "picture", "source",  # Image Tags
+        "video", "track",  # Video Tags
+        "audio",  # Audio Tags
+        "embed", "object", "iframe",  # Embedded Content
+        "script"
+    ]
+
+    # Remove the specified tags while keeping their content
+    for tag in tags_to_remove:
+        for match in html_body.find_all(tag):
+            match.unwrap()
+
+    return str(html_body)
+
+
 def send_course_update_notification(course_key, content, user):
     """
     Send course update notification
@@ -2250,7 +2274,7 @@ def send_course_update_notification(course_key, content, user):
     extra_context = {
         'author_id': user.id,
         'course_name': course.display_name,
-        'email_content': clean_thread_html_body(content)
+        'email_content': clean_html_body(content)
     }
     notification_data = CourseNotificationData(
         course_key=course_key,
