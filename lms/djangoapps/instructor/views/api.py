@@ -2191,23 +2191,35 @@ def list_background_email_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EMAIL)
-def list_email_content(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListEmailContent(APIView):
     """
     List the content of bulk emails sent
     """
-    course_id = CourseKey.from_string(course_id)
-    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
-    # First get tasks list of bulk emails sent
-    emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EMAIL
 
-    response_payload = {
-        'emails': list(map(extract_email_features, emails)),
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List the content of bulk emails sent for a specific course.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            course_id (str): The ID of the course for which to list the bulk emails.
+
+        Returns:
+            HttpResponse: A response object containing the list of bulk email contents.
+        """
+        course_id = CourseKey.from_string(course_id)
+        task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
+        # First get tasks list of bulk emails sent
+        emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
+
+        response_payload = {
+            'emails': list(map(extract_email_features, emails)),
+        }
+        return JsonResponse(response_payload)
 
 
 class InstructorTaskSerializer(serializers.Serializer):  # pylint: disable=abstract-method
