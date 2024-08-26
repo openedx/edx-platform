@@ -34,6 +34,7 @@ class Env:
         https://openedx.atlassian.net/browse/PLAT-1629 and
         https://github.com/docker/for-mac/issues/1509
         """
+
         file_path = path(__file__)
         attempt = 1
         while True:
@@ -48,7 +49,7 @@ class Env:
                 else:
                     print('Unable to determine the absolute path of the edx-platform repo, aborting')
                     raise
-        return absolute_path.parent.parent.parent.parent
+        return absolute_path.parent.parent
 
     # Root of the git repository (edx-platform)
     REPO_ROOT = repo_root()
