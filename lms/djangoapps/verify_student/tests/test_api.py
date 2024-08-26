@@ -31,8 +31,8 @@ class TestSendApprovalEmail(TestCase):
 
         self.user = UserFactory.create()
         self.attempt = SoftwareSecurePhotoVerification(
-            status="submitted",
-            user=self.user
+            status = "submitted",
+            user = self.user
         )
         self.attempt.save()
 
@@ -62,10 +62,10 @@ class CreateVerificationAttempt(TestCase):
 
         self.user = UserFactory.create()
         self.attempt = VerificationAttempt(
-            user=self.user,
-            name='Tester McTest',
-            status=VerificationAttemptStatus.created,
-            expiration_datetime=datetime(2024, 12, 31, tzinfo=timezone.utc)
+            user = self.user,
+            name = 'Tester McTest',
+            status = VerificationAttemptStatus.created,
+            expiration_datetime = datetime(2024, 12, 31, tzinfo = timezone.utc)
         )
         self.attempt.save()
 
@@ -73,31 +73,31 @@ class CreateVerificationAttempt(TestCase):
         expected_id = 2
         self.assertEqual(
             create_verification_attempt(
-                user=self.user,
-                name='Tester McTest',
-                status=VerificationAttemptStatus.created,
-                expiration_datetime=datetime(2024, 12, 31, tzinfo=timezone.utc)
+                user = self.user,
+                name = 'Tester McTest',
+                status = VerificationAttemptStatus.created,
+                expiration_datetime = datetime(2024, 12, 31, tzinfo = timezone.utc)
             ),
             expected_id
         )
-        verification_attempt = VerificationAttempt.objects.get(id=expected_id)
+        verification_attempt = VerificationAttempt.objects.get(id = expected_id)
 
         self.assertEqual(verification_attempt.user, self.user)
         self.assertEqual(verification_attempt.name, 'Tester McTest')
         self.assertEqual(verification_attempt.status, VerificationAttemptStatus.created)
-        self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo=timezone.utc))
+        self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo = timezone.utc))
 
     def test_create_verification_attempt_no_expiration_datetime(self):
         expected_id = 2
         self.assertEqual(
             create_verification_attempt(
-                user=self.user,
-                name='Tester McTest',
-                status=VerificationAttemptStatus.created,
+                user = self.user,
+                name = 'Tester McTest',
+                status = VerificationAttemptStatus.created,
             ),
             expected_id
         )
-        verification_attempt = VerificationAttempt.objects.get(id=expected_id)
+        verification_attempt = VerificationAttempt.objects.get(id = expected_id)
 
         self.assertEqual(verification_attempt.user, self.user)
         self.assertEqual(verification_attempt.name, 'Tester McTest')
@@ -114,12 +114,12 @@ class UpdateVerificationAttemptStatus(TestCase):
     def setUp(self):
         super().setUp()
 
-        self.user= UserFactory.create()
-        self.attempt= VerificationAttempt(
-            user=self.user,
-            name='Tester McTest',
-            status=VerificationAttemptStatus.created,
-            expiration_datetime=datetime(2024, 12, 31, tzinfo=timezone.utc)
+        self.user = UserFactory.create()
+        self.attempt = VerificationAttempt(
+            user = self.user,
+            name = 'Tester McTest',
+            status = VerificationAttemptStatus.created,
+            expiration_datetime = datetime(2024, 12, 31, tzinfo = timezone.utc)
         )
         self.attempt.save()
 
@@ -129,14 +129,14 @@ class UpdateVerificationAttemptStatus(TestCase):
         VerificationAttemptStatus.denied,
     )
     def test_update_verification_attempt_status(self, to_status):
-        update_verification_attempt_status(attempt_id=self.attempt.id, status=to_status)
+        update_verification_attempt_status(attempt_id = self.attempt.id, status = to_status)
 
-        verification_attempt = VerificationAttempt.objects.get(id=self.attempt.id)
+        verification_attempt = VerificationAttempt.objects.get(id = self.attempt.id)
 
         # These are fields whose values should not change as a result of this update.
         self.assertEqual(verification_attempt.user, self.user)
         self.assertEqual(verification_attempt.name, 'Tester McTest')
-        self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo=timezone.utc))
+        self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo = timezone.utc))
 
         # This field's value should change as a result of this update.
         self.assertEqual(verification_attempt.status, to_status)
@@ -153,14 +153,14 @@ class UpdateVerificationAttemptStatus(TestCase):
         self.assertRaises(
             VerificationAttemptInvalidStatus,
             update_verification_attempt_status,
-            attempt_id=self.attempt.id,
-            status=to_status,
+            attempt_id = self.attempt.id,
+            status = to_status,
         )
 
     def test_update_verification_attempt_status_not_found(self):
         self.assertRaises(
             VerificationAttempt.DoesNotExist,
             update_verification_attempt_status,
-            attempt_id=999999,
-            status=VerificationAttemptStatus.approved,
+            attempt_id = 999999,
+            status = VerificationAttemptStatus.approved,
         )

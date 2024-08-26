@@ -64,7 +64,6 @@ def create_verification_attempt(user, name, status, expiration_datetime=None):
         expiration_datetime=expiration_datetime,
     )
 
-
     return verification_attempt.id
 
 
