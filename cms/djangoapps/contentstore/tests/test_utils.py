@@ -956,10 +956,8 @@ class CourseUpdateNotificationTests(ModuleStoreTestCase):
         user = UserFactory()
         CourseEnrollment.enroll(user=user, course_key=self.course.id)
         assert Notification.objects.all().count() == 0
-        expected_content = "<p>content</p>"
-        content = f"{expected_content}<img src='' />"
+        content = "<p>content</p><img src='' />"
         send_course_update_notification(self.course.id, content, self.user)
         assert Notification.objects.all().count() == 1
-        notification = Notification.objects.all()[0]
-        assert "email_content" in notification.content_context
-        assert notification.content_context["email_content"] == expected_content
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong><p>content</p></strong></p>"

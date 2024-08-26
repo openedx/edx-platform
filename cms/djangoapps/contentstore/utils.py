@@ -2269,17 +2269,16 @@ def send_course_update_notification(course_key, content, user):
     """
     Send course update notification
     """
-    text_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(content))
+    text_content = re.sub(r"(\s|&nbsp;|//)+", " ", clean_html_body(content))
     course = modulestore().get_course(course_key)
     extra_context = {
         'author_id': user.id,
         'course_name': course.display_name,
-        'email_content': clean_html_body(content)
     }
     notification_data = CourseNotificationData(
         course_key=course_key,
         content_context={
-            "course_update_content": text_content if len(text_content.strip()) < 10 else "Click here to view",
+            "course_update_content": text_content,
             **extra_context,
         },
         notification_type="course_updates",
