@@ -327,7 +327,7 @@
     top: 4px;
     width: 14px;
     height: 14px;
-    background: url("var(--static-path)/images/unanswered-icon.png") center center no-repeat; }
+    background: url(var(--static-path)"/images/unanswered-icon.png") center center no-repeat; }
   /* line 523, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
   .xmodule_display.xmodule_ProblemBlock div.problem div span.processing, .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-processing {
     display: inline-block;
@@ -335,7 +335,7 @@
     top: 6px;
     width: 25px;
     height: 20px;
-    background: url("var(--static-path)/images/spinner.gif") center center no-repeat; }
+    background: url(var(--static-path)"/images/spinner.gif") center center no-repeat; }
   /* line 532, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
   .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-check {
     display: inline-block;
@@ -343,7 +343,7 @@
     top: 3px;
     width: 25px;
     height: 20px;
-    background: url("var(--static-path)/images/correct-icon.png") center center no-repeat; }
+    background: url(var(--static-path)"/images/correct-icon.png") center center no-repeat; }
   /* line 541, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
   .xmodule_display.xmodule_ProblemBlock div.problem div span.incomplete, .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-close {
     display: inline-block;
@@ -351,7 +351,7 @@
     top: 3px;
     width: 20px;
     height: 20px;
-    background: url("var(--static-path)/images/incorrect-icon.png") center center no-repeat; }
+    background: url(var(--static-path)"/images/incorrect-icon.png") center center no-repeat; }
   /* line 551, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
   .xmodule_display.xmodule_ProblemBlock div.problem div .reload {
     float: right;
@@ -378,7 +378,7 @@
     .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status .grading {
       margin: 0px 7px 0 0;
       padding-left: 25px;
-      background: url("var(--static-path)/images/info-icon.png") left center no-repeat;
+      background: url(var(--static-path)"/images/info-icon.png") left center no-repeat;
       text-indent: 0px; }
     /* line 581, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
     .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status p {
@@ -977,7 +977,7 @@
       .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors {
         margin: calc((var(--baseline)/4));
         padding: calc((var(--baseline)/2)) calc((var(--baseline)/2)) calc((var(--baseline)/2)) calc((var(--baseline)*2));
-        background: url("var(--static-path)/images/incorrect-icon.png") center left no-repeat; }
+        background: url(var(--static-path)"/images/incorrect-icon.png") center left no-repeat; }
         /* line 1376, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
         .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors li {
           color: #b00; }
@@ -1002,19 +1002,19 @@
           margin-left: 24pt; }
       /* line 1405, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
       .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct {
-        background: url("var(--static-path)/images/correct-icon.png") left 20px no-repeat; }
+        background: url(var(--static-path)"/images/correct-icon.png") left 20px no-repeat; }
         /* line 1408, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
         .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct .result-actual-output {
           color: #090; }
       /* line 1413, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
       .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct {
-        background: url("var(--static-path)/images/partially-correct-icon.png") left 20px no-repeat; }
+        background: url(var(--static-path)"/images/partially-correct-icon.png") left 20px no-repeat; }
         /* line 1416, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
         .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct .result-actual-output {
           color: #090; }
       /* line 1421, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
       .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect {
-        background: url("var(--static-path)/images/incorrect-icon.png") left 20px no-repeat; }
+        background: url(var(--static-path)"/images/incorrect-icon.png") left 20px no-repeat; }
         /* line 1424, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
         .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect .result-actual-output {
           color: #b00; }
@@ -1174,7 +1174,7 @@
   /* line 1647, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
   .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_show_correct::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_show_correct::after {
     margin-left: calc((var(--baseline)*0.75));
-    content: url("var(--static-path)/images/correct-icon.png"); }
+    content: url(var(--static-path)"/images/correct-icon.png"); }
   /* line 1654, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
   .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup span.mock_label {
     cursor: default; }
