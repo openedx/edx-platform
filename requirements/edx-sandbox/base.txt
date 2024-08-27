@@ -61,7 +61,7 @@ pillow==10.4.0
     # via matplotlib
 pycparser==2.22
     # via cffi
-pyparsing==3.1.2
+pyparsing==3.1.4
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
@@ -73,7 +73,7 @@ random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
 regex==2024.7.24
     # via nltk
-scipy==1.14.0
+scipy==1.14.1
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem

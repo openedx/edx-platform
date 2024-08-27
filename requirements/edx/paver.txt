@@ -14,7 +14,7 @@ dnspython==2.6.1
     # via pymongo
 edx-opaque-keys==2.10.0
     # via -r requirements/edx/paver.in
-idna==3.7
+idna==3.8
     # via requests
 lazy==1.6
     # via -r requirements/edx/paver.in
@@ -51,7 +51,7 @@ six==1.16.0
     # via
     #   libsass
     #   paver
-stevedore==5.2.0
+stevedore==5.3.0
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
@@ -61,7 +61,7 @@ urllib3==1.26.19
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-watchdog==4.0.2
+watchdog==5.0.0
     # via -r requirements/edx/paver.in
 wrapt==1.16.0
     # via -r requirements/edx/paver.in
