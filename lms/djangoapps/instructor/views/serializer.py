@@ -129,7 +129,7 @@ def extract_user_info(user, course_discussion_settings):
         'group_name': group_name,
     }
 
-  
+
 class ShowStudentExtensionSerializer(serializers.Serializer):
     """
     Serializer for validating and processing the student identifier.
