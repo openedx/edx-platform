@@ -80,7 +80,6 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
 
 
 class SendEmailSerializer(serializers.Serializer):
-    send_to = serializers.EmailField(max_length=255)
-    subject = serializers.CharField(max_length=255)
-    message = serializers.CharField()
-
+    send_to = serializers.CharField()
+    subject = serializers.CharField()
+    message = serializers.CharField(required=False)
