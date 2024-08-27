@@ -2769,30 +2769,27 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
             log.warning(f"Email is not enabled for course {course_id}")
             return HttpResponseForbidden("Email is not enabled for this course.")
 
-        serializer_data = self.serializer_class(data=request.data)
-        serializer_data.is_valid(raise_exception=True)
-
-        targets = json.loads(serializer_data.validated_data.get("send_to"))
-        subject = serializer_data.validated_data.get("subject")
-        message = serializer_data.validated_data.get("message")
-        # optional, this is a date and time in the form of an ISO8601 string
         schedule = request.POST.get("schedule", "")
+        serializer_data = self.serializer_class(data=request.data)
 
-        schedule_dt = None
-        if schedule:
-            try:
-                # convert the schedule from a string to a datetime, then check if its a valid future date and time, dateutil
-                # will throw a ValueError if the schedule is no good.
-                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
-                if schedule_dt < datetime.datetime.now(pytz.utc):
-                    raise ValueError("the requested schedule is in the past")
-            except ValueError as value_error:
-                error_message = (
-                    f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
-                    f"{value_error}"
-                )
-                log.error(error_message)
-                return HttpResponseBadRequest(error_message)
+        try:
+            # Validate the data
+            if not serializer_data.is_valid():
+                return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            targets = json.loads(serializer_data.validated_data.get("send_to"))
+            subject = serializer_data.validated_data.get("subject")
+            message = serializer_data.validated_data.get("message")
+            # optional, this is a date and time in the form of an ISO8601 string
+            schedule_dt = serializer_data.validated_data.get("schedule", "")
+
+        except ValueError as value_error:
+            error_message = (
+                f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
+                f"{value_error}"
+            )
+            log.error(error_message)
+            return HttpResponseBadRequest(error_message)
 
         # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
         # there is no site configuration enabled for the current site then we use system defaults for both.
