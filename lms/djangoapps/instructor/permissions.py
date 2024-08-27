@@ -95,7 +95,6 @@ class InstructorPermission(BasePermission):
 
 class ForumAdminRequiresInstructorAccess(BasePermission):
     """
-    #
     default roles require either (staff & forum admin) or (instructor)
     User should be forum-admin and staff to access this endpoint.
 

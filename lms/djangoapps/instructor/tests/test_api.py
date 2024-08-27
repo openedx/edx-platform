@@ -2558,10 +2558,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_staff_with_forum_admin_access_with_oauth(self):
         """
-        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
-        Allowed Role is either (staff & forum admin) or (instructor)
-
-        In this test case user has staff permissions and forum admin role also.
+        Verify the endpoint using JWT authentication.
         """
         self.client.logout()
         dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
