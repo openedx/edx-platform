@@ -58,7 +58,6 @@ from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadReq
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
-from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
@@ -303,10 +302,6 @@ def course_handler(request, course_key_string=None):
             else:
                 return HttpResponseBadRequest()
         elif request.method == 'GET':  # assume html
-            # Update course discussion settings, sometimes the course discussion settings are not updated
-            # when the course is created, so we need to update them here.
-            course_key = CourseKey.from_string(course_key_string)
-            update_discussions_settings_from_course(course_key)
             if course_key_string is None:
                 return redirect(reverse('home'))
             else:

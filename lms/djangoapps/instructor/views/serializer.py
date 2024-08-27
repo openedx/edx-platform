@@ -88,3 +88,22 @@ class UpdateForumRoleMembershipSerializer(AccessSerializer):
         ],
         help_text="Rolename assign to given user."
     )
+
+    
+class ShowStudentExtensionSerializer(serializers.Serializer):
+    """
+    Serializer for validating and processing the student identifier.
+    """
+    student = serializers.CharField(write_only=True, required=True)
+
+    def validate_student(self, value):
+        """
+        Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
+

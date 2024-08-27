@@ -467,7 +467,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.23.9
+edx-enterprise==4.23.13
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -823,7 +823,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.10.1
+openedx-learning==0.11.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -1258,9 +1258,8 @@ webob==1.8.8
     #   xblock
 wrapt==1.16.0
     # via -r requirements/edx/paver.txt
-xblock[django]==4.0.1
+xblock[django]==5.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   acid-xblock
     #   crowdsourcehinter-xblock
