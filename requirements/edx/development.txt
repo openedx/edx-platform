@@ -770,7 +770,7 @@ edx-name-affirmation==2.3.7
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-opaque-keys[django]==2.10.0
+edx-opaque-keys[django] @ git+https://github.com/open-craft/opaque-keys.git@chris/FAL-3785-collections-key
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
