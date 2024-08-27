@@ -33,6 +33,7 @@ from common.djangoapps.track.event_transaction_utils import (
     get_event_transaction_id,
     set_event_transaction_type
 )
+from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
@@ -456,6 +457,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
         'contact_mailing_address': contact_mailing_address,
         'platform_name': platform_name,
         'site_configuration_values': configuration_helpers.get_current_site_configuration_values(),
+        'logo_url': get_logo_url_for_email(),
     }
     return email_params
 
