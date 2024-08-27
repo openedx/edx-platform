@@ -2251,6 +2251,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         self.other_instructor = InstructorFactory(course_key=self.course.id)
         self.other_staff = StaffFactory(course_key=self.course.id)
         self.other_user = UserFactory()
+        self.list_forum_members_url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
 
     def test_modify_access_noparams(self):
         """ Test missing all query parameters. """
@@ -2501,9 +2502,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         """
         for role_name in ["Group Moderator", "Moderator", "Community TA", "Administrator"]:
             self.create_forum_roles(role_name, user)
-
-            url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
-            return self.client.post(url, {'rolename': role_name})
+            return self.client.post(self.list_forum_members_url, {'rolename': role_name})
 
     def test_staff_without_forum_admin_access(self):
         """
@@ -2513,23 +2512,16 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         In this test case user has staff permissions but his forum admin role is missing.
         """
         self.client.logout()
-        user = UserFactory()
-
-        # access as enrolled users
-        CourseEnrollment.enroll(user, self.course.id)  # user is also enrolled in a course.
-
-        # add specific and assign user to that.
-        self.client.login(username=user.username, password=self.TEST_PASSWORD)
-
+        self.client.login(username=self.other_user.username, password=self.TEST_PASSWORD)
         role_name = "staff"
         CourseAccessRoleFactory(
             course_id=self.course.id,
-            user=user,
+            user=self.other_user,
             role=role_name,
             org=self.course.id.org
         )
 
-        response = self.access_list_forum(user)
+        response = self.access_list_forum(self.other_user)
         assert response.status_code == 403
 
         if role_name in ["Administrator"]:
@@ -2548,28 +2540,20 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         In this test case user has staff permissions and forum admin role also.
         """
         self.client.logout()
-        user = UserFactory()
-
-        # access as enrolled users
-        CourseEnrollment.enroll(user, self.course.id)  # user is also enrolled in a course.
-
-        # add specific and assign user to that.
-        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        self.client.login(username=self.other_user.username, password=self.TEST_PASSWORD)
 
         CourseAccessRoleFactory(
             course_id=self.course.id,
-            user=user,
+            user=self.other_user,
             role="staff",
             org=self.course.id.org
         )
 
         # make user staff and administrator
-        self.create_forum_roles('Administrator', user)
-
-        response = self.access_list_forum(user)
+        self.create_forum_roles('Administrator', self.other_user)
+        response = self.access_list_forum(self.other_user)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-
         assert data['course_id'] == str(self.course.id)
 
     def test_staff_with_forum_admin_access_with_oauth(self):
@@ -2580,10 +2564,8 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         In this test case user has staff permissions and forum admin role also.
         """
         self.client.logout()
-        user = UserFactory()
-        url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
-        dot_application = ApplicationFactory(user=user, authorization_grant_type='password')
-        access_token = AccessTokenFactory(user=user, application=dot_application)
+        dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
+        access_token = AccessTokenFactory(user=self.other_user, application=dot_application)
         oauth_adapter = DOTAdapter()
         token_dict = {
             'access_token': access_token,
@@ -2594,27 +2576,26 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
         }
         response = self.client.post(
-            url,
+            self.list_forum_members_url,
             data={'rolename': 'Moderator'},
             **headers
         )
-        # authentication works but it has no permissions.
+        # JWT authentication works but it has no permissions.
         assert response.status_code == 403
 
+        # add user as course staff.
         CourseAccessRoleFactory(
             course_id=self.course.id,
-            user=user,
+            user=self.other_user,
             role="staff",
             org=self.course.id.org
         )
-        self.create_forum_roles('Moderator', user)
 
-        response = self.client.post(
-            url,
-            data={'rolename': 'Moderator'},
-            **headers
-        )
+        # add user as forum admin.
+        self.create_forum_roles('Administrator', self.other_user)
+        response = self.client.post(self.list_forum_members_url, data={'rolename': 'Moderator'}, **headers)
         assert response.status_code == 200
+
 
 @ddt.ddt
 class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
