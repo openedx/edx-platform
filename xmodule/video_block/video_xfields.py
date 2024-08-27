@@ -120,6 +120,13 @@ class VideoFields:
         scope=Scope.settings,
         default=""
     )
+    transcript_url = String(
+        help=_("The default transcript for the video, from the Default Timed Transcript field on the Basic tab. "
+               "This transcript should be in English. You don't have to change this setting."),
+        display_name=_("Transcript URL"),
+        scope=Scope.settings,
+        default=""
+    )
     show_captions = Boolean(
         help=_("Specify whether the transcripts appear with the video by default."),
         display_name=_("Show Transcript"),

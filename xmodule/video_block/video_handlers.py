@@ -12,6 +12,7 @@ import math
 
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+import requests
 from edxval.api import create_external_video, create_or_update_video_transcript, delete_video_transcript
 from opaque_keys.edx.locator import CourseLocator
 from webob import Response
@@ -309,6 +310,16 @@ class VideoStudentViewHandlers:
                     Returns list of languages, for which transcript files exist.
                     For 'en' check if SJSON exists. For non-`en` check if SRT file exists.
         """
+        if self.transcript_url:
+            try:
+                return Response(Transcript.convert(
+                        content=requests.get(self.transcript_url).text,
+                        input_format=Transcript.SRT,
+                        output_format=Transcript.SJSON
+                    ))
+
+            except Exception as err:
+                return Response(status=404)
         is_bumper = request.GET.get('is_bumper', False)
         transcripts = self.get_transcripts_info(is_bumper)
 
