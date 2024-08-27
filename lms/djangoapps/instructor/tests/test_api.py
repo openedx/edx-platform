@@ -90,6 +90,9 @@ from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
@@ -2484,7 +2487,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def create_forum_roles(self, role_name, user):
         """
-        Utility method for adding roles.
+        DRY Utility method for adding roles.
         """
         role, __ = Role.objects.get_or_create(
             course_id=self.course.id,
@@ -2561,17 +2564,57 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         )
 
         # make user staff and administrator
-        role, __ = Role.objects.get_or_create(
-            course_id=self.course.id,
-            name="Administrator"
-        )
-        role.users.add(user)
+        self.create_forum_roles('Administrator', user)
+
         response = self.access_list_forum(user)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
 
         assert data['course_id'] == str(self.course.id)
 
+    def test_staff_with_forum_admin_access_with_oauth(self):
+        """
+        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
+        Allowed Role is either (staff & forum admin) or (instructor)
+
+        In this test case user has staff permissions and forum admin role also.
+        """
+        self.client.logout()
+        user = UserFactory()
+        url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
+        dot_application = ApplicationFactory(user=user, authorization_grant_type='password')
+        access_token = AccessTokenFactory(user=user, application=dot_application)
+        oauth_adapter = DOTAdapter()
+        token_dict = {
+            'access_token': access_token,
+            'scope': 'email profile',
+        }
+        jwt_token = jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=True)
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
+        }
+        response = self.client.post(
+            url,
+            data={'rolename': 'Moderator'},
+            **headers
+        )
+        # authentication works but it has no permissions.
+        assert response.status_code == 403
+
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role="staff",
+            org=self.course.id.org
+        )
+        self.create_forum_roles('Moderator', user)
+
+        response = self.client.post(
+            url,
+            data={'rolename': 'Moderator'},
+            **headers
+        )
+        assert response.status_code == 200
 
 @ddt.ddt
 class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
