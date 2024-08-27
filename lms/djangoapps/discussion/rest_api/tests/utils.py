@@ -675,12 +675,13 @@ class ThreadMock(object):
     A mock thread object
     """
 
-    def __init__(self, thread_id, creator, title, parent_id=None):
+    def __init__(self, thread_id, creator, title, parent_id=None, body=''):
         self.id = thread_id
         self.user_id = str(creator.id)
         self.username = creator.username
         self.title = title
         self.parent_id = parent_id
+        self.body = body
 
     def url_with_id(self, params):
         return f"http://example.com/{params['id']}"

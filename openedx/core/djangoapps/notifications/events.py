@@ -10,6 +10,7 @@ NOTIFICATION_READ = 'edx.notifications.read'
 NOTIFICATION_APP_ALL_READ = 'edx.notifications.app_all_read'
 NOTIFICATION_PREFERENCES_UPDATED = 'edx.notifications.preferences.updated'
 NOTIFICATION_TRAY_OPENED = 'edx.notifications.tray_opened'
+NOTIFICATION_PREFERENCE_UNSUBSCRIBE = 'edx.notifications.preferences.one_click_unsubscribe'
 
 
 def get_user_forums_roles(user, course_id):
@@ -155,3 +156,17 @@ def notification_tray_opened_event(user, unseen_notifications_count):
             'unseen_notifications_count': unseen_notifications_count,
         }
     )
+
+
+def notification_preference_unsubscribe_event(user):
+    """
+    Emits an event when user clicks on one-click-unsubscribe url
+    """
+    event_data = {
+        'user_id': user.id,
+        'username': user.username,
+        'event_type': 'email_digest_unsubscribe'
+    }
+    with tracker.get_tracker().context(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data):
+        tracker.emit(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
+        segment.track(user.id, NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
