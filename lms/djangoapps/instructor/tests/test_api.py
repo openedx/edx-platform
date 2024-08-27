@@ -3521,7 +3521,6 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         self.client.logout()
         user = UserFactory()
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
-
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, self.full_test_message)
         assert response.status_code == 403
