@@ -83,11 +83,7 @@ from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_user,
-    get_group_name,
-    has_forum_access,
-)
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.constants import INVOICE_KEY
