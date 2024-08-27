@@ -1,4 +1,4 @@
-# """Unit tests for the Paver asset tasks."""
+"""Unit tests for the Paver asset tasks."""
 
 import json
 import os
