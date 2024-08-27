@@ -77,12 +77,12 @@ jobs:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
-            make test-lint
-            make test-eslint
-            make test-stylelint
-            make test-xsslint
-            make test-pi_check
-            make test-check_keyword
+            make pycodestyle
+            make eslint
+            make stylelint
+            make xsslint
+            make pi_check
+            make check_keyword
           
       - name: Save Job Artifacts
         if: always()

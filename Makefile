@@ -205,28 +205,28 @@ migrate: migrate-lms migrate-cms
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
 
-test-eslint:
+eslint:
 	python scripts/quality_test/quality_test.py eslint
 
-test-stylelint:
+stylelint:
 	python scripts/quality_test/quality_test.py stylelint
 
-test-xsslint:
+xsslint:
 	python scripts/quality_test/quality_test.py xsslint
 
-test-lint:
+pycodestyle:
 	pycodestyle .
 
-test-pi_check:
+pi_check:
 	python scripts/quality_test/quality_test.py pii_check
 
-test-check_keyword:
+check_keyword:
 	python scripts/quality_test/quality_test.py check_keywords
 
 test-js:
-	 xvfb-run --auto-servernum python scripts/js_test.py --option jstest
+	python scripts/js_test.py --option jstest
 
 test-coverage:
 	python scripts/js_test.py --option coverage
 
-quality-test: test-lint test-eslint test-stylelint test-xsslint test-pi_check test-check_keyword
+quality-test: pycodestyle eslint stylelint xsslint pi_check check_keyword
