@@ -3,18 +3,13 @@ Permissions for the instructor dashboard and associated actions
 """
 from bridgekeeper import perms
 from bridgekeeper.rules import is_staff
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_user,
-    get_group_name,
-    has_forum_access
-)
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.lib.courses import get_course_by_id
 

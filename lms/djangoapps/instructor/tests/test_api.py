@@ -55,7 +55,6 @@ from common.djangoapps.student.roles import (
     CourseInstructorRole
 )
 from common.djangoapps.student.tests.factories import (
-    AdminFactory,
     BetaTesterFactory,
     CourseAccessRoleFactory,
     CourseEnrollmentFactory,
@@ -88,7 +87,7 @@ from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTask
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
