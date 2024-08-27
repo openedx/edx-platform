@@ -61,7 +61,7 @@ class AccessSerializer(serializers.Serializer):
         return user
 
 
-class ListInstructorSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for handling the input data for the problem response report generation API.
 
