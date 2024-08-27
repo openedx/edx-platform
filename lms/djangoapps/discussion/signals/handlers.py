@@ -176,8 +176,9 @@ def create_comment_created_notification(*args, **kwargs):
     comment = kwargs['post']
     thread_id = comment.attributes['thread_id']
     parent_id = comment.attributes['parent_id']
+    comment_id = comment.attributes['id']
     course_key_str = comment.attributes['course_id']
-    send_response_notifications.apply_async(args=[thread_id, course_key_str, user.id, parent_id])
+    send_response_notifications.apply_async(args=[thread_id, course_key_str, user.id, comment_id, parent_id])
 
 
 @receiver(signals.comment_endorsed)

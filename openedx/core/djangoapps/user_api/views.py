@@ -1,6 +1,5 @@
 """HTTP end-points for the User API. """
 
-
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
@@ -16,21 +15,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.lib.api.view_utils import require_post_params
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
 from openedx.core.djangoapps.user_api.serializers import (
     CountryTimeZoneSerializer,
     UserPreferenceSerializer,
-    UserSerializer
+    UserSerializer,
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from openedx.core.lib.api.view_utils import require_post_params
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     DRF class for interacting with the User ORM object
     """
+
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = User.objects.all().prefetch_related("preferences").select_related("profile")
     serializer_class = UserSerializer
@@ -42,6 +42,7 @@ class ForumRoleUsersListView(generics.ListAPIView):
     """
     Forum roles are represented by a list of user dicts
     """
+
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
     paginate_by = 10
@@ -51,10 +52,10 @@ class ForumRoleUsersListView(generics.ListAPIView):
         """
         Return a list of users with the specified role/course pair
         """
-        name = self.kwargs['name']
-        course_id_string = self.request.query_params.get('course_id')
+        name = self.kwargs["name"]
+        course_id_string = self.request.query_params.get("course_id")
         if not course_id_string:
-            raise ParseError('course_id must be specified')
+            raise ParseError("course_id must be specified")
         course_id = CourseKey.from_string(course_id_string)
         role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
         users = role.users.prefetch_related("preferences").select_related("profile").all()
@@ -65,6 +66,7 @@ class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     """
     DRF class for interacting with the UserPreference ORM
     """
+
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = UserPreference.objects.all()
     filter_backends = (DjangoFilterBackend,)
@@ -78,26 +80,30 @@ class PreferenceUsersListView(generics.ListAPIView):
     """
     DRF class for listing a user's preferences
     """
+
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
 
     def get_queryset(self):
-        return User.objects.filter(
-            preferences__key=self.kwargs["pref_key"]
-        ).prefetch_related("preferences").select_related("profile")
+        return (
+            User.objects.filter(preferences__key=self.kwargs["pref_key"])
+            .prefetch_related("preferences")
+            .select_related("profile")
+        )
 
 
 class UpdateEmailOptInPreference(APIView):
-    """View for updating the email opt in preference. """
+    """View for updating the email opt in preference."""
+
     authentication_classes = (SessionAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated,)
 
     @method_decorator(require_post_params(["course_id", "email_opt_in"]))
     @method_decorator(ensure_csrf_cookie)
     def post(self, request):
-        """ Post function for updating the email opt in preference.
+        """Post function for updating the email opt in preference.
 
         Allows the modification or creation of the email opt in preference at an
         organizational level.
@@ -111,17 +117,13 @@ class UpdateEmailOptInPreference(APIView):
                     assume False.
 
         """
-        course_id = request.data['course_id']
+        course_id = request.data["course_id"]
         try:
             org = locator.CourseLocator.from_string(course_id).org
         except InvalidKeyError:
-            return HttpResponse(
-                status=400,
-                content=f"No course '{course_id}' found",
-                content_type="text/plain"
-            )
+            return HttpResponse(status=400, content=f"No course '{course_id}' found", content_type="text/plain")
         # Only check for true. All other values are False.
-        email_opt_in = request.data['email_opt_in'].lower() == 'true'
+        email_opt_in = request.data["email_opt_in"].lower() == "true"
         update_email_opt_in(request.user, org, email_opt_in)
         return HttpResponse(status=status.HTTP_200_OK)
 
@@ -152,9 +154,10 @@ class CountryTimeZoneListView(generics.ListAPIView):
             * time_zone: The name of the time zone.
             * description: The display version of the time zone
     """
+
     serializer_class = CountryTimeZoneSerializer
     paginator = None
 
     def get_queryset(self):
-        country_code = self.request.GET.get('country_code', None)
+        country_code = self.request.GET.get("country_code", None)
         return get_country_time_zones(country_code)

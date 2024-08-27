@@ -1096,12 +1096,13 @@
                         if (typeof this.currentIndex !== 'undefined') {
                             this.subtitlesEl
                                 .find('li.current')
+                                .attr('aria-current', 'false')
                                 .removeClass('current');
-                        }
-
+                        }                 
                         this.subtitlesEl
                             .find("span[data-index='" + newIndex + "']")
                             .parent()
+                            .attr('aria-current', 'true')
                             .addClass('current');
 
                         this.currentIndex = newIndex;

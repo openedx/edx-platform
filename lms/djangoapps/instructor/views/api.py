@@ -105,7 +105,9 @@ from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
-from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer, AccessSerializer
+from lms.djangoapps.instructor.views.serializer import (
+    AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -2172,23 +2174,35 @@ def list_background_email_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EMAIL)
-def list_email_content(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListEmailContent(APIView):
     """
     List the content of bulk emails sent
     """
-    course_id = CourseKey.from_string(course_id)
-    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
-    # First get tasks list of bulk emails sent
-    emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EMAIL
 
-    response_payload = {
-        'emails': list(map(extract_email_features, emails)),
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List the content of bulk emails sent for a specific course.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            course_id (str): The ID of the course for which to list the bulk emails.
+
+        Returns:
+            HttpResponse: A response object containing the list of bulk email contents.
+        """
+        course_id = CourseKey.from_string(course_id)
+        task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
+        # First get tasks list of bulk emails sent
+        emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
+
+        response_payload = {
+            'emails': list(map(extract_email_features, emails)),
+        }
+        return JsonResponse(response_payload)
 
 
 class InstructorTaskSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -2967,20 +2981,50 @@ def show_unit_extensions(request, course_id):
     return JsonResponse(dump_block_extensions(course, unit))
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('student')
-def show_student_extensions(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ShowStudentExtensions(APIView):
     """
     Shows all of the due date extensions granted to a particular student in a
     particular course.
     """
-    student = require_student_from_identifier(request.POST.get('student'))
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    return JsonResponse(dump_student_extensions(course, student))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowStudentExtensionSerializer
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handles POST requests to retrieve due date extensions for a specific student
+        within a specified course.
+
+        Parameters:
+        - `request`: The HTTP request object containing user-submitted data.
+        - `course_id`: The ID of the course for which the extensions are being queried.
+
+        Data expected in the request:
+        - `student`: A required field containing the identifier of the student for whom
+          the due date extensions are being retrieved. This data is extracted from the
+          request body.
+
+        Returns:
+        - A JSON response containing the details of the due date extensions granted to
+          the specified student in the specified course.
+        """
+        data = {
+            'student': request.data.get('student')
+        }
+        serializer_data = self.serializer_class(data=data)
+
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('student')
+        if not student:
+            response_payload = f'Could not find student matching identifier: {request.data.get("student")}'
+            return JsonResponse({'error': response_payload}, status=400)
+
+        course = get_course_by_id(CourseKey.from_string(course_id))
+        return Response(dump_student_extensions(course, student))
 
 
 def _split_input_list(str_list):
