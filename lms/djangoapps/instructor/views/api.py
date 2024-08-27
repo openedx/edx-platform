@@ -2739,6 +2739,8 @@ def list_forum_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
+from rest_framework import serializers, status
+
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -2774,22 +2776,26 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
 
         try:
             # Validate the data
-            if not serializer_data.is_valid():
-                return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            serializer_data.is_valid()
             targets = json.loads(serializer_data.validated_data.get("send_to"))
             subject = serializer_data.validated_data.get("subject")
             message = serializer_data.validated_data.get("message")
             # optional, this is a date and time in the form of an ISO8601 string
             schedule_dt = serializer_data.validated_data.get("schedule", "")
 
-        except ValueError as value_error:
+
+        except serializers.ValidationError as e:
             error_message = (
                 f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
+
                 f"{value_error}"
             )
             log.error(error_message)
             return HttpResponseBadRequest(error_message)
+        except Exception as e:
+            log.error(f"Unhandled exception: {str(e)}")
+            # Return a response with a generic error message
+            return Response({"error": "An unexpected error occurred."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
         # there is no site configuration enabled for the current site then we use system defaults for both.

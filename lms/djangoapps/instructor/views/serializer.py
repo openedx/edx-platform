@@ -90,7 +90,6 @@ class SendEmailSerializer(serializers.Serializer):
     schedule = serializers.CharField(required=False)
 
     def validate_schedule(self, value):
-
         if value:
             schedule_dt = dateutil.parser.parse(value).replace(tzinfo=pytz.utc)
             if schedule_dt < datetime.datetime.now(pytz.utc):
