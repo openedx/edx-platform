@@ -30,7 +30,7 @@ from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
     update_logistration_context_for_enterprise
 )
-from student.helpers import get_next_url_for_login_page
+from student.helpers import get_next_url_for_login_page, add_hide_elements_cookie_to_redirect
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
@@ -146,12 +146,14 @@ def login_and_registration_form(request, initial_mode="login"):
     #  since Django's SessionAuthentication middleware auto-updates session cookies but not
     #  the other login-related cookies. See ARCH-282.
     if request.user.is_authenticated and are_logged_in_cookies_set(request):
-        return redirect(redirect_to)
+        response = add_hide_elements_cookie_to_redirect(redirect_to)
+        return response
 
     # Tahoe: Disable upstream login/register forms when the Tahoe Identity Provider is enabled.
     tahoe_idp_redirect_url = tahoe_idp_helpers.get_idp_form_url(request, initial_mode, redirect_to)
     if tahoe_idp_redirect_url:
-        return redirect(tahoe_idp_redirect_url)
+        response = add_hide_elements_cookie_to_redirect(tahoe_idp_redirect_url)
+        return response
 
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
