@@ -152,9 +152,9 @@ def content_object_tags_changed_handler(**kwargs) -> None:
 
     try:
         # Check if valid if course or library block
-        get_content_key_from_string(content_object_tags.object_id)
+        content_key = get_content_key_from_string(str(content_object_tags.object_id))
     except ValueError:
         log.error("Received invalid content object id")
         return
 
-    upsert_block_tags_index_docs(content_object_tags.object_id)
+    upsert_block_tags_index_docs(content_key)
