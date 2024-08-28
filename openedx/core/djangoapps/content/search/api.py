@@ -317,6 +317,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.context_key,
             Fields.org,
             Fields.tags,
+            Fields.tags + "." + Fields.tags_collections,
             Fields.tags + "." + Fields.tags_taxonomy,
             Fields.tags + "." + Fields.tags_level0,
             Fields.tags + "." + Fields.tags_level1,
@@ -339,6 +340,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             # are searchable only if at least one document in the index has a value. If we didn't list them here and,
             # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
             # these sub-fields: "Attribute `tags.level3` is not searchable."
+            Fields.tags + "." + Fields.tags_collections,
             Fields.tags + "." + Fields.tags_taxonomy,
             Fields.tags + "." + Fields.tags_level0,
             Fields.tags + "." + Fields.tags_level1,
