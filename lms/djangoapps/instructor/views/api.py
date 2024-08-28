@@ -2909,10 +2909,6 @@ def _display_unit(unit):
         return str(unit.location)
 
 
-
-
-# @require_post_params('student', 'url', 'due_datetime')
-
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class ChangeDueDate(APIView):
     """
@@ -2924,7 +2920,14 @@ class ChangeDueDate(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
+        """
+        Grants a due date extension to a student for a particular unit.
 
+        params:
+            url (str): The URL related to the block that needs the due date update.
+            due_datetime (str): The new due date and time for the block.
+            student (str): The email or username of the student whose access is being modified.
+        """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
@@ -2939,8 +2942,8 @@ class ChangeDueDate(APIView):
         course = get_course_by_id(CourseKey.from_string(course_id))
 
         unit = find_unit(course, serializer_data.validated_data.get('url'))
-        due_date = parse_datetime( serializer_data.validated_data.get('due_datetime'))
-        reason = strip_tags( serializer_data.validated_data.get('reason', ''))
+        due_date = parse_datetime(serializer_data.validated_data.get('due_datetime'))
+        reason = strip_tags(serializer_data.validated_data.get('reason', ''))
 
         set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
 

@@ -80,6 +80,13 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
 
 
 class BlockDueDateSerializer(serializers.Serializer):
+    """
+    Serializer for handling block due date updates for a specific student.
+    Fields:
+        url (str): The URL related to the block that needs the due date update.
+        due_datetime (str): The new due date and time for the block.
+        student (str): The email or username of the student whose access is being modified.
+    """
     url = serializers.CharField()
     due_datetime = serializers.CharField()
     student = serializers.CharField(
