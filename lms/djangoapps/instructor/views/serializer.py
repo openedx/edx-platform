@@ -7,9 +7,6 @@ from rest_framework import serializers
 from .tools import get_student_from_identifier
 
 from lms.djangoapps.instructor.access import ROLES
-import dateutil
-import pytz
-import datetime
 
 
 class RoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -83,16 +80,19 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
 
 
 class SendEmailSerializer(serializers.Serializer):
+    """
+    Serializer for sending an email with optional scheduling.
+
+    Fields:
+        send_to (str): The email address of the recipient. This field is required.
+        subject (str): The subject line of the email. This field is required.
+        message (str): The body of the email. This field is required.
+        schedule (str, optional):
+        An optional field to specify when the email should be sent.
+        If provided, this should be a string that can be parsed into a
+        datetime format or some other scheduling logic.
+    """
     send_to = serializers.CharField(write_only=True, required=True)
     subject = serializers.CharField(write_only=True, required=True)
     message = serializers.CharField(required=True)
-
     schedule = serializers.CharField(required=False)
-
-    def validate_schedule(self, value):
-        if value:
-            schedule_dt = dateutil.parser.parse(value).replace(tzinfo=pytz.utc)
-            if schedule_dt < datetime.datetime.now(pytz.utc):
-                raise serializers.ValidationError("the requested schedule is in the past")
-
-        return value

@@ -2768,34 +2768,34 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
         course_overview = CourseOverview.get_from_id(course_id)
 
         if not is_bulk_email_feature_enabled(course_id):
-            log.warning(f"Email is not enabled for course {course_id}")
-            return HttpResponseForbidden("Email is not enabled for this course.")
+                log.warning(f"Email is not enabled for course {course_id}")
+                return HttpResponseForbidden("Email is not enabled for this course.")
 
-        schedule = request.POST.get("schedule", "")
         serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-        try:
-            # Validate the data
-            serializer_data.is_valid()
-            targets = json.loads(serializer_data.validated_data.get("send_to"))
-            subject = serializer_data.validated_data.get("subject")
-            message = serializer_data.validated_data.get("message")
-            # optional, this is a date and time in the form of an ISO8601 string
-            schedule_dt = serializer_data.validated_data.get("schedule", "")
+        targets = json.loads(request.POST.get("send_to"))
+        subject = serializer_data.validated_data.get("subject")
+        message = serializer_data.validated_data.get("message")
+        # optional, this is a date and time in the form of an ISO8601 string
+        schedule = serializer_data.validated_data.get("schedule", "")
 
-
-        except serializers.ValidationError as e:
-            error_message = (
-                f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
-
-                f"{value_error}"
-            )
-            log.error(error_message)
-            return HttpResponseBadRequest(error_message)
-        except Exception as e:
-            log.error(f"Unhandled exception: {str(e)}")
-            # Return a response with a generic error message
-            return Response({"error": "An unexpected error occurred."}, status=status.HTTP_400_BAD_REQUEST)
+        schedule_dt = None
+        if schedule:
+            try:
+                # convert the schedule from a string to a datetime, then check if its a valid future date and time, dateutil
+                # will throw a ValueError if the schedule is no good.
+                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
+                if schedule_dt < datetime.datetime.now(pytz.utc):
+                    raise ValueError("the requested schedule is in the past")
+            except ValueError as value_error:
+                error_message = (
+                    f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
+                    f"{value_error}"
+                )
+                log.error(error_message)
+                return HttpResponseBadRequest(error_message)
 
         # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
         # there is no site configuration enabled for the current site then we use system defaults for both.

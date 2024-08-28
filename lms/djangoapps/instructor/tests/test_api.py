@@ -3646,9 +3646,6 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
 
             response = self.client.post(url, self.full_test_message)
 
-        import pdb;
-        pdb.set_trace()
-
         assert response.status_code == 400
         log.check_present((LOG_PATH, "ERROR", expected_message),)
 
