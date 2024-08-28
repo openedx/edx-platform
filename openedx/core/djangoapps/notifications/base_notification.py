@@ -217,10 +217,12 @@ COURSE_NOTIFICATION_TYPES = {
         'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have received a grade for open response assessment '
+        'content_template': _('<{p}>You have received {points_earned} out of {points_possible} on your assessment: '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',
+            'points_earned': 'Points earned',
+            'points_possible': 'Points possible',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],

@@ -140,7 +140,7 @@ def submit_grade(request, usage_id, grade_data, submission_uuid):
 
     if response_data.get("success", False):
         submissions = get_submissions(request, usage_id)
-        send_staff_grade_assigned_notification(request, usage_id, submission_uuid, submissions)
+        send_staff_grade_assigned_notification(request, usage_id, submissions[submission_uuid])
 
     return response_data
 

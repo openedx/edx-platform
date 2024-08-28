@@ -24,12 +24,12 @@ log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-def send_staff_grade_assigned_notification(request, usage_id, submission_uuid, submissions):
+def send_staff_grade_assigned_notification(request, usage_id, submission):
     """
         Send a user notification for a course for a new grade being assigned
     """
     try:
-        ora_user = User.objects.get(email=submissions[submission_uuid]['email'])
+        ora_user = User.objects.get(email=submission['email'])
         # Do not send the notification if the request user is the same as the ora submitter
         if request.user != ora_user:
             # Get ORA block
@@ -43,6 +43,8 @@ def send_staff_grade_assigned_notification(request, usage_id, submission_uuid, s
                 context={
                     'ora_name': ora_metadata.display_name,
                     'course_name': course_metadata.display_name,
+                    'points_earned': submission['score']['pointsEarned'],
+                    'points_possible': submission['score']['pointsPossible'],
                 },
                 notification_type="ora_staff_grade_assigned",
                 content_url=f"{settings.LMS_ROOT_URL}/courses/{str(course_id)}/jump_to/{str(ora_usage_key)}",
@@ -58,7 +60,3 @@ def send_staff_grade_assigned_notification(request, usage_id, submission_uuid, s
     # Issues with the XBlock handlers
     except XBlockInternalError as ex:
         log.error(ex)
-
-    # Blanket exception handling in case something blows up
-    except Exception as ex:
-        log.exception(ex)
