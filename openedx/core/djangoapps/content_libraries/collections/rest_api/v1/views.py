@@ -5,11 +5,16 @@ Collections API Views
 from __future__ import annotations
 
 from django.http import Http404
+from django.utils.translation import gettext as _
 
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
+from rest_framework.viewsets import ModelViewSet
 
+from openedx_learning.api.authoring_models import Collection, Component
+from openedx_learning.api import authoring as authoring_api
 from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx_events.content_authoring.data import LibraryCollectionData
@@ -21,11 +26,9 @@ from openedx_events.content_authoring.signals import (
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionSerializer,
+    ContentLibraryCollectionContentsUpdateSerializer,
     ContentLibraryCollectionCreateOrUpdateSerializer,
 )
-
-from openedx_learning.api.authoring_models import Collection
-from openedx_learning.api import authoring as authoring_api
 
 
 class LibraryCollectionsView(ModelViewSet):
@@ -179,3 +182,38 @@ class LibraryCollectionsView(ModelViewSet):
         # TODO: Implement the deletion logic and emit event signal
 
         return Response(None, status=HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(detail=True, methods=['delete', 'patch'], url_path='contents', url_name='contents:update')
+    def update_contents(self, request, lib_key_str, pk=None):
+        """
+        Adds (PATCH) or removes (DELETE) Components to/from a Collection.
+
+        Collection and Components must all be part of the given library/learning package.
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        library_obj = api.require_permission_for_library_key(
+            library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+
+        serializer = ContentLibraryCollectionContentsUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            count = api.update_collection_contents(
+                library_obj,
+                collection_pk=pk,
+                usage_keys=serializer.validated_data["usage_keys"],
+                remove=(request.method == "DELETE"),
+            )
+        except Collection.DoesNotExist as exc:
+            raise Http404() from exc
+
+        except Component.DoesNotExist as exc:
+            # Only allows adding/removing components that are in the collection's learning package.
+            raise ValidationError({
+                "usage_keys": _("Component(s) not found in library"),
+            }) from exc
+
+        return Response({'count': count})

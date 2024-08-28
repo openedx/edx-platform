@@ -69,15 +69,20 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from edx_rest_api_client.client import OAuthAPIClient
 from lxml import etree
-from opaque_keys.edx.keys import UsageKey, UsageKeyV2
+from opaque_keys.edx.keys import BlockTypeKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import (
     LibraryLocatorV2,
     LibraryUsageLocatorV2,
     LibraryLocator as LibraryLocatorV1
 )
 from opaque_keys import InvalidKeyError
-from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    ContentObjectData,
+    LibraryBlockData,
+)
 from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_TAGS_CHANGED,
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
@@ -86,7 +91,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, MediaType, LearningPackage
+from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -1060,6 +1065,69 @@ def revert_changes(library_key):
             update_blocks=True
         )
     )
+
+
+def update_collection_contents(
+    library: ContentLibraryMetadata,
+    collection_pk: int,
+    usage_keys: list[UsageKeyV2],
+    remove=False,
+) -> int:
+    """
+    Associates the Collection with Components for the given UsageKeys.
+
+    By default the Components are added to the Collection.
+    If remove=True, the Components are removed from the Collection.
+
+    Raises:
+    * Collection.DoesNotExist if no Collection with the given pk is found in the given library.
+    * Component.DoesNotExist if any of the given usage_keys don't correspond to a Component in the
+      library/learning_package.
+    """
+    learning_package = library.learning_package
+    collections_qset = authoring_api.get_learning_package_collections(
+        learning_package.id,
+    ).filter(pk=collection_pk)
+
+    collection = collections_qset.first()
+    if not collection:
+        raise Collection.DoesNotExist()
+
+    # Fetch the Component.key values for the provided UsageKeys.
+    component_keys = []
+    for usage_key in usage_keys:
+        # Parse the block_family from the key to use as namespace.
+        block_type = BlockTypeKey.from_string(str(usage_key))
+
+        # Can raise Component.DoesNotExist
+        component = authoring_api.get_component_by_key(
+            learning_package.id,
+            namespace=block_type.block_family,
+            type_name=usage_key.block_type,
+            local_key=usage_key.block_id,
+        )
+        component_keys.append(component.key)
+
+    # Note: Component.key matches its PublishableEntity.key
+    contents_qset = learning_package.publishable_entities.filter(
+        key__in=component_keys,
+    )
+    if not contents_qset.count():
+        raise Component.DoesNotExist()
+
+    if remove:
+        count = authoring_api.remove_from_collections(collections_qset, contents_qset)
+    else:
+        count = authoring_api.add_to_collections(collections_qset, contents_qset)
+
+    # Emit a CONTENT_OBJECT_TAGS_CHANGED event for each of the objects added/removed
+    object_keys = contents_qset.values_list("key", flat=True)
+    for object_key in object_keys:
+        CONTENT_OBJECT_TAGS_CHANGED.send_event(
+            content_object=ContentObjectData(object_id=object_key),
+        )
+
+    return count
 
 
 # V1/V2 Compatibility Helpers
