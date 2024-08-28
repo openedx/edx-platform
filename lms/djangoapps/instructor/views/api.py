@@ -2739,8 +2739,6 @@ def list_forum_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
-from rest_framework import serializers, status
-
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -2788,7 +2786,8 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
         schedule_dt = None
         if schedule:
             try:
-                # convert the schedule from a string to a datetime, then check if its a valid future date and time, dateutil
+                # convert the schedule from a string to a datetime, then check if its a
+                # valid future date and time, dateutil
                 # will throw a ValueError if the schedule is no good.
                 schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
                 if schedule_dt < datetime.datetime.now(pytz.utc):
@@ -2801,13 +2800,14 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
                 log.error(error_message)
                 return HttpResponseBadRequest(error_message)
 
-        # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
-        # there is no site configuration enabled for the current site then we use system defaults for both.
+        # Retrieve the customized email "from address" and email template from site configuration for the c
+        # ourse/partner.
+        # If there is no site configuration enabled for the current site then we use system defaults for both.
         from_addr = _get_branded_email_from_address(course_overview)
         template_name = _get_branded_email_template(course_overview)
 
-        # Create the CourseEmail object. This is saved immediately so that any transaction that has been pending up to this
-        # point will also be committed.
+        # Create the CourseEmail object. This is saved immediately so that any transaction that has been
+        # pending up to this point will also be committed.
         try:
             email = create_course_email(
                 course_id,
