@@ -74,8 +74,10 @@ def update_verification_attempt(attempt_id, name=None, status=None, expiration_d
     This method is intended to be used by IDV implementation plugins to update VerificationAttempt instances.
 
     Arguments:
-        * id (str): the verification attempt id of the attempt to update
-        * status (str): the new status
+        * attempt_id (int): the verification attempt id of the attempt to update
+        * name (string, optional): the new name being ID verified
+        * status (string, optional): the new status of the verification attempt
+        * expiration_datetime (datetime, optional): The new expiration date and time
 
     Returns:
         * None
