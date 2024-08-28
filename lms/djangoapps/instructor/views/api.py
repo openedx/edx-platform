@@ -2775,7 +2775,11 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
+        # Skipping serializer validation to avoid potential disruptions.
+        # The API handles numerous input variations, and changes here could introduce breaking issues.
+
         targets = json.loads(request.POST.get("send_to"))
+
         subject = serializer_data.validated_data.get("subject")
         message = serializer_data.validated_data.get("message")
         # optional, this is a date and time in the form of an ISO8601 string
