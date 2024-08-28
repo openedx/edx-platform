@@ -313,7 +313,14 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'push': True,
                             'email_cadence': 'Daily',
                             'info': 'Notifications for submission grading.'
-                        }
+                        },
+                        'ora_staff_grade_assigned': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
                     },
                     'non_editable': {}
                 }

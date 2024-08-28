@@ -31,7 +31,7 @@ def send_staff_grade_assigned_notification(request, usage_id, submission):
     try:
         ora_user = User.objects.get(email=submission['email'])
         # Do not send the notification if the request user is the same as the ora submitter
-        if request.user != ora_user:
+        if request.user.id != ora_user.id:
             # Get ORA block
             ora_usage_key = UsageKey.from_string(usage_id)
             ora_metadata = modulestore().get_item(ora_usage_key)
