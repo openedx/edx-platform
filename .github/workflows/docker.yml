@@ -91,7 +91,7 @@ jobs:
       - name: Test edX platform
         run: |
           cd .github/test
-          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh
+          docker compose run lms /openedx/edx-platform/.github/test/tests.sh
 
       - name: Push the image to the registry
         if: ${{ github.event_name == 'merge_group' || github.event_name == 'push' }}
