@@ -2944,8 +2944,11 @@ class ChangeDueDate(APIView):
         unit = find_unit(course, serializer_data.validated_data.get('url'))
         due_date = parse_datetime(serializer_data.validated_data.get('due_datetime'))
         reason = strip_tags(serializer_data.validated_data.get('reason', ''))
+        try:
+            set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
+        except Exception as error:  # pylint: disable=broad-except
+            return JsonResponse({'error': str(error)}, status=400)
 
-        set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
 
         return JsonResponse(_(
             'Successfully changed due date for student {0} for {1} '
@@ -3008,8 +3011,8 @@ class ShowStudentExtensions(APIView):
     particular course.
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowStudentExtensionSerializer
     permission_name = permissions.GIVE_STUDENT_EXTENSION
-    serializer_class = BlockDueDateSerializer
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
