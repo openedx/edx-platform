@@ -77,3 +77,23 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class BlockDueDateSerializer(serializers.Serializer):
+    url = serializers.CharField()
+    due_datetime = serializers.CharField()
+    student = serializers.CharField(
+        max_length=255,
+        help_text="Email or username of user to change access"
+    )
+
+    def validate_student(self, value):
+        """
+        Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
