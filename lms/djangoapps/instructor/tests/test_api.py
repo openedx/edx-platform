@@ -4145,6 +4145,21 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # This operation regenerates the cache, so we can use cached results from edx-when.
         assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
 
+    def test_change_due_date_with_reason(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2013 00:00',
+            'reason': 'Testing reason.'  # this is optional field.
+        })
+        assert response.status_code == 200, response.content
+
+        assert get_extended_due(self.course, self.week1, self.user1) == due_date
+        # This operation regenerates the cache, so we can use cached results from edx-when.
+        assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
+
     def test_change_to_invalid_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
