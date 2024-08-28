@@ -5,11 +5,11 @@ import logging
 
 from django.conf import settings
 from django.utils.translation import gettext as _
+from django.core.exceptions import ValidationError
 
 from lms.djangoapps.verify_student.emails import send_verification_approved_email
 from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import VerificationAttempt
-from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 
 log = logging.getLogger(__name__)
@@ -67,9 +67,9 @@ def create_verification_attempt(user, name, status, expiration_datetime=None):
     return verification_attempt.id
 
 
-def update_verification_attempt_status(attempt_id, status):
+def update_verification_attempt(attempt_id, name=None, status=None, expiration_datetime=None):
     """
-    Update the status of a verification attempt.
+    Update a verification attempt.
 
     This method is intended to be used by IDV implementation plugins to update VerificationAttempt instances.
 
@@ -80,15 +80,6 @@ def update_verification_attempt_status(attempt_id, status):
     Returns:
         * None
     """
-    status_list = [attr for attr in dir(VerificationAttemptStatus) if not attr.startswith('__')]
-
-    if status not in status_list:
-        log.error(
-            f'update_verification_attempt_status called with invalid status. '
-            f'Status must be one of: {status_list}',
-        )
-        raise VerificationAttemptInvalidStatus
-
     try:
         attempt = VerificationAttempt.objects.get(id=attempt_id)
     except VerificationAttempt.DoesNotExist:
@@ -96,7 +87,27 @@ def update_verification_attempt_status(attempt_id, status):
             f'VerificationAttempt with id {attempt_id} was not found '
             f'when updating the attempt to status={status}',
         )
-        raise VerificationAttempt.DoesNotExist  # pylint: disable=raise-missing-from
+        raise
 
-    attempt.status = status
-    attempt.save()
+    if name is not None:
+        attempt.name = name
+
+    if status is not None:
+        attempt.status = status
+
+    if expiration_datetime is not None:
+        attempt.expiration_datetime = expiration_datetime
+
+    try:
+        attempt.clean_fields()
+        attempt.save()
+    except ValidationError:
+        log.error(
+            'Attempted to call update_verification_attempt called with invalid status: %(status)s. '
+            'Status must be one of: %(status_list)s',
+            {
+                'status': status,
+                'status_list': VerificationAttempt.STATUS_CHOICES,
+            },
+        )
+        raise VerificationAttemptInvalidStatus  # pylint: disable=raise-missing-from

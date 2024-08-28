@@ -13,7 +13,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.api import (
     create_verification_attempt,
     send_approval_email,
-    update_verification_attempt_status,
+    update_verification_attempt,
 )
 from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationAttempt
@@ -106,9 +106,9 @@ class CreateVerificationAttempt(TestCase):
 
 
 @ddt.ddt
-class UpdateVerificationAttemptStatus(TestCase):
+class UpdateVerificationAttempt(TestCase):
     """
-    Test cases for the update_verification_attempt_status API method.
+    Test cases for the update_verification_attempt API method.
     """
 
     def setUp(self):
@@ -124,22 +124,50 @@ class UpdateVerificationAttemptStatus(TestCase):
         self.attempt.save()
 
     @ddt.data(
-        VerificationAttemptStatus.pending,
-        VerificationAttemptStatus.approved,
-        VerificationAttemptStatus.denied,
+        ('Tester McTest', VerificationAttemptStatus.pending, datetime(2024, 12, 31, tzinfo=timezone.utc)),
+        ('Tester McTest2', VerificationAttemptStatus.approved, datetime(2025, 12, 31, tzinfo=timezone.utc)),
+        ('Tester McTest3', VerificationAttemptStatus.denied, datetime(2026, 12, 31, tzinfo=timezone.utc)),
     )
-    def test_update_verification_attempt_status(self, to_status):
-        update_verification_attempt_status(attempt_id=self.attempt.id, status=to_status)
+    @ddt.unpack
+    def test_update_verification_attempt(self, name, status, expiration_datetime):
+        update_verification_attempt(
+            attempt_id=self.attempt.id,
+            name=name,
+            status=status,
+            expiration_datetime=expiration_datetime,
+        )
 
         verification_attempt = VerificationAttempt.objects.get(id=self.attempt.id)
 
-        # These are fields whose values should not change as a result of this update.
+        # Values should change as a result of this update.
         self.assertEqual(verification_attempt.user, self.user)
-        self.assertEqual(verification_attempt.name, 'Tester McTest')
-        self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo=timezone.utc))
+        self.assertEqual(verification_attempt.name, name)
+        self.assertEqual(verification_attempt.status, status)
+        self.assertEqual(verification_attempt.expiration_datetime, expiration_datetime)
 
-        # This field's value should change as a result of this update.
-        self.assertEqual(verification_attempt.status, to_status)
+    def test_update_verification_attempt_none_values(self):
+        update_verification_attempt(
+            attempt_id=self.attempt.id,
+            name=None,
+            status=None,
+            expiration_datetime=None,
+        )
+
+        verification_attempt = VerificationAttempt.objects.get(id=self.attempt.id)
+
+        # Values should not change as a result of the values passed in being None.
+        self.assertEqual(verification_attempt.user, self.user)
+        self.assertEqual(verification_attempt.name, self.attempt.name)
+        self.assertEqual(verification_attempt.status, self.attempt.status)
+        self.assertEqual(verification_attempt.expiration_datetime, self.attempt.expiration_datetime)
+
+    def test_update_verification_attempt_not_found(self):
+        self.assertRaises(
+            VerificationAttempt.DoesNotExist,
+            update_verification_attempt,
+            attempt_id=999999,
+            status=VerificationAttemptStatus.approved,
+        )
 
     # These are statuses used in edx-name-affirmation's VerifiedName model and persona-integration's unique
     # VerificationAttempt model, and not by verify_student's VerificationAttempt model.
@@ -149,18 +177,12 @@ class UpdateVerificationAttemptStatus(TestCase):
         'submitted',
         'expired',
     )
-    def test_update_verification_attempt_status_invalid(self, to_status):
+    def test_update_verification_attempt_invalid(self, status):
         self.assertRaises(
             VerificationAttemptInvalidStatus,
-            update_verification_attempt_status,
+            update_verification_attempt,
             attempt_id=self.attempt.id,
-            status=to_status,
-        )
-
-    def test_update_verification_attempt_status_not_found(self):
-        self.assertRaises(
-            VerificationAttempt.DoesNotExist,
-            update_verification_attempt_status,
-            attempt_id=999999,
-            status=VerificationAttemptStatus.approved,
+            name=None,
+            status=status,
+            expiration_datetime=None,
         )
