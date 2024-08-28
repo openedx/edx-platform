@@ -93,6 +93,8 @@ class SendEmailSerializer(serializers.Serializer):
         datetime format or some other scheduling logic.
     """
     send_to = serializers.CharField(write_only=True, required=True)
-    subject = serializers.CharField(write_only=True, required=True)
+
+    # set max length as per model field.
+    subject = serializers.CharField(max_length=128, write_only=True, required=True)
     message = serializers.CharField(required=True)
     schedule = serializers.CharField(required=False)

@@ -2766,8 +2766,8 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
         course_overview = CourseOverview.get_from_id(course_id)
 
         if not is_bulk_email_feature_enabled(course_id):
-                log.warning(f"Email is not enabled for course {course_id}")
-                return HttpResponseForbidden("Email is not enabled for this course.")
+            log.warning(f"Email is not enabled for course {course_id}")
+            return HttpResponseForbidden("Email is not enabled for this course.")
 
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
