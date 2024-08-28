@@ -35,7 +35,8 @@ class TestSendStaffGradeAssignedNotification(unittest.TestCase):
     @patch('lms.djangoapps.ora_staff_grader.notifications.modulestore')
     @patch('lms.djangoapps.ora_staff_grader.notifications.get_course_overview_or_none')
     @patch('lms.djangoapps.ora_staff_grader.notifications.USER_NOTIFICATION_REQUESTED.send_event')
-    def test_send_notification_success(self, mock_send_event, mock_get_course_overview_or_none, mock_modulestore, mock_from_string, mock_get_user):
+    def test_send_notification_success(self, mock_send_event, mock_get_course_overview_or_none,
+                                       mock_modulestore, mock_from_string, mock_get_user):
         """
         Test that the notification is sent when the user IDs do not match.
         """
