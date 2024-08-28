@@ -22,6 +22,7 @@ from lms.djangoapps.ora_staff_grader.errors import (
 )
 
 from lms.djangoapps.ora_staff_grader.utils import call_xblock_json_handler, is_json
+from .notifications import send_staff_grade_assigned_notification
 
 
 def get_submissions(request, usage_id):
@@ -116,7 +117,7 @@ def get_assessment_info(request, usage_id, submission_uuid):
     return json.loads(response.content)
 
 
-def submit_grade(request, usage_id, grade_data):
+def submit_grade(request, usage_id, grade_data, submission_uuid):
     """
     Submit a grade for an assessment.
 
@@ -136,6 +137,10 @@ def submit_grade(request, usage_id, grade_data):
         raise XBlockInternalError(
             context={"handler": handler_name, "msg": response_data.get("msg", "")}
         )
+
+    if response_data.get("success", False):
+        submissions = get_submissions(request, usage_id)
+        send_staff_grade_assigned_notification(request, usage_id, submission_uuid, submissions)
 
     return response_data
 

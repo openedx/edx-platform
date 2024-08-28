@@ -479,7 +479,7 @@ class UpdateGradeView(StaffGraderBaseView):
             # Transform grade data and submit assessment, raises on failure
             context = {"submission_uuid": submission_uuid}
             grade_data = StaffAssessSerializer(request.data, context=context).data
-            submit_grade(request, ora_location, grade_data)
+            submit_grade(request, ora_location, grade_data, submission_uuid)
 
             # Clear the lock on the graded submission
             delete_submission_lock(request, ora_location, submission_uuid)
