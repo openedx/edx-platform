@@ -2949,7 +2949,6 @@ class ChangeDueDate(APIView):
         except Exception as error:  # pylint: disable=broad-except
             return JsonResponse({'error': str(error)}, status=400)
 
-
         return JsonResponse(_(
             'Successfully changed due date for student {0} for {1} '
             'to {2}').format(student.profile.name, _display_unit(unit),
