@@ -9060,7 +9060,7 @@ msgstr "Crear una cuenta"
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
-msgstr "Primera vez aquí?"
+msgstr "¿Primera vez aquí?"
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an Account."
