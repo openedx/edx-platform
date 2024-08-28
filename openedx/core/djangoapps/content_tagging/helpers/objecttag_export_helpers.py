@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import Any, Callable, Iterator, Union
 
 from attrs import define
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey, LibCollectionKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from xblock.core import XBlock
 
@@ -135,7 +135,7 @@ def _get_library_block_tagged_object(
 
 
 def build_object_tree_with_objecttags(
-    content_key: LibraryLocatorV2 | CourseKey,
+    content_key: LibraryLocatorV2 | CourseKey | LibCollectionKey,
     object_tag_cache: TagValuesByObjectIdDict,
 ) -> TaggedContent:
     """

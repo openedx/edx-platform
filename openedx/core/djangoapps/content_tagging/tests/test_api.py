@@ -396,7 +396,7 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
         assert taxonomies == {
             self.taxonomy_3.id: self.taxonomy_3,
         }
-        
+
 
 class TestExportImportTags(TaggedCourseMixin):
     """

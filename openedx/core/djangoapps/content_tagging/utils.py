@@ -44,7 +44,7 @@ def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
     # If the content key is a UsageKey, return the context key
     context_key = content_key.context_key
 
-    if isinstance(context_key, (CourseKey, LibraryLocatorV2, LibCollectionKey)):
+    if isinstance(context_key, (CourseKey, LibraryLocatorV2)):
         return context_key
 
     raise ValueError("context must be a CourseKey or a LibraryLocatorV2")
