@@ -5,6 +5,7 @@ Tests Library Collections REST API views
 from __future__ import annotations
 
 from openedx_learning.api.authoring_models import Collection
+from openedx_learning.api.authoring import create_collection
 from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -33,23 +34,24 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         self.lib2 = ContentLibrary.objects.get(slug="test-lib-col-2")
 
         # Create Content Library Collections
-        self.col1 = Collection.objects.create(
+        self.col1 = create_collection(
             learning_package_id=self.lib1.learning_package.id,
             title="Collection 1",
+            created_by=self.user.id,
             description="Description for Collection 1",
-            created_by=self.user,
         )
-        self.col2 = Collection.objects.create(
+
+        self.col2 = create_collection(
             learning_package_id=self.lib1.learning_package.id,
             title="Collection 2",
+            created_by=self.user.id,
             description="Description for Collection 2",
-            created_by=self.user,
         )
-        self.col3 = Collection.objects.create(
+        self.col3 = create_collection(
             learning_package_id=self.lib2.learning_package.id,
             title="Collection 3",
+            created_by=self.user.id,
             description="Description for Collection 3",
-            created_by=self.user,
         )
 
     def test_get_library_collection(self):
@@ -94,6 +96,12 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
 
         assert resp.status_code == 404
 
+        # Fetch collection with invalid library_key provided, it should fail
+        resp = self.client.get(
+            URL_LIB_COLLECTION.format(lib_key=123, collection_id=123)
+        )
+        assert resp.status_code == 404
+
     def test_list_library_collections(self):
         """
         Test listing Content Library Collections
@@ -120,9 +128,13 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         """
         Test listing invalid Content Library Collections
         """
-        invalid_key = LibraryLocatorV2.from_string("lib:DoesNotExist:NE1")
-        resp = self.client.get(URL_LIB_COLLECTIONS.format(lib_key=invalid_key))
+        non_existing_key = LibraryLocatorV2.from_string("lib:DoesNotExist:NE1")
+        resp = self.client.get(URL_LIB_COLLECTIONS.format(lib_key=non_existing_key))
 
+        assert resp.status_code == 404
+
+        # List collections with invalid library_key provided, it should fail
+        resp = resp = self.client.get(URL_LIB_COLLECTIONS.format(lib_key=123))
         assert resp.status_code == 404
 
     def test_create_library_collection(self):
@@ -180,6 +192,14 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         )
 
         assert resp.status_code == 400
+
+        # Create collection with invalid library_key provided, it should fail
+        resp = self.client.post(
+            URL_LIB_COLLECTIONS.format(lib_key=123),
+            {**post_data_missing_title, **post_data_missing_desc},
+            format="json"
+        )
+        assert resp.status_code == 404
 
     def test_update_library_collection(self):
         """
@@ -241,6 +261,14 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
             format="json"
         )
 
+        assert resp.status_code == 404
+
+        # Update collection with invalid library_key provided, it should fail
+        resp = self.client.patch(
+            URL_LIB_COLLECTION.format(lib_key=123, collection_id=self.col3.id),
+            patch_data,
+            format="json"
+        )
         assert resp.status_code == 404
 
     def test_delete_library_collection(self):
