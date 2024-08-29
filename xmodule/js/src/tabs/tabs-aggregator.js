@@ -63,8 +63,8 @@
         if ($.isFunction(onSwitchFunction)) {
           onSwitchFunction();
         }
-        this.$tabs.removeClass('current');
-        $currentTarget.addClass('current');
+        this.$tabs.attr('aria-current', 'false').removeClass('current');
+        $currentTarget.attr('aria-current', 'true').addClass('current');
 
         /*
         Tabs are implemeted like anchors. Therefore we can use hash to find
