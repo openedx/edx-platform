@@ -13,8 +13,14 @@ from opaque_keys.edx.keys import (
     UsageKey,
 )
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_events.content_authoring.data import ContentObjectData
+from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from openedx_learning.api import authoring as authoring_api
 
 from .. import api
+from ..models import ContentLibrary
+from .base import ContentLibrariesRestApiTest
 
 
 class EdxModulestoreImportClientTest(TestCase):
@@ -241,3 +247,142 @@ class EdxApiImportClientTest(TestCase):
             block_olx
         )
         mock_publish_changes.assert_not_called()
+
+
+class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+    """
+    Tests for Content Library API collections methods.
+
+    Same guidelines as ContentLibrariesTestCase.
+    """
+    ENABLED_OPENEDX_EVENTS = [
+        CONTENT_OBJECT_TAGS_CHANGED.event_type,
+    ]
+
+    def setUp(self):
+        super().setUp()
+
+        # Create Content Libraries
+        self._create_library("test-lib-col-1", "Test Library 1")
+        self._create_library("test-lib-col-2", "Test Library 2")
+
+        # Fetch the created ContentLibrare objects so we can access their learning_package.id
+        self.lib1 = ContentLibrary.objects.get(slug="test-lib-col-1")
+        self.lib2 = ContentLibrary.objects.get(slug="test-lib-col-2")
+
+        # Create Content Library Collections
+        self.col1 = authoring_api.create_collection(
+            learning_package_id=self.lib1.learning_package.id,
+            title="Collection 1",
+            description="Description for Collection 1",
+            created_by=self.user.id,
+        )
+        self.col2 = authoring_api.create_collection(
+            learning_package_id=self.lib2.learning_package.id,
+            title="Collection 2",
+            description="Description for Collection 2",
+            created_by=self.user.id,
+        )
+
+        # Create some library blocks in lib1
+        self.lib1_problem_block = self._add_block_to_library(
+            self.lib1.library_key, "problem", "problem1",
+        )
+        self.lib1_html_block = self._add_block_to_library(
+            self.lib1.library_key, "html", "html1",
+        )
+
+    def test_update_collection_components(self):
+        count = api.update_collection_components(
+            library=self.lib1,
+            collection_pk=self.col1.pk,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+        assert count == 2
+        assert len(self.col1.entities.all()) == 2
+
+        count = api.update_collection_components(
+            library=self.lib1,
+            collection_pk=self.col1.pk,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+            remove=True,
+        )
+        assert count == 1
+        self.col1.refresh_from_db()
+        assert len(self.col1.entities.all()) == 1
+
+    def test_update_collection_components_event(self):
+        """
+        Check that a CONTENT_OBJECT_TAGS_CHANGED event is raised for each added/removed component.
+        """
+        event_receiver = mock.Mock()
+        CONTENT_OBJECT_TAGS_CHANGED.connect(event_receiver)
+        api.update_collection_components(
+            library=self.lib1,
+            collection_pk=self.col1.pk,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+
+        assert event_receiver.call_count == 2
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_TAGS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectData(
+                    object_id=UsageKey.from_string(self.lib1_problem_block["id"]),
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_TAGS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectData(
+                    object_id=UsageKey.from_string(self.lib1_html_block["id"]),
+                ),
+            },
+            event_receiver.call_args_list[1].kwargs,
+        )
+
+    def test_update_no_components(self):
+        """
+        Calling update_collection_components with no usage_keys should not fail, just return 0.
+        """
+        assert not api.update_collection_components(
+            library=self.lib1,
+            collection_pk=self.col1.pk,
+            usage_keys=[],
+        )
+
+    def test_update_collection_components_from_wrong_library(self):
+        with self.assertRaises(api.ContentLibraryBlockNotFound) as exc:
+            api.update_collection_components(
+                library=self.lib2,
+                collection_pk=self.col2.pk,
+                usage_keys=[
+                    UsageKey.from_string(self.lib1_problem_block["id"]),
+                    UsageKey.from_string(self.lib1_html_block["id"]),
+                ],
+            )
+            assert self.lib1_problem_block["id"] in str(exc.exception)
+
+    def test_update_collection_components_from_wrong_collection(self):
+        with self.assertRaises(api.ContentLibraryCollectionNotFound) as exc:
+            api.update_collection_components(
+                library=self.lib2,
+                collection_pk=self.col1.pk,
+                usage_keys=[
+                    UsageKey.from_string(self.lib1_problem_block["id"]),
+                    UsageKey.from_string(self.lib1_html_block["id"]),
+                ],
+            )
+            assert self.lib1_problem_block["id"] in str(exc.exception)
