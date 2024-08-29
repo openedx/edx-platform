@@ -875,6 +875,7 @@ class VideoBlock(
         video_url = metadata_fields['html5_sources']
         video_id = metadata_fields['edx_video_id']
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
+        transcript_url = metadata_fields['transcript_url']
 
         def get_youtube_link(video_id):
             """
@@ -931,7 +932,8 @@ class VideoBlock(
         metadata = {
             'display_name': display_name,
             'video_url': video_url,
-            'edx_video_id': video_id
+            'edx_video_id': video_id,
+            'transcript_url': transcript_url
         }
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
