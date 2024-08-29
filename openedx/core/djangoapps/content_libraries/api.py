@@ -116,6 +116,8 @@ log = logging.getLogger(__name__)
 
 ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
+ContentLibraryCollectionNotFound = Collection.DoesNotExist
+
 
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """
@@ -1067,10 +1069,11 @@ def revert_changes(library_key):
     )
 
 
-def update_collection_contents(
+def update_collection_components(
     library: ContentLibraryMetadata,
     collection_pk: int,
     usage_keys: list[UsageKeyV2],
+    created_by: int | None = None,
     remove=False,
 ) -> int:
     """
@@ -1080,9 +1083,8 @@ def update_collection_contents(
     If remove=True, the Components are removed from the Collection.
 
     Raises:
-    * Collection.DoesNotExist if no Collection with the given pk is found in the given library.
-    * Component.DoesNotExist if any of the given usage_keys don't correspond to a Component in the
-      library/learning_package.
+    * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
+    * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
     """
     learning_package = library.learning_package
     collections_qset = authoring_api.get_learning_package_collections(
@@ -1091,7 +1093,7 @@ def update_collection_contents(
 
     collection = collections_qset.first()
     if not collection:
-        raise Collection.DoesNotExist()
+        raise ContentLibraryCollectionNotFound(collection_pk)
 
     # Fetch the Component.key values for the provided UsageKeys.
     component_keys = []
@@ -1099,32 +1101,42 @@ def update_collection_contents(
         # Parse the block_family from the key to use as namespace.
         block_type = BlockTypeKey.from_string(str(usage_key))
 
-        # Can raise Component.DoesNotExist
-        component = authoring_api.get_component_by_key(
-            learning_package.id,
-            namespace=block_type.block_family,
-            type_name=usage_key.block_type,
-            local_key=usage_key.block_id,
-        )
+        try:
+            component = authoring_api.get_component_by_key(
+                learning_package.id,
+                namespace=block_type.block_family,
+                type_name=usage_key.block_type,
+                local_key=usage_key.block_id,
+            )
+        except Component.DoesNotExist as exc:
+            raise ContentLibraryBlockNotFound(usage_key) from exc
+
         component_keys.append(component.key)
 
     # Note: Component.key matches its PublishableEntity.key
-    contents_qset = learning_package.publishable_entities.filter(
+    entities_qset = learning_package.publishable_entities.filter(
         key__in=component_keys,
     )
-    if not contents_qset.count():
-        raise Component.DoesNotExist()
+    if not entities_qset.count():
+        usage_key = usage_keys[0] if usage_keys else None
+        raise ContentLibraryBlockNotFound(usage_key)
 
     if remove:
-        count = authoring_api.remove_from_collections(collections_qset, contents_qset)
+        count = authoring_api.remove_from_collections(
+            collections_qset,
+            entities_qset,
+        )
     else:
-        count = authoring_api.add_to_collections(collections_qset, contents_qset)
+        count = authoring_api.add_to_collections(
+            collections_qset,
+            entities_qset,
+            created_by=created_by,
+        )
 
     # Emit a CONTENT_OBJECT_TAGS_CHANGED event for each of the objects added/removed
-    object_keys = contents_qset.values_list("key", flat=True)
-    for object_key in object_keys:
+    for usage_key in usage_keys:
         CONTENT_OBJECT_TAGS_CHANGED.send_event(
-            content_object=ContentObjectData(object_id=object_key),
+            content_object=ContentObjectData(object_id=usage_key),
         )
 
     return count

@@ -16,7 +16,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 URL_PREFIX = '/api/libraries/v2/{lib_key}/'
 URL_LIB_COLLECTIONS = URL_PREFIX + 'collections/'
 URL_LIB_COLLECTION = URL_LIB_COLLECTIONS + '{collection_id}/'
-URL_LIB_COLLECTION_CONTENTS = URL_LIB_COLLECTION + 'contents/'
+URL_LIB_COLLECTION_COMPONENTS = URL_LIB_COLLECTION + 'components/'
 
 
 @ddt.ddt
@@ -278,7 +278,10 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         use Meilisearch instead.
         """
         resp = self.client.get(
-            URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib1.library_key, collection_id=self.col1.id),
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_id=self.col1.id,
+            ),
         )
         assert resp.status_code == 405
 
@@ -288,7 +291,10 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         """
         # Add two components to col1
         resp = self.client.patch(
-            URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib1.library_key, collection_id=self.col1.id),
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_id=self.col1.id,
+            ),
             data={
                 "usage_keys": [
                     self.lib1_problem_block["id"],
@@ -301,7 +307,10 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
 
         # Remove one of the added components from col1
         resp = self.client.delete(
-            URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib1.library_key, collection_id=self.col1.id),
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_id=self.col1.id,
+            ),
             data={
                 "usage_keys": [
                     self.lib1_problem_block["id"],
@@ -317,7 +326,10 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         Collection must belong to the requested library.
         """
         resp = getattr(self.client, method)(
-            URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib2.library_key, collection_id=self.col1.id),
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib2.library_key,
+                collection_id=self.col1.id,
+            ),
             data={
                 "usage_keys": [
                     self.lib1_problem_block["id"],
@@ -329,10 +341,13 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
     @ddt.data("patch", "delete")
     def test_update_components_missing_data(self, method):
         """
-        List of component keys must contain at least one item.
+        List of usage keys must contain at least one item.
         """
         resp = getattr(self.client, method)(
-            URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib2.library_key, collection_id=self.col3.id),
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib2.library_key,
+                collection_id=self.col3.id,
+            ),
         )
         assert resp.status_code == 400
         assert resp.data == {
@@ -342,10 +357,13 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
     @ddt.data("patch", "delete")
     def test_update_components_from_another_library(self, method):
         """
-        Adding/removing components from another library raises a validation error.
+        Adding/removing components from another library raises a 404.
         """
         resp = getattr(self.client, method)(
-            URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib2.library_key, collection_id=self.col3.id),
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib2.library_key,
+                collection_id=self.col3.id,
+            ),
             data={
                 "usage_keys": [
                     self.lib1_problem_block["id"],
@@ -353,10 +371,7 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
                 ]
             }
         )
-        assert resp.status_code == 400
-        assert resp.data == {
-            "usage_keys": "Component(s) not found in library",
-        }
+        assert resp.status_code == 404
 
     @ddt.data("patch", "delete")
     def test_update_components_permissions(self, method):
@@ -366,11 +381,9 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         random_user = UserFactory.create(username="Random", email="random@example.com")
         with self.as_user(random_user):
             resp = getattr(self.client, method)(
-                URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib1.library_key, collection_id=self.col1.id),
-            )
-            assert resp.status_code == 403
-
-            resp = self.client.patch(
-                URL_LIB_COLLECTION_CONTENTS.format(lib_key=self.lib1.library_key, collection_id=self.col1.id),
+                URL_LIB_COLLECTION_COMPONENTS.format(
+                    lib_key=self.lib1.library_key,
+                    collection_id=self.col1.id,
+                ),
             )
             assert resp.status_code == 403

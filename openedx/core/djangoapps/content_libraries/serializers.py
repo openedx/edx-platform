@@ -293,7 +293,7 @@ class UsageKeyV2Serializer(serializers.Serializer):
             raise ValidationError from err
 
 
-class ContentLibraryCollectionContentsUpdateSerializer(serializers.Serializer):
+class ContentLibraryCollectionComponentsUpdateSerializer(serializers.Serializer):
     """
     Serializer for adding/removing Components to/from a Collection.
     """
