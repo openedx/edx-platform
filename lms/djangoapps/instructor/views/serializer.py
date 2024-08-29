@@ -87,11 +87,11 @@ class StudentAttemptsSerializer(serializers.Serializer):
     problem_to_reset = serializers.CharField(
         help_text="The identifier or description of the problem that needs to be reset."
     )
+
+    # following are optional params.
     unique_student_identifier = serializers.CharField(
         help_text="Email or username of student.", required=False
     )
-
-    # following are optional params.
     all_students = serializers.CharField(required=False)
     delete_module = serializers.CharField(required=False)
 

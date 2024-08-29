@@ -1797,15 +1797,13 @@ class StudentProgressUrl(APIView):
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
-class ResetStudentAttempts(APIView):
+class ResetStudentAttempts(DeveloperErrorViewMixin, APIView):
     """
     Resets a students attempts counter or starts a task to reset all students
     attempts counters. Optionally deletes student state for a problem. Limited
     to staff access. Some sub-methods limited to instructor access.
     """
-    # @require_post_params(
-    #     problem_to_reset="problem urlname to reset"
-    # )
+    http_method_names = ['post']
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.GIVE_STUDENT_EXTENSION
     serializer_class = StudentAttemptsSerializer
@@ -1837,15 +1835,12 @@ class ResetStudentAttempts(APIView):
 
         all_students = serializer_data.validated_data.get('all_students')
 
-
         if all_students and not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
         problem_to_reset = strip_if_string(serializer_data.validated_data.get('problem_to_reset'))
-
         student_identifier = request.POST.get('unique_student_identifier', None)
         student = serializer_data.validated_data.get('unique_student_identifier')
-
         delete_module = serializer_data.validated_data.get('delete_module')
 
         # parameter combinations
