@@ -75,7 +75,7 @@ class HomePageView(APIView):
         ```
         """
 
-        home_context = get_home_context(request, no_course=True, hide_library_button_for_mfe=False)
+        home_context = get_home_context(request, True)
         home_context.update({
             'allow_to_create_new_org': settings.FEATURES.get('ENABLE_CREATOR_GROUP', True) and request.user.is_staff,
             'studio_name': settings.STUDIO_NAME,
