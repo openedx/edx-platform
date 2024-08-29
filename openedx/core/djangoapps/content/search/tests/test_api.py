@@ -6,12 +6,13 @@ from __future__ import annotations
 import copy
 
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, Mock, call, patch
 from opaque_keys.edx.keys import UsageKey
 
 import ddt
 from django.test import override_settings
 from freezegun import freeze_time
+from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -174,6 +175,28 @@ class TestSearchApi(ModuleStoreTestCase):
         tagging_api.add_tag_to_taxonomy(self.taxonomyB, "three")
         tagging_api.add_tag_to_taxonomy(self.taxonomyB, "four")
 
+        # Create a collection:
+        self.learning_package = authoring_api.get_learning_package_by_key(self.library.key)
+        self.collection_dict = {
+            'id': 1,
+            'type': 'collection',
+            'display_name': 'my_collection',
+            'description': 'my collection description',
+            'context_key': 'lib:org1:lib',
+            'org': 'org1',
+            'created': created_date.timestamp(),
+            'modified': created_date.timestamp(),
+            "access_id": lib_access.id,
+            'breadcrumbs': [{'display_name': 'Library'}]
+        }
+        with freeze_time(created_date):
+            self.collection = authoring_api.create_collection(
+                learning_package_id=self.learning_package.id,
+                title="my_collection",
+                created_by=None,
+                description="my collection description"
+            )
+
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
         with self.assertRaises(RuntimeError):
@@ -199,8 +222,25 @@ class TestSearchApi(ModuleStoreTestCase):
             [
                 call([doc_sequential, doc_vertical]),
                 call([doc_problem1, doc_problem2]),
+                call([self.collection_dict]),
             ],
             any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    @patch(
+        "openedx.core.djangoapps.content.search.api.searchable_doc_for_collection",
+        Mock(side_effect=Exception("Failed to generate document")),
+    )
+    def test_reindex_meilisearch_collection_error(self, mock_meilisearch):
+
+        mock_logger = Mock()
+        api.rebuild_index(mock_logger)
+        assert call(
+            [self.collection_dict]
+        ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
+        mock_logger.assert_any_call(
+            f"Error indexing collection {self.collection}: Failed to generate document"
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)

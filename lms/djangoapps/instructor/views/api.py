@@ -37,6 +37,7 @@ from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
@@ -105,7 +106,9 @@ from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
-from lms.djangoapps.instructor.views.serializer import RoleNameSerializer, UserSerializer, AccessSerializer
+from lms.djangoapps.instructor.views.serializer import (
+    AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -1508,28 +1511,38 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         return JsonResponse({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def get_students_who_may_enroll(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetStudentsWhoMayEnroll(DeveloperErrorViewMixin, APIView):
     """
     Initiate generation of a CSV file containing information about
-    students who may enroll in a course.
-
-    Responds with JSON
-        {"status": "... status message ..."}
-
     """
-    course_key = CourseKey.from_string(course_id)
-    query_features = ['email']
-    report_type = _('enrollment')
-    task_api.submit_calculate_may_enroll_csv(request, course_key, query_features)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing information about
+         students who may enroll in a course.
+
+        Responds with JSON
+            {"status": "... status message ..."}
+        """
+        course_key = CourseKey.from_string(course_id)
+        query_features = ['email']
+        report_type = _('enrollment')
+        try:
+            task_api.submit_calculate_may_enroll_csv(request, course_key, query_features)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        except Exception as e:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'Requested task is already running')
+
+        return JsonResponse({"status": success_status})
+
+    def get(self, request, *args, **kwargs):
+        raise MethodNotAllowed('GET')
 
 
 def _cohorts_csv_validator(file_storage, file_to_validate):
@@ -2992,20 +3005,50 @@ def show_unit_extensions(request, course_id):
     return JsonResponse(dump_block_extensions(course, unit))
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('student')
-def show_student_extensions(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ShowStudentExtensions(APIView):
     """
     Shows all of the due date extensions granted to a particular student in a
     particular course.
     """
-    student = require_student_from_identifier(request.POST.get('student'))
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    return JsonResponse(dump_student_extensions(course, student))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowStudentExtensionSerializer
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handles POST requests to retrieve due date extensions for a specific student
+        within a specified course.
+
+        Parameters:
+        - `request`: The HTTP request object containing user-submitted data.
+        - `course_id`: The ID of the course for which the extensions are being queried.
+
+        Data expected in the request:
+        - `student`: A required field containing the identifier of the student for whom
+          the due date extensions are being retrieved. This data is extracted from the
+          request body.
+
+        Returns:
+        - A JSON response containing the details of the due date extensions granted to
+          the specified student in the specified course.
+        """
+        data = {
+            'student': request.data.get('student')
+        }
+        serializer_data = self.serializer_class(data=data)
+
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('student')
+        if not student:
+            response_payload = f'Could not find student matching identifier: {request.data.get("student")}'
+            return JsonResponse({'error': response_payload}, status=400)
+
+        course = get_course_by_id(CourseKey.from_string(course_id))
+        return Response(dump_student_extensions(course, student))
 
 
 def _split_input_list(str_list):

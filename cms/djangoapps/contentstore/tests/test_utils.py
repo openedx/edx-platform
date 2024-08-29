@@ -9,6 +9,7 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
@@ -19,7 +20,11 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from cms.djangoapps.contentstore import utils
 from cms.djangoapps.contentstore.tasks import ALL_ALLOWED_XBLOCKS, validate_course_olx
 from cms.djangoapps.contentstore.tests.utils import TEST_DATA_DIR, CourseTestCase
+from cms.djangoapps.contentstore.utils import send_course_update_notification
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -927,3 +932,32 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
 
         utils.update_course_details(mock_request, self.course.id, payload, None)
         mock_update.assert_called_once_with(self.course.id, payload, mock_request.user)
+
+
+@override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+class CourseUpdateNotificationTests(ModuleStoreTestCase):
+    """
+    Unit tests for the course_update notification.
+    """
+
+    def setUp(self):
+        """
+        Setup the test environment.
+        """
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(org='testorg', number='testcourse', run='testrun')
+        CourseNotificationPreference.objects.create(user_id=self.user.id, course_id=self.course.id)
+
+    def test_course_update_notification_sent(self):
+        """
+        Test that the course_update notification is sent.
+        """
+        user = UserFactory()
+        CourseEnrollment.enroll(user=user, course_key=self.course.id)
+        assert Notification.objects.all().count() == 0
+        content = "<p>content</p><img src='' />"
+        send_course_update_notification(self.course.id, content, self.user)
+        assert Notification.objects.all().count() == 1
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong><p>content</p></strong></p>"

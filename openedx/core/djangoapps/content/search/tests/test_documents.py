@@ -1,7 +1,11 @@
 """
 Tests for the Studio content search documents (what gets stored in the index)
 """
+from datetime import datetime, timezone
 from organizations.models import Organization
+
+from freezegun import freeze_time
+from openedx_learning.api import authoring as authoring_api
 
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -11,10 +15,12 @@ from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
 try:
     # This import errors in the lms because content.search is not an installed app there.
-    from ..documents import searchable_doc_for_course_block, searchable_doc_tags
+    from ..documents import searchable_doc_for_course_block, searchable_doc_tags, searchable_doc_for_collection
     from ..models import SearchAccess
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
+    searchable_doc_tags = lambda x: x
+    searchable_doc_for_collection = lambda x: x
     SearchAccess = {}
 
 
@@ -197,4 +203,31 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             ],
             "content": {},
             # This video has no tags.
+        }
+
+    def test_collection_with_no_library(self):
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            learning_package = authoring_api.create_learning_package(
+                key="course-v1:edX+toy+2012_Fall",
+                title="some learning_package",
+                description="some description",
+            )
+            collection = authoring_api.create_collection(
+                learning_package_id=learning_package.id,
+                title="my_collection",
+                created_by=None,
+                description="my collection description"
+            )
+        doc = searchable_doc_for_collection(collection)
+        assert doc == {
+            "id": collection.id,
+            "type": "collection",
+            "display_name": collection.title,
+            "description": collection.description,
+            "context_key": learning_package.key,
+            "access_id": self.toy_course_access_id,
+            "breadcrumbs": [{"display_name": learning_package.title}],
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
         }

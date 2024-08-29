@@ -3394,6 +3394,7 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
+    "openedx_learning.apps.authoring.collections",
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
@@ -3685,9 +3686,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # Set CORS_ALLOW_HEADERS regardless of whether we've enabled ENABLE_CORS_HEADERS
 # because that decision might happen in a later config file. (The headers to
 # allow is an application logic, and not site policy.)
-CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-    'use-jwt-cookie',
-)
+CORS_ALLOW_HEADERS = corsheaders_default_headers
 
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page

@@ -74,9 +74,6 @@ class CookieTests(TestCase):
             for key, val in response.cookies.items()
         }
 
-    def _set_use_jwt_cookie_header(self, request):
-        request.META['HTTP_USE_JWT_COOKIE'] = 'true'
-
     def _assert_recreate_jwt_from_cookies(self, response, can_recreate):
         """
         If can_recreate is True, verifies that a JWT can be properly recreated
@@ -133,7 +130,6 @@ class CookieTests(TestCase):
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_set_logged_in_jwt_cookies(self):
         setup_login_oauth_client()
-        self._set_use_jwt_cookie_header(self.request)
         response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
         self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
         self._assert_consistent_expires(response, num_of_unique_expires=2)
@@ -153,7 +149,6 @@ class CookieTests(TestCase):
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_refresh_jwt_cookies(self):
         setup_login_oauth_client()
-        self._set_use_jwt_cookie_header(self.request)
         response = cookies_api.get_response_with_refreshed_jwt_cookies(self.request, self.user)
         data = json.loads(response.content.decode('utf8').replace("'", '"'))
         assert data['success'] is True
