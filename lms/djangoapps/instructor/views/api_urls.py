@@ -51,7 +51,7 @@ urlpatterns = [
     path('update_forum_role_membership', api.update_forum_role_membership, name='update_forum_role_membership'),
     path('send_email', api.send_email, name='send_email'),
     path('change_due_date', api.change_due_date, name='change_due_date'),
-    path('reset_due_date', api.reset_due_date, name='reset_due_date'),
+    path('reset_due_date', api.ResetDueDate.as_view(), name='reset_due_date'),
     path('show_unit_extensions', api.show_unit_extensions, name='show_unit_extensions'),
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
 

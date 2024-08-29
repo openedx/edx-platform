@@ -77,3 +77,39 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class BlockDueDateSerializer(serializers.Serializer):
+    """
+    Serializer for handling block due date updates for a specific student.
+    Fields:
+        url (str): The URL related to the block that needs the due date update.
+        due_datetime (str): The new due date and time for the block.
+        student (str): The email or username of the student whose access is being modified.
+        reason (str): Reason why updating this.
+    """
+    url = serializers.CharField()
+    due_datetime = serializers.CharField()
+    student = serializers.CharField(
+        max_length=255,
+        help_text="Email or username of user to change access"
+    )
+    reason = serializers.CharField(required=False)
+
+    def validate_student(self, value):
+        """
+        Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
+
+    def __init__(self, *args, **kwargs):
+        # Get context to check if `due_datetime` should be optional
+        make_due_datetime = kwargs.get('context', {}).get('make_due_datetime', False)
+        super().__init__(*args, **kwargs)
+        if make_due_datetime:
+            self.fields['due_datetime'].required = False

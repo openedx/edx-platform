@@ -106,7 +106,7 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, Queue
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
-    AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer
+    AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer, BlockDueDateSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2933,37 +2933,59 @@ def change_due_date(request, course_id):
                          due_date.strftime('%Y-%m-%d %H:%M')))
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('student', 'url')
-def reset_due_date(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ResetDueDate(APIView):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    student = require_student_from_identifier(request.POST.get('student'))
-    unit = find_unit(course, request.POST.get('url'))
-    reason = strip_tags(request.POST.get('reason', ''))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+    serializer_class = BlockDueDateSerializer
 
-    version = getattr(course, 'course_version', None)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        reset a due date extension to a student for a particular unit.
+        params:
+            url (str): The URL related to the block that needs the due date update.
+            student (str): The email or username of the student whose access is being modified.
+            reason (str): Optional param.
+        """
+        serializer_data = self.serializer_class(data=request.data, context={'make_due_datetime': True})
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    original_due_date = get_date_for_block(course_id, unit.location, published_version=version)
+        student = serializer_data.validated_data.get('student')
+        if not student:
+            response_payload = {
+                'error': f'Could not find student matching identifier: {request.data.get("student")}'
+            }
+            return JsonResponse(response_payload)
 
-    set_due_date_extension(course, unit, student, None, request.user, reason=reason)
-    if not original_due_date:
-        # It's possible the normal due date was deleted after an extension was granted:
-        return JsonResponse(
-            _("Successfully removed invalid due date extension (unit has no due date).")
-        )
+        course = get_course_by_id(CourseKey.from_string(course_id))
+        unit = find_unit(course, serializer_data.validated_data.get('url'))
+        reason = strip_tags(serializer_data.validated_data.get('reason', ''))
 
-    original_due_date_str = original_due_date.strftime('%Y-%m-%d %H:%M')
-    return JsonResponse(_(
-        'Successfully reset due date for student {0} for {1} '
-        'to {2}').format(student.profile.name, _display_unit(unit),
-                         original_due_date_str))
+        version = getattr(course, 'course_version', None)
+
+        original_due_date = get_date_for_block(course_id, unit.location, published_version=version)
+
+        try:
+            set_due_date_extension(course, unit, student, None, request.user, reason=reason)
+            if not original_due_date:
+                # It's possible the normal due date was deleted after an extension was granted:
+                return JsonResponse(
+                    _("Successfully removed invalid due date extension (unit has no due date).")
+                )
+
+            original_due_date_str = original_due_date.strftime('%Y-%m-%d %H:%M')
+            return JsonResponse(_(
+                'Successfully reset due date for student {0} for {1} '
+                'to {2}').format(student.profile.name, _display_unit(unit),
+                                 original_due_date_str))
+
+        except Exception as error:  # pylint: disable=broad-except
+            return JsonResponse({'error': str(error)}, status=400)
 
 
 @handle_dashboard_error
