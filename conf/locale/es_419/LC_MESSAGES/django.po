@@ -6136,7 +6136,7 @@ msgstr "Certificado inválido"
 #. the purpose of the page
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Certificate Validation"
-msgstr "Certificados de validación"
+msgstr "Validación de certificados"
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
@@ -8863,7 +8863,7 @@ msgid ""
 "This email was automatically sent from %(site_name)s to %(email_address)s"
 msgstr ""
 "Este correo electrónico se envió automáticamente desde %(site_name)s "
-"a%(email_address)s"
+"a %(email_address)s"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
 #: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
@@ -8871,7 +8871,7 @@ msgstr ""
 #: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
 #, python-format
 msgid "Dear %(full_name)s"
-msgstr "Estimado %(full_name)s"
+msgstr "Estimado(a) %(full_name)s"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
 #, python-format
@@ -8920,7 +8920,7 @@ msgid ""
 "of the course staff."
 msgstr ""
 "Un miembro del equipo del curso te ha invitado a unirte a %(course_name)s "
-"en%(site_name)s."
+"en %(site_name)s."
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
 msgid "To access this course click on the button below and login:"
@@ -9050,7 +9050,7 @@ msgid ""
 "of the course staff. This course will no longer appear on your %(site_name)s"
 " dashboard."
 msgstr ""
-"Un miembro del equipo del curso te ha dado de baja de%(course_name)s en "
+"Un miembro del equipo del curso te ha dado de baja de %(course_name)s en "
 "%(site_name)s. Este curso ya no aparecerá en tu panel de usuario de "
 "%(site_name)s."
 
@@ -9090,8 +9090,8 @@ msgid ""
 "the course staff. This course will now appear on your %(site_name)s "
 "dashboard."
 msgstr ""
-"Un miembro del equipo del curso te ha inscrito a %(course_name)s en "
-"%(site_name)s. Este curso te aparecerá en tu panel de usuario de "
+"Un miembro del equipo del curso te ha inscrito en %(course_name)s de "
+"%(site_name)s. Este curso aparecerá en tu panel de usuario en "
 "%(site_name)s."
 
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
@@ -9348,14 +9348,14 @@ msgstr "Verificación de Identidad enviada"
 msgid ""
 "Thank you for submitting your photos for identity verification with "
 "%(platform_name)s. "
-msgstr "Gracias por enviar tus fotos para verificiar tu identidad con "
+msgstr "Gracias por enviar tus fotos para verificar tu identidad con "
 "%(platform_name)s. "
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
 "We have received your photos and they will be reviewed within 5-7 days."
-msgstr "Hemos recibido tus fotos y serán revisadas dentro de los póximos 5 a 7 dias."
+msgstr "Hemos recibido tus fotos y serán revisadas dentro de los próximos 5 a 7 días."
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
@@ -11774,10 +11774,10 @@ msgid ""
 "process your personal data in accordance                   with the "
 "{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"Al Crear una Cuenta, estás accediendo a los  "
+"Al crear una cuenta, estás accediendo a los "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} y"
 " reconoces que {platform_name} y todos sus miembros, pueden procesar tu "
-"datos personales de acuerdo a la{privacy_policy_link_start}Política de "
+"datos personales de acuerdo a la {privacy_policy_link_start}Política de "
 "Privacidad{privacy_policy_link_end}."
 
 #. Translators: "Terms of service" is a legal document users must agree to
