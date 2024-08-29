@@ -36,6 +36,8 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from common.djangoapps.third_party_auth.middleware import ExceptionMiddleware
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1835,6 +1837,7 @@ class ResetStudentAttempts(APIView):
 
         all_students = serializer_data.validated_data.get('all_students')
 
+
         if all_students and not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
@@ -1844,11 +1847,6 @@ class ResetStudentAttempts(APIView):
         student = serializer_data.validated_data.get('unique_student_identifier')
 
         delete_module = serializer_data.validated_data.get('delete_module')
-
-        if not student:
-            return HttpResponseBadRequest(
-                f'Could not find student matching identifier: {request.data.get("student_identifier")}'
-            )
 
         # parameter combinations
         if all_students and student:
@@ -1868,27 +1866,33 @@ class ResetStudentAttempts(APIView):
         response_payload = {}
         response_payload['problem_to_reset'] = problem_to_reset
 
-        try:
-            enrollment.reset_student_attempts(
-                course_id,
-                student,
-                module_state_key,
-                requesting_user=request.user,
-                delete_module=delete_module
-            )
-        except StudentModule.DoesNotExist:
-            return HttpResponseBadRequest(_("Module does not exist."))
-        except sub_api.SubmissionError:
-            # Trust the submissions API to log the error
-            error_msg = _("An error occurred while deleting the score.")
-            return HttpResponse(error_msg, status=500)
+        if student:
+            try:
+                enrollment.reset_student_attempts(
+                    course_id,
+                    student,
+                    module_state_key,
+                    requesting_user=request.user,
+                    delete_module=delete_module
+                )
+            except StudentModule.DoesNotExist:
+                return HttpResponseBadRequest(_("Module does not exist."))
+            except sub_api.SubmissionError:
+                # Trust the submissions API to log the error
+                error_msg = _("An error occurred while deleting the score.")
+                return HttpResponse(error_msg, status=500)
+            response_payload['student'] = student_identifier
 
-        response_payload['student'] = student_identifier
-
-        if all_students:
-            task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
-            response_payload['task'] = TASK_SUBMISSION_OK
-            response_payload['student'] = 'All Students'
+        elif all_students:
+            try:
+                task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
+                response_payload['task'] = TASK_SUBMISSION_OK
+                response_payload['student'] = 'All Students'
+            except Exception:
+                error_msg = _("An error occurred while attempting to reset for all students.")
+                return HttpResponse(error_msg, status=500)
+        else:
+            return HttpResponseBadRequest()
 
         return JsonResponse(response_payload)
 

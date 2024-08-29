@@ -97,14 +97,11 @@ class StudentAttemptsSerializer(serializers.Serializer):
 
     def validate_all_students(self, value):
         """
-        converts the all_student params value.
+        converts the all_student params value to bool.
         """
-        if value is not None:
-            return value in ['true', 'True', True]
+        return self.verify_bool(value)
 
-        return False
-
-    def validate_all_students(self, value):
+    def validate_delete_module(self, value):
         """
         converts the all_student params value.
         """
@@ -127,4 +124,7 @@ class StudentAttemptsSerializer(serializers.Serializer):
         name in the POST request. Handles translation from string
         values to boolean values.
         """
-        return self.verify_bool(value)
+        if value is not None:
+            return value in ['true', 'True', True]
+
+        return False
