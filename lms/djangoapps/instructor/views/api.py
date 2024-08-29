@@ -1824,28 +1824,31 @@ class ResetStudentAttempts(APIView):
             mutually exclusive with all_students
         """
         course_id = CourseKey.from_string(course_id)
-
         serializer_data = self.serializer_class(data=request.data)
+
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
-
-        student = serializer_data.validated_data.get('student')
-        if not student:
-            return HttpResponseBadRequest(
-                f'Could not find student matching identifier: {request.data.get("student")}'
-            )
 
         course = get_course_with_access(
             request.user, 'staff', course_id, depth=None
         )
 
         all_students = serializer_data.validated_data.get('all_students')
+
         if all_students and not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
         problem_to_reset = strip_if_string(serializer_data.validated_data.get('problem_to_reset'))
-        student = serializer_data.validated_data.get('student')
-        delete_module = _get_boolean_param(request, 'delete_module')
+
+        student_identifier = request.POST.get('unique_student_identifier', None)
+        student = serializer_data.validated_data.get('unique_student_identifier')
+
+        delete_module = serializer_data.validated_data.get('delete_module')
+
+        if not student:
+            return HttpResponseBadRequest(
+                f'Could not find student matching identifier: {request.data.get("student_identifier")}'
+            )
 
         # parameter combinations
         if all_students and student:
@@ -1865,28 +1868,27 @@ class ResetStudentAttempts(APIView):
         response_payload = {}
         response_payload['problem_to_reset'] = problem_to_reset
 
-        if student:
-            try:
-                enrollment.reset_student_attempts(
-                    course_id,
-                    student,
-                    module_state_key,
-                    requesting_user=request.user,
-                    delete_module=delete_module
-                )
-            except StudentModule.DoesNotExist:
-                return HttpResponseBadRequest(_("Module does not exist."))
-            except sub_api.SubmissionError:
-                # Trust the submissions API to log the error
-                error_msg = _("An error occurred while deleting the score.")
-                return HttpResponse(error_msg, status=500)
-            response_payload['student'] = student_identifier
-        elif all_students:
+        try:
+            enrollment.reset_student_attempts(
+                course_id,
+                student,
+                module_state_key,
+                requesting_user=request.user,
+                delete_module=delete_module
+            )
+        except StudentModule.DoesNotExist:
+            return HttpResponseBadRequest(_("Module does not exist."))
+        except sub_api.SubmissionError:
+            # Trust the submissions API to log the error
+            error_msg = _("An error occurred while deleting the score.")
+            return HttpResponse(error_msg, status=500)
+
+        response_payload['student'] = student_identifier
+
+        if all_students:
             task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
             response_payload['task'] = TASK_SUBMISSION_OK
             response_payload['student'] = 'All Students'
-        else:
-            return HttpResponseBadRequest()
 
         return JsonResponse(response_payload)
 
@@ -1925,8 +1927,10 @@ def reset_student_attempts_for_entrance_exam(request, course_id):
 
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
+
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
+
     all_students = _get_boolean_param(request, 'all_students')
     delete_module = _get_boolean_param(request, 'delete_module')
 

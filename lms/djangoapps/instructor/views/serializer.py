@@ -80,24 +80,35 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
 
 
 class StudentAttemptsSerializer(serializers.Serializer):
+    """
+    Serializer for resetting a students attempts counter or starts a task to reset all students
+    attempts counters.
+    """
     problem_to_reset = serializers.CharField(
         help_text="The identifier or description of the problem that needs to be reset."
     )
-    all_students = serializers.CharField()
-    problem_to_reset = serializers.CharField()
-
     unique_student_identifier = serializers.CharField(
-        help_text="Email or username of user to change access"
+        help_text="Email or username of student.", required=False
     )
+
+    # following are optional params.
+    all_students = serializers.CharField(required=False)
+    delete_module = serializers.CharField(required=False)
 
     def validate_all_students(self, value):
         """
         converts the all_student params value.
         """
         if value is not None:
-           return value in ['true', 'True', True]
+            return value in ['true', 'True', True]
 
         return False
+
+    def validate_all_students(self, value):
+        """
+        converts the all_student params value.
+        """
+        return self.verify_bool(value)
 
     def validate_unique_student_identifier(self, value):
         """
@@ -109,3 +120,11 @@ class StudentAttemptsSerializer(serializers.Serializer):
             return None
 
         return user
+
+    def verify_bool(self, value):
+        """
+        Returns the value of the boolean parameter with the given
+        name in the POST request. Handles translation from string
+        values to boolean values.
+        """
+        return self.verify_bool(value)
