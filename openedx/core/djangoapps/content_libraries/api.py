@@ -1086,6 +1086,9 @@ def update_collection_components(
     * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
     * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
     """
+    if not usage_keys:
+        return 0
+
     learning_package = library.learning_package
     collections_qset = authoring_api.get_collections(learning_package.id).filter(pk=collection_pk)
 
@@ -1115,9 +1118,6 @@ def update_collection_components(
     entities_qset = learning_package.publishable_entities.filter(
         key__in=component_keys,
     )
-    if not entities_qset.count():
-        usage_key = usage_keys[0] if usage_keys else None
-        raise ContentLibraryBlockNotFound(usage_key)
 
     if remove:
         count = authoring_api.remove_from_collections(
