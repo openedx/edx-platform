@@ -31,6 +31,7 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
+from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
 from opaque_keys.edx.django.models import CourseKeyField
 
 from lms.djangoapps.verify_student.ssencrypt import (
@@ -1189,3 +1190,27 @@ class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-m
 
     def __str__(self):
         return str(self.arguments)
+
+
+class VerificationAttempt(TimeStampedModel):
+    """
+    The model represents impelementation-agnostic information about identity verification (IDV) attempts.
+
+    Plugins that implement forms of IDV can store information about IDV attempts in this model for use across
+    the platform.
+    """
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    name = models.CharField(blank=True, max_length=255)
+
+    STATUS_CHOICES = [
+        VerificationAttemptStatus.created,
+        VerificationAttemptStatus.pending,
+        VerificationAttemptStatus.approved,
+        VerificationAttemptStatus.denied,
+    ]
+    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
+
+    expiration_datetime = models.DateTimeField(
+        null=True,
+        blank=True,
+    )

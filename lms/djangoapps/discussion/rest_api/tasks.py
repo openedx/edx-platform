@@ -33,7 +33,7 @@ def send_thread_created_notification(thread_id, course_key_str, user_id):
 
 @shared_task
 @set_code_owner_attribute
-def send_response_notifications(thread_id, course_key_str, user_id, parent_id=None):
+def send_response_notifications(thread_id, course_key_str, user_id, comment_id, parent_id=None):
     """
     Send notifications to users who are subscribed to the thread.
     """
@@ -43,7 +43,7 @@ def send_response_notifications(thread_id, course_key_str, user_id, parent_id=No
     thread = Thread(id=thread_id).retrieve()
     user = User.objects.get(id=user_id)
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
-    notification_sender = DiscussionNotificationSender(thread, course, user, parent_id)
+    notification_sender = DiscussionNotificationSender(thread, course, user, parent_id, comment_id)
     notification_sender.send_new_comment_notification()
     notification_sender.send_new_response_notification()
     notification_sender.send_new_comment_on_response_notification()

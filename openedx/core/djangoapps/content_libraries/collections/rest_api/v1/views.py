@@ -14,7 +14,6 @@ from rest_framework.viewsets import ModelViewSet
 from openedx_learning.api.authoring_models import Collection
 from openedx_learning.api import authoring as authoring_api
 from opaque_keys.edx.locator import LibraryLocatorV2
-
 from openedx_events.content_authoring.data import LibraryCollectionData
 from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_CREATED,
@@ -27,7 +26,7 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionComponentsUpdateSerializer,
     ContentLibraryCollectionCreateOrUpdateSerializer,
 )
-from openedx.core.djangoapps.content_libraries.views import convert_exceptions
+from openedx.core.djangoapps.content_libraries.utils import convert_exceptions
 
 
 class LibraryCollectionsView(ModelViewSet):
@@ -44,11 +43,7 @@ class LibraryCollectionsView(ModelViewSet):
         """
         Verify that the collection belongs to the library and the user has the correct permissions
         """
-        try:
-            library_obj = api.require_permission_for_library_key(library_key, user, permission)
-        except api.ContentLibraryNotFound as exc:
-            raise Http404 from exc
-
+        library_obj = api.require_permission_for_library_key(library_key, user, permission)
         collection = None
         if library_obj.learning_package_id:
             collection = authoring_api.get_collections(
@@ -56,6 +51,7 @@ class LibraryCollectionsView(ModelViewSet):
             ).filter(id=collection_id).first()
         return collection
 
+    @convert_exceptions
     def retrieve(self, request, *args, **kwargs):
         """
         Retrieve the Content Library Collection
@@ -79,6 +75,7 @@ class LibraryCollectionsView(ModelViewSet):
         serializer = self.get_serializer(collection)
         return Response(serializer.data)
 
+    @convert_exceptions
     def list(self, request, *args, **kwargs):
         """
         List Collections that belong to Content Library
@@ -90,17 +87,15 @@ class LibraryCollectionsView(ModelViewSet):
         # Check if user has permissions to view collections by checking if user
         # has permission to view the Content Library they belong to
         library_key = LibraryLocatorV2.from_string(lib_key_str)
-        try:
-            content_library = api.require_permission_for_library_key(
-                library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
-            )
-        except api.ContentLibraryNotFound as exc:
-            raise Http404 from exc
+        content_library = api.require_permission_for_library_key(
+            library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+        )
 
         collections = authoring_api.get_collections(content_library.learning_package.id)
         serializer = self.get_serializer(collections, many=True)
         return Response(serializer.data)
 
+    @convert_exceptions
     def create(self, request, *args, **kwargs):
         """
         Create a Collection that belongs to a Content Library
@@ -112,12 +107,9 @@ class LibraryCollectionsView(ModelViewSet):
         # Check if user has permissions to create a collection in the Content Library
         # by checking if user has permission to edit the Content Library
         library_key = LibraryLocatorV2.from_string(lib_key_str)
-        try:
-            content_library = api.require_permission_for_library_key(
-                library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-            )
-        except api.ContentLibraryNotFound as exc:
-            raise Http404 from exc
+        content_library = api.require_permission_for_library_key(
+            library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
 
         create_serializer = ContentLibraryCollectionCreateOrUpdateSerializer(data=request.data)
         create_serializer.is_valid(raise_exception=True)
@@ -139,6 +131,7 @@ class LibraryCollectionsView(ModelViewSet):
 
         return Response(serializer.data)
 
+    @convert_exceptions
     def partial_update(self, request, *args, **kwargs):
         """
         Update a Collection that belongs to a Content Library
@@ -175,6 +168,7 @@ class LibraryCollectionsView(ModelViewSet):
 
         return Response(serializer.data)
 
+    @convert_exceptions
     def destroy(self, request, *args, **kwargs):
         """
         Deletes a Collection that belongs to a Content Library
