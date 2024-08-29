@@ -1888,7 +1888,7 @@ class ResetStudentAttempts(APIView):
                 task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
                 response_payload['task'] = TASK_SUBMISSION_OK
                 response_payload['student'] = 'All Students'
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 error_msg = _("An error occurred while attempting to reset for all students.")
                 return HttpResponse(error_msg, status=500)
         else:
