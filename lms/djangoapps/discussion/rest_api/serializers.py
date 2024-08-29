@@ -205,7 +205,9 @@ class _ContentSerializer(serializers.Serializer):
         Returns the role label (i.e. "Staff" or "Community TA") for the user
         with the given id.
         """
-        is_staff = user_id in self.context["course_staff_user_ids"] or user_id in self.context["moderator_user_ids"]
+        user = User.objects.get(id=user_id)
+        is_global_satff = user.is_staff or (user.is_superuser and user.is_staff)
+        is_staff = user_id in self.context["course_staff_user_ids"] or user_id in self.context["moderator_user_ids"] or is_global_satff
         is_ta = user_id in self.context["ta_user_ids"]
 
         return (
