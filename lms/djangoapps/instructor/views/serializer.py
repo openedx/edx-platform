@@ -77,3 +77,35 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class StudentAttemptsSerializer(serializers.Serializer):
+    problem_to_reset = serializers.CharField(
+        help_text="The identifier or description of the problem that needs to be reset."
+    )
+    all_students = serializers.CharField()
+    problem_to_reset = serializers.CharField()
+
+    unique_student_identifier = serializers.CharField(
+        help_text="Email or username of user to change access"
+    )
+
+    def validate_all_students(self, value):
+        """
+        converts the all_student params value.
+        """
+        if value is not None:
+           return value in ['true', 'True', True]
+
+        return False
+
+    def validate_unique_student_identifier(self, value):
+        """
+        Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
