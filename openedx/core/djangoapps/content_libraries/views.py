@@ -63,7 +63,6 @@ the api module instead.
         https://github.com/openedx/edx-platform/pull/30456
 """
 
-from functools import wraps
 import itertools
 import json
 import logging
@@ -120,38 +119,11 @@ from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as
 from openedx.core.djangoapps.xblock import api as xblock_api
 
 from .models import ContentLibrary, LtiGradedResource, LtiProfile
+from .utils import convert_exceptions
 
 
 User = get_user_model()
 log = logging.getLogger(__name__)
-
-
-def convert_exceptions(fn):
-    """
-    Catch any Content Library API exceptions that occur and convert them to
-    DRF exceptions so DRF will return an appropriate HTTP response
-    """
-
-    @wraps(fn)
-    def wrapped_fn(*args, **kwargs):
-        try:
-            return fn(*args, **kwargs)
-        except api.ContentLibraryNotFound:
-            log.exception("Content library not found")
-            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.ContentLibraryBlockNotFound:
-            log.exception("XBlock not found in content library")
-            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.LibraryBlockAlreadyExists as exc:
-            log.exception(str(exc))
-            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.InvalidNameError as exc:
-            log.exception(str(exc))
-            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.BlockLimitReachedError as exc:
-            log.exception(str(exc))
-            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
-    return wrapped_fn
 
 
 class LibraryApiPaginationDocs:
