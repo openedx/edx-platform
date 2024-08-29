@@ -51,7 +51,7 @@ class LibraryCollectionsView(ModelViewSet):
 
         collection = None
         if library_obj.learning_package_id:
-            collection = authoring_api.get_learning_package_collections(
+            collection = authoring_api.get_collections(
                 library_obj.learning_package_id
             ).filter(id=collection_id).first()
         return collection
@@ -97,7 +97,7 @@ class LibraryCollectionsView(ModelViewSet):
         except api.ContentLibraryNotFound as exc:
             raise Http404 from exc
 
-        collections = authoring_api.get_learning_package_collections(content_library.learning_package.id)
+        collections = authoring_api.get_collections(content_library.learning_package.id)
         serializer = self.get_serializer(collections, many=True)
         return Response(serializer.data)
 

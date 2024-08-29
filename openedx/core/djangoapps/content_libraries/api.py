@@ -1087,9 +1087,7 @@ def update_collection_components(
     * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
     """
     learning_package = library.learning_package
-    collections_qset = authoring_api.get_learning_package_collections(
-        learning_package.id,
-    ).filter(pk=collection_pk)
+    collections_qset = authoring_api.get_collections(learning_package.id).filter(pk=collection_pk)
 
     collection = collections_qset.first()
     if not collection:
