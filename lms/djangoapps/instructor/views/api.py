@@ -1816,7 +1816,7 @@ class ResetStudentAttempts(DeveloperErrorViewMixin, APIView):
         - all_students is a boolean
             requires instructor access
             mutually exclusive with delete_module
-            mutually exclusive wit delete_module
+            mutually exclusive with delete_module
         - delete_module is a boolean
             requires instructor access
             mutually exclusive with all_students
