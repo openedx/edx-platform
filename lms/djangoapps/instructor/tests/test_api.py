@@ -4703,7 +4703,9 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course = CourseFactory.create()
+        cls.course = CourseFactory.create(
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
 
     def setUp(self):
         super().setUp()
@@ -4714,6 +4716,27 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         self.other_instructor = InstructorFactory(course_key=self.course.id)
         self.other_staff = StaffFactory(course_key=self.course.id)
         self.other_user = UserFactory()
+
+    def assert_all_end_points(self, expected_status_code, headers):
+        endpoints = [
+            ('list_course_role_members', {'rolename': 'staff'}),
+            ('register_and_enroll_students', {}),
+            ('get_student_progress_url', {  'course_id': str(self.course.id),
+                'unique_student_identifier': self.other_user.email
+                }
+            ),
+            ('list_entrance_exam_instructor_tasks', {'unique_student_identifier': self.other_user.email})
+        ]
+        for endpoint, body in endpoints:
+            url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+            response = self.client.post(
+                url,
+                data=body,
+                **headers
+            )
+
+        # JWT authentication works but it has no permissions.
+        assert response.status_code == expected_status_code
 
     def test_end_points_with_oauth(self):
         """
@@ -4731,36 +4754,11 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         headers = {
             'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
         }
-        endpoints = [
-            ('list_course_role_members', {'rolename': 'staff'}),
-            ('register_and_enroll_students', {})
-        ]
-
-        for endpoint, body in endpoints:
-            url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
-            response = self.client.post(
-                url,
-                data=body,
-                **headers
-            )
-            # JWT authentication works but it has no permissions.
-            assert response.status_code == 403
-
+        self.assert_all_end_points(403, headers)
         CourseAccessRoleFactory(
             course_id=self.course.id,
             user=self.other_user,
             role="instructor",
             org=self.course.id.org
         )
-
-        for endpoint, body in endpoints:
-            url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
-
-            response = self.client.post(
-                url,
-                data=body,
-                **headers
-            )
-
-            assert response.status_code == 200
-
+        self.assert_all_end_points(200, headers)
