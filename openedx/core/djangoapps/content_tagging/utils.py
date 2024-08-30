@@ -46,6 +46,8 @@ def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
 
     # If the content key is a LibraryCollectionKey, return the LibraryLocatorV2
     if isinstance(content_key, LibraryCollectionKey):
+        if not isinstance(content_key.library_key, LibraryLocatorV2):
+            raise TypeError("Expected a LibraryLocatorV2")
         return content_key.library_key
 
     # If the content key is a UsageKey, return the context key
