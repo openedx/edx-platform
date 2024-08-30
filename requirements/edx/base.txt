@@ -467,7 +467,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.23.9
+edx-enterprise==4.23.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -823,7 +823,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.11.1
+openedx-learning==0.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
