@@ -19,7 +19,7 @@ from openedx_events.content_authoring.signals import (
 )
 
 from openedx.core.djangoapps.content_libraries import api, permissions
-from openedx.core.djangoapps.content_libraries.utils import convert_exceptions
+from openedx.core.djangoapps.content_libraries.views import convert_exceptions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionSerializer,
     ContentLibraryCollectionCreateOrUpdateSerializer,
