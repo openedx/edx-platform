@@ -316,12 +316,13 @@ class RegisterAndEnrollStudents(APIView):
         to create the new account.
         The failure will be messaged in a response in the browser.
         """
-        if not configuration_helpers.get_value(
-            'ALLOW_AUTOMATED_SIGNUPS',
-            settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False),
-        ):
-            return HttpResponseForbidden()
-
+        # if not configuration_helpers.get_value(
+        #     'ALLOW_AUTOMATED_SIGNUPS',
+        #     settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False),
+        # ):
+        #     return HttpResponseForbidden()
+        import pdb;
+        pdb.set_trace()
         course_id = CourseKey.from_string(course_id)
         warnings = []
         row_errors = []
@@ -1114,6 +1115,8 @@ class ListCourseRoleMembersView(APIView):
         Raises:
             Http404: If the course does not exist.
         """
+        import pdb;
+        pdb.set_trace()
         course_id = CourseKey.from_string(course_id)
         course = get_course_with_access(
             request.user, 'instructor', course_id, depth=None

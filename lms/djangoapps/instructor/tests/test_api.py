@@ -4675,3 +4675,92 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
             f"The student {self.user} does not have certificate for the course {self.course.id.course}. Kindly "
             "verify student username/email and the selected course are correct and try again."
         )
+
+from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
+from common.djangoapps.student.tests.factories import (
+    BetaTesterFactory,
+    CourseAccessRoleFactory,
+    CourseEnrollmentFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    StaffFactory,
+    UserFactory
+)
+
+class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test endpoints whereby instructors can change permissions
+    of other users.
+
+    This test does NOT test whether the actions had an effect on the
+    database, that is the job of test_access.
+    This tests the response and action switch.
+    Actually, modify_access does not have a very meaningful
+    response yet, so only the status code is tested.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super().setUp()
+
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
+
+        self.other_instructor = InstructorFactory(course_key=self.course.id)
+        self.other_staff = StaffFactory(course_key=self.course.id)
+        self.other_user = UserFactory()
+
+    def test_end_points_with_oauth(self):
+        """
+        Verify the endpoint using JWT authentication.
+        """
+        self.client.logout()
+        dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
+        access_token = AccessTokenFactory(user=self.other_user, application=dot_application)
+        oauth_adapter = DOTAdapter()
+        token_dict = {
+            'access_token': access_token,
+            'scope': 'email profile',
+        }
+        jwt_token = jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=True)
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
+        }
+        endpoints = [
+            ('list_course_role_members', {'rolename': 'staff'}),
+            ('register_and_enroll_students', {})
+        ]
+
+        for endpoint, body in endpoints:
+            url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+            response = self.client.post(
+                url,
+                data=body,
+                **headers
+            )
+            # JWT authentication works but it has no permissions.
+            assert response.status_code == 403
+
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=self.other_user,
+            role="instructor",
+            org=self.course.id.org
+        )
+
+        for endpoint, body in endpoints:
+            url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+
+            response = self.client.post(
+                url,
+                data=body,
+                **headers
+            )
+
+            assert response.status_code == 200
+
