@@ -91,7 +91,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage
+from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -1070,12 +1070,11 @@ def revert_changes(library_key):
 
 
 def update_collection_components(
-    library: ContentLibraryMetadata,
-    collection_pk: int,
+    collection: Collection,
     usage_keys: list[UsageKeyV2],
     created_by: int | None = None,
     remove=False,
-) -> int:
+) -> Collection:
     """
     Associates the Collection with Components for the given UsageKeys.
 
@@ -1085,17 +1084,9 @@ def update_collection_components(
     Raises:
     * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
     * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
+
+    Returns the updated Collection.
     """
-    if not usage_keys:
-        return 0
-
-    learning_package = library.learning_package
-    collections_qset = authoring_api.get_collections(learning_package.id).filter(pk=collection_pk)
-
-    collection = collections_qset.first()
-    if not collection:
-        raise ContentLibraryCollectionNotFound(collection_pk)
-
     # Fetch the Component.key values for the provided UsageKeys.
     component_keys = []
     for usage_key in usage_keys:
@@ -1104,7 +1095,7 @@ def update_collection_components(
 
         try:
             component = authoring_api.get_component_by_key(
-                learning_package.id,
+                collection.learning_package_id,
                 namespace=block_type.block_family,
                 type_name=usage_key.block_type,
                 local_key=usage_key.block_id,
@@ -1115,18 +1106,18 @@ def update_collection_components(
         component_keys.append(component.key)
 
     # Note: Component.key matches its PublishableEntity.key
-    entities_qset = learning_package.publishable_entities.filter(
+    entities_qset = PublishableEntity.objects.filter(
         key__in=component_keys,
     )
 
     if remove:
-        count = authoring_api.remove_from_collections(
-            collections_qset,
+        collection = authoring_api.remove_from_collection(
+            collection.pk,
             entities_qset,
         )
     else:
-        count = authoring_api.add_to_collections(
-            collections_qset,
+        collection = authoring_api.add_to_collection(
+            collection.pk,
             entities_qset,
             created_by=created_by,
         )
@@ -1137,7 +1128,7 @@ def update_collection_components(
             content_object=ContentObjectData(object_id=usage_key),
         )
 
-    return count
+    return collection
 
 
 # V1/V2 Compatibility Helpers

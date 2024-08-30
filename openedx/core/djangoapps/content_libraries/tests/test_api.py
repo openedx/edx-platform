@@ -305,27 +305,24 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
 
     def test_update_collection_components(self):
-        count = api.update_collection_components(
-            library=self.lib1,
-            collection_pk=self.col1.pk,
+        assert not list(self.col1.entities.all())
+
+        self.col1 = api.update_collection_components(
+            collection=self.col1,
             usage_keys=[
                 UsageKey.from_string(self.lib1_problem_block["id"]),
                 UsageKey.from_string(self.lib1_html_block["id"]),
             ],
         )
-        assert count == 2
         assert len(self.col1.entities.all()) == 2
 
-        count = api.update_collection_components(
-            library=self.lib1,
-            collection_pk=self.col1.pk,
+        self.col1 = api.update_collection_components(
+            collection=self.col1,
             usage_keys=[
                 UsageKey.from_string(self.lib1_html_block["id"]),
             ],
             remove=True,
         )
-        assert count == 1
-        self.col1.refresh_from_db()
         assert len(self.col1.entities.all()) == 1
 
     def test_update_collection_components_event(self):
@@ -335,8 +332,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         event_receiver = mock.Mock()
         CONTENT_OBJECT_TAGS_CHANGED.connect(event_receiver)
         api.update_collection_components(
-            library=self.lib1,
-            collection_pk=self.col1.pk,
+            collection=self.col1,
             usage_keys=[
                 UsageKey.from_string(self.lib1_problem_block["id"]),
                 UsageKey.from_string(self.lib1_html_block["id"]),
@@ -365,33 +361,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             event_receiver.call_args_list[1].kwargs,
         )
 
-    def test_update_no_components(self):
-        """
-        Calling update_collection_components with no usage_keys should not fail, just return 0.
-        """
-        assert not api.update_collection_components(
-            library=self.lib1,
-            collection_pk=self.col1.pk,
-            usage_keys=[],
-        )
-
     def test_update_collection_components_from_wrong_library(self):
         with self.assertRaises(api.ContentLibraryBlockNotFound) as exc:
             api.update_collection_components(
-                library=self.lib2,
-                collection_pk=self.col2.pk,
-                usage_keys=[
-                    UsageKey.from_string(self.lib1_problem_block["id"]),
-                    UsageKey.from_string(self.lib1_html_block["id"]),
-                ],
-            )
-            assert self.lib1_problem_block["id"] in str(exc.exception)
-
-    def test_update_collection_components_from_wrong_collection(self):
-        with self.assertRaises(api.ContentLibraryCollectionNotFound) as exc:
-            api.update_collection_components(
-                library=self.lib2,
-                collection_pk=self.col1.pk,
+                collection=self.col2,
                 usage_keys=[
                     UsageKey.from_string(self.lib1_problem_block["id"]),
                     UsageKey.from_string(self.lib1_html_block["id"]),

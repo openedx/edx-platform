@@ -188,21 +188,21 @@ class LibraryCollectionsView(ModelViewSet):
         Collection and Components must all be part of the given library/learning package.
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
-        library_obj = api.require_permission_for_library_key(
-            library_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        collection = self._verify_and_fetch_library_collection(
+            library_key, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
+        if not collection:
+            raise Http404
 
         serializer = ContentLibraryCollectionComponentsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        count = api.update_collection_components(
-            library_obj,
-            collection_pk=pk,
-            usage_keys=serializer.validated_data["usage_keys"],
+        usage_keys = serializer.validated_data["usage_keys"]
+        api.update_collection_components(
+            collection,
+            usage_keys=usage_keys,
             created_by=self.request.user.id,
             remove=(request.method == "DELETE"),
         )
 
-        return Response({'count': count})
+        return Response({'count': len(usage_keys)})
