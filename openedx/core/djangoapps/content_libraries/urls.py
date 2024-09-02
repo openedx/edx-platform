@@ -7,7 +7,7 @@ from django.urls import include, path, re_path
 from rest_framework import routers
 
 from . import views
-from .collections.rest_api.v1 import views as collection_views
+from . import views_collections
 
 
 # Django application name.
@@ -21,7 +21,7 @@ import_blocks_router.register(r'tasks', views.LibraryImportTaskViewSet, basename
 
 library_collections_router = routers.DefaultRouter()
 library_collections_router.register(
-    r'collections', collection_views.LibraryCollectionsView, basename="library-collections"
+    r'collections', views_collections.LibraryCollectionsView, basename="library-collections"
 )
 
 # These URLs are only used in Studio. The LMS already provides all the

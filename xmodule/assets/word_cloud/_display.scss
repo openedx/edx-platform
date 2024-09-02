@@ -4,7 +4,7 @@
 @import 'lms/theme/variables-v1';
 
 .input-cloud {
-  margin: ($baseline/4);
+  margin: calc((var(--baseline)/4));
 }
 
 .result_cloud_section {
