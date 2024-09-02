@@ -37,4 +37,3 @@ class ContentLibrariesConfig(AppConfig):
         Import signal handler's module to ensure they are registered.
         """
         from . import signal_handlers  # pylint: disable=unused-import
-        from .collections import handlers  # pylint: disable=unused-import

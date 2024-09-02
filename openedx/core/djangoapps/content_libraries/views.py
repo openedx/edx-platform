@@ -63,6 +63,7 @@ the api module instead.
         https://github.com/openedx/edx-platform/pull/30456
 """
 
+from functools import wraps
 import itertools
 import json
 import logging
@@ -120,7 +121,6 @@ from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as
 from openedx.core.djangoapps.xblock import api as xblock_api
 
 from .models import ContentLibrary, LtiGradedResource, LtiProfile
-from .utils import convert_exceptions
 
 
 User = get_user_model()

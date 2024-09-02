@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from django.http import Http404
 
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
@@ -22,6 +23,7 @@ from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.views import convert_exceptions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionSerializer,
+    ContentLibraryCollectionComponentsUpdateSerializer,
     ContentLibraryCollectionCreateOrUpdateSerializer,
 )
 
@@ -43,7 +45,7 @@ class LibraryCollectionsView(ModelViewSet):
         library_obj = api.require_permission_for_library_key(library_key, user, permission)
         collection = None
         if library_obj.learning_package_id:
-            collection = authoring_api.get_learning_package_collections(
+            collection = authoring_api.get_collections(
                 library_obj.learning_package_id
             ).filter(id=collection_id).first()
         return collection
@@ -88,7 +90,7 @@ class LibraryCollectionsView(ModelViewSet):
             library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
         )
 
-        collections = authoring_api.get_learning_package_collections(content_library.learning_package.id)
+        collections = authoring_api.get_collections(content_library.learning_package.id)
         serializer = self.get_serializer(collections, many=True)
         return Response(serializer.data)
 
@@ -175,3 +177,31 @@ class LibraryCollectionsView(ModelViewSet):
         # TODO: Implement the deletion logic and emit event signal
 
         return Response(None, status=HTTP_405_METHOD_NOT_ALLOWED)
+
+    @convert_exceptions
+    @action(detail=True, methods=['delete', 'patch'], url_path='components', url_name='components-update')
+    def update_components(self, request, lib_key_str, pk=None):
+        """
+        Adds (PATCH) or removes (DELETE) Components to/from a Collection.
+
+        Collection and Components must all be part of the given library/learning package.
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        collection = self._verify_and_fetch_library_collection(
+            library_key, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
+        if not collection:
+            raise Http404
+
+        serializer = ContentLibraryCollectionComponentsUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        usage_keys = serializer.validated_data["usage_keys"]
+        api.update_collection_components(
+            collection,
+            usage_keys=usage_keys,
+            created_by=self.request.user.id,
+            remove=(request.method == "DELETE"),
+        )
+
+        return Response({'count': len(usage_keys)})
