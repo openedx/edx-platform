@@ -14,6 +14,7 @@ from openedx.core.djangoapps.course_date_signals.handlers import (
     extract_dates_from_course
 )
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
+from openedx.core.djangoapps.course_date_signals.waffle import DISABLE_SPACED_OUT_SECTIONS
 
 from . import utils
 
@@ -368,5 +369,61 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
             for _ in range(3):
                 BlockFactory.create(category='sequential', parent=self.chapter)
             expected_dates = [(self.course.location, {})]
+        course = self.store.get_item(self.course.location)
+        self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    @override_waffle_flag(DISABLE_SPACED_OUT_SECTIONS, active=True)
+    def test_extract_dates_from_course_spaced_out_sections_disabled(self):
+        """
+        A section with a subsection that has relative_weeks_due and
+        a subsection without relative_weeks_due that has graded content.
+        With DISABLE_SPACED_OUT_SECTIONS active, PLS should not apply for the
+        subsections without relative_weeks_due, even if it's graded. In other
+        words, when DISABLE_SPACED_OUT_SECTIONS is active, only custom set
+        relative_weeks_due are applied.
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequential1 = BlockFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=2)
+            vertical1 = BlockFactory.create(category='vertical', parent=sequential1)
+            problem1 = BlockFactory.create(category='problem', parent=vertical1)
+
+            chapter2 = BlockFactory.create(category='chapter', parent=self.course)
+            sequential2 = BlockFactory.create(category='sequential', parent=chapter2, graded=True)
+            vertical2 = BlockFactory.create(category='vertical', parent=sequential2)
+            problem2 = BlockFactory.create(category='problem', parent=vertical2)
+
+            expected_dates = [
+                (self.course.location, {}),
+                (self.chapter.location, {'due': timedelta(days=14)}),
+                (sequential1.location, {'due': timedelta(days=14)}),
+                (vertical1.location, {'due': timedelta(days=14)}),
+                (problem1.location, {'due': timedelta(days=14)}),
+            ]
+        course = self.store.get_item(self.course.location)
+        self.assertCountEqual(extract_dates_from_course(course), expected_dates)
+
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=False)
+    @override_waffle_flag(DISABLE_SPACED_OUT_SECTIONS, active=True)
+    def test_extract_dates_from_course_spaced_out_sections_and_custom_dates_disabled(self):
+        """
+        A section with a subsection that has relative_weeks_due and
+        a subsection without relative_weeks_due that has graded content.
+        With DISABLE_SPACED_OUT_SECTIONS active and CUSTOM_RELATIVE_DATES
+        disabled, PLS should not apply for the subsections with relative_weeks_due.
+        """
+        with self.store.bulk_operations(self.course.id):
+            sequential1 = BlockFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=2)
+            vertical1 = BlockFactory.create(category='vertical', parent=sequential1)
+            problem1 = BlockFactory.create(category='problem', parent=vertical1)
+
+            chapter2 = BlockFactory.create(category='chapter', parent=self.course)
+            sequential2 = BlockFactory.create(category='sequential', parent=chapter2, graded=True)
+            vertical2 = BlockFactory.create(category='vertical', parent=sequential2)
+            problem2 = BlockFactory.create(category='problem', parent=vertical2)
+
+            expected_dates = [
+                (self.course.location, {}),
+            ]
         course = self.store.get_item(self.course.location)
         self.assertCountEqual(extract_dates_from_course(course), expected_dates)
