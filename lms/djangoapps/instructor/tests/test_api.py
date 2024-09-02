@@ -4768,7 +4768,7 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         CourseAccessRoleFactory(
             course_id=self.course.id,
             user=self.other_user,
-            role="instructor",
+            role="staff",
             org=self.course.id.org
         )
         self.assert_all_end_points(200)
