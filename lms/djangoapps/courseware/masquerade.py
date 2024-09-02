@@ -121,6 +121,7 @@ class MasqueradeView(View):
                 'group_id': course.group_id,
                 'role': course.role,
                 'user_name': course.user_name or None,
+                'user_email': User.objects.get(username=course.user_name).email if course.user_name else '',
                 'user_partition_id': course.user_partition_id,
             },
             'available': [
