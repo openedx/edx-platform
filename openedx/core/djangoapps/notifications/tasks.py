@@ -184,7 +184,6 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                     email='email' in notification_preferences,
                     group_by_id=group_by_id,
                 )
-                breakpoint()
                 if grouping_enabled and existing_notifications.get(user_id, None):
                     group_user_notifications(new_notification, existing_notifications[user_id])
                 else:
