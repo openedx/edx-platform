@@ -29,22 +29,21 @@ from django.http import (
     HttpResponseNotModified,
     HttpResponsePermanentRedirect
 )
+from django.views.decorators.http import require_safe
 from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
 
-from openedx.core.djangoapps.header_control import force_header_for_response
 from common.djangoapps.student.models import CourseEnrollment
-from xmodule.assetstore.assetmgr import AssetManager  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.contentstore.content import XASSET_LOCATION_TAG, StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import InvalidLocationError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.header_control import force_header_for_response
+from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.contentstore.content import XASSET_LOCATION_TAG, StaticContent
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore import InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .caching import get_cached_content, set_cached_content
 from .models import CdnUserAgentsConfig, CourseAssetCacheTtlConfig
-
-from django.views.decorators.http import require_safe
 
 
 @require_safe
