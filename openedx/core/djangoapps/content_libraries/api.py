@@ -80,6 +80,7 @@ from openedx_events.content_authoring.data import (
     ContentLibraryData,
     ContentObjectData,
     LibraryBlockData,
+    LibraryCollectionData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_TAGS_CHANGED,
@@ -89,6 +90,8 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
@@ -1069,11 +1072,77 @@ def revert_changes(library_key):
     )
 
 
-def update_collection_components(
-    collection: Collection,
+def create_library_collection(
+    library_key: LibraryLocatorV2,
+    title: str,
+    description: str = "",
+    created_by: int | None = None,
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Creates a Collection in the given ContentLibrary,
+    and emits a LIBRARY_COLLECTION_CREATED event.
+
+    If you've already fetched a ContentLibrary for the given library_key, pass it in here to avoid refetching.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    collection = authoring_api.create_collection(
+        learning_package_id=content_library.learning_package_id,
+        title=title,
+        description=description,
+        created_by=created_by,
+    )
+
+    # Emit event for library collection created
+    LIBRARY_COLLECTION_CREATED.send_event(
+        library_collection=LibraryCollectionData(
+            library_key=library_key,
+            collection_id=collection.id,
+        )
+    )
+
+    return collection
+
+
+def update_library_collection(
+    library_key: LibraryLocatorV2,
+    collection_id: int,
+    title: str | None = None,
+    description: str | None = None,
+) -> Collection:
+    """
+    Creates a Collection in the given ContentLibrary,
+    and emits a LIBRARY_COLLECTION_CREATED event.
+    """
+    collection = authoring_api.update_collection(
+        collection_id=collection_id,
+        title=title,
+        description=description,
+    )
+
+    # Emit event for library collection updated
+    LIBRARY_COLLECTION_UPDATED.send_event(
+        library_collection=LibraryCollectionData(
+            library_key=library_key,
+            collection_id=collection.id
+        )
+    )
+
+    return collection
+
+
+def update_library_collection_components(
+    library_key: LibraryLocatorV2,
+    collection_id: int,
     usage_keys: list[UsageKeyV2],
     created_by: int | None = None,
     remove=False,
+    content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
     Associates the Collection with Components for the given UsageKeys.
@@ -1081,12 +1150,20 @@ def update_collection_components(
     By default the Components are added to the Collection.
     If remove=True, the Components are removed from the Collection.
 
+    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
+
     Raises:
     * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
     * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
 
     Returns the updated Collection.
     """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
     # Fetch the Component.key values for the provided UsageKeys.
     component_keys = []
     for usage_key in usage_keys:
@@ -1095,7 +1172,7 @@ def update_collection_components(
 
         try:
             component = authoring_api.get_component_by_key(
-                collection.learning_package_id,
+                content_library.learning_package_id,
                 namespace=block_type.block_family,
                 type_name=usage_key.block_type,
                 local_key=usage_key.block_id,
@@ -1112,15 +1189,23 @@ def update_collection_components(
 
     if remove:
         collection = authoring_api.remove_from_collection(
-            collection.pk,
+            collection_id,
             entities_qset,
         )
     else:
         collection = authoring_api.add_to_collection(
-            collection.pk,
+            collection_id,
             entities_qset,
             created_by=created_by,
         )
+
+    # Emit event for library collection updated
+    LIBRARY_COLLECTION_UPDATED.send_event(
+        library_collection=LibraryCollectionData(
+            library_key=library_key,
+            collection_id=collection_id
+        )
+    )
 
     # Emit a CONTENT_OBJECT_TAGS_CHANGED event for each of the objects added/removed
     for usage_key in usage_keys:
