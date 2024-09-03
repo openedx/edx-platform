@@ -14,6 +14,11 @@
 
 <%block name = "headextra">
 <link href="${marketing_link('LOGIN_PAGE_STYLING')}" rel="stylesheet">
+<style>
+.window-wrap {
+	background-image: url("${marketing_link('LOGIN_PAGE_BANNER')}") !important;
+}
+</style>
 </%block>
 <%block name="js_extra">
     <%static:require_module module_name="js/student_account/logistration_factory" class_name="LogistrationFactory">
