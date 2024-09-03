@@ -28,7 +28,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
 
-from ..middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
+from ..views import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
 
 log = logging.getLogger(__name__)
 
