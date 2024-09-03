@@ -196,8 +196,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
         """
         Test send_notifications with grouping enabled.
         """
-        with patch(
-            'openedx.core.djangoapps.notifications.tasks.group_user_notifications') as group_user_notifications_mock:
+        with patch('openedx.core.djangoapps.notifications.tasks.group_user_notifications') as user_notifications_mock:
             context = {
                 'post_title': 'Post title',
                 'author_name': 'author name',
@@ -222,7 +221,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
                 content_url
             )
             self.assertEqual(Notification.objects.filter(user_id=self.user.id).count(), 1)
-            group_user_notifications_mock.assert_called_once()
+            user_notifications_mock.assert_called_once()
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.data(

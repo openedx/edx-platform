@@ -59,6 +59,7 @@ class NewCommentGrouper(BaseNotificationGrouper):
         context['grouped_count'] += 1
         return context
 
+
 def group_user_notifications(new_notification: Notification, old_notification: Notification):
     """
     Groups user notification based on notification type and group_id

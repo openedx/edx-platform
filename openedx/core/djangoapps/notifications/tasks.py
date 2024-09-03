@@ -14,13 +14,13 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
     get_notification_content
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.events import notification_generated_event
-from openedx.core.djangoapps.notifications.filters import NotificationFilter
 from openedx.core.djangoapps.notifications.grouping_notifications import (
     get_user_existing_notifications,
     group_user_notifications, NotificationRegistry,
