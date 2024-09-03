@@ -1449,8 +1449,9 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/string-utils.js',
     'edx-ui-toolkit/js/utils/html-utils.js',
 
-    # Here we were loading Bootstrap and supporting libraries, but it no longer seems to be needed for any Studio UI.
-    # 'common/js/vendor/bootstrap.bundle.js',
+    # Load Bootstrap and supporting libraries
+    'common/js/vendor/popper.js',
+    'common/js/vendor/bootstrap.js',
 
     # Finally load RequireJS
     'common/js/vendor/require.js'
