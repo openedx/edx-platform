@@ -501,7 +501,7 @@ def get_callback(notification_type):
     """
     try:
         return globals()[f"modify_context_{notification_type}"]
-    except: # pylint: disable=W0702
+    except:  # pylint: disable=W0702
         return None
 
 
