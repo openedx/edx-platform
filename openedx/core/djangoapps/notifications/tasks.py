@@ -18,13 +18,12 @@ from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
     get_notification_content
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_GROUP_NOTIFICATIONS, ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.filters import NotificationFilter
 from openedx.core.djangoapps.notifications.grouping_notifications import (
-    get_notification_type_grouping_function,
     get_user_existing_notifications,
-    group_user_notifications,
+    group_user_notifications, NotificationRegistry,
 )
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
@@ -132,8 +131,8 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
 
     group_by_id = context.pop('group_by_id', '')
-    grouping_function = get_notification_type_grouping_function(notification_type)
-    waffle_flag_enabled = ENABLE_GROUP_NOTIFICATIONS.is_enabled(course_key)
+    grouping_function = NotificationRegistry.get_grouper(notification_type)
+    waffle_flag_enabled = ENABLE_NOTIFICATION_GROUPING.is_enabled(course_key)
     grouping_enabled = waffle_flag_enabled and group_by_id and grouping_function is not None
     notifications_generated = False
     notification_content = ''

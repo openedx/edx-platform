@@ -39,7 +39,7 @@ ENABLE_EMAIL_NOTIFICATIONS = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_email_notifi
 # .. toggle_tickets: INF-1304
 ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora_grade_notifications", __name__)
 
-# .. toggle_name: notifications.enable_group_notifications
+# .. toggle_name: notifications.enable_notification_grouping
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable the Notifications Grouping feature
@@ -48,4 +48,4 @@ ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora
 # .. toggle_target_removal_date: 2025-06-01
 # .. toggle_warning: When the flag is ON, Notifications Grouping feature is enabled.
 # .. toggle_tickets: INF-1472
-ENABLE_GROUP_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_group_notifications', __name__)
+ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification_grouping', __name__)
