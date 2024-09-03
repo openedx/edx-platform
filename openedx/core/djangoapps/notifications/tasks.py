@@ -129,7 +129,6 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
-
     group_by_id = context.pop('group_by_id', '')
     grouping_function = NotificationRegistry.get_grouper(notification_type)
     waffle_flag_enabled = ENABLE_NOTIFICATION_GROUPING.is_enabled(course_key)
