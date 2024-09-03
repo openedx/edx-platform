@@ -3,6 +3,7 @@ Tests Library Collections REST API views
 """
 
 from __future__ import annotations
+import ddt
 
 from openedx_learning.api.authoring_models import Collection
 from openedx_learning.api.authoring import create_collection
@@ -16,8 +17,10 @@ from common.djangoapps.student.tests.factories import UserFactory
 URL_PREFIX = '/api/libraries/v2/{lib_key}/'
 URL_LIB_COLLECTIONS = URL_PREFIX + 'collections/'
 URL_LIB_COLLECTION = URL_LIB_COLLECTIONS + '{collection_id}/'
+URL_LIB_COLLECTION_COMPONENTS = URL_LIB_COLLECTION + 'components/'
 
 
+@ddt.ddt
 @skip_unless_cms  # Content Library Collections REST API is only available in Studio
 class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
     """
@@ -52,6 +55,20 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
             title="Collection 3",
             created_by=self.user.id,
             description="Description for Collection 3",
+        )
+
+        # Create some library blocks
+        self.lib1_problem_block = self._add_block_to_library(
+            self.lib1.library_key, "problem", "problem1",
+        )
+        self.lib1_html_block = self._add_block_to_library(
+            self.lib1.library_key, "html", "html1",
+        )
+        self.lib2_problem_block = self._add_block_to_library(
+            self.lib2.library_key, "problem", "problem2",
+        )
+        self.lib2_html_block = self._add_block_to_library(
+            self.lib2.library_key, "html", "html2",
         )
 
     def test_get_library_collection(self):
@@ -282,3 +299,119 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         )
 
         assert resp.status_code == 405
+
+    def test_get_components(self):
+        """
+        Retrieving components is not supported by the REST API;
+        use Meilisearch instead.
+        """
+        resp = self.client.get(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_id=self.col1.id,
+            ),
+        )
+        assert resp.status_code == 405
+
+    def test_update_components(self):
+        """
+        Test adding and removing components from a collection.
+        """
+        # Add two components to col1
+        resp = self.client.patch(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_id=self.col1.id,
+            ),
+            data={
+                "usage_keys": [
+                    self.lib1_problem_block["id"],
+                    self.lib1_html_block["id"],
+                ]
+            }
+        )
+        assert resp.status_code == 200
+        assert resp.data == {"count": 2}
+
+        # Remove one of the added components from col1
+        resp = self.client.delete(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib1.library_key,
+                collection_id=self.col1.id,
+            ),
+            data={
+                "usage_keys": [
+                    self.lib1_problem_block["id"],
+                ]
+            }
+        )
+        assert resp.status_code == 200
+        assert resp.data == {"count": 1}
+
+    @ddt.data("patch", "delete")
+    def test_update_components_wrong_collection(self, method):
+        """
+        Collection must belong to the requested library.
+        """
+        resp = getattr(self.client, method)(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib2.library_key,
+                collection_id=self.col1.id,
+            ),
+            data={
+                "usage_keys": [
+                    self.lib1_problem_block["id"],
+                ]
+            }
+        )
+        assert resp.status_code == 404
+
+    @ddt.data("patch", "delete")
+    def test_update_components_missing_data(self, method):
+        """
+        List of usage keys must contain at least one item.
+        """
+        resp = getattr(self.client, method)(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib2.library_key,
+                collection_id=self.col3.id,
+            ),
+        )
+        assert resp.status_code == 400
+        assert resp.data == {
+            "usage_keys": ["This field is required."],
+        }
+
+    @ddt.data("patch", "delete")
+    def test_update_components_from_another_library(self, method):
+        """
+        Adding/removing components from another library raises a 404.
+        """
+        resp = getattr(self.client, method)(
+            URL_LIB_COLLECTION_COMPONENTS.format(
+                lib_key=self.lib2.library_key,
+                collection_id=self.col3.id,
+            ),
+            data={
+                "usage_keys": [
+                    self.lib1_problem_block["id"],
+                    self.lib1_html_block["id"],
+                ]
+            }
+        )
+        assert resp.status_code == 404
+
+    @ddt.data("patch", "delete")
+    def test_update_components_permissions(self, method):
+        """
+        Check that a random user without permissions cannot update a Content Library Collection's components.
+        """
+        random_user = UserFactory.create(username="Random", email="random@example.com")
+        with self.as_user(random_user):
+            resp = getattr(self.client, method)(
+                URL_LIB_COLLECTION_COMPONENTS.format(
+                    lib_key=self.lib1.library_key,
+                    collection_id=self.col1.id,
+                ),
+            )
+            assert resp.status_code == 403
