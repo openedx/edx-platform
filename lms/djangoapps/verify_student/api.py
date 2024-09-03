@@ -5,11 +5,11 @@ import logging
 
 from django.conf import settings
 from django.utils.translation import gettext as _
-from django.core.exceptions import ValidationError
 
 from lms.djangoapps.verify_student.emails import send_verification_approved_email
 from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import VerificationAttempt
+from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 
 log = logging.getLogger(__name__)
@@ -97,19 +97,19 @@ def update_verification_attempt(attempt_id, name=None, status=None, expiration_d
     if status is not None:
         attempt.status = status
 
+        status_list = [attr for attr in dir(VerificationAttemptStatus) if not attr.startswith('__')]
+        if status not in status_list:
+            log.error(
+                'Attempted to call update_verification_attempt called with invalid status: %(status)s. '
+                'Status must be one of: %(status_list)s',
+                {
+                    'status': status,
+                    'status_list': VerificationAttempt.STATUS_CHOICES,
+                },
+            )
+            raise VerificationAttemptInvalidStatus
+
     if expiration_datetime is not None:
         attempt.expiration_datetime = expiration_datetime
 
-    try:
-        attempt.clean_fields()
-        attempt.save()
-    except ValidationError:
-        log.error(
-            'Attempted to call update_verification_attempt called with invalid status: %(status)s. '
-            'Status must be one of: %(status_list)s',
-            {
-                'status': status,
-                'status_list': VerificationAttempt.STATUS_CHOICES,
-            },
-        )
-        raise VerificationAttemptInvalidStatus  # pylint: disable=raise-missing-from
+    attempt.save()

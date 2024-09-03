@@ -169,8 +169,6 @@ class UpdateVerificationAttempt(TestCase):
             status=VerificationAttemptStatus.approved,
         )
 
-    # These are statuses used in edx-name-affirmation's VerifiedName model and persona-integration's unique
-    # VerificationAttempt model, and not by verify_student's VerificationAttempt model.
     @ddt.data(
         'completed',
         'failed',
