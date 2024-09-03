@@ -44,8 +44,14 @@ class TestNotificationRegistry(unittest.TestCase):
 
 
 class TestNewCommentGrouper(unittest.TestCase):
+    """
+    Tests for the NewCommentGrouper class
+    """
 
     def setUp(self):
+        """
+        Set up the test
+        """
         self.new_notification = MagicMock(spec=Notification)
         self.old_notification = MagicMock(spec=Notification)
         self.old_notification.content_context = {
@@ -56,7 +62,7 @@ class TestNewCommentGrouper(unittest.TestCase):
         """
         Test that the function creates the grouping keys
         """
-        updated_context = NewCommentGrouper.group(self.new_notification, self.old_notification)
+        updated_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
 
         self.assertIn('replier_name_grouped', updated_context)
         self.assertIn('grouped_count', updated_context)
@@ -76,7 +82,7 @@ class TestNewCommentGrouper(unittest.TestCase):
         }
         self.new_notification.content_context = {'replier_name': 'User3'}
 
-        updated_context = NewCommentGrouper.group(self.new_notification, self.old_notification)
+        updated_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
 
         self.assertIn('replier_name_grouped', updated_context)
         self.assertEqual(len(updated_context['replier_name_grouped']), 3)
@@ -84,6 +90,9 @@ class TestNewCommentGrouper(unittest.TestCase):
 
 
 class TestGroupUserNotifications(unittest.TestCase):
+    """
+    Tests for the group_user_notifications function
+    """
 
     @patch('openedx.core.djangoapps.notifications.grouping_notifications.NotificationRegistry.get_grouper')
     def test_group_user_notifications(self, mock_get_grouper):

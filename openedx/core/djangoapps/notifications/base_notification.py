@@ -480,6 +480,9 @@ class NotificationAppManager:
 
 
 def get_grouped_template_context(template, context):
+    """
+    Returns grouped template context for the given template
+    """
     if not context.get('grouped', False):
         return ''
     user_key = context.get('user_key')
@@ -493,9 +496,12 @@ def get_grouped_template_context(template, context):
 
 
 def get_callback(notification_type):
+    """
+    Returns callback for the given notification type
+    """
     try:
         return globals()[f"modify_context_{notification_type}"]
-    except:
+    except: # pylint: disable=W0702
         return None
 
 

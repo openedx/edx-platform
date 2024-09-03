@@ -1,3 +1,6 @@
+"""
+Notification grouping utilities for notifications
+"""
 import datetime
 from typing import Dict, Type, Union
 
@@ -9,17 +12,36 @@ from openedx.core.djangoapps.notifications.models import Notification
 
 
 class BaseNotificationGrouper(ABC):
+    """
+    Base class for notification groupers.
+    """
+
     @abstractmethod
     def group(self, new_notification, old_notification):
         pass
 
 
 class NotificationRegistry:
+    """
+    Registry for notification groupers.
+    """
     _groupers: Dict[str, Type[BaseNotificationGrouper]] = {}
 
     @classmethod
     def register(cls, notification_type: str):
+        """
+        Registers a notification grouper for the given notification type.
+        Args
+            notification_type: The type of notification for which to register the grouper.
+
+        Returns:
+            A decorator that registers the grouper class for the given notification type.
+        """
+
         def decorator(grouper_class: Type[BaseNotificationGrouper]) -> Type[BaseNotificationGrouper]:
+            """
+            Registers the grouper class for the given notification type.
+            """
             cls._groupers[notification_type] = grouper_class
             return grouper_class
 
@@ -35,7 +57,6 @@ class NotificationRegistry:
         Returns:
             The corresponding BaseNotificationGrouper instance or None if no grouper is found.
         """
-
         grouper_class = cls._groupers.get(notification_type)
         if not grouper_class:
             return None
@@ -44,8 +65,14 @@ class NotificationRegistry:
 
 @NotificationRegistry.register('new_comment')
 class NewCommentGrouper(BaseNotificationGrouper):
-    @classmethod
-    def group(cls, new_notification, old_notification):
+    """
+    Groups new comment notifications based on the replier name.
+    """
+
+    def group(self, new_notification, old_notification):
+        """
+        Groups new comment notifications based on the replier name.
+        """
         context = old_notification.content_context.copy()
         user_key = 'replier_name'
         group_key = f'{user_key}_grouped'
