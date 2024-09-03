@@ -4,8 +4,6 @@ Collections API Views
 
 from __future__ import annotations
 
-from django.http import Http404
-
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -38,16 +36,21 @@ class LibraryCollectionsView(ModelViewSet):
 
     serializer_class = ContentLibraryCollectionSerializer
 
-    def _verify_and_fetch_library_collection(self, library_key, collection_id, user, permission) -> Collection | None:
+    def _verify_and_fetch_library_collection(self, lib_key_str, collection_id, user, permission) -> Collection | None:
         """
-        Verify that the collection belongs to the library and the user has the correct permissions
+        Verify that the collection belongs to the library and the user has the correct permissions.
+
+        This method may raise exceptions; these are handled by the @convert_exceptions wrapper on the views.
         """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
         library_obj = api.require_permission_for_library_key(library_key, user, permission)
         collection = None
         if library_obj.learning_package_id:
             collection = authoring_api.get_collections(
                 library_obj.learning_package_id
             ).filter(id=collection_id).first()
+        if not collection:
+            raise api.ContentLibraryCollectionNotFound
         return collection
 
     @convert_exceptions
@@ -55,21 +58,14 @@ class LibraryCollectionsView(ModelViewSet):
         """
         Retrieve the Content Library Collection
         """
-        lib_key_str = kwargs.pop('lib_key_str', None)
-        if not lib_key_str:
-            raise Http404
-
-        pk = kwargs.pop("pk", None)
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        lib_key_str = kwargs.pop("lib_key_str")
+        pk = kwargs.pop("pk")
 
         # Check if user has permissions to view this collection by checking if
         # user has permission to view the Content Library it belongs to
         collection = self._verify_and_fetch_library_collection(
-            library_key, pk, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+            lib_key_str, pk, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
         )
-
-        if not collection:
-            raise Http404
 
         serializer = self.get_serializer(collection)
         return Response(serializer.data)
@@ -79,13 +75,11 @@ class LibraryCollectionsView(ModelViewSet):
         """
         List Collections that belong to Content Library
         """
-        lib_key_str = kwargs.pop('lib_key_str', None)
-        if not lib_key_str:
-            raise Http404
+        lib_key_str = kwargs.pop("lib_key_str")
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
 
         # Check if user has permissions to view collections by checking if user
         # has permission to view the Content Library they belong to
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
         content_library = api.require_permission_for_library_key(
             library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
         )
@@ -99,13 +93,11 @@ class LibraryCollectionsView(ModelViewSet):
         """
         Create a Collection that belongs to a Content Library
         """
-        lib_key_str = kwargs.pop('lib_key_str', None)
-        if not lib_key_str:
-            raise Http404
+        lib_key_str = kwargs.pop("lib_key_str")
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
 
         # Check if user has permissions to create a collection in the Content Library
         # by checking if user has permission to edit the Content Library
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
         content_library = api.require_permission_for_library_key(
             library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
@@ -135,20 +127,15 @@ class LibraryCollectionsView(ModelViewSet):
         """
         Update a Collection that belongs to a Content Library
         """
-        lib_key_str = kwargs.pop('lib_key_str', None)
-        if not lib_key_str:
-            raise Http404
-
-        pk = kwargs.pop('pk', None)
+        lib_key_str = kwargs.pop('lib_key_str')
         library_key = LibraryLocatorV2.from_string(lib_key_str)
+        pk = kwargs.pop('pk')
+
         # Check if user has permissions to update a collection in the Content Library
         # by checking if user has permission to edit the Content Library
         collection = self._verify_and_fetch_library_collection(
-            library_key, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+            lib_key_str, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
-
-        if not collection:
-            raise Http404
 
         update_serializer = ContentLibraryCollectionCreateOrUpdateSerializer(
             collection, data=request.data, partial=True
@@ -180,18 +167,15 @@ class LibraryCollectionsView(ModelViewSet):
 
     @convert_exceptions
     @action(detail=True, methods=['delete', 'patch'], url_path='components', url_name='components-update')
-    def update_components(self, request, lib_key_str, pk=None):
+    def update_components(self, request, lib_key_str, pk):
         """
         Adds (PATCH) or removes (DELETE) Components to/from a Collection.
 
         Collection and Components must all be part of the given library/learning package.
         """
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
         collection = self._verify_and_fetch_library_collection(
-            library_key, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+            lib_key_str, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
-        if not collection:
-            raise Http404
 
         serializer = ContentLibraryCollectionComponentsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
