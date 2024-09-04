@@ -4689,6 +4689,7 @@ from common.djangoapps.student.tests.factories import (
     UserFactory
 )
 
+
 class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -4700,6 +4701,7 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
     Actually, modify_access does not have a very meaningful
     response yet, so only the status code is tested.
     """
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -4712,9 +4714,6 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
-
-        self.other_instructor = InstructorFactory(course_key=self.course.id)
-        self.other_staff = StaffFactory(course_key=self.course.id)
         self.other_user = UserFactory()
 
         dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
@@ -4729,15 +4728,14 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
             'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
         }
 
-
     def assert_all_end_points(self, expected_status_code):
         endpoints = [
             ('list_course_role_members', {'rolename': 'staff'}),
             ('register_and_enroll_students', {}),
-            ('get_student_progress_url', {  'course_id': str(self.course.id),
-                'unique_student_identifier': self.other_user.email
-                }
-            ),
+            ('get_student_progress_url', {'course_id': str(self.course.id),
+                                          'unique_student_identifier': self.other_user.email
+                                          }
+             ),
             ('list_entrance_exam_instructor_tasks', {'unique_student_identifier': self.other_user.email}),
             ('list_email_content', {}),
             ('show_student_extensions', {'student': self.other_user.email})
