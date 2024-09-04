@@ -13,10 +13,16 @@ from opaque_keys.edx.keys import (
     UsageKey,
 )
 from opaque_keys.edx.locator import LibraryLocatorV2
-from openedx_events.content_authoring.data import ContentObjectData
-from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
+from openedx_events.content_authoring.data import (
+    ContentObjectData,
+    LibraryCollectionData,
+)
+from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_TAGS_CHANGED,
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_UPDATED,
+)
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
-from openedx_learning.api import authoring as authoring_api
 
 from .. import api
 from ..models import ContentLibrary
@@ -257,6 +263,8 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
     """
     ENABLED_OPENEDX_EVENTS = [
         CONTENT_OBJECT_TAGS_CHANGED.event_type,
+        LIBRARY_COLLECTION_CREATED.event_type,
+        LIBRARY_COLLECTION_UPDATED.event_type,
     ]
 
     @classmethod
@@ -306,6 +314,78 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             self.lib1.library_key, "html", "html1",
         )
 
+    def test_create_library_collection(self):
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_CREATED.connect(event_receiver)
+
+        collection = api.create_library_collection(
+            self.lib2.library_key,
+            collection_key="COL4",
+            title="Collection 4",
+            description="Description for Collection 4",
+            created_by=self.user.id,
+        )
+        assert collection.key == "COL4"
+        assert collection.title == "Collection 4"
+        assert collection.description == "Description for Collection 4"
+        assert collection.created_by == self.user
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_CREATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib2.library_key,
+                    collection_key="COL4",
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
+    def test_create_library_collection_invalid_library(self):
+        library_key = LibraryLocatorV2.from_string("lib:INVALID:test-lib-does-not-exist")
+        with self.assertRaises(api.ContentLibraryNotFound) as exc:
+            api.create_library_collection(
+                library_key,
+                collection_key="COL4",
+                title="Collection 3",
+            )
+
+    def test_update_library_collection(self):
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+
+        self.col1 = api.update_library_collection(
+            self.lib1.library_key,
+            self.col1.key,
+            title="New title for Collection 1",
+        )
+        assert self.col1.key == "COL1"
+        assert self.col1.title == "New title for Collection 1"
+        assert self.col1.description == "Description for Collection 1"
+        assert self.col1.created_by == self.user
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
+    def test_update_library_collection_wrong_library(self):
+        with self.assertRaises(api.ContentLibraryCollectionNotFound) as exc:
+            api.update_library_collection(
+                self.lib1.library_key,
+                self.col2.key,
+            )
+
     def test_update_library_collection_components(self):
         assert not list(self.col1.entities.all())
 
@@ -335,6 +415,8 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         """
         event_receiver = mock.Mock()
         CONTENT_OBJECT_TAGS_CHANGED.connect(event_receiver)
+        LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+
         api.update_library_collection_components(
             self.lib1.library_key,
             self.col1.key,
@@ -344,13 +426,14 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             ],
         )
 
-        assert event_receiver.call_count == 2
+        assert event_receiver.call_count == 3
         self.assertDictContainsSubset(
             {
-                "signal": CONTENT_OBJECT_TAGS_CHANGED,
+                "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
-                "content_object": ContentObjectData(
-                    object_id=UsageKey.from_string(self.lib1_problem_block["id"]),
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -360,10 +443,20 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": CONTENT_OBJECT_TAGS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectData(
-                    object_id=UsageKey.from_string(self.lib1_html_block["id"]),
+                    object_id=UsageKey.from_string(self.lib1_problem_block["id"]),
                 ),
             },
             event_receiver.call_args_list[1].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_TAGS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectData(
+                    object_id=UsageKey.from_string(self.lib1_html_block["id"]),
+                ),
+            },
+            event_receiver.call_args_list[2].kwargs,
         )
 
     def test_update_collection_components_from_wrong_library(self):
