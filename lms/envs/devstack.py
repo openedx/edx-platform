@@ -522,16 +522,6 @@ course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
 ]
 course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
 
-######################## Subscriptions API SETTINGS ########################
-SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
-SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
-
-SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
-SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
-SUBSCRIPTIONS_TRIAL_LENGTH = 7
-
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'

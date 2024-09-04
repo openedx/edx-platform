@@ -4691,7 +4691,6 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_channel_worker',
     'enterprise_access_worker',
     'enterprise_subsidy_worker',
-    'subscriptions_worker'
 ]
 
 # Setting for Open API key and prompts used by edx-enterprise.
@@ -5384,17 +5383,6 @@ ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
-
-######################## Subscriptions API SETTINGS ########################
-SUBSCRIPTIONS_ROOT_URL = ""
-SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
-
-SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
-SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
-SUBSCRIPTIONS_TRIAL_LENGTH = 7
-SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 
 ############## NOTIFICATIONS ##############
 NOTIFICATIONS_EXPIRY = 60
