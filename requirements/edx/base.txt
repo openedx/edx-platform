@@ -823,7 +823,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.11.3
+openedx-learning @ git+https://github.com/open-craft/openedx-learning/@jill/collection-key
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
