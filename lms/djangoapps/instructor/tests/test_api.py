@@ -60,12 +60,15 @@ from common.djangoapps.student.roles import (
     CourseFinanceAdminRole,
     CourseInstructorRole,
 )
-from common.djangoapps.student.tests.factories import BetaTesterFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import InstructorFactory
-from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    BetaTesterFactory,
+    CourseAccessRoleFactory,
+    CourseEnrollmentFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    StaffFactory,
+    UserFactory
+)
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
@@ -94,12 +97,23 @@ from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from xmodule.fields import Date
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .test_tools import msk_from_problem_urlname
 
@@ -4675,19 +4689,6 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
             f"The student {self.user} does not have certificate for the course {self.course.id.course}. Kindly "
             "verify student username/email and the selected course are correct and try again."
         )
-
-from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
-from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
-from common.djangoapps.student.tests.factories import (
-    BetaTesterFactory,
-    CourseAccessRoleFactory,
-    CourseEnrollmentFactory,
-    GlobalStaffFactory,
-    InstructorFactory,
-    StaffFactory,
-    UserFactory
-)
 
 
 class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
