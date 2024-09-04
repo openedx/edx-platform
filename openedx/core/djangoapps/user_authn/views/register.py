@@ -390,7 +390,9 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'is_year_of_birth_selected': bool(profile.year_of_birth),
             'is_education_selected': bool(profile.level_of_education_display),
             'is_goal_set': bool(profile.goals),
-            'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
+            'total_registration_time': round(
+                float(params.get('total_registration_time') or params.get('totalRegistrationTime') or 0)
+            ),
             'activation_key': registration.activation_key if registration else None,
             'host': params.get('host', ''),
             'app_name': params.get('app_name', ''),

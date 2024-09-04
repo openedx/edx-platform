@@ -13,6 +13,7 @@ from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx_learning.api.authoring_models import LearningPackage
 
 log = logging.getLogger(__name__)
 
@@ -27,10 +28,12 @@ class Fields:
     type = "type"  # DocType.course_block or DocType.library_block (see below)
     block_id = "block_id"  # The block_id part of the usage key. Sometimes human-readable, sometimes a random hex ID
     display_name = "display_name"
+    description = "description"
     modified = "modified"
     created = "created"
     last_published = "last_published"
     block_type = "block_type"
+    problem_types = "problem_types"
     context_key = "context_key"
     org = "org"
     access_id = "access_id"  # .models.SearchAccess.id
@@ -65,6 +68,7 @@ class DocType:
     """
     course_block = "course_block"
     library_block = "library_block"
+    collection = "collection"
 
 
 def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
@@ -273,5 +277,40 @@ def searchable_doc_for_course_block(block) -> dict:
     }
 
     doc.update(_fields_from_block(block))
+
+    return doc
+
+
+def searchable_doc_for_collection(collection) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, so that the given collection can be
+    found using faceted search.
+    """
+    doc = {
+        Fields.id: collection.id,
+        Fields.type: DocType.collection,
+        Fields.display_name: collection.title,
+        Fields.description: collection.description,
+        Fields.created: collection.created.timestamp(),
+        Fields.modified: collection.modified.timestamp(),
+        # Add related learning_package.key as context_key by default.
+        # If related contentlibrary is found, it will override this value below.
+        # Mostly contentlibrary.library_key == learning_package.key
+        Fields.context_key: collection.learning_package.key,
+    }
+    # Just in case learning_package is not related to a library
+    try:
+        context_key = collection.learning_package.contentlibrary.library_key
+        org = str(context_key.org)
+        doc.update({
+            Fields.context_key: str(context_key),
+            Fields.org: org,
+        })
+    except LearningPackage.contentlibrary.RelatedObjectDoesNotExist:
+        log.warning(f"Related library not found for {collection}")
+    doc[Fields.access_id] = _meili_access_id_from_context_key(doc[Fields.context_key])
+    # Add the breadcrumbs.
+    doc[Fields.breadcrumbs] = [{"display_name": collection.learning_package.title}]
 
     return doc
