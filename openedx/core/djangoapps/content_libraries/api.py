@@ -1074,9 +1074,12 @@ def revert_changes(library_key):
 
 def create_library_collection(
     library_key: LibraryLocatorV2,
+    collection_key: str,
     title: str,
+    *,
     description: str = "",
     created_by: int | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
     content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
@@ -1093,6 +1096,7 @@ def create_library_collection(
 
     collection = authoring_api.create_collection(
         learning_package_id=content_library.learning_package_id,
+        key=collection_key,
         title=title,
         description=description,
         created_by=created_by,
@@ -1102,7 +1106,7 @@ def create_library_collection(
     LIBRARY_COLLECTION_CREATED.send_event(
         library_collection=LibraryCollectionData(
             library_key=library_key,
-            collection_id=collection.id,
+            collection_key=collection.key,
         )
     )
 
@@ -1111,25 +1115,38 @@ def create_library_collection(
 
 def update_library_collection(
     library_key: LibraryLocatorV2,
-    collection_id: int,
+    collection_key: str,
+    *,
     title: str | None = None,
     description: str | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
     Creates a Collection in the given ContentLibrary,
     and emits a LIBRARY_COLLECTION_CREATED event.
     """
-    collection = authoring_api.update_collection(
-        collection_id=collection_id,
-        title=title,
-        description=description,
-    )
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    try:
+        collection = authoring_api.update_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+        )
+    except Collection.DoesNotExist as exc:
+        raise ContentLibraryCollectionNotFound from exc
 
     # Emit event for library collection updated
     LIBRARY_COLLECTION_UPDATED.send_event(
         library_collection=LibraryCollectionData(
             library_key=library_key,
-            collection_id=collection.id
+            collection_key=collection.key,
         )
     )
 
@@ -1138,10 +1155,12 @@ def update_library_collection(
 
 def update_library_collection_components(
     library_key: LibraryLocatorV2,
-    collection_id: int,
+    collection_key: str,
+    *,
     usage_keys: list[UsageKeyV2],
     created_by: int | None = None,
     remove=False,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
     content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
@@ -1189,12 +1208,14 @@ def update_library_collection_components(
 
     if remove:
         collection = authoring_api.remove_from_collection(
-            collection_id,
+            content_library.learning_package_id,
+            collection_key,
             entities_qset,
         )
     else:
         collection = authoring_api.add_to_collection(
-            collection_id,
+            content_library.learning_package_id,
+            collection_key,
             entities_qset,
             created_by=created_by,
         )
@@ -1203,7 +1224,7 @@ def update_library_collection_components(
     LIBRARY_COLLECTION_UPDATED.send_event(
         library_collection=LibraryCollectionData(
             library_key=library_key,
-            collection_id=collection_id
+            collection_key=collection.key,
         )
     )
 

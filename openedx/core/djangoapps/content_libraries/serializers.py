@@ -262,13 +262,21 @@ class ContentLibraryCollectionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ContentLibraryCollectionCreateOrUpdateSerializer(serializers.Serializer):
+class ContentLibraryCollectionUpdateSerializer(serializers.Serializer):
     """
-    Serializer for add/update a Collection in a Content Library
+    Serializer for updating a Collection in a Content Library
     """
 
     title = serializers.CharField()
     description = serializers.CharField()
+
+
+class ContentLibraryCollectionCreateSerializer(ContentLibraryCollectionUpdateSerializer):
+    """
+    Serializer for adding a Collection in a Content Library
+    """
+
+    key = serializers.CharField()
 
 
 class UsageKeyV2Serializer(serializers.Serializer):

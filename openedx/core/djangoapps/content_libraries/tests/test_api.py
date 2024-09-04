@@ -6,7 +6,6 @@ import base64
 import hashlib
 from unittest import mock
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from opaque_keys.edx.keys import (
@@ -284,14 +283,16 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         self.lib2 = ContentLibrary.objects.get(slug="test-lib-col-2")
 
         # Create Content Library Collections
-        self.col1 = authoring_api.create_collection(
-            learning_package_id=self.lib1.learning_package.id,
+        self.col1 = api.create_library_collection(
+            self.lib1.library_key,
+            collection_key="COL1",
             title="Collection 1",
             description="Description for Collection 1",
             created_by=self.user.id,
         )
-        self.col2 = authoring_api.create_collection(
-            learning_package_id=self.lib2.learning_package.id,
+        self.col2 = api.create_library_collection(
+            self.lib2.library_key,
+            collection_key="COL2",
             title="Collection 2",
             description="Description for Collection 2",
             created_by=self.user.id,
@@ -310,7 +311,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
 
         self.col1 = api.update_library_collection_components(
             self.lib1.library_key,
-            collection_id=self.col1.id,
+            self.col1.key,
             usage_keys=[
                 UsageKey.from_string(self.lib1_problem_block["id"]),
                 UsageKey.from_string(self.lib1_html_block["id"]),
@@ -320,7 +321,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
 
         self.col1 = api.update_library_collection_components(
             self.lib1.library_key,
-            collection_id=self.col1.id,
+            self.col1.key,
             usage_keys=[
                 UsageKey.from_string(self.lib1_html_block["id"]),
             ],
@@ -336,7 +337,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         CONTENT_OBJECT_TAGS_CHANGED.connect(event_receiver)
         api.update_library_collection_components(
             self.lib1.library_key,
-            collection_id=self.col1.id,
+            self.col1.key,
             usage_keys=[
                 UsageKey.from_string(self.lib1_problem_block["id"]),
                 UsageKey.from_string(self.lib1_html_block["id"]),
@@ -366,10 +367,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
 
     def test_update_collection_components_from_wrong_library(self):
-        with self.assertRaises(ValidationError) as exc:
+        with self.assertRaises(api.ContentLibraryBlockNotFound) as exc:
             api.update_library_collection_components(
-                self.lib1.library_key,
-                collection_id=self.col2.id,
+                self.lib2.library_key,
+                self.col2.key,
                 usage_keys=[
                     UsageKey.from_string(self.lib1_problem_block["id"]),
                     UsageKey.from_string(self.lib1_html_block["id"]),

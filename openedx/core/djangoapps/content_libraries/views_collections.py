@@ -4,12 +4,16 @@ Collections API Views
 
 from __future__ import annotations
 
+from django.db.models import QuerySet
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import Collection
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
@@ -17,11 +21,9 @@ from openedx.core.djangoapps.content_libraries.views import convert_exceptions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionSerializer,
     ContentLibraryCollectionComponentsUpdateSerializer,
-    ContentLibraryCollectionCreateOrUpdateSerializer,
+    ContentLibraryCollectionCreateSerializer,
+    ContentLibraryCollectionUpdateSerializer,
 )
-
-from openedx_learning.api.authoring_models import Collection
-from openedx_learning.api import authoring as authoring_api
 
 
 class LibraryCollectionsView(ModelViewSet):
@@ -30,84 +32,90 @@ class LibraryCollectionsView(ModelViewSet):
     """
 
     serializer_class = ContentLibraryCollectionSerializer
+    lookup_field = 'key'
 
-    def _verify_and_fetch_library_collection(
-        self,
-        library_key,
-        collection_id,
-        user,
-        permission,
-    ) -> tuple[ContentLibrary, Collection]:
+    def __init__(self, *args, **kwargs) -> None:
         """
-        Verify that the collection belongs to the library and the user has the correct permissions.
+        Caches the ContentLibrary for the duration of the request.
+        """
+        super().__init__(*args, **kwargs)
+        self._content_library: ContentLibrary | None = None
+
+    def get_content_library(self) -> ContentLibrary:
+        """
+        Returns the requested ContentLibrary object, if access allows.
+        """
+        if self._content_library:
+            return self._content_library
+
+        lib_key_str = self.kwargs["lib_key_str"]
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        permission = (
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+            if self.request.method in ['OPTIONS', 'GET']
+            else permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
+
+        self._content_library = api.require_permission_for_library_key(
+            library_key,
+            self.request.user,
+            permission,
+        )
+        return self._content_library
+
+    def get_queryset(self) -> QuerySet[Collection]:
+        """
+        Returns a queryset for the requested Collections, if access allows.
 
         This method may raise exceptions; these are handled by the @convert_exceptions wrapper on the views.
         """
-        library_obj = api.require_permission_for_library_key(library_key, user, permission)
-        collection = None
-        if library_obj.learning_package_id:
-            collection = authoring_api.get_collections(
-                library_obj.learning_package_id
-            ).filter(id=collection_id).first()
-        if not collection:
+        content_library = self.get_content_library()
+        assert content_library.learning_package_id
+        return authoring_api.get_collections(content_library.learning_package_id)
+
+    def get_object(self) -> Collection:
+        """
+        Returns the requested Collections, if access allows.
+
+        This method may raise exceptions; these are handled by the @convert_exceptions wrapper on the views.
+        """
+        collection = super().get_object()
+        content_library = self.get_content_library()
+
+        # Ensure the ContentLibrary and Collection share the same learning package
+        if collection.learning_package_id != content_library.learning_package_id:
             raise api.ContentLibraryCollectionNotFound
-        return library_obj, collection
+        return collection
 
     @convert_exceptions
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs) -> Response:
         """
         Retrieve the Content Library Collection
         """
-        lib_key_str = kwargs.pop("lib_key_str")
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
-        pk = kwargs.pop("pk")
-
-        # Check if user has permissions to view this collection by checking if
-        # user has permission to view the Content Library it belongs to
-        _, collection = self._verify_and_fetch_library_collection(
-            library_key, pk, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
-        )
-
-        serializer = self.get_serializer(collection)
-        return Response(serializer.data)
+        # View declared so we can wrap it in @convert_exceptions
+        return super().retrieve(request, *args, **kwargs)
 
     @convert_exceptions
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs) -> Response:
         """
         List Collections that belong to Content Library
         """
-        lib_key_str = kwargs.pop("lib_key_str")
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
-
-        # Check if user has permissions to view collections by checking if user
-        # has permission to view the Content Library they belong to
-        content_library = api.require_permission_for_library_key(
-            library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
-        )
-
-        collections = authoring_api.get_collections(content_library.learning_package.id)
-        serializer = self.get_serializer(collections, many=True)
-        return Response(serializer.data)
+        # View declared so we can wrap it in @convert_exceptions
+        return super().list(request, *args, **kwargs)
 
     @convert_exceptions
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs) -> Response:
         """
         Create a Collection that belongs to a Content Library
         """
-        lib_key_str = kwargs.pop("lib_key_str")
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
-
-        # Check if user has permissions to create a collection in the Content Library
-        # by checking if user has permission to edit the Content Library
-        content_library = api.require_permission_for_library_key(
-            library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
-
-        create_serializer = ContentLibraryCollectionCreateOrUpdateSerializer(data=request.data)
+        content_library = self.get_content_library()
+        create_serializer = ContentLibraryCollectionCreateSerializer(data=request.data)
         create_serializer.is_valid(raise_exception=True)
+
         collection = api.create_library_collection(
-            library_key=library_key,
+            library_key=content_library.library_key,
             content_library=content_library,
+            collection_key=create_serializer.validated_data["key"],
             title=create_serializer.validated_data["title"],
             description=create_serializer.validated_data["description"],
             created_by=request.user.id,
@@ -117,27 +125,21 @@ class LibraryCollectionsView(ModelViewSet):
         return Response(serializer.data)
 
     @convert_exceptions
-    def partial_update(self, request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs) -> Response:
         """
         Update a Collection that belongs to a Content Library
         """
-        lib_key_str = kwargs.pop('lib_key_str')
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
-        pk = kwargs.pop('pk')
+        content_library = self.get_content_library()
+        collection_key = kwargs["key"]
 
-        # Check if user has permissions to update a collection in the Content Library
-        # by checking if user has permission to edit the Content Library
-        self._verify_and_fetch_library_collection(
-            library_key, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
-
-        update_serializer = ContentLibraryCollectionCreateOrUpdateSerializer(
+        update_serializer = ContentLibraryCollectionUpdateSerializer(
             data=request.data, partial=True
         )
         update_serializer.is_valid(raise_exception=True)
         updated_collection = api.update_library_collection(
-            library_key=library_key,
-            collection_id=pk,
+            library_key=content_library.library_key,
+            collection_key=collection_key,
+            content_library=content_library,
             **update_serializer.validated_data
         )
         serializer = self.get_serializer(updated_collection)
@@ -145,7 +147,7 @@ class LibraryCollectionsView(ModelViewSet):
         return Response(serializer.data)
 
     @convert_exceptions
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs) -> Response:
         """
         Deletes a Collection that belongs to a Content Library
 
@@ -157,25 +159,23 @@ class LibraryCollectionsView(ModelViewSet):
 
     @convert_exceptions
     @action(detail=True, methods=['delete', 'patch'], url_path='components', url_name='components-update')
-    def update_components(self, request, lib_key_str, pk):
+    def update_components(self, request, *args, **kwargs) -> Response:
         """
         Adds (PATCH) or removes (DELETE) Components to/from a Collection.
 
         Collection and Components must all be part of the given library/learning package.
         """
-        library_key = LibraryLocatorV2.from_string(lib_key_str)
-        library_obj, _ = self._verify_and_fetch_library_collection(
-            library_key, pk, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
+        content_library = self.get_content_library()
+        collection_key = kwargs["key"]
 
         serializer = ContentLibraryCollectionComponentsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         usage_keys = serializer.validated_data["usage_keys"]
         api.update_library_collection_components(
-            library_key=library_key,
-            content_library=library_obj,
-            collection_id=pk,
+            library_key=content_library.library_key,
+            content_library=content_library,
+            collection_key=collection_key,
             usage_keys=usage_keys,
             created_by=self.request.user.id,
             remove=(request.method == "DELETE"),
