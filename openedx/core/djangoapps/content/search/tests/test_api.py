@@ -180,12 +180,13 @@ class TestSearchApi(ModuleStoreTestCase):
         with freeze_time(created_date):
             self.collection = authoring_api.create_collection(
                 learning_package_id=self.learning_package.id,
+                key="MYCOL",
                 title="my_collection",
                 created_by=None,
                 description="my collection description"
             )
         self.collection_dict = {
-            'id': self.collection.id,
+            'id': 'MYCOL',
             'type': 'collection',
             'display_name': 'my_collection',
             'description': 'my collection description',
