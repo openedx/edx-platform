@@ -5277,19 +5277,6 @@ paths:
       required: true
       type: string
       format: uuid
-  /entitlements/v1/subscriptions/entitlements/revoke:
-    post:
-      operationId: entitlements_v1_subscriptions_entitlements_revoke_create
-      description: |-
-        Invokes the entitlements expiration process for the provided uuids and downgrades the
-        enrollments to Audit mode.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - entitlements
-    parameters: []
   /experiments/v0/custom/REV-934/:
     get:
       operationId: experiments_v0_custom_REV-934_list
