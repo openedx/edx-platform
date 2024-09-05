@@ -549,7 +549,7 @@ elasticsearch==7.13.4
     #   edx-search
 enmerkar==0.7.1
     # via enmerkar-underscore
-enmerkar-underscore==2.3.0
+enmerkar-underscore==2.3.1
     # via -r requirements/edx/kernel.in
 event-tracking==3.0.0
     # via
