@@ -507,10 +507,7 @@ def get_notification_content(notification_type, context):
     if notification_type == 'course_update':
         notification_type = 'course_updates'
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
-
     if notification_type:
-        if content_function:
-            return content_function(notification_type, context)
         is_grouped = context.get('grouped', False)
         key = "grouped_content_template" if is_grouped else "content_template"
         notification_type_content_template = notification_type.get(key, None)
@@ -518,6 +515,8 @@ def get_notification_content(notification_type, context):
             if is_grouped:
                 return get_grouped_template_context(notification_type_content_template, context)
             return notification_type_content_template.format(**context)
+        if content_function:
+            return content_function(notification_type, context)
     return ''
 
 
