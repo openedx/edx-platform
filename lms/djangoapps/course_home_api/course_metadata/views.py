@@ -16,6 +16,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
@@ -140,6 +141,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'can_view_certificate': certificates_viewable_for_course(course),
             'course_modes': course_modes,
             'is_new_discussion_sidebar_view_enabled': new_discussion_sidebar_view_is_enabled(course_key),
+            'has_course_author_access': has_course_author_access(request.user, course_key, 'cms'),
         }
         context = self.get_serializer_context()
         context['course'] = course
