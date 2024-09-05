@@ -494,15 +494,15 @@ def get_grouped_template_context(template, context):
     new_context.update({user_key: text})
     return template.format(**new_context)
 
-
-def get_callback(notification_type):
-    """
-    Returns callback for the given notification type
-    """
-    try:
-        return globals()[f"modify_context_{notification_type}"]
-    except:  # pylint: disable=W0702
-        return None
+#
+# def get_callback(notification_type):
+#     """
+#     Returns callback for the given notification type
+#     """
+#     try:
+#         return globals()[f"modify_context_{notification_type}"]
+#     except:  # pylint: disable=W0702
+#         return None
 
 
 def get_notification_content(notification_type, context):

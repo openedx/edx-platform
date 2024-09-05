@@ -21,11 +21,12 @@ def get_notification_content_with_author_pronoun(notification_type, context):
         'strong': 'strong',
         'p': 'p',
     }
-    notification_type_content_template = notification_type.get('content_template', None)
+    context.update(html_tags_context)
+    notification_type_content_template: str = notification_type.get('content_template', None)
     if 'author_pronoun' in context:
         context['author_name'] = context['author_pronoun']
     if notification_type_content_template:
-        return notification_type_content_template.format(**context, **html_tags_context)
+        return notification_type_content_template.format(**context)
     return ''
 
 
