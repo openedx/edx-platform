@@ -78,12 +78,12 @@ from opaque_keys.edx.locator import (
 from opaque_keys import InvalidKeyError
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
-    ContentObjectData,
+    ContentObjectChangedData,
     LibraryBlockData,
     LibraryCollectionData,
 )
 from openedx_events.content_authoring.signals import (
-    CONTENT_OBJECT_TAGS_CHANGED,
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
@@ -1228,10 +1228,13 @@ def update_library_collection_components(
         )
     )
 
-    # Emit a CONTENT_OBJECT_TAGS_CHANGED event for each of the objects added/removed
+    # Emit a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for each of the objects added/removed
     for usage_key in usage_keys:
-        CONTENT_OBJECT_TAGS_CHANGED.send_event(
-            content_object=ContentObjectData(object_id=usage_key),
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            content_object=ContentObjectChangedData(
+                object_id=str(usage_key),
+                changes=["collections"],
+            ),
         )
 
     return collection

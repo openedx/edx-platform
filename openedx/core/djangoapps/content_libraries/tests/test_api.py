@@ -14,11 +14,11 @@ from opaque_keys.edx.keys import (
 )
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_events.content_authoring.data import (
-    ContentObjectData,
+    ContentObjectChangedData,
     LibraryCollectionData,
 )
 from openedx_events.content_authoring.signals import (
-    CONTENT_OBJECT_TAGS_CHANGED,
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_COLLECTION_CREATED,
     LIBRARY_COLLECTION_UPDATED,
 )
@@ -262,7 +262,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
     Same guidelines as ContentLibrariesTestCase.
     """
     ENABLED_OPENEDX_EVENTS = [
-        CONTENT_OBJECT_TAGS_CHANGED.event_type,
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.event_type,
         LIBRARY_COLLECTION_CREATED.event_type,
         LIBRARY_COLLECTION_UPDATED.event_type,
     ]
@@ -411,10 +411,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
 
     def test_update_library_collection_components_event(self):
         """
-        Check that a CONTENT_OBJECT_TAGS_CHANGED event is raised for each added/removed component.
+        Check that a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event is raised for each added/removed component.
         """
         event_receiver = mock.Mock()
-        CONTENT_OBJECT_TAGS_CHANGED.connect(event_receiver)
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_receiver)
         LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
 
         api.update_library_collection_components(
@@ -440,20 +440,22 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
         self.assertDictContainsSubset(
             {
-                "signal": CONTENT_OBJECT_TAGS_CHANGED,
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
-                "content_object": ContentObjectData(
+                "content_object": ContentObjectChangedData(
                     object_id=UsageKey.from_string(self.lib1_problem_block["id"]),
+                    changes=["collections"],
                 ),
             },
             event_receiver.call_args_list[1].kwargs,
         )
         self.assertDictContainsSubset(
             {
-                "signal": CONTENT_OBJECT_TAGS_CHANGED,
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
-                "content_object": ContentObjectData(
+                "content_object": ContentObjectChangedData(
                     object_id=UsageKey.from_string(self.lib1_html_block["id"]),
+                    changes=["collections"],
                 ),
             },
             event_receiver.call_args_list[2].kwargs,

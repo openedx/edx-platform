@@ -6,7 +6,14 @@ import logging
 
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from openedx_events.content_authoring.data import ContentLibraryData, ContentObjectData, LibraryBlockData, XBlockData
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    ContentObjectChangedData,
+    LibraryBlockData,
+    XBlockData,
+)
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
@@ -16,9 +23,8 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
-    CONTENT_OBJECT_TAGS_CHANGED,
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
-from openedx.core.djangoapps.content_tagging.utils import get_content_key_from_string
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
@@ -139,22 +145,22 @@ def content_library_updated_handler(**kwargs) -> None:
     update_content_library_index_docs.delay(str(content_library_data.library_key))
 
 
-@receiver(CONTENT_OBJECT_TAGS_CHANGED)
+@receiver(CONTENT_OBJECT_ASSOCIATIONS_CHANGED)
 @only_if_meilisearch_enabled
-def content_object_tags_changed_handler(**kwargs) -> None:
+def content_object_associations_changed_handler(**kwargs) -> None:
     """
-    Update the tags data in the index for the Content Object
+    Update the collections/tags data in the index for the Content Object
     """
-    content_object_tags = kwargs.get("content_object", None)
-    if not content_object_tags or not isinstance(content_object_tags, ContentObjectData):
+    content_object = kwargs.get("content_object", None)
+    if not content_object or not isinstance(content_object, ContentObjectChangedData):
         log.error("Received null or incorrect data for event")
         return
 
     try:
         # Check if valid if course or library block
-        content_key = get_content_key_from_string(str(content_object_tags.object_id))
-    except ValueError:
+        usage_key = UsageKey.from_string(str(content_object.object_id))
+    except InvalidKeyError:
         log.error("Received invalid content object id")
         return
 
-    upsert_block_tags_index_docs(content_key)
+    upsert_block_tags_index_docs(usage_key)
