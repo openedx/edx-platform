@@ -58,7 +58,7 @@ from .api import (
     has_team_api_access,
     user_organization_protection_status
 )
-from .csv import TeamMembershipImportManager, load_team_membership_csv
+from .csv import TeamMembershipImportManager, _get_team_membership_csv_headers, _lookup_team_membership_data, load_team_membership_csv
 from .errors import AlreadyOnTeamInTeamset, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
@@ -1657,11 +1657,25 @@ class MembershipBulkManagementView(GenericAPIView):
     authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, **_kwargs):
+    def get(self, request, **kwargs):
         """
         Download CSV with team membership data for given course run.
         """
         self.check_access()
+        response_format = request.query_params.get('fmt')
+        if response_format == 'json':
+            return self.get_json()
+        return self.get_csv()
+
+    def get_json(self):
+        headers = _get_team_membership_csv_headers(self.course)
+        data = _lookup_team_membership_data(self.course)
+        return JsonResponse({
+            'columns': headers, 
+            'rows': data
+        })
+
+    def get_csv(self):
         response = HttpResponse(content_type='text/csv')
         filename = "team-membership_{}_{}_{}.csv".format(
             self.course.id.org, self.course.id.course, self.course.id.run
@@ -1670,15 +1684,18 @@ class MembershipBulkManagementView(GenericAPIView):
         load_team_membership_csv(self.course, response)
         return response
 
-    def post(self, request, **_kwargs):
+    def post(self, request, **kwargs):
         """
         Process uploaded CSV to modify team memberships for given course run.
         """
         self.check_access()
-
-        inputfile_handle = request.FILES['csv']
         team_import_manager = TeamMembershipImportManager(self.course)
-        team_import_manager.set_team_membership_from_csv(inputfile_handle)
+        response_format = request.query_params.get('fmt')
+        if response_format == 'json':
+            team_import_manager.set_team_membership_from_json(request.data)
+        else:
+            inputfile_handle = request.FILES['csv']
+            team_import_manager.set_team_membership_from_csv(inputfile_handle)
 
         if team_import_manager.import_succeeded:
             msg = f"{team_import_manager.number_of_learners_assigned} learners were affected."

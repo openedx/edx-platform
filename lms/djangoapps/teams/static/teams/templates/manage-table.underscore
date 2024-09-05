@@ -1,0 +1,21 @@
+<table id="team-table">
+    <thead>
+        <tr>
+            <% _.each(data.headers, function(header) { %>
+                <th><%- header %></th>
+            <% }) %>
+        </tr>
+    </thead>
+    <tbody>
+        <% _.each(data.rows, function(row, rowindex) { %>
+            <tr>
+                <% _.each(data.headers, function(header, colindex) { %>
+                    <td id="teamstable-<%- rowindex %>-<%- colindex %>">
+                        <%- row[header] || '' %>
+                    <td>
+                <% }) %>
+            </tr>
+        <% }) %>
+    </tbody>
+    <tr>
+<table>

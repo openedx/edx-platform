@@ -107,6 +107,7 @@ class InitializeView(StaffGraderBaseView):
         #  Instead, see docs for exposing a wrapper api:
         #  https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/implement_the_right_toggle_type.html#using-other-toggles pylint: disable=line-too-long
         # pylint: disable=toggle-missing-annotation
+        breakpoint()
         enhanced_staff_grader_flag = CourseWaffleFlag(
             f"{WAFFLE_NAMESPACE}.{ENHANCED_STAFF_GRADER}",
             module_name='openassessment.xblock.config_mixin'

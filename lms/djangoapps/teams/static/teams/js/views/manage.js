@@ -8,8 +8,9 @@
         'edx-ui-toolkit/js/utils/html-utils',
         'common/js/components/utils/view_utils',
         'teams/js/views/team_utils',
-        'text!teams/templates/manage.underscore'
-    ], function(Backbone, _, gettext, HtmlUtils, ViewUtils, TeamUtils, manageTemplate) {
+        'text!teams/templates/manage.underscore',
+        'text!teams/templates/manage-table.underscore'
+    ], function(Backbone, _, gettext, HtmlUtils, ViewUtils, TeamUtils, manageTemplate, manageTableTemplate) {
         var ManageView = Backbone.View.extend({
 
             srInfo: {
@@ -20,7 +21,8 @@
             events: {
                 'click #download-team-csv': 'downloadCsv',
                 'change #upload-team-csv-input': 'setTeamMembershipCsv',
-                'click #upload-team-csv': ViewUtils.withDisabledElement('uploadCsv')
+                'click #upload-team-csv': ViewUtils.withDisabledElement('uploadCsv'),
+                'click #load-manage-team-button': 'loadManageTeamTable',
             },
 
             initialize: function(options) {
@@ -51,6 +53,43 @@
                 } else {
                     $('#upload-team-csv').addClass('is-disabled').attr('aria-disabled', true);
                 }
+            },
+
+            teamTableLoading: function() {
+                const teamTable = $('.team-table-wrapper');
+                const loadButton = $('.load-manage-team-button');
+                loadButton.addClass('is-disabled').attr('aria-disabled', true);
+                HtmlUtils.setHtml(
+                    teamTable,
+                    "Loading.."
+                );
+            },
+
+            loadManageTeamTable: function(event) {
+                this.teamTableLoading();
+                $.ajax({
+                    type: 'get',
+                    url: this.csvUploadUrl,
+                    data: {fmt: 'json'}
+                }).done(
+                    this.renderManageTeamsTable
+                ).fail(
+                    this.handleManageTeamsTableFailure
+                );
+            },
+
+            renderManageTeamsTable: function(data) {
+                TeamUtils.showInfoBanner("Table Loaded", false);
+                const teamTable = $('.team-table-wrapper');
+                console.log(data);
+                HtmlUtils.setHtml(
+                    teamTable,
+                    HtmlUtils.template(manageTableTemplate)({data: data})
+                );
+            },
+
+            handleCsvUploadFailure: function(jqXHR) {
+                TeamUtils.showInfoBanner(jqXHR, true);
             },
 
             uploadCsv: function() {

@@ -46,6 +46,12 @@
                     <div class="message-content"><%- gettext("Error assigning team memberships") %></div>
                 </div>
             </div>
+            <div class="team-table-section">
+                <button id="load-manage-team-button">Load Team Info</button>
+                <button hidden disabled id="save-manage-team-button">Save Team Info</button>
+                <div class="team-table-wrapper">
+                </div>
+            </div>
         </div>
     </div>
 </div>

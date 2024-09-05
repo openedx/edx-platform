@@ -240,6 +240,7 @@ class InitializeSerializer(serializers.Serializer):
         Only enable ESG if the flag is enabled and also this is not a Team ORA
         Revert back to BooleanField in AU-617 when ESG officially supports team ORAs
         """
+        breakpoint()
         return obj['isEnabled'] and not obj['oraMetadata'].teams_enabled
 
 

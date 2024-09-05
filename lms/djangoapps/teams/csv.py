@@ -143,6 +143,14 @@ def _group_teamset_memberships_by_user(course_team_memberships):
         teamset_memberships_by_user[user][topic_id] = team_name
     return teamset_memberships_by_user
 
+class JsonMockDictReader:
+    def __init__(self, data):
+        self._data = data
+        self.fieldnames = data['headers']
+
+    def __iter__(self):
+        return iter(self._data['data'])
+
 
 class TeamMembershipImportManager:
     """
@@ -175,6 +183,10 @@ class TeamMembershipImportManager:
         """
         csv_reader = csv.DictReader(line.decode('utf-8-sig').strip() for line in input_file.readlines())
         return self.set_team_memberships(csv_reader)
+    
+    def set_team_membership_from_json(self, input_data):
+        mock_csv_reader = JsonMockDictReader(input_data)
+        return self.set_team_memberships(mock_csv_reader)
 
     def set_team_memberships(self, csv_reader):
         """
