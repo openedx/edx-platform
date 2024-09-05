@@ -1,11 +1,12 @@
 @import 'base/mixins';
+@import 'lms/theme/variables-v1';
 
 $a11y--gray: rgb(127, 127, 127);
 $a11y--blue: rgb(0, 159, 230);
-$a11y--gray-d1: shade($gray, 20%);
-$a11y--gray-l2: tint($gray, 40%);
-$a11y--gray-l3: tint($gray, 60%);
-$a11y--blue-s1: saturate($blue, 15%);
+$a11y--gray-d1: var(--gray-d1);
+$a11y--gray-l2: var(--gray-l2);
+$a11y--gray-l3: var(--gray-l3);
+$a11y--blue-s1: var(--blue-s1);
 
 %use-font-awesome {
   font-family: FontAwesome;
@@ -32,7 +33,7 @@ $a11y--blue-s1: saturate($blue, 15%);
     display: none;
     position: absolute;
     list-style: none;
-    background-color: $white;
+    background-color: var(--white);
     border: 1px solid #eee;
 
     li {
@@ -41,7 +42,7 @@ $a11y--blue-s1: saturate($blue, 15%);
       margin: 0;
       padding: 0;
       border-bottom: 1px solid #eee;
-      color: $white;
+      color: var(--white);
 
       a {
         display: block;
@@ -84,23 +85,23 @@ $a11y--blue-s1: saturate($blue, 15%);
 
     &.open {
       > a {
-        background-color: $action-primary-active-bg;
-        color: $very-light-text;
+        background-color: var(--action-primary-active-bg);
+        color: var(--very-light-text);
 
         &::after {
-          color: $very-light-text;
+          color: var(--very-light-text);
         }
       }
     }
 
     > a {
-      @include transition(all $tmg-f2 ease-in-out 0s);
+      @include transition(all var(--tmg-f2) ease-in-out 0s);
       @include font-size(12);
 
       display: block;
       border-radius: 0 3px 3px 0;
-      background-color: $very-light-text;
-      padding: ($baseline*0.75) ($baseline*1.25) ($baseline*0.75) ($baseline*0.75);
+      background-color: var(--very-light-text);
+      padding: calc((var(--baseline)*0.75)) calc((var(--baseline)*1.25)) calc((var(--baseline)*0.75)) calc((var(--baseline)*0.75));
       color: $a11y--gray-l2;
       min-width: 1.5em;
       line-height: 14px;
@@ -113,9 +114,9 @@ $a11y--blue-s1: saturate($blue, 15%);
 
         content: "\f0d7";
         position: absolute;
-        right: ($baseline*0.5);
+        right: calc((var(--baseline)*0.5));
         top: 33%;
-        color: $lighter-base-font-color;
+        color: var(--lighter-base-font-color);
       }
     }
 
@@ -144,7 +145,7 @@ $a11y--blue-s1: saturate($blue, 15%);
   @extend %ui-depth5;
 
   border: 1px solid #333;
-  background: $white;
+  background: var(--white);
   color: #333;
   padding: 0;
   margin: 0;
@@ -162,8 +163,8 @@ $a11y--blue-s1: saturate($blue, 15%);
 
   .menu-item,
   .submenu-item {
-    border-top: 1px solid $gray-l3;
-    padding: ($baseline/4) ($baseline/2);
+    border-top: 1px solid var(--gray-l3);
+    padding: calc((var(--baseline)/4)) calc((var(--baseline)/2));
     outline: none;
 
     & > span {
@@ -176,17 +177,17 @@ $a11y--blue-s1: saturate($blue, 15%);
 
     &:focus {
       background: #333;
-      color: $white;
+      color: var(--white);
 
       & > span {
-        color: $white;
+        color: var(--white);
       }
     }
   }
 
   .submenu-item {
     position: relative;
-    padding: ($baseline/4) $baseline ($baseline/4) ($baseline/2);
+    padding: calc((var(--baseline)/4)) var(--baseline) calc((var(--baseline)/4)) calc((var(--baseline)/2));
 
     &::after {
       content: '\25B6';
@@ -202,10 +203,10 @@ $a11y--blue-s1: saturate($blue, 15%);
 
     &.is-opened {
       background: #333;
-      color: $white;
+      color: var(--white);
 
       & > span {
-        color: $white;
+        color: var(--white);
       }
 
       & > .submenu {
@@ -220,7 +221,7 @@ $a11y--blue-s1: saturate($blue, 15%);
 
   .is-disabled {
     pointer-events: none;
-    color: $gray-l3;
+    color: var(--gray-l3);
   }
 }
 
