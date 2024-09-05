@@ -480,6 +480,10 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
         # Gather info for enterprise dashboard
         enterprise_customer = get_enterprise_customer(user, self.request, is_masquerade)
 
+        # TEMP log for learner dashboard enterpriseDashboard incident
+        logger.info(
+            f'Temp: enterprise customer: {enterprise_customer}'
+        )
         # Get site-wide social sharing config
         social_share_settings = get_social_share_settings()
 
