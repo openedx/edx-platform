@@ -1021,7 +1021,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events @ git+https://github.com/open-craft/openedx-events.git@yusuf-musleh/content-library-collections-signals
+openedx-events @ git+https://github.com/open-craft/openedx-events.git@jill/content-object-associations
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
