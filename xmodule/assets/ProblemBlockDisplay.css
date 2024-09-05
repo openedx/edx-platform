@@ -1,0 +1,1246 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
+/* line 1, /openedx/edx-platform/xmodule/assets/ProblemBlockDisplay.scss */
+.xmodule_display.xmodule_ProblemBlock {
+  /* stylelint-disable-line */
+  /* stylelint-disable-line */ }
+  /* line 44, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .incorrect .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .incorrect .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .partially-correct .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .partially-correct .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .correct .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .correct .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .partially-correct .status-icon::after {
+    font-family: FontAwesome;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    speak: none; }
+  /* line 67, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock h2 {
+    margin-top: 0;
+    margin-bottom: calc((var(--baseline)*0.75)); }
+    /* line 71, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock h2.problem-header {
+      display: inline-block; }
+      /* line 74, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock h2.problem-header section.staff {
+        margin-top: calc((var(--baseline)*1.5));
+        font-size: 80%; }
+    @media print {
+      /* line 67, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock h2 {
+        display: block;
+        width: auto;
+        border-right: 0; } }
+  /* line 87, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .explanation-title {
+    font-weight: bold; }
+  /* line 91, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect, .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct,
+  .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct {
+    margin-top: calc((var(--baseline) / 4)); }
+    /* line 94, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect .icon, .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct .icon,
+    .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct .icon {
+      margin-right: calc((var(--baseline) / 4)); }
+  /* line 102, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect .icon {
+    color: var(--incorrect); }
+  /* line 111, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct .icon,
+  .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct .icon {
+    color: var(--correct); }
+  /* line 116, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .feedback-hint-text {
+    color: #646464; }
+  /* line 120, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem-hint {
+    margin-bottom: 20px;
+    width: 100%; }
+  /* line 125, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .hint-label {
+    display: inline-block;
+    padding-right: 0.5em; }
+  /* line 130, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .hint-text {
+    display: inline-block; }
+  /* line 134, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .feedback-hint-multi .hint-text {
+    display: block; }
+  /* line 138, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock iframe[seamless] {
+    overflow: hidden;
+    padding: 0;
+    border: 0 none transparent;
+    background-color: transparent; }
+  /* line 145, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .inline-error {
+    color: var(--error-color-dark); }
+  /* line 149, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem-progress {
+    display: inline-block;
+    color: var(--gray-d1);
+    font-size: 0.875em; }
+  /* line 157, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem {
+    padding-top: var(--baseline); }
+    @media print {
+      /* line 157, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem {
+        display: block;
+        padding: 0;
+        width: auto; }
+        /* line 165, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem canvas,
+        .xmodule_display.xmodule_ProblemBlock div.problem img {
+          page-break-inside: avoid; } }
+    /* line 171, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem input.math {
+      direction: ltr; }
+    /* line 175, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .inline {
+      display: inline; }
+      /* line 178, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .inline + p {
+        margin-top: var(--baseline); }
+    /* line 183, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .question-description {
+      color: var(--gray-d1);
+      font-size: var(--small-font-size); }
+    /* line 188, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem form > label, .xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label {
+      display: block;
+      margin-bottom: var(--baseline);
+      font: inherit;
+      color: inherit;
+      -webkit-font-smoothing: initial; }
+    /* line 196, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label + .question-description {
+      margin-top: calc(-1 * var(--baseline)); }
+  /* line 204, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .wrapper-problem-response + .wrapper-problem-response,
+  .xmodule_display.xmodule_ProblemBlock .wrapper-problem-response + p {
+    margin-top: calc((var(--baseline) * 1.5)); }
+  /* line 210, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup {
+    min-width: 100px;
+    width: auto !important;
+    width: 100px; }
+    /* line 15, /openedx/edx-platform/common/static/sass/bourbon/addons/_clearfix.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup:after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup:after {
+      content: "";
+      display: table;
+      clear: both; }
+    /* line 217, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label {
+      box-sizing: border-box;
+      display: inline-block;
+      clear: both;
+      margin-bottom: calc((var(--baseline)/2));
+      border: 2px solid var(--gray-l4);
+      border-radius: 3px;
+      padding: calc((var(--baseline)/2));
+      width: 100%; }
+      /* line 228, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label::after {
+        margin-left: calc((var(--baseline)*0.75)); }
+    /* line 233, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup .indicator-container, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .indicator-container {
+      min-height: 1px;
+      width: 25px;
+      display: inline-block; }
+    /* line 239, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup fieldset, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup fieldset {
+      box-sizing: border-box; }
+    /* line 243, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="radio"], .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input[type="radio"], .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"], .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input[type="checkbox"] {
+      margin: calc((var(--baseline)/4));
+      margin-right: calc((var(--baseline)/2)); }
+    /* line 252, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label {
+      border: 2px solid var(--blue); }
+    /* line 260, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + label.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + section.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + label.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + section.choicetextgroup_correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_correct {
+      border: 2px solid var(--correct); }
+      /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_correct .status-icon::after {
+        color: var(--correct);
+        font-size: 1.2em;
+        content: ""; }
+    /* line 266, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + label.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + section.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + label.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + section.choicetextgroup_partially-correct, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_partially-correct {
+      border: 2px solid var(--partially-correct); }
+      /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + section.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + section.choicetextgroup_partially-correct .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_partially-correct .status-icon::after {
+        color: var(--partially-correct);
+        font-size: 1.2em;
+        content: ""; }
+    /* line 272, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + label.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + section.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + label.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + section.choicetextgroup_incorrect, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_incorrect {
+      border: 2px solid var(--incorrect); }
+      /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_incorrect .status-icon::after {
+        color: var(--incorrect);
+        font-size: 1.2em;
+        content: ""; }
+    /* line 278, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input + label.choicegroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicegroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + label.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + label.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input + section.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input + section.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus + label.choicegroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicegroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + label.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + label.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:focus + section.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus + section.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover + label.choicegroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicegroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + label.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + label.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover + section.choicetextgroup_submitted, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover + section.choicetextgroup_submitted {
+      border: 2px solid var(--submitted); }
+  /* line 291, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup .field {
+    position: relative; }
+  /* line 295, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label {
+    padding: calc((var(--baseline)/2));
+    padding-left: calc((var(--baseline)*2.3));
+    position: relative;
+    font-size: var(--base-font-size);
+    line-height: normal;
+    cursor: pointer; }
+  /* line 305, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="radio"],
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"] {
+    left: 0.5625em;
+    position: absolute;
+    top: 0.35em;
+    width: calc(var(--baseline)*1.1);
+    height: calc(var(--baseline)*1.1);
+    z-index: 1; }
+  /* line 316, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend {
+    margin-bottom: var(--baseline);
+    max-width: 100%;
+    white-space: normal; }
+  /* line 322, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend + .question-description {
+    margin-top: calc(-1 * var(--baseline));
+    max-width: 100%;
+    white-space: normal; }
+  /* line 334, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container {
+    margin-left: calc((var(--baseline)*0.75)); }
+    /* line 337, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status {
+      width: var(--baseline); }
+      /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.correct .status-icon::after {
+        color: var(--correct);
+        font-size: 1.2em;
+        content: ""; }
+      /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.partially-correct .status-icon::after {
+        color: var(--partially-correct);
+        font-size: 1.2em;
+        content: ""; }
+      /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.incorrect .status-icon::after {
+        color: var(--incorrect);
+        font-size: 1.2em;
+        content: ""; }
+      /* line 358, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.submitted .status-icon, .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.unsubmitted .status-icon, .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.unanswered .status-icon {
+        content: ''; }
+  /* line 371, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem ol.enumerate li::before {
+    display: block;
+    visibility: hidden;
+    height: 0;
+    content: " "; }
+  /* line 381, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .solution-span > span {
+    margin: var(--baseline) 0;
+    display: block;
+    position: relative; }
+    /* line 386, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .solution-span > span:empty {
+      display: none; }
+  /* line 393, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .targeted-feedback-span > span {
+    display: block;
+    position: relative; }
+    /* line 397, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .targeted-feedback-span > span:empty {
+      display: none; }
+  /* line 408, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div p.answer {
+    margin-top: -2px; }
+  /* line 412, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div p span.clarification i {
+    font-style: normal; }
+    /* line 415, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div p span.clarification i:hover {
+      color: var(--blue); }
+  /* line 422, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.correct input, .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
+    border-color: var(--correct); }
+  /* line 428, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.partially-correct input, .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
+    border-color: var(--partially-correct); }
+  /* line 434, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.processing input {
+    border-color: #aaa; }
+  /* line 440, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-close input {
+    border-color: var(--incorrect); }
+  /* line 446, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.incorrect input, .xmodule_display.xmodule_ProblemBlock div.problem div.incomplete input {
+    border-color: var(--incorrect); }
+  /* line 452, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.submitted input, .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
+    border-color: var(--submitted); }
+  /* line 457, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div p.answer {
+    display: inline-block;
+    margin-top: calc((var(--baseline) / 2));
+    margin-bottom: 0; }
+    /* line 462, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div p.answer::before {
+      display: inline;
+      content: "Answer: "; }
+    /* line 471, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div p.answer:empty::before {
+      display: none; }
+  /* line 477, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div div.equation {
+    clear: both;
+    margin-top: 3px; }
+    /* line 481, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div div.equation .MathJax_Display {
+      width: auto; }
+    /* line 485, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div div.equation img.loading {
+      padding-left: calc((var(--baseline)/2));
+      display: inline-block; }
+    /* line 491, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div div.equation span {
+      margin-bottom: 0;
+      display: inline-block; }
+      /* line 495, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem div div.equation span.MathJax_CHTML, .xmodule_display.xmodule_ProblemBlock div.problem div div.equation span.MathJax, .xmodule_display.xmodule_ProblemBlock div.problem div div.equation span.MathJax_SVG {
+        padding: 6px;
+        min-width: 30px;
+        border: 1px solid #e3e3e3;
+        border-radius: 4px;
+        background: #f1f1f1; }
+  @media print {
+    /* line 506, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div [id^='display'].equation {
+      display: none; } }
+  /* line 514, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-bullet {
+    display: inline-block;
+    position: relative;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    background: var(--icon-unanswered) center center no-repeat; }
+  /* line 523, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div span.processing, .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-processing {
+    display: inline-block;
+    position: relative;
+    top: 6px;
+    width: 25px;
+    height: 20px;
+    background: var(--icon-spinner) center center no-repeat; }
+  /* line 532, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-check {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 25px;
+    height: 20px;
+    background: var(--icon-correct) center center no-repeat; }
+  /* line 541, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div span.incomplete, .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-close {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 20px;
+    height: 20px;
+    background: var(--icon-incorrect) center center no-repeat; }
+  /* line 551, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div .reload {
+    float: right;
+    margin: calc((var(--baseline)/2)); }
+  /* line 558, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status {
+    margin: calc(var(--baseline)/2) 0;
+    padding: calc(var(--baseline)/2);
+    border-radius: 5px;
+    background: var(--gray-l6); }
+    /* line 15, /openedx/edx-platform/common/static/sass/bourbon/addons/_clearfix.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status:after {
+      content: "";
+      display: table;
+      clear: both; }
+    /* line 566, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status span {
+      display: block;
+      float: left;
+      overflow: hidden;
+      margin: -7px 7px 0 0;
+      text-indent: -9999px; }
+    /* line 574, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status .grading {
+      margin: 0px 7px 0 0;
+      padding-left: 25px;
+      background: var(--icon-info) left center no-repeat;
+      text-indent: 0px; }
+    /* line 581, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status p {
+      float: left;
+      margin-bottom: 0;
+      text-transform: capitalize;
+      line-height: 20px; }
+    /* line 588, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status.file {
+      margin-top: var(--baseline);
+      padding: var(--baseline) 0 0 0;
+      border: 0;
+      border-top: 1px solid #eee;
+      background: var(--white); }
+      /* line 595, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status.file p.debug {
+        display: none; }
+      /* line 599, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status.file input {
+        float: left; }
+  /* line 607, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation p {
+    margin-bottom: calc((var(--baseline)/5)); }
+  /* line 613, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div .feedback-on-feedback {
+    margin-right: var(--baseline);
+    height: 100px; }
+  /* line 619, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-response header {
+    text-align: right; }
+    /* line 622, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-response header a {
+      font-size: .85em; }
+  /* line 629, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-scoring .scoring-list {
+    margin-left: 3px;
+    list-style-type: none; }
+    /* line 633, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-scoring .scoring-list li {
+      display: inline;
+      margin-left: 50px; }
+      /* line 637, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-scoring .scoring-list li:first-child {
+        margin-left: 0; }
+      /* line 641, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation-scoring .scoring-list li label {
+        font-size: .9em; }
+  /* line 648, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div .submit-message-container {
+    margin: var(--baseline) 0px; }
+  /* line 654, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.inline > span {
+    display: inline; }
+  /* line 659, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem ul {
+    margin-bottom: lh();
+    margin-left: .75em;
+    margin-left: .75rem;
+    list-style: disc outside none; }
+  /* line 666, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem ol {
+    margin-bottom: lh();
+    margin-left: .75em;
+    margin-left: .75rem;
+    list-style: decimal outside none; }
+  /* line 673, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem dl {
+    line-height: 1.4em; }
+  /* line 682, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem dl dd {
+    margin-bottom: 0; }
+  /* line 686, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem dd {
+    margin-left: .5em;
+    margin-left: .5rem; }
+  /* line 691, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem li {
+    margin-bottom: lh(0.5);
+    line-height: 1.4em; }
+    /* line 695, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem li:last-child {
+      margin-bottom: 0; }
+  /* line 700, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem p {
+    margin-bottom: lh(); }
+  /* line 704, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem table {
+    margin: lh() 0;
+    border-collapse: collapse;
+    table-layout: auto; }
+    /* line 710, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table td.cont-justified-left, .xmodule_display.xmodule_ProblemBlock div.problem table th.cont-justified-left {
+      text-align: left !important; }
+    /* line 714, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table td.cont-justified-right, .xmodule_display.xmodule_ProblemBlock div.problem table th.cont-justified-right {
+      text-align: right !important; }
+    /* line 718, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table td.cont-justified-center, .xmodule_display.xmodule_ProblemBlock div.problem table th.cont-justified-center {
+      text-align: center !important; }
+    /* line 723, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table th {
+      text-align: left; }
+    /* line 729, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table td {
+      text-align: left; }
+    /* line 733, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table caption, .xmodule_display.xmodule_ProblemBlock div.problem table th, .xmodule_display.xmodule_ProblemBlock div.problem table td {
+      padding: .25em .75em .25em 0;
+      padding: .25rem .75rem .25rem 0; }
+    /* line 738, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table caption {
+      margin-bottom: .75em;
+      margin-bottom: .75rem;
+      padding: .75em 0;
+      padding: .75rem 0;
+      background: #f1f1f1; }
+    /* line 746, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem table tr, .xmodule_display.xmodule_ProblemBlock div.problem table td, .xmodule_display.xmodule_ProblemBlock div.problem table th {
+      vertical-align: middle; }
+  /* line 751, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem code {
+    margin: 0 2px;
+    padding: 0px 5px;
+    border: 1px solid #eaeaea;
+    border-radius: 3px;
+    background-color: var(--gray-l6);
+    white-space: nowrap;
+    font-size: .9em; }
+  /* line 761, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem pre {
+    overflow: auto;
+    padding: 6px calc(var(--baseline)/2);
+    border: 1px solid var(--gray-l3);
+    border-radius: 3px;
+    background-color: var(--gray-l6);
+    font-size: .9em;
+    line-height: 1.4; }
+    /* line 770, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem pre > code {
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      white-space: pre; }
+  /* line 784, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput input {
+    box-sizing: border-box;
+    border: 2px solid var(--gray-l4);
+    border-radius: 3px;
+    min-width: 160px;
+    height: 46px; }
+  /* line 793, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline .status, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput .status {
+    display: inline-block;
+    margin-top: calc((var(--baseline)/2));
+    background: none; }
+  /* line 801, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .incorrect input, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .incorrect input {
+    border: 2px solid var(--incorrect); }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .incorrect .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .incorrect .status .status-icon::after {
+    color: var(--incorrect);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 812, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .partially-correct input, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .partially-correct input {
+    border: 2px solid var(--partially-correct); }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .partially-correct .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .partially-correct .status .status-icon::after {
+    color: var(--partially-correct);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 823, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .correct input, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .correct input {
+    border: 2px solid var(--correct); }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .correct .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .correct .status .status-icon::after {
+    color: var(--correct);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 834, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .submitted input, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .submitted input {
+    border: 2px solid var(--submitted); }
+  /* line 838, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .submitted .status, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .submitted .status {
+    content: ''; }
+  /* line 845, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unanswered input, .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unsubmitted input, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .unanswered input, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .unsubmitted input {
+    border: 2px solid var(--gray-l4); }
+  /* line 851, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unanswered .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline > .unsubmitted .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .unanswered .status .status-icon::after, .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > .unsubmitted .status .status-icon::after {
+    content: '';
+    display: inline-block; }
+  /* line 863, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput > div input {
+    direction: ltr;
+    text-align: left; }
+  /* line 870, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .trailing_text {
+    margin-right: calc((var(--baseline)/2));
+    display: inline-block; }
+  /* line 881, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input {
+    margin: 0 0 0 0 !important; }
+    /* line 884, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container {
+      display: inline-block; }
+      /* line 887, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.correct::after,
+      .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.partially-correct::after,
+      .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.incorrect::after,
+      .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.submitted::after,
+      .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container .status.unanswered::after {
+        margin-left: 0; }
+  /* line 901, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror {
+    border: 1px solid black;
+    font-size: 14px;
+    line-height: 18px;
+    resize: none; }
+    /* line 907, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror .cm-tab {
+      background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+      background-position: right;
+      background-repeat: no-repeat; }
+    /* line 913, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror pre {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      border-width: 0;
+      border-radius: 0;
+      background: transparent;
+      white-space: pre;
+      word-wrap: normal;
+      font-size: inherit;
+      font-family: inherit;
+      resize: none; }
+      /* line 926, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror pre.CodeMirror-cursor {
+        position: absolute;
+        visibility: hidden;
+        width: 0;
+        border-right: none;
+        border-left: 1px solid var(--black); }
+  /* line 938, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror-focused pre.CodeMirror-cursor {
+    visibility: visible; }
+  /* line 942, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror-code pre {
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content; }
+  /* line 948, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror-scroll {
+    margin-right: 0px; }
+  /* line 953, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .capa-message {
+    display: inline-block;
+    color: var(--gray-d1);
+    -webkit-font-smoothing: antialiased; }
+  /* line 961, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .action {
+    min-height: var(--baseline);
+    width: 100%;
+    display: flex;
+    display: -ms-flexbox;
+    -ms-flex-align: start;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap; }
+    /* line 971, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-buttons-wrapper {
+      display: inline-flex;
+      justify-content: flex-end;
+      width: 100%;
+      padding-bottom: var(--baseline); }
+    /* line 978, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-button-wrapper {
+      border-right: 1px solid var(--gray-300);
+      padding: 0 13px;
+      display: inline-block; }
+      /* line 984, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-button-wrapper:last-child {
+        border: none;
+        padding-right: 0; }
+    /* line 990, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn {
+      border: none;
+      max-width: 110px; }
+      /* line 994, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:hover, .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:focus, .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:active {
+        color: var(--primary) !important; }
+      /* line 1000, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn .icon {
+        margin-bottom: calc(var(--baseline) / 10);
+        display: block; }
+      @media print {
+        /* line 990, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn {
+          display: none; } }
+    /* line 1010, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container {
+      padding-bottom: var(--baseline);
+      flex-grow: 1;
+      display: flex;
+      align-items: center; }
+      @media (max-width: var(--bp-screen-lg)) {
+        /* line 1010, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container {
+          max-width: 100%;
+          padding-bottom: var(--baseline); } }
+      /* line 1021, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit {
+        margin-right: calc((var(--baseline) / 2));
+        float: left;
+        white-space: nowrap; }
+      /* line 1028, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-description {
+        color: var(--primary);
+        font-size: small;
+        padding-right: calc(var(--baseline) / 2); }
+      /* line 1033, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-link-button {
+        color: var(--primary);
+        padding-right: calc(var(--baseline) / 4); }
+    /* line 1039, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .action .submission-feedback {
+      margin-right: calc((var(--baseline) / 2));
+      margin-top: calc(var(--baseline) / 2);
+      display: inline-block;
+      color: var(--gray-d1);
+      font-size: var(--medium-font-size);
+      -webkit-font-smoothing: antialiased;
+      vertical-align: middle; }
+      /* line 1049, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .action .submission-feedback.cta-enabled {
+        margin-top: 0; }
+  /* line 1059, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem hr {
+    float: none;
+    clear: both;
+    margin: 0 0 .75rem;
+    width: 100%;
+    height: 1px;
+    border: none;
+    background: #ddd;
+    color: #ddd; }
+  /* line 1070, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .hidden {
+    display: none;
+    visibility: hidden; }
+  /* line 1075, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem input[type="email"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="number"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="password"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="search"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="tel"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="text"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="url"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="color"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="date"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="datetime"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="datetime-local"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="month"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="time"], .xmodule_display.xmodule_ProblemBlock div.problem input[type="week"] {
+    display: inline;
+    width: auto; }
+  /* line 1081, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem center {
+    display: block;
+    margin: lh() 0;
+    padding: lh();
+    border: 1px solid var(--gray-l3); }
+  /* line 1088, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .message {
+    font-size: inherit; }
+  /* line 1092, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .detailed-solution > p {
+    margin: 0; }
+    /* line 1095, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .detailed-solution > p:first-child {
+      margin-bottom: 0; }
+  /* line 1106, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback > p,
+  .xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback-partially-correct > p,
+  .xmodule_display.xmodule_ProblemBlock div.problem .detailed-targeted-feedback-correct > p {
+    margin: 0;
+    font-weight: normal; }
+  /* line 1116, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.capa_alert {
+    margin-top: var(--baseline);
+    padding: 8px 12px;
+    border: 1px solid var(--warning-color);
+    border-radius: 3px;
+    background: var(--warning-color-accent);
+    font-size: 0.9em; }
+  /* line 1125, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .notification {
+    float: left;
+    margin-top: calc(var(--baseline) / 2);
+    padding: calc((var(--baseline) / 2.5)) calc((var(--baseline) / 2)) calc((var(--baseline) / 5)) calc((var(--baseline) / 2));
+    line-height: var(--base-line-height); }
+    /* line 1132, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification.success {
+      border-top: 3px solid var(--success); }
+      /* line 239, common/static/sass/edx-pattern-library-shims/base/_variables.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .notification.success .icon {
+        margin-right: 15px;
+        color: var(--success); }
+    /* line 1136, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification.error {
+      border-top: 3px solid var(--danger); }
+      /* line 239, common/static/sass/edx-pattern-library-shims/base/_variables.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .notification.error .icon {
+        margin-right: 15px;
+        color: var(--danger); }
+    /* line 1140, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification.warning {
+      border-top: 3px solid var(--warning); }
+      /* line 239, common/static/sass/edx-pattern-library-shims/base/_variables.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .notification.warning .icon {
+        margin-right: 15px;
+        color: var(--warning); }
+    /* line 1144, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification.general {
+      border-top: 3px solid var(--general-color-accent); }
+      /* line 239, common/static/sass/edx-pattern-library-shims/base/_variables.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .notification.general .icon {
+        margin-right: 15px;
+        color: var(--general-color-accent); }
+    /* line 1148, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint {
+      border: 1px solid var(--uxpl-gray-background);
+      border-radius: 6px; }
+      /* line 1152, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint .icon {
+        margin-right: calc(3 * var(--baseline) / 4);
+        color: var(--uxpl-gray-dark); }
+      /* line 1158, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint li {
+        color: var(--uxpl-gray-base); }
+        /* line 1161, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint li strong {
+          color: var(--uxpl-gray-dark); }
+    /* line 1167, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification .icon {
+      float: left;
+      position: relative;
+      top: calc(var(--baseline) / 5); }
+    /* line 1174, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-message {
+      display: inline-block;
+      width: 69.38776%;
+      margin-bottom: 8px; }
+      /* line 1181, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-message ol {
+        list-style: none outside none;
+        padding: 0;
+        margin: 0; }
+        /* line 1186, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-message ol li:not(:last-child) {
+          margin-bottom: calc(var(--baseline) / 4); }
+    /* line 1192, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-btn-wrapper {
+      float: right; }
+  /* line 1198, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .notification-btn {
+    float: right;
+    padding: calc((var(--baseline) / 10)) calc((var(--baseline) / 4));
+    min-width: calc((var(--baseline) * 3));
+    display: block;
+    clear: both; }
+    /* line 1206, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .notification-btn:first-child {
+      margin-bottom: calc(var(--baseline) / 4); }
+  /* line 1213, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem button:hover {
+    background-image: none;
+    box-shadow: none; }
+  /* line 1218, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem button:focus {
+    box-shadow: none; }
+  /* line 1222, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem button.btn-default {
+    background-color: transparent; }
+  /* line 1227, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem button.btn-brand:hover {
+    background-color: var(--btn-brand-focus-background); }
+  /* line 1233, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .review-btn {
+    color: var(--blue); }
+    /* line 1235, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .review-btn.sr {
+      color: var(--blue); }
+  /* line 1240, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem div.capa_reset {
+    padding: 25px;
+    background-color: var(--error-color-light);
+    border: 1px solid var(--error-color);
+    border-radius: 3px;
+    font-size: 1em;
+    margin-top: calc(var(--baseline)/2);
+    margin-bottom: calc(var(--baseline)/2); }
+  /* line 1250, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .capa_reset > h2 {
+    color: #a00; }
+  /* line 1254, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .capa_reset li {
+    font-size: 0.9em; }
+  /* line 1258, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .hints {
+    border: 1px solid var(--gray-l3); }
+    /* line 1261, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .hints h3 {
+      padding: 9px;
+      border-bottom: 1px solid #e3e3e3;
+      background: #eee;
+      text-shadow: 0 1px 0 var(--white);
+      font-size: 1em; }
+    /* line 1271, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .hints div {
+      border-bottom: 1px solid #ddd; }
+      /* line 1274, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .hints div:last-child {
+        border-bottom: none; }
+      /* line 1278, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .hints div p {
+        margin-bottom: 0; }
+      /* line 1283, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .hints div header a {
+        display: block;
+        padding: 9px;
+        background: var(--gray-l6);
+        box-shadow: inset 0 0 0 1px var(--white); }
+      /* line 1291, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .hints div > section {
+        padding: 9px; }
+  /* line 1297, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .test {
+    padding-top: 18px; }
+    /* line 1300, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .test header {
+      margin-bottom: 12px; }
+      /* line 1303, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .test header h3 {
+        color: #aaa;
+        font-style: normal;
+        font-size: 0.9em; }
+    /* line 1312, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .test > section {
+      position: relative;
+      margin-bottom: calc((var(--baseline)/2));
+      padding: 9px 9px var(--baseline);
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      background: var(--white);
+      box-shadow: inset 0 0 0 1px #eee; }
+      /* line 1321, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .test > section p:last-of-type {
+        margin-bottom: 0; }
+      /* line 1325, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .test > section .shortform {
+        margin-bottom: .6em; }
+      /* line 1329, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .test > section a.full {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 1px;
+        left: 0;
+        box-sizing: border-box;
+        display: block;
+        padding: calc((var(--baseline)/5));
+        background: var(--gray-l4);
+        text-align: right;
+        font-size: 1em; }
+        /* line 1339, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .test > section a.full.full-top {
+          position: absolute;
+          top: 1px;
+          right: 0;
+          bottom: auto;
+          left: 0; }
+        /* line 1343, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .test > section a.full.full-bottom {
+          position: absolute;
+          top: auto;
+          right: 0;
+          bottom: 1px;
+          left: 0; }
+  /* line 1351, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section {
+    padding-top: calc((var(--baseline)*1.5));
+    padding-left: var(--baseline);
+    background-color: #fafafa;
+    color: #2c2c2c;
+    font-size: 1em;
+    font-family: monospace; }
+    /* line 1359, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section header {
+      font-size: 1.4em; }
+    /* line 1367, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform {
+      margin: 0;
+      padding: 0; }
+      /* line 1371, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors {
+        margin: calc((var(--baseline)/4));
+        padding: calc((var(--baseline)/2)) calc((var(--baseline)/2)) calc((var(--baseline)/2)) calc((var(--baseline)*2));
+        background: var(--icon-incorrect) center left no-repeat; }
+        /* line 1376, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors li {
+          color: #b00; }
+      /* line 1381, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output {
+        margin: calc(var(--baseline)/4);
+        padding: var(--baseline) 0 calc((var(--baseline)*0.75)) 50px;
+        border-top: 1px solid #ddd;
+        border-left: var(--baseline) solid #fafafa; }
+        /* line 1387, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output h4 {
+          font-size: 1em;
+          font-family: monospace; }
+        /* line 1392, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output dl {
+          margin: 0; }
+        /* line 1396, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output dt {
+          margin-top: var(--baseline); }
+        /* line 1400, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output dd {
+          margin-left: 24pt; }
+      /* line 1405, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct {
+        background: var(--icon-correct) left 20px no-repeat; }
+        /* line 1408, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct .result-actual-output {
+          color: #090; }
+      /* line 1413, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct {
+        background: var(--icon-partially-correct) left 20px no-repeat; }
+        /* line 1416, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct .result-actual-output {
+          color: #090; }
+      /* line 1421, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect {
+        background: var(--icon-incorrect) left 20px no-repeat; }
+        /* line 1424, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect .result-actual-output {
+          color: #b00; }
+      /* line 1429, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .markup-text {
+        margin: calc((var(--baseline)/4));
+        padding: var(--baseline) 0 15px 50px;
+        border-top: 1px solid #ddd;
+        border-left: 20px solid #fafafa; }
+        /* line 1435, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .markup-text bs {
+          color: #b00; }
+        /* line 1439, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .markup-text bg {
+          color: #bda046; }
+  /* line 1453, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric tr {
+    margin: calc((var(--baseline)/2)) 0;
+    height: 100%; }
+  /* line 1458, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric td {
+    margin: calc((var(--baseline)/2)) 0;
+    padding: var(--baseline) 0;
+    height: 100%; }
+  /* line 1464, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric th {
+    margin: calc((var(--baseline)/4));
+    padding: calc((var(--baseline)/4)); }
+  /* line 1469, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric label,
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric .view-only {
+    position: relative;
+    display: inline-block;
+    margin: 3px;
+    padding: calc((var(--baseline)*0.75));
+    min-width: 50px;
+    min-height: 50px;
+    width: 150px;
+    height: 100%;
+    background-color: var(--gray-l3);
+    font-size: .9em; }
+  /* line 1483, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric .grade {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: calc((var(--baseline)/2)); }
+  /* line 1490, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric .selected-grade {
+    background: #666;
+    color: white; }
+  /* line 1495, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric input[type=radio]:checked + label {
+    background: #666;
+    color: white; }
+  /* line 1500, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .rubric input[class='score-selection'] {
+    display: none; }
+  /* line 1509, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input {
+    margin: 0 0 1em 0;
+    border: 1px solid var(--gray-l3);
+    border-radius: 1em;
+    /* for debugging the input value field. enable the debug flag on the inputtype */ }
+    /* line 1514, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-header {
+      padding: .5em 1em;
+      border-bottom: 1px solid var(--gray-l3); }
+    /* line 1521, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-body {
+      padding: .5em 1em; }
+    /* line 1523, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input a.annotation-return {
+      float: right;
+      font: inherit;
+      font-weight: normal; }
+    /* line 1529, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input a.annotation-return::after {
+      content: " \2191"; }
+    /* line 1531, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .block, .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags {
+      margin: .5em 0;
+      padding: 0; }
+    /* line 1536, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .block-highlight {
+      padding: .5em;
+      border: 1px solid rgba(214, 214, 0, 0.3);
+      background-color: rgba(255, 255, 10, 0.3);
+      color: #333;
+      font-style: normal; }
+    /* line 1544, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .block-comment {
+      font-style: italic; }
+    /* line 1546, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags {
+      display: block;
+      margin-left: 1em;
+      list-style-type: none; }
+      /* line 1551, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li {
+        position: relative;
+        display: block;
+        margin: 1em 0 0 0; }
+        /* line 1556, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag {
+          display: inline-block;
+          margin-left: calc((var(--baseline)*2));
+          border: 1px solid #666666; }
+          /* line 1563, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+          .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag.selected {
+            background-color: rgba(255, 255, 10, 0.3); }
+        /* line 1568, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag-status {
+          position: absolute;
+          left: 0; }
+        /* line 1572, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+        .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag-status, .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag {
+          padding: .25em .5em; }
+    /* line 1576, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input textarea.comment {
+      padding: 0.2em 0.4em;
+      width: 100%;
+      height: 7.2em;
+      line-height: 1.4em; }
+    /* line 1587, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .answer-annotation {
+      display: block;
+      margin: 0; }
+    /* line 1590, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value {
+      margin: 1em 0;
+      padding: 1em;
+      border: 1px solid var(--black);
+      background-color: #999;
+      color: var(--white); }
+      /* line 1597, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value input[type="text"] {
+        width: 100%; }
+      /* line 1599, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value pre {
+        background-color: var(--gray-l3);
+        color: var(--black); }
+      /* line 1601, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+      .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value::before {
+        display: block;
+        content: "debug input value";
+        font-size: 1.5em; }
+  /* line 1618, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input[type="text"] {
+    margin-bottom: 0.5em; }
+  /* line 1625, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_correct input[type="text"], .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_correct input[type="text"] {
+    border-color: var(--correct); }
+  /* line 1633, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_partially-correct input[type="text"], .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_partially-correct input[type="text"] {
+    border-color: var(--partially-correct); }
+  /* line 1647, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_show_correct::after, .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_show_correct::after {
+    margin-left: calc((var(--baseline)*0.75));
+    content: var(--icon-correct); }
+  /* line 1654, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup span.mock_label {
+    cursor: default; }
+  /* line 1665, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 25px;
+    height: 20px; }
+    /* line 1674, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status.unsubmitted .status-icon, .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status.unanswered .status-icon {
+      content: ''; }
+    /* line 1678, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status.unsubmitted .status-message, .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .status.unanswered .status-message {
+      display: none; }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .correct .status-icon::after {
+    color: var(--correct);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .incorrect .status-icon::after {
+    color: var(--incorrect);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .partially-correct .status-icon::after {
+    color: var(--partially-correct);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 1696, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .submitted {
+    content: ''; }
+  /* line 1706, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 25px;
+    height: 20px; }
+    /* line 1715, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status.unsubmitted .status-icon, .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status.unanswered .status-icon {
+      content: ''; }
+    /* line 1719, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+    .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status.unsubmitted .status-message, .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .tag-status.unanswered .status-message {
+      display: none; }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .correct .status-icon::after {
+    color: var(--correct);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .incorrect .status-icon::after {
+    color: var(--incorrect);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 55, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .partially-correct .status-icon::after {
+    color: var(--partially-correct);
+    font-size: 1.2em;
+    content: ""; }
+  /* line 1737, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .submitted {
+    content: ''; }
+  /* line 1744, /openedx/edx-platform/xmodule/assets/capa/_display.scss */
+  .xmodule_display.xmodule_ProblemBlock .problems-wrapper .loading-spinner {
+    text-align: center;
+    color: var(--gray-d1); }

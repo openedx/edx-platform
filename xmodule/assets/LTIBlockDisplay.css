@@ -1,0 +1,51 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
+/* line 1, /openedx/edx-platform/xmodule/assets/LTIBlockDisplay.scss */
+.xmodule_display.xmodule_LTIBlock {
+  /* stylelint-disable-line */
+  /* stylelint-disable-line */
+  /* stylelint-disable-line */
+  /* stylelint-disable-line */ }
+  /* line 7, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+  .xmodule_display.xmodule_LTIBlock h2.problem-header {
+    display: inline-block; }
+  /* line 11, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+  .xmodule_display.xmodule_LTIBlock div.problem-progress {
+    display: inline-block;
+    padding-left: calc((var(--baseline)/4));
+    color: #666;
+    font-weight: 100;
+    font-size: 1em; }
+  /* line 20, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+  .xmodule_display.xmodule_LTIBlock div.lti {
+    margin: 0 auto; }
+    /* line 24, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+    .xmodule_display.xmodule_LTIBlock div.lti .wrapper-lti-link {
+      font-size: 14px;
+      background-color: var(--sidebar-color);
+      padding: var(--baseline); }
+      /* line 30, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+      .xmodule_display.xmodule_LTIBlock div.lti .wrapper-lti-link .lti-link {
+        margin-bottom: 0;
+        text-align: right; }
+        /* line 34, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+        .xmodule_display.xmodule_LTIBlock div.lti .wrapper-lti-link .lti-link .link_lti_new_window {
+          font-size: 13px;
+          line-height: 20.72px; }
+    /* line 43, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+    .xmodule_display.xmodule_LTIBlock div.lti form.ltiLaunchForm {
+      display: none; }
+    /* line 47, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+    .xmodule_display.xmodule_LTIBlock div.lti iframe.ltiLaunchFrame {
+      width: 100%;
+      height: 800px;
+      display: block;
+      border: 0px; }
+    /* line 54, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+    .xmodule_display.xmodule_LTIBlock div.lti h4.problem-feedback-label {
+      font-weight: 100;
+      font-size: 1em;
+      font-family: "Source Sans", "Open Sans", Verdana, Geneva, sans-serif, sans-serif; }
+    /* line 60, /openedx/edx-platform/xmodule/assets/lti/_lti.scss */
+    .xmodule_display.xmodule_LTIBlock div.lti div.problem-feedback {
+      margin-top: calc((var(--baseline)/4));
+      margin-bottom: calc((var(--baseline)/4)); }

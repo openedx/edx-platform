@@ -24,27 +24,19 @@ However, we are proactively working towards a system where:
 * Each XBlock's assets are contained within their own folder as much as
   possible. See ``./vertical`` as an example.
 
-Themable Sass (.scss)
+Themable CSS (.css)
 *********************
 
-XBlock CSS for ``student_view``, ``author_view``, and ``public_view`` is compiled from the various ``./<ClassName>BlockDisplay.scss`` modules, such as `AnnotatableBlockDisplay.scss`_.
+The CSS for an XBlock's ``student_view``, ``author_view``, and ``public_view``
+is located in the ``xmodule/assets`` directory and follows the naming
+convention ``<ClassName>BlockDisplay.css``.
 
-XBlock CSS for ``studio_view`` is compiled from the various ``./<ClassName>BlockEditor.scss`` modules, such as `AnnotatableBlockEditor.scss`_.
+The CSS for an XBlock's ``studio_view`` is also located in the
+``xmodule/assets`` directory and follows the naming convention
+``<ClassName>BlockEditor.css``.
 
-Those Sass modules are mostly thin wrappers around the underscore-prefixed Sass
-modules within block-type-subdirectories, such as `annotatable/_display.css`. In the
-future, we may `simplify things`_ by collapsing the top-level Sass modules and
-just directly compiling the block-type-subdirectories' Sass.
-
-The CSS is compiled into the static folders of both LMS and CMS, as well as into
-the corresponding folders in any enabled themes, as part of the edx-platform build.
-It is collected into the static root, and then linked to from XBlock fragments by the
-``add_sass_to_fragment`` function in `builtin_assets.py`_.
-
-.. _AnnotatableBlockDisplay.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockDisplay.scss
-.. _AnnotatableBlockEditor.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockEditor.scss
-.. _annotatable/_display.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/annotatable/_display.scss
-.. _simplify things: https://github.com/openedx/edx-platform/issues/32621
+These css files can be linked to Xblock via ``add_css_url`` or ``add_css``
+methods in ``Fragment`` class from `fragment.py`_ module.
 
 
 JavaScript (.js)
@@ -80,7 +72,6 @@ As part of an `active build refactoring`_, we will soon consolidate all edx-plat
 .. _LibraryContentBlock: https://github.com/openedx/edx-platform/blob/master/xmodule/library_content_block.py
 .. _active build refactoring: https://github.com/openedx/edx-platform/issues/31624
 .. _builtin_assets.py: https://github.com/openedx/edx-platform/tree/master/xmodule/util/builtin_assets.py
-.. _static_content.py: https://github.com/openedx/edx-platform/blob/master/xmodule/static_content.py
-.. _library_source_block/style.css: https://github.com/openedx/edx-platform/blob/master/xmodule/assets/library_source_block/style.css
+.. _fragment.py: https://github.com/openedx/web-fragments/blob/master/web_fragments/fragment.py
 .. _webpack.builtinblocks.config.js: https://github.com/openedx/edx-platform/blob/master/webpack.builtinblocks.config.js
 .. _webpack.common.config.js: https://github.com/openedx/edx-platform/blob/master/webpack.common.config.js

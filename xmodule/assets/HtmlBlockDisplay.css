@@ -1,0 +1,458 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
+/* line 1, /openedx/edx-platform/xmodule/assets/HtmlBlockDisplay.scss */
+.xmodule_display.xmodule_AboutBlock,
+.xmodule_display.xmodule_CourseInfoBlock,
+.xmodule_display.xmodule_HtmlBlock,
+.xmodule_display.xmodule_StaticTabBlock {
+  /* stylelint-disable-line */
+  /* stylelint-disable-line */ }
+  /* line 8, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock *,
+  .xmodule_display.xmodule_CourseInfoBlock *,
+  .xmodule_display.xmodule_HtmlBlock *,
+  .xmodule_display.xmodule_StaticTabBlock * {
+    line-height: 1.4em; }
+  /* line 12, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock h1,
+  .xmodule_display.xmodule_CourseInfoBlock h1,
+  .xmodule_display.xmodule_HtmlBlock h1,
+  .xmodule_display.xmodule_StaticTabBlock h1 {
+    color: var(--body-color);
+    font: normal 2em/1.4em var(--font-family-sans-serif);
+    letter-spacing: 1px;
+    margin: 0 0 1.416em; }
+  /* line 20, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock h2,
+  .xmodule_display.xmodule_CourseInfoBlock h2,
+  .xmodule_display.xmodule_HtmlBlock h2,
+  .xmodule_display.xmodule_StaticTabBlock h2 {
+    color: #646464;
+    font: normal 1.2em/1.2em var(--font-family-sans-serif);
+    letter-spacing: 1px;
+    margin-bottom: calc((var(--baseline)*0.75));
+    -webkit-font-smoothing: antialiased; }
+  /* line 28, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock h3,
+  .xmodule_display.xmodule_AboutBlock h4,
+  .xmodule_display.xmodule_AboutBlock h5,
+  .xmodule_display.xmodule_AboutBlock h6,
+  .xmodule_display.xmodule_CourseInfoBlock h3,
+  .xmodule_display.xmodule_CourseInfoBlock h4,
+  .xmodule_display.xmodule_CourseInfoBlock h5,
+  .xmodule_display.xmodule_CourseInfoBlock h6,
+  .xmodule_display.xmodule_HtmlBlock h3,
+  .xmodule_display.xmodule_HtmlBlock h4,
+  .xmodule_display.xmodule_HtmlBlock h5,
+  .xmodule_display.xmodule_HtmlBlock h6,
+  .xmodule_display.xmodule_StaticTabBlock h3,
+  .xmodule_display.xmodule_StaticTabBlock h4,
+  .xmodule_display.xmodule_StaticTabBlock h5,
+  .xmodule_display.xmodule_StaticTabBlock h6 {
+    margin: 0 0 calc((var(--baseline)/2));
+    font-weight: 600; }
+  /* line 37, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock h3,
+  .xmodule_display.xmodule_CourseInfoBlock h3,
+  .xmodule_display.xmodule_HtmlBlock h3,
+  .xmodule_display.xmodule_StaticTabBlock h3 {
+    font-size: 1.2em; }
+  /* line 41, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock h4,
+  .xmodule_display.xmodule_CourseInfoBlock h4,
+  .xmodule_display.xmodule_HtmlBlock h4,
+  .xmodule_display.xmodule_StaticTabBlock h4 {
+    font-size: 1em; }
+  /* line 45, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock h5,
+  .xmodule_display.xmodule_CourseInfoBlock h5,
+  .xmodule_display.xmodule_HtmlBlock h5,
+  .xmodule_display.xmodule_StaticTabBlock h5 {
+    font-size: 0.83em; }
+  /* line 49, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock h6,
+  .xmodule_display.xmodule_CourseInfoBlock h6,
+  .xmodule_display.xmodule_HtmlBlock h6,
+  .xmodule_display.xmodule_StaticTabBlock h6 {
+    font-size: 0.75em; }
+  /* line 53, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock p,
+  .xmodule_display.xmodule_CourseInfoBlock p,
+  .xmodule_display.xmodule_HtmlBlock p,
+  .xmodule_display.xmodule_StaticTabBlock p {
+    margin-bottom: 1.416em;
+    font-size: 1em;
+    line-height: 1.6em !important;
+    color: var(--body-color); }
+  /* line 60, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock em,
+  .xmodule_display.xmodule_AboutBlock i,
+  .xmodule_display.xmodule_CourseInfoBlock em,
+  .xmodule_display.xmodule_CourseInfoBlock i,
+  .xmodule_display.xmodule_HtmlBlock em,
+  .xmodule_display.xmodule_HtmlBlock i,
+  .xmodule_display.xmodule_StaticTabBlock em,
+  .xmodule_display.xmodule_StaticTabBlock i {
+    font-style: italic; }
+    /* line 64, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock em span,
+    .xmodule_display.xmodule_AboutBlock i span,
+    .xmodule_display.xmodule_CourseInfoBlock em span,
+    .xmodule_display.xmodule_CourseInfoBlock i span,
+    .xmodule_display.xmodule_HtmlBlock em span,
+    .xmodule_display.xmodule_HtmlBlock i span,
+    .xmodule_display.xmodule_StaticTabBlock em span,
+    .xmodule_display.xmodule_StaticTabBlock i span {
+      font-style: italic; }
+  /* line 69, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock strong,
+  .xmodule_display.xmodule_AboutBlock b,
+  .xmodule_display.xmodule_CourseInfoBlock strong,
+  .xmodule_display.xmodule_CourseInfoBlock b,
+  .xmodule_display.xmodule_HtmlBlock strong,
+  .xmodule_display.xmodule_HtmlBlock b,
+  .xmodule_display.xmodule_StaticTabBlock strong,
+  .xmodule_display.xmodule_StaticTabBlock b {
+    font-weight: bold; }
+    /* line 73, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock strong span,
+    .xmodule_display.xmodule_AboutBlock b span,
+    .xmodule_display.xmodule_CourseInfoBlock strong span,
+    .xmodule_display.xmodule_CourseInfoBlock b span,
+    .xmodule_display.xmodule_HtmlBlock strong span,
+    .xmodule_display.xmodule_HtmlBlock b span,
+    .xmodule_display.xmodule_StaticTabBlock strong span,
+    .xmodule_display.xmodule_StaticTabBlock b span {
+      font-weight: bold; }
+  /* line 78, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock p + p,
+  .xmodule_display.xmodule_AboutBlock ul + p,
+  .xmodule_display.xmodule_AboutBlock ol + p,
+  .xmodule_display.xmodule_CourseInfoBlock p + p,
+  .xmodule_display.xmodule_CourseInfoBlock ul + p,
+  .xmodule_display.xmodule_CourseInfoBlock ol + p,
+  .xmodule_display.xmodule_HtmlBlock p + p,
+  .xmodule_display.xmodule_HtmlBlock ul + p,
+  .xmodule_display.xmodule_HtmlBlock ol + p,
+  .xmodule_display.xmodule_StaticTabBlock p + p,
+  .xmodule_display.xmodule_StaticTabBlock ul + p,
+  .xmodule_display.xmodule_StaticTabBlock ol + p {
+    margin-top: var(--baseline); }
+  /* line 84, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock blockquote,
+  .xmodule_display.xmodule_CourseInfoBlock blockquote,
+  .xmodule_display.xmodule_HtmlBlock blockquote,
+  .xmodule_display.xmodule_StaticTabBlock blockquote {
+    margin: 1em calc((var(--baseline)*2)); }
+  /* line 88, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock ol,
+  .xmodule_display.xmodule_AboutBlock ul,
+  .xmodule_display.xmodule_CourseInfoBlock ol,
+  .xmodule_display.xmodule_CourseInfoBlock ul,
+  .xmodule_display.xmodule_HtmlBlock ol,
+  .xmodule_display.xmodule_HtmlBlock ul,
+  .xmodule_display.xmodule_StaticTabBlock ol,
+  .xmodule_display.xmodule_StaticTabBlock ul {
+    padding: 0 0 0 1em;
+    margin: 1em 0;
+    color: var(--body-color); }
+    /* line 96, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock ol li,
+    .xmodule_display.xmodule_AboutBlock ul li,
+    .xmodule_display.xmodule_CourseInfoBlock ol li,
+    .xmodule_display.xmodule_CourseInfoBlock ul li,
+    .xmodule_display.xmodule_HtmlBlock ol li,
+    .xmodule_display.xmodule_HtmlBlock ul li,
+    .xmodule_display.xmodule_StaticTabBlock ol li,
+    .xmodule_display.xmodule_StaticTabBlock ul li {
+      margin-bottom: 0.708em; }
+  /* line 101, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock ol,
+  .xmodule_display.xmodule_CourseInfoBlock ol,
+  .xmodule_display.xmodule_HtmlBlock ol,
+  .xmodule_display.xmodule_StaticTabBlock ol {
+    list-style: decimal outside none; }
+  /* line 105, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock ul,
+  .xmodule_display.xmodule_CourseInfoBlock ul,
+  .xmodule_display.xmodule_HtmlBlock ul,
+  .xmodule_display.xmodule_StaticTabBlock ul {
+    list-style: disc outside none; }
+  /* line 110, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock a:link, .xmodule_display.xmodule_AboutBlock a:visited, .xmodule_display.xmodule_AboutBlock a:hover, .xmodule_display.xmodule_AboutBlock a:active, .xmodule_display.xmodule_AboutBlock a:focus,
+  .xmodule_display.xmodule_CourseInfoBlock a:link,
+  .xmodule_display.xmodule_CourseInfoBlock a:visited,
+  .xmodule_display.xmodule_CourseInfoBlock a:hover,
+  .xmodule_display.xmodule_CourseInfoBlock a:active,
+  .xmodule_display.xmodule_CourseInfoBlock a:focus,
+  .xmodule_display.xmodule_HtmlBlock a:link,
+  .xmodule_display.xmodule_HtmlBlock a:visited,
+  .xmodule_display.xmodule_HtmlBlock a:hover,
+  .xmodule_display.xmodule_HtmlBlock a:active,
+  .xmodule_display.xmodule_HtmlBlock a:focus,
+  .xmodule_display.xmodule_StaticTabBlock a:link,
+  .xmodule_display.xmodule_StaticTabBlock a:visited,
+  .xmodule_display.xmodule_StaticTabBlock a:hover,
+  .xmodule_display.xmodule_StaticTabBlock a:active,
+  .xmodule_display.xmodule_StaticTabBlock a:focus {
+    color: var(--blue); }
+  /* line 119, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock img,
+  .xmodule_display.xmodule_CourseInfoBlock img,
+  .xmodule_display.xmodule_HtmlBlock img,
+  .xmodule_display.xmodule_StaticTabBlock img {
+    max-width: 100%; }
+  /* line 123, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock pre,
+  .xmodule_display.xmodule_CourseInfoBlock pre,
+  .xmodule_display.xmodule_HtmlBlock pre,
+  .xmodule_display.xmodule_StaticTabBlock pre {
+    margin: 1em 0;
+    color: var(--body-color);
+    font-family: monospace, serif;
+    font-size: 1em;
+    white-space: pre-wrap;
+    word-wrap: break-word; }
+  /* line 132, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock code,
+  .xmodule_display.xmodule_CourseInfoBlock code,
+  .xmodule_display.xmodule_HtmlBlock code,
+  .xmodule_display.xmodule_StaticTabBlock code {
+    color: var(--body-color);
+    font-family: monospace, serif;
+    background: none;
+    padding: 0; }
+  /* line 139, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock table,
+  .xmodule_display.xmodule_CourseInfoBlock table,
+  .xmodule_display.xmodule_HtmlBlock table,
+  .xmodule_display.xmodule_StaticTabBlock table {
+    width: 100%;
+    margin: var(--baseline) 0;
+    border-collapse: collapse;
+    font-size: 16px; }
+    /* line 145, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock table td,
+    .xmodule_display.xmodule_AboutBlock table th,
+    .xmodule_display.xmodule_CourseInfoBlock table td,
+    .xmodule_display.xmodule_CourseInfoBlock table th,
+    .xmodule_display.xmodule_HtmlBlock table td,
+    .xmodule_display.xmodule_HtmlBlock table th,
+    .xmodule_display.xmodule_StaticTabBlock table td,
+    .xmodule_display.xmodule_StaticTabBlock table th {
+      margin: var(--baseline) 0;
+      padding: calc((var(--baseline)/2));
+      border: 1px solid var(--gray-l3);
+      font-size: 14px; }
+      /* line 152, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock table td.cont-justified-left,
+      .xmodule_display.xmodule_AboutBlock table th.cont-justified-left,
+      .xmodule_display.xmodule_CourseInfoBlock table td.cont-justified-left,
+      .xmodule_display.xmodule_CourseInfoBlock table th.cont-justified-left,
+      .xmodule_display.xmodule_HtmlBlock table td.cont-justified-left,
+      .xmodule_display.xmodule_HtmlBlock table th.cont-justified-left,
+      .xmodule_display.xmodule_StaticTabBlock table td.cont-justified-left,
+      .xmodule_display.xmodule_StaticTabBlock table th.cont-justified-left {
+        text-align: left !important; }
+      /* line 156, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock table td.cont-justified-right,
+      .xmodule_display.xmodule_AboutBlock table th.cont-justified-right,
+      .xmodule_display.xmodule_CourseInfoBlock table td.cont-justified-right,
+      .xmodule_display.xmodule_CourseInfoBlock table th.cont-justified-right,
+      .xmodule_display.xmodule_HtmlBlock table td.cont-justified-right,
+      .xmodule_display.xmodule_HtmlBlock table th.cont-justified-right,
+      .xmodule_display.xmodule_StaticTabBlock table td.cont-justified-right,
+      .xmodule_display.xmodule_StaticTabBlock table th.cont-justified-right {
+        text-align: right !important; }
+      /* line 160, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock table td.cont-justified-center,
+      .xmodule_display.xmodule_AboutBlock table th.cont-justified-center,
+      .xmodule_display.xmodule_CourseInfoBlock table td.cont-justified-center,
+      .xmodule_display.xmodule_CourseInfoBlock table th.cont-justified-center,
+      .xmodule_display.xmodule_HtmlBlock table td.cont-justified-center,
+      .xmodule_display.xmodule_HtmlBlock table th.cont-justified-center,
+      .xmodule_display.xmodule_StaticTabBlock table td.cont-justified-center,
+      .xmodule_display.xmodule_StaticTabBlock table th.cont-justified-center {
+        text-align: center !important; }
+  /* line 166, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock th,
+  .xmodule_display.xmodule_CourseInfoBlock th,
+  .xmodule_display.xmodule_HtmlBlock th,
+  .xmodule_display.xmodule_StaticTabBlock th {
+    background: #eee;
+    font-weight: bold; }
+  /* line 177, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .modal-ui-icon,
+  .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .modal-ui-icon,
+  .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .modal-ui-icon,
+  .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .modal-ui-icon {
+    position: absolute;
+    display: block;
+    padding: calc((var(--baseline)/4)) 7px;
+    border-radius: 5px;
+    opacity: 0.9;
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black); }
+    /* line 189, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .modal-ui-icon .label,
+    .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .modal-ui-icon .label,
+    .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .modal-ui-icon .label,
+    .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .modal-ui-icon .label {
+      font-weight: bold; }
+    /* line 193, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .modal-ui-icon i,
+    .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .modal-ui-icon i,
+    .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .modal-ui-icon i,
+    .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .modal-ui-icon i {
+      font-style: normal; }
+  /* line 198, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-link,
+  .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-link,
+  .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-link,
+  .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-link {
+    position: relative;
+    display: block; }
+    /* line 204, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-link .action-fullscreen,
+    .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-link .action-fullscreen,
+    .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-link .action-fullscreen,
+    .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-link .action-fullscreen {
+      display: none;
+      top: 10px;
+      left: 10px; }
+    /* line 210, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-link:hover .action-fullscreen,
+    .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-link:hover .action-fullscreen,
+    .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-link:hover .action-fullscreen,
+    .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-link:hover .action-fullscreen {
+      display: block; }
+  /* line 215, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+  .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal,
+  .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal,
+  .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal,
+  .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7); }
+    /* line 227, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content,
+    .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content,
+    .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content,
+    .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content {
+      position: relative;
+      top: 2.5%;
+      display: block;
+      height: 95%;
+      width: 95%;
+      margin: auto;
+      overflow: hidden; }
+      /* line 236, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-wrapper,
+      .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-wrapper,
+      .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-wrapper,
+      .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-wrapper {
+        position: relative; }
+        /* line 239, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+        .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-wrapper img,
+        .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-wrapper img,
+        .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-wrapper img,
+        .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-wrapper img {
+          position: relative;
+          display: block;
+          max-width: 100%;
+          max-height: 100%;
+          margin: auto;
+          cursor: default; }
+      /* line 249, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .action-close,
+      .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .action-close,
+      .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .action-close,
+      .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .action-close {
+        top: 10px;
+        right: 10px; }
+      /* line 254, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls,
+      .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls,
+      .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls,
+      .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none; }
+        /* line 262, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+        .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control,
+        .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control,
+        .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control,
+        .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control {
+          position: relative;
+          display: inline-block;
+          margin: 0;
+          padding: 0; }
+          /* line 268, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+          .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon,
+          .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon,
+          .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon,
+          .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon {
+            position: relative; }
+            /* line 271, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+            .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-in,
+            .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-in,
+            .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-in,
+            .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-in {
+              margin-right: calc((var(--baseline)/4)); }
+            /* line 275, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+            .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out,
+            .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out,
+            .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out,
+            .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out {
+              margin-left: calc((var(--baseline)/4)); }
+            /* line 279, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+            .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.is-disabled,
+            .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.is-disabled,
+            .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.is-disabled,
+            .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.is-disabled {
+              opacity: 0.5;
+              cursor: default; }
+    /* line 288, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen,
+    .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen,
+    .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen,
+    .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen {
+      display: block; }
+      /* line 292, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper,
+      .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper,
+      .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper,
+      .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper {
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important; }
+        /* line 298, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+        .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper img,
+        .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper img,
+        .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper img,
+        .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal.image-is-fit-to-screen .image-content .image-wrapper img {
+          top: 0 !important;
+          left: 0 !important; }
+    /* line 305, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+    .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal.image-is-zoomed,
+    .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal.image-is-zoomed,
+    .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal.image-is-zoomed,
+    .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal.image-is-zoomed {
+      display: block; }
+      /* line 309, /openedx/edx-platform/xmodule/assets/html/_display.scss */
+      .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal.image-is-zoomed .image-content .image-wrapper img,
+      .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal.image-is-zoomed .image-content .image-wrapper img,
+      .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal.image-is-zoomed .image-content .image-wrapper img,
+      .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal.image-is-zoomed .image-content .image-wrapper img {
+        max-width: none;
+        max-height: none;
+        margin: 0;
+        cursor: move; }
