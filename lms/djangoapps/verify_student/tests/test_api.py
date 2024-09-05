@@ -64,7 +64,7 @@ class CreateVerificationAttempt(TestCase):
         self.attempt = VerificationAttempt(
             user=self.user,
             name='Tester McTest',
-            status=VerificationAttemptStatus.created,
+            status=VerificationAttemptStatus.CREATED,
             expiration_datetime=datetime(2024, 12, 31, tzinfo=timezone.utc)
         )
         self.attempt.save()
@@ -75,7 +75,7 @@ class CreateVerificationAttempt(TestCase):
             create_verification_attempt(
                 user=self.user,
                 name='Tester McTest',
-                status=VerificationAttemptStatus.created,
+                status=VerificationAttemptStatus.CREATED,
                 expiration_datetime=datetime(2024, 12, 31, tzinfo=timezone.utc)
             ),
             expected_id
@@ -84,7 +84,7 @@ class CreateVerificationAttempt(TestCase):
 
         self.assertEqual(verification_attempt.user, self.user)
         self.assertEqual(verification_attempt.name, 'Tester McTest')
-        self.assertEqual(verification_attempt.status, VerificationAttemptStatus.created)
+        self.assertEqual(verification_attempt.status, VerificationAttemptStatus.CREATED)
         self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo=timezone.utc))
 
     def test_create_verification_attempt_no_expiration_datetime(self):
@@ -93,7 +93,7 @@ class CreateVerificationAttempt(TestCase):
             create_verification_attempt(
                 user=self.user,
                 name='Tester McTest',
-                status=VerificationAttemptStatus.created,
+                status=VerificationAttemptStatus.CREATED,
             ),
             expected_id
         )
@@ -101,7 +101,7 @@ class CreateVerificationAttempt(TestCase):
 
         self.assertEqual(verification_attempt.user, self.user)
         self.assertEqual(verification_attempt.name, 'Tester McTest')
-        self.assertEqual(verification_attempt.status, VerificationAttemptStatus.created)
+        self.assertEqual(verification_attempt.status, VerificationAttemptStatus.CREATED)
         self.assertEqual(verification_attempt.expiration_datetime, None)
 
 
@@ -118,15 +118,15 @@ class UpdateVerificationAttempt(TestCase):
         self.attempt = VerificationAttempt(
             user=self.user,
             name='Tester McTest',
-            status=VerificationAttemptStatus.created,
+            status=VerificationAttemptStatus.CREATED,
             expiration_datetime=datetime(2024, 12, 31, tzinfo=timezone.utc)
         )
         self.attempt.save()
 
     @ddt.data(
-        ('Tester McTest', VerificationAttemptStatus.pending, datetime(2024, 12, 31, tzinfo=timezone.utc)),
-        ('Tester McTest2', VerificationAttemptStatus.approved, datetime(2025, 12, 31, tzinfo=timezone.utc)),
-        ('Tester McTest3', VerificationAttemptStatus.denied, datetime(2026, 12, 31, tzinfo=timezone.utc)),
+        ('Tester McTest', VerificationAttemptStatus.PENDING, datetime(2024, 12, 31, tzinfo=timezone.utc)),
+        ('Tester McTest2', VerificationAttemptStatus.APPROVED, datetime(2025, 12, 31, tzinfo=timezone.utc)),
+        ('Tester McTest3', VerificationAttemptStatus.DENIED, datetime(2026, 12, 31, tzinfo=timezone.utc)),
     )
     @ddt.unpack
     def test_update_verification_attempt(self, name, status, expiration_datetime):
@@ -155,18 +155,18 @@ class UpdateVerificationAttempt(TestCase):
 
         verification_attempt = VerificationAttempt.objects.get(id=self.attempt.id)
 
-        # Values should not change as a result of the values passed in being None.
+        # Values should not change as a result of the values passed in being None, except for expiration_datetime.
         self.assertEqual(verification_attempt.user, self.user)
         self.assertEqual(verification_attempt.name, self.attempt.name)
         self.assertEqual(verification_attempt.status, self.attempt.status)
-        self.assertEqual(verification_attempt.expiration_datetime, self.attempt.expiration_datetime)
+        self.assertEqual(verification_attempt.expiration_datetime, None)
 
     def test_update_verification_attempt_not_found(self):
         self.assertRaises(
             VerificationAttempt.DoesNotExist,
             update_verification_attempt,
             attempt_id=999999,
-            status=VerificationAttemptStatus.approved,
+            status=VerificationAttemptStatus.APPROVED,
         )
 
     @ddt.data(

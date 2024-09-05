@@ -4,7 +4,11 @@ API module.
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
+
+from datetime import datetime
+from typing import Optional
 
 from lms.djangoapps.verify_student.emails import send_verification_approved_email
 from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
@@ -13,6 +17,8 @@ from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 
 log = logging.getLogger(__name__)
+
+User = get_user_model()
 
 
 def send_approval_email(attempt):
@@ -42,7 +48,7 @@ def send_approval_email(attempt):
         send_verification_approved_email(context=email_context)
 
 
-def create_verification_attempt(user, name, status, expiration_datetime=None):
+def create_verification_attempt(user: User, name: str, status: str, expiration_datetime: Optional[datetime] = None):
     """
     Create a verification attempt.
 
@@ -67,7 +73,12 @@ def create_verification_attempt(user, name, status, expiration_datetime=None):
     return verification_attempt.id
 
 
-def update_verification_attempt(attempt_id, name=None, status=None, expiration_datetime=None):
+def update_verification_attempt(
+    attempt_id: int,
+    name: Optional[str] = None,
+    status: Optional[str] = None,
+    expiration_datetime: Optional[datetime] = None
+):
     """
     Update a verification attempt.
 
@@ -97,7 +108,7 @@ def update_verification_attempt(attempt_id, name=None, status=None, expiration_d
     if status is not None:
         attempt.status = status
 
-        status_list = [attr for attr in dir(VerificationAttemptStatus) if not attr.startswith('__')]
+        status_list = list(VerificationAttemptStatus)
         if status not in status_list:
             log.error(
                 'Attempted to call update_verification_attempt called with invalid status: %(status)s. '
@@ -109,7 +120,8 @@ def update_verification_attempt(attempt_id, name=None, status=None, expiration_d
             )
             raise VerificationAttemptInvalidStatus
 
-    if expiration_datetime is not None:
-        attempt.expiration_datetime = expiration_datetime
+    # NOTE: Generally, we only set the expiration date from the time that an IDV attempt is marked approved,
+    # so we allow expiration_datetime to = None for other status updates (e.g. pending).
+    attempt.expiration_datetime = expiration_datetime
 
     attempt.save()
