@@ -76,6 +76,9 @@ class ReportedContentNotification(BaseMessageType):
 
 
 class CommentNotification(BaseMessageType):
+    """
+    Notify discussion participants of new comments.
+    """
     pass
 
 

@@ -30,7 +30,7 @@ class GCMDeviceViewSet(GCMDeviceViewSetBase):
             If False, the device will not receive notifications.
           * cloud_message_type (required) - You should choose FCM or GCM. Currently, only FCM is supported.
           * application_id (optional) - Opaque application identity, should be filled in for multiple
-            key/certificate access.
+            key/certificate access. Should be equal settings.FCM_APP_NAME.
     **Example Response**
         ```json
         {

@@ -10,11 +10,7 @@ def setup_firebase_app(firebase_credentials, app_name='fcm-app'):
     """
     Returns a Firebase app instance if the Firebase credentials are provided.
     """
-    try:
-        import firebase_admin  # pylint: disable=import-outside-toplevel
-    except ImportError:
-        log.error('Could not import firebase_admin package.')
-        return
+    import firebase_admin  # pylint: disable=import-outside-toplevel
 
     if firebase_credentials:
         try:

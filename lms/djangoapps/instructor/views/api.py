@@ -514,11 +514,13 @@ class RegisterAndEnrollStudents(APIView):
                                 reason='Enrolling via csv upload',
                                 state_transition=UNENROLLED_TO_ENROLLED,
                             )
-                            enroll_email(course_id=course_id,
-                                         student_email=email,
-                                         auto_enroll=True,
-                                         email_students=notify_by_email,
-                                         email_params=email_params)
+                            enroll_email(
+                                course_id=course_id,
+                                student_email=email,
+                                auto_enroll=True,
+                                message_students=notify_by_email,
+                                message_params=email_params,
+                            )
                         else:
                             # update the course mode if already enrolled
                             existing_enrollment = CourseEnrollment.get_enrollment(user, course_id)
