@@ -5544,3 +5544,6 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_default: empty dictionary
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
+
+
+OVERRIDE_GET_ABSOLUTE_ECOMMERCE_URL = 'edx_ecommerce_extension.overrides.get_absolute_ecommerce_url'
