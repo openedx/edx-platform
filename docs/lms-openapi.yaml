@@ -3461,29 +3461,6 @@ paths:
       in: path
       required: true
       type: string
-  /demographics/v1/demographics/status/:
-    get:
-      operationId: demographics_v1_demographics_status_list
-      summary: GET /api/user/v1/accounts/demographics/status
-      description: This is a Web API to determine the status of demographics related
-        features
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - demographics
-    patch:
-      operationId: demographics_v1_demographics_status_partial_update
-      summary: PATCH /api/user/v1/accounts/demographics/status
-      description: This is a Web API to update fields that are dependent on user interaction.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - demographics
-    parameters: []
   /discounts/course/{course_key_string}:
     get:
       operationId: discounts_course_read
@@ -5300,19 +5277,6 @@ paths:
       required: true
       type: string
       format: uuid
-  /entitlements/v1/subscriptions/entitlements/revoke:
-    post:
-      operationId: entitlements_v1_subscriptions_entitlements_revoke_create
-      description: |-
-        Invokes the entitlements expiration process for the provided uuids and downgrades the
-        enrollments to Audit mode.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - entitlements
-    parameters: []
   /experiments/v0/custom/REV-934/:
     get:
       operationId: experiments_v0_custom_REV-934_list
@@ -6649,6 +6613,11 @@ paths:
                 course, chapter, sequential, vertical, html, problem, video, and
                 discussion.
             display_name: (str) The display name of the block.
+            course_progress: (dict) Contains information about how many assignments are in the course
+                and how many assignments the student has completed.
+                Included here:
+                    * total_assignments_count: (int) Total course's assignments count.
+                    * assignments_completed: (int) Assignments witch the student has completed.
 
         **Returns**
 
@@ -6693,6 +6662,26 @@ paths:
       - mobile
     parameters:
     - name: api_version
+      in: path
+      required: true
+      type: string
+  /mobile/{api_version}/course_info/{course_id}/enrollment_details:
+    get:
+      operationId: mobile_course_info_enrollment_details_list
+      summary: Handle the GET request
+      description: Returns user enrollment and course details.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - mobile
+    parameters:
+    - name: api_version
+      in: path
+      required: true
+      type: string
+    - name: course_id
       in: path
       required: true
       type: string
@@ -6861,6 +6850,10 @@ paths:
             An additional attribute "expiration" has been added to the response, which lists the date
             when access to the course will expire or null if it doesn't expire.
 
+            In v4 we added to the response primary object. Primary object contains the latest user's enrollment
+            or course where user has the latest progress. Primary object has been cut from user's
+            enrolments array and inserted into separated section with key `primary`.
+
         **Example Request**
 
             GET /api/mobile/v1/users/{username}/course_enrollments/
@@ -6910,14 +6903,14 @@ paths:
             * mode: The type of certificate registration for this course (honor or
               certified).
             * url: URL to the downloadable version of the certificate, if exists.
+            * course_progress: Contains information about how many assignments are in the course
+              and how many assignments the student has completed.
+            * total_assignments_count: Total course's assignments count.
+            * assignments_completed: Assignments witch the student has completed.
       parameters: []
       responses:
         '200':
           description: ''
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/CourseEnrollment'
       tags:
       - mobile
     parameters:
@@ -7031,22 +7024,6 @@ paths:
       tags:
       - notifications
     parameters: []
-  /notifications/channel/configurations/{course_key_string}:
-    patch:
-      operationId: notifications_channel_configurations_partial_update
-      description: Update an existing user notification preference for an entire channel
-        with the data in the request body.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - notifications
-    parameters:
-    - name: course_key_string
-      in: path
-      required: true
-      type: string
   /notifications/configurations/{course_key_string}:
     get:
       operationId: notifications_configurations_read
@@ -7219,6 +7196,38 @@ paths:
       - notifications
     parameters:
     - name: app_name
+      in: path
+      required: true
+      type: string
+  /notifications/preferences/update/{username}/{patch}/:
+    get:
+      operationId: notifications_preferences_update_read
+      description: |-
+        View to update user preferences from encrypted username and patch.
+        username and patch must be string
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - notifications
+    post:
+      operationId: notifications_preferences_update_create
+      description: |-
+        View to update user preferences from encrypted username and patch.
+        username and patch must be string
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - notifications
+    parameters:
+    - name: username
+      in: path
+      required: true
+      type: string
+    - name: patch
       in: path
       required: true
       type: string
@@ -11729,39 +11738,6 @@ definitions:
         readOnly: true
       course_enrollments:
         title: Course enrollments
-        type: string
-        readOnly: true
-  CourseEnrollment:
-    type: object
-    properties:
-      audit_access_expires:
-        title: Audit access expires
-        type: string
-        readOnly: true
-      created:
-        title: Created
-        type: string
-        format: date-time
-        readOnly: true
-        x-nullable: true
-      mode:
-        title: Mode
-        type: string
-        maxLength: 100
-        minLength: 1
-      is_active:
-        title: Is active
-        type: boolean
-      course:
-        title: Course
-        type: string
-        readOnly: true
-      certificate:
-        title: Certificate
-        type: string
-        readOnly: true
-      course_modes:
-        title: Course modes
         type: string
         readOnly: true
   Notification:
