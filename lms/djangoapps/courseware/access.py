@@ -53,7 +53,8 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     OrgInstructorRole,
     OrgStaffRole,
-    SupportStaffRole
+    SupportStaffRole,
+    CourseLimitedStaffRole,
 )
 from common.djangoapps.util import milestones_helpers as milestones_helpers  # lint-amnesty, pylint: disable=useless-import-alias
 from common.djangoapps.util.milestones_helpers import (
@@ -94,6 +95,31 @@ def has_ccx_coach_role(user, course_key):
     else:
         raise CCXLocatorValidationException("Invalid CCX key. To verify that "
                                             "user is a coach on CCX, you must provide key to CCX")
+    return False
+
+def has_cms_access(user, course_key):
+    """
+    Check if user has access to the CMS. When requesting from the LMS, a user with the
+    limited staff access role needs access to the CMS APIs, but not the CMS site. This
+    function accounts for this edge case when determining if a user has access to the CMS
+    site.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        course_key: Key to course.
+
+    Returns:
+        bool: whether user has access to the CMS site.
+    """
+    has_course_author_access = auth.has_course_author_access(user, course_key)
+    is_limited_staff = auth.user_has_role(
+            user, CourseLimitedStaffRole(course_key)
+        ) and not GlobalStaff().has_user(user)
+
+    if is_limited_staff and has_course_author_access:
+        return False
+    if has_course_author_access:
+        return True
     return False
 
 
@@ -304,6 +330,7 @@ def _has_access_course(user, action, courselike):
 
     Valid actions:
 
+    'cms' -- can load and has access to cms view of course
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
     'load_mobile' -- can load from a mobile context
@@ -411,6 +438,7 @@ def _has_access_course(user, action, courselike):
         )
 
     checkers = {
+        # 'cms': lambda: auth.has_course_author_access(user, courselike.id),
         'load': can_load,
         'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, courselike),
         'enroll': can_enroll,
