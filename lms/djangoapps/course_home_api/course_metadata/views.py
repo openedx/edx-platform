@@ -20,7 +20,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.course_metadata.serializers import CourseHomeMetadataSerializer
-from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access, has_cms_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
@@ -124,6 +124,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
         data = {
             'course_id': course.id,
             'username': username,
+            'studio_access': has_cms_access(request.user, course_key),
             'is_staff': has_access(request.user, 'staff', course_key).has_access,
             'original_user_is_staff': original_user_is_staff,
             'number': course.display_number_with_default,
