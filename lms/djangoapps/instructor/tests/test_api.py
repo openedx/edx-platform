@@ -4685,14 +4685,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
 
 class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Test endpoints whereby instructors can change permissions
-    of other users.
-
-    This test does NOT test whether the actions had an effect on the
-    database, that is the job of test_access.
-    This tests the response and action switch.
-    Actually, modify_access does not have a very meaningful
-    response yet, so only the status code is tested.
+    Test endpoints using Oauth2 authentication.
     """
 
     @classmethod
@@ -4704,7 +4697,6 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
 
     def setUp(self):
         super().setUp()
-
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         self.other_user = UserFactory()
@@ -4722,6 +4714,9 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         }
 
     def assert_all_end_points(self, expected_status_code):
+        """
+        Util method for verifying different end-points.
+        """
         endpoints = [
             ('list_course_role_members', {'rolename': 'staff'}),
             ('register_and_enroll_students', {}),
