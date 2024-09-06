@@ -122,7 +122,7 @@ class MigrationTests(TestCase):
     """
 
     @unittest.skip(
-        "Temporary skip for ENT-8971 while the client id and secret columns in Canvas replaced."
+        "Temporary skip for ENT-8972 while the char field decrypted client secret columns in SAP is removed."
     )
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):

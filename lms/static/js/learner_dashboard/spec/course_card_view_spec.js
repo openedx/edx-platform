@@ -17,10 +17,8 @@ describe('Course Card View', () => {
             programData,
             collectionCourseStatus,
             courseData: {},
-            subscriptionData: [],
             urls: {},
             userPreferences: {},
-            isSubscriptionEligible: false,
         };
 
         if (typeof collectionCourseStatus === 'undefined') {
