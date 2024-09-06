@@ -273,6 +273,17 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             })
         self._register_subscriptions_endpoint()
 
+        self.comment = ThreadMock(thread_id=4, creator=self.user_2, title='test comment', body='comment body')
+        self.register_get_comment_response(
+            {
+                'id': self.comment.id,
+                'thread_id': self.thread.id,
+                'parent_id': None,
+                'user_id': self.comment.user_id,
+                'body': self.comment.body,
+            }
+        )
+
     def test_basic(self):
         """
         Left empty intentionally. This test case is inherited from DiscussionAPIViewTestMixin
@@ -292,7 +303,13 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
 
         # Post the form or do what it takes to send the signal
 
-        send_response_notifications(self.thread.id, str(self.course.id), self.user_2.id, parent_id=None)
+        send_response_notifications(
+            self.thread.id,
+            str(self.course.id),
+            self.user_2.id,
+            self.comment.id,
+            parent_id=None
+        )
         self.assertEqual(handler.call_count, 2)
         args = handler.call_args_list[0][1]['notification_data']
         self.assertEqual([int(user_id) for user_id in args.user_ids], [self.user_1.id])
@@ -300,6 +317,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_2.username,
             'post_title': 'test thread',
+            'email_content': self.comment.body,
             'course_name': self.course.display_name,
             'sender_id': self.user_2.id
         }
@@ -325,7 +343,13 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'user_id': self.thread_2.user_id
         })
 
-        send_response_notifications(self.thread.id, str(self.course.id), self.user_3.id, parent_id=self.thread_2.id)
+        send_response_notifications(
+            self.thread.id,
+            str(self.course.id),
+            self.user_3.id,
+            self.comment.id,
+            parent_id=self.thread_2.id
+        )
         # check if 2 call are made to the handler i.e. one for the response creator and one for the thread creator
         self.assertEqual(handler.call_count, 2)
 
@@ -337,7 +361,9 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
+            'email_content': self.comment.body,
             'author_name': 'dummy\'s',
+            'author_pronoun': 'dummy\'s',
             'course_name': self.course.display_name,
             'sender_id': self.user_3.id
         }
@@ -354,6 +380,7 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
+            'email_content': self.comment.body,
             'course_name': self.course.display_name,
             'sender_id': self.user_3.id
         }
@@ -371,7 +398,13 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         """
         handler = mock.Mock()
         USER_NOTIFICATION_REQUESTED.connect(handler)
-        send_response_notifications(self.thread.id, str(self.course.id), self.user_1.id, parent_id=None)
+
+        send_response_notifications(
+            self.thread.id,
+            str(self.course.id),
+            self.user_1.id,
+            self.comment.id, parent_id=None
+        )
         self.assertEqual(handler.call_count, 1)
 
     def test_comment_creators_own_response(self):
@@ -388,7 +421,13 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'user_id': self.thread_3.user_id
         })
 
-        send_response_notifications(self.thread.id, str(self.course.id), self.user_3.id, parent_id=self.thread_2.id)
+        send_response_notifications(
+            self.thread.id,
+            str(self.course.id),
+            self.user_3.id,
+            parent_id=self.thread_2.id,
+            comment_id=self.comment.id
+        )
         # check if 1 call is made to the handler i.e. for the thread creator
         self.assertEqual(handler.call_count, 2)
 
@@ -399,9 +438,11 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
-            'author_name': 'your',
+            'author_name': 'dummy\'s',
+            'author_pronoun': 'your',
             'course_name': self.course.display_name,
             'sender_id': self.user_3.id,
+            'email_content': self.comment.body
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -427,7 +468,13 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         USER_NOTIFICATION_REQUESTED.connect(handler)
 
         # Post the form or do what it takes to send the signal
-        notification_sender = DiscussionNotificationSender(self.thread, self.course, self.user_2, parent_id=parent_id)
+        notification_sender = DiscussionNotificationSender(
+            self.thread,
+            self.course,
+            self.user_2,
+            parent_id=parent_id,
+            comment_id=self.comment.id
+        )
         notification_sender.send_response_on_followed_post_notification()
         self.assertEqual(handler.call_count, 1)
         args = handler.call_args[1]['notification_data']
@@ -437,11 +484,13 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_2.username,
             'post_title': 'test thread',
+            'email_content': self.comment.body,
             'course_name': self.course.display_name,
             'sender_id': self.user_2.id,
         }
         if parent_id:
-            expected_context['author_name'] = 'dummy'
+            expected_context['author_name'] = 'dummy\'s'
+            expected_context['author_pronoun'] = 'dummy\'s'
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
             args.content_url,
@@ -513,6 +562,7 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
 
         thread = ThreadMock(thread_id=1, creator=self.user_1, title='test thread')
         response = ThreadMock(thread_id=2, creator=self.user_2, title='test response')
+        comment = ThreadMock(thread_id=3, creator=self.user_2, title='test comment', body='comment body')
         self.register_get_thread_response({
             'id': thread.id,
             'course_id': str(self.course.id),
@@ -527,11 +577,20 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
             'thread_id': thread.id,
             'user_id': response.user_id
         })
+        self.register_get_comment_response({
+            'id': comment.id,
+            'parent_id': response.id,
+            'user_id': comment.user_id,
+            'body': comment.body
+        })
         self.register_get_subscriptions(1, {})
-        send_response_notifications(thread.id, str(self.course.id), self.user_2.id, parent_id=response.id)
+        send_response_notifications(thread.id, str(self.course.id), self.user_2.id, parent_id=response.id,
+                                    comment_id=comment.id)
         handler.assert_called_once()
         context = handler.call_args[1]['notification_data'].context
-        self.assertEqual(context['author_name'], 'their')
+        self.assertEqual(context['author_name'], 'dummy\'s')
+        self.assertEqual(context['author_pronoun'], 'their')
+        self.assertEqual(context['email_content'], comment.body)
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
@@ -604,6 +663,7 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(self.user_2.id),
+            'email_content': 'dummy'
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
@@ -621,6 +681,7 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(response.user_id),
+            'email_content': 'dummy'
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))

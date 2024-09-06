@@ -112,6 +112,7 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     LibraryXBlockStaticFileSerializer,
     LibraryXBlockStaticFilesSerializer,
     ContentLibraryAddPermissionByEmailSerializer,
+    LibraryPasteClipboardSerializer,
 )
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -487,7 +488,7 @@ class LibraryCommitView(APIView):
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.publish_changes(key)
+        api.publish_changes(key, request.user.id)
         return Response({})
 
     @convert_exceptions
@@ -500,6 +501,34 @@ class LibraryCommitView(APIView):
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.revert_changes(key)
         return Response({})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryPasteClipboardView(GenericAPIView):
+    """
+    Paste content of clipboard into Library.
+    """
+    @convert_exceptions
+    def post(self, request, lib_key_str):
+        """
+        Import the contents of the user's clipboard and paste them into the Library
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        serializer = LibraryPasteClipboardSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            result = api.import_staged_content_from_user_clipboard(
+                library_key, request.user, **serializer.validated_data
+            )
+        except api.IncompatibleTypesError as err:
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+                detail={'block_type': str(err)},
+            )
+
+        return Response(LibraryXBlockMetadataSerializer(result).data)
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -556,7 +585,7 @@ class LibraryBlocksView(GenericAPIView):
 
         # Create a new regular top-level block:
         try:
-            result = api.create_library_block(library_key, **serializer.validated_data)
+            result = api.create_library_block(library_key, user_id=request.user.id, **serializer.validated_data)
         except api.IncompatibleTypesError as err:
             raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 detail={'block_type': str(err)},

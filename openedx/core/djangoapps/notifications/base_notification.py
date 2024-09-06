@@ -7,6 +7,7 @@ from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+from .notification_content import get_notification_type_content_function
 
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
 
@@ -109,8 +110,9 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'info': '',
         'non_editable': [],
-        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}\'s response in '
-                              'a post you’re following <{strong}>{post_title}</{strong}></{p}>'),
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
+                              '</{strong}> response in a post you’re following <{strong}>{post_title}'
+                              '</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'author_name': 'author name',
@@ -169,18 +171,17 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
-    'course_update': {
+    'course_updates': {
         'notification_app': 'updates',
-        'name': 'course_update',
+        'name': 'course_updates',
         'is_core': False,
         'info': '',
         'web': True,
-        'email': True,
+        'email': False,
         'push': True,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new course update: '
-                              '<{strong}>{course_update_content}</{strong}></{p}>'),
+        'content_template': _('<{p}><{strong}>{course_update_content}</{strong}></{p}>'),
         'content_context': {
             'course_update_content': 'Course update',
         },
@@ -197,7 +198,7 @@ COURSE_NOTIFICATION_TYPES = {
         'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new open response submission awaiting for review for : '
+        'content_template': _('<{p}>You have a new open response submission awaiting for review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',
@@ -465,8 +466,13 @@ def get_notification_content(notification_type, context):
         'strong': 'strong',
         'p': 'p',
     }
+    content_function = get_notification_type_content_function(notification_type)
+    if notification_type == 'course_update':
+        notification_type = 'course_updates'
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
     if notification_type:
+        if content_function:
+            return content_function(notification_type, context)
         notification_type_content_template = notification_type.get('content_template', None)
         if notification_type_content_template:
             return notification_type_content_template.format(**context, **html_tags_context)

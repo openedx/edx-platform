@@ -70,7 +70,7 @@ class TestUtilFunctions(ModuleStoreTestCase):
         """
         Notification.objects.all().delete()
         create_notification(self.user, self.course.id, app_name='discussion', notification_type='new_comment')
-        create_notification(self.user, self.course.id, app_name='updates', notification_type='course_update')
+        create_notification(self.user, self.course.id, app_name='updates', notification_type='course_updates')
         app_dict = create_app_notifications_dict(Notification.objects.all())
         assert len(app_dict.keys()) == 2
         for key in ['discussion', 'updates']:
@@ -130,7 +130,7 @@ class TestContextFunctions(ModuleStoreTestCase):
         discussion_notification = create_notification(self.user, self.course.id, app_name='discussion',
                                                       notification_type='new_comment')
         update_notification = create_notification(self.user, self.course.id, app_name='updates',
-                                                  notification_type='course_update')
+                                                  notification_type='course_updates')
         app_dict = create_app_notifications_dict(Notification.objects.all())
         end_date = datetime.datetime(2024, 3, 24, 12, 0)
         params = {
