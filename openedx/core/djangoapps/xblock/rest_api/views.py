@@ -226,7 +226,9 @@ class BlockFieldsView(APIView):
         old_metadata = block.get_explicitly_set_fields_by_scope(Scope.settings)
         old_content = block.get_explicitly_set_fields_by_scope(Scope.content)
 
-        block.data = data
+        # only update data if it was passed
+        if data is not None:
+            block.data = data
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'.
