@@ -18,8 +18,11 @@ from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from openedx_tagging.core.tagging.models.utils import TAGS_CSV_SEPARATOR
 from organizations.models import Organization
 from .helpers.objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
-from openedx_events.content_authoring.data import ContentObjectChangedData
-from openedx_events.content_authoring.signals import CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+from openedx_events.content_authoring.data import ContentObjectData, ContentObjectChangedData
+from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    CONTENT_OBJECT_TAGS_CHANGED,
+)
 
 from .models import TaxonomyOrg
 from .types import ContentKey, TagValuesByObjectIdDict, TagValuesByTaxonomyIdDict, TaxonomyDict
@@ -301,12 +304,19 @@ def set_exported_object_tags(
             create_invalid=True,
             taxonomy_export_id=str(taxonomy_export_id),
         )
+
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectChangedData(
                 object_id=content_key_str,
                 changes=["tags"],
             )
+        )
+
+        # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+        CONTENT_OBJECT_TAGS_CHANGED.send_event(
+            time=now(),
+            content_object=ContentObjectData(object_id=content_key_str)
         )
 
 
@@ -408,6 +418,12 @@ def tag_object(
                 object_id=object_id,
                 changes=["tags"],
             )
+        )
+
+        # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+        CONTENT_OBJECT_TAGS_CHANGED.send_event(
+            time=now(),
+            content_object=ContentObjectData(object_id=object_id)
         )
 
 # Expose the oel_tagging APIs
