@@ -443,7 +443,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=UsageKey.from_string(self.lib1_problem_block["id"]),
+                    object_id=self.lib1_problem_block["id"],
                     changes=["collections"],
                 ),
             },
@@ -454,7 +454,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=UsageKey.from_string(self.lib1_html_block["id"]),
+                    object_id=self.lib1_html_block["id"],
                     changes=["collections"],
                 ),
             },
