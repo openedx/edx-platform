@@ -122,7 +122,7 @@ class ContentTypeGatingPartition(UserPartition):
         ecomm_service = EcommerceService()
         ecommerce_checkout = ecomm_service.is_enabled(user)
         if ecommerce_checkout and sku:
-            return ecomm_service.get_checkout_page_url(sku, course_run_key=course_run_key) or ''
+            return ecomm_service.get_checkout_page_url(sku, course_run_keys=course_run_key) or ''
 
     def _get_course_key_from_course_block(self, block):
         """

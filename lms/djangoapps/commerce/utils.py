@@ -23,10 +23,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from .models import CommerceConfiguration
-from .waffle import (  # lint-amnesty, pylint: disable=invalid-django-waffle-import
-    should_redirect_to_commerce_coordinator_checkout,
-    should_redirect_to_commerce_coordinator_refunds,
-)
+from .waffle import should_redirect_to_commerce_coordinator_refunds
 from edx_django_utils.plugins import pluggable_override
 
 log = logging.getLogger(__name__)
@@ -111,6 +108,7 @@ class EcommerceService:
         return self.get_absolute_ecommerce_url(self.config.basket_checkout_page)
 
 
+    @pluggable_override('OVERRIDE_GET_CHECKOUT_PAGE_URL')
     def get_checkout_page_url(self, *skus, **kwargs):
         """ Construct the URL to the ecommerce checkout page and include products.
 
@@ -127,8 +125,7 @@ class EcommerceService:
         """
         program_uuid = kwargs.get('program_uuid')
         enterprise_catalog_uuid = kwargs.get('catalog')
-        course_run_key = kwargs.get('course_run_key')
-        query_params = {'sku': skus, 'course_run_key': course_run_key}
+        query_params = {'sku': skus}
         if enterprise_catalog_uuid:
             query_params.update({'catalog': enterprise_catalog_uuid})
 
@@ -152,7 +149,7 @@ class EcommerceService:
         verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
             if self.is_enabled(user):
-                return self.get_checkout_page_url(verified_mode.sku, course_run_key=course_run_key)
+                return self.get_checkout_page_url(verified_mode.sku, course_run_keys=course_run_key)
             else:
                 return reverse('dashboard')
         return None
