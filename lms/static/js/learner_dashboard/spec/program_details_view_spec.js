@@ -7,11 +7,6 @@ describe('Program Details View', () => {
     let view = null;
     const options = {
         programData: {
-            subscription_eligible: false,
-            subscription_prices: [{
-                price: '100.00',
-                currency: 'USD',
-            }],
             subtitle: '',
             overview: '',
             weeks_to_complete: null,
@@ -468,24 +463,11 @@ describe('Program Details View', () => {
                 },
             ],
         },
-        subscriptionData: [
-            {
-                trial_end: '1970-01-01T03:25:45Z',
-                current_period_end: '1970-06-03T07:12:04Z',
-                price: '100.00',
-                currency: 'USD',
-                subscription_state: 'pre',
-            },
-        ],
         urls: {
             program_listing_url: '/dashboard/programs/',
             commerce_api_url: '/api/commerce/v0/baskets/',
             track_selection_url: '/course_modes/choose/',
             program_record_url: 'http://credentials.example.com/records/programs/UUID',
-            buy_subscription_url: '/subscriptions',
-            manage_subscription_url: '/orders',
-            subscriptions_learner_help_center_url: '/learner',
-            orders_and_subscriptions_url: '/orders',
         },
         userPreferences: {
             'pref-lang': 'en',
@@ -513,58 +495,8 @@ describe('Program Details View', () => {
             },
         ],
         programTabViewEnabled: false,
-        isUserB2CSubscriptionsEnabled: false,
     };
     const data = options.programData;
-
-    const testSubscriptionState = (state, heading, body, trial = false) => {
-        const subscriptionData = {
-            ...options.subscriptionData[0],
-            subscription_state: state,
-        };
-        if (trial) {
-            subscriptionData.trial_end = moment().add(3, 'days').utc().format(
-                'YYYY-MM-DDTHH:mm:ss[Z]',
-            );
-        }
-        // eslint-disable-next-line no-use-before-define
-        view = initView({
-            // eslint-disable-next-line no-undef
-            programData: $.extend({}, options.programData, {
-                subscription_eligible: true,
-            }),
-            isUserB2CSubscriptionsEnabled: true,
-            subscriptionData: [subscriptionData],
-        });
-        view.render();
-        expect(view.$('.upgrade-subscription')[0]).toBeInDOM();
-        expect(view.$('.upgrade-subscription .upgrade-button'))
-            .toContainText(heading);
-        expect(view.$('.upgrade-subscription .subscription-info-brief'))
-            .toContainText(body);
-    };
-
-    const testSubscriptionSunsetting = (state, heading, body) => {
-        const subscriptionData = {
-            ...options.subscriptionData[0],
-            subscription_state: state,
-        };
-        // eslint-disable-next-line no-use-before-define
-        view = initView({
-            // eslint-disable-next-line no-undef
-            programData: $.extend({}, options.programData, {
-                subscription_eligible: false,
-            }),
-            isUserB2CSubscriptionsEnabled: true,
-            subscriptionData: [subscriptionData],
-        });
-        view.render();
-        expect(view.$('.upgrade-subscription')[0]).not.toBeInDOM();
-        expect(view.$('.upgrade-subscription .upgrade-button')).not
-            .toContainText(heading);
-        expect(view.$('.upgrade-subscription .subscription-info-brief')).not
-            .toContainText(body);
-    };
 
     const initView = (updates) => {
         // eslint-disable-next-line no-undef
@@ -728,39 +660,6 @@ describe('Program Details View', () => {
         expect(window.analytics.track).toHaveBeenCalledWith(
             'edx.bi.user.dashboard.program.purchase',
             properties,
-        );
-    });
-
-    it('should not render the get subscription link if program is not active', () => {
-        testSubscriptionSunsetting(
-            'pre',
-            'Start 7-day free trial',
-            '$100/month USD subscription after trial ends. Cancel anytime.',
-        );
-    });
-
-    it('should not render appropriate subscription text when subscription is active with trial', () => {
-        testSubscriptionSunsetting(
-            'active',
-            'Manage my subscription',
-            'Trial ends',
-            true,
-        );
-    });
-
-    it('should not render appropriate subscription text when subscription is active', () => {
-        testSubscriptionSunsetting(
-            'active',
-            'Manage my subscription',
-            'Your next billing date is',
-        );
-    });
-
-    it('should not render appropriate subscription text when subscription is inactive', () => {
-        testSubscriptionSunsetting(
-            'inactive',
-            'Restart my subscription',
-            '$100/month USD subscription. Cancel anytime.',
         );
     });
 });
