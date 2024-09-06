@@ -171,7 +171,7 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     and in Collections 3 and 4, this would return:
         {
             "tags": {
-                "collections": [3, 4],
+                "collections": ["Col_key1", "Col_key2"],
                 "taxonomy": ["Location", "Difficulty"],
                 "level0": ["Location > North America", "Difficulty > Hard"],
                 "level1": ["Location > North America > Canada"],
