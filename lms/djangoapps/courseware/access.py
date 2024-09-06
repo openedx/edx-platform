@@ -97,6 +97,7 @@ def has_ccx_coach_role(user, course_key):
                                             "user is a coach on CCX, you must provide key to CCX")
     return False
 
+
 def has_cms_access(user, course_key):
     """
     Check if user has access to the CMS. When requesting from the LMS, a user with the
@@ -113,8 +114,8 @@ def has_cms_access(user, course_key):
     """
     has_course_author_access = auth.has_course_author_access(user, course_key)
     is_limited_staff = auth.user_has_role(
-            user, CourseLimitedStaffRole(course_key)
-        ) and not GlobalStaff().has_user(user)
+        user, CourseLimitedStaffRole(course_key)
+    ) and not GlobalStaff().has_user(user)
 
     if is_limited_staff and has_course_author_access:
         return False
