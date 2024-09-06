@@ -119,9 +119,8 @@ def has_cms_access(user, course_key):
 
     if is_limited_staff and has_course_author_access:
         return False
-    if has_course_author_access:
-        return True
-    return False
+
+    return has_course_author_access
 
 
 @function_trace('has_access')
@@ -439,7 +438,6 @@ def _has_access_course(user, action, courselike):
         )
 
     checkers = {
-        # 'cms': lambda: auth.has_course_author_access(user, courselike.id),
         'load': can_load,
         'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, courselike),
         'enroll': can_enroll,
