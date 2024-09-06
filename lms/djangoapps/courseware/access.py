@@ -330,7 +330,6 @@ def _has_access_course(user, action, courselike):
 
     Valid actions:
 
-    'cms' -- can load and has access to cms view of course
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
     'load_mobile' -- can load from a mobile context
