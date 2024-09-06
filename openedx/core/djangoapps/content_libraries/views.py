@@ -149,6 +149,9 @@ def convert_exceptions(fn):
         except api.ContentLibraryCollectionNotFound:
             log.exception("Collection not found in content library")
             raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
+        except api.LibraryCollectionAlreadyExists as exc:
+            log.exception(str(exc))
+            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
         except api.LibraryBlockAlreadyExists as exc:
             log.exception(str(exc))
             raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from

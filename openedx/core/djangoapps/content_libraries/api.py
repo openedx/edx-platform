@@ -130,6 +130,10 @@ class LibraryAlreadyExists(KeyError):
     """ A library with the specified slug already exists """
 
 
+class LibraryCollectionAlreadyExists(IntegrityError):
+    """ A Collection with that key already exists in the library """
+
+
 class LibraryBlockAlreadyExists(KeyError):
     """ An XBlock with that ID already exists in the library """
 
@@ -1094,13 +1098,16 @@ def create_library_collection(
     assert content_library.learning_package_id
     assert content_library.library_key == library_key
 
-    collection = authoring_api.create_collection(
-        learning_package_id=content_library.learning_package_id,
-        key=collection_key,
-        title=title,
-        description=description,
-        created_by=created_by,
-    )
+    try:
+        collection = authoring_api.create_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+            created_by=created_by,
+        )
+    except IntegrityError as err:
+        raise LibraryCollectionAlreadyExists from err
 
     # Emit event for library collection created
     LIBRARY_COLLECTION_CREATED.send_event(
