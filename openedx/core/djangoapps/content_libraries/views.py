@@ -72,6 +72,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
 from django.db.transaction import atomic, non_atomic_requests
+from django.db.utils import IntegrityError
 from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -863,15 +864,16 @@ class LibraryCollectionsRootView(GenericAPIView):
 
         key = slugify(title)
 
-        # TODO verify if key is unique
-
-        result = authoring_api.create_collection(
-            learning_package_id=library.learning_package_id,
-            key=key,
-            title=title,
-            description=serializer.validated_data['description'],
-            created_by=request.user.id,
-        )
+        try:
+            result = authoring_api.create_collection(
+                learning_package_id=library.learning_package_id,
+                key=key,
+                title=title,
+                description=serializer.validated_data['description'],
+                created_by=request.user.id,
+            )
+        except IntegrityError:
+            return Response(status=status.HTTP_409_CONFLICT)
 
         return Response(LibraryCollectionMetadataSerializer(result).data)
 
