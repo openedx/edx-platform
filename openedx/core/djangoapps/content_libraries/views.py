@@ -80,6 +80,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateResponseMixin, View
+from django.utils.text import slugify
 from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
 from pylti1p3.exception import LtiException, OIDCException
 
@@ -88,6 +89,7 @@ from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
+from openedx_learning.api import authoring as authoring_api
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.generics import GenericAPIView
@@ -113,6 +115,8 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     LibraryXBlockStaticFilesSerializer,
     ContentLibraryAddPermissionByEmailSerializer,
     LibraryPasteClipboardSerializer,
+    LibraryCollectionCreationSerializer,
+    LibraryCollectionMetadataSerializer,
 )
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -152,6 +156,10 @@ def convert_exceptions(fn):
             log.exception(str(exc))
             raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
     return wrapped_fn
+
+
+# Library 1.3 Views
+# =============
 
 
 class LibraryApiPaginationDocs:
@@ -827,6 +835,45 @@ class LibraryImportTaskViewSet(GenericViewSet):
 
         import_task = api.ContentLibraryBlockImportTask.objects.get(pk=pk)
         return Response(ContentLibraryBlockImportTaskSerializer(import_task).data)
+
+
+# Library Collections Views
+# =============
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryCollectionsRootView(GenericAPIView):
+    """
+    Views to list and create library collections.
+    """
+
+    # TODO Implement list collections
+
+    def post(self, request, lib_key_str):
+        """
+        Create a new collection library.
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        serializer = LibraryCollectionCreationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        library = api.get_library(library_key)
+        title = serializer.validated_data['title']
+
+        key = slugify(title)
+
+        # TODO verify if key is unique
+
+        result = authoring_api.create_collection(
+            learning_package_id=library.learning_package_id,
+            key=key,
+            title=title,
+            description=serializer.validated_data['description'],
+            created_by=request.user.id,
+        )
+
+        return Response(LibraryCollectionMetadataSerializer(result).data)
 
 
 # LTI 1.3 Views

@@ -245,3 +245,23 @@ class ContentLibraryBlockImportTaskCreateSerializer(serializers.Serializer):
     """
 
     course_key = CourseKeyField()
+
+
+class LibraryCollectionCreationSerializer(serializers.Serializer):
+    """
+    Serializer to create a new library collection.
+    """
+
+    title = serializers.CharField()
+    description = serializers.CharField()
+
+class LibraryCollectionMetadataSerializer(serializers.Serializer):
+    """
+    Serializer for Library Collection Metadata.
+    """
+
+    id = serializers.CharField(read_only=True)
+    # Rename collection.key to "slug" because "key" is a reserved prop name in React
+    slug = serializers.CharField(read_only=True)
+    title = serializers.CharField()
+    description = serializers.CharField(allow_blank=True)

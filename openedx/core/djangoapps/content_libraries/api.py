@@ -152,6 +152,7 @@ class ContentLibraryMetadata:
     key = attr.ib(type=LibraryLocatorV2)
     title = attr.ib("")
     description = attr.ib("")
+    learning_package_id = attr.ib(default=None, type=int)
     num_blocks = attr.ib(0)
     version = attr.ib(0)
     type = attr.ib(default=COMPLEX)
@@ -392,6 +393,7 @@ def get_library(library_key):
     return ContentLibraryMetadata(
         key=library_key,
         title=learning_package.title,
+        learning_package_id = learning_package.id,
         type=ref.type,
         description=ref.learning_package.description,
         num_blocks=num_blocks,
