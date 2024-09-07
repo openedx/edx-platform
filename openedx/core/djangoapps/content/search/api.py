@@ -20,6 +20,7 @@ from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import Collection
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
@@ -298,7 +299,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
     # Get the list of collections
     status_cb("Counting collections...")
-    num_collections = authoring_api.get_collections().count()
+    collections = Collection.objects.filter(enabled=True).select_related("learning_package").order_by('pk')
+    num_collections = collections.count()
 
     # Some counters so we can track our progress as indexing progresses:
     num_contexts = num_courses + num_libraries + num_collections
@@ -459,7 +461,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             return num_contexts_done
 
         # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
-        paginator = Paginator(authoring_api.get_collections(enabled=True), 100)
+        paginator = Paginator(collections, 100)
         for p in paginator.page_range:
             num_contexts_done = index_collection_batch(paginator.page(p).object_list, num_contexts_done)
 
