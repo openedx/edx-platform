@@ -4732,7 +4732,15 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
             }, 'data_researcher')
         ]
 
-    def assert_all_end_points(self, endpoint, body, role, add_role):
+        self.fake_jwt = ('wyJUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjaGFuZ2UtbWUiLCJleHAiOjE3MjU4OTA2NzIsImdyY'
+                         'W50X3R5cGUiOiJwYXNzd29yZCIsImlhdCI6MTcyNTg4NzA3MiwiaXNzIjoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL29h'
+                         'XNlcl9pZCI6MX0'
+                         '.ec8neWp1YAuF40ye4oeK40obaapUvjfNPUQCycrsajwvcu58KcuLc96sf0JKmMMMn7DH9N98hg8W38iwbhKif1kLsCKr'
+                         'tStl1u2XGvFkyMov8TtespbHit5LYRZpJwrhC1h50ru2buYj3isWrAElGPIDyAj0FAvSJnvJhWSMDtIwB2gxZI1DqOm'
+                         'M6mzT7JbOU4QH2PNZrb2EZ11F6k9I-HrHnLQymr4s0vyjMlcBWllW3y19futNCgsFFRMXI4Z9zIbspsy5bq_Skub'
+                         'dBpnl0P9x8vUJCAbFnJABAVPtF7F7nNsROQMKsZtQxaUUwdcYZi5qKL2GcgGfO0eTL4IbJA')
+
+    def assert_all_end_points(self, endpoint, body, role, add_role, use_jwt=True):
         """
         Util method for verifying different end-points.
         """
@@ -4744,13 +4752,30 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
                 org=self.course.id.org
             )
 
+        if use_jwt:
+            headers = self.headers
+        else:
+            headers = {
+                'HTTP_AUTHORIZATION': 'JWT ' + self.fake_jwt  # this is fake jwt.
+            }
+
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
         response = self.client.post(
             url,
             data=body,
-            **self.headers
+            **headers
         )
         return response
+
+    def test_end_points_with_oauth_without_jwt(self):
+        """
+        Verify the endpoint using invalid JWT returns 401.
+        """
+        for endpoint, body, role in self.endpoints:
+            with self.subTest(endpoint=endpoint, role=role, body=body):
+                response = self.assert_all_end_points(endpoint, body, role, False, False)
+                # JWT authentication works but it has no permissions.
+                assert response.status_code == 401, f"Failed for endpoint: {endpoint}"
 
     def test_end_points_with_oauth_without_permissions(self):
         """
@@ -4758,7 +4783,7 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         """
         for endpoint, body, role in self.endpoints:
             with self.subTest(endpoint=endpoint, role=role, body=body):
-                response = self.assert_all_end_points(endpoint, body, role, False)
+                response = self.assert_all_end_points(endpoint, body, role, False, True)
                 # JWT authentication works but it has no permissions.
                 assert response.status_code == 403, f"Failed for endpoint: {endpoint}"
 
@@ -4768,5 +4793,5 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         """
         for endpoint, body, role in self.endpoints:
             with self.subTest(endpoint=endpoint, role=role, body=body):
-                response = self.assert_all_end_points(endpoint, body, role, True)
+                response = self.assert_all_end_points(endpoint, body, role, True, True)
                 assert response.status_code == 200, f"Failed for endpoint: {endpoint}"
