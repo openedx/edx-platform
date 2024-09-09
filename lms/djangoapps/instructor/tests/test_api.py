@@ -91,7 +91,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     generate_already_running_error_message
 )
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
-from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule, logger
+from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
