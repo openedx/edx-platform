@@ -47,6 +47,7 @@ from common.djangoapps.student.models import (
     UNENROLLED_TO_ALLOWEDTOENROLL,
     UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_UNENROLLED,
+    CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
@@ -62,7 +63,6 @@ from common.djangoapps.student.roles import (
 )
 from common.djangoapps.student.tests.factories import (
     BetaTesterFactory,
-    CourseAccessRoleFactory,
     CourseEnrollmentFactory,
     GlobalStaffFactory,
     InstructorFactory,
@@ -91,7 +91,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     generate_already_running_error_message
 )
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
-from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule
+from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule, logger
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -4683,6 +4683,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         )
 
 
+@patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
 class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints using Oauth2 authentication.
@@ -4697,10 +4698,8 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
 
     def setUp(self):
         super().setUp()
-        self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
-        self.other_user = UserFactory()
 
+        self.other_user = UserFactory()
         dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
         access_token = AccessTokenFactory(user=self.other_user, application=dot_application)
         oauth_adapter = DOTAdapter()
@@ -4709,52 +4708,65 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
             'scope': 'email profile',
         }
         jwt_token = jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=True)
+
         self.headers = {
             'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
         }
 
-    def assert_all_end_points(self, expected_status_code):
+        # endpoints contains all urls with body and role.
+        self.endpoints = [
+            ('list_course_role_members', {'rolename': 'staff'}, 'instructor'),
+            ('register_and_enroll_students', {}, 'staff'),
+            ('get_student_progress_url', {'course_id': str(self.course.id),
+                                          'unique_student_identifier': self.other_user.email
+                                          }, 'staff'
+             ),
+            ('list_entrance_exam_instructor_tasks', {'unique_student_identifier': self.other_user.email}, 'staff'),
+            ('list_email_content', {}, 'staff'),
+            ('show_student_extensions', {'student': self.other_user.email}, 'staff'),
+            ('list_email_content', {}, 'staff'),
+            ('list_report_downloads', {
+                "send-to": ["myself"],
+                "subject": "This is subject",
+                "message": "message"
+            }, 'data_researcher')
+        ]
+
+    def assert_all_end_points(self, endpoint, body, role, add_role):
         """
         Util method for verifying different end-points.
         """
-        endpoints = [
-            ('list_course_role_members', {'rolename': 'staff'}),
-            ('register_and_enroll_students', {}),
-            ('get_student_progress_url', {'course_id': str(self.course.id),
-                                          'unique_student_identifier': self.other_user.email
-                                          }
-             ),
-            ('list_entrance_exam_instructor_tasks', {'unique_student_identifier': self.other_user.email}),
-            ('list_email_content', {}),
-            ('show_student_extensions', {'student': self.other_user.email})
-        ]
-        for endpoint, body in endpoints:
-            url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
-            response = self.client.post(
-                url,
-                data=body,
-                **self.headers
+        if add_role:
+            role, _ = CourseAccessRole.objects.get_or_create(
+                course_id=self.course.id,
+                user=self.other_user,
+                role=role,
+                org=self.course.id.org
             )
 
-        # JWT authentication works but it has no permissions.
-        assert response.status_code == expected_status_code
+        url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(
+            url,
+            data=body,
+            **self.headers
+        )
+        return response
 
     def test_end_points_with_oauth_without_permissions(self):
         """
-        Verify the endpoint using JWT authentication.
+        Verify the endpoint using JWT authentication. But has not permissions.
         """
-        self.client.logout()
-        self.assert_all_end_points(403)
+        for endpoint, body, role in self.endpoints:
+            with self.subTest(endpoint=endpoint, role=role, body=body):
+                response = self.assert_all_end_points(endpoint, body, role, False)
+                # JWT authentication works but it has no permissions.
+                assert response.status_code == 403, f"Failed for endpoint: {endpoint}"
 
     def test_end_points_with_oauth_with_permissions(self):
         """
-        Verify the endpoint using JWT authentication.
+        Verify the endpoint using JWT authentication with permissions.
         """
-        self.client.logout()
-        CourseAccessRoleFactory(
-            course_id=self.course.id,
-            user=self.other_user,
-            role="staff",
-            org=self.course.id.org
-        )
-        self.assert_all_end_points(200)
+        for endpoint, body, role in self.endpoints:
+            with self.subTest(endpoint=endpoint, role=role, body=body):
+                response = self.assert_all_end_points(endpoint, body, role, True)
+                assert response.status_code == 200, f"Failed for endpoint: {endpoint}"
