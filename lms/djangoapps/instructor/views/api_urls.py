@@ -59,7 +59,7 @@ urlpatterns = [
     path('get_proctored_exam_results', api.get_proctored_exam_results, name='get_proctored_exam_results'),
 
     # Grade downloads...
-    path('list_report_downloads', api.list_report_downloads, name='list_report_downloads'),
+    path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
     path('calculate_grades_csv', api.calculate_grades_csv, name='calculate_grades_csv'),
     path('problem_grade_report', api.problem_grade_report, name='problem_grade_report'),
 

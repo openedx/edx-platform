@@ -2541,16 +2541,22 @@ class ReportDownloads(DeveloperErrorViewMixin, APIView):
         return _list_report_downloads(request=request, course_id=course_id)
 
 
-@require_POST
-@ensure_csrf_cookie
-def list_report_downloads(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListReportDownloads(APIView):
+
     """
     List grade CSV files that are available for download for this course.
 
     Takes the following query parameters:
     - (optional) report_name - name of the report
     """
-    return _list_report_downloads(request=request, course_id=course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+
+        return _list_report_downloads(request=request, course_id=course_id)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
