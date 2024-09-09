@@ -4779,7 +4779,7 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
 
     def test_end_points_with_oauth_without_permissions(self):
         """
-        Verify the endpoint using JWT authentication. But has not permissions.
+        Verify the endpoint using JWT authentication. But has no permissions.
         """
         for endpoint, body, role in self.endpoints:
             with self.subTest(endpoint=endpoint, role=role, body=body):
