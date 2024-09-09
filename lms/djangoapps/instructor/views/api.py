@@ -107,7 +107,8 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, Queue
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
-    AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer
+    AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer,
+    UserSerializer, SendEmailSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2769,81 +2770,96 @@ def list_forum_members(request, course_id):
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EMAIL)
-@require_post_params(send_to="sending to whom", subject="subject line", message="message text")
-@common_exceptions_400
-def send_email(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class SendEmail(DeveloperErrorViewMixin, APIView):
     """
     Send an email to self, staff, cohorts, or everyone involved in a course.
-    Query Parameters:
-    - 'send_to' specifies what group the email should be sent to
-       Options are defined by the CourseEmail model in
-       lms/djangoapps/bulk_email/models.py
-    - 'subject' specifies email's subject
-    - 'message' specifies email's content
     """
-    course_id = CourseKey.from_string(course_id)
-    course_overview = CourseOverview.get_from_id(course_id)
+    http_method_names = ['post']
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EMAIL
+    serializer_class = SendEmailSerializer
 
-    if not is_bulk_email_feature_enabled(course_id):
-        log.warning(f"Email is not enabled for course {course_id}")
-        return HttpResponseForbidden("Email is not enabled for this course.")
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Query Parameters:
+        - 'send_to' specifies what group the email should be sent to
+           Options are defined by the CourseEmail model in
+           lms/djangoapps/bulk_email/models.py
+        - 'subject' specifies email's subject
+        - 'message' specifies email's content
+        """
+        course_id = CourseKey.from_string(course_id)
+        course_overview = CourseOverview.get_from_id(course_id)
 
-    targets = json.loads(request.POST.get("send_to"))
-    subject = request.POST.get("subject")
-    message = request.POST.get("message")
-    # optional, this is a date and time in the form of an ISO8601 string
-    schedule = request.POST.get("schedule", "")
+        if not is_bulk_email_feature_enabled(course_id):
+            log.warning(f"Email is not enabled for course {course_id}")
+            return HttpResponseForbidden("Email is not enabled for this course.")
 
-    schedule_dt = None
-    if schedule:
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        # Skipping serializer validation to avoid potential disruptions.
+        # The API handles numerous input variations, and changes here could introduce breaking issues.
+
+        targets = json.loads(request.POST.get("send_to"))
+
+        subject = serializer_data.validated_data.get("subject")
+        message = serializer_data.validated_data.get("message")
+        # optional, this is a date and time in the form of an ISO8601 string
+        schedule = serializer_data.validated_data.get("schedule", "")
+
+        schedule_dt = None
+        if schedule:
+            try:
+                # convert the schedule from a string to a datetime, then check if its a
+                # valid future date and time, dateutil
+                # will throw a ValueError if the schedule is no good.
+                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
+                if schedule_dt < datetime.datetime.now(pytz.utc):
+                    raise ValueError("the requested schedule is in the past")
+            except ValueError as value_error:
+                error_message = (
+                    f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
+                    f"{value_error}"
+                )
+                log.error(error_message)
+                return HttpResponseBadRequest(error_message)
+
+        # Retrieve the customized email "from address" and email template from site configuration for the c
+        # ourse/partner.
+        # If there is no site configuration enabled for the current site then we use system defaults for both.
+        from_addr = _get_branded_email_from_address(course_overview)
+        template_name = _get_branded_email_template(course_overview)
+
+        # Create the CourseEmail object. This is saved immediately so that any transaction that has been
+        # pending up to this point will also be committed.
         try:
-            # convert the schedule from a string to a datetime, then check if its a valid future date and time, dateutil
-            # will throw a ValueError if the schedule is no good.
-            schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
-            if schedule_dt < datetime.datetime.now(pytz.utc):
-                raise ValueError("the requested schedule is in the past")
-        except ValueError as value_error:
-            error_message = (
-                f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
-                f"{value_error}"
+            email = create_course_email(
+                course_id,
+                request.user,
+                targets,
+                subject,
+                message,
+                template_name=template_name,
+                from_addr=from_addr,
             )
-            log.error(error_message)
-            return HttpResponseBadRequest(error_message)
+        except ValueError as err:
+            return HttpResponseBadRequest(repr(err))
 
-    # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
-    # there is no site configuration enabled for the current site then we use system defaults for both.
-    from_addr = _get_branded_email_from_address(course_overview)
-    template_name = _get_branded_email_template(course_overview)
+        # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+        task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt)
 
-    # Create the CourseEmail object. This is saved immediately so that any transaction that has been pending up to this
-    # point will also be committed.
-    try:
-        email = create_course_email(
-            course_id,
-            request.user,
-            targets,
-            subject,
-            message,
-            template_name=template_name,
-            from_addr=from_addr,
-        )
-    except ValueError as err:
-        return HttpResponseBadRequest(repr(err))
+        response_payload = {
+            'course_id': str(course_id),
+            'success': True,
+        }
 
-    # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt)
-
-    response_payload = {
-        'course_id': str(course_id),
-        'success': True,
-    }
-
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @require_POST
