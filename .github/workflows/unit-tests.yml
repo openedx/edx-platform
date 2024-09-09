@@ -15,7 +15,7 @@ concurrency:
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version:
@@ -142,7 +142,7 @@ jobs:
           overwrite: true
 
   collect-and-verify:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -207,7 +207,7 @@ jobs:
   # https://github.com/orgs/community/discussions/33579
   success:
     name: Unit tests successful
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: always()
     needs: [run-tests]
     steps:
@@ -218,7 +218,7 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
   compile-warnings-report:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [run-tests]
     steps:
       - uses: actions/checkout@v4
@@ -246,7 +246,7 @@ jobs:
           overwrite: true
 
   merge-artifacts:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [compile-warnings-report]
     steps:
       - name: Merge Pytest Warnings JSON Artifacts
@@ -266,7 +266,7 @@ jobs:
   # Combine and upload coverage reports.
   coverage:
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [run-tests]
     strategy:
       matrix:
