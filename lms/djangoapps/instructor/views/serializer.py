@@ -77,3 +77,24 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class SendEmailSerializer(serializers.Serializer):
+    """
+    Serializer for sending an email with optional scheduling.
+
+    Fields:
+        send_to (str): The email address of the recipient. This field is required.
+        subject (str): The subject line of the email. This field is required.
+        message (str): The body of the email. This field is required.
+        schedule (str, optional):
+        An optional field to specify when the email should be sent.
+        If provided, this should be a string that can be parsed into a
+        datetime format or some other scheduling logic.
+    """
+    send_to = serializers.CharField(write_only=True, required=True)
+
+    # set max length as per model field.
+    subject = serializers.CharField(max_length=128, write_only=True, required=True)
+    message = serializers.CharField(required=True)
+    schedule = serializers.CharField(required=False)

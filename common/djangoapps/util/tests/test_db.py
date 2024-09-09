@@ -1,6 +1,5 @@
 """Tests for util.db module."""
 
-import unittest
 from io import StringIO
 
 import ddt
@@ -121,9 +120,6 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip(
-        "Temporary skip for ENT-8972 while the char field decrypted client secret columns in SAP is removed."
-    )
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
