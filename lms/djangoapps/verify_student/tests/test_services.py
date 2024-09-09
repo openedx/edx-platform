@@ -58,7 +58,10 @@ class TestIDVerificationService(ModuleStoreTestCase):
             assert not IDVerificationService.user_is_verified(user), status
 
         attempt.status = "approved"
-        attempt.expiration_date = now() + timedelta(days=19)
+        if verification_model == VerificationAttempt:
+            attempt.expiration_datetime = now() + timedelta(days=19)
+        else:
+            attempt.expiration_date = now() + timedelta(days=19)
         attempt.save()
 
         assert IDVerificationService.user_is_verified(user), attempt.status
@@ -84,7 +87,10 @@ class TestIDVerificationService(ModuleStoreTestCase):
         # -- must_retry, and submitted both count until we hear otherwise
         for status in ["submitted", "must_retry", "approved"]:
             attempt.status = status
-            attempt.expiration_date = now() + timedelta(days=19)
+            if verification_model == VerificationAttempt:
+                attempt.expiration_datetime = now() + timedelta(days=19)
+            else:
+                attempt.expiration_date = now() + timedelta(days=19)
             attempt.save()
             assert IDVerificationService.user_has_valid_or_pending(user), status
 
@@ -188,7 +194,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
             user=user, status='approved', expiration_date=datetime(2021, 11, 12, 0, 0, tzinfo=timezone.utc)
         )
         newest = VerificationAttempt.objects.create(
-            user=user, status='approved', expiration_date=datetime(2022, 1, 12, 0, 0, tzinfo=timezone.utc)
+            user=user, status='approved', expiration_datetime=datetime(2022, 1, 12, 0, 0, tzinfo=timezone.utc)
         )
 
         expiration_datetime = IDVerificationService.get_expiration_datetime(user, ['approved'])

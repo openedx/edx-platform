@@ -251,11 +251,18 @@ class IDVerificationService:
         """
         Returns a verification attempt object by attempt_id
         If the verification object cannot be found, returns None
+
+        This method does not take into account verifications stored in the
+        VerificationAttempt model used for pluggable IDV implementations.
+
+        As part of the work to implement pluggable IDV, this method's use
+        will be deprecated: DEPR-XXX
         """
         verification = None
 
-        # TODO: Not updated for new model since we can't query multiple tables
-        # by id.
+        # This does not look at the VerificationAttempt model since the provided id would become
+        # ambiguous between tables. The verification models in this list all inherit from the same
+        # base class and share the same id space.
         verification_models = [
             SoftwareSecurePhotoVerification,
             SSOVerification,
