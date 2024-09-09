@@ -15,6 +15,7 @@ from django.test import TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
 from testfixtures import LogCapture
@@ -49,6 +50,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
 from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
+from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_COUNTRY_DISABLING
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
@@ -65,6 +67,7 @@ from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions
 )
+
 ENABLE_AUTO_GENERATED_USERNAME = settings.FEATURES.copy()
 ENABLE_AUTO_GENERATED_USERNAME['ENABLE_AUTO_GENERATED_USERNAME'] = True
 
@@ -1556,7 +1559,7 @@ class RegistrationViewTestV1(
         assert len(mail.outbox) == 1
         sent_email = mail.outbox[0]
         assert sent_email.to == [self.EMAIL]
-        assert sent_email.subject ==\
+        assert sent_email.subject == \
                f'Action Required: Activate your {settings.PLATFORM_NAME} account'
         assert f'high-quality {settings.PLATFORM_NAME} courses' in sent_email.body
 
@@ -2468,6 +2471,32 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             })
         assert response.status_code == 400
 
+    @override_waffle_switch(ENABLE_COUNTRY_DISABLING, True)
+    @override_settings(DISABLED_COUNTRIES=['KP'])
+    def test_register_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is disabled for a country
+        """
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+            "country": "KP",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {'country':
+                [
+                    {
+                        'user_message': 'Registration from this country is not allowed due to restrictions.'
+                    }
+                ], 'error_code': 'validation-error'}
+        )
+
 
 @httpretty.activate
 @ddt.ddt
@@ -2574,6 +2603,25 @@ class ThirdPartyRegistrationTestMixin(
         assert response.status_code == 200
 
         self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
+
+    @override_waffle_switch(ENABLE_COUNTRY_DISABLING, True)
+    @override_settings(DISABLED_COUNTRIES=['US'])
+    def test_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is disabled for a country
+        """
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+        self._setup_provider_response(success=True)
+        response = self.client.post(self.url, self.data())
+        assert response.status_code == 400
+        assert response.json() == {
+            'country': [
+                {
+                    'user_message': 'Registration from this country is not allowed due to restrictions.'
+                }
+            ], 'error_code': 'validation-error'
+        }
+        self._verify_user_existence(user_exists=False, social_link_exists=False, user_is_active=False)
 
     def test_unlinked_active_user(self):
         user = UserFactory()

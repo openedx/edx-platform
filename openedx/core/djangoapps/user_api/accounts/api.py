@@ -3,7 +3,6 @@
 Programmatic integration point for User API Accounts sub-application
 """
 
-
 import datetime
 import re
 
@@ -41,6 +40,7 @@ from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
+from ...user_authn.config.waffle import ENABLE_COUNTRY_DISABLING
 
 name_affirmation_installed = is_name_affirmation_installed()
 if name_affirmation_installed:
@@ -152,6 +152,15 @@ def update_account_settings(requesting_user, update, username=None):
 
     _validate_email_change(user, update, field_errors)
     _validate_secondary_email(user, update, field_errors)
+    if (
+        ENABLE_COUNTRY_DISABLING.is_enabled()
+        and update['country'] in settings.DISABLED_COUNTRIES
+    ):
+        field_errors['country'] = {
+            'developer_message': 'Country is disabled for registration',
+            'user_message': 'This country cannot be selected for user registration'
+        }
+
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
 
