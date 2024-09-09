@@ -7,7 +7,7 @@ from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-from .notification_content import get_notification_type_content_function
+from .notification_content import get_notification_type_context_function
 
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
 
@@ -479,44 +479,91 @@ class NotificationAppManager:
         return course_notification_preference_config
 
 
-def get_grouped_template_context(template, context):
+def get_grouped_template_context(context):
     """
-    Returns grouped template context for the given template
+    Generates a grouped template context if 'grouped' is True in the context.
+
+    Args:
+        context (dict): A dictionary containing template data, including 'grouped',
+                        'user_key', 'group_key', and 'grouped_count'.
+
+    Returns:
+        dict: Formatted template with the grouped context or an empty string if 'grouped' is False.
     """
-    if not context.get('grouped', False):
-        return ''
-    user_key = context.get('user_key')
-    group_key = context.get('group_key')
-    user_list = context[group_key]
-    grouped_count = context['grouped_count']
-    text = " and ".join(user_list) if grouped_count == 2 else f"{user_list[0]} and {grouped_count - 1} others"
+    # Ensure 'grouped' is in context and True, otherwise return an empty string
+    if not context.get('grouped'):
+        return context
+
+    # Retrieve keys from the context with error handling for missing keys
+    user_key = context['user_key']
+    group_key = context['group_key']
+    user_list = context.get(group_key, [])
+    grouped_count = context.get('grouped_count', 0)
+
+    # Validate that user_list and grouped_count are consistent
+    if not user_list or grouped_count <= 0:
+        raise ValueError("Invalid 'grouped_count' or empty 'user_list'.")
+
+    # Format the user display text based on the number of users in the group
+    if grouped_count == 2:
+        text = " and ".join(user_list)
+    else:
+        text = f"{user_list[0]} and {grouped_count - 1} others"
+
+    # Update the context with the new user text
     new_context = context.copy()
-    new_context.update({user_key: text})
-    return template.format(**new_context)
+    new_context[user_key] = text
+
+    # Format and return the template with the new context
+    return new_context
 
 
 def get_notification_content(notification_type, context):
     """
     Returns notification content for the given notification type with provided context.
+
+    Args:
+    notification_type (str): The type of notification (e.g., 'course_update').
+    context (dict): The context data to be used in the notification template.
+
+    Returns:
+    str: Rendered notification content based on the template and context.
     """
     context.update({
         'strong': 'strong',
         'p': 'p',
     })
-    content_function = get_notification_type_content_function(notification_type)
+
+    # Retrieve the function associated with the notification type.
+    context_function = get_notification_type_context_function(notification_type)
+
+    # Fix a specific case where 'course_update' needs to be renamed to 'course_updates'.
     if notification_type == 'course_update':
         notification_type = 'course_updates'
+
+    # Retrieve the notification type object from NotificationTypeManager.
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
+
     if notification_type:
+        # Check if the notification is grouped.
         is_grouped = context.get('grouped', False)
-        key = "grouped_content_template" if is_grouped else "content_template"
-        notification_type_content_template = notification_type.get(key, None)
-        if notification_type_content_template:
+
+        # Determine the correct template key based on whether it's grouped or not.
+        template_key = "grouped_content_template" if is_grouped else "content_template"
+
+        # Get the corresponding template from the notification type.
+        template = notification_type.get(template_key, None)
+
+        # Apply the context function to transform or modify the context.
+        context = context_function(context)
+
+        if template:
+            # Handle grouped templates differently by modifying the context using a different function.
             if is_grouped:
-                return get_grouped_template_context(notification_type_content_template, context)
-            return notification_type_content_template.format(**context)
-        if content_function:
-            return content_function(notification_type, context)
+                context = get_grouped_template_context(context)
+
+            return template.format(**context)
+
     return ''
 
 
