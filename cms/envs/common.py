@@ -949,7 +949,6 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
-    'openedx.core.djangoapps.contentserver.middleware.StaticContentServerMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'common.djangoapps.track.middleware.TrackMiddleware',
@@ -1449,9 +1448,8 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/string-utils.js',
     'edx-ui-toolkit/js/utils/html-utils.js',
 
-    # Load Bootstrap and supporting libraries
-    'common/js/vendor/popper.js',
-    'common/js/vendor/bootstrap.js',
+    # Here we were loading Bootstrap and supporting libraries, but it no longer seems to be needed for any Studio UI.
+    # 'common/js/vendor/bootstrap.bundle.js',
 
     # Finally load RequireJS
     'common/js/vendor/require.js'

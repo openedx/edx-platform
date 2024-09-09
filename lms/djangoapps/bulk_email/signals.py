@@ -41,11 +41,18 @@ def ace_email_sent_handler(sender, **kwargs):
     except user_model.DoesNotExist:
         user_id = None
     course_email = message.context.get('course_email', None)
-    course_id = course_email.course_id if course_email else None
+    course_id = message.context.get('course_id')
+    if not course_id:
+        course_id = course_email.course_id if course_email else None
+    try:
+        channel = sender.__class__.__name__
+    except AttributeError:
+        channel = 'Other'
     tracker.emit(
-        'edx.bulk_email.sent',
+        'edx.ace.message_sent',
         {
             'message_type': message.name,
+            'channel': channel,
             'course_id': course_id,
             'user_id': user_id,
         }
