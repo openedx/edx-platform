@@ -98,6 +98,8 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
+from openedx_events.content_authoring.data import LibraryCollectionData
+from openedx_events.content_authoring.signals import LIBRARY_COLLECTION_CREATED
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
@@ -881,6 +883,13 @@ class LibraryCollectionsRootView(GenericAPIView):
                 )
             except IntegrityError:
                 attempt += 1
+
+        LIBRARY_COLLECTION_CREATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=result.id,
+            )
+        )
 
         return Response(LibraryCollectionMetadataSerializer(result).data)
 
