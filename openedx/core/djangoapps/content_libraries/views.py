@@ -864,16 +864,23 @@ class LibraryCollectionsRootView(GenericAPIView):
 
         key = slugify(title)
 
-        try:
-            result = authoring_api.create_collection(
-                learning_package_id=library.learning_package_id,
-                key=key,
-                title=title,
-                description=serializer.validated_data['description'],
-                created_by=request.user.id,
-            )
-        except IntegrityError:
-            return Response(status=status.HTTP_409_CONFLICT)
+        attempt = 0
+        result = None
+
+        # It's possible that the key is not unique in the database
+        # So to avoid that, we add a correlative number in the key
+        while not result:
+            modified_key = key if attempt == 0 else key + str(attempt)
+            try:
+                result = authoring_api.create_collection(
+                    learning_package_id=library.learning_package_id,
+                    key=modified_key,
+                    title=title,
+                    description=serializer.validated_data['description'],
+                    created_by=request.user.id,
+                )
+            except IntegrityError:
+                attempt += 1
 
         return Response(LibraryCollectionMetadataSerializer(result).data)
 
