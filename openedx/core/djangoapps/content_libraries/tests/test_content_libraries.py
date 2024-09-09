@@ -24,6 +24,7 @@ from openedx_events.content_authoring.signals import (
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx.core.djangoapps.content_libraries.tests.base import (
     ContentLibrariesRestApiTest,
+    URL_LIB_DETAIL,
     URL_BLOCK_METADATA_URL,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
@@ -1063,3 +1064,27 @@ class ContentLibraryXBlockValidationTest(APITestCase):
         self.assertEqual(response.json(), {
             'detail': f"XBlock {valid_not_found_key} does not exist, or you don't have permission to view it.",
         })
+
+
+class LibraryCollectionsTestCase(ContentLibrariesRestApiTest):
+
+    def test_create_collection(self):
+        """
+        Test collection creation
+
+        Tests with some non-ASCII chars in title, description.
+        """
+        url = URL_LIB_DETAIL + 'collections/'
+        lib = self._create_library(
+            slug="téstlꜟط", title="A Tést Lꜟطrary", description="Just Téstꜟng", license_type=CC_4_BY,
+        )
+        collection = self._api("post", url.format(lib_key=lib["id"]), {
+            'title': 'A Tést Lꜟطrary Collection',
+            'description': 'Just Téstꜟng',
+        }, 200)
+        expected_data = {
+            'id': '1',
+            'title': 'A Tést Lꜟطrary Collection',
+            'description': 'Just Téstꜟng'
+        }
+        self.assertDictContainsEntries(collection, expected_data)
