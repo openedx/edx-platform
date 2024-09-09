@@ -4,7 +4,6 @@ Tests for StaticContentServer
 
 
 import copy
-
 import datetime
 import logging
 import unittest
@@ -17,18 +16,18 @@ from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
 from opaque_keys import InvalidKeyError
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.contentstore.content import VERSIONED_ASSETS_PREFIX, StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
+from ..views import HTTP_DATE_FORMAT, StaticContentServer, parse_range_header
 
 log = logging.getLogger(__name__)
 
