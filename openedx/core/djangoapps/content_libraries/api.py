@@ -393,7 +393,7 @@ def get_library(library_key):
     return ContentLibraryMetadata(
         key=library_key,
         title=learning_package.title,
-        learning_package_id = learning_package.id,
+        learning_package_id=learning_package.id,
         type=ref.type,
         description=ref.learning_package.description,
         num_blocks=num_blocks,

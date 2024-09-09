@@ -19,7 +19,6 @@ from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
-from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request

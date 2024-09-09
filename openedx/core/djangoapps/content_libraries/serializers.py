@@ -255,11 +255,13 @@ class LibraryCollectionCreationSerializer(serializers.Serializer):
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
 
+
 class LibraryCollectionMetadataSerializer(serializers.Serializer):
     """
     Serializer for Library Collection Metadata.
     """
 
+    # TODO Set this "id" with the LibraryCollectionKey
     id = serializers.CharField(read_only=True)
     # Rename collection.key to "slug" because "key" is a reserved prop name in React
     slug = serializers.CharField(read_only=True)
