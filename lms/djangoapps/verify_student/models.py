@@ -1203,10 +1203,10 @@ class VerificationAttempt(TimeStampedModel):
     name = models.CharField(blank=True, max_length=255)
 
     STATUS_CHOICES = [
-        VerificationAttemptStatus.created,
-        VerificationAttemptStatus.pending,
-        VerificationAttemptStatus.approved,
-        VerificationAttemptStatus.denied,
+        VerificationAttemptStatus.CREATED,
+        VerificationAttemptStatus.PENDING,
+        VerificationAttemptStatus.APPROVED,
+        VerificationAttemptStatus.DENIED,
     ]
     status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
 
