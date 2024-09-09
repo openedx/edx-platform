@@ -1084,7 +1084,35 @@ class LibraryCollectionsTestCase(ContentLibrariesRestApiTest):
         }, 200)
         expected_data = {
             'id': '1',
+            'slug': 'a-test-lrary-collection',
             'title': 'A Tést Lꜟطrary Collection',
             'description': 'Just Téstꜟng'
         }
         self.assertDictContainsEntries(collection, expected_data)
+
+    def test_create_collection_same_key(self):
+        """
+        Test collection creation with same key
+        """
+        url = URL_LIB_DETAIL + 'collections/'
+        lib = self._create_library(
+            slug="téstlꜟط", title="A Tést Lꜟطrary", description="Just Téstꜟng", license_type=CC_4_BY,
+        )
+
+        self._api("post", url.format(lib_key=lib["id"]), {
+            'title': 'Test Collection',
+            'description': 'Just a Test',
+        }, 200)
+
+        for i in range(0, 100):
+            collection = self._api("post", url.format(lib_key=lib["id"]), {
+                'title': 'Test Collection',
+                'description': 'Just a Test',
+            }, 200)
+            expected_data = {
+                'id': collection['id'],
+                'slug': f'test-collection-{i + 1}',
+                'title': 'Test Collection',
+                'description': 'Just a Test'
+            }
+            self.assertDictContainsEntries(collection, expected_data)

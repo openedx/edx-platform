@@ -870,7 +870,7 @@ class LibraryCollectionsRootView(GenericAPIView):
         # It's possible that the key is not unique in the database
         # So to avoid that, we add a correlative number in the key
         while not result:
-            modified_key = key if attempt == 0 else key + str(attempt)
+            modified_key = key if attempt == 0 else key + '-' + str(attempt)
             try:
                 result = authoring_api.create_collection(
                     learning_package_id=library.learning_package_id,
