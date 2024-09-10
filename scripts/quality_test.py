@@ -193,7 +193,7 @@ def run_eslint():
     if result.returncode != 0:
         print(f"ESLint command failed with return code {result.returncode}")
         # You may want to handle or raise an error here depending on your needs
-    
+
     try:
         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
     except TypeError:
