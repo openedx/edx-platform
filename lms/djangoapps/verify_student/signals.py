@@ -10,9 +10,9 @@ from django.dispatch.dispatcher import receiver
 from xmodule.modulestore.django import SignalHandler, modulestore
 
 from common.djangoapps.student.models_api import get_name, get_pending_name_change
-from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL
+from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC
 
-from .models import SoftwareSecurePhotoVerification, VerificationDeadline
+from .models import SoftwareSecurePhotoVerification, VerificationDeadline, VerificationAttempt
 
 log = logging.getLogger(__name__)
 
@@ -75,3 +75,9 @@ def send_idv_update(sender, instance, **kwargs):  # pylint: disable=unused-argum
         photo_id_name=instance.name,
         full_name=full_name
     )
+
+
+@receiver(USER_RETIRE_LMS_MISC)
+def _listen_for_lms_retire_verification_attempts(sender, **kwargs):  # pylint: disable=unused-argument
+    user = kwargs.get('user')
+    VerificationAttempt.retire_user(user.id)
