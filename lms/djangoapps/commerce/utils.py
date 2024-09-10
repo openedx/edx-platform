@@ -160,7 +160,7 @@ class EcommerceService:
         verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
             if self.is_enabled(user):
-                return self.get_checkout_page_url(verified_mode.sku, course_run_keys=course_run_key)
+                return self.get_checkout_page_url(verified_mode.sku, course_run_keys=[course_run_key])
             else:
                 return reverse('dashboard')
         return None
