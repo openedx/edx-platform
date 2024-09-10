@@ -3515,6 +3515,14 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         self.client.logout()
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, self.full_test_message)
+        assert response.status_code == 401
+
+    def test_send_email_logged_in_but_no_perms(self):
+        self.client.logout()
+        user = UserFactory()
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, self.full_test_message)
         assert response.status_code == 403
 
     def test_send_email_but_not_staff(self):
@@ -3635,6 +3643,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         with LogCapture() as log:
+
             response = self.client.post(url, self.full_test_message)
 
         assert response.status_code == 400

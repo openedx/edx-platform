@@ -31,10 +31,10 @@ urlpatterns = [
     re_path(r'^get_students_features(?P<csv>/csv)?$', api.get_students_features, name='get_students_features'),
     path('get_issued_certificates/', api.get_issued_certificates, name='get_issued_certificates'),
     path('get_students_who_may_enroll', api.GetStudentsWhoMayEnroll.as_view(), name='get_students_who_may_enroll'),
-    path('get_anon_ids', api.get_anon_ids, name='get_anon_ids'),
+    path('get_anon_ids', api.GetAnonIds.as_view(), name='get_anon_ids'),
     path('get_student_enrollment_status', api.get_student_enrollment_status, name="get_student_enrollment_status"),
     path('get_student_progress_url', api.StudentProgressUrl.as_view(), name='get_student_progress_url'),
-    path('reset_student_attempts', api.reset_student_attempts, name='reset_student_attempts'),
+    path('reset_student_attempts', api.ResetStudentAttempts.as_view(), name='reset_student_attempts'),
     path('rescore_problem', api.rescore_problem, name='rescore_problem'),
     path('override_problem_score', api.override_problem_score, name='override_problem_score'),
     path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
@@ -48,9 +48,9 @@ urlpatterns = [
     path('list_background_email_tasks', api.list_background_email_tasks, name='list_background_email_tasks'),
     path('list_email_content', api.ListEmailContent.as_view(), name='list_email_content'),
     path('list_forum_members', api.list_forum_members, name='list_forum_members'),
-    path('update_forum_role_membership', api.update_forum_role_membership, name='update_forum_role_membership'),
-    path('send_email', api.send_email, name='send_email'),
+    path('update_forum_role_membership', api.update_forum_role_membership, name='update_forum_role_membership'),,
     path('change_due_date', api.ChangeDueDate.as_view(), name='change_due_date'),
+    path('send_email', api.SendEmail.as_view(), name='send_email'),
     path('reset_due_date', api.reset_due_date, name='reset_due_date'),
     path('show_unit_extensions', api.show_unit_extensions, name='show_unit_extensions'),
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
@@ -59,7 +59,7 @@ urlpatterns = [
     path('get_proctored_exam_results', api.get_proctored_exam_results, name='get_proctored_exam_results'),
 
     # Grade downloads...
-    path('list_report_downloads', api.list_report_downloads, name='list_report_downloads'),
+    path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
     path('calculate_grades_csv', api.calculate_grades_csv, name='calculate_grades_csv'),
     path('problem_grade_report', api.problem_grade_report, name='problem_grade_report'),
 
