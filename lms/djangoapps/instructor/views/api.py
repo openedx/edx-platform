@@ -1717,7 +1717,6 @@ class GetStudentEnrollmentStatus(APIView):
         Takes query parameter unique_student_identifier
         """
         error = ''
-        user = None
         mode = None
         is_active = None
 
@@ -1729,9 +1728,8 @@ class GetStudentEnrollmentStatus(APIView):
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
         user = serializer_data.validated_data.get('unique_student_identifier')
-        mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-
-        enrollment_status = _('Enrollment status for {student}: unknown').format(student=unique_student_identifier)
+        if user:
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
 
         if user and mode:
             if is_active:
