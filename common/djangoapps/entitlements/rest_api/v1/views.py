@@ -15,7 +15,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import (  # lint-amnesty, pylint: disable=line-too-long
@@ -24,22 +23,13 @@ from common.djangoapps.entitlements.models import (  # lint-amnesty, pylint: dis
     CourseEntitlementSupportDetail
 )
 from common.djangoapps.entitlements.rest_api.v1.filters import CourseEntitlementFilter
-from common.djangoapps.entitlements.rest_api.v1.permissions import (
-    IsAdminOrSupportOrAuthenticatedReadOnly,
-    IsSubscriptionWorkerUser
-)
+from common.djangoapps.entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
-from common.djangoapps.entitlements.rest_api.v1.throttles import ServiceUserThrottle
-from common.djangoapps.entitlements.tasks import retry_revoke_subscriptions_verified_access
-from common.djangoapps.entitlements.utils import (
-    is_course_run_entitlement_fulfillable,
-    revoke_entitlements_and_downgrade_courses_to_audit
-)
+from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.core.djangoapps.credentials.utils import get_courses_completion_status
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
 User = get_user_model()
@@ -132,7 +122,6 @@ class EntitlementViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = CourseEntitlementFilter
     pagination_class = EntitlementsPagination
-    throttle_classes = (ServiceUserThrottle,)
 
     def get_queryset(self):
         user = self.request.user
@@ -530,68 +519,3 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 })
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class SubscriptionsRevokeVerifiedAccessView(APIView):
-    """
-    Endpoint for expiring entitlements for a user and downgrading the enrollments
-    to Audit mode. This endpoint accepts a list of entitlement UUIDs and will expire
-    the entitlements along with downgrading the related enrollments to Audit mode.
-    Only those enrollments are downgraded to Audit for which user has not been awarded
-    a completion certificate yet.
-    """
-    authentication_classes = (JwtAuthentication, SessionAuthenticationCrossDomainCsrf,)
-    permission_classes = (permissions.IsAuthenticated, IsSubscriptionWorkerUser,)
-    throttle_classes = (ServiceUserThrottle,)
-
-    def _process_revoke_and_downgrade_to_audit(self, course_entitlements, user_id, revocable_entitlement_uuids):
-        """
-        Gets course completion status for the provided course entitlements and triggers the
-        revoke and downgrade to audit process for the course entitlements which are not completed.
-        Triggers the retry task asynchronously if there is an exception while getting the
-        course completion status.
-        """
-        entitled_course_ids = []
-        user = User.objects.get(id=user_id)
-        username = user.username
-        for course_entitlement in course_entitlements:
-            if course_entitlement.enrollment_course_run is not None:
-                entitled_course_ids.append(str(course_entitlement.enrollment_course_run.course_id))
-
-        log.info('B2C_SUBSCRIPTIONS: Getting course completion status for user [%s] and entitled_course_ids %s',
-                 username,
-                 entitled_course_ids)
-        awarded_cert_course_ids, is_exception = get_courses_completion_status(username, entitled_course_ids)
-
-        if is_exception:
-            # Trigger the retry task asynchronously
-            log.exception('B2C_SUBSCRIPTIONS: Exception occurred while getting course completion status for user %s '
-                          'and entitled_course_ids %s',
-                          username,
-                          entitled_course_ids)
-            retry_revoke_subscriptions_verified_access.apply_async(args=(revocable_entitlement_uuids,
-                                                                         entitled_course_ids,
-                                                                         username))
-            return
-        revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, username, awarded_cert_course_ids,
-                                                           revocable_entitlement_uuids)
-
-    def post(self, request):
-        """
-        Invokes the entitlements expiration process for the provided uuids and downgrades the
-        enrollments to Audit mode.
-        """
-        revocable_entitlement_uuids = request.data.get('entitlement_uuids', [])
-        user_id = request.data.get('lms_user_id', None)
-        course_entitlements = (CourseEntitlement.objects.filter(uuid__in=revocable_entitlement_uuids).
-                               select_related('user').
-                               select_related('enrollment_course_run'))
-
-        if course_entitlements.exists():
-            self._process_revoke_and_downgrade_to_audit(course_entitlements, user_id, revocable_entitlement_uuids)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            log.info('B2C_SUBSCRIPTIONS: Entitlements not found for the provided entitlements data: %s and user: %s',
-                     revocable_entitlement_uuids,
-                     user_id)
-            return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1674,18 +1674,31 @@ def get_proctored_exam_results(request, course_id):
     return JsonResponse({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_anon_ids(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetAnonIds(APIView):
     """
-    Respond with 2-column CSV output of user-id, anonymized-user-id
+    Respond with 2-column CSV output of user-id, anonymized-user-id.
+    This API processes the incoming request to generate a CSV file containing
+    two columns: `user-id` and `anonymized-user-id`. The CSV is returned as a
+    response to the client.
     """
-    report_type = _('Anonymized User IDs')
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-    task_api.generate_anonymous_ids(request, course_id)
-    return JsonResponse({"status": success_status})
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Handle POST request to generate a CSV output.
+
+        Returns:
+            Response: A CSV file with two columns: `user-id` and `anonymized-user-id`.
+        """
+        report_type = _('Anonymized User IDs')
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        task_api.generate_anonymous_ids(request, course_id)
+        return JsonResponse({"status": success_status})
 
 
 @require_POST

@@ -198,7 +198,7 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         Test creating an invalid Content Library Collection
         """
         post_data_missing_title = {
-            "description": "Description for Collection 4",
+            "key": "COL_KEY",
         }
         resp = self.client.post(
             URL_LIB_COLLECTIONS.format(lib_key=self.lib1.library_key), post_data_missing_title, format="json"
@@ -206,19 +206,31 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
 
         assert resp.status_code == 400
 
-        post_data_missing_desc = {
+        post_data_missing_key = {
             "title": "Collection 4",
         }
         resp = self.client.post(
-            URL_LIB_COLLECTIONS.format(lib_key=self.lib1.library_key), post_data_missing_desc, format="json"
+            URL_LIB_COLLECTIONS.format(lib_key=self.lib1.library_key), post_data_missing_key, format="json"
         )
 
+        assert resp.status_code == 400
+
+        # Create collection with an existing collection.key; it should fail
+        post_data_existing_key = {
+            "key": self.col1.key,
+            "title": "Collection 4",
+        }
+        resp = self.client.post(
+            URL_LIB_COLLECTIONS.format(lib_key=self.lib1.library_key),
+            post_data_existing_key,
+            format="json"
+        )
         assert resp.status_code == 400
 
         # Create collection with invalid library_key provided, it should fail
         resp = self.client.post(
             URL_LIB_COLLECTIONS.format(lib_key=123),
-            {**post_data_missing_title, **post_data_missing_desc},
+            {**post_data_missing_title, **post_data_missing_key},
             format="json"
         )
         assert resp.status_code == 404

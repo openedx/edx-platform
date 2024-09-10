@@ -1,5 +1,4 @@
 <header class="js-program-header program-header full-width-banner"></header>
-<div class="js-program-details-alerts program-details-alerts program-subscription-alert-wrapper col-12 col-md-8"></div>
 <!-- TODO: consider if article is the most appropriate element here -->
 
 <div class="col-12 flex-column flex-md-row d-md-flex">
@@ -22,8 +21,7 @@
                 </div>
             <% } %>
             <% if (
-                !isSubscriptionEligible
-                && is_learner_eligible_for_one_click_purchase
+                is_learner_eligible_for_one_click_purchase
                 && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)
             ) { %>
             <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program" id="program_dashboard_course_upsell_all_button">
