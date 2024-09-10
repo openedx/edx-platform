@@ -256,7 +256,7 @@ class IDVerificationService:
         VerificationAttempt model used for pluggable IDV implementations.
 
         As part of the work to implement pluggable IDV, this method's use
-        will be deprecated: DEPR-XXX
+        will be deprecated: https://openedx.atlassian.net/browse/OSPR-1011
         """
         verification = None
 
