@@ -13,6 +13,12 @@ from typing import Optional
 from lms.djangoapps.verify_student.emails import send_verification_approved_email
 from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import VerificationAttempt
+from lms.djangoapps.verify_student.signals import (
+    emit_idv_attempt_approved_event,
+    emit_idv_attempt_created_event,
+    emit_idv_attempt_denied_event,
+    emit_idv_attempt_pending_event,
+)
 from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 
@@ -70,11 +76,20 @@ def create_verification_attempt(user: User, name: str, status: str, expiration_d
         expiration_datetime=expiration_datetime,
     )
 
+    emit_idv_attempt_created_event(
+        attempt_id=verification_attempt.id,
+        user=user,
+        status=status,
+        name=name,
+        expiration_date=expiration_datetime,
+    )
+
     return verification_attempt.id
 
 
 def update_verification_attempt(
     attempt_id: int,
+    user: User,
     name: Optional[str] = None,
     status: Optional[str] = None,
     expiration_datetime: Optional[datetime] = None
@@ -86,6 +101,7 @@ def update_verification_attempt(
 
     Arguments:
         * attempt_id (int): the verification attempt id of the attempt to update
+        * user (User): the user (usually a learner) performing the verification attempt
         * name (string, optional): the new name being ID verified
         * status (string, optional): the new status of the verification attempt
         * expiration_datetime (datetime, optional): The new expiration date and time
@@ -119,6 +135,31 @@ def update_verification_attempt(
                 },
             )
             raise VerificationAttemptInvalidStatus
+
+        if status == VerificationAttemptStatus.PENDING:
+            emit_idv_attempt_pending_event(
+                attempt_id=attempt_id,
+                user=user,
+                status=status,
+                name=name,
+                expiration_date=expiration_datetime,
+            )
+        elif status == VerificationAttemptStatus.APPROVED:
+            emit_idv_attempt_approved_event(
+                attempt_id=attempt_id,
+                user=user,
+                status=status,
+                name=name,
+                expiration_date=expiration_datetime,
+            )
+        elif status == VerificationAttemptStatus.DENIED:
+            emit_idv_attempt_denied_event(
+                attempt_id=attempt_id,
+                user=user,
+                status=status,
+                name=name,
+                expiration_date=expiration_datetime,
+            )
 
     # NOTE: Generally, we only set the expiration date from the time that an IDV attempt is marked approved,
     # so we allow expiration_datetime to = None for other status updates (e.g. pending).

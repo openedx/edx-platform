@@ -133,6 +133,7 @@ class UpdateVerificationAttempt(TestCase):
         update_verification_attempt(
             attempt_id=self.attempt.id,
             name=name,
+            user=self.user,
             status=status,
             expiration_datetime=expiration_datetime,
         )
@@ -149,6 +150,7 @@ class UpdateVerificationAttempt(TestCase):
         update_verification_attempt(
             attempt_id=self.attempt.id,
             name=None,
+            user=self.user,
             status=None,
             expiration_datetime=None,
         )
@@ -166,6 +168,8 @@ class UpdateVerificationAttempt(TestCase):
             VerificationAttempt.DoesNotExist,
             update_verification_attempt,
             attempt_id=999999,
+            name=None,
+            user=self.user,
             status=VerificationAttemptStatus.APPROVED,
         )
 
@@ -181,6 +185,7 @@ class UpdateVerificationAttempt(TestCase):
             update_verification_attempt,
             attempt_id=self.attempt.id,
             name=None,
+            user=self.user,
             status=status,
             expiration_datetime=None,
         )
