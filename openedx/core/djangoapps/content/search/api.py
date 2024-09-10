@@ -34,6 +34,7 @@ from .documents import (
     searchable_doc_for_course_block,
     searchable_doc_for_collection,
     searchable_doc_for_library_block,
+    searchable_doc_collections,
     searchable_doc_tags,
 )
 
@@ -317,12 +318,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.context_key,
             Fields.org,
             Fields.tags,
-            Fields.tags + "." + Fields.tags_collections,
             Fields.tags + "." + Fields.tags_taxonomy,
             Fields.tags + "." + Fields.tags_level0,
             Fields.tags + "." + Fields.tags_level1,
             Fields.tags + "." + Fields.tags_level2,
             Fields.tags + "." + Fields.tags_level3,
+            Fields.collections,
             Fields.type,
             Fields.access_id,
             Fields.last_published,
@@ -336,11 +337,11 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.content,
             Fields.tags,
             Fields.description,
+            Fields.collections,
             # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
             # are searchable only if at least one document in the index has a value. If we didn't list them here and,
             # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
             # these sub-fields: "Attribute `tags.level3` is not searchable."
-            Fields.tags + "." + Fields.tags_collections,
             Fields.tags + "." + Fields.tags_taxonomy,
             Fields.tags + "." + Fields.tags_level0,
             Fields.tags + "." + Fields.tags_level1,
@@ -377,6 +378,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     doc = {}
                     doc.update(searchable_doc_for_library_block(metadata))
                     doc.update(searchable_doc_tags(metadata.usage_key))
+                    doc.update(searchable_doc_collections(metadata.usage_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing library component {component}: {err}")
@@ -570,6 +572,15 @@ def upsert_block_tags_index_docs(usage_key: UsageKey):
     """
     doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
     doc.update(searchable_doc_tags(usage_key))
+    _update_index_docs([doc])
+
+
+def upsert_block_collections_index_docs(usage_key: UsageKey):
+    """
+    Updates the collections data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
+    doc.update(searchable_doc_collections(usage_key))
     _update_index_docs([doc])
 
 

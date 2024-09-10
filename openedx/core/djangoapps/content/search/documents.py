@@ -54,7 +54,8 @@ class Fields:
     tags_level1 = "level1"
     tags_level2 = "level2"
     tags_level3 = "level3"
-    tags_collections = "collections"  # subfield of tags, i.e. tags.collections
+    # List of collection.key strings this object belongs to.
+    collections = "collections"
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
     # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
@@ -167,11 +168,10 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
 
     See the comments above on "Field.tags" for an explanation of the format.
 
-    e.g. for something tagged "Difficulty: Hard" and "Location: Vancouver",
-    and in Collections 3 and 4, this would return:
+    e.g. for something tagged "Difficulty: Hard" and "Location: Vancouver" this
+    would return:
         {
             "tags": {
-                "collections": ["Col_key1", "Col_key2"],
                 "taxonomy": ["Location", "Difficulty"],
                 "level0": ["Location > North America", "Difficulty > Hard"],
                 "level1": ["Location > North America > Canada"],
@@ -186,16 +186,21 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     strings in a particular format that the frontend knows how to render to
     support hierarchical refinement by tag.
     """
-    result = {}
-
     # Note that we could improve performance for indexing many components from the same library/course,
     # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
     # tags for each component separately.
     all_tags = tagging_api.get_object_tags(str(object_id)).all()
+    if not all_tags:
+        # Clear out tags in the index when unselecting all tags for the block, otherwise
+        # it would remain the last value if a cleared Fields.tags field is not included
+        return {Fields.tags: {}}
+    result = {
+        Fields.tags_taxonomy: [],
+        Fields.tags_level0: [],
+        # ... other levels added as needed
+    }
     for obj_tag in all_tags:
         # Add the taxonomy name:
-        if Fields.tags_taxonomy not in result:
-            result[Fields.tags_taxonomy] = []
         if obj_tag.taxonomy.name not in result[Fields.tags_taxonomy]:
             result[Fields.tags_taxonomy].append(obj_tag.taxonomy.name)
         # Taxonomy name plus each level of tags, in a list: # e.g. ["Location", "North America", "Canada", "Vancouver"]
@@ -219,7 +224,22 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
             if len(parts) == level + 2:
                 break  # We have all the levels for this tag now (e.g. parts=["Difficulty", "Hard"] -> need level0 only)
 
+    return {Fields.tags: result}
+
+
+def _collections_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the collections for its index doc.
+
+    e.g. for something in Collections "COL_A" and "COL_B", this would return:
+        {
+            "collections": ["COL_A", "COL_B"],
+        }
+
+    Returns an empty dict if the object is not in any collections.
+    """
     # Gather the collections associated with this object
+    result = {}
     collections = []
     try:
         component = lib_api.get_component_from_usage_key(object_id)
@@ -231,9 +251,9 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
         log.warning(f"No component found for {object_id}")
 
     if collections:
-        result[Fields.tags_collections] = list(collections)
+        result[Fields.collections] = list(collections)
 
-    return {Fields.tags: result}
+    return result
 
 
 def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetadata) -> dict:
@@ -274,6 +294,19 @@ def searchable_doc_tags(usage_key: UsageKey) -> dict:
         Fields.id: meili_id_from_opaque_key(usage_key),
     }
     doc.update(_tags_for_content_object(usage_key))
+
+    return doc
+
+
+def searchable_doc_collections(usage_key: UsageKey) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the collections data for the given content object.
+    """
+    doc = {
+        Fields.id: meili_id_from_opaque_key(usage_key),
+    }
+    doc.update(_collections_for_content_object(usage_key))
 
     return doc
 

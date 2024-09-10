@@ -175,7 +175,7 @@ class TestSearchApi(ModuleStoreTestCase):
         tagging_api.add_tag_to_taxonomy(self.taxonomyB, "three")
         tagging_api.add_tag_to_taxonomy(self.taxonomyB, "four")
 
-        # Create collections:
+        # Create a collection:
         self.learning_package = authoring_api.get_learning_package_by_key(self.library.key)
         with freeze_time(created_date):
             self.collection = authoring_api.create_collection(
@@ -379,36 +379,10 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         Test indexing an Library Block with tags.
         """
-        collection1 = authoring_api.create_collection(
-            learning_package_id=self.library.learning_package.id,
-            key="COL1",
-            title="Collection 1",
-            created_by=None,
-            description="First Collection",
-        )
-
-        collection2 = authoring_api.create_collection(
-            learning_package_id=self.library.learning_package.id,
-            key="COL2",
-            title="Collection 2",
-            created_by=None,
-            description="Second Collection",
-        )
 
         # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
         tagging_api.tag_object(str(self.problem1.usage_key), self.taxonomyA, ["one", "two"])
         tagging_api.tag_object(str(self.problem1.usage_key), self.taxonomyB, ["three", "four"])
-
-        # Add Problem1 to both Collections (these internally call `upsert_block_tags_index_docs`)
-        # (adding in reverse order to test sorting of collection tag))
-        for collection in (collection2, collection1):
-            library_api.update_library_collection_components(
-                self.library.key,
-                collection_key=collection.key,
-                usage_keys=[
-                    self.problem1.usage_key,
-                ],
-            )
 
         # Build expected docs with tags at each stage
         doc_problem_with_tags1 = {
@@ -425,27 +399,59 @@ class TestSearchApi(ModuleStoreTestCase):
                 'level0': ['A > one', 'A > two', 'B > four', 'B > three']
             }
         }
-        doc_problem_with_collection2 = {
-            "id": self.doc_problem1["id"],
-            "tags": {
-                'collections': [collection2.key],
-                'taxonomy': ['A', 'B'],
-                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
-            }
-        }
-        doc_problem_with_collection1 = {
-            "id": self.doc_problem1["id"],
-            "tags": {
-                'collections': [collection1.key, collection2.key],
-                'taxonomy': ['A', 'B'],
-                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
-            }
-        }
 
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_problem_with_tags1]),
                 call([doc_problem_with_tags2]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_library_block_collections(self, mock_meilisearch):
+        """
+        Test indexing an Library Block that is in two collections.
+        """
+        collection1 = authoring_api.create_collection(
+            learning_package_id=self.library.learning_package.id,
+            key="COL1",
+            title="Collection 1",
+            created_by=None,
+            description="First Collection",
+        )
+
+        collection2 = authoring_api.create_collection(
+            learning_package_id=self.library.learning_package.id,
+            key="COL2",
+            title="Collection 2",
+            created_by=None,
+            description="Second Collection",
+        )
+
+        # Add Problem1 to both Collections (these internally call `upsert_block_collections_index_docs`)
+        # (adding in reverse order to test sorting of collection tag))
+        for collection in (collection2, collection1):
+            library_api.update_library_collection_components(
+                self.library.key,
+                collection_key=collection.key,
+                usage_keys=[
+                    self.problem1.usage_key,
+                ],
+            )
+
+        # Build expected docs with collections at each stage
+        doc_problem_with_collection2 = {
+            "id": self.doc_problem1["id"],
+            "collections": [collection2.key],
+        }
+        doc_problem_with_collection1 = {
+            "id": self.doc_problem1["id"],
+            "collections": [collection1.key, collection2.key],
+        }
+
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
                 call([doc_problem_with_collection2]),
                 call([doc_problem_with_collection1]),
             ],
