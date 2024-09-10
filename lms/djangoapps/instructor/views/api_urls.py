@@ -42,7 +42,7 @@ urlpatterns = [
     path('rescore_entrance_exam', api.rescore_entrance_exam, name='rescore_entrance_exam'),
     path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),
          name='list_entrance_exam_instructor_tasks'),
-    path('mark_student_can_skip_entrance_exam', api.mark_student_can_skip_entrance_exam,
+    path('mark_student_can_skip_entrance_exam', api.MarkStudentCanSkipEntranceExam.as_view(),
          name='mark_student_can_skip_entrance_exam'),
     path('list_instructor_tasks', api.list_instructor_tasks, name='list_instructor_tasks'),
     path('list_background_email_tasks', api.list_background_email_tasks, name='list_background_email_tasks'),

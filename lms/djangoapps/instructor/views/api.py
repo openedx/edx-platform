@@ -108,7 +108,7 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer,
-    UserSerializer, SendEmailSerializer
+    UserSerializer, SendEmailSerializer, UniqueStudentIdentifierSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -3151,6 +3151,42 @@ def mark_student_can_skip_entrance_exam(request, course_id):
         'message': message,
     }
     return JsonResponse(response_payload)
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class MarkStudentCanSkipEntranceExam(APIView):
+    """
+    Mark a student to skip entrance exam.
+    """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Takes `unique_student_identifier` as required POST parameter.
+        """
+        course_id = CourseKey.from_string(course_id)
+        student_identifier = request.data.get("unique_student_identifier")
+
+        serializer_data = UniqueStudentIdentifierSerializer(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('unique_student_identifier')
+        if not student:
+            response_payload = f'Could not find student matching : {student_identifier}'
+            return JsonResponse({'error': response_payload}, status=400)
+
+        __, created = EntranceExamConfiguration.objects.get_or_create(user=student, course_id=course_id)
+        if created:
+            message = _('This student (%s) will skip the entrance exam.') % student_identifier
+        else:
+            message = _('This student (%s) is already allowed to skip the entrance exam.') % student_identifier
+        response_payload = {
+            'message': message,
+        }
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
