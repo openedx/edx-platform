@@ -149,7 +149,7 @@ class SendEmailSerializer(serializers.Serializer):
     subject = serializers.CharField(max_length=128, write_only=True, required=True)
     message = serializers.CharField(required=True)
     schedule = serializers.CharField(required=False)
- 
+
 
 class BlockDueDateSerializer(serializers.Serializer):
     """
