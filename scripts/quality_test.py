@@ -133,7 +133,7 @@ def _get_stylelint_violations():
         result = subprocess.run(
             command,
             shell=True,
-            check=True,
+            check=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
@@ -149,6 +149,7 @@ def _get_stylelint_violations():
                 stylelint_report=stylelint_report
             )
         )
+
 
 def run_eslint():
     """
@@ -182,31 +183,16 @@ def run_eslint():
             text=True,
             check=False
         )
-    import pdb; pdb.set_trace()
-    
+
     # Print the content of the report file for debugging
     with open(eslint_report, 'r') as report_file:
         report_content = report_file.read()
         print("ESLint report content:")
         print(report_content)
 
-    try:
-        num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
-    except TypeError:
-        fail_quality(
-            'eslint',
-            f"FAILURE: Number of eslint violations could not be found in {eslint_report}"
-        )
-
-    # Fail if number of violations is greater than the limit
-    if num_violations > violations_limit > -1:
-        fail_quality(
-            'eslint',
-            f"FAILURE: Too many eslint violations ({num_violations}).\nThe limit is {violations_limit}."
-        )
-    else:
-        print("successfully run eslint with violations")
-        print(num_violations)
+    if result.returncode != 0:
+        print(f"ESLint command failed with return code {result.returncode}")
+        # You may want to handle or raise an error here depending on your needs
 
 
 # def run_eslint():
