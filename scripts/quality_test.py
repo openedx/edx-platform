@@ -130,20 +130,21 @@ def _get_stylelint_violations():
     # formatter = 'node_modules/stylelint-formatter-pretty'
 
     # command = f"stylelint **/*.scss --custom-formatter={formatter}"
-    formatter = 'node_modules/stylelint-formatter-pretty'
+    formatter = 'node_modules/stylelint-formatter-pretty/index.js'
     # Expand the glob pattern to match all .scss files
     scss_files = glob.glob('**/*.scss', recursive=True)
 
     command = [
-        "node_modules/.bin/stylelint",
-        *scss_files,  # The glob pattern for SCSS files
+        "node",
+        "./node_modules/.bin/stylelint",
+        "**/*.scss",  # The glob pattern for SCSS files
         f"--custom-formatter={formatter}"  # Using the custom formatter
     ]
     with open(stylelint_report, 'w') as report_file:
         result = subprocess.run(
             command,
-            stdout=report_file,
-            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True
         )
 
@@ -228,7 +229,8 @@ def run_stylelint():
 
     violations_limit = 0
     num_violations = _get_stylelint_violations()
-
+    print("violations")
+    print(num_violations)
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit:
         fail_quality(
