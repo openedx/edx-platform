@@ -3,6 +3,7 @@ Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
 import argparse
+import glob
 import json
 import os
 import re
@@ -126,19 +127,29 @@ def _get_stylelint_violations():
     stylelint_report_dir = (REPORT_DIR / "stylelint")
     stylelint_report = stylelint_report_dir / "stylelint.report"
     _prepare_report_dir(stylelint_report_dir)
+    # formatter = 'node_modules/stylelint-formatter-pretty'
+
+    # command = f"stylelint **/*.scss --custom-formatter={formatter}"
     formatter = 'node_modules/stylelint-formatter-pretty'
 
-    command = f"stylelint **/*.scss --custom-formatter={formatter}"
+    # Expand the glob pattern to match all .scss files
+    scss_files = glob.glob('**/*.scss', recursive=True)
+
+    command = [
+        "stylelint",
+        "**/*.scss",  # The glob pattern for SCSS files
+        f"--custom-formatter={formatter}"  # Using the custom formatter
+    ]
+
     with open(stylelint_report, 'w') as report_file:
         result = subprocess.run(
             command,
-            shell=True,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            check=True,
+            stdout=report_file,
+            stderr=subprocess.STDOUT,
             text=True
         )
-        report_file.write(result.stdout)
+        # report_file.write(result.stdout)
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
@@ -184,16 +195,6 @@ def run_eslint():
             check=False
         )
 
-    # Print the content of the report file for debugging
-    with open(eslint_report, 'r') as report_file:
-        report_content = report_file.read()
-        print("ESLint report content:")
-        print(report_content)
-
-    if result.returncode != 0:
-        print(f"ESLint command failed with return code {result.returncode}")
-        # You may want to handle or raise an error here depending on your needs
-
     try:
         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
     except TypeError:
@@ -215,60 +216,6 @@ def run_eslint():
     else:
         print("successfully run eslint with violations")
         print(num_violations)
-
-
-# def run_eslint():
-#     """
-#     Runs eslint on static asset directories.
-#     If limit option is passed, fails build if more violations than the limit are found.
-#     """
-
-#     REPO_ROOT = repo_root()
-#     REPORT_DIR = REPO_ROOT / 'reports'
-#     eslint_report_dir = (REPORT_DIR / "eslint")
-#     eslint_report = eslint_report_dir / "eslint.report"
-#     _prepare_report_dir(eslint_report_dir)
-#     violations_limit = 4950
-
-#     command = (
-#         "node --max_old_space_size=4096 node_modules/.bin/eslint "
-#         "--ext .js --ext .jsx --format=compact ."
-#     )
-#     with open(eslint_report, 'w') as report_file:
-#         # Run the command
-#         result = subprocess.run(
-#             command,
-#             shell=True,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#             text=True,
-#             check=False
-#         )
-
-#         # Write the output to the report file
-#         report_file.write(result.stdout)
-
-#     try:
-#         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
-#     except TypeError:
-#         fail_quality(
-#             'eslint',
-#             "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
-#                 eslint_report=eslint_report
-#             )
-#         )
-
-#     # Fail if number of violations is greater than the limit
-#     if num_violations > violations_limit > -1:
-#         fail_quality(
-#             'eslint',
-#             "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
-#                 count=num_violations, violations_limit=violations_limit
-#             )
-#         )
-#     else:
-#         print("successfully run eslint with violations")
-#         print(num_violations)
 
 
 def run_stylelint():
