@@ -85,6 +85,57 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
         return user
 
 
+class StudentAttemptsSerializer(serializers.Serializer):
+    """
+    Serializer for resetting a students attempts counter or starts a task to reset all students
+    attempts counters.
+    """
+    problem_to_reset = serializers.CharField(
+        help_text="The identifier or description of the problem that needs to be reset."
+    )
+
+    # following are optional params.
+    unique_student_identifier = serializers.CharField(
+        help_text="Email or username of student.", required=False
+    )
+    all_students = serializers.CharField(required=False)
+    delete_module = serializers.CharField(required=False)
+
+    def validate_all_students(self, value):
+        """
+        converts the all_student params value to bool.
+        """
+        return self.verify_bool(value)
+
+    def validate_delete_module(self, value):
+        """
+        converts the all_student params value.
+        """
+        return self.verify_bool(value)
+
+    def validate_unique_student_identifier(self, value):
+        """
+        Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
+
+    def verify_bool(self, value):
+        """
+        Returns the value of the boolean parameter with the given
+        name in the POST request. Handles translation from string
+        values to boolean values.
+        """
+        if value is not None:
+            return value in ['true', 'True', True]
+
+        return False
+
+
 class SendEmailSerializer(serializers.Serializer):
     """
     Serializer for sending an email with optional scheduling.
