@@ -108,7 +108,7 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, RoleNameSerializer, ShowStudentExtensionSerializer,
-    UserSerializer, SendEmailSerializer, UniqueStudentIdentifierSerializer
+    UniqueStudentIdentifierSerializer, UserSerializer, SendEmailSerializer, StudentAttemptsSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -1817,23 +1817,24 @@ class StudentProgressUrl(APIView):
         return Response(serializer.data)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params(
-    problem_to_reset="problem urlname to reset"
-)
-@common_exceptions_400
-def reset_student_attempts(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ResetStudentAttempts(DeveloperErrorViewMixin, APIView):
     """
-
     Resets a students attempts counter or starts a task to reset all students
     attempts counters. Optionally deletes student state for a problem. Limited
     to staff access. Some sub-methods limited to instructor access.
+    """
+    http_method_names = ['post']
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+    serializer_class = StudentAttemptsSerializer
 
-    Takes some of the following query parameters
+    @method_decorator(ensure_csrf_cookie)
+    @transaction.non_atomic_requests
+    def post(self, request, course_id):
+        """
+        Takes some of the following query parameters
         - problem_to_reset is a urlname of a problem
         - unique_student_identifier is an email or username
         - all_students is a boolean
@@ -1843,65 +1844,74 @@ def reset_student_attempts(request, course_id):
         - delete_module is a boolean
             requires instructor access
             mutually exclusive with all_students
-    """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
-    all_students = _get_boolean_param(request, 'all_students')
+        """
+        course_id = CourseKey.from_string(course_id)
+        serializer_data = self.serializer_class(data=request.data)
 
-    if all_students and not has_access(request.user, 'instructor', course):
-        return HttpResponseForbidden("Requires instructor access.")
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    student = None
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-    delete_module = _get_boolean_param(request, 'delete_module')
-
-    # parameter combinations
-    if all_students and student:
-        return HttpResponseBadRequest(
-            "all_students and unique_student_identifier are mutually exclusive."
-        )
-    if all_students and delete_module:
-        return HttpResponseBadRequest(
-            "all_students and delete_module are mutually exclusive."
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    try:
-        module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
-    except InvalidKeyError:
-        return HttpResponseBadRequest()
+        all_students = serializer_data.validated_data.get('all_students')
 
-    response_payload = {}
-    response_payload['problem_to_reset'] = problem_to_reset
+        if all_students and not has_access(request.user, 'instructor', course):
+            return HttpResponseForbidden("Requires instructor access.")
 
-    if student:
-        try:
-            enrollment.reset_student_attempts(
-                course_id,
-                student,
-                module_state_key,
-                requesting_user=request.user,
-                delete_module=delete_module
+        problem_to_reset = strip_if_string(serializer_data.validated_data.get('problem_to_reset'))
+        student_identifier = request.POST.get('unique_student_identifier', None)
+        student = serializer_data.validated_data.get('unique_student_identifier')
+        delete_module = serializer_data.validated_data.get('delete_module')
+
+        # parameter combinations
+        if all_students and student:
+            return HttpResponseBadRequest(
+                "all_students and unique_student_identifier are mutually exclusive."
             )
-        except StudentModule.DoesNotExist:
-            return HttpResponseBadRequest(_("Module does not exist."))
-        except sub_api.SubmissionError:
-            # Trust the submissions API to log the error
-            error_msg = _("An error occurred while deleting the score.")
-            return HttpResponse(error_msg, status=500)
-        response_payload['student'] = student_identifier
-    elif all_students:
-        task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
-        response_payload['task'] = TASK_SUBMISSION_OK
-        response_payload['student'] = 'All Students'
-    else:
-        return HttpResponseBadRequest()
+        if all_students and delete_module:
+            return HttpResponseBadRequest(
+                "all_students and delete_module are mutually exclusive."
+            )
 
-    return JsonResponse(response_payload)
+        try:
+            module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
+        except InvalidKeyError:
+            return HttpResponseBadRequest()
+
+        response_payload = {}
+        response_payload['problem_to_reset'] = problem_to_reset
+
+        if student:
+            try:
+                enrollment.reset_student_attempts(
+                    course_id,
+                    student,
+                    module_state_key,
+                    requesting_user=request.user,
+                    delete_module=delete_module
+                )
+            except StudentModule.DoesNotExist:
+                return HttpResponseBadRequest(_("Module does not exist."))
+            except sub_api.SubmissionError:
+                # Trust the submissions API to log the error
+                error_msg = _("An error occurred while deleting the score.")
+                return HttpResponse(error_msg, status=500)
+            response_payload['student'] = student_identifier
+
+        elif all_students:
+            try:
+                task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
+                response_payload['task'] = TASK_SUBMISSION_OK
+                response_payload['student'] = 'All Students'
+            except Exception:  # pylint: disable=broad-except
+                error_msg = _("An error occurred while attempting to reset for all students.")
+                return HttpResponse(error_msg, status=500)
+        else:
+            return HttpResponseBadRequest()
+
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
@@ -1938,8 +1948,10 @@ def reset_student_attempts_for_entrance_exam(request, course_id):
 
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
+
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
+
     all_students = _get_boolean_param(request, 'all_students')
     delete_module = _get_boolean_param(request, 'delete_module')
 
