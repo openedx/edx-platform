@@ -193,6 +193,28 @@ def run_eslint():
     if result.returncode != 0:
         print(f"ESLint command failed with return code {result.returncode}")
         # You may want to handle or raise an error here depending on your needs
+    
+    try:
+        num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
+    except TypeError:
+        fail_quality(
+            'eslint',
+            "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
+                eslint_report=eslint_report
+            )
+        )
+
+    # Fail if number of violations is greater than the limit
+    if num_violations > violations_limit > -1:
+        fail_quality(
+            'eslint',
+            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations, violations_limit=violations_limit
+            )
+        )
+    else:
+        print("successfully run eslint with violations")
+        print(num_violations)
 
 
 # def run_eslint():
