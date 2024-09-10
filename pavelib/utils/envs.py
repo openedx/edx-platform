@@ -1,4 +1,3 @@
-
 """
 Helper functions for loading environment settings.
 """

@@ -6,7 +6,7 @@
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
   pre-requirements pull pull_xblock_translations pull_translations push_translations \
   requirements shell swagger \
-  technical-docs test-requirements ubuntu-requirements upgrade-package upgrade pep8_test
+  technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -205,28 +205,29 @@ migrate: migrate-lms migrate-cms
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
 
-eslint:
-	python scripts/quality_test/quality_test.py eslint
+eslint:	## check javascript for quality issues
+	python scripts/quality_test.py eslint
 
-stylelint:
-	python scripts/quality_test/quality_test.py stylelint
+stylelint: ## check css/scss for quality issues
+	python scripts/quality_test.py stylelint
 
-xsslint:
-	python scripts/quality_test/quality_test.py xsslint
+xsslint: ## check xss for quality issues
+	python scripts/quality_test.py xsslint
 
-pycodestyle:
+pycodestyle: ## check python files for quality issues 
 	pycodestyle .
 
-pi_check:
-	python scripts/quality_test/quality_test.py pii_check
+pii_check: ## check django models for pii annotations
+	python scripts/quality_test.py pii_check
 
-check_keyword:
-	python scripts/quality_test/quality_test.py check_keywords
+check_keywords: ## check django models for reserve keywords
+	python scripts/quality_test.py check_keywords
 
-test-js:
+test-js: ## run javascript tests
 	python scripts/js_test.py --option jstest
 
-test-coverage:
+coverage-js: ## run javascript coverage test
 	python scripts/js_test.py --option coverage
 
-quality-test: pycodestyle eslint stylelint xsslint pi_check check_keyword
+quality: ## run all quality tests
+	pycodestyle eslint stylelint xsslint pii_check check_keywords

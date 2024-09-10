@@ -133,7 +133,7 @@ def _get_stylelint_violations():
         result = subprocess.run(
             command,
             shell=True,
-            check=False,
+            check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
@@ -150,7 +150,6 @@ def _get_stylelint_violations():
             )
         )
 
-
 def run_eslint():
     """
     Runs eslint on static asset directories.
@@ -159,50 +158,109 @@ def run_eslint():
 
     REPO_ROOT = repo_root()
     REPORT_DIR = REPO_ROOT / 'reports'
-    eslint_report_dir = (REPORT_DIR / "eslint")
+    eslint_report_dir = REPORT_DIR / "eslint"
     eslint_report = eslint_report_dir / "eslint.report"
     _prepare_report_dir(eslint_report_dir)
     violations_limit = 4950
 
-    command = (
-        "node --max_old_space_size=4096 node_modules/.bin/eslint "
-        "--ext .js --ext .jsx --format=compact ."
-    )
+    command = [
+        "node",
+        "--max_old_space_size=4096",
+        "node_modules/.bin/eslint",
+        "--ext", ".js",
+        "--ext", ".jsx",
+        "--format=compact",
+        "."
+    ]
+
     with open(eslint_report, 'w') as report_file:
         # Run the command
         result = subprocess.run(
             command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=report_file,
+            stderr=subprocess.STDOUT,
             text=True,
             check=False
         )
-
-        # Write the output to the report file
-        report_file.write(result.stdout)
+    import pdb; pdb.set_trace()
+    
+    # Print the content of the report file for debugging
+    with open(eslint_report, 'r') as report_file:
+        report_content = report_file.read()
+        print("ESLint report content:")
+        print(report_content)
 
     try:
         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
     except TypeError:
         fail_quality(
             'eslint',
-            "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
-                eslint_report=eslint_report
-            )
+            f"FAILURE: Number of eslint violations could not be found in {eslint_report}"
         )
 
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
         fail_quality(
             'eslint',
-            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
-                count=num_violations, violations_limit=violations_limit
-            )
+            f"FAILURE: Too many eslint violations ({num_violations}).\nThe limit is {violations_limit}."
         )
     else:
         print("successfully run eslint with violations")
         print(num_violations)
+
+
+# def run_eslint():
+#     """
+#     Runs eslint on static asset directories.
+#     If limit option is passed, fails build if more violations than the limit are found.
+#     """
+
+#     REPO_ROOT = repo_root()
+#     REPORT_DIR = REPO_ROOT / 'reports'
+#     eslint_report_dir = (REPORT_DIR / "eslint")
+#     eslint_report = eslint_report_dir / "eslint.report"
+#     _prepare_report_dir(eslint_report_dir)
+#     violations_limit = 4950
+
+#     command = (
+#         "node --max_old_space_size=4096 node_modules/.bin/eslint "
+#         "--ext .js --ext .jsx --format=compact ."
+#     )
+#     with open(eslint_report, 'w') as report_file:
+#         # Run the command
+#         result = subprocess.run(
+#             command,
+#             shell=True,
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#             text=True,
+#             check=False
+#         )
+
+#         # Write the output to the report file
+#         report_file.write(result.stdout)
+
+#     try:
+#         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
+#     except TypeError:
+#         fail_quality(
+#             'eslint',
+#             "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
+#                 eslint_report=eslint_report
+#             )
+#         )
+
+#     # Fail if number of violations is greater than the limit
+#     if num_violations > violations_limit > -1:
+#         fail_quality(
+#             'eslint',
+#             "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
+#                 count=num_violations, violations_limit=violations_limit
+#             )
+#         )
+#     else:
+#         print("successfully run eslint with violations")
+#         print(num_violations)
 
 
 def run_stylelint():
@@ -323,7 +381,7 @@ def run_pii_check():
     if not pii_check_passed:
         fail_quality('pii', full_log)
     else:
-        print("successfully run pi_check")
+        print("successfully run pii_check")
 
 
 def check_keywords():

@@ -72,7 +72,7 @@ jobs:
         run: |
           npm install -g jest
           xvfb-run --auto-servernum make test-js
-          make test-coverage
+          make coverage-js
 
       - name: Save Job Artifacts
         uses: actions/upload-artifact@v4
