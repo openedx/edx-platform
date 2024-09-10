@@ -136,18 +136,17 @@ def _get_stylelint_violations():
 
     command = [
         "node_modules/.bin/stylelint",
-        *scss_files,  # The glob pattern for SCSS files
+        "**/*.scss",  # The glob pattern for SCSS files
         f"--custom-formatter={formatter}"  # Using the custom formatter
     ]
     with open(stylelint_report, 'w') as report_file:
         result = subprocess.run(
             command,
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=report_file,
+            stderr=subprocess.STDOUT,
             text=True
         )
-        report_file.write(result.stdout)
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
