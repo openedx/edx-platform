@@ -64,7 +64,7 @@ def send_response_endorsed_notifications(thread_id, response_id, course_key_str,
     creator = User.objects.get(id=response.user_id)
     endorser = User.objects.get(id=endorsed_by)
     course = get_course_with_access(creator, 'load', course_key, check_if_enrolled=True)
-    notification_sender = DiscussionNotificationSender(thread, course, creator)
+    notification_sender = DiscussionNotificationSender(thread, course, creator, comment_id=response_id)
     # skip sending notification to author of thread if they are the same as the author of the response
     if response.user_id != thread.user_id:
         # sends notification to author of thread

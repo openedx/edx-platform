@@ -472,7 +472,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         'edx.bulk_email.created',
         {
             'course_id': str(course_email.course_id),
-            'to_list': to_list,
+            'to_list': [user_obj.get('email', '') for user_obj in to_list],
             'total_recipients': total_recipients,
         }
     )
