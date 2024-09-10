@@ -162,6 +162,39 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         else:
             assert 'To update these settings go to the Advanced Settings page.' in alert_text
 
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'proctortrack': {},
+            'test_proctoring_provider': {},
+        },
+        FEATURES=FEATURES_WITH_EXAM_SETTINGS_ENABLED,
+    )
+    @ddt.data(
+        "advanced_settings_handler",
+        "course_handler",
+    )
+    def test_invalid_provider_alert(self, page_handler):
+        """
+        An alert should appear if the course has a proctoring provider that is not valid.
+        """
+        # create an error by setting an invalid proctoring provider
+        self.course.proctoring_provider = 'invalid_provider'
+        self.course.enable_proctored_exams = True
+        self.save_course()
+
+        url = reverse_course_url(page_handler, self.course.id)
+        resp = self.client.get(url, HTTP_ACCEPT='text/html')
+        alert_text = self._get_exam_settings_alert_text(resp.content)
+        assert (
+            'This course has proctored exam settings that are incomplete or invalid.'
+            in alert_text
+        )
+        assert (
+            'The proctoring provider configured for this course, \'invalid_provider\', is not valid.'
+            in alert_text
+        )
+
     @ddt.data(
         "advanced_settings_handler",
         "course_handler",
