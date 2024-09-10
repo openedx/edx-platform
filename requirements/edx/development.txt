@@ -1358,7 +1358,7 @@ openedx-django-wiki==2.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events @ git+https://github.com/open-craft/openedx-events.git@yusuf-musleh/content-library-collections-signals
+openedx-events==9.14.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
