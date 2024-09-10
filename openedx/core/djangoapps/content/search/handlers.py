@@ -136,7 +136,13 @@ def content_library_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    update_content_library_index_docs.delay(str(content_library_data.library_key))
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches index.
+    # Currently, this is only required to make sure that removed/discarded components are removed
+    # from the search index and displayed to user properly. If it becomes a performance bottleneck
+    # for other update operations other than discard, we can update CONTENT_LIBRARY_UPDATED event
+    # to include a parameter which can help us decide if the task needs to run sync or async.
+    update_content_library_index_docs.apply(args=[str(content_library_data.library_key)])
 
 
 @receiver(CONTENT_OBJECT_TAGS_CHANGED)
