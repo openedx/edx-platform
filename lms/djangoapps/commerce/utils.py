@@ -23,7 +23,10 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from .models import CommerceConfiguration
-from .waffle import should_redirect_to_commerce_coordinator_refunds
+from .waffle import (  # lint-amnesty, pylint: disable=invalid-django-waffle-import
+    should_redirect_to_commerce_coordinator_checkout,
+    should_redirect_to_commerce_coordinator_refunds,
+)
 from edx_django_utils.plugins import pluggable_override
 
 log = logging.getLogger(__name__)
@@ -107,6 +110,14 @@ class EcommerceService:
         """
         return self.get_absolute_ecommerce_url(self.config.basket_checkout_page)
 
+    def get_add_to_basket_url(self):
+        """ Return the URL for the payment page based on the waffle switch.
+        Example:
+            http://localhost/enabled_service_api_path
+        """
+        if should_redirect_to_commerce_coordinator_checkout():
+            return urljoin(settings.COMMERCE_COORDINATOR_URL_ROOT, settings.COORDINATOR_CHECKOUT_REDIRECT_PATH)
+        return self.payment_page_url()
 
     @pluggable_override('OVERRIDE_GET_CHECKOUT_PAGE_URL')
     def get_checkout_page_url(self, *skus, **kwargs):
@@ -144,7 +155,7 @@ class EcommerceService:
         """
         Returns the URL for the user to upgrade, or None if not applicable.
         """
-        course_run_key= str(course_key)
+        course_run_key = str(course_key)
 
         verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
