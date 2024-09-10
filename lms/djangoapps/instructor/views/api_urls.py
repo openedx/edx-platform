@@ -49,7 +49,7 @@ urlpatterns = [
     path('list_email_content', api.ListEmailContent.as_view(), name='list_email_content'),
     path('list_forum_members', api.list_forum_members, name='list_forum_members'),
     path('update_forum_role_membership', api.update_forum_role_membership, name='update_forum_role_membership'),
-    path('send_email', api.send_email, name='send_email'),
+    path('send_email', api.SendEmail.as_view(), name='send_email'),
     path('change_due_date', api.change_due_date, name='change_due_date'),
     path('reset_due_date', api.reset_due_date, name='reset_due_date'),
     path('show_unit_extensions', api.show_unit_extensions, name='show_unit_extensions'),
@@ -59,7 +59,7 @@ urlpatterns = [
     path('get_proctored_exam_results', api.get_proctored_exam_results, name='get_proctored_exam_results'),
 
     # Grade downloads...
-    path('list_report_downloads', api.list_report_downloads, name='list_report_downloads'),
+    path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
     path('calculate_grades_csv', api.calculate_grades_csv, name='calculate_grades_csv'),
     path('problem_grade_report', api.problem_grade_report, name='problem_grade_report'),
 

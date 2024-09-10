@@ -217,7 +217,10 @@ class CourseMetadata:
             try:
                 val = model['value']
                 if hasattr(block, key) and getattr(block, key) != val:
-                    key_values[key] = block.fields[key].from_json(val)
+                    if key == 'proctoring_provider':
+                        key_values[key] = block.fields[key].from_json(val, validate_providers=True)
+                    else:
+                        key_values[key] = block.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
                 raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(  # lint-amnesty, pylint: disable=raise-missing-from
                     name=model['display_name'], detailed_message=str(err)))
@@ -253,7 +256,10 @@ class CourseMetadata:
             try:
                 val = model['value']
                 if hasattr(block, key) and getattr(block, key) != val:
-                    key_values[key] = block.fields[key].from_json(val)
+                    if key == 'proctoring_provider':
+                        key_values[key] = block.fields[key].from_json(val, validate_providers=True)
+                    else:
+                        key_values[key] = block.fields[key].from_json(val)
             except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
                 errors.append({'key': key, 'message': str(err), 'model': model})
