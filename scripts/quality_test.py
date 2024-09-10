@@ -136,7 +136,7 @@ def _get_stylelint_violations():
 
     command = [
         "node_modules/.bin/stylelint",
-        "**/*.scss",  # The glob pattern for SCSS files
+        *scss_files,  # The glob pattern for SCSS files
         f"--custom-formatter={formatter}"  # Using the custom formatter
     ]
     with open(stylelint_report, 'w') as report_file:
@@ -147,6 +147,12 @@ def _get_stylelint_violations():
             stderr=subprocess.STDOUT,
             text=True
         )
+
+    # Debugging output: Print stderr and return code
+    if result.returncode != 0:
+        print(f"Stylelint failed with exit code {result.returncode}")
+        print(f"Error message:\n{result.stderr}")
+        return
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
