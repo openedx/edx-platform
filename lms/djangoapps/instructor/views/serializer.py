@@ -129,7 +129,7 @@ class StudentAttemptsSerializer(serializers.Serializer):
 
         return False
 
-     
+
 class SendEmailSerializer(serializers.Serializer):
     """
     Serializer for sending an email with optional scheduling.
@@ -149,4 +149,3 @@ class SendEmailSerializer(serializers.Serializer):
     subject = serializers.CharField(max_length=128, write_only=True, required=True)
     message = serializers.CharField(required=True)
     schedule = serializers.CharField(required=False)
-
