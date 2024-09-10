@@ -207,9 +207,9 @@ COURSE_NOTIFICATION_TYPES = {
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
         'visible_to': [CourseStaffRole.ROLE, CourseInstructorRole.ROLE]
     },
-    'ora_staff_grade_assigned': {
+    'ora_grade_assigned': {
         'notification_app': 'grading',
-        'name': 'ora_staff_grade_assigned',
+        'name': 'ora_grade_assigned',
         'is_core': False,
         'info': '',
         'web': False,
