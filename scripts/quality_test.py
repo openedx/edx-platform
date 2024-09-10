@@ -135,7 +135,7 @@ def _get_stylelint_violations():
     scss_files = glob.glob('**/*.scss', recursive=True)
 
     command = [
-        "stylelint",
+        "node_modules/.bin/stylelint",
         *scss_files,  # The glob pattern for SCSS files
         f"--custom-formatter={formatter}"  # Using the custom formatter
     ]
