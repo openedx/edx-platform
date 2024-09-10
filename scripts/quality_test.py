@@ -131,25 +131,23 @@ def _get_stylelint_violations():
 
     # command = f"stylelint **/*.scss --custom-formatter={formatter}"
     formatter = 'node_modules/stylelint-formatter-pretty'
-
     # Expand the glob pattern to match all .scss files
     scss_files = glob.glob('**/*.scss', recursive=True)
 
     command = [
         "stylelint",
-        "**/*.scss",  # The glob pattern for SCSS files
+        *scss_files,  # The glob pattern for SCSS files
         f"--custom-formatter={formatter}"  # Using the custom formatter
     ]
-
     with open(stylelint_report, 'w') as report_file:
         result = subprocess.run(
             command,
             check=True,
-            stdout=report_file,
-            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True
         )
-        # report_file.write(result.stdout)
+        report_file.write(result.stdout)
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
