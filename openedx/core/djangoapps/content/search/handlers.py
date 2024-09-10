@@ -29,13 +29,13 @@ from openedx_events.content_authoring.signals import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
 
-from .api import only_if_meilisearch_enabled, upsert_block_tags_index_docs
+from .api import only_if_meilisearch_enabled, upsert_block_collections_index_docs, upsert_block_tags_index_docs
 from .tasks import (
     delete_library_block_index_doc,
     delete_xblock_index_doc,
     update_content_library_index_docs,
     upsert_library_block_index_doc,
-    upsert_xblock_index_doc
+    upsert_xblock_index_doc,
 )
 
 log = logging.getLogger(__name__)
