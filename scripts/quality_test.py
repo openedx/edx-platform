@@ -142,7 +142,6 @@ def _get_stylelint_violations():
     with open(stylelint_report, 'w') as report_file:
         result = subprocess.run(
             command,
-            check=True,
             stdout=report_file,
             stderr=subprocess.STDOUT,
             text=True
