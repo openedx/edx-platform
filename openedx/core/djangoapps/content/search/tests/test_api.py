@@ -186,7 +186,7 @@ class TestSearchApi(ModuleStoreTestCase):
                 description="my collection description"
             )
         self.collection_dict = {
-            'id': 'MYCOL',
+            'id': self.collection.id,
             'type': 'collection',
             'display_name': 'my_collection',
             'description': 'my collection description',

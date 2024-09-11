@@ -222,7 +222,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             )
         doc = searchable_doc_for_collection(collection)
         assert doc == {
-            "id": "MYCOL",
+            "id": collection.id,
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
