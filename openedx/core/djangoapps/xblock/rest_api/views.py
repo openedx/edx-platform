@@ -123,8 +123,11 @@ def embed_block_view(request, usage_key_str, view_name):
         'is_development': settings.DEBUG,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
-    # TODO: add the course authoring MFE and learner MFE URLs to CSP frame-ancestors
-    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors
+
+    # Only allow this iframe be embedded if the parent is in the CORS_ORIGIN_WHITELIST
+    cors_origin_whitelist = configuration_helpers.get_value('CORS_ORIGIN_WHITELIST', settings.CORS_ORIGIN_WHITELIST)
+    response["Content-Security-Policy"] = f"frame-ancestors 'self' {' '.join(cors_origin_whitelist)};"
+
     return response
 
 
