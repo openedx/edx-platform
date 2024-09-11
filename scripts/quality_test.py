@@ -362,30 +362,40 @@ def check_keywords():
     """
     REPO_ROOT = repo_root()
     REPORT_DIR = REPO_ROOT / 'reports'
-    report_path = os.path.join(REPORT_DIR, 'reserved_keywords')
-    os.makedirs(report_path, exist_ok=True)
+    report_path = REPORT_DIR / 'reserved_keywords'
+    report_path.mkdir(parents=True, exist_ok=True)
 
     overall_status = True
-    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
-        report_file = f"{env}_reserved_keyword_report.csv"
+    for env_name, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+        report_file_path = report_path / f"{env_name}_reserved_keyword_report.csv"
         override_file = os.path.join(REPO_ROOT, "db_keyword_overrides.yml")
         try:
-            command = (
-                f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
-                f"python manage.py {env} check_reserved_keywords "
-                f"--override_file {override_file} "
-                f"--report_path {report_path} "
-                f"--report_file {report_file}"
-            )
-
-            subprocess.run(
-                command,
-                shell=True,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+            env = {
+                **os.environ,  # Include the current environment variables
+                "DJANGO_SETTINGS_MODULE": env_settings_file  # Set DJANGO_SETTINGS_MODULE for each environment
+            }
+            # command = (
+            #     f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
+            #     f"python manage.py {env} check_reserved_keywords "
+            #     f"--override_file {override_file} "
+            #     f"--report_path {report_path} "
+            #     f"--report_file {report_file}"
+            # )
+            command = [
+                "python", "manage.py", env_name, "check_reserved_keywords",
+                "--override_file", str(override_file),
+                "--report_path", str(report_path),
+                "--report_file", str(report_file_path)
+            ]
+            with open(report_file_path, 'w') as report_file:
+                subprocess.run(
+                    command,
+                    env=env,
+                    check=True,
+                    stdout=report_file,
+                    stderr=subprocess.STDOUT,
+                    text=True
+                )
         except BuildFailure:
             overall_status = False
     if not overall_status:
