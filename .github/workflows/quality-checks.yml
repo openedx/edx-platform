@@ -76,9 +76,11 @@ jobs:
         env:
           PIP_SRC: ${{ runner.temp }}
           TARGET_BRANCH: ${{ github.base_ref }}
-        run: |            
+        run: |
+            make pycodestyle
+            make eslint
             make pii_check
-
+            make check_keywords
           
       - name: Save Job Artifacts
         if: always()
