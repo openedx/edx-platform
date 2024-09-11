@@ -301,7 +301,7 @@ def run_pii_check():
     output_file = os.path.join(report_dir, 'pii_check_{}.report')
     env_report = []
     pii_check_passed = True
-    
+
     for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
         try:
             print(f"Running {env_name} PII Annotation check and report")
