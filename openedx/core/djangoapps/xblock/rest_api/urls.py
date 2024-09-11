@@ -29,4 +29,8 @@ urlpatterns = [
             ),
         ])),
     ])),
+    path('xblocks/v2/<str:usage_key_str>/', include([
+        # render one of this XBlock's views (e.g. student_view) for embedding in an iframe
+        re_path(r'^embed/(?P<view_name>[\w\-]+)/$', views.embed_block_view),
+    ])),
 ]
