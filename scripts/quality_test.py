@@ -315,21 +315,23 @@ def run_pii_check():
                 **os.environ,  # Include the current environment variables
                 "DJANGO_SETTINGS_MODULE": env_settings_file  # Set DJANGO_SETTINGS_MODULE for each environment
             }
-
+            
             # Break the command into a list of arguments
             command = [
-                "code_annotations", "django_find_annotations",
+                "code_annotations", 
+                "django_find_annotations",
                 "--config_file", ".pii_annotations.yml",
                 "--report_path", report_dir,
                 "--app_name", env_name.lower(),
                 "--lint", "--report", "--coverage"
             ]
-
+            # import pdb; pdb.set_trace()
             # Run the command without shell=True
             result = subprocess.run(
                 command,
                 env=env,  # Pass the environment with DJANGO_SETTINGS_MODULE
                 check=True,
+                # shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
