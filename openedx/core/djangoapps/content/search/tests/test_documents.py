@@ -19,6 +19,7 @@ try:
     from ..documents import (
         searchable_doc_for_course_block,
         searchable_doc_tags,
+        searchable_doc_collections,
         searchable_doc_for_collection,
         searchable_doc_for_library_block,
     )
@@ -261,6 +262,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         doc = {}
         doc.update(searchable_doc_for_library_block(self.library_block))
         doc.update(searchable_doc_tags(self.library_block.usage_key))
+        doc.update(searchable_doc_collections(self.library_block.usage_key))
         assert doc == {
             "id": "lbedx2012_fallhtmltext2-4bb47d67",
             "type": "library_block",
