@@ -10,9 +10,20 @@ from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-or
 
 from common.djangoapps.student.models_api import do_name_change_request
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire
-from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.models import (
+    SoftwareSecurePhotoVerification,
+    VerificationDeadline,
+    VerificationAttempt
+)
+from lms.djangoapps.verify_student.signals import (
+    _listen_for_course_publish,
+    _listen_for_lms_retire,
+    _listen_for_lms_retire_verification_attempts
+)
+from lms.djangoapps.verify_student.tests.factories import (
+    SoftwareSecurePhotoVerificationFactory,
+    VerificationAttemptFactory
+)
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -174,3 +185,26 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
             photo_id_name=attempt.name,
             full_name=pending_name_change.new_name
         )
+
+
+class RetirementSignalVerificationAttemptsTest(ModuleStoreTestCase):
+    """
+    Tests for the LMS User Retirement signal for Verification Attempts
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.other_user = UserFactory.create()
+        VerificationAttemptFactory.create(user=self.user)
+        VerificationAttemptFactory.create(user=self.other_user)
+
+    def test_retirement_signal(self):
+        _listen_for_lms_retire_verification_attempts(sender=self.__class__, user=self.user)
+        self.assertEqual(len(VerificationAttempt.objects.filter(user=self.user)), 0)
+        self.assertEqual(len(VerificationAttempt.objects.filter(user=self.other_user)), 1)
+
+    def test_retirement_signal_no_attempts(self):
+        no_attempt_user = UserFactory.create()
+        _listen_for_lms_retire_verification_attempts(sender=self.__class__, user=no_attempt_user)
+        self.assertEqual(len(VerificationAttempt.objects.all()), 2)
