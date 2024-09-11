@@ -327,21 +327,21 @@ def run_pii_check():
             ]
             
             # Run the command without shell=True
-            result = subprocess.run(
-                command,
-                env=env,  # Pass the environment with DJANGO_SETTINGS_MODULE
-                check=True,
-                # shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+            with open(run_output_file, 'w') as report_file:
+                result = subprocess.run(
+                    command,
+                    env=env,  # Pass the environment with DJANGO_SETTINGS_MODULE
+                    check=True,
+                    stdout=report_file,
+                    stderr=subprocess.STDOUT
+                    text=True
+                )
 
             print("Command Output:\n", result.stdout)
 
             # Write output to run_output_file
-            with open(run_output_file, 'w') as f:
-                f.write(result.stdout)
+            # with open(run_output_file, 'w') as f:
+            #     f.write(result.stdout)
 
             # Extract results
             uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
