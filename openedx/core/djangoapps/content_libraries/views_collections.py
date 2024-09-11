@@ -5,6 +5,8 @@ Collections API Views
 from __future__ import annotations
 
 from django.db.models import QuerySet
+from django.utils.text import slugify
+from django.db import transaction
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -21,7 +23,6 @@ from openedx.core.djangoapps.content_libraries.views import convert_exceptions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionSerializer,
     ContentLibraryCollectionComponentsUpdateSerializer,
-    ContentLibraryCollectionCreateSerializer,
     ContentLibraryCollectionUpdateSerializer,
 )
 
@@ -109,17 +110,30 @@ class LibraryCollectionsView(ModelViewSet):
         Create a Collection that belongs to a Content Library
         """
         content_library = self.get_content_library()
-        create_serializer = ContentLibraryCollectionCreateSerializer(data=request.data)
+        create_serializer = ContentLibraryCollectionUpdateSerializer(data=request.data)
         create_serializer.is_valid(raise_exception=True)
 
-        collection = api.create_library_collection(
-            library_key=content_library.library_key,
-            content_library=content_library,
-            collection_key=create_serializer.validated_data["key"],
-            title=create_serializer.validated_data["title"],
-            description=create_serializer.validated_data["description"],
-            created_by=request.user.id,
-        )
+        title = create_serializer.validated_data['title']
+        key = slugify(title)
+
+        attempt = 0
+        collection = None
+        while not collection:
+            modified_key = key if attempt == 0 else key + '-' + str(attempt)
+            try:
+                # Add transaction here to avoid TransactionManagementError on retry
+                with transaction.atomic():
+                    collection = api.create_library_collection(
+                        library_key=content_library.library_key,
+                        content_library=content_library,
+                        collection_key=modified_key,
+                        title=title,
+                        description=create_serializer.validated_data["description"],
+                        created_by=request.user.id,
+                    )
+            except api.LibraryCollectionAlreadyExists:
+                attempt += 1
+
         serializer = self.get_serializer(collection)
 
         return Response(serializer.data)

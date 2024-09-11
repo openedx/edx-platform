@@ -162,16 +162,15 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
         Test creating a Content Library Collection
         """
         post_data = {
-            "key": "COL4",
             "title": "Collection 4",
             "description": "Description for Collection 4",
         }
         resp = self.client.post(
             URL_LIB_COLLECTIONS.format(lib_key=self.lib1.library_key), post_data, format="json"
         )
-
         # Check that the new Content Library Collection is returned in response and created in DB
         assert resp.status_code == 200
+        post_data["key"] = 'collection-4'
         self.assertDictContainsEntries(resp.data, post_data)
 
         created_collection = Collection.objects.get(id=resp.data["id"])
@@ -183,7 +182,6 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
 
         with self.as_user(reader):
             post_data = {
-                "key": "COL5",
                 "title": "Collection 5",
                 "description": "Description for Collection 5",
             }
@@ -192,6 +190,31 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
             )
 
             assert resp.status_code == 403
+
+    def test_create_collection_same_key(self):
+        """
+        Test collection creation with same key
+        """
+        post_data = {
+            "title": "Same Collection",
+            "description": "Description for Collection 4",
+        }
+        self.client.post(
+            URL_LIB_COLLECTIONS.format(lib_key=self.lib1.library_key), post_data, format="json"
+        )
+
+        for i in range(100):
+            resp = self.client.post(
+                URL_LIB_COLLECTIONS.format(lib_key=self.lib1.library_key), post_data, format="json"
+            )
+            expected_data = {
+                "key": f"same-collection-{i + 1}",
+                "title": "Same Collection",
+                "description": "Description for Collection 4",
+            }
+
+            assert resp.status_code == 200
+            self.assertDictContainsEntries(resp.data, expected_data)
 
     def test_create_invalid_library_collection(self):
         """
