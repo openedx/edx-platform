@@ -61,12 +61,16 @@ def opt_out_email_updates(request, token, course_id):
             course_id,
         )
 
-    tracker.emit(
-        'edx.bulk_email.opt_out',
-        {
-            'course_id': course_id,
-            'user_id': user.id,
-        }
-    )
+    event_name = 'edx.bulk_email.opt_out'
+    event_data = {
+        "username": user.username,
+        "user_id": user.id,
+        "course_id": course_id,
+    }
+    with tracker.get_tracker().context(event_name, event_data):
+        tracker.emit(
+            event_name,
+            event_data
+        )
 
     return render_to_response('bulk_email/unsubscribe_success.html', context)

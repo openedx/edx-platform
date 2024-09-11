@@ -1203,10 +1203,10 @@ class VerificationAttempt(TimeStampedModel):
     name = models.CharField(blank=True, max_length=255)
 
     STATUS_CHOICES = [
-        VerificationAttemptStatus.created,
-        VerificationAttemptStatus.pending,
-        VerificationAttemptStatus.approved,
-        VerificationAttemptStatus.denied,
+        VerificationAttemptStatus.CREATED,
+        VerificationAttemptStatus.PENDING,
+        VerificationAttemptStatus.APPROVED,
+        VerificationAttemptStatus.DENIED,
     ]
     status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
 
@@ -1219,3 +1219,13 @@ class VerificationAttempt(TimeStampedModel):
     def updated_at(self):
         """Backwards compatibility with existing IDVerification models"""
         return self.modified
+
+    @classmethod
+    def retire_user(cls, user_id):
+        """
+        Retire user as part of GDPR pipeline
+
+        :param user_id: int
+        """
+        verification_attempts = cls.objects.filter(user_id=user_id)
+        verification_attempts.delete()
