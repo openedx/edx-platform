@@ -72,9 +72,6 @@ jobs:
         run: |
           pip install -r requirements/edx/assets.txt
 
-      - name: Initiate Mongo DB Service
-        run: sudo systemctl start mongod
-
       - name: Add node_modules bin to $Path
         run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
 
