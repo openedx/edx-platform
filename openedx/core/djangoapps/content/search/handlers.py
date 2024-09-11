@@ -6,20 +6,23 @@ import logging
 
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
     ContentObjectChangedData,
     LibraryBlockData,
+    LibraryCollectionData,
     XBlockData,
 )
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_UPDATED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
@@ -34,6 +37,7 @@ from .tasks import (
     delete_library_block_index_doc,
     delete_xblock_index_doc,
     update_content_library_index_docs,
+    update_library_collection_index_doc,
     upsert_library_block_index_doc,
     upsert_xblock_index_doc,
 )
@@ -149,6 +153,24 @@ def content_library_updated_handler(**kwargs) -> None:
     # for other update operations other than discard, we can update CONTENT_LIBRARY_UPDATED event
     # to include a parameter which can help us decide if the task needs to run sync or async.
     update_content_library_index_docs.apply(args=[str(content_library_data.library_key)])
+
+
+@receiver(LIBRARY_COLLECTION_CREATED)
+@receiver(LIBRARY_COLLECTION_UPDATED)
+@only_if_meilisearch_enabled
+def library_collection_updated_handler(**kwargs) -> None:
+    """
+    Create or update the index for the content library collection
+    """
+    library_collection = kwargs.get("library_collection", None)
+    if not library_collection or not isinstance(library_collection, LibraryCollectionData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+
+    update_library_collection_index_doc.delay(
+        str(library_collection.library_key),
+        library_collection.collection_key,
+    )
 
 
 @receiver(CONTENT_OBJECT_ASSOCIATIONS_CHANGED)
