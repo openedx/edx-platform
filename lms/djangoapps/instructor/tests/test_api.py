@@ -4767,31 +4767,30 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
         )
         return response
 
+    def run_endpoint_tests(self, expected_status, add_role, use_jwt):
+        """
+        Util method for running different end-points.
+        """
+        for endpoint, body, role in self.endpoints:
+            with self.subTest(endpoint=endpoint, role=role, body=body):
+                response = self.assert_all_end_points(endpoint, body, role, add_role, use_jwt)
+                # JWT authentication works but it has no permissions.
+                assert response.status_code == expected_status, f"Failed for endpoint: {endpoint}"
+
     def test_end_points_with_oauth_without_jwt(self):
         """
         Verify the endpoint using invalid JWT returns 401.
         """
-        for endpoint, body, role in self.endpoints:
-            with self.subTest(endpoint=endpoint, role=role, body=body):
-                response = self.assert_all_end_points(endpoint, body, role, False, False)
-                # JWT authentication works but it has no permissions.
-                assert response.status_code == 401, f"Failed for endpoint: {endpoint}"
+        self.run_endpoint_tests(expected_status=401, add_role=False, use_jwt=False)
 
     def test_end_points_with_oauth_without_permissions(self):
         """
         Verify the endpoint using JWT authentication. But has no permissions.
         """
-        for endpoint, body, role in self.endpoints:
-            with self.subTest(endpoint=endpoint, role=role, body=body):
-                response = self.assert_all_end_points(endpoint, body, role, False, True)
-                # JWT authentication works but it has no permissions.
-                assert response.status_code == 403, f"Failed for endpoint: {endpoint}"
+        self.run_endpoint_tests(expected_status=403, add_role=False, use_jwt=True)
 
     def test_end_points_with_oauth_with_permissions(self):
         """
         Verify the endpoint using JWT authentication with permissions.
         """
-        for endpoint, body, role in self.endpoints:
-            with self.subTest(endpoint=endpoint, role=role, body=body):
-                response = self.assert_all_end_points(endpoint, body, role, True, True)
-                assert response.status_code == 200, f"Failed for endpoint: {endpoint}"
+        self.run_endpoint_tests(expected_status=200, add_role=True, use_jwt=True)
