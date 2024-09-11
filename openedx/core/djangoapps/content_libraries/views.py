@@ -84,6 +84,7 @@ from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, Dj
 from pylti1p3.exception import LtiException, OIDCException
 
 import edx_api_doc_tools as apidocs
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
@@ -136,12 +137,21 @@ def convert_exceptions(fn):
     def wrapped_fn(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
+        except InvalidKeyError as exc:
+            log.exception(str(exc))
+            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
         except api.ContentLibraryNotFound:
             log.exception("Content library not found")
             raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
         except api.ContentLibraryBlockNotFound:
             log.exception("XBlock not found in content library")
             raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
+        except api.ContentLibraryCollectionNotFound:
+            log.exception("Collection not found in content library")
+            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
+        except api.LibraryCollectionAlreadyExists as exc:
+            log.exception(str(exc))
+            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
         except api.LibraryBlockAlreadyExists as exc:
             log.exception(str(exc))
             raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
