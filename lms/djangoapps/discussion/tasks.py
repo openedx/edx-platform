@@ -79,7 +79,6 @@ class CommentNotification(BaseMessageType):
     """
     Notify discussion participants of new comments.
     """
-    pass
 
 
 @shared_task(base=LoggedTask)
