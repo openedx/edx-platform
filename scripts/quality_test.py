@@ -132,12 +132,12 @@ def _get_stylelint_violations():
     # command = f"stylelint **/*.scss --custom-formatter={formatter}"
     formatter = 'node_modules/stylelint-formatter-pretty/index.js'
     # Expand the glob pattern to match all .scss files
-    scss_files = glob.glob('**/*.scss', recursive=True)
+    # scss_files = glob.glob('**/*.scss', recursive=True)
 
     command = [
         "node",
-        "./node_modules/.bin/stylelint",
-        "**/*.scss",  # The glob pattern for SCSS files
+        "node_modules/.bin/stylelint",
+        '**/*.scss',  # The glob pattern for SCSS files
         f"--custom-formatter={formatter}"  # Using the custom formatter
     ]
     with open(stylelint_report, 'w') as report_file:
@@ -145,7 +145,8 @@ def _get_stylelint_violations():
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
+            check=True
         )
 
     # Debugging output: Print stderr and return code
@@ -300,30 +301,45 @@ def run_pii_check():
     output_file = os.path.join(report_dir, 'pii_check_{}.report')
     env_report = []
     pii_check_passed = True
+    
     for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
         try:
             print(f"Running {env_name} PII Annotation check and report")
             print("-" * 45)
+
             run_output_file = str(output_file).format(env_name.lower())
             os.makedirs(report_dir, exist_ok=True)
-            command = (
-                f"export DJANGO_SETTINGS_MODULE={env_settings_file};"
-                f"code_annotations django_find_annotations"
-                f"--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()}"
-                f"--lint --report --coverage | tee {run_output_file}"
-            )
+
+            # Prepare the environment for the command
+            env = {
+                **os.environ,  # Include the current environment variables
+                "DJANGO_SETTINGS_MODULE": env_settings_file  # Set DJANGO_SETTINGS_MODULE for each environment
+            }
+
+            # Break the command into a list of arguments
+            command = [
+                "code_annotations", "django_find_annotations",
+                "--config_file", ".pii_annotations.yml",
+                "--report_path", report_dir,
+                "--app_name", env_name.lower(),
+                "--lint", "--report", "--coverage"
+            ]
+
+            # Run the command without shell=True
             result = subprocess.run(
                 command,
-                shell=True,
-                check=False,
+                env=env,  # Pass the environment with DJANGO_SETTINGS_MODULE
+                check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
 
+            # Write output to run_output_file
             with open(run_output_file, 'w') as f:
                 f.write(result.stdout)
 
+            # Extract results
             uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
             env_report.append((
                 uncovered_model_count,
@@ -333,14 +349,15 @@ def run_pii_check():
         except BuildFailure as error_message:
             fail_quality(pii_report_name, f'FAILURE: {error_message}')
 
+        # Update pii_check_passed based on the result of the current environment
         if not pii_check_passed_env:
             pii_check_passed = False
 
-    # Finally, fail the paver task if code_annotations suggests that the check failed.
+    # If the PII check failed in any environment, fail the task
     if not pii_check_passed:
         fail_quality('pii', full_log)
     else:
-        print("successfully run pii_check")
+        print("Successfully ran pii_check")
 
 
 def check_keywords():
