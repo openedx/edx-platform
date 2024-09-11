@@ -61,6 +61,10 @@ class Fields:
     # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
     content = "content"
 
+    # Collections use this field to communicate how many entities/components they contain.
+    # Structural XBlocks may use this one day to indicate how many child blocks they ocntain.
+    num_children = "num_children"
+
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
     # command (changing those settings on an large active index is not recommended).
@@ -344,6 +348,7 @@ def searchable_doc_for_collection(collection) -> dict:
         # If related contentlibrary is found, it will override this value below.
         # Mostly contentlibrary.library_key == learning_package.key
         Fields.context_key: collection.learning_package.key,
+        Fields.num_children: collection.entities.count(),
     }
     # Just in case learning_package is not related to a library
     try:
