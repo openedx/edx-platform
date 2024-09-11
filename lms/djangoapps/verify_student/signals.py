@@ -16,6 +16,7 @@ from openedx_events.learning.signals import (
 # providing_args = ["attempt_id", "user_id", "status", "full_name", "profile_name"]
 idv_update_signal = Signal()
 
+
 def _create_user_data(user):
     """
     Helper function to create a UserData object.
