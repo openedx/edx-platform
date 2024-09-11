@@ -333,7 +333,7 @@ def run_pii_check():
                     env=env,  # Pass the environment with DJANGO_SETTINGS_MODULE
                     check=True,
                     stdout=report_file,
-                    stderr=subprocess.STDOUT
+                    stderr=subprocess.STDOUT,
                     text=True
                 )
 
