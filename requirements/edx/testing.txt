@@ -571,7 +571,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.24.0
+edx-enterprise==4.25.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -661,7 +661,7 @@ enmerkar==0.7.1
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar-underscore
-enmerkar-underscore==2.3.0
+enmerkar-underscore==2.3.1
     # via -r requirements/edx/base.txt
 event-tracking==3.0.0
     # via
@@ -1024,6 +1024,7 @@ openedx-django-wiki==2.1.0
 openedx-events==9.12.0
     # via
     #   -r requirements/edx/base.txt
+    #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   event-tracking

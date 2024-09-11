@@ -663,6 +663,7 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(self.user_2.id),
+            'email_content': 'dummy'
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
@@ -680,6 +681,7 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(response.user_id),
+            'email_content': 'dummy'
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))

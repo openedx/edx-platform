@@ -8,7 +8,6 @@ import os
 import time
 from pprint import pformat
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 
 from lms.djangoapps.verify_student.api import send_approval_email
