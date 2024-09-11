@@ -2273,6 +2273,7 @@ CACHES = {
 
 ############################ OAUTH2 Provider ###################################
 
+
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
 
@@ -2287,12 +2288,6 @@ API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
-
-EDX_DRF_EXTENSIONS = {
-    # Set this value to an empty dict in order to prevent automatically updating
-    # user data from values in (possibly stale) JWTs.
-    'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
-}
 
 ############## Settings for Studio Context Sensitive Help ##############
 
