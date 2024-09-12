@@ -296,16 +296,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     status_cb("Counting courses...")
     num_courses = CourseOverview.objects.count()
 
-    # Get the list of collections
-    status_cb("Counting collections...")
-    num_collections = authoring_api.get_collections().count()
-
     # Some counters so we can track our progress as indexing progresses:
-    num_contexts = num_courses + num_libraries + num_collections
+    num_contexts = num_courses + num_libraries
     num_contexts_done = 0  # How many courses/libraries we've indexed
     num_blocks_done = 0  # How many individual components/XBlocks we've indexed
 
-    status_cb(f"Found {num_courses} courses, {num_libraries} libraries and {num_collections} collections.")
+    status_cb(f"Found {num_courses} courses, {num_libraries} libraries.")
     with _using_temp_index(status_cb) as temp_index_name:
         ############## Configure the index ##############
 
@@ -390,10 +386,43 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     status_cb(f"Error indexing library {lib_key}: {err}")
             return docs
 
+        ############## Collections ##############
+        def index_collection_batch(batch, num_done) -> int:
+            docs = []
+            for collection in batch:
+                try:
+                    doc = searchable_doc_for_collection(collection)
+                    # Uncomment below line once collections are tagged.
+                    # doc.update(searchable_doc_tags(collection.id))
+                    docs.append(doc)
+                except Exception as err:  # pylint: disable=broad-except
+                    status_cb(f"Error indexing collection {collection}: {err}")
+                num_done += 1
+
+            if docs:
+                try:
+                    # Add docs in batch of 100 at once (usually faster than adding one at a time):
+                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                except (TypeError, KeyError, MeilisearchError) as err:
+                    status_cb(f"Error indexing collection batch {p}: {err}")
+            return num_done
+
         for lib_key in lib_keys:
-            status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing library {lib_key}")
+            status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing blocks in library {lib_key}")
             lib_docs = index_library(lib_key)
             num_blocks_done += len(lib_docs)
+
+            # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
+            library = lib_api.get_library(lib_key)
+            collections = authoring_api.get_collections(library.learning_package.id, enabled=True)
+            num_collections = collections.count()
+            num_collections_done = 0
+            status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
+            paginator = Paginator(collections, 100)
+            for p in paginator.page_range:
+                num_collections_done = index_collection_batch(paginator.page(p).object_list, num_collections_done)
+            status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
+
             num_contexts_done += 1
 
         ############## Courses ##############
@@ -429,39 +458,6 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 course_docs = index_course(course)
                 num_contexts_done += 1
                 num_blocks_done += len(course_docs)
-
-        ############## Collections ##############
-        status_cb("Indexing collections...")
-
-        def index_collection_batch(batch, num_contexts_done) -> int:
-            docs = []
-            for collection in batch:
-                status_cb(
-                    f"{num_contexts_done + 1}/{num_contexts}. "
-                    f"Now indexing collection {collection.title} ({collection.id})"
-                )
-                try:
-                    doc = searchable_doc_for_collection(collection)
-                    # Uncomment below line once collections are tagged.
-                    # doc.update(searchable_doc_tags(collection.id))
-                    docs.append(doc)
-                except Exception as err:  # pylint: disable=broad-except
-                    status_cb(f"Error indexing collection {collection}: {err}")
-                finally:
-                    num_contexts_done += 1
-
-            if docs:
-                try:
-                    # Add docs in batch of 100 at once (usually faster than adding one at a time):
-                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
-                except (TypeError, KeyError, MeilisearchError) as err:
-                    status_cb(f"Error indexing collection batch {p}: {err}")
-            return num_contexts_done
-
-        # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
-        paginator = Paginator(authoring_api.get_collections(enabled=True), 100)
-        for p in paginator.page_range:
-            num_contexts_done = index_collection_batch(paginator.page(p).object_list, num_contexts_done)
 
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 

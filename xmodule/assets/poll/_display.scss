@@ -20,13 +20,13 @@ div.poll_question {
 
   h3 {
     margin-top: 0;
-    margin-bottom: ($baseline*0.75);
+    margin-bottom: calc((var(--baseline)*0.75));
     color: #fe57a1;
     font-size: 1.9em;
 
     &.problem-header {
       div.staff {
-        margin-top: ($baseline*1.5);
+        margin-top: calc((var(--baseline)*1.5));
         font-size: 80%;
       }
     }
@@ -44,7 +44,7 @@ div.poll_question {
   }
 
   .poll_answer {
-    margin-bottom: $baseline;
+    margin-bottom: var(--baseline);
 
     &.short {
       clear: both;
@@ -107,7 +107,7 @@ div.poll_question {
         font-weight: bold;
         letter-spacing: normal;
         line-height: 25.59375px;
-        margin-bottom: ($baseline*0.75);
+        margin-bottom: calc((var(--baseline)*0.75));
         margin: 0;
         padding: 0px;
         text-align: center;
@@ -145,9 +145,9 @@ div.poll_question {
         width: 80%;
         text-align: left;
         min-height: 30px;
-        margin-left: $baseline;
+        margin-left: var(--baseline);
         height: auto;
-        margin-bottom: $baseline;
+        margin-bottom: var(--baseline);
 
         &.short {
           width: 100px;
@@ -157,7 +157,7 @@ div.poll_question {
 
     .stats {
       min-height: 40px;
-      margin-top: $baseline;
+      margin-top: var(--baseline);
       clear: both;
 
       &.short {
@@ -174,7 +174,7 @@ div.poll_question {
         border: 1px solid black;
         display: inline;
         float: left;
-        margin-right: ($baseline/2);
+        margin-right: calc((var(--baseline)/2));
 
         &.short {
           width: 65%;

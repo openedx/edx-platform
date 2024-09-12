@@ -215,6 +215,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             )
             collection = authoring_api.create_collection(
                 learning_package_id=learning_package.id,
+                key="MYCOL",
                 title="my_collection",
                 created_by=None,
                 description="my collection description"
@@ -223,11 +224,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         assert doc == {
             "id": collection.id,
             "type": "collection",
-            "display_name": collection.title,
-            "description": collection.description,
+            "display_name": "my_collection",
+            "description": "my collection description",
             "context_key": learning_package.key,
             "access_id": self.toy_course_access_id,
-            "breadcrumbs": [{"display_name": learning_package.title}],
+            "breadcrumbs": [{"display_name": "some learning_package"}],
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
         }

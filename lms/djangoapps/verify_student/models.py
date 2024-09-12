@@ -1215,6 +1215,11 @@ class VerificationAttempt(TimeStampedModel):
         blank=True,
     )
 
+    @property
+    def updated_at(self):
+        """Backwards compatibility with existing IDVerification models"""
+        return self.modified
+
     @classmethod
     def retire_user(cls, user_id):
         """

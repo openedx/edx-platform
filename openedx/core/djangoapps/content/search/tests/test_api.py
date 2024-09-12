@@ -177,8 +177,16 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Create a collection:
         self.learning_package = authoring_api.get_learning_package_by_key(self.library.key)
+        with freeze_time(created_date):
+            self.collection = authoring_api.create_collection(
+                learning_package_id=self.learning_package.id,
+                key="MYCOL",
+                title="my_collection",
+                created_by=None,
+                description="my collection description"
+            )
         self.collection_dict = {
-            'id': 1,
+            'id': self.collection.id,
             'type': 'collection',
             'display_name': 'my_collection',
             'description': 'my collection description',
@@ -189,13 +197,6 @@ class TestSearchApi(ModuleStoreTestCase):
             "access_id": lib_access.id,
             'breadcrumbs': [{'display_name': 'Library'}]
         }
-        with freeze_time(created_date):
-            self.collection = authoring_api.create_collection(
-                learning_package_id=self.learning_package.id,
-                title="my_collection",
-                created_by=None,
-                description="my collection description"
-            )
 
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
