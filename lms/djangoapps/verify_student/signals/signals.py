@@ -22,9 +22,6 @@ def _create_user_data(user):
     Helper function to create a UserData object.
     """
     user_data = UserData(
-        # NOTE to self: the id field was previously = lms_user_id in edx-exams, which I copied this from
-        # Do we want that specific ID, or is this fine?
-        # (There was also a "full_name" field, but I don't think we need that)
         id=user.id,
         is_active=user.is_active,
         pii=UserPersonalData(

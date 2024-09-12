@@ -15,6 +15,7 @@ from lms.djangoapps.verify_student.api import (
     send_approval_email,
     update_verification_attempt,
 )
+from lms.djangoapps.verify_student.signals.signals import idv_update_signal
 from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationAttempt
 from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus
@@ -133,7 +134,6 @@ class UpdateVerificationAttempt(TestCase):
         update_verification_attempt(
             attempt_id=self.attempt.id,
             name=name,
-            user=self.user,
             status=status,
             expiration_datetime=expiration_datetime,
         )
@@ -150,7 +150,6 @@ class UpdateVerificationAttempt(TestCase):
         update_verification_attempt(
             attempt_id=self.attempt.id,
             name=None,
-            user=self.user,
             status=None,
             expiration_datetime=None,
         )
@@ -169,7 +168,6 @@ class UpdateVerificationAttempt(TestCase):
             update_verification_attempt,
             attempt_id=999999,
             name=None,
-            user=self.user,
             status=VerificationAttemptStatus.APPROVED,
         )
 
@@ -185,7 +183,6 @@ class UpdateVerificationAttempt(TestCase):
             update_verification_attempt,
             attempt_id=self.attempt.id,
             name=None,
-            user=self.user,
             status=status,
             expiration_datetime=None,
         )
