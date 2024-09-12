@@ -54,8 +54,12 @@ class Fields:
     tags_level1 = "level1"
     tags_level2 = "level2"
     tags_level3 = "level3"
-    # List of collection.key strings this object belongs to.
+    # Collections (dictionary) that this object belongs to.
+    # Similarly to tags above, we collect the collection.titles and collection.keys into hierarchical facets.
     collections = "collections"
+    collections_display_name = "display_name"
+    collections_key = "key"
+
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
     # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
@@ -233,25 +237,41 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
 
     e.g. for something in Collections "COL_A" and "COL_B", this would return:
         {
-            "collections": ["COL_A", "COL_B"],
+            "collections":  {
+                "display_name": ["Collection A", "Collection B"],
+                "key": ["COL_A", "COL_B"],
+            }
         }
 
-    Returns an empty dict if the object is not in any collections.
+    If the object is in no collections, returns:
+        {
+            "collections":  {},
+        }
+
     """
     # Gather the collections associated with this object
-    result = {}
-    collections = []
+    collections = None
     try:
         component = lib_api.get_component_from_usage_key(object_id)
         collections = authoring_api.get_entity_collections(
             component.learning_package_id,
             component.key,
-        ).values_list("key", flat=True)
+        )
     except ObjectDoesNotExist:
         log.warning(f"No component found for {object_id}")
 
-    if collections:
-        result[Fields.collections] = list(collections)
+    if not collections:
+        return {Fields.collections: {}}
+
+    result = {
+        Fields.collections: {
+            Fields.collections_display_name: [],
+            Fields.collections_key: [],
+        }
+    }
+    for collection in collections:
+        result[Fields.collections][Fields.collections_display_name].append(collection.title)
+        result[Fields.collections][Fields.collections_key].append(collection.key)
 
     return result
 

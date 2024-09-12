@@ -284,7 +284,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "content": {
                 "html_content": "",
             },
-            "collections": ["TOY_COLLECTION"],
+            "collections": {
+                "key": ["TOY_COLLECTION"],
+                "display_name": ["Toy Collection"],
+            },
             "tags": {
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"],
