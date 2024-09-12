@@ -28,7 +28,11 @@ class Fields:
     id = "id"
     usage_key = "usage_key"
     type = "type"  # DocType.course_block or DocType.library_block (see below)
-    block_id = "block_id"  # The block_id part of the usage key. Sometimes human-readable, sometimes a random hex ID
+    # The block_id part of the usage key for course or library blocks.
+    # If it's a collection, the collection.key is stored here.
+    # Sometimes human-readable, sometimes a random hex ID
+    # Is only unique within the given context_key.
+    block_id = "block_id"
     display_name = "display_name"
     description = "description"
     modified = "modified"
@@ -54,7 +58,7 @@ class Fields:
     tags_level1 = "level1"
     tags_level2 = "level2"
     tags_level3 = "level3"
-    # List of collection.key strings this object belongs to.
+    # List of collection.block_id strings this object belongs to.
     collections = "collections"
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
@@ -339,6 +343,7 @@ def searchable_doc_for_collection(collection) -> dict:
     """
     doc = {
         Fields.id: collection.id,
+        Fields.block_id: collection.key,
         Fields.type: DocType.collection,
         Fields.display_name: collection.title,
         Fields.description: collection.description,

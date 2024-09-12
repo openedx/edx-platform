@@ -186,7 +186,8 @@ class TestSearchApi(ModuleStoreTestCase):
                 description="my collection description"
             )
         self.collection_dict = {
-            'id': self.collection.id,
+            "id": self.collection.id,
+            "block_id": self.collection.key,
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
@@ -451,6 +452,7 @@ class TestSearchApi(ModuleStoreTestCase):
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
         doc_collection1_created = {
             "id": collection1.id,
+            "block_id": collection1.key,
             "type": "collection",
             "display_name": "Collection 1",
             "description": "First Collection",
@@ -464,6 +466,7 @@ class TestSearchApi(ModuleStoreTestCase):
         }
         doc_collection2_created = {
             "id": collection2.id,
+            "block_id": collection2.key,
             "type": "collection",
             "display_name": "Collection 2",
             "description": "Second Collection",
@@ -477,6 +480,7 @@ class TestSearchApi(ModuleStoreTestCase):
         }
         doc_collection2_updated = {
             "id": collection2.id,
+            "block_id": collection2.key,
             "type": "collection",
             "display_name": "Collection 2",
             "description": "Second Collection",
@@ -490,6 +494,7 @@ class TestSearchApi(ModuleStoreTestCase):
         }
         doc_collection1_updated = {
             "id": collection1.id,
+            "block_id": collection1.key,
             "type": "collection",
             "display_name": "Collection 1",
             "description": "First Collection",

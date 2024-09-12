@@ -295,6 +295,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         doc = searchable_doc_for_collection(self.collection)
         assert doc == {
             "id": self.collection.id,
+            "block_id": self.collection.key,
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -325,6 +326,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         doc = searchable_doc_for_collection(collection)
         assert doc == {
             "id": collection.id,
+            "block_id": collection.key,
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
