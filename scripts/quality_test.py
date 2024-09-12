@@ -3,6 +3,7 @@ Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
 import argparse
+import glob
 import json
 import os
 import re
@@ -101,7 +102,6 @@ def _get_count_from_last_line(filename, file_type):
     It is returning only the value (as a floating number).
     """
     report_contents = _get_report_contents(filename, file_type, last_line_only=True)
-
     if report_contents is None:
         return 0
 
@@ -126,19 +126,21 @@ def _get_stylelint_violations():
     stylelint_report_dir = (REPORT_DIR / "stylelint")
     stylelint_report = stylelint_report_dir / "stylelint.report"
     _prepare_report_dir(stylelint_report_dir)
-    formatter = 'node_modules/stylelint-formatter-pretty'
 
-    command = f"stylelint **/*.scss --custom-formatter={formatter}"
+    command = [
+        'node', 'node_modules/stylelint',
+        '*scss_files',
+        '--custom-formatter', 'stylelint-formatter-pretty/index.js'
+    ]
+
     with open(stylelint_report, 'w') as report_file:
-        result = subprocess.run(
+        subprocess.run(
             command,
-            shell=True,
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=report_file,
+            stderr=subprocess.STDOUT,
             text=True
         )
-        report_file.write(result.stdout)
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
@@ -149,6 +151,7 @@ def _get_stylelint_violations():
                 stylelint_report=stylelint_report
             )
         )
+
 
 def run_eslint():
     """
@@ -174,93 +177,35 @@ def run_eslint():
     ]
 
     with open(eslint_report, 'w') as report_file:
-        # Run the command
-        result = subprocess.run(
+        subprocess.run(
             command,
             stdout=report_file,
             stderr=subprocess.STDOUT,
             text=True,
             check=False
         )
-    import pdb; pdb.set_trace()
-    
-    # Print the content of the report file for debugging
-    with open(eslint_report, 'r') as report_file:
-        report_content = report_file.read()
-        print("ESLint report content:")
-        print(report_content)
 
     try:
         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
     except TypeError:
         fail_quality(
             'eslint',
-            f"FAILURE: Number of eslint violations could not be found in {eslint_report}"
+            "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
+                eslint_report=eslint_report
+            )
         )
 
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
         fail_quality(
             'eslint',
-            f"FAILURE: Too many eslint violations ({num_violations}).\nThe limit is {violations_limit}."
+            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations, violations_limit=violations_limit
+            )
         )
     else:
         print("successfully run eslint with violations")
         print(num_violations)
-
-
-# def run_eslint():
-#     """
-#     Runs eslint on static asset directories.
-#     If limit option is passed, fails build if more violations than the limit are found.
-#     """
-
-#     REPO_ROOT = repo_root()
-#     REPORT_DIR = REPO_ROOT / 'reports'
-#     eslint_report_dir = (REPORT_DIR / "eslint")
-#     eslint_report = eslint_report_dir / "eslint.report"
-#     _prepare_report_dir(eslint_report_dir)
-#     violations_limit = 4950
-
-#     command = (
-#         "node --max_old_space_size=4096 node_modules/.bin/eslint "
-#         "--ext .js --ext .jsx --format=compact ."
-#     )
-#     with open(eslint_report, 'w') as report_file:
-#         # Run the command
-#         result = subprocess.run(
-#             command,
-#             shell=True,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#             text=True,
-#             check=False
-#         )
-
-#         # Write the output to the report file
-#         report_file.write(result.stdout)
-
-#     try:
-#         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
-#     except TypeError:
-#         fail_quality(
-#             'eslint',
-#             "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
-#                 eslint_report=eslint_report
-#             )
-#         )
-
-#     # Fail if number of violations is greater than the limit
-#     if num_violations > violations_limit > -1:
-#         fail_quality(
-#             'eslint',
-#             "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
-#                 count=num_violations, violations_limit=violations_limit
-#             )
-#         )
-#     else:
-#         print("successfully run eslint with violations")
-#         print(num_violations)
 
 
 def run_stylelint():
@@ -271,7 +216,6 @@ def run_stylelint():
 
     violations_limit = 0
     num_violations = _get_stylelint_violations()
-
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit:
         fail_quality(
@@ -341,30 +285,41 @@ def run_pii_check():
     output_file = os.path.join(report_dir, 'pii_check_{}.report')
     env_report = []
     pii_check_passed = True
+
     for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
         try:
             print(f"Running {env_name} PII Annotation check and report")
             print("-" * 45)
+
             run_output_file = str(output_file).format(env_name.lower())
             os.makedirs(report_dir, exist_ok=True)
-            command = (
-                f"export DJANGO_SETTINGS_MODULE={env_settings_file};"
-                f"code_annotations django_find_annotations"
-                f"--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name.lower()}"
-                f"--lint --report --coverage | tee {run_output_file}"
-            )
-            result = subprocess.run(
-                command,
-                shell=True,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
 
-            with open(run_output_file, 'w') as f:
-                f.write(result.stdout)
+            # Prepare the environment for the command
+            env = {
+                **os.environ,  # Include the current environment variables
+                "DJANGO_SETTINGS_MODULE": env_settings_file  # Set DJANGO_SETTINGS_MODULE for each environment
+            }
 
+            command = [
+                "code_annotations",
+                "django_find_annotations",
+                "--config_file", ".pii_annotations.yml",
+                "--report_path", str(report_dir),
+                "--app_name", env_name.lower()
+            ]
+
+            # Run the command without shell=True
+            with open(run_output_file, 'w') as report_file:
+                subprocess.run(
+                    command,
+                    env=env,  # Pass the environment with DJANGO_SETTINGS_MODULE
+                    check=True,
+                    stdout=report_file,
+                    stderr=subprocess.STDOUT,
+                    text=True
+                )
+
+            # Extract results
             uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
             env_report.append((
                 uncovered_model_count,
@@ -374,14 +329,15 @@ def run_pii_check():
         except BuildFailure as error_message:
             fail_quality(pii_report_name, f'FAILURE: {error_message}')
 
+        # Update pii_check_passed based on the result of the current environment
         if not pii_check_passed_env:
             pii_check_passed = False
 
-    # Finally, fail the paver task if code_annotations suggests that the check failed.
+    # If the PII check failed in any environment, fail the task
     if not pii_check_passed:
         fail_quality('pii', full_log)
     else:
-        print("successfully run pii_check")
+        print("Successfully ran pii_check")
 
 
 def check_keywords():
@@ -390,30 +346,33 @@ def check_keywords():
     """
     REPO_ROOT = repo_root()
     REPORT_DIR = REPO_ROOT / 'reports'
-    report_path = os.path.join(REPORT_DIR, 'reserved_keywords')
-    os.makedirs(report_path, exist_ok=True)
+    report_path = REPORT_DIR / 'reserved_keywords'
+    report_path.mkdir(parents=True, exist_ok=True)
 
     overall_status = True
-    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
-        report_file = f"{env}_reserved_keyword_report.csv"
+    for env_name, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+        report_file_path = report_path / f"{env_name}_reserved_keyword_report.csv"
         override_file = os.path.join(REPO_ROOT, "db_keyword_overrides.yml")
         try:
-            command = (
-                f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
-                f"python manage.py {env} check_reserved_keywords "
-                f"--override_file {override_file} "
-                f"--report_path {report_path} "
-                f"--report_file {report_file}"
-            )
-
-            subprocess.run(
-                command,
-                shell=True,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+            env = {
+                **os.environ,  # Include the current environment variables
+                "DJANGO_SETTINGS_MODULE": env_settings_file  # Set DJANGO_SETTINGS_MODULE for each environment
+            }
+            command = [
+                "python", "manage.py", env_name, "check_reserved_keywords",
+                "--override_file", str(override_file),
+                "--report_path", str(report_path),
+                "--report_file", str(report_file_path)
+            ]
+            with open(report_file_path, 'w') as report_file:
+                subprocess.run(
+                    command,
+                    env=env,
+                    check=True,
+                    stdout=report_file,
+                    stderr=subprocess.STDOUT,
+                    text=True
+                )
         except BuildFailure:
             overall_status = False
     if not overall_status:
@@ -491,13 +450,19 @@ def run_xsslint():
     xsslint_report = xsslint_report_dir / "xsslint.report"
     _prepare_report_dir(xsslint_report_dir)
 
-    # Prepare the command to run the xsslint script
-    command = (
-        f"{REPO_ROOT}/scripts/xsslint/{xsslint_script} "
-        f"--rule-totals --config=scripts.xsslint_config >> {xsslint_report}"
-    )
-
-    result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    command = [
+        f"{REPO_ROOT}/scripts/xsslint/{xsslint_script}",
+        "--rule-totals",
+        "--config=scripts.xsslint_config"
+    ]
+    with open(xsslint_report, 'w') as report_file:
+        subprocess.run(
+            command,
+            check=True,
+            stdout=report_file,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
     xsslint_counts = _get_xsslint_counts(xsslint_report)
 
     try:

@@ -229,5 +229,4 @@ test-js: ## run javascript tests
 coverage-js: ## run javascript coverage test
 	python scripts/js_test.py --option coverage
 
-quality: ## run all quality tests
-	pycodestyle eslint stylelint xsslint pii_check check_keywords
+quality: pycodestyle eslint stylelint xsslint pii_check check_keywords
