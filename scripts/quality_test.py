@@ -102,7 +102,6 @@ def _get_count_from_last_line(filename, file_type):
     It is returning only the value (as a floating number).
     """
     report_contents = _get_report_contents(filename, file_type, last_line_only=True)
-
     if report_contents is None:
         return 0
 
@@ -127,33 +126,21 @@ def _get_stylelint_violations():
     stylelint_report_dir = (REPORT_DIR / "stylelint")
     stylelint_report = stylelint_report_dir / "stylelint.report"
     _prepare_report_dir(stylelint_report_dir)
-    # formatter = 'node_modules/stylelint-formatter-pretty'
-
-    # command = f"stylelint **/*.scss --custom-formatter={formatter}"
-    formatter = 'node_modules/stylelint-formatter-pretty/index.js'
-    # Expand the glob pattern to match all .scss files
-    # scss_files = glob.glob('**/*.scss', recursive=True)
 
     command = [
-        "node",
-        "node_modules/.bin/stylelint",
-        '**/*.scss',  # The glob pattern for SCSS files
-        f"--custom-formatter={formatter}"  # Using the custom formatter
+        'node', 'node_modules/stylelint',
+        '*scss_files',
+        '--custom-formatter', 'stylelint-formatter-pretty/index.js'
     ]
-    with open(stylelint_report, 'w') as report_file:
-        result = subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True
-        )
 
-    # Debugging output: Print stderr and return code
-    if result.returncode != 0:
-        print(f"Stylelint failed with exit code {result.returncode}")
-        print(f"Error message:\n{result.stderr}")
-        return
+    with open(stylelint_report, 'w') as report_file:
+        subprocess.run(
+            command,
+            check=True,
+            stdout=report_file,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
 
     try:
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
@@ -190,8 +177,7 @@ def run_eslint():
     ]
 
     with open(eslint_report, 'w') as report_file:
-        # Run the command
-        result = subprocess.run(
+        subprocess.run(
             command,
             stdout=report_file,
             stderr=subprocess.STDOUT,
@@ -230,8 +216,6 @@ def run_stylelint():
 
     violations_limit = 0
     num_violations = _get_stylelint_violations()
-    print("violations")
-    print(num_violations)
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit:
         fail_quality(
@@ -326,7 +310,7 @@ def run_pii_check():
 
             # Run the command without shell=True
             with open(run_output_file, 'w') as report_file:
-                result = subprocess.run(
+                subprocess.run(
                     command,
                     env=env,  # Pass the environment with DJANGO_SETTINGS_MODULE
                     check=True,
@@ -374,13 +358,6 @@ def check_keywords():
                 **os.environ,  # Include the current environment variables
                 "DJANGO_SETTINGS_MODULE": env_settings_file  # Set DJANGO_SETTINGS_MODULE for each environment
             }
-            # command = (
-            #     f"export DJANGO_SETTINGS_MODULE={env_settings_file}; "
-            #     f"python manage.py {env} check_reserved_keywords "
-            #     f"--override_file {override_file} "
-            #     f"--report_path {report_path} "
-            #     f"--report_file {report_file}"
-            # )
             command = [
                 "python", "manage.py", env_name, "check_reserved_keywords",
                 "--override_file", str(override_file),
@@ -473,13 +450,19 @@ def run_xsslint():
     xsslint_report = xsslint_report_dir / "xsslint.report"
     _prepare_report_dir(xsslint_report_dir)
 
-    # Prepare the command to run the xsslint script
-    command = (
-        f"{REPO_ROOT}/scripts/xsslint/{xsslint_script} "
-        f"--rule-totals --config=scripts.xsslint_config >> {xsslint_report}"
-    )
-
-    result = subprocess.run(command, shell=True, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    command = [
+        f"{REPO_ROOT}/scripts/xsslint/{xsslint_script}",
+        "--rule-totals",
+        "--config=scripts.xsslint_config"
+    ]
+    with open(xsslint_report, 'w') as report_file:
+        subprocess.run(
+            command,
+            check=True,
+            stdout=report_file,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
     xsslint_counts = _get_xsslint_counts(xsslint_report)
 
     try:

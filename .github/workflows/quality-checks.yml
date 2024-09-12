@@ -79,6 +79,8 @@ jobs:
         run: |
             make pycodestyle
             make eslint
+            make stylelint
+            make xsslint
             make pii_check
             make check_keywords
           
