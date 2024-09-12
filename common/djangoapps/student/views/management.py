@@ -1464,3 +1464,13 @@ def extras_update_user_details(request):
                 old_user.last_name = lastName
         old_user.save()
         return HttpResponse("Saved")
+
+@login_required
+def extras_notebook_submissions(request):
+    MEMCACHE_TIMEOUT = 3600
+    token = uuid.uuid4().hex
+    value = request.user.id
+    cache.set(token, value, MEMCACHE_TIMEOUT)
+
+    redirect_url = "https://dashboard.talentsprint.com/submissions/notebook/auth.html?tokenID=" + token + "&requestingDomain="+ configuration_helpers.get_value("SITE_NAME", "maple.talentsprint.com")
+    return redirect(redirect_url)
