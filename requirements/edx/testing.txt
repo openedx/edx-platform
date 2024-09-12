@@ -590,7 +590,7 @@ edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.7
     # via -r requirements/edx/base.txt
-edx-opaque-keys[django] @ git+https://github.com/open-craft/opaque-keys.git@chris/FAL-3785-collections-key
+edx-opaque-keys[django]==2.11.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
