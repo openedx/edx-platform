@@ -1214,3 +1214,18 @@ class VerificationAttempt(TimeStampedModel):
         null=True,
         blank=True,
     )
+
+    @property
+    def updated_at(self):
+        """Backwards compatibility with existing IDVerification models"""
+        return self.modified
+
+    @classmethod
+    def retire_user(cls, user_id):
+        """
+        Retire user as part of GDPR pipeline
+
+        :param user_id: int
+        """
+        verification_attempts = cls.objects.filter(user_id=user_id)
+        verification_attempts.delete()
