@@ -1474,3 +1474,20 @@ def extras_notebook_submissions(request):
 
     redirect_url = "https://dashboard.talentsprint.com/submissions/notebook/auth.html?tokenID=" + token + "&requestingDomain="+ configuration_helpers.get_value("SITE_NAME", "maple.talentsprint.com")
     return redirect(redirect_url)
+
+def extras_userdetails(request):
+    try:
+        if "uid" in request.GET:
+            uid = request.GET["uid"]
+        elif "token" in request.GET:
+            uid = cache.get(request.GET["token"])
+    except MultiValueDictKeyError:
+        return render(request, 'blank.html', {"message": "Key Missing"})
+
+    try:
+        u = User.objects.get(id = uid)
+        p = UserProfile.objects.get(user = u)
+        user_details = {"username": u.username,"name" : u.first_name + " " + u.last_name,"mail" : u.email, "uid" : uid}
+        return JsonResponse(user_details)
+    except User.DoesNotExist:
+        return render(request, 'blank.html', {"message": "User Does Not Exist"})
