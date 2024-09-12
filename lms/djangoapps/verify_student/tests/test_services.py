@@ -2,8 +2,8 @@
 Tests for the service classes in verify_student.
 """
 
-from datetime import datetime, timedelta, timezone
 import itertools
+from datetime import datetime, timedelta, timezone
 from random import randint
 from unittest.mock import patch
 
@@ -16,10 +16,16 @@ from freezegun import freeze_time
 from pytz import utc
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import (
+    ManualVerification,
+    SoftwareSecurePhotoVerification,
+    SSOVerification,
+    VerificationAttempt
+)
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import \
+    ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 FAKE_SETTINGS = {
@@ -34,12 +40,15 @@ class TestIDVerificationService(ModuleStoreTestCase):
     Tests for IDVerificationService.
     """
 
-    def test_user_is_verified(self):
+    @ddt.data(
+        SoftwareSecurePhotoVerification, VerificationAttempt
+    )
+    def test_user_is_verified(self, verification_model):
         """
         Test to make sure we correctly answer whether a user has been verified.
         """
         user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt = verification_model(user=user)
         attempt.save()
 
         # If it's any of these, they're not verified...
@@ -49,16 +58,24 @@ class TestIDVerificationService(ModuleStoreTestCase):
             assert not IDVerificationService.user_is_verified(user), status
 
         attempt.status = "approved"
+        if verification_model == VerificationAttempt:
+            attempt.expiration_datetime = now() + timedelta(days=19)
+        else:
+            attempt.expiration_date = now() + timedelta(days=19)
         attempt.save()
+
         assert IDVerificationService.user_is_verified(user), attempt.status
 
-    def test_user_has_valid_or_pending(self):
+    @ddt.data(
+        SoftwareSecurePhotoVerification, VerificationAttempt
+    )
+    def test_user_has_valid_or_pending(self, verification_model):
         """
         Determine whether we have to prompt this user to verify, or if they've
         already at least initiated a verification submission.
         """
         user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt = verification_model(user=user)
 
         # If it's any of these statuses, they don't have anything outstanding
         for status in ["created", "ready", "denied"]:
@@ -70,6 +87,10 @@ class TestIDVerificationService(ModuleStoreTestCase):
         # -- must_retry, and submitted both count until we hear otherwise
         for status in ["submitted", "must_retry", "approved"]:
             attempt.status = status
+            if verification_model == VerificationAttempt:
+                attempt.expiration_datetime = now() + timedelta(days=19)
+            else:
+                attempt.expiration_date = now() + timedelta(days=19)
             attempt.save()
             assert IDVerificationService.user_has_valid_or_pending(user), status
 
@@ -102,18 +123,22 @@ class TestIDVerificationService(ModuleStoreTestCase):
         user_a = UserFactory.create()
         user_b = UserFactory.create()
         user_c = UserFactory.create()
+        user_d = UserFactory.create()
         user_unverified = UserFactory.create()
         user_denied = UserFactory.create()
+        user_denied_b = UserFactory.create()
 
         SoftwareSecurePhotoVerification.objects.create(user=user_a, status='approved')
         ManualVerification.objects.create(user=user_b, status='approved')
         SSOVerification.objects.create(user=user_c, status='approved')
+        VerificationAttempt.objects.create(user=user_d, status='approved')
         SSOVerification.objects.create(user=user_denied, status='denied')
+        VerificationAttempt.objects.create(user=user_denied_b, status='denied')
 
         verified_user_ids = set(IDVerificationService.get_verified_user_ids([
-            user_a, user_b, user_c, user_unverified, user_denied
+            user_a, user_b, user_c, user_d, user_unverified, user_denied
         ]))
-        expected_user_ids = {user_a.id, user_b.id, user_c.id}
+        expected_user_ids = {user_a.id, user_b.id, user_c.id, user_d.id}
 
         assert expected_user_ids == verified_user_ids
 
@@ -157,6 +182,23 @@ class TestIDVerificationService(ModuleStoreTestCase):
 
         expiration_datetime = IDVerificationService.get_expiration_datetime(user_a, ['approved'])
         assert expiration_datetime == newer_record.expiration_datetime
+
+    def test_get_expiration_datetime_mixed_models(self):
+        """
+        Test that the latest expiration datetime is returned if there are both instances of
+        IDVerification models and VerificationAttempt models
+        """
+        user = UserFactory.create()
+
+        SoftwareSecurePhotoVerification.objects.create(
+            user=user, status='approved', expiration_date=datetime(2021, 11, 12, 0, 0, tzinfo=timezone.utc)
+        )
+        newest = VerificationAttempt.objects.create(
+            user=user, status='approved', expiration_datetime=datetime(2022, 1, 12, 0, 0, tzinfo=timezone.utc)
+        )
+
+        expiration_datetime = IDVerificationService.get_expiration_datetime(user, ['approved'])
+        assert expiration_datetime == newest.expiration_datetime
 
     @ddt.data(
         {'status': 'denied', 'error_msg': '[{"generalReasons": ["Name mismatch"]}]'},

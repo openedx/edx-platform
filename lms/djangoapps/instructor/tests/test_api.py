@@ -47,6 +47,7 @@ from common.djangoapps.student.models import (
     UNENROLLED_TO_ALLOWEDTOENROLL,
     UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_UNENROLLED,
+    CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
@@ -60,12 +61,14 @@ from common.djangoapps.student.roles import (
     CourseFinanceAdminRole,
     CourseInstructorRole,
 )
-from common.djangoapps.student.tests.factories import BetaTesterFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import InstructorFactory
-from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    BetaTesterFactory,
+    CourseEnrollmentFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    StaffFactory,
+    UserFactory
+)
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
@@ -94,6 +97,9 @@ from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
@@ -4675,3 +4681,116 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
             f"The student {self.user} does not have certificate for the course {self.course.id.course}. Kindly "
             "verify student username/email and the selected course are correct and try again."
         )
+
+
+@patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test endpoints using Oauth2 authentication.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create(
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
+
+    def setUp(self):
+        super().setUp()
+
+        self.other_user = UserFactory()
+        dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
+        access_token = AccessTokenFactory(user=self.other_user, application=dot_application)
+        oauth_adapter = DOTAdapter()
+        token_dict = {
+            'access_token': access_token,
+            'scope': 'email profile',
+        }
+        jwt_token = jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=True)
+
+        self.headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
+        }
+
+        # endpoints contains all urls with body and role.
+        self.endpoints = [
+            ('list_course_role_members', {'rolename': 'staff'}, 'instructor'),
+            ('register_and_enroll_students', {}, 'staff'),
+            ('get_student_progress_url', {'course_id': str(self.course.id),
+                                          'unique_student_identifier': self.other_user.email
+                                          }, 'staff'
+             ),
+            ('list_entrance_exam_instructor_tasks', {'unique_student_identifier': self.other_user.email}, 'staff'),
+            ('list_email_content', {}, 'staff'),
+            ('show_student_extensions', {'student': self.other_user.email}, 'staff'),
+            ('list_email_content', {}, 'staff'),
+            ('list_report_downloads', {
+                "send-to": ["myself"],
+                "subject": "This is subject",
+                "message": "message"
+            }, 'data_researcher')
+        ]
+
+        self.fake_jwt = ('wyJUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjaGFuZ2UtbWUiLCJleHAiOjE3MjU4OTA2NzIsImdyY'
+                         'W50X3R5cGUiOiJwYXNzd29yZCIsImlhdCI6MTcyNTg4NzA3MiwiaXNzIjoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL29h'
+                         'XNlcl9pZCI6MX0'
+                         '.ec8neWp1YAuF40ye4oeK40obaapUvjfNPUQCycrsajwvcu58KcuLc96sf0JKmMMMn7DH9N98hg8W38iwbhKif1kLsCKr'
+                         'tStl1u2XGvFkyMov8TtespbHit5LYRZpJwrhC1h50ru2buYj3isWrAElGPIDyAj0FAvSJnvJhWSMDtIwB2gxZI1DqOm'
+                         'M6mzT7JbOU4QH2PNZrb2EZ11F6k9I-HrHnLQymr4s0vyjMlcBWllW3y19futNCgsFFRMXI4Z9zIbspsy5bq_Skub'
+                         'dBpnl0P9x8vUJCAbFnJABAVPtF7F7nNsROQMKsZtQxaUUwdcYZi5qKL2GcgGfO0eTL4IbJA')
+
+    def assert_all_end_points(self, endpoint, body, role, add_role, use_jwt=True):
+        """
+        Util method for verifying different end-points.
+        """
+        if add_role:
+            role, _ = CourseAccessRole.objects.get_or_create(
+                course_id=self.course.id,
+                user=self.other_user,
+                role=role,
+                org=self.course.id.org
+            )
+
+        if use_jwt:
+            headers = self.headers
+        else:
+            headers = {
+                'HTTP_AUTHORIZATION': 'JWT ' + self.fake_jwt  # this is fake jwt.
+            }
+
+        url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(
+            url,
+            data=body,
+            **headers
+        )
+        return response
+
+    def run_endpoint_tests(self, expected_status, add_role, use_jwt):
+        """
+        Util method for running different end-points.
+        """
+        for endpoint, body, role in self.endpoints:
+            with self.subTest(endpoint=endpoint, role=role, body=body):
+                response = self.assert_all_end_points(endpoint, body, role, add_role, use_jwt)
+                # JWT authentication works but it has no permissions.
+                assert response.status_code == expected_status, f"Failed for endpoint: {endpoint}"
+
+    def test_end_points_with_oauth_without_jwt(self):
+        """
+        Verify the endpoint using invalid JWT returns 401.
+        """
+        self.run_endpoint_tests(expected_status=401, add_role=False, use_jwt=False)
+
+    def test_end_points_with_oauth_without_permissions(self):
+        """
+        Verify the endpoint using JWT authentication. But has no permissions.
+        """
+        self.run_endpoint_tests(expected_status=403, add_role=False, use_jwt=True)
+
+    def test_end_points_with_oauth_with_permissions(self):
+        """
+        Verify the endpoint using JWT authentication with permissions.
+        """
+        self.run_endpoint_tests(expected_status=200, add_role=True, use_jwt=True)

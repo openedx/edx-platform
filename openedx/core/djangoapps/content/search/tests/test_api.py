@@ -186,7 +186,7 @@ class TestSearchApi(ModuleStoreTestCase):
                 description="my collection description"
             )
         self.collection_dict = {
-            "id": "MYCOL",
+            'id': self.collection.id,
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
@@ -450,7 +450,7 @@ class TestSearchApi(ModuleStoreTestCase):
         # Build expected docs at each stage
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
         doc_collection1_created = {
-            "id": "COL1",
+            "id": collection1.id,
             "type": "collection",
             "display_name": "Collection 1",
             "description": "First Collection",
@@ -463,7 +463,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_created = {
-            "id": "COL2",
+            "id": collection2.id,
             "type": "collection",
             "display_name": "Collection 2",
             "description": "Second Collection",
@@ -476,7 +476,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_updated = {
-            "id": "COL2",
+            "id": collection2.id,
             "type": "collection",
             "display_name": "Collection 2",
             "description": "Second Collection",
@@ -489,7 +489,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection1_updated = {
-            "id": "COL1",
+            "id": collection1.id,
             "type": "collection",
             "display_name": "Collection 1",
             "description": "First Collection",

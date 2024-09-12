@@ -338,7 +338,7 @@ def searchable_doc_for_collection(collection) -> dict:
     found using faceted search.
     """
     doc = {
-        Fields.id: collection.key,
+        Fields.id: collection.id,
         Fields.type: DocType.collection,
         Fields.display_name: collection.title,
         Fields.description: collection.description,
