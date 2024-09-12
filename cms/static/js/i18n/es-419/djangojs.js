@@ -454,7 +454,7 @@
     "Chapter name and asset_path are both required": "Se requiere tanto el nombre del cap\u00edtulo como la ruta_del_recurso",
     "Chapter name is required": "Se requiere el nombre del cap\u00edtulo",
     "Chapter {order}": "Cap\u00edtulo {order}",
-    "Check Your Email": "Revise tu correo electr\u00f3nico",
+    "Check Your Email": "Revisa tu correo electr\u00f3nico",
     "Check the highlighted fields below and try again.": "Revisa los campos resaltados abajo e intenta nuevamente.",
     "Check this box to receive an email digest once a day notifying you about new, unread activity from posts you are following.": "Marque esta casilla para recibir un resumen diario por correo electr\u00f3nico con notificaciones de actividad nueva y sin leer de las conversaciones que est\u00e1 siguiendo.",
     "Check your email account for instructions to reset your password.": "Revise en su correo electr\u00f3nico las instrucciones para cambiar su contrase\u00f1a.",

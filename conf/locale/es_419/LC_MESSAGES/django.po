@@ -23286,8 +23286,8 @@ msgid ""
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr ""
-"Por favor revise su correo no desado en caso de que nuestro correo no esté "
-"en su buzón de entrada. ¿Aún no encuentra el correo de verificación? Pida "
+"Por favor revisa tu correo no deseado en caso de que nuestro correo no esté "
+"en tu buzón de entrada. ¿Aún no encuentras el correo de verificación? Pide "
 "ayuda a través del vínculo siguiente."
 
 #: cms/templates/library.html
