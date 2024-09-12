@@ -171,7 +171,7 @@ def content_object_associations_changed_handler(**kwargs) -> None:
 
     # This event's changes may contain both "tags" and "collections", but this will happen rarely, if ever.
     # So we allow a potential double "upsert" here.
-    if "tags" in content_object.changes:
+    if not content_object.changes or "tags" in content_object.changes:
         upsert_block_tags_index_docs(usage_key)
-    elif "collections" in content_object.changes:
+    if not content_object.changes or "collections" in content_object.changes:
         upsert_block_collections_index_docs(usage_key)
