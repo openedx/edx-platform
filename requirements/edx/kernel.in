@@ -76,7 +76,7 @@ edx-event-bus-kafka>=5.6.0          # Kafka implementation of event bus
 edx-event-bus-redis
 edx-milestones
 edx-name-affirmation
-edx-opaque-keys>=2.11.0
+edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
 # using hash to support django42
