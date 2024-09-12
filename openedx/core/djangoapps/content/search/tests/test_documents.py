@@ -294,7 +294,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
     def test_collection_with_library(self):
         doc = searchable_doc_for_collection(self.collection)
         assert doc == {
-            "id": "TOY_COLLECTION",
+            "id": self.collection.id,
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -323,7 +323,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             )
         doc = searchable_doc_for_collection(collection)
         assert doc == {
-            "id": "MYCOL",
+            "id": collection.id,
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
