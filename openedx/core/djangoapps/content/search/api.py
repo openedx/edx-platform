@@ -324,6 +324,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level2,
             Fields.tags + "." + Fields.tags_level3,
             Fields.collections,
+            Fields.collections + "." + Fields.collections_display_name,
+            Fields.collections + "." + Fields.collections_key,
             Fields.type,
             Fields.access_id,
             Fields.last_published,
@@ -335,8 +337,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.display_name,
             Fields.block_id,
             Fields.content,
-            Fields.tags,
             Fields.description,
+            Fields.tags,
             Fields.collections,
             # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
             # are searchable only if at least one document in the index has a value. If we didn't list them here and,
@@ -347,6 +349,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level1,
             Fields.tags + "." + Fields.tags_level2,
             Fields.tags + "." + Fields.tags_level3,
+            Fields.collections + "." + Fields.collections_display_name,
+            Fields.collections + "." + Fields.collections_key,
         ])
         # Mark which attributes can be used for sorting search results:
         client.index(temp_index_name).update_sortable_attributes([

@@ -217,10 +217,13 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_vertical["tags"] = {}
         doc_problem1 = copy.deepcopy(self.doc_problem1)
         doc_problem1["tags"] = {}
+        doc_problem1["collections"] = {}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
+        doc_problem2["collections"] = {}
 
         api.rebuild_index()
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
                 call([doc_sequential, doc_vertical]),
@@ -256,6 +259,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_vertical["tags"] = {}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
+        doc_problem2["collections"] = {}
 
         orig_from_component = library_api.LibraryXBlockMetadata.from_component
 
@@ -348,6 +352,7 @@ class TestSearchApi(ModuleStoreTestCase):
             }
         }
 
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_sequential_with_tags1]),
@@ -402,6 +407,7 @@ class TestSearchApi(ModuleStoreTestCase):
             }
         }
 
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_problem_with_tags1]),
@@ -506,23 +512,30 @@ class TestSearchApi(ModuleStoreTestCase):
             "access_id": lib_access.id,
             "breadcrumbs": [{"display_name": "Library"}],
         }
-        doc_problem_with_collection2 = {
-            "id": self.doc_problem1["id"],
-            "collections": [collection2.key],
-        }
         doc_problem_with_collection1 = {
             "id": self.doc_problem1["id"],
-            "collections": [collection1.key, collection2.key],
+            "collections": {
+                "display_name": ["Collection 2"],
+                "key": ["COL2"],
+            },
+        }
+        doc_problem_with_collection2 = {
+            "id": self.doc_problem1["id"],
+            "collections": {
+                "display_name": ["Collection 1", "Collection 2"],
+                "key": ["COL1", "COL2"],
+            },
         }
 
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 6
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_collection1_created]),
                 call([doc_collection2_created]),
                 call([doc_collection2_updated]),
                 call([doc_collection1_updated]),
-                call([doc_problem_with_collection2]),
                 call([doc_problem_with_collection1]),
+                call([doc_problem_with_collection2]),
             ],
             any_order=True,
         )
