@@ -140,7 +140,7 @@ block) with the following properties:
   but simply a piece of metadata directly on the downstream content which
   points to the upstream content. We will no longer rely on precarious
   hash-derived usage keys to establish connection to upstream blocks;
-  like any other block, an upstream-link blocks can be granted whatever block
+  like any other block, an upstream-linked blocks can be granted whatever block
   ID that the authoring environment assigns it, whether random or
   human-readable.
 
@@ -209,6 +209,17 @@ block) with the following properties:
   upstreams (such as externally-hosted libraries) and other downstreams (such
   as a standalone enrollable sequence without a course).
 
+  If any of these assumptions are violated, we will raise an exception or log a
+  warning, as appropriate. Particularly, if these assumptions are violated at
+  the OLX level via a course import, then we will probably show a warning at
+  import time and refuse to sync from the unsupported upstream; however, we
+  will *not* fail the entire import or mangle the value of upstream link, since
+  we want to remain forwards-compatible with potential future forms of syncing.
+  As a concrete example: if a course block has *another course block's usage
+  key* as an upstream, then we will faithfully keep that value through the
+  import and export process, but we will not prompt the user to sync updates
+  for that block.
+
 * **Decoupled:** Upstream-downstream linking is not tied up with any other
   courseware feature; in particular, it is unrelated to content randomization.
   Randomized library content will be supported, but it will be a *synthesis* of
@@ -219,9 +230,32 @@ block) with the following properties:
 Consequences
 ************
 
-We will implement the core logic in a new module
-``cms/lib/xblock/upstream_sync.py``. Here is a truncated excerpt from that new
-module, focusing on the new HTTP and Python APIs which will be added:
+To support the Libraries Relaunch in Sumac:
+
+* For every XBlock in CMS, we will use XBlock fields to persist the upstream
+  link, its versions, its customizable fields, and its set of downstream
+  overrides.
+
+  * We will avoid exposing these fields to LMS code.
+
+  * We will define an initial set of customizable fields for Problem, Text, and
+    Video blocks.
+
+* We will define method(s) for syncing update on the XBlock runtime so that
+  they are available in the SplitModuleStore's XBlock Runtime
+  (CachingDescriptorSystem).
+
+  * Either in the initial implementation or in a later implementation, it may
+    make sense to declare abstract versions of the syncing method(s) higher up
+    in XBlock Runtime inheritance hierarchy.
+
+* We will expose a CMS HTTP API for syncing updates to blocks from their
+  upstreams.
+
+  * We will avoid exposing this API from the LMS.
+
+For reference, here are some excerpts of a potential implementation. This may
+change through development and code review.
 
 .. code-block:: python
 
@@ -257,7 +291,7 @@ module, focusing on the new HTTP and Python APIs which will be added:
             """),
             default=None, scope=Scope.settings, hidden=True, enforce_type=True,
         )
-        downstream_customized = List(
+        downstream_customized = Set(
             help=("""
                 Names of the fields which have values set on the upstream
                 block yet have been explicitly overridden on this downstream
@@ -292,37 +326,6 @@ module, focusing on the new HTTP and Python APIs which will be added:
             """
             ...
 
-        @XBlock.handler
-        def sync_updates(self, request: Request, suffix=None) -> Response:
-            """
-            POST handler which applies updates from the upstream block.
-            No request/response data.
-            Responses:
-                200: Success
-                400: Upstream is missing or invalid
-                405: Method other than POST
-            """
-            ...
-
-        def sync_from_upstream(self, *, user: User, apply_updates: bool) -> None:
-            """
-            Python API for loading updates from upstream block.
-            Can choose whether or not to actually apply those updates...
-                apply_updates=False: Think "get fetch".
-                                     Use case: course import.
-                apply_updates=True:  Think "git pull".
-                                     Use case: sync_updates handler.
-            Raises: InvalidKeyError, UnsupportedUpstreamKeyType, XBlockNotFoundError
-            """
-            ...
-
-        def get_upstream_info(self) -> UpstreamInfo | None:
-            """
-            Python API for upstream metadata, or None.
-            Raises: InvalidKeyError, XBlockNotFoundError
-            """
-            ...
-
     @dataclass(frozen=True)
     class UpstreamInfo:
         """
@@ -345,18 +348,44 @@ module, focusing on the new HTTP and Python APIs which will be added:
                 and not self.error
             )
 
-    def validate_upstream_key(usage_key: UsageKey | str) -> UsageKey:
-        """
-        Raise an error if the provided key is not a valid upstream reference.
-        Instead of explicitly checking whether a key is a LibraryLocatorV2,
-        callers should validate using this function, and use an `except` clause
-        to handle the case where the key is not a valid upstream.
-        Raises: InvalidKeyError, UnsupportedUpstreamKeyType
-        """
-        ...
 
-Here is what the OLX for a library-sourced Problem XBlock in a course might
-look like:
+    ###########################################################################
+    # xmodule/modulestore/split_mongo/caching_descriptor_system.py
+    ###########################################################################
+
+    class CachingDescriptorSystem(...):
+
+        def validate_upstream_key(self, usage_key: UsageKey | str) -> UsageKey:
+            """
+            Raise an error if the provided key is not a valid upstream reference.
+            Instead of explicitly checking whether a key is a LibraryLocatorV2,
+            callers should validate using this function, and use an `except` clause
+            to handle the case where the key is not a valid upstream.
+            Raises: InvalidKeyError, UnsupportedUpstreamKeyType
+            """
+            ...
+
+        def sync_from_upstream(self, *, downstream_key: UsageKey, apply_updates: bool) -> None:
+            """
+            Python API for loading updates from upstream block.
+            Can choose whether or not to actually apply those updates...
+                apply_updates=False: Think "get fetch".
+                                     Use case: course import.
+                apply_updates=True:  Think "git pull".
+                                     Use case: sync_updates handler.
+            Raises: InvalidKeyError, UnsupportedUpstreamKeyType, XBlockNotFoundError
+            """
+            ...
+
+        def get_upstream_info(self, downstream_key: UsageKey) -> UpstreamInfo | None:
+            """
+            Python API for upstream metadata, or None.
+            Raises: InvalidKeyError, XBlockNotFoundError
+            """
+            ...
+
+Finally, here is what the OLX for a library-sourced Problem XBlock in a course
+might look like:
 
 .. code-block:: xml
 
