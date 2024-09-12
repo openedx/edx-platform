@@ -298,10 +298,12 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         doc = searchable_doc_for_collection(self.collection)
         assert doc == {
             "id": self.collection.id,
+            "block_id": self.collection.key,
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
             "description": "my toy collection description",
+            "num_children": 1,
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
             "breadcrumbs": [{"display_name": "some content_library"}],
@@ -327,9 +329,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         doc = searchable_doc_for_collection(collection)
         assert doc == {
             "id": collection.id,
+            "block_id": collection.key,
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
+            "num_children": 0,
             "context_key": learning_package.key,
             "access_id": self.toy_course_access_id,
             "breadcrumbs": [{"display_name": "some learning_package"}],

@@ -557,6 +557,22 @@ def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     _update_index_docs(docs)
 
 
+def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collection_key: str) -> None:
+    """
+    Creates or updates the document for the given Library Collection in the search index
+    """
+    content_library = lib_api.ContentLibrary.objects.get_by_key(library_key)
+    collection = authoring_api.get_collection(
+        learning_package_id=content_library.learning_package_id,
+        collection_key=collection_key,
+    )
+    docs = [
+        searchable_doc_for_collection(collection)
+    ]
+
+    _update_index_docs(docs)
+
+
 def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     """
     Creates or updates the documents for the given Content Library in the search index

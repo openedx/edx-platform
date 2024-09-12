@@ -186,16 +186,18 @@ class TestSearchApi(ModuleStoreTestCase):
                 description="my collection description"
             )
         self.collection_dict = {
-            'id': self.collection.id,
-            'type': 'collection',
-            'display_name': 'my_collection',
-            'description': 'my collection description',
-            'context_key': 'lib:org1:lib',
-            'org': 'org1',
-            'created': created_date.timestamp(),
-            'modified': created_date.timestamp(),
+            "id": self.collection.id,
+            "block_id": self.collection.key,
+            "type": "collection",
+            "display_name": "my_collection",
+            "description": "my collection description",
+            "num_children": 0,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
             "access_id": lib_access.id,
-            'breadcrumbs': [{'display_name': 'Library'}]
+            "breadcrumbs": [{"display_name": "Library"}],
         }
 
     @override_settings(MEILISEARCH_ENABLED=False)
@@ -415,38 +417,101 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_block_collections(self, mock_meilisearch):
+    def test_index_library_block_and_collections(self, mock_meilisearch):
         """
-        Test indexing an Library Block that is in two collections.
+        Test indexing an Library Block and the Collections it's in.
         """
-        collection1 = authoring_api.create_collection(
-            learning_package_id=self.library.learning_package.id,
-            key="COL1",
-            title="Collection 1",
-            created_by=None,
-            description="First Collection",
-        )
-
-        collection2 = authoring_api.create_collection(
-            learning_package_id=self.library.learning_package.id,
-            key="COL2",
-            title="Collection 2",
-            created_by=None,
-            description="Second Collection",
-        )
-
-        # Add Problem1 to both Collections (these internally call `upsert_block_collections_index_docs`)
-        # (adding in reverse order to test sorting of collection tag))
-        for collection in (collection2, collection1):
-            library_api.update_library_collection_components(
+        # Create collections (these internally call `upsert_library_collection_index_doc`)
+        created_date = datetime(2023, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            collection1 = library_api.create_library_collection(
                 self.library.key,
-                collection_key=collection.key,
-                usage_keys=[
-                    self.problem1.usage_key,
-                ],
+                collection_key="COL1",
+                title="Collection 1",
+                created_by=None,
+                description="First Collection",
             )
 
-        # Build expected docs with collections at each stage
+            collection2 = library_api.create_library_collection(
+                self.library.key,
+                collection_key="COL2",
+                title="Collection 2",
+                created_by=None,
+                description="Second Collection",
+            )
+
+        # Add Problem1 to both Collections (these internally call `upsert_block_collections_index_docs` and
+        # `upsert_library_collection_index_doc`)
+        # (adding in reverse order to test sorting of collection tag)
+        updated_date = datetime(2023, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
+        with freeze_time(updated_date):
+            for collection in (collection2, collection1):
+                library_api.update_library_collection_components(
+                    self.library.key,
+                    collection_key=collection.key,
+                    usage_keys=[
+                        self.problem1.usage_key,
+                    ],
+                )
+
+        # Build expected docs at each stage
+        lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
+        doc_collection1_created = {
+            "id": collection1.id,
+            "block_id": collection1.key,
+            "type": "collection",
+            "display_name": "Collection 1",
+            "description": "First Collection",
+            "num_children": 0,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
+        doc_collection2_created = {
+            "id": collection2.id,
+            "block_id": collection2.key,
+            "type": "collection",
+            "display_name": "Collection 2",
+            "description": "Second Collection",
+            "num_children": 0,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
+        doc_collection2_updated = {
+            "id": collection2.id,
+            "block_id": collection2.key,
+            "type": "collection",
+            "display_name": "Collection 2",
+            "description": "Second Collection",
+            "num_children": 1,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": updated_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
+        doc_collection1_updated = {
+            "id": collection1.id,
+            "block_id": collection1.key,
+            "type": "collection",
+            "display_name": "Collection 1",
+            "description": "First Collection",
+            "num_children": 1,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": updated_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
         doc_problem_with_collection1 = {
             "id": self.doc_problem1["id"],
             "collections": {
@@ -462,9 +527,13 @@ class TestSearchApi(ModuleStoreTestCase):
             },
         }
 
-        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 6
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
+                call([doc_collection1_created]),
+                call([doc_collection2_created]),
+                call([doc_collection2_updated]),
+                call([doc_collection1_updated]),
                 call([doc_problem_with_collection1]),
                 call([doc_problem_with_collection2]),
             ],
