@@ -5,9 +5,11 @@ from unittest.mock import Mock, patch
 from unittest import skip
 
 import ddt
+from datetime import datetime, timezone
 from uuid import uuid4
 from django.contrib.auth.models import Group
 from django.test.client import Client
+from freezegun import freeze_time
 from organizations.models import Organization
 from rest_framework.test import APITestCase
 
@@ -287,10 +289,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        updated_date = datetime(2024, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
+        with freeze_time(updated_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = updated_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
@@ -372,10 +378,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        updated_date = datetime(2024, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
+        with freeze_time(updated_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = updated_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
