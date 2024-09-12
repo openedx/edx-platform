@@ -51,6 +51,7 @@ class CourseHomeSerializer(serializers.Serializer):
         allow_empty=True
     )
     archived_courses = CourseCommonSerializer(required=False, many=True)
+    can_access_advanced_settings = serializers.BooleanField()
     can_create_organizations = serializers.BooleanField()
     course_creator_status = serializers.CharField()
     courses = CourseCommonSerializer(required=False, many=True)
