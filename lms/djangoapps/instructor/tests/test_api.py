@@ -4704,15 +4704,19 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
     Test endpoints using Oauth2 authentication.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create(
-            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
-        )
-
     def setUp(self):
         super().setUp()
+        self.course = CourseFactory.create(
+            org='test_org',
+            course='test_course',
+            run='test_run',
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
+        self.problem_location = msk_from_problem_urlname(
+            self.course.id,
+            'robot-some-problem-urlname'
+        )
+        self.problem_urlname = str(self.problem_location)
 
         self.other_user = UserFactory()
         dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
@@ -4744,7 +4748,14 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
                 "send-to": ["myself"],
                 "subject": "This is subject",
                 "message": "message"
-            }, 'data_researcher')
+            }, 'data_researcher'),
+            ('list_instructor_tasks',
+             {
+                 'problem_location_str': self.problem_urlname,
+                 'unique_student_identifier': self.other_user.email
+             },
+             'data_researcher'),
+            ('list_instructor_tasks', {}, 'data_researcher')
         ]
 
         self.fake_jwt = ('wyJUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjaGFuZ2UtbWUiLCJleHAiOjE3MjU4OTA2NzIsImdyY'
