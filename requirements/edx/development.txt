@@ -768,6 +768,7 @@ edx-milestones==0.6.0
     #   -r requirements/edx/testing.txt
 edx-name-affirmation==2.4.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.11.0
