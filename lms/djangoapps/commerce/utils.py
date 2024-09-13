@@ -126,6 +126,7 @@ class EcommerceService:
         Args:
             skus (list): List of SKUs associated with products to be added to basket
             program_uuid (string): The UUID of the program, if applicable
+            course_run_keys (list): The course run keys of the products to be added to basket.
 
         Returns:
             Absolute path to the ecommerce checkout page showing basket that contains specified products.
