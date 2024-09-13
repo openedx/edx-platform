@@ -75,6 +75,7 @@ def send_ace_message(goal):
         'email': user.email,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'course_name': course_name,
+        'course_id': str(goal.course_key),
         'days_per_week': goal.days_per_week,
         'course_url': course_home_url,
         'goals_unsubscribe_url': goals_unsubscribe_url,

@@ -43,6 +43,7 @@ class CourseHomeMetadataSerializer(VerifiedModeSerializer):
     """
     celebrations = serializers.DictField()
     course_access = serializers.DictField()
+    studio_access = serializers.BooleanField()
     course_id = serializers.CharField()
     is_enrolled = serializers.BooleanField()
     is_self_paced = serializers.BooleanField()
