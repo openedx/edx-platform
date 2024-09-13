@@ -36,6 +36,7 @@ from .documents import (
     searchable_doc_for_library_block,
     searchable_doc_collections,
     searchable_doc_tags,
+    searchable_doc_tags_for_collection,
 )
 
 log = logging.getLogger(__name__)
@@ -395,13 +396,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             return docs
 
         ############## Collections ##############
-        def index_collection_batch(batch, num_done) -> int:
+        def index_collection_batch(batch, num_done, library_key) -> int:
             docs = []
             for collection in batch:
                 try:
                     doc = searchable_doc_for_collection(collection)
-                    # Uncomment below line once collections are tagged.
-                    # doc.update(searchable_doc_tags(collection.id))
+                    doc.update(searchable_doc_tags_for_collection(library_key, collection))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing collection {collection}: {err}")
@@ -428,7 +428,11 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
             paginator = Paginator(collections, 100)
             for p in paginator.page_range:
-                num_collections_done = index_collection_batch(paginator.page(p).object_list, num_collections_done)
+                num_collections_done = index_collection_batch(
+                    paginator.page(p).object_list,
+                    num_collections_done,
+                    lib_key,
+                )
             status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
 
             num_contexts_done += 1

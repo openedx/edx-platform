@@ -221,6 +221,9 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
         doc_problem2["collections"] = {}
+        doc_collection = copy.deepcopy(self.collection_dict)
+        doc_collection["tags"] = {}
+        doc_collection["collections"] = {}
 
         api.rebuild_index()
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
@@ -228,7 +231,7 @@ class TestSearchApi(ModuleStoreTestCase):
             [
                 call([doc_sequential, doc_vertical]),
                 call([doc_problem1, doc_problem2]),
-                call([self.collection_dict]),
+                call([doc_collection]),
             ],
             any_order=True,
         )
