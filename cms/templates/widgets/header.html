@@ -11,6 +11,7 @@
   from cms.djangoapps.contentstore.utils import get_pages_and_resources_url, get_course_outline_url, get_updates_url, get_files_uploads_url, get_video_uploads_url, get_schedule_details_url, get_grading_url, get_advanced_settings_url, get_import_url, get_export_url, get_studio_home_url, get_course_team_url
   from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
   from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
+from common.djangoapps.edxmako.shortcuts import marketing_link
 %>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
@@ -18,7 +19,7 @@
       <h1 class="branding">
         % if not toggles.use_new_home_page():
         <a class="brand-link" href="/">
-          <img class="brand-image" src="https://static.talentsprint.com/iitk-logo.png" alt="${settings.STUDIO_NAME}" />
+          <img class="brand-image" src="${marketing_link('HEADER_LOGO')}" alt="${settings.STUDIO_NAME}" />
             % if settings.LOGO_IMAGE_EXTRA_TEXT == 'edge':
             <span class="font-italic"> <span class="tilted">|</span> EDGE</span>
             % endif
@@ -26,7 +27,7 @@
         % endif
         % if toggles.use_new_home_page():
         <a class="brand-link" href="${get_studio_home_url()}">
-          <img class="brand-image" src="https://static.talentsprint.com/iitk-logo.png" alt="${settings.STUDIO_NAME}" />
+          <img class="brand-image" src="${marketing_link('HEADER_LOGO')}" alt="${settings.STUDIO_NAME}" />
             % if settings.LOGO_IMAGE_EXTRA_TEXT == 'edge':
             <span class="font-italic"> <span class="tilted">|</span> EDGE</span>
             % endif
