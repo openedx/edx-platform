@@ -321,7 +321,10 @@ class CourseGrade(CourseGradeBase):
         """
 
         # Confused about the addition of .05 here?  See https://openedx.atlassian.net/browse/TNL-6972
-        return round_away_from_zero(grader_result['percent'] * 100 + 0.05) / 100
+        #return round_away_from_zero(grader_result['percent'] * 100 + 0.05) / 100
+
+        #SA || gradeRoundOff
+        return grader_result['percent']
 
     @staticmethod
     def _compute_letter_grade(grade_cutoffs, percent):
