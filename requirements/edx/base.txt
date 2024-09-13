@@ -824,10 +824,8 @@ openedx-filters==1.9.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.11.4
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/kernel.in
+openedx-learning @ git+https://github.com/open-craft/openedx-learning/@rpenido/fal-3802-component-sidebar-manage-tab
+    # via -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.1
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
