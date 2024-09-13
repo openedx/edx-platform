@@ -11763,7 +11763,7 @@ msgstr ""
 #, python-brace-format
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr ""
-"Usted debe estar de acuerdo con los {terms_of_service} de {platform_name}."
+"Debes estar de acuerdo con las {terms_of_service} de {platform_name}."
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #, python-brace-format
@@ -11774,9 +11774,9 @@ msgid ""
 "process your personal data in accordance                   with the "
 "{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"Al crear una cuenta, estás accediendo a los "
+"Al crear una cuenta, estás accediendo a las "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} y"
-" reconoces que {platform_name} y todos sus miembros, pueden procesar tu "
+" reconoces que {platform_name} y todos sus miembros, pueden procesar tus "
 "datos personales de acuerdo a la {privacy_policy_link_start}Política de "
 "Privacidad{privacy_policy_link_end}."
 
