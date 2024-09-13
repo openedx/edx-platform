@@ -4,7 +4,12 @@ Serializers for the content libraries REST API
 # pylint: disable=abstract-method
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
+from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys import InvalidKeyError
+
+from openedx_learning.api.authoring_models import Collection
 from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES,
     COMPLEX,
@@ -245,3 +250,52 @@ class ContentLibraryBlockImportTaskCreateSerializer(serializers.Serializer):
     """
 
     course_key = CourseKeyField()
+
+
+class ContentLibraryCollectionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for a Content Library Collection
+    """
+
+    class Meta:
+        model = Collection
+        fields = '__all__'
+
+
+class ContentLibraryCollectionUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for updating a Collection in a Content Library
+    """
+
+    title = serializers.CharField()
+    description = serializers.CharField(allow_blank=True)
+
+
+class UsageKeyV2Serializer(serializers.Serializer):
+    """
+    Serializes a UsageKeyV2.
+    """
+    def to_representation(self, value: UsageKeyV2) -> str:
+        """
+        Returns the UsageKeyV2 value as a string.
+        """
+        return str(value)
+
+    def to_internal_value(self, value: str) -> UsageKeyV2:
+        """
+        Returns a UsageKeyV2 from the string value.
+
+        Raises ValidationError if invalid UsageKeyV2.
+        """
+        try:
+            return UsageKeyV2.from_string(value)
+        except InvalidKeyError as err:
+            raise ValidationError from err
+
+
+class ContentLibraryCollectionComponentsUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing Components to/from a Collection.
+    """
+
+    usage_keys = serializers.ListField(child=UsageKeyV2Serializer(), allow_empty=False)

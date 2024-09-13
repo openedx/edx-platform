@@ -52,6 +52,7 @@ class HomePageView(APIView):
             "allow_unicode_course_id": false,
             "allowed_organizations": [],
             "archived_courses": [],
+            "can_access_advanced_settings": true,
             "can_create_organizations": true,
             "course_creator_status": "granted",
             "courses": [],

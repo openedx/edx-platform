@@ -1537,6 +1537,7 @@ def get_library_context(request, request_is_json=False):
     )
     from cms.djangoapps.contentstore.views.library import (
         LIBRARIES_ENABLED,
+        user_can_view_create_library_button,
     )
 
     libraries = _accessible_libraries_iter(request.user) if LIBRARIES_ENABLED else []
@@ -1550,7 +1551,7 @@ def get_library_context(request, request_is_json=False):
             'in_process_course_actions': [],
             'courses': [],
             'libraries_enabled': LIBRARIES_ENABLED,
-            'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
+            'show_new_library_button': user_can_view_create_library_button(request.user) and request.user.is_active,
             'user': request.user,
             'request_course_creator_url': reverse('request_course_creator'),
             'course_creator_status': _get_course_creator_status(request.user),
@@ -1715,6 +1716,7 @@ def get_home_context(request, no_course=False):
         'allowed_organizations': get_allowed_organizations(user),
         'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),
         'can_create_organizations': user_can_create_organizations(user),
+        'can_access_advanced_settings': auth.has_studio_advanced_settings_access(user),
     }
 
     return home_context

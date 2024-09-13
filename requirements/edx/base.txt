@@ -467,7 +467,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.24.0
+edx-enterprise==4.25.10
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -482,7 +482,7 @@ edx-i18n-tools==1.5.0
     #   ora2
 edx-milestones==0.6.0
     # via -r requirements/edx/kernel.in
-edx-name-affirmation==2.3.7
+edx-name-affirmation==2.4.0
     # via -r requirements/edx/kernel.in
 edx-opaque-keys[django]==2.11.0
     # via
@@ -549,7 +549,7 @@ elasticsearch==7.13.4
     #   edx-search
 enmerkar==0.7.1
     # via enmerkar-underscore
-enmerkar-underscore==2.3.0
+enmerkar-underscore==2.3.1
     # via -r requirements/edx/kernel.in
 event-tracking==3.0.0
     # via
@@ -811,9 +811,10 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.11.0
+openedx-events==9.14.0
     # via
     #   -r requirements/edx/kernel.in
+    #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   event-tracking
@@ -823,7 +824,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.11.2
+openedx-learning==0.11.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

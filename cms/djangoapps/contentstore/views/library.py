@@ -69,31 +69,7 @@ def should_redirect_to_library_authoring_mfe():
     )
 
 
-def user_can_view_create_library_button(user):
-    """
-    Helper method for displaying the visibilty of the create_library_button.
-    """
-    if not LIBRARIES_ENABLED:
-        return False
-    elif user.is_staff:
-        return True
-    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        is_course_creator = get_course_creator_status(user) == 'granted'
-        has_org_staff_role = OrgStaffRole().get_orgs_for_user(user).exists()
-        has_course_staff_role = UserBasedRole(user=user, role=CourseStaffRole.ROLE).courses_with_role().exists()
-        has_course_admin_role = UserBasedRole(user=user, role=CourseInstructorRole.ROLE).courses_with_role().exists()
-        return is_course_creator or has_org_staff_role or has_course_staff_role or has_course_admin_role
-    else:
-        # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
-        disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)
-        disable_course_creation = settings.FEATURES.get('DISABLE_COURSE_CREATION', False)
-        if disable_library_creation is not None:
-            return not disable_library_creation
-        else:
-            return not disable_course_creation
-
-
-def user_can_create_library(user, org):
+def _user_can_create_library_for_org(user, org=None):
     """
     Helper method for returning the library creation status for a particular user,
     taking into account the value LIBRARIES_ENABLED.
@@ -109,29 +85,29 @@ def user_can_create_library(user, org):
     Course Staff: Can make libraries in the organization which has courses of which they are staff.
     Course Admin: Can make libraries in the organization which has courses of which they are Admin.
     """
-    if org is None:
-        return False
     if not LIBRARIES_ENABLED:
         return False
     elif user.is_staff:
         return True
-    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        org_filter_params = {}
+        if org:
+            org_filter_params['org'] = org
         is_course_creator = get_course_creator_status(user) == 'granted'
-        has_org_staff_role = org in OrgStaffRole().get_orgs_for_user(user)
+        has_org_staff_role = OrgStaffRole().get_orgs_for_user(user).filter(**org_filter_params).exists()
         has_course_staff_role = (
             UserBasedRole(user=user, role=CourseStaffRole.ROLE)
             .courses_with_role()
-            .filter(org=org)
+            .filter(**org_filter_params)
             .exists()
         )
         has_course_admin_role = (
             UserBasedRole(user=user, role=CourseInstructorRole.ROLE)
             .courses_with_role()
-            .filter(org=org)
+            .filter(**org_filter_params)
             .exists()
         )
         return is_course_creator or has_org_staff_role or has_course_staff_role or has_course_admin_role
-
     else:
         # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
         disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)
@@ -140,6 +116,22 @@ def user_can_create_library(user, org):
             return not disable_library_creation
         else:
             return not disable_course_creation
+
+
+def user_can_view_create_library_button(user):
+    """
+    Helper method for displaying the visibilty of the create_library_button.
+    """
+    return _user_can_create_library_for_org(user)
+
+
+def user_can_create_library(user, org):
+    """
+    Helper method for to check if user can create library for given org.
+    """
+    if org is None:
+        return False
+    return _user_can_create_library_for_org(user, org)
 
 
 @login_required
