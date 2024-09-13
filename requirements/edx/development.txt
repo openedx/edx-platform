@@ -770,7 +770,7 @@ edx-name-affirmation==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-opaque-keys[django]==2.10.0
+edx-opaque-keys[django]==2.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

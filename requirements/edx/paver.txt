@@ -12,7 +12,7 @@ charset-normalizer==2.0.12
     #   requests
 dnspython==2.6.1
     # via pymongo
-edx-opaque-keys==2.10.0
+edx-opaque-keys==2.11.0
     # via -r requirements/edx/paver.in
 idna==3.7
     # via requests
