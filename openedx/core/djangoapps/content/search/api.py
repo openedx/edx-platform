@@ -608,6 +608,17 @@ def upsert_block_collections_index_docs(usage_key: UsageKey):
     _update_index_docs([doc])
 
 
+def upsert_collection_tags_index_docs(collection_usage_key: LibraryLocatorV2):
+    """
+    Updates the tags data in documents for the given library collection
+    """
+    collection = lib_api.get_library_collection_from_usage_key(collection_usage_key)
+
+    doc = {Fields.id: collection.id}
+    doc.update(collection_usage_key.library_key, collection)
+    _update_index_docs([doc])
+
+
 def _get_user_orgs(request: Request) -> list[str]:
     """
     Get the org.short_names for the organizations that the requesting user has OrgStaffRole or OrgInstructorRole.
