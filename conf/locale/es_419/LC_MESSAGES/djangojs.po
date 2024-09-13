@@ -5214,7 +5214,7 @@ msgstr "Ocurrió un error al iniciar tu sesión en %s."
 #: lms/static/js/student_account/views/LoginView.js
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Check Your Email"
-msgstr "Revise tu correo electrónico"
+msgstr "Revisa tu correo electrónico"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5228,8 +5228,8 @@ msgid ""
 msgstr ""
 "{paragraphStart}Has escrito {boldStart}{email}{boldEnd}. Si este correo "
 "electrónico está asociado a tu cuenta {platform_name}, te enviaremos un "
-"correo con las instrucciones para recuperar tu contraseña a este correo "
-"electrónico. {paragraphEnd}{paragraphStart}Si no recibes el correo de "
+"correo con las instrucciones para recuperar tu contraseña a esa casilla"
+". {paragraphEnd}{paragraphStart}Si no recibes el correo de "
 "restablecimiento de contraseña después de 1 minuto, verifica que escribiste "
 "la dirección de correo correcta o mira en tu carpeta de correo no "
 "deseado.{paragraphEnd}{paragraphStart}Si necesitas más ayuda, "
