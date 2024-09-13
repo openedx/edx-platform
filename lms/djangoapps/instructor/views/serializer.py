@@ -215,4 +215,3 @@ class BlockDueDateSerializer(serializers.Serializer):
             return None
 
         return user
-

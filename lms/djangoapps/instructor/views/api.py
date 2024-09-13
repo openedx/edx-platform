@@ -2397,7 +2397,7 @@ class ListInstructorTasks(APIView):
         serializer.is_valid(raise_exception=True)
 
         return _list_instructor_tasks(
-            request=request, course_id=course_id, serialize_data= serializer.validated_data
+            request=request, course_id=course_id, serialize_data=serializer.validated_data
         )
 
 
