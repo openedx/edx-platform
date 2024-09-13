@@ -6,7 +6,12 @@
   <base target="_blank">
   <meta charset="UTF-8">
   <!-- gettext & XBlock JS i18n code -->
-  <script type="text/javascript" src="{{ lms_root_url }}/static/js/i18n/en/djangojs.js"></script>
+  {% if is_development %}
+    <!-- in development, the djangojs file isn't available so use fallback-->
+    <script type="text/javascript" src="{{ lms_root_url }}/static/js/src/gettext_fallback.js"></script>
+  {% else %}
+    <script type="text/javascript" src="{{ lms_root_url }}/static/js/i18n/en/djangojs.js"></script>
+  {% endif %}
   <!-- Most XBlocks require jQuery: -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <!-- The Video XBlock requires "ajaxWithPrefix" -->
