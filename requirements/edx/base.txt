@@ -482,7 +482,7 @@ edx-i18n-tools==1.5.0
     #   ora2
 edx-milestones==0.6.0
     # via -r requirements/edx/kernel.in
-edx-name-affirmation==2.4.0
+edx-name-affirmation==2.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

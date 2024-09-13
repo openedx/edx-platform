@@ -588,7 +588,7 @@ edx-lint==5.3.7
     # via -r requirements/edx/testing.in
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.4.0
+edx-name-affirmation==2.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
