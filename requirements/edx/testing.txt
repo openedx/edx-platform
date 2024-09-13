@@ -571,7 +571,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.25.9
+edx-enterprise==4.25.10
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -588,7 +588,7 @@ edx-lint==5.3.7
     # via -r requirements/edx/testing.in
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.3.7
+edx-name-affirmation==2.4.0
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.10.0
     # via

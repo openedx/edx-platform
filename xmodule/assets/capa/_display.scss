@@ -50,7 +50,7 @@ $asterisk-icon: '\f069'; // .fa-asterisk
 
 // +Mixins - Status Icon - Capa
 // ====================
-@mixin status-icon($color: var(--gray), $fontAwesomeIcon: "\f00d") {
+@mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d") {
   .status-icon {
     &::after {
       @extend %use-font-awesome;
@@ -66,13 +66,13 @@ $asterisk-icon: '\f069'; // .fa-asterisk
 // ====================
 h2 {
   margin-top: 0;
-  margin-bottom: calc((var(--baseline)*0.75));
+  margin-bottom: ($baseline*0.75);
 
   &.problem-header {
     display: inline-block;
 
     section.staff {
-      margin-top: calc((var(--baseline)*1.5));
+      margin-top: ($baseline*1.5);
       font-size: 80%;
     }
   }
@@ -89,10 +89,10 @@ h2 {
 }
 
 %feedback-hint {
-  margin-top: calc((var(--baseline) / 4));
+  margin-top: ($baseline / 4);
 
   .icon {
-    @include margin-right(calc((var(--baseline) / 4)));
+    @include margin-right($baseline / 4);
   }
 }
 
@@ -100,7 +100,7 @@ h2 {
   @extend %feedback-hint;
 
   .icon {
-    color: var(--incorrect);
+    color: $incorrect;
   }
 }
 
@@ -109,7 +109,7 @@ h2 {
   @extend %feedback-hint;
 
   .icon {
-    color: var(--correct);
+    color: $correct;
   }
 }
 
@@ -143,19 +143,19 @@ iframe[seamless] {
 }
 
 .inline-error {
-  color: var(--error-color-dark);
+  color: darken($error-color, 11%);
 }
 
 div.problem-progress {
   display: inline-block;
-  color: var(--gray-d1);
+  color: $gray-d1;
   font-size: em(14);
 }
 
 // +Problem - Base
 // ====================
 div.problem {
-  padding-top: var(--baseline);
+  padding-top: $baseline;
 
   @media print {
     display: block;
@@ -176,25 +176,25 @@ div.problem {
     display: inline;
 
     + p {
-      margin-top: var(--baseline);
+      margin-top: $baseline;
     }
   }
 
   .question-description {
-    color: var(--gray-d1);
-    font-size: var(--small-font-size);
+    color: $gray-d1;
+    font-size: $small-font-size;
   }
 
   form > label, .problem-group-label {
     display: block;
-    margin-bottom: var(--baseline);
+    margin-bottom: $baseline;
     font: inherit;
     color: inherit;
     -webkit-font-smoothing: initial;
   }
 
   .problem-group-label + .question-description {
-    margin-top: calc(-1 * var(--baseline));
+    margin-top: -$baseline;
   }
 
 }
@@ -203,7 +203,7 @@ div.problem {
 // can not use the & + & since .problem is nested deeply in .xmodule_display.xmodule_CapaModule
 .wrapper-problem-response + .wrapper-problem-response,
 .wrapper-problem-response + p {
-  margin-top: calc((var(--baseline) * 1.5));
+  margin-top: ($baseline * 1.5);
 }
 
 // Choice Group - silent class
@@ -219,14 +219,14 @@ div.problem {
 
     display: inline-block;
     clear: both;
-    margin-bottom: calc((var(--baseline)/2));
-    border: 2px solid var(--gray-l4);
+    margin-bottom: ($baseline/2);
+    border: 2px solid $gray-l4;
     border-radius: 3px;
-    padding: calc((var(--baseline)/2));
+    padding: ($baseline/2);
     width: 100%;
 
     &::after {
-      @include margin-left(calc((var(--baseline)*0.75)));
+      @include margin-left($baseline*0.75);
     }
   }
 
@@ -242,15 +242,15 @@ div.problem {
 
   input[type="radio"],
   input[type="checkbox"] {
-    @include margin(calc((var(--baseline)/4)));
-    @include margin-right(calc((var(--baseline)/2)));
+    @include margin($baseline/4);
+    @include margin-right($baseline/2);
   }
 
   input {
     &:focus,
     &:hover {
       & + label {
-        border: 2px solid var(--blue);
+        border: 2px solid $blue;
       }
     }
 
@@ -258,25 +258,25 @@ div.problem {
     &:focus,
     &:hover {
       & + label.choicegroup_correct {
-        @include status-icon(var(--correct), $checkmark-icon);
+        @include status-icon($correct, $checkmark-icon);
 
-        border: 2px solid var(--correct);
+        border: 2px solid $correct;
       }
 
       & + label.choicegroup_partially-correct {
-        @include status-icon(var(--partially-correct), $asterisk-icon);
+        @include status-icon($partially-correct, $asterisk-icon);
 
-        border: 2px solid var(--partially-correct);
+        border: 2px solid $partially-correct;
       }
 
       & + label.choicegroup_incorrect {
-        @include status-icon(var(--incorrect), $cross-icon);
+        @include status-icon($incorrect, $cross-icon);
 
-        border: 2px solid var(--incorrect);
+        border: 2px solid $incorrect;
       }
 
       & + label.choicegroup_submitted {
-        border: 2px solid var(--submitted);
+        border: 2px solid $submitted;
       }
     }
   }
@@ -293,11 +293,11 @@ div.problem {
     }
 
     label {
-      @include padding(calc((var(--baseline)/2)));
-      @include padding-left(calc((var(--baseline)*2.3)));
+      @include padding($baseline/2);
+      @include padding-left($baseline*2.3);
 
       position: relative;
-      font-size: var(--base-font-size);
+      font-size: $base-font-size;
       line-height: normal;
       cursor: pointer;
     }
@@ -308,19 +308,19 @@ div.problem {
 
       position: absolute;
       top: 0.35em;
-      width: calc(var(--baseline)*1.1);
-      height: calc(var(--baseline)*1.1);
+      width: $baseline*1.1;
+      height: $baseline*1.1;
       z-index: 1;
     }
 
     legend {
-      margin-bottom: var(--baseline);
+      margin-bottom: $baseline;
       max-width: 100%;
       white-space: normal;
     }
 
     legend + .question-description {
-      margin-top: calc(-1 * var(--baseline));
+      margin-top: -$baseline;
       max-width: 100%;
       white-space: normal;
     }
@@ -332,24 +332,24 @@ div.problem {
 // Summary status indicators shown after the input area
 div.problem {
   .indicator-container {
-    @include margin-left(calc((var(--baseline)*0.75)));
+    @include margin-left($baseline*0.75);
 
     .status {
-      width: var(--baseline);
+      width: $baseline;
 
       // CASE: correct answer
       &.correct {
-        @include status-icon(var(--correct), $checkmark-icon);
+        @include status-icon($correct, $checkmark-icon);
       }
 
       // CASE: partially correct answer
       &.partially-correct {
-        @include status-icon(var(--partially-correct), $asterisk-icon);
+        @include status-icon($partially-correct, $asterisk-icon);
       }
 
       // CASE: incorrect answer
       &.incorrect {
-        @include status-icon(var(--incorrect), $cross-icon);
+        @include status-icon($incorrect, $cross-icon);
       }
 
       &.submitted,
@@ -379,7 +379,7 @@ div.problem {
 
   .solution-span {
     > span {
-      margin: var(--baseline) 0;
+      margin: $baseline 0;
       display: block;
       position: relative;
 
@@ -413,20 +413,20 @@ div.problem {
         font-style: normal;
 
         &:hover {
-          color: var(--blue);
+          color: $blue;
         }
       }
     }
 
     &.correct, &.ui-icon-check {
       input {
-        border-color: var(--correct);
+        border-color: $correct;
       }
     }
 
     &.partially-correct, &.ui-icon-check {
       input {
-        border-color: var(--partially-correct);
+        border-color: $partially-correct;
       }
     }
 
@@ -438,25 +438,25 @@ div.problem {
 
     &.ui-icon-close {
       input {
-        border-color: var(--incorrect);
+        border-color: $incorrect;
       }
     }
 
     &.incorrect, &.incomplete {
       input {
-        border-color: var(--incorrect);
+        border-color: $incorrect;
       }
     }
 
     &.submitted, &.ui-icon-check {
       input {
-        border-color: var(--submitted);
+        border-color: $submitted;
       }
     }
 
     p.answer {
       display: inline-block;
-      margin-top: calc((var(--baseline) / 2));
+      margin-top: ($baseline / 2);
       margin-bottom: 0;
 
       &::before {
@@ -483,7 +483,7 @@ div.problem {
       }
 
       img.loading {
-        @include padding-left(calc((var(--baseline)/2)));
+        @include padding-left($baseline/2);
 
         display: inline-block;
       }
@@ -517,7 +517,7 @@ div.problem {
         top: 4px;
         width: 14px;
         height: 14px;
-        background: var(--icon-unanswered) center center no-repeat;
+        background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
       }
 
       &.processing, &.ui-icon-processing {
@@ -526,7 +526,7 @@ div.problem {
         top: 6px;
         width: 25px;
         height: 20px;
-        background: var(--icon-spinner) center center no-repeat;
+        background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
       }
 
       &.ui-icon-check {
@@ -535,7 +535,7 @@ div.problem {
         top: 3px;
         width: 25px;
         height: 20px;
-        background: var(--icon-correct) center center no-repeat;
+        background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
       }
 
       &.incomplete, &.ui-icon-close {
@@ -544,24 +544,24 @@ div.problem {
         top: 3px;
         width: 20px;
         height: 20px;
-        background: var(--icon-incorrect) center center no-repeat;
+        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
       }
     }
 
     .reload {
       @include float(right);
 
-      margin: calc((var(--baseline)/2));
+      margin: ($baseline/2);
     }
 
 
     .grader-status {
       @include clearfix();
 
-      margin: calc(var(--baseline)/2) 0;
-      padding: calc(var(--baseline)/2);
+      margin: $baseline/2 0;
+      padding: $baseline/2;
       border-radius: 5px;
-      background: var(--gray-l6);
+      background: $gray-l6;
 
       span {
         display: block;
@@ -574,7 +574,7 @@ div.problem {
       .grading {
         margin: 0px 7px 0 0;
         padding-left: 25px;
-        background: var(--icon-info) left center no-repeat;
+        background: url('#{$static-path}/images/info-icon.png') left center no-repeat;
         text-indent: 0px;
       }
 
@@ -586,11 +586,11 @@ div.problem {
       }
 
       &.file {
-        margin-top: var(--baseline);
-        padding: var(--baseline) 0 0 0;
+        margin-top: $baseline;
+        padding: $baseline 0 0 0;
         border: 0;
         border-top: 1px solid #eee;
-        background: var(--white);
+        background: $white;
 
         p.debug {
           display: none;
@@ -605,13 +605,13 @@ div.problem {
 
     .evaluation {
       p {
-        margin-bottom: calc((var(--baseline)/5));
+        margin-bottom: ($baseline/5);
       }
     }
 
 
     .feedback-on-feedback {
-      margin-right: var(--baseline);
+      margin-right: $baseline;
       height: 100px;
     }
 
@@ -646,7 +646,7 @@ div.problem {
     }
 
     .submit-message-container {
-      margin: var(--baseline) 0px ;
+      margin: $baseline 0px ;
     }
   }
 
@@ -753,17 +753,17 @@ div.problem {
     padding: 0px 5px;
     border: 1px solid #eaeaea;
     border-radius: 3px;
-    background-color: var(--gray-l6);
+    background-color: $gray-l6;
     white-space: nowrap;
     font-size: .9em;
   }
 
   pre {
     overflow: auto;
-    padding: 6px calc(var(--baseline)/2);
-    border: 1px solid var(--gray-l3);
+    padding: 6px $baseline/2;
+    border: 1px solid $gray-l3;
     border-radius: 3px;
-    background-color: var(--gray-l6);
+    background-color: $gray-l6;
     font-size: .9em;
     line-height: 1.4;
 
@@ -784,7 +784,7 @@ div.problem {
     input {
       box-sizing: border-box;
 
-      border: 2px solid var(--gray-l4);
+      border: 2px solid $gray-l4;
       border-radius: 3px;
       min-width: 160px;
       height: 46px;
@@ -792,47 +792,47 @@ div.problem {
 
     .status {
       display: inline-block;
-      margin-top: calc((var(--baseline)/2));
+      margin-top: ($baseline/2);
       background: none;
     }
 
     // CASE: incorrect answer
     > .incorrect {
       input {
-        border: 2px solid var(--incorrect);
+        border: 2px solid $incorrect;
       }
 
       .status {
-        @include status-icon(var(--incorrect), $cross-icon);
+        @include status-icon($incorrect, $cross-icon);
       }
     }
 
     // CASE: partially correct answer
     > .partially-correct {
       input {
-        border: 2px solid var(--partially-correct);
+        border: 2px solid $partially-correct;
       }
 
       .status {
-        @include status-icon(var(--partially-correct), $asterisk-icon);
+        @include status-icon($partially-correct, $asterisk-icon);
       }
     }
 
     // CASE: correct answer
     > .correct {
       input {
-        border: 2px solid var(--correct);
+        border: 2px solid $correct;
       }
 
       .status {
-        @include status-icon(var(--correct), $checkmark-icon);
+        @include status-icon($correct, $checkmark-icon);
       }
     }
 
     // CASE: submitted, correctness withheld
     > .submitted {
       input {
-        border: 2px solid var(--submitted);
+        border: 2px solid $submitted;
       }
 
       .status {
@@ -843,7 +843,7 @@ div.problem {
     // CASE: unanswered and unsubmitted
     > .unanswered, > .unsubmitted {
       input {
-        border: 2px solid var(--gray-l4);
+        border: 2px solid $gray-l4;
       }
 
       .status {
@@ -868,7 +868,7 @@ div.problem {
   }
 
   .trailing_text {
-    @include margin-right(calc((var(--baseline)/2)));
+    @include margin-right($baseline/2);
 
     display: inline-block;
   }
@@ -930,7 +930,7 @@ div.problem {
         visibility: hidden;
         width: 0;
         border-right: none;
-        border-left: 1px solid var(--black);
+        border-left: 1px solid $black;
       }
     }
   }
@@ -952,14 +952,14 @@ div.problem {
 
 .capa-message {
   display: inline-block;
-  color: var(--gray-d1);
+  color: $gray-d1;
   -webkit-font-smoothing: antialiased;
 }
 
 // +Problem - Actions
 // ====================
 div.problem .action {
-  min-height: var(--baseline);
+  min-height: $baseline;
   width: 100%;
   display: flex;
   display: -ms-flexbox;
@@ -972,11 +972,11 @@ div.problem .action {
       display: inline-flex;
       justify-content: flex-end;
       width: 100%;
-      padding-bottom: var(--baseline);
+      padding-bottom: $baseline;
   }
 
   .problem-action-button-wrapper {
-    @include border-right(1px solid var(--gray-300));
+    @include border-right(1px solid $gray-300);
     @include padding(0, 13px); // to create a 26px gap, which is an a11y recommendation
 
     display: inline-block;
@@ -994,11 +994,11 @@ div.problem .action {
     &:hover,
     &:focus,
     &:active {
-      color: var(--primary) !important;
+      color: $primary !important;
     }
 
     .icon {
-      margin-bottom: calc(var(--baseline) / 10);
+      margin-bottom: $baseline / 10;
       display: block;
     }
 
@@ -1008,41 +1008,41 @@ div.problem .action {
   }
 
   .submit-attempt-container {
-    padding-bottom: var(--baseline);
+    padding-bottom: $baseline;
     flex-grow: 1;
     display: flex;
     align-items: center;
 
-    @media (max-width: var(--bp-screen-lg)) {
+    @media (max-width: $bp-screen-lg) {
       max-width: 100%;
-      padding-bottom: var(--baseline);
+      padding-bottom: $baseline;
     }
 
     .submit {
-      @include margin-right(calc((var(--baseline) / 2)));
+      @include margin-right($baseline / 2);
       @include float(left);
 
       white-space: nowrap;
     }
 
     .submit-cta-description {
-        color: var(--primary);
+        color: $primary;
         font-size: small;
-        padding-right: calc(var(--baseline) / 2);
+        padding-right: $baseline / 2;
     }
     .submit-cta-link-button {
-        color: var(--primary);
-        padding-right: calc(var(--baseline) / 4);
+        color: $primary;
+        padding-right: $baseline / 4;
     }
   }
 
   .submission-feedback {
-    @include margin-right(calc((var(--baseline) / 2)));
+    @include margin-right($baseline / 2);
 
-    margin-top: calc(var(--baseline) / 2);
+    margin-top: $baseline / 2;
     display: inline-block;
-    color: var(--gray-d1);
-    font-size: var(--medium-font-size);
+    color: $gray-d1;
+    font-size: $medium-font-size;
     -webkit-font-smoothing: antialiased;
     vertical-align: middle;
 
@@ -1082,7 +1082,7 @@ div.problem {
     display: block;
     margin: lh() 0;
     padding: lh();
-    border: 1px solid var(--gray-l3);
+    border: 1px solid $gray-l3;
   }
 
   .message {
@@ -1114,52 +1114,52 @@ div.problem {
   }
 
   div.capa_alert {
-    margin-top: var(--baseline);
+    margin-top: $baseline;
     padding: 8px 12px;
-    border: 1px solid var(--warning-color);
+    border: 1px solid $warning-color;
     border-radius: 3px;
-    background: var(--warning-color-accent);
+    background: $warning-color-accent;
     font-size: 0.9em;
   }
 
   .notification {
     @include float(left);
 
-    margin-top: calc(var(--baseline) / 2);
-    padding: calc((var(--baseline) / 2.5)) calc((var(--baseline) / 2)) calc((var(--baseline) / 5)) calc((var(--baseline) / 2));
-    line-height: var(--base-line-height);
+    margin-top: $baseline / 2;
+    padding: ($baseline / 2.5) ($baseline / 2) ($baseline / 5) ($baseline / 2);
+    line-height: $base-line-height;
 
     &.success {
-      @include notification-by-type(var(--success));
+      @include notification-by-type($success);
     }
 
     &.error {
-      @include notification-by-type(var(--danger));
+      @include notification-by-type($danger);
     }
 
     &.warning {
-      @include notification-by-type(var(--warning));
+      @include notification-by-type($warning);
     }
 
     &.general {
-      @include notification-by-type(var(--general-color-accent));
+      @include notification-by-type($general-color-accent);
     }
 
     &.problem-hint {
-      border: 1px solid var(--uxpl-gray-background);
+      border: 1px solid $uxpl-gray-background;
       border-radius: 6px;
 
       .icon {
-        @include margin-right(calc(3 * var(--baseline) / 4) );
+        @include margin-right(3 * $baseline / 4);
 
-        color: var(--uxpl-gray-dark);
+        color: $uxpl-gray-dark;
       }
 
       li {
-        color: var(--uxpl-gray-base);
+        color: $uxpl-gray-base;
 
         strong {
-          color: var(--uxpl-gray-dark);
+          color: $uxpl-gray-dark;
         }
       }
     }
@@ -1168,7 +1168,7 @@ div.problem {
       @include float(left);
 
       position: relative;
-      top: calc(var(--baseline) / 5);
+      top: $baseline / 5;
     }
 
     .notification-message {
@@ -1184,7 +1184,7 @@ div.problem {
         margin: 0;
 
         li:not(:last-child) {
-          margin-bottom: calc(var(--baseline) / 4);
+          margin-bottom: $baseline / 4;
         }
       }
     }
@@ -1198,13 +1198,13 @@ div.problem {
   .notification-btn {
     @include float(right);
 
-    padding: calc((var(--baseline) / 10)) calc((var(--baseline) / 4));
-    min-width: calc((var(--baseline) * 3));
+    padding: ($baseline / 10) ($baseline / 4);
+    min-width: ($baseline * 3);
     display: block;
     clear: both;
 
     &:first-child {
-      margin-bottom: calc(var(--baseline) / 4);
+      margin-bottom: $baseline / 4;
     }
   }
 
@@ -1225,26 +1225,26 @@ div.problem {
 
     &.btn-brand {
       &:hover {
-        background-color: var(--btn-brand-focus-background);
+        background-color: $btn-brand-focus-background;
       }
     }
   }
 
   .review-btn {
-    color: var(--blue); // notification type has other colors
+    color: $blue; // notification type has other colors
     &.sr {
-      color: var(--blue);
+      color: $blue;
     }
   }
 
   div.capa_reset {
     padding: 25px;
-    background-color: var(--error-color-light);
-    border: 1px solid var(--error-color);
+    border: 1px solid $error-color;
+    background-color: lighten($error-color, 25%);
     border-radius: 3px;
     font-size: 1em;
-    margin-top: calc(var(--baseline)/2);
-    margin-bottom: calc(var(--baseline)/2);
+    margin-top: $baseline/2;
+    margin-bottom: $baseline/2;
   }
 
   .capa_reset>h2 {
@@ -1256,7 +1256,7 @@ div.problem {
   }
 
   .hints {
-    border: 1px solid var(--gray-l3);
+    border: 1px solid $gray-l3;
 
     h3 {
       @extend %t-strong;
@@ -1264,7 +1264,7 @@ div.problem {
       padding: 9px;
       border-bottom: 1px solid #e3e3e3;
       background: #eee;
-      text-shadow: 0 1px 0 var(--white);
+      text-shadow: 0 1px 0 $white;
       font-size: em(16);
     }
 
@@ -1283,8 +1283,8 @@ div.problem {
         a {
           display: block;
           padding: 9px;
-          background: var(--gray-l6);
-          box-shadow: inset 0 0 0 1px var(--white);
+          background: $gray-l6;
+          box-shadow: inset 0 0 0 1px $white;
         }
       }
 
@@ -1311,11 +1311,11 @@ div.problem {
 
     > section {
       position: relative;
-      margin-bottom: calc((var(--baseline)/2));
-      padding: 9px 9px var(--baseline);
+      margin-bottom: ($baseline/2);
+      padding: 9px 9px $baseline;
       border: 1px solid #ddd;
       border-radius: 3px;
-      background: var(--white);
+      background: $white;
       box-shadow: inset 0 0 0 1px #eee;
 
       p:last-of-type {
@@ -1331,8 +1331,8 @@ div.problem {
         box-sizing: border-box;
 
         display: block;
-        padding: calc((var(--baseline)/5));
-        background: var(--gray-l4);
+        padding: ($baseline/5);
+        background: $gray-l4;
         text-align: right;
         font-size: 1em;
 
@@ -1349,8 +1349,8 @@ div.problem {
 
   .external-grader-message {
     section {
-      padding-top: calc((var(--baseline)*1.5));
-      padding-left: var(--baseline);
+      padding-top: ($baseline*1.5);
+      padding-left: $baseline;
       background-color: #fafafa;
       color: #2c2c2c;
       font-size: 1em;
@@ -1369,9 +1369,9 @@ div.problem {
         padding: 0;
 
         .result-errors {
-          margin: calc((var(--baseline)/4));
-          padding: calc((var(--baseline)/2)) calc((var(--baseline)/2)) calc((var(--baseline)/2)) calc((var(--baseline)*2));
-          background: var(--icon-incorrect) center left no-repeat;
+          margin: ($baseline/4);
+          padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline*2);
+          background: url('#{$static-path}/images/incorrect-icon.png') center left no-repeat;
 
           li {
             color: #b00;
@@ -1379,10 +1379,10 @@ div.problem {
         }
 
         .result-output {
-          margin: calc(var(--baseline)/4);
-          padding: var(--baseline) 0 calc((var(--baseline)*0.75)) 50px;
+          margin: $baseline/4;
+          padding: $baseline 0 ($baseline*0.75) 50px;
           border-top: 1px solid #ddd;
-          border-left: var(--baseline) solid #fafafa;
+          border-left: $baseline solid #fafafa;
 
           h4 {
             font-size: 1em;
@@ -1394,7 +1394,7 @@ div.problem {
           }
 
           dt {
-            margin-top: var(--baseline);
+            margin-top: $baseline;
           }
 
           dd {
@@ -1403,7 +1403,7 @@ div.problem {
         }
 
         .result-correct {
-          background: var(--icon-correct) left 20px no-repeat;
+          background: url('#{$static-path}/images/correct-icon.png') left 20px no-repeat;
 
           .result-actual-output {
             color: #090;
@@ -1411,7 +1411,7 @@ div.problem {
         }
 
         .result-partially-correct {
-          background: var(--icon-partially-correct) left 20px no-repeat;
+          background: url('#{$static-path}/images/partially-correct-icon.png') left 20px no-repeat;
 
           .result-actual-output {
             color: #090;
@@ -1419,7 +1419,7 @@ div.problem {
         }
 
         .result-incorrect {
-          background: var(--icon-incorrect) left 20px no-repeat;
+          background: url('#{$static-path}/images/incorrect-icon.png') left 20px no-repeat;
 
           .result-actual-output {
             color: #b00;
@@ -1427,8 +1427,8 @@ div.problem {
         }
 
         .markup-text{
-          margin: calc((var(--baseline)/4));
-          padding: var(--baseline) 0 15px 50px;
+          margin: ($baseline/4);
+          padding: $baseline 0 15px 50px;
           border-top: 1px solid #ddd;
           border-left: 20px solid #fafafa;
 
@@ -1451,19 +1451,19 @@ div.problem {
 div.problem {
   .rubric {
     tr {
-      margin: calc((var(--baseline)/2)) 0;
+      margin: ($baseline/2) 0;
       height: 100%;
     }
 
     td {
-      margin: calc((var(--baseline)/2)) 0;
-      padding: var(--baseline) 0;
+      margin: ($baseline/2) 0;
+      padding: $baseline 0;
       height: 100%;
     }
 
     th {
-      margin: calc((var(--baseline)/4));
-      padding: calc((var(--baseline)/4));
+      margin: ($baseline/4);
+      padding: ($baseline/4);
     }
 
     label,
@@ -1471,12 +1471,12 @@ div.problem {
       position: relative;
       display: inline-block;
       margin: 3px;
-      padding: calc((var(--baseline)*0.75));
+      padding: ($baseline*0.75);
       min-width: 50px;
       min-height: 50px;
       width: 150px;
       height: 100%;
-      background-color: var(--gray-l3);
+      background-color: $gray-l3;
       font-size: .9em;
     }
 
@@ -1484,7 +1484,7 @@ div.problem {
       position: absolute;
       right: 0;
       bottom: 0;
-      margin: calc((var(--baseline)/2));
+      margin: ($baseline/2);
     }
 
     .selected-grade {
@@ -1508,14 +1508,14 @@ div.problem {
 div.problem {
   .annotation-input {
     margin: 0 0 1em 0;
-    border: 1px solid var(--gray-l3);
+    border: 1px solid $gray-l3;
     border-radius: 1em;
 
     .annotation-header {
       @extend %t-strong;
 
       padding: .5em 1em;
-      border-bottom: 1px solid var(--gray-l3);
+      border-bottom: 1px solid $gray-l3;
     }
 
     .annotation-body { padding: .5em 1em; }
@@ -1557,7 +1557,7 @@ div.problem {
           @extend %ui-fake-link;
 
           display: inline-block;
-          margin-left: calc((var(--baseline)*2));
+          margin-left: ($baseline*2);
           border: 1px solid rgb(102,102,102);
 
           &.selected {
@@ -1590,13 +1590,13 @@ div.problem {
     .debug-value {
       margin: 1em 0;
       padding: 1em;
-      border: 1px solid var(--black);
+      border: 1px solid $black;
       background-color: #999;
-      color: var(--white);
+      color: $white;
 
       input[type="text"] { width: 100%; }
 
-      pre { background-color: var(--gray-l3); color: var(--black); }
+      pre { background-color: $gray-l3; color: $black; }
 
       &::before {
         @extend %t-strong;
@@ -1623,7 +1623,7 @@ div.problem {
       @extend label.choicegroup_correct;
 
       input[type="text"] {
-        border-color: var(--correct);
+        border-color: $correct;
       }
     }
 
@@ -1631,7 +1631,7 @@ div.problem {
       @extend label.choicegroup_partially-correct;
 
       input[type="text"] {
-        border-color: var(--partially-correct);
+        border-color: $partially-correct;
       }
     }
 
@@ -1645,9 +1645,9 @@ div.problem {
 
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
       &::after {
-        @include margin-left(calc((var(--baseline)*0.75)));
+        @include margin-left($baseline*0.75);
 
-        content: var(--icon-correct);
+        content: url('#{$static-path}/images/correct-icon.png');
       }
     }
 
@@ -1682,15 +1682,15 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .correct {
-    @include status-icon(var(--correct), $checkmark-icon);
+    @include status-icon($correct, $checkmark-icon);
   }
 
   .incorrect {
-    @include status-icon(var(--incorrect), $cross-icon);
+    @include status-icon($incorrect, $cross-icon);
   }
 
   .partially-correct {
-    @include status-icon(var(--partially-correct), $asterisk-icon);
+    @include status-icon($partially-correct, $asterisk-icon);
   }
 
   .submitted {
@@ -1723,15 +1723,15 @@ div.problem .annotation-input {
   }
 
   .correct {
-    @include status-icon(var(--correct), $checkmark-icon);
+    @include status-icon($correct, $checkmark-icon);
   }
 
   .incorrect {
-    @include status-icon(var(--incorrect), $cross-icon);
+    @include status-icon($incorrect, $cross-icon);
   }
 
   .partially-correct {
-    @include status-icon(var(--partially-correct), $asterisk-icon);
+    @include status-icon($partially-correct, $asterisk-icon);
   }
 
   .submitted {
@@ -1743,5 +1743,5 @@ div.problem .annotation-input {
 // ====================
 .problems-wrapper .loading-spinner {
   text-align: center;
-  color: var(--gray-d1);
+  color: $gray-d1;
 }
