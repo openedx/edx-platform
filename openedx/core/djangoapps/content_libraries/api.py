@@ -236,11 +236,9 @@ class LibraryXBlockMetadata:
         if last_publish_log and last_publish_log.published_by:
             published_by = last_publish_log.published_by.username
 
-        last_draft_log = authoring_api.get_entities_with_unpublished_changes(component.pk) \
-            .order_by('-created').first()
-        last_draft_created = last_draft_log.created if last_draft_log else None
-        last_draft_created_by = \
-            last_draft_log.created_by.username if last_draft_log and last_draft_log.created_by else None
+        draft = component.versioning.draft
+        last_draft_created = draft.created if draft else None
+        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
 
         return cls(
             usage_key=LibraryUsageLocatorV2(
