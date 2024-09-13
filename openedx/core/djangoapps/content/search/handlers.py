@@ -195,9 +195,10 @@ def content_object_associations_changed_handler(**kwargs) -> None:
 
     try:
         # Check if valid if course or library block
-        usage_key = UsageKey.from_string(str(content_object.object_id))        
+        usage_key = UsageKey.from_string(str(content_object.object_id))
     except InvalidKeyError:
         try:
+            # Check if valid if library collection
             usage_key = LibraryCollectionLocator.from_string(str(content_object.object_id))
         except InvalidKeyError:
             log.error("Received invalid content object id")
