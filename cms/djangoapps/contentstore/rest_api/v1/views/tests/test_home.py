@@ -44,6 +44,7 @@ class HomePageViewTest(CourseTestCase):
             "allow_unicode_course_id": False,
             "allowed_organizations": [],
             "archived_courses": [],
+            "can_access_advanced_settings": True,
             "can_create_organizations": True,
             "course_creator_status": "granted",
             "courses": [],
