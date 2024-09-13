@@ -7,6 +7,7 @@ from django.urls import include, path, re_path
 from rest_framework import routers
 
 from . import views
+from . import views_collections
 
 
 # Django application name.
@@ -17,6 +18,11 @@ app_name = 'openedx.core.djangoapps.content_libraries'
 
 import_blocks_router = routers.DefaultRouter()
 import_blocks_router.register(r'tasks', views.LibraryImportTaskViewSet, basename='import-block-task')
+
+library_collections_router = routers.DefaultRouter()
+library_collections_router.register(
+    r'collections', views_collections.LibraryCollectionsView, basename="library-collections"
+)
 
 # These URLs are only used in Studio. The LMS already provides all the
 # API endpoints needed to serve XBlocks from content libraries using the
@@ -45,6 +51,8 @@ urlpatterns = [
             path('import_blocks/', include(import_blocks_router.urls)),
             # Paste contents of clipboard into library
             path('paste_clipboard/', views.LibraryPasteClipboardView.as_view()),
+            # Library Collections
+            path('', include(library_collections_router.urls)),
         ])),
         path('blocks/<str:usage_key_str>/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:

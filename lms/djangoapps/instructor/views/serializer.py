@@ -149,3 +149,32 @@ class SendEmailSerializer(serializers.Serializer):
     subject = serializers.CharField(max_length=128, write_only=True, required=True)
     message = serializers.CharField(required=True)
     schedule = serializers.CharField(required=False)
+
+
+class BlockDueDateSerializer(serializers.Serializer):
+    """
+    Serializer for handling block due date updates for a specific student.
+    Fields:
+        url (str): The URL related to the block that needs the due date update.
+        due_datetime (str): The new due date and time for the block.
+        student (str): The email or username of the student whose access is being modified.
+        reason (str): Reason why updating this.
+    """
+    url = serializers.CharField()
+    due_datetime = serializers.CharField()
+    student = serializers.CharField(
+        max_length=255,
+        help_text="Email or username of user to change access"
+    )
+    reason = serializers.CharField(required=False)
+
+    def validate_student(self, value):
+        """
+        Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user

@@ -18,8 +18,11 @@ from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from openedx_tagging.core.tagging.models.utils import TAGS_CSV_SEPARATOR
 from organizations.models import Organization
 from .helpers.objecttag_export_helpers import build_object_tree_with_objecttags, iterate_with_level
-from openedx_events.content_authoring.data import ContentObjectData
-from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
+from openedx_events.content_authoring.data import ContentObjectData, ContentObjectChangedData
+from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    CONTENT_OBJECT_TAGS_CHANGED,
+)
 
 from .models import TaxonomyOrg
 from .types import ContentKey, TagValuesByObjectIdDict, TagValuesByTaxonomyIdDict, TaxonomyDict
@@ -301,6 +304,16 @@ def set_exported_object_tags(
             create_invalid=True,
             taxonomy_export_id=str(taxonomy_export_id),
         )
+
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            time=now(),
+            content_object=ContentObjectChangedData(
+                object_id=content_key_str,
+                changes=["tags"],
+            )
+        )
+
+        # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
         CONTENT_OBJECT_TAGS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectData(object_id=content_key_str)
@@ -378,7 +391,7 @@ def tag_object(
     Replaces the existing ObjectTag entries for the given taxonomy + object_id
     with the given list of tags, if the taxonomy can be used by the given object_id.
 
-    This is a wrapper around oel_tagging.tag_object that adds emitting the `CONTENT_OBJECT_TAGS_CHANGED` event
+    This is a wrapper around oel_tagging.tag_object that adds emitting the `CONTENT_OBJECT_ASSOCIATIONS_CHANGED` event
     when tagging an object.
 
     tags: A list of the values of the tags from this taxonomy to apply.
@@ -399,6 +412,15 @@ def tag_object(
             taxonomy=taxonomy,
             tags=tags,
         )
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            time=now(),
+            content_object=ContentObjectChangedData(
+                object_id=object_id,
+                changes=["tags"],
+            )
+        )
+
+        # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
         CONTENT_OBJECT_TAGS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectData(object_id=object_id)
