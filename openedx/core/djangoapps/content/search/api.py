@@ -18,7 +18,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
@@ -608,14 +608,14 @@ def upsert_block_collections_index_docs(usage_key: UsageKey):
     _update_index_docs([doc])
 
 
-def upsert_collection_tags_index_docs(collection_usage_key: LibraryLocatorV2):
+def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLocator):
     """
     Updates the tags data in documents for the given library collection
     """
     collection = lib_api.get_library_collection_from_usage_key(collection_usage_key)
 
     doc = {Fields.id: collection.id}
-    doc.update(collection_usage_key.library_key, collection)
+    doc.update(searchable_doc_tags_for_collection(collection_usage_key.library_key, collection))
     _update_index_docs([doc])
 
 

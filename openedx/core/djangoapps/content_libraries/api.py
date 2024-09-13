@@ -1292,7 +1292,7 @@ def get_library_collection_from_usage_key(
     collection_key = collection_usage_key.collection_id
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     try:
-        return authoring_api.get(
+        return authoring_api.get_collection(
             content_library.learning_package_id,
             collection_key,
         )
