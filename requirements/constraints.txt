@@ -142,3 +142,7 @@ django-storages<1.14.4
 # We are pinning this until after all the smaller migrations get handled and then we can migrate this all at once.
 # Ticket to unpin: https://github.com/edx/edx-arch-experiments/issues/760
 social-auth-app-django<=5.4.1
+
+# Temporary pin as to prevent a new version of edx-name-affirmation from being merged before we modify it to work
+# properly along with work in this PR: https://github.com/openedx/edx-platform/pull/35468
+edx-name-affirmation==2.4.0
