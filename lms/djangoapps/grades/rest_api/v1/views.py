@@ -351,11 +351,13 @@ class SectionGradesBreakdown(GradeViewMixin, PaginatedAPIView):
         summary = []
         for section in course_grade.summary.get('section_breakdown'):
             summary.append(section)
+        
+        #SA || gradeRoundOff
         course_grading_status = {
             'course_id': str(course_key),
             'username': user.username,
             'passed': course_grade.passed,
-            'current_grade': int(course_grade.percent * 100),
+            'current_grade': course_grade.percent * 100,
             'section_breakdown': summary,
         }
         return course_grading_status
