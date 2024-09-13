@@ -99,6 +99,8 @@ def render_block_view(request, usage_key_str, view_name):
 def embed_block_view(request, usage_key_str, view_name):
     """
     Render the given XBlock in an <iframe>
+
+    Unstable - may change after Sumac
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
