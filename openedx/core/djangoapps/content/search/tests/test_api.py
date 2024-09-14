@@ -201,7 +201,6 @@ class TestSearchApi(ModuleStoreTestCase):
             "access_id": lib_access.id,
             "breadcrumbs": [{"display_name": "Library"}],
         }
-        
 
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
