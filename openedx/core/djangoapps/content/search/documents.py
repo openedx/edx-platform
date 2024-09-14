@@ -405,6 +405,7 @@ def searchable_doc_for_collection(collection) -> dict:
         doc.update({
             Fields.context_key: str(context_key),
             Fields.org: org,
+            Fields.usage_key: str(lib_api.get_library_collection_usage_key(context_key, collection.key)),
         })
     except LearningPackage.contentlibrary.RelatedObjectDoesNotExist:
         log.warning(f"Related library not found for {collection}")
