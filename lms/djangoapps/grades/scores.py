@@ -163,7 +163,7 @@ def compute_percent(earned, possible):
      """
     if possible > 0:
         # Rounds to two decimal places.
-        return around(earned / possible, decimals=2)
+        return around(earned / possible, decimals=4)
     else:
         return 0.0
 
