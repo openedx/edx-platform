@@ -46,4 +46,5 @@ def get_base_template_context(site):
         'mobile_store_logo_urls': get_config_value_from_site_or_settings('MOBILE_STORE_LOGO_URLS', site=site),
         'logo_url': get_logo_url_for_email(),
         'site_configuration_values': site_configuration_values,
+        'header_url' : marketing_link('HEADER_LOGO'),
     }
