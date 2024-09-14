@@ -1491,3 +1491,13 @@ def extras_userdetails(request):
         return JsonResponse(user_details)
     except User.DoesNotExist:
         return render(request, 'blank.html', {"message": "User Does Not Exist"})
+
+
+#KC
+@login_required
+@csrf_exempt
+def extras_emiitk_get_grades(request):
+        url = "https://emasters.iitk.ac.in/report/grades"
+        response = requests.request("POST", url = url, data = {"email" : request.user.email, "roll_no" : request.user.last_name, "name" : request.user.first_name})
+        context = response.text
+        return  HttpResponse(context)
