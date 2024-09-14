@@ -185,9 +185,11 @@ class TestSearchApi(ModuleStoreTestCase):
                 created_by=None,
                 description="my collection description"
             )
+            self.collection_usage_key = "lib-collection:org1:lib:MYCOL"
         self.collection_dict = {
             "id": self.collection.id,
             "block_id": self.collection.key,
+            "usage_key": self.collection_usage_key,
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
@@ -199,6 +201,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "access_id": lib_access.id,
             "breadcrumbs": [{"display_name": "Library"}],
         }
+        
 
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
@@ -461,6 +464,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection1_created = {
             "id": collection1.id,
             "block_id": collection1.key,
+            "usage_key": f"lib-collection:org1:lib:{collection1.key}",
             "type": "collection",
             "display_name": "Collection 1",
             "description": "First Collection",
@@ -475,6 +479,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection2_created = {
             "id": collection2.id,
             "block_id": collection2.key,
+            "usage_key": f"lib-collection:org1:lib:{collection2.key}",
             "type": "collection",
             "display_name": "Collection 2",
             "description": "Second Collection",
@@ -489,6 +494,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection2_updated = {
             "id": collection2.id,
             "block_id": collection2.key,
+            "usage_key": f"lib-collection:org1:lib:{collection2.key}",
             "type": "collection",
             "display_name": "Collection 2",
             "description": "Second Collection",
@@ -503,6 +509,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection1_updated = {
             "id": collection1.id,
             "block_id": collection1.key,
+            "usage_key": f"lib-collection:org1:lib:{collection1.key}",
             "type": "collection",
             "display_name": "Collection 1",
             "description": "First Collection",
@@ -577,4 +584,35 @@ class TestSearchApi(ModuleStoreTestCase):
         ]
         mock_meilisearch.return_value.index.return_value.delete_documents.assert_called_once_with(
             filter=delete_filter
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_tags_in_collections(self, mock_meilisearch):
+        # Tag collection
+        tagging_api.tag_object(self.collection_usage_key, self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(self.collection_usage_key, self.taxonomyB, ["three", "four"])
+
+        # Build expected docs with tags at each stage
+        doc_collection_with_tags1 = {
+            "id": self.collection.id,
+            "tags": {
+                'taxonomy': ['A'],
+                'level0': ['A > one', 'A > two']
+            }
+        }
+        doc_collection_with_tags2 = {
+            "id": self.collection.id,
+            "tags": {
+                'taxonomy': ['A', 'B'],
+                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
+            }
+        }
+
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_collection_with_tags1]),
+                call([doc_collection_with_tags2]),
+            ],
+            any_order=True,
         )
