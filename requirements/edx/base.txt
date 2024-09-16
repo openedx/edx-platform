@@ -825,7 +825,9 @@ openedx-filters==1.9.0
     #   lti-consumer-xblock
     #   ora2
 openedx-learning==0.11.5
-    # via -r requirements/edx/kernel.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.1
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
