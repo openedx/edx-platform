@@ -1034,7 +1034,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning @ git+https://github.com/open-craft/openedx-learning/@rpenido/fal-3802-component-sidebar-manage-tab
+openedx-learning==0.11.5
     # via -r requirements/edx/base.txt
 openedx-mongodbproxy==0.2.1
     # via -r requirements/edx/base.txt
