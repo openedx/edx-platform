@@ -299,11 +299,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         }
 
     def test_collection_with_library(self):
-        doc = {}
-        doc.update(searchable_doc_for_collection(self.collection))
+        doc = searchable_doc_for_collection(self.collection)
         doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection))
-
-        print(doc)
 
         assert doc == {
             "id": self.collection.id,
