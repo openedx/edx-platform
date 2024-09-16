@@ -15,7 +15,6 @@ from lms.djangoapps.verify_student.api import (
     send_approval_email,
     update_verification_attempt,
 )
-from lms.djangoapps.verify_student.signals.signals import idv_update_signal
 from lms.djangoapps.verify_student.exceptions import VerificationAttemptInvalidStatus
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationAttempt
 from lms.djangoapps.verify_student.statuses import VerificationAttemptStatus

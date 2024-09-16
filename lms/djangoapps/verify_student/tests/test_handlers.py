@@ -20,7 +20,6 @@ from lms.djangoapps.verify_student.signals.handlers import (
     _listen_for_lms_retire,
     _listen_for_lms_retire_verification_attempts
 )
-from lms.djangoapps.verify_student.signals.signals import idv_update_signal
 from lms.djangoapps.verify_student.tests.factories import (
     SoftwareSecurePhotoVerificationFactory,
     VerificationAttemptFactory

@@ -11,9 +11,7 @@ from xmodule.modulestore.django import SignalHandler, modulestore
 from common.djangoapps.student.models_api import get_name, get_pending_name_change
 from lms.djangoapps.verify_student.signals.signals import idv_update_signal
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC
-from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC
 
-from lms.djangoapps.verify_student.apps import VerifyStudentConfig
 from .models import SoftwareSecurePhotoVerification, VerificationDeadline, VerificationAttempt
 
 log = logging.getLogger(__name__)
