@@ -503,7 +503,8 @@ class PayAndVerifyView(View):
             if ecommerce_service.is_enabled(user):
                 url = ecommerce_service.get_checkout_page_url(
                     sku,
-                    catalog=self.request.GET.get('catalog')
+                    catalog=self.request.GET.get('catalog'),
+                    course_run_keys=[str(course_key)]
                 )
 
         # Redirect if necessary, otherwise implicitly return None
