@@ -7,6 +7,7 @@ from typing import Dict, Optional
 from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey
 
+from forum import api as forum_api
 from openedx.core.djangoapps.django_comment_common.comment_client import settings
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import perform_request
 
@@ -29,17 +30,8 @@ def get_course_commentable_counts(course_key: CourseKey) -> Dict[str, Dict[str, 
             }
 
     """
-    url = f"{settings.PREFIX}/commentables/{course_key}/counts"
-    response = perform_request(
-        'get',
-        url,
-        metric_tags=[
-            f"course_key:{course_key}",
-            "function:get_course_commentable_counts",
-        ],
-        metric_action='commentable_stats.retrieve',
-    )
-    return response
+    commentable_stats = forum_api.retrieve_commentables_stats(str(course_key))
+    return commentable_stats
 
 
 @function_trace("get_course_user_stats")

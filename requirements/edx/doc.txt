@@ -281,6 +281,7 @@ django==4.2.15
     #   enmerkar
     #   enmerkar-underscore
     #   event-tracking
+    #   forum
     #   help-tokens
     #   jsonfield
     #   lti-consumer-xblock
@@ -452,6 +453,7 @@ djangorestframework==3.14.0
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
+    #   forum
     #   openedx-learning
     #   ora2
     #   super-csv
@@ -633,6 +635,7 @@ elasticsearch==7.13.4
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-search
+    #   forum
 enmerkar==0.7.1
     # via
     #   -r requirements/edx/base.txt
@@ -658,6 +661,8 @@ firebase-admin==6.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
+forum @ git+https://github.com/edly-io/forum.git@feat/migrate_from_http_to_python_call
+    # via -r requirements/edx/base.txt
 frozenlist==1.4.1
     # via
     #   -r requirements/edx/base.txt
@@ -960,7 +965,9 @@ openai==0.28.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 openedx-atlas==0.6.1
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   forum
 openedx-calc==3.1.0
     # via -r requirements/edx/base.txt
 openedx-django-pyfs==3.6.0
@@ -1150,6 +1157,7 @@ pymongo==4.4.0
     #   -r requirements/edx/base.txt
     #   edx-opaque-keys
     #   event-tracking
+    #   forum
     #   mongoengine
     #   openedx-mongodbproxy
 pynacl==1.5.0
@@ -1271,6 +1279,7 @@ requests==2.32.3
     #   edx-drf-extensions
     #   edx-enterprise
     #   edx-rest-api-client
+    #   forum
     #   geoip2
     #   google-api-core
     #   google-cloud-storage
