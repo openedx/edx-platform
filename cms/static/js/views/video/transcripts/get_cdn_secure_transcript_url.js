@@ -3,9 +3,10 @@ define(["jquery", "backbone", "underscore"], function($, Backbone) {
             var cdnLinks_autoComplete_srt = function() {
                 $('.list-input.settings-list li:nth-child(3) .wrapper-comp-setting input').autocomplete({
                     source: function(request, response) {
+                        api_url = window.location.hostname.includes("learn-cmu.talentsprint.com") ? "https://cdn-intl.talentsprint.com/findFilePaths" : "https://cdn.exec.talentsprint.com/app/findFilePaths";
                         $.ajax({
                             type: "POST",
-                            url: "https://cdn.exec.talentsprint.com/app/findFilePaths",
+                            url: api_url,
                             dataType: "json",
                             contentType: "application/json; charset=utf-8",
                             data: JSON.stringify({
