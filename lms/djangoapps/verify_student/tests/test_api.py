@@ -88,11 +88,11 @@ class CreateVerificationAttempt(TestCase):
         self.assertEqual(verification_attempt.status, VerificationAttemptStatus.CREATED)
         self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo=timezone.utc))
         mock_created_event.assert_called_with(
-                attempt_id=verification_attempt.id,
-                user=self.user,
-                status=VerificationAttemptStatus.CREATED,
-                name='Tester McTest',
-                expiration_date=datetime(2024, 12, 31, tzinfo=timezone.utc),
+            attempt_id=verification_attempt.id,
+            user=self.user,
+            status=VerificationAttemptStatus.CREATED,
+            name='Tester McTest',
+            expiration_date=datetime(2024, 12, 31, tzinfo=timezone.utc),
         )
 
     def test_create_verification_attempt_no_expiration_datetime(self):
@@ -140,7 +140,8 @@ class UpdateVerificationAttempt(TestCase):
     @patch('lms.djangoapps.verify_student.api.emit_idv_attempt_pending_event')
     @patch('lms.djangoapps.verify_student.api.emit_idv_attempt_approved_event')
     @patch('lms.djangoapps.verify_student.api.emit_idv_attempt_denied_event')
-    def test_update_verification_attempt(self,
+    def test_update_verification_attempt(
+        self,
         name,
         status,
         expiration_datetime,
@@ -170,7 +171,7 @@ class UpdateVerificationAttempt(TestCase):
                 status=status,
                 name=name,
                 expiration_date=expiration_datetime,
-        )
+            )
         elif status == VerificationAttemptStatus.APPROVED:
             mock_approved_event.assert_called_with(
                 attempt_id=verification_attempt.id,
@@ -178,7 +179,7 @@ class UpdateVerificationAttempt(TestCase):
                 status=status,
                 name=name,
                 expiration_date=expiration_datetime,
-        )
+            )
         elif status == VerificationAttemptStatus.DENIED:
             mock_denied_event.assert_called_with(
                 attempt_id=verification_attempt.id,
@@ -186,7 +187,7 @@ class UpdateVerificationAttempt(TestCase):
                 status=status,
                 name=name,
                 expiration_date=expiration_datetime,
-        )
+            )
 
     def test_update_verification_attempt_none_values(self):
         update_verification_attempt(
