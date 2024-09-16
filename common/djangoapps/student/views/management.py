@@ -1501,3 +1501,30 @@ def extras_emiitk_get_grades(request):
         response = requests.request("POST", url = url, data = {"email" : request.user.email, "roll_no" : request.user.last_name, "name" : request.user.first_name})
         context = response.text
         return  HttpResponse(context)
+
+@csrf_exempt
+@login_required
+def extras_get_payment_details(request):
+    site = configuration_helpers.get_value("course_org_filter", True)
+    program_image_url = configuration_helpers.get_value("MKTG_URLS", True)
+    programe_name = configuration_helpers.get_value("PLATFORM_NAME", True)
+    student_orders_endpoint = "https://talentsprint.com/get-payment-history.dpl"
+    international_orders_endpoint = "https://international.talentsprint.com/get-payment-history.dpl"
+
+    try:
+        payload = {"email": request.user.email, "password" : "TS123$" , "site" : site}
+        response = requests.post(student_orders_endpoint, data=payload)
+        international_response = requests.post(international_orders_endpoint, data=payload)
+        data = {}
+        if international_response.json() and response.json():
+            temp = response.json()
+            temp.update(international_response.json())
+            data = temp
+        elif response.json():
+            data = response.json()
+        elif international_response.json():
+            data = international_response.json()
+        return render(request, "payment_details.html", context={"data": data, "image_url" : program_image_url["HEADER_LOGO"] , "program_name" : programe_name, "site" : site, "email" : request.user.email })
+
+    except Exception as e:
+        return HttpResponse(f"error: {e}")

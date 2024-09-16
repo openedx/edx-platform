@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<link href="https://static.talentsprint.com/extras/table_template/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.jqueryui.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/scroller/2.2.0/css/scroller.jqueryui.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://static.talentsprint.com/extras/table_template/css/payment_details.css">
+<link rel="shortcut icon" href="https://static.talentsprint.com/favicon.ico" type="image/x-icon" data-react-helmet="true">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" integrity="sha512-uKQ39gEGiyUJl4AI6L+ekBdGKpGw4xJ55+xyJG7YFlJokPNYegn9KwQ3P8A7aFQAUtUsAQHep+d/lrGqrbPIDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+<div class="container">
+  <img class="logo" src="{{image_url}}">
+  <h1>Payment Summary</h1>
+  <div class="table-responsive table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl tableFixHead">
+
+    <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+          <tr class="header">
+            <th>ORDER ID </th>
+            <th>DETAILS</th>
+            <th>TOTAL FEE</th>
+            <th>FEE PAID</th>
+            <th>OUTSTANDING</th>
+            <th>RECEIPTS</th>
+          </tr>
+        </thead>
+        <tbody id="tableData">
+          {% if data %}
+            {% for order, order_details in data.items %}
+                 <tr>
+                         <td>{{order}}</td>
+                         {% if 'AF' in order_details.model %}
+                           <td>Application Fee</td>
+                         {% elif '-PF-' in order_details.model %}
+                           <td>Program Fee</td>
+                         {% elif '-CV-' in order_details.model %}
+                           <td>Campus Visit Fee</td>
+                         {% else %}
+                           <td>
+                             {% for title in order_details.title %}
+                               {{ title }} </br>
+                             {% endfor %}
+                           </td>
+                        {% endif %}
+
+                        <td>{% if order_details.currency == 'INR' %}&#8377; {% else %}&#36; {% endif %}{{ order_details.order_total }}</td>
+                          <td>{% if order_details.currency == 'INR' %}&#8377; {% else %}&#36; {% endif %}{{ order_details.colleted_value }}</td>
+
+                        {% if order_details.payment_link != '' %}
+                            <td>
+                                    <span>{% if order_details.currency == 'INR' %}&#8377; {% else %}&#36; {% endif %}{{ order_details.balance }}</span><br>
+                                <button type="button" class="btn btn-success dues"><a href ="{{ order_details.payment_link }}" target="_blank">PAY DUES</a></button>
+                            </td>
+                        {% else %}
+                         <td>-</td>
+                        {% endif%}
+                        {% if order_details.colleted_value != 0%}
+                        <td><span class="download-button" data-collected_value = "{{ order_details.colleted_value }}" data-order="{{ order }}" data-program="{{ program_name }}" data-image="{{ image_url }}" data-email="{{ email }}" data-site="{{site}}" data-currency="{{ order_details.currency }}" ><a href="#"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 1.059v10.425m0 0 4-3.791m-4 3.79-4-3.79m11 3.79v2.844c0 .502-.21.985-.586 1.34a2.058 2.058 0 0 1-1.414.555H3c-.53 0-1.04-.2-1.414-.555A1.847 1.847 0 0 1 1 14.327v-2.843"/></svg></a></span></td>
+                        {% else %}
+                         <td>-</td>
+                        {% endif %}
+                 </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+
+
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.jqueryui.min.js"></script>
+<script src="https://cdn.datatables.net/scroller/2.2.0/js/dataTables.scroller.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    new DataTable('#example', {
+      fixedHeader: true,
+      paging: false,
+      responsive: true,
+      scrollCollapse: false,
+      scroller: false,
+      scrollY: 200,
+      scrollX: true,
+      bFilter: false,
+      bInfo: false,
+      bSort: false,
+      fixedColumns: true,
+    });
+});
+</script>
+<script>
+    $(document).ready(function () {
+        $('.download-button').on("click", function () {
+            var orderId = $(this).data("order");
+            var loadingOverlay = $('#loadingOverlay');
+            loadingOverlay.show();
+
+            $.ajax({
+                url: 'https://dashboard.talentsprint.com/reports/generate_pdf',
+                method: 'POST',
+                data: { order: orderId, image_url: $(this).data("image"), program_name: $(this).data("program"), currency: $(this).data("currency"), site: $(this).data("site") },
+                xhrFields: {
+                    responseType: 'blob'
+                 },
+                success: function (response) {
+                    loadingOverlay.hide();
+                    var blob = new Blob([response], { type: 'application/pdf' });
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'receipt_' + orderId + '.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    console.log('API call success', response);
+                },
+
+                error: function (error) {
+                    loadingOverlay.hide();
+                    console.error('API call failed:', error);
+                }
+            });
+        });
+    });
+</script>
+
+
+</body>
+</html>
