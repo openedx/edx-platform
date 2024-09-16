@@ -218,8 +218,12 @@ class LibraryXBlockMetadata:
     modified = attr.ib(type=datetime)
     display_name = attr.ib("")
     last_published = attr.ib(default=None, type=datetime)
+    last_draft_created = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib("")
+    published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     tags_count = attr.ib(0)
+    created = attr.ib(default=None, type=datetime)
 
     @classmethod
     def from_component(cls, library_key, component):
@@ -227,6 +231,14 @@ class LibraryXBlockMetadata:
         Construct a LibraryXBlockMetadata from a Component object.
         """
         last_publish_log = component.versioning.last_publish_log
+
+        published_by = None
+        if last_publish_log and last_publish_log.published_by:
+            published_by = last_publish_log.published_by.username
+
+        draft = component.versioning.draft
+        last_draft_created = draft.created if draft else None
+        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
 
         return cls(
             usage_key=LibraryUsageLocatorV2(
@@ -238,7 +250,10 @@ class LibraryXBlockMetadata:
             created=component.created,
             modified=component.versioning.draft.created,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
-            has_unpublished_changes=component.versioning.has_unpublished_changes
+            published_by=published_by,
+            last_draft_created=last_draft_created,
+            last_draft_created_by=last_draft_created_by,
+            has_unpublished_changes=component.versioning.has_unpublished_changes,
         )
 
 
