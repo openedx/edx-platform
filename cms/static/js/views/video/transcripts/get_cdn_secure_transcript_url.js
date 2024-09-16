@@ -27,7 +27,11 @@ define(["jquery", "backbone", "underscore"], function($, Backbone) {
                     scroll: true,
                     autoFocus: true,
                     select: function(event, ui) {
-                        ui.item.value = "https://" + ui.item.domain + "/content/" + ui.item.value;
+                        if(ui.item.domain == "cdn.exec.talentsprint.com" || ui.item.domain == "cdn.chn.talentsprint.com") {
+                            ui.item.value = "https://" + ui.item.domain + "/content/" + ui.item.value;
+                        }else {
+                            ui.item.value = "https://" + ui.item.domain + "/content/" + Crypto.MD5(ui.item.value + "dingdong") + "/" + ui.item.value;
+                        }
                         $(this).val(ui.item.value);
                         $(this).trigger("input");
                         event.preventDefault();
