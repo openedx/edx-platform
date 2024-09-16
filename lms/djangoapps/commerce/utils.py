@@ -27,6 +27,7 @@ from .waffle import (  # lint-amnesty, pylint: disable=invalid-django-waffle-imp
     should_redirect_to_commerce_coordinator_checkout,
     should_redirect_to_commerce_coordinator_refunds,
 )
+from edx_django_utils.plugins import pluggable_override
 
 log = logging.getLogger(__name__)
 
@@ -56,6 +57,7 @@ class EcommerceService:
         """ Retrieve Ecommerce service public url root. """
         return configuration_helpers.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
 
+    @pluggable_override('OVERRIDE_GET_ABSOLUTE_ECOMMERCE_URL')
     def get_absolute_ecommerce_url(self, ecommerce_page_url):
         """ Return the absolute URL to the ecommerce page.
 
@@ -110,7 +112,6 @@ class EcommerceService:
 
     def get_add_to_basket_url(self):
         """ Return the URL for the payment page based on the waffle switch.
-
         Example:
             http://localhost/enabled_service_api_path
         """
@@ -118,12 +119,14 @@ class EcommerceService:
             return urljoin(settings.COMMERCE_COORDINATOR_URL_ROOT, settings.COORDINATOR_CHECKOUT_REDIRECT_PATH)
         return self.payment_page_url()
 
+    @pluggable_override('OVERRIDE_GET_CHECKOUT_PAGE_URL')
     def get_checkout_page_url(self, *skus, **kwargs):
         """ Construct the URL to the ecommerce checkout page and include products.
 
         Args:
             skus (list): List of SKUs associated with products to be added to basket
             program_uuid (string): The UUID of the program, if applicable
+            course_run_keys (list): The course run keys of the products to be added to basket.
 
         Returns:
             Absolute path to the ecommerce checkout page showing basket that contains specified products.
@@ -153,10 +156,12 @@ class EcommerceService:
         """
         Returns the URL for the user to upgrade, or None if not applicable.
         """
+        course_run_key = str(course_key)
+
         verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
             if self.is_enabled(user):
-                return self.get_checkout_page_url(verified_mode.sku)
+                return self.get_checkout_page_url(verified_mode.sku, course_run_keys=[course_run_key])
             else:
                 return reverse('dashboard')
         return None
