@@ -219,7 +219,7 @@ class LibraryXBlockMetadata:
     display_name = attr.ib("")
     last_published = attr.ib(default=None, type=datetime)
     last_draft_created = attr.ib(default=None, type=datetime)
-    last_draft_created_by = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib("")
     published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     tags_count = attr.ib(0)
