@@ -136,7 +136,7 @@ def submit_grade(request, usage_id, grade_data):
         raise XBlockInternalError(
             context={"handler": handler_name, "msg": response_data.get("msg", "")}
         )
-        
+
     return response_data
 
 
