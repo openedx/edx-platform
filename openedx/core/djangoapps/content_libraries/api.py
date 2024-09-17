@@ -1285,7 +1285,7 @@ def get_library_collection_from_usage_key(
     collection_usage_key: LibraryCollectionLocator,
 ) -> Collection:
     """
-    Return a Collection ussing the LibraryCollectionLocator
+    Return a Collection using the LibraryCollectionLocator
     """
 
     library_key = collection_usage_key.library_key
