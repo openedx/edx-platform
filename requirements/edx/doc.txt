@@ -562,10 +562,8 @@ edx-i18n-tools==1.5.0
     #   ora2
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.4.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+edx-name-affirmation==2.4.1
+    # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.11.0
     # via
     #   -r requirements/edx/base.txt
