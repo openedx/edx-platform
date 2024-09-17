@@ -66,7 +66,29 @@ jobs:
 
       - name: install system requirements
         run: |
-          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx openssl
+
+      # This is needed until the ENABLE_BLAKE2B_HASHING can be removed and we
+      # can stop using MD4 by default.
+      - name: enable md4 hashing in libssl
+        run: |
+          cat <<EOF | sudo tee /etc/ssl/openssl.cnf
+          # Use this in order to automatically load providers.
+          openssl_conf = openssl_init
+
+          [openssl_init]
+          providers = provider_sect
+
+          [provider_sect]
+          default = default_sect
+          legacy = legacy_sect
+
+          [default_sect]
+          activate = 1
+
+          [legacy_sect]
+          activate = 1
+          EOF
 
       - name: install mongo version
         run: |
