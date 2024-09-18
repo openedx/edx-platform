@@ -20,8 +20,6 @@ import random
 import string
 from datetime import datetime
 
-from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_COUNTRY_DISABLING
-
 log = logging.getLogger(__name__)
 API_V1 = 'v1'
 UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
@@ -193,7 +191,6 @@ def remove_disabled_country_from_list(countries: Dict) -> Dict:
     Returns:
     - dict: Dict of countries with disabled countries removed.
     """
-    if ENABLE_COUNTRY_DISABLING.is_enabled():
-        for country_code in settings.DISABLED_COUNTRIES:
-            del countries[country_code]
+    for country_code in settings.DISABLED_COUNTRIES:
+        del countries[country_code]
     return countries

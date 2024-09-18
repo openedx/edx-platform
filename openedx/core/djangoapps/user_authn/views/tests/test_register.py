@@ -15,7 +15,6 @@ from django.test import TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
 from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
 from testfixtures import LogCapture
@@ -50,7 +49,6 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
 from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_COUNTRY_DISABLING
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
@@ -2471,7 +2469,6 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             })
         assert response.status_code == 400
 
-    @override_waffle_switch(ENABLE_COUNTRY_DISABLING, True)
     @override_settings(DISABLED_COUNTRIES=['KP'])
     def test_register_with_disabled_country(self):
         """
@@ -2604,7 +2601,6 @@ class ThirdPartyRegistrationTestMixin(
 
         self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
 
-    @override_waffle_switch(ENABLE_COUNTRY_DISABLING, True)
     @override_settings(DISABLED_COUNTRIES=['US'])
     def test_with_disabled_country(self):
         """

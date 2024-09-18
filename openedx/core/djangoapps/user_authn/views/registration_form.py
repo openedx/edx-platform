@@ -22,7 +22,6 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_COUNTRY_DISABLING
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password, is_registration_api_v1 as is_api_v1
 from openedx.core.djangoapps.user_authn.views.utils import remove_disabled_country_from_list
 from openedx.core.djangolib.markup import HTML, Text
@@ -303,10 +302,9 @@ class AccountCreationForm(forms.Form):
         """
         Check if the user's country is in the embargoed countries list.
         """
-        if ENABLE_COUNTRY_DISABLING.is_enabled():
-            country = self.cleaned_data.get("country")
-            if country in settings.DISABLED_COUNTRIES:
-                raise ValidationError(_("Registration from this country is not allowed due to restrictions."))
+        country = self.cleaned_data.get("country")
+        if country in settings.DISABLED_COUNTRIES:
+            raise ValidationError(_("Registration from this country is not allowed due to restrictions."))
         return self.cleaned_data.get("country")
 
 

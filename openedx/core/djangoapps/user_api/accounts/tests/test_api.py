@@ -17,7 +17,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
 from pytz import UTC
 from social_django.models import UserSocialAuth
 from common.djangoapps.student.models import (
@@ -49,7 +48,6 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotAuthorized,
     UserNotFound
 )
-from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_COUNTRY_DISABLING
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 
@@ -576,7 +574,6 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert account_settings['country'] is None
         assert account_settings['state'] is None
 
-    @override_waffle_switch(ENABLE_COUNTRY_DISABLING, active=True)
     @override_settings(DISABLED_COUNTRIES=['KP'])
     def test_change_to_disabled_country(self):
         """
