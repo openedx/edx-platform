@@ -10,6 +10,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from openedx_learning.api import authoring as authoring_api
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
@@ -339,6 +340,28 @@ def searchable_doc_collections(usage_key: UsageKey) -> dict:
     return doc
 
 
+def searchable_doc_tags_for_collection(
+    library_key: LibraryLocatorV2,
+    collection,
+) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the tags data for the given library collection.
+    """
+    doc = {
+        Fields.id: collection.id,
+    }
+
+    collection_usage_key = lib_api.get_library_collection_usage_key(
+        library_key,
+        collection.key,
+    )
+
+    doc.update(_tags_for_content_object(collection_usage_key))
+
+    return doc
+
+
 def searchable_doc_for_course_block(block) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -382,6 +405,7 @@ def searchable_doc_for_collection(collection) -> dict:
         doc.update({
             Fields.context_key: str(context_key),
             Fields.org: org,
+            Fields.usage_key: str(lib_api.get_library_collection_usage_key(context_key, collection.key)),
         })
     except LearningPackage.contentlibrary.RelatedObjectDoesNotExist:
         log.warning(f"Related library not found for {collection}")
