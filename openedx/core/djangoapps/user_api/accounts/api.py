@@ -151,7 +151,7 @@ def update_account_settings(requesting_user, update, username=None):
 
     _validate_email_change(user, update, field_errors)
     _validate_secondary_email(user, update, field_errors)
-    if update.get('country','') in settings.DISABLED_COUNTRIES:
+    if update.get('country', '') in settings.DISABLED_COUNTRIES:
         field_errors['country'] = {
             'developer_message': 'Country is disabled for registration',
             'user_message': 'This country cannot be selected for user registration'
