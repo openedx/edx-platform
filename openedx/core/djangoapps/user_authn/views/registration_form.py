@@ -298,13 +298,18 @@ class AccountCreationForm(forms.Form):
 
 def get_registration_extension_form(*args, **kwargs):
     """
-    Convenience function for getting the custom form set in settings.REGISTRATION_EXTENSION_FORM.
+    Convenience function for getting the custom form set in site configurations or plataform settings
+    REGISTRATION_EXTENSION_FORM.
 
-    An example form app for this can be found at http://github.com/open-craft/custom-form-app
+    Documentation on how to enable this feature can be found on
+    https://github.com/Pearson-Advance/pearson-core/blob/master/docs/pearson_core_features.md#amazon-custom-registration-form
     """
-    if not getattr(settings, 'REGISTRATION_EXTENSION_FORM', None):
+    # No Default valued is passed since we prioritize site configurations over site settings.
+    registration_extra_form = configuration_helpers.get_value('REGISTRATION_EXTENSION_FORM',
+                                                              settings.REGISTRATION_EXTENSION_FORM)
+    if not registration_extra_form:
         return None
-    module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)
+    module, klass = registration_extra_form.rsplit('.', 1)
     module = import_module(module)
     return getattr(module, klass)(*args, **kwargs)
 
