@@ -124,7 +124,9 @@ def library_block_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    upsert_library_block_index_doc.delay(str(library_block_data.usage_key))
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    upsert_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
 
 
 @receiver(LIBRARY_BLOCK_DELETED)
@@ -138,7 +140,9 @@ def library_block_deleted(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    delete_library_block_index_doc.delay(str(library_block_data.usage_key))
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    delete_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
 
 
 @receiver(CONTENT_LIBRARY_UPDATED)
