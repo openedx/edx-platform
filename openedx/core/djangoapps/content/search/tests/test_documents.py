@@ -19,6 +19,7 @@ try:
     from ..documents import (
         searchable_doc_for_course_block,
         searchable_doc_tags,
+        searchable_doc_tags_for_collection,
         searchable_doc_collections,
         searchable_doc_for_collection,
         searchable_doc_for_library_block,
@@ -27,6 +28,7 @@ try:
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
     searchable_doc_tags = lambda x: x
+    searchable_doc_tags_for_collection = lambda x: x
     searchable_doc_for_collection = lambda x: x
     searchable_doc_for_library_block = lambda x: x
     SearchAccess = {}
@@ -76,6 +78,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 created_by=None,
                 description="my toy collection description"
             )
+            cls.collection_usage_key = "lib-collection:edX:2012_Fall:TOY_COLLECTION"
             cls.library_block = library_api.create_library_block(
                 cls.library.key,
                 "html",
@@ -109,6 +112,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
         tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
         tagging_api.tag_object(str(cls.library_block.usage_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(cls.collection_usage_key, cls.difficulty_tags, tags=["Normal"])
 
     @property
     def toy_course_access_id(self):
@@ -296,9 +300,12 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
 
     def test_collection_with_library(self):
         doc = searchable_doc_for_collection(self.collection)
+        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection))
+
         assert doc == {
             "id": self.collection.id,
             "block_id": self.collection.key,
+            "usage_key": self.collection_usage_key,
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -309,6 +316,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
+            'tags': {
+                'taxonomy': ['Difficulty'],
+                'level0': ['Difficulty > Normal']
+            }
         }
 
     def test_collection_with_no_library(self):

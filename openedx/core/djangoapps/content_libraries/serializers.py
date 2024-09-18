@@ -148,7 +148,12 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
 
     block_type = serializers.CharField(source="usage_key.block_type")
     display_name = serializers.CharField(read_only=True)
+    last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    published_by = serializers.CharField(read_only=True)
+    last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    last_draft_created_by = serializers.CharField(read_only=True)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
+    created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
 
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
