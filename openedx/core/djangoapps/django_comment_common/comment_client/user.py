@@ -148,7 +148,7 @@ class User(models.Model):
             retrieve_params['course_id'] = str(self.course_id)
         if self.attributes.get('group_id'):
             retrieve_params['group_id'] = self.group_id
-        response = forum_api.retrieve_user(self.attributes["id"], retrieve_params)
+        response = forum_api.get_user(self.attributes["id"], retrieve_params)
         self._update_from_response(response)
 
     def retire(self, retired_username):

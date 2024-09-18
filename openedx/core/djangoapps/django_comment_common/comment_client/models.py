@@ -4,6 +4,7 @@
 import logging
 
 from .utils import CommentClientRequestError, extract, perform_request
+from forum import api as forum_api
 
 log = logging.getLogger(__name__)
 
@@ -69,14 +70,7 @@ class Model:
         return self
 
     def _retrieve(self, *args, **kwargs):
-        url = self.url(action='get', params=self.attributes)
-        response = perform_request(
-            'get',
-            url,
-            self.default_retrieve_params,
-            metric_tags=self._metric_tags,
-            metric_action='model.retrieve'
-        )
+        response = forum_api.get_parent_comment(self.attributes["id"])
         self._update_from_response(response)
 
     @property
@@ -154,23 +148,21 @@ class Model:
             request_params = self.updatable_attributes()
             if params:
                 request_params.update(params)
-            url = self.url(action='put', params=self.attributes)
-            response = perform_request(
-                'put',
-                url,
+            response = forum_api.update_comment(
+                self.attributes["id"],
                 request_params,
-                metric_tags=self._metric_tags,
-                metric_action='model.update'
             )
-        else:   # otherwise, treat this as an insert
-            url = self.url(action='post', params=self.attributes)
-            response = perform_request(
-                'post',
-                url,
-                self.initializable_attributes(),
-                metric_tags=self._metric_tags,
-                metric_action='model.insert'
-            )
+        else:  # otherwise, treat this as an insert
+            if parent_id := self.attributes.get("parent_id"):
+                response = forum_api.create_child_comment(
+                    parent_id,
+                    self.initializable_attributes(),
+                )
+            else:
+                response = forum_api.create_parent_comment(
+                    self.attributes["thread_id"],
+                    self.initializable_attributes(),
+                )
         self.retrieved = True
         self._update_from_response(response)
         self.after_save(self)

@@ -30,7 +30,7 @@ def get_course_commentable_counts(course_key: CourseKey) -> Dict[str, Dict[str, 
             }
 
     """
-    commentable_stats = forum_api.retrieve_commentables_stats(str(course_key))
+    commentable_stats = forum_api.get_commentables_stats(str(course_key))
     return commentable_stats
 
 
