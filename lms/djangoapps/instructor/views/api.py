@@ -108,7 +108,7 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer
+    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2373,9 +2373,8 @@ class InstructorTasks(DeveloperErrorViewMixin, APIView):
         return _list_instructor_tasks(request=request, course_id=course_id)
 
 
-@require_POST
-@ensure_csrf_cookie
-def list_instructor_tasks(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListInstructorTasks(APIView):
     """
     List instructor tasks.
 
@@ -2385,21 +2384,44 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-    return _list_instructor_tasks(request=request, course_id=course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.SHOW_TASKS
+    serializer_class = ListInstructorTaskInputSerializer
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List instructor tasks.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return _list_instructor_tasks(
+            request=request, course_id=course_id, serialize_data=serializer.validated_data
+        )
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.SHOW_TASKS)
-def _list_instructor_tasks(request, course_id):
+def _list_instructor_tasks(request, course_id, serialize_data=None):
     """
     List instructor tasks.
 
     Internal function with common code for both DRF and and tradition views.
     """
+    # This method is also used by other APIs with the GET method.
+    # The query_params attribute is utilized for GET requests,
+    # where parameters are passed as query strings.
+
     course_id = CourseKey.from_string(course_id)
-    params = getattr(request, 'query_params', request.POST)
-    problem_location_str = strip_if_string(params.get('problem_location_str', False))
-    student = params.get('unique_student_identifier', None)
+    if serialize_data is not None:
+        problem_location_str = strip_if_string(serialize_data.get('problem_location_str', False))
+        student = serialize_data.get('unique_student_identifier', None)
+    else:
+        params = getattr(request, 'query_params', request.POST)
+        problem_location_str = strip_if_string(params.get('problem_location_str', False))
+        student = params.get('unique_student_identifier', None)
+
     if student is not None:
         student = get_student_from_identifier(student)
 

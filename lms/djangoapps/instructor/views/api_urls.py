@@ -44,7 +44,7 @@ urlpatterns = [
          name='list_entrance_exam_instructor_tasks'),
     path('mark_student_can_skip_entrance_exam', api.mark_student_can_skip_entrance_exam,
          name='mark_student_can_skip_entrance_exam'),
-    path('list_instructor_tasks', api.list_instructor_tasks, name='list_instructor_tasks'),
+    path('list_instructor_tasks', api.ListInstructorTasks.as_view(), name='list_instructor_tasks'),
     path('list_background_email_tasks', api.list_background_email_tasks, name='list_background_email_tasks'),
     path('list_email_content', api.ListEmailContent.as_view(), name='list_email_content'),
     path('list_forum_members', api.list_forum_members, name='list_forum_members'),
