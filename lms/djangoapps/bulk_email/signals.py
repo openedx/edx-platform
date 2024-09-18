@@ -1,7 +1,6 @@
 """
 Signal handlers for the bulk_email app
 """
-from django.contrib.auth import get_user_model
 from django.dispatch import receiver
 from eventtracking import tracker
 
