@@ -1,0 +1,139 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
+/* line 1, /openedx/edx-platform/xmodule/assets/VideoBlockEditor.scss */
+.xmodule_edit.xmodule_VideoBlock { }
+  /* line 123, common/static/sass/_mixins.scss */
+  .xmodule_edit.xmodule_VideoBlock .ui-col-wide {
+    width: 74.46809%;
+    margin-right: 2.12766%;
+    float: left; }
+  /* line 130, common/static/sass/_mixins.scss */
+  .xmodule_edit.xmodule_VideoBlock .ui-col-narrow {
+    width: 23.40426%;
+    float: left; }
+  /* line 342, common/static/sass/_mixins.scss */
+  .xmodule_edit.xmodule_VideoBlock .ui-loading {
+    box-shadow: inset 0 1px 2px 1px rgba(0, 0, 0, 0.2);
+    padding: 15px 20px; }
+  /* line 368, common/static/sass/_mixins.scss */
+  .xmodule_edit.xmodule_VideoBlock .ui-loading {
+    animation: fadeIn 0.25s linear 1;
+    opacity: 0.6;
+    background-color: #fff;
+    padding: 30px 20px;
+    text-align: center; }
+    /* line 379, common/static/sass/_mixins.scss */
+    .xmodule_edit.xmodule_VideoBlock .ui-loading .spin {
+      display: inline-block; }
+    /* line 385, common/static/sass/_mixins.scss */
+    .xmodule_edit.xmodule_VideoBlock .ui-loading .copy {
+      padding-left: 5px; }
+  /* line 390, common/static/sass/_mixins.scss */
+  .xmodule_edit.xmodule_VideoBlock .is-hidden {
+    display: none; }
+  /* line 10, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+  .xmodule_edit.xmodule_VideoBlock .tabs-wrapper {
+    padding-top: 0;
+    position: relative; }
+    /* line 14, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+    .xmodule_edit.xmodule_VideoBlock .tabs-wrapper .wrapper-comp-settings {
+      display: block; }
+  /* line 20, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+  .xmodule_edit.xmodule_VideoBlock .editor-single-tab-name {
+    display: none; }
+  /* line 25, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+  .xmodule_edit.xmodule_VideoBlock .editor-with-tabs {
+    position: relative; }
+    /* line 15, /openedx/edx-platform/common/static/sass/bourbon/addons/_clearfix.scss */
+    .xmodule_edit.xmodule_VideoBlock .editor-with-tabs:after {
+      content: "";
+      display: table;
+      clear: both; }
+    /* line 31, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+    .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header {
+      box-sizing: border-box;
+      padding: 18px var(--baseline);
+      top: 0 !important;
+      right: 0;
+      background-color: var(--blue);
+      border-bottom: 1px solid var(--blue-d2);
+      color: var(--white); }
+      /* line 42, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+      .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .component-name {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 50%;
+        color: var(--white);
+        font-weight: 600; }
+        /* line 52, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+        .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .component-name em {
+          display: inline-block;
+          margin-right: calc((var(--baseline)/4));
+          font-weight: 400;
+          color: var(--white); }
+      /* line 61, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+      .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs {
+        list-style: none;
+        right: 0;
+        top: calc((var(--baseline)/4));
+        position: absolute;
+        padding: 12px calc((var(--baseline)*0.75)); }
+        /* line 68, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+        .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap {
+          display: inline-block;
+          margin-left: 8px; }
+          /* line 72, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+          .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab {
+            font-size: 14px;
+            font-size: 1.4rem;
+            background-color: rgba(255, 255, 255, 0.3);
+            background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+            background-image: linear-gradient(to bottom,rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+            border: 1px solid var(--blue-d1);
+            border-radius: 3px;
+            padding: calc((var(--baseline)/4)) var(--baseline);
+            background-color: var(--blue);
+            font-weight: bold;
+            color: var(--white); }
+            /* line 83, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+            .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab.current {
+              background-color: var(--blue);
+              background-image: -webkit-linear-gradient(var(--blue), var(--blue));
+              background-image: linear-gradient(to ,var(--blue));
+              color: var(--blue-d1);
+              box-shadow: inset 0 1px 2px 1px var(--shadow-l1);
+              background-color: var(--blue-d4);
+              cursor: default; }
+            /* line 92, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+            .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:hover, .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:focus {
+              box-shadow: inset 0 1px 2px 1px var(--shadow);
+              background-image: linear-gradient(#009fe6, #009fe6) !important; }
+    /* line 102, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+    .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .is-inactive {
+      display: none; }
+    /* line 106, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+    .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .comp-subtitles-entry {
+      text-align: center; }
+      /* line 109, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+      .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .comp-subtitles-entry .file-upload {
+        display: none; }
+      /* line 114, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+      .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .comp-subtitles-entry .comp-subtitles-import-list > li {
+        display: block;
+        margin: calc(var(--baseline)/2) 0; }
+      /* line 119, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+      .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .comp-subtitles-entry .comp-subtitles-import-list .blue-button {
+        font-size: 1em;
+        display: block;
+        width: 70%;
+        margin: 0 auto;
+        text-align: center; }
+  /* line 130, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+  .xmodule_edit.xmodule_VideoBlock .component-tab {
+    background: var(--white);
+    position: relative;
+    border-top: 1px solid #8891a1; }
+    /* line 135, /openedx/edx-platform/xmodule/assets/tabs/_tabs.scss */
+    .xmodule_edit.xmodule_VideoBlock .component-tab#advanced {
+      padding: 0;
+      border: none; }

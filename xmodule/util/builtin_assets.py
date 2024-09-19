@@ -12,6 +12,26 @@ from django.core.exceptions import ImproperlyConfigured
 from openedx.core.djangoapps.theming.helpers_static import get_static_file_url
 
 
+def add_css_to_fragment(fragment, css_relative_path):
+    """
+    Given a css path relative to xmodule/assets, add a compiled CSS URL to the fragment.
+
+    Raises:
+    * ValueError if {css_relative_path} is absolute or does not end in '.css'.
+    * FileNotFoundError if edx-platform/xmodule/assets/{css_relative_path} is missing.
+    """
+    if not isinstance(css_relative_path, Path):
+        css_relative_path = Path(css_relative_path)
+    if css_relative_path.is_absolute():
+        raise ValueError(f"css_file_name should be relative; is absolute: {css_relative_path}")
+    if css_relative_path.suffix != '.css':
+        raise ValueError(f"css_file_name should be .css file; is: {css_relative_path}")
+    css_absolute_path = Path(settings.REPO_ROOT) / "xmodule" / "assets" / css_relative_path
+    if not css_absolute_path.is_file():
+        raise FileNotFoundError(f"css file not found: {css_absolute_path}")
+    fragment.add_css_url(str(css_absolute_path))
+
+
 def add_sass_to_fragment(fragment, sass_relative_path):
     """
     Given a Sass path relative to xmodule/assets, add a compiled CSS URL to the fragment.
