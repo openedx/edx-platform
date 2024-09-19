@@ -238,6 +238,7 @@ def refund_entitlement(course_entitlement):
         return False
 
 
+@pluggable_override('OVERRIDE_REFUND_SEAT')
 def refund_seat(course_enrollment, change_mode=False):
     """
     Attempt to initiate a refund for any orders associated with the seat being unenrolled,
