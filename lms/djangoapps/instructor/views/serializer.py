@@ -129,7 +129,7 @@ def extract_user_info(user, course_discussion_settings):
         'group_name': group_name,
     }
 
-  
+
 class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for handling the input data for the problem response report generation API.
@@ -165,7 +165,6 @@ Attributes:
             )
 
         return data
-
 
 
 class ShowStudentExtensionSerializer(serializers.Serializer):
