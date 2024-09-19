@@ -151,8 +151,8 @@ Set up CMS SSO (for Production):
   click into the application you created above (``studio-sso-id``), and copy its "Client secret".
 * In your private LMS_CFG yaml file or your private Django settings module:
 
-   * Set ``SOCIAL_AUTH_EDX_OAUTH2_KEY`` to the client ID (``studio-sso-id``).
-   * Set ``SOCIAL_AUTH_EDX_OAUTH2_SECRET`` to the client secret (which you copied).
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_KEY`` to the client ID (``studio-sso-id``).
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_SECRET`` to the client secret (which you copied).
 Run the Platform
 ----------------
 
