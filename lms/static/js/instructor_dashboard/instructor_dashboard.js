@@ -52,7 +52,7 @@ such that the value can be defined later than this assignment (file load order).
 
     var usesProctoringLegacyView = function () {
         // If the element #proctoring-mfe-view is present, then uses the new MFE
-        // and the legagy views should not be initialized.
+        // and the legacy views should not be initialized.
         return !document.getElementById('proctoring-mfe-view');
     }
 
