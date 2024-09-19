@@ -18,7 +18,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
@@ -36,6 +36,7 @@ from .documents import (
     searchable_doc_for_library_block,
     searchable_doc_collections,
     searchable_doc_tags,
+    searchable_doc_tags_for_collection,
 )
 
 log = logging.getLogger(__name__)
@@ -395,13 +396,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             return docs
 
         ############## Collections ##############
-        def index_collection_batch(batch, num_done) -> int:
+        def index_collection_batch(batch, num_done, library_key) -> int:
             docs = []
             for collection in batch:
                 try:
                     doc = searchable_doc_for_collection(collection)
-                    # Uncomment below line once collections are tagged.
-                    # doc.update(searchable_doc_tags(collection.id))
+                    doc.update(searchable_doc_tags_for_collection(library_key, collection))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing collection {collection}: {err}")
@@ -428,7 +428,11 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
             paginator = Paginator(collections, 100)
             for p in paginator.page_range:
-                num_collections_done = index_collection_batch(paginator.page(p).object_list, num_collections_done)
+                num_collections_done = index_collection_batch(
+                    paginator.page(p).object_list,
+                    num_collections_done,
+                    lib_key,
+                )
             status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
 
             num_contexts_done += 1
@@ -601,6 +605,17 @@ def upsert_block_collections_index_docs(usage_key: UsageKey):
     """
     doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
     doc.update(searchable_doc_collections(usage_key))
+    _update_index_docs([doc])
+
+
+def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLocator):
+    """
+    Updates the tags data in documents for the given library collection
+    """
+    collection = lib_api.get_library_collection_from_usage_key(collection_usage_key)
+
+    doc = {Fields.id: collection.id}
+    doc.update(searchable_doc_tags_for_collection(collection_usage_key.library_key, collection))
     _update_index_docs([doc])
 
 

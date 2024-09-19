@@ -766,9 +766,8 @@ edx-milestones==0.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-name-affirmation==2.4.0
+edx-name-affirmation==2.4.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.11.0
@@ -1374,7 +1373,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.11.4
+openedx-learning==0.11.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1388,7 +1387,7 @@ optimizely-sdk==4.1.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==6.11.2
+ora2==6.12.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
