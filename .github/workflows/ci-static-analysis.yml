@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.11"
+          - "3.12"
         os: ["ubuntu-20.04"]
 
     steps:

@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         python-version:
-          - "3.11"
+          - "3.12"
         # 'pinned' is used to install the latest patch version of Django
         # within the global constraint i.e. Django==4.2.8 in current case
         # because we have global constraint of Django<4.2
