@@ -1214,7 +1214,7 @@ class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-m
         return str(self.arguments)
 
 
-class VerificationAttempt(TimeStampedModel):
+class VerificationAttempt(TimeStampedModel, StatusModel):
     """
     The model represents impelementation-agnostic information about identity verification (IDV) attempts.
 
@@ -1255,4 +1255,4 @@ class VerificationAttempt(TimeStampedModel):
     @classmethod
     def should_display_status_to_user(cls):
         """Temporary placeholder so that calls to this method do not break edx-platform"""
-        return
+        return False
