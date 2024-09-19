@@ -1251,3 +1251,8 @@ class VerificationAttempt(TimeStampedModel):
         """
         verification_attempts = cls.objects.filter(user_id=user_id)
         verification_attempts.delete()
+
+    @classmethod
+    def should_display_status_to_user(cls):
+        """Temporary placeholder so that calls to this method do not break edx-platform"""
+        return
