@@ -198,8 +198,8 @@ class Thread(models.Model):
         self._update_from_response(thread_data)
 
     def un_pin(self, user, thread_id):
-        response = forum_api.unpin_thread(user.id, thread_id)
-        self._update_from_response(response)
+        thread_data = forum_api.unpin_thread(user.id, thread_id)
+        self._update_from_response(thread_data)
 
 
 def _url_for_flag_abuse_thread(thread_id):

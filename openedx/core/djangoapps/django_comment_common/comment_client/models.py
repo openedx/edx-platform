@@ -148,20 +148,50 @@ class Model:
             request_params = self.updatable_attributes()
             if params:
                 request_params.update(params)
+            try:
+                body = request_params["body"]
+                course_id = str(request_params["course_id"])
+                user_id = request_params["user_id"]
+            except KeyError as e:
+                raise e
             response = forum_api.update_comment(
                 self.attributes["id"],
-                request_params,
+                body,
+                course_id,
+                user_id,
+                request_params.get("anonymous", False),
+                request_params.get("anonymous_to_peers", False),
+                request_params.get("endorsed", False),
+                request_params.get("closed", False),
+                request_params.get("editing_user_id"),
+                request_params.get("edit_reason_code"),
+                request_params.get("endorsement_user_id"),
             )
         else:  # otherwise, treat this as an insert
+            request_data = self.initializable_attributes()
+            try:
+                body = request_data["body"]
+                user_id = request_data["user_id"]
+                course_id = str(request_data["course_id"])
+            except KeyError as e:
+                raise e
             if parent_id := self.attributes.get("parent_id"):
                 response = forum_api.create_child_comment(
                     parent_id,
-                    self.initializable_attributes(),
+                    body,
+                    user_id,
+                    course_id,
+                    request_data.get("anonymous", False),
+                    request_data.get("anonymous_to_peers", False),
                 )
             else:
                 response = forum_api.create_parent_comment(
                     self.attributes["thread_id"],
-                    self.initializable_attributes(),
+                    body,
+                    user_id,
+                    course_id,
+                    request_data.get("anonymous", False),
+                    request_data.get("anonymous_to_peers", False),
                 )
         self.retrieved = True
         self._update_from_response(response)
