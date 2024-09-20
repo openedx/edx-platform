@@ -70,7 +70,17 @@ class Model:
         return self
 
     def _retrieve(self, *args, **kwargs):
-        response = forum_api.get_parent_comment(self.attributes["id"])
+        if self.type=="comment":
+            response = forum_api.get_parent_comment(self.attributes["id"])
+        else:
+            url = self.url(action='get', params=self.attributes)
+            response = perform_request(
+                'get',
+                url,
+                self.default_retrieve_params,
+                metric_tags=self._metric_tags,
+                metric_action='model.retrieve'
+            )
         self._update_from_response(response)
 
     @property
@@ -148,58 +158,82 @@ class Model:
             request_params = self.updatable_attributes()
             if params:
                 request_params.update(params)
-            try:
-                body = request_params["body"]
-                course_id = str(request_params["course_id"])
-                user_id = request_params["user_id"]
-            except KeyError as e:
-                raise e
-            response = forum_api.update_comment(
-                self.attributes["id"],
-                body,
-                course_id,
-                user_id,
-                request_params.get("anonymous", False),
-                request_params.get("anonymous_to_peers", False),
-                request_params.get("endorsed", False),
-                request_params.get("closed", False),
-                request_params.get("editing_user_id"),
-                request_params.get("edit_reason_code"),
-                request_params.get("endorsement_user_id"),
-            )
-        else:  # otherwise, treat this as an insert
-            request_data = self.initializable_attributes()
-            try:
-                body = request_data["body"]
-                user_id = request_data["user_id"]
-                course_id = str(request_data["course_id"])
-            except KeyError as e:
-                raise e
-            if parent_id := self.attributes.get("parent_id"):
-                response = forum_api.create_child_comment(
-                    parent_id,
+            if self.type=="comment":
+                try:
+                    body = request_params["body"]
+                    course_id = str(request_params["course_id"])
+                    user_id = request_params["user_id"]
+                except KeyError as e:
+                    raise e
+                response = forum_api.update_comment(
+                    self.attributes["id"],
                     body,
-                    user_id,
                     course_id,
-                    request_data.get("anonymous", False),
-                    request_data.get("anonymous_to_peers", False),
+                    user_id,
+                    request_params.get("anonymous", False),
+                    request_params.get("anonymous_to_peers", False),
+                    request_params.get("endorsed", False),
+                    request_params.get("closed", False),
+                    request_params.get("editing_user_id"),
+                    request_params.get("edit_reason_code"),
+                    request_params.get("endorsement_user_id"),
                 )
             else:
-                response = forum_api.create_parent_comment(
-                    self.attributes["thread_id"],
-                    body,
-                    user_id,
-                    course_id,
-                    request_data.get("anonymous", False),
-                    request_data.get("anonymous_to_peers", False),
+                url = self.url(action='put', params=self.attributes)
+                response = perform_request(
+                    'put',
+                    url,
+                    request_params,
+                    metric_tags=self._metric_tags,
+                    metric_action='model.update'
                 )
+        else:  # otherwise, treat this as an insert
+            if self.type=="comment":
+                request_data = self.initializable_attributes()
+                try:
+                    body = request_data["body"]
+                    user_id = request_data["user_id"]
+                    course_id = str(request_data["course_id"])
+                except KeyError as e:
+                    raise e
+                if parent_id := self.attributes.get("parent_id"):
+                    response = forum_api.create_child_comment(
+                        parent_id,
+                        body,
+                        user_id,
+                        course_id,
+                        request_data.get("anonymous", False),
+                        request_data.get("anonymous_to_peers", False),
+                    )
+                else:
+                    response = forum_api.create_parent_comment(
+                        self.attributes["thread_id"],
+                        body,
+                        user_id,
+                        course_id,
+                        request_data.get("anonymous", False),
+                        request_data.get("anonymous_to_peers", False),
+                    )
+            else:   # otherwise, treat this as an insert
+                url = self.url(action='post', params=self.attributes)
+                response = perform_request(
+                    'post',
+                    url,
+                    self.initializable_attributes(),
+                    metric_tags=self._metric_tags,
+                    metric_action='model.insert'
+                )
+                
         self.retrieved = True
         self._update_from_response(response)
         self.after_save(self)
 
     def delete(self):
-        url = self.url(action='delete', params=self.attributes)
-        response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
+        if self.type=="comment":
+            response = forum_api.delete_comment(self.attributes["id"])
+        else:
+            url = self.url(action='delete', params=self.attributes)
+            response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
         self.retrieved = True
         self._update_from_response(response)
 
