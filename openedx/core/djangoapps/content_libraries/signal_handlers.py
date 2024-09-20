@@ -5,7 +5,7 @@ Content library signal handlers.
 import logging
 
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -15,6 +15,7 @@ from openedx_events.content_authoring.data import (
 )
 from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api.authoring_models import Collection
@@ -93,3 +94,22 @@ def library_collection_saved(sender, instance, created, **kwargs):
                 collection_key=instance.key,
             )
         )
+
+
+@receiver(post_delete, sender=Collection, dispatch_uid="library_collection_deleted")
+def library_collection_deleted(sender, instance, **kwargs):
+    """
+    Raises LIBRARY_COLLECTION_DELETED for the deleted Collection.
+    """
+    try:
+        library = ContentLibrary.objects.get(learning_package_id=instance.learning_package_id)
+    except ContentLibrary.DoesNotExist:
+        log.error("{instance} is not associated with a content library.")
+        return
+
+    LIBRARY_COLLECTION_DELETED.send_event(
+        library_collection=LibraryCollectionData(
+            library_key=library.library_key,
+            collection_key=instance.key,
+        )
+    )

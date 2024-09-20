@@ -511,15 +511,28 @@ def delete_index_doc(usage_key: UsageKey) -> None:
     Args:
         usage_key (UsageKey): The usage key of the XBlock to be removed from the index
     """
-    current_rebuild_index_name = _get_running_rebuild_index_name()
+    doc = searchable_doc_for_usage_key(usage_key)
+    _delete_index_doc(doc[Fields.id])
+
+
+def _delete_index_doc(doc_id) -> None:
+    """
+    Helper function that deletes the document with the given ID from the search index
+
+    If there is a rebuild in progress, the document will also be removed from the new index.
+    """
+    if not doc_id:
+        return
 
     client = _get_meilisearch_client()
+    current_rebuild_index_name = _get_running_rebuild_index_name()
 
     tasks = []
     if current_rebuild_index_name:
-        # If there is a rebuild in progress, the document will also be deleted from the new index.
-        tasks.append(client.index(current_rebuild_index_name).delete_document(meili_id_from_opaque_key(usage_key)))
-    tasks.append(client.index(STUDIO_INDEX_NAME).delete_document(meili_id_from_opaque_key(usage_key)))
+        # If there is a rebuild in progress, the document will also be removed from the new index.
+        tasks.append(client.index(current_rebuild_index_name).delete_document(doc_id))
+
+    tasks.append(client.index(STUDIO_INDEX_NAME).delete_document(doc_id))
 
     _wait_for_meili_tasks(tasks)
 
@@ -564,13 +577,25 @@ def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
 
 def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collection_key: str) -> None:
     """
-    Creates or updates the document for the given Library Collection in the search index
-    """
-    docs = [
-        searchable_doc_for_collection(library_key, collection_key)
-    ]
+    Creates, updates, or deletes the document for the given Library Collection in the search index.
 
-    _update_index_docs(docs)
+    If the Collection is not found or disabled (i.e. soft-deleted), then delete it from the search index.
+    """
+    doc = searchable_doc_for_collection(library_key, collection_key)
+
+    # Soft-deleted/disabled collections are removed from the index
+    if doc.get('_disabled'):
+
+        _delete_index_doc(doc[Fields.id])
+
+    # Hard-deleted collections are also deleted from the index
+    elif not doc.get(Fields.type):
+
+        _delete_index_doc(doc[Fields.id])
+
+    # Otherwise, upsert the collection.
+    else:
+        _update_index_docs([doc])
 
 
 def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:

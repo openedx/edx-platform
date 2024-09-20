@@ -425,4 +425,9 @@ def searchable_doc_for_collection(
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
 
+        # Disabled collections should be removed from the search index,
+        # so we mark them as _disabled
+        if not collection.enabled:
+            doc['_disabled'] = True
+
     return doc

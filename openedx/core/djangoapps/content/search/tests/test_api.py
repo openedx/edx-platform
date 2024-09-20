@@ -615,3 +615,101 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             any_order=True,
         )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_delete_collection(self, mock_meilisearch):
+        """
+        Test soft-deleting, restoring, and hard-deleting a collection.
+        """
+        # Add a component to the collection
+        updated_date = datetime(2023, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
+        with freeze_time(updated_date):
+            library_api.update_library_collection_components(
+                self.library.key,
+                collection_key=self.collection.key,
+                usage_keys=[
+                    self.problem1.usage_key,
+                ],
+            )
+
+        doc_collection = copy.deepcopy(self.collection_dict)
+        doc_collection["num_children"] = 1
+        doc_collection["modified"] = updated_date.timestamp()
+        doc_problem_with_collection = {
+            "id": self.doc_problem1["id"],
+            "collections": {
+                "display_name": [self.collection.title],
+                "key": [self.collection.key],
+            },
+        }
+
+        # Should update the collection and its component
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_collection]),
+                call([doc_problem_with_collection]),
+            ],
+            any_order=True,
+        )
+        mock_meilisearch.return_value.index.reset_mock()
+
+        # Soft-delete the collection
+        authoring_api.delete_collection(
+            self.collection.learning_package_id,
+            self.collection.key,
+        )
+
+        doc_problem_without_collection = {
+            "id": self.doc_problem1["id"],
+            "collections": {},
+        }
+
+        # Should delete the collection document
+        mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
+            self.collection_dict["id"],
+        )
+        ## TODO: ...and update the component's "collections" field
+        # mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
+        #     doc_problem_without_collection,
+        # ])
+        mock_meilisearch.return_value.index.reset_mock()
+
+        # Restore the collection
+        restored_date = datetime(2023, 8, 9, 10, 11, 12, tzinfo=timezone.utc)
+        with freeze_time(restored_date):
+            authoring_api.restore_collection(
+                self.collection.learning_package_id,
+                self.collection.key,
+            )
+
+        doc_collection = copy.deepcopy(self.collection_dict)
+        doc_collection["num_children"] = 1
+        doc_collection["modified"] = restored_date.timestamp()
+
+        # Should update the collection TODO and its component's "collections" field
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 1  # TODO 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_collection]),
+                # TODO call([doc_problem_with_collection]),
+            ],
+            any_order=True,
+        )
+        mock_meilisearch.return_value.index.reset_mock()
+
+        # Hard-delete the collection
+        authoring_api.delete_collection(
+            self.collection.learning_package_id,
+            self.collection.key,
+            hard_delete=True,
+        )
+
+        # Should delete the collection document
+        mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
+            self.collection_dict["id"],
+        )
+        ## TODO ...and cascade delete updates the "collections" field for the associated components
+        # mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
+        #     doc_problem_without_collection,
+        # ])
