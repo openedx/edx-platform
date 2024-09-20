@@ -64,7 +64,7 @@ class AccessSerializer(UniqueStudentIdentifierSerializer):
     action = serializers.ChoiceField(
         choices=['allow', 'revoke'],
         help_text="Action to perform on the user's access"
-    )    
+    )
 
 
 class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method
