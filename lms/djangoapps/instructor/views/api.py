@@ -3052,7 +3052,7 @@ class ResetDueDate(APIView):
             student (str): The email or username of the student whose access is being modified.
             reason (str): Optional param.
         """
-        serializer_data = self.serializer_class(data=request.data, context={'make_due_datetime': True})
+        serializer_data = self.serializer_class(data=request.data, context={'disable_due_datetime': True})
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
