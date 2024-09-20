@@ -222,4 +222,3 @@ class BlockDueDateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         if make_due_datetime:
             self.fields['due_datetime'].required = False
- 
