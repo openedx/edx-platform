@@ -134,7 +134,7 @@ class CourseRunSerializer(serializers.Serializer):
         if ecommerce_payment_page and verified_sku:
             query_params = {
                 'sku': verified_sku,
-                'course_run_key': instance.course_id
+                'course_run_key': str(instance.course_id)
             }
             encoded_params = urlencode(query_params)
             upgrade_url = f"{ecommerce_payment_page}?{encoded_params}"
