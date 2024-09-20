@@ -187,7 +187,7 @@ class TestSearchApi(ModuleStoreTestCase):
             )
             self.collection_usage_key = "lib-collection:org1:lib:MYCOL"
         self.collection_dict = {
-            "id": self.collection.id,
+            "id": "lib-collectionorg1libmycol-5b647617",
             "block_id": self.collection.key,
             "usage_key": self.collection_usage_key,
             "type": "collection",
@@ -461,7 +461,7 @@ class TestSearchApi(ModuleStoreTestCase):
         # Build expected docs at each stage
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
         doc_collection1_created = {
-            "id": collection1.id,
+            "id": "lib-collectionorg1libcol1-283a79c9",
             "block_id": collection1.key,
             "usage_key": f"lib-collection:org1:lib:{collection1.key}",
             "type": "collection",
@@ -476,7 +476,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_created = {
-            "id": collection2.id,
+            "id": "lib-collectionorg1libcol2-46823d4d",
             "block_id": collection2.key,
             "usage_key": f"lib-collection:org1:lib:{collection2.key}",
             "type": "collection",
@@ -491,7 +491,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_updated = {
-            "id": collection2.id,
+            "id": "lib-collectionorg1libcol2-46823d4d",
             "block_id": collection2.key,
             "usage_key": f"lib-collection:org1:lib:{collection2.key}",
             "type": "collection",
@@ -506,7 +506,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection1_updated = {
-            "id": collection1.id,
+            "id": "lib-collectionorg1libcol1-283a79c9",
             "block_id": collection1.key,
             "usage_key": f"lib-collection:org1:lib:{collection1.key}",
             "type": "collection",
@@ -593,14 +593,14 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Build expected docs with tags at each stage
         doc_collection_with_tags1 = {
-            "id": self.collection.id,
+            "id": "lib-collectionorg1libmycol-5b647617",
             "tags": {
                 'taxonomy': ['A'],
                 'level0': ['A > one', 'A > two']
             }
         }
         doc_collection_with_tags2 = {
-            "id": self.collection.id,
+            "id": "lib-collectionorg1libmycol-5b647617",
             "tags": {
                 'taxonomy': ['A', 'B'],
                 'level0': ['A > one', 'A > two', 'B > four', 'B > three']

@@ -34,6 +34,7 @@ from .documents import (
     searchable_doc_for_course_block,
     searchable_doc_for_collection,
     searchable_doc_for_library_block,
+    searchable_doc_for_usage_key,
     searchable_doc_collections,
     searchable_doc_tags,
     searchable_doc_tags_for_collection,

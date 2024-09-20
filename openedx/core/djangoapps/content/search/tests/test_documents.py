@@ -303,7 +303,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection))
 
         assert doc == {
-            "id": self.collection.id,
+            "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
             "usage_key": self.collection_usage_key,
             "type": "collection",
