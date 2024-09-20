@@ -3141,30 +3141,6 @@ def enable_certificate_generation(request, course_id=None):
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM)
-@require_POST
-def mark_student_can_skip_entrance_exam(request, course_id):
-    """
-    Mark a student to skip entrance exam.
-    Takes `unique_student_identifier` as required POST parameter.
-    """
-    course_id = CourseKey.from_string(course_id)
-    student_identifier = request.POST.get('unique_student_identifier')
-    student = get_student_from_identifier(student_identifier)
-
-    __, created = EntranceExamConfiguration.objects.get_or_create(user=student, course_id=course_id)
-    if created:
-        message = _('This student (%s) will skip the entrance exam.') % student_identifier
-    else:
-        message = _('This student (%s) is already allowed to skip the entrance exam.') % student_identifier
-    response_payload = {
-        'message': message,
-    }
-    return JsonResponse(response_payload)
-
-
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class MarkStudentCanSkipEntranceExam(APIView):
     """
