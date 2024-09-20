@@ -401,8 +401,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             docs = []
             for collection in batch:
                 try:
-                    doc = searchable_doc_for_collection(collection)
-                    doc.update(searchable_doc_tags_for_collection(library_key, collection))
+                    doc = searchable_doc_for_collection(library_key, collection.key, collection=collection)
+                    doc.update(searchable_doc_tags_for_collection(library_key, collection.key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing collection {collection}: {err}")
@@ -566,13 +566,8 @@ def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collectio
     """
     Creates or updates the document for the given Library Collection in the search index
     """
-    content_library = lib_api.ContentLibrary.objects.get_by_key(library_key)
-    collection = authoring_api.get_collection(
-        learning_package_id=content_library.learning_package_id,
-        collection_key=collection_key,
-    )
     docs = [
-        searchable_doc_for_collection(collection)
+        searchable_doc_for_collection(library_key, collection_key)
     ]
 
     _update_index_docs(docs)
@@ -613,10 +608,8 @@ def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLoc
     """
     Updates the tags data in documents for the given library collection
     """
-    collection = lib_api.get_library_collection_from_usage_key(collection_usage_key)
 
-    doc = {Fields.id: collection.id}
-    doc.update(searchable_doc_tags_for_collection(collection_usage_key.library_key, collection))
+    doc = searchable_doc_tags_for_collection(collection_usage_key.library_key, collection_usage_key.collection_id)
     _update_index_docs([doc])
 
 

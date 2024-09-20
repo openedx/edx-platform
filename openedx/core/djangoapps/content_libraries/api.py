@@ -1237,17 +1237,10 @@ def update_library_collection_components(
 def get_library_collection_usage_key(
     library_key: LibraryLocatorV2,
     collection_key: str,
-    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
-    content_library: ContentLibrary | None = None,
 ) -> LibraryCollectionLocator:
     """
     Returns the LibraryCollectionLocator associated to a collection
     """
-    if not content_library:
-        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    assert content_library
-    assert content_library.learning_package_id
-    assert content_library.library_key == library_key
 
     return LibraryCollectionLocator(library_key, collection_key)
 
