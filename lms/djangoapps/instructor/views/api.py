@@ -137,7 +137,6 @@ from .tools import (
     handle_dashboard_error,
     keep_field_private,
     parse_datetime,
-    require_student_from_identifier,
     set_due_date_extension,
     strip_if_string,
 )
