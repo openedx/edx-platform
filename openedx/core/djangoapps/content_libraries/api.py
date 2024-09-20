@@ -69,24 +69,33 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from edx_rest_api_client.client import OAuthAPIClient
 from lxml import etree
-from opaque_keys.edx.keys import UsageKey, UsageKeyV2
+from opaque_keys.edx.keys import BlockTypeKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import (
     LibraryLocatorV2,
     LibraryUsageLocatorV2,
-    LibraryLocator as LibraryLocatorV1
+    LibraryLocator as LibraryLocatorV1,
+    LibraryCollectionLocator,
 )
 from opaque_keys import InvalidKeyError
-from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    ContentObjectChangedData,
+    LibraryBlockData,
+    LibraryCollectionData,
+)
 from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, MediaType
+from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -111,6 +120,8 @@ log = logging.getLogger(__name__)
 
 ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
+ContentLibraryCollectionNotFound = Collection.DoesNotExist
+
 
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """
@@ -118,6 +129,10 @@ class ContentLibraryBlockNotFound(XBlockNotFoundError):
 
 class LibraryAlreadyExists(KeyError):
     """ A library with the specified slug already exists """
+
+
+class LibraryCollectionAlreadyExists(IntegrityError):
+    """ A Collection with that key already exists in the library """
 
 
 class LibraryBlockAlreadyExists(KeyError):
@@ -150,6 +165,7 @@ class ContentLibraryMetadata:
     Class that represents the metadata about a content library.
     """
     key = attr.ib(type=LibraryLocatorV2)
+    learning_package = attr.ib(type=LearningPackage)
     title = attr.ib("")
     description = attr.ib("")
     num_blocks = attr.ib(0)
@@ -203,8 +219,12 @@ class LibraryXBlockMetadata:
     modified = attr.ib(type=datetime)
     display_name = attr.ib("")
     last_published = attr.ib(default=None, type=datetime)
+    last_draft_created = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib("")
+    published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     tags_count = attr.ib(0)
+    created = attr.ib(default=None, type=datetime)
 
     @classmethod
     def from_component(cls, library_key, component):
@@ -212,6 +232,14 @@ class LibraryXBlockMetadata:
         Construct a LibraryXBlockMetadata from a Component object.
         """
         last_publish_log = component.versioning.last_publish_log
+
+        published_by = None
+        if last_publish_log and last_publish_log.published_by:
+            published_by = last_publish_log.published_by.username
+
+        draft = component.versioning.draft
+        last_draft_created = draft.created if draft else None
+        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
 
         return cls(
             usage_key=LibraryUsageLocatorV2(
@@ -223,7 +251,10 @@ class LibraryXBlockMetadata:
             created=component.created,
             modified=component.versioning.draft.created,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
-            has_unpublished_changes=component.versioning.has_unpublished_changes
+            published_by=published_by,
+            last_draft_created=last_draft_created,
+            last_draft_created_by=last_draft_created_by,
+            has_unpublished_changes=component.versioning.has_unpublished_changes,
         )
 
 
@@ -323,13 +354,14 @@ def get_metadata(queryset, text_search=None):
             has_unpublished_changes=False,
             has_unpublished_deletes=False,
             license=lib.license,
+            learning_package=lib.learning_package,
         )
         for lib in queryset
     ]
     return libraries
 
 
-def require_permission_for_library_key(library_key, user, permission):
+def require_permission_for_library_key(library_key, user, permission) -> ContentLibrary:
     """
     Given any of the content library permission strings defined in
     openedx.core.djangoapps.content_libraries.permissions,
@@ -339,9 +371,11 @@ def require_permission_for_library_key(library_key, user, permission):
     Raises django.core.exceptions.PermissionDenied if the user doesn't have
     permission.
     """
-    library_obj = ContentLibrary.objects.get_by_key(library_key)
+    library_obj = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     if not user.has_perm(permission, obj=library_obj):
         raise PermissionDenied
+
+    return library_obj
 
 
 def get_library(library_key):
@@ -408,6 +442,7 @@ def get_library(library_key):
         license=ref.license,
         created=learning_package.created,
         updated=learning_package.updated,
+        learning_package=learning_package
     )
 
 
@@ -479,6 +514,7 @@ def create_library(
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         license=library_license,
+        learning_package=ref.learning_package
     )
 
 
@@ -1054,6 +1090,214 @@ def revert_changes(library_key):
             update_blocks=True
         )
     )
+
+
+def create_library_collection(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    title: str,
+    *,
+    description: str = "",
+    created_by: int | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Creates a Collection in the given ContentLibrary,
+    and emits a LIBRARY_COLLECTION_CREATED event.
+
+    If you've already fetched a ContentLibrary for the given library_key, pass it in here to avoid refetching.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    try:
+        collection = authoring_api.create_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+            created_by=created_by,
+        )
+    except IntegrityError as err:
+        raise LibraryCollectionAlreadyExists from err
+
+    # Emit event for library collection created
+    LIBRARY_COLLECTION_CREATED.send_event(
+        library_collection=LibraryCollectionData(
+            library_key=library_key,
+            collection_key=collection.key,
+        )
+    )
+
+    return collection
+
+
+def update_library_collection(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    *,
+    title: str | None = None,
+    description: str | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Creates a Collection in the given ContentLibrary,
+    and emits a LIBRARY_COLLECTION_CREATED event.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    try:
+        collection = authoring_api.update_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+        )
+    except Collection.DoesNotExist as exc:
+        raise ContentLibraryCollectionNotFound from exc
+
+    # Emit event for library collection updated
+    LIBRARY_COLLECTION_UPDATED.send_event(
+        library_collection=LibraryCollectionData(
+            library_key=library_key,
+            collection_key=collection.key,
+        )
+    )
+
+    return collection
+
+
+def update_library_collection_components(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    *,
+    usage_keys: list[UsageKeyV2],
+    created_by: int | None = None,
+    remove=False,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Associates the Collection with Components for the given UsageKeys.
+
+    By default the Components are added to the Collection.
+    If remove=True, the Components are removed from the Collection.
+
+    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
+
+    Raises:
+    * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
+    * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
+
+    Returns the updated Collection.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    # Fetch the Component.key values for the provided UsageKeys.
+    component_keys = []
+    for usage_key in usage_keys:
+        # Parse the block_family from the key to use as namespace.
+        block_type = BlockTypeKey.from_string(str(usage_key))
+
+        try:
+            component = authoring_api.get_component_by_key(
+                content_library.learning_package_id,
+                namespace=block_type.block_family,
+                type_name=usage_key.block_type,
+                local_key=usage_key.block_id,
+            )
+        except Component.DoesNotExist as exc:
+            raise ContentLibraryBlockNotFound(usage_key) from exc
+
+        component_keys.append(component.key)
+
+    # Note: Component.key matches its PublishableEntity.key
+    entities_qset = PublishableEntity.objects.filter(
+        key__in=component_keys,
+    )
+
+    if remove:
+        collection = authoring_api.remove_from_collection(
+            content_library.learning_package_id,
+            collection_key,
+            entities_qset,
+        )
+    else:
+        collection = authoring_api.add_to_collection(
+            content_library.learning_package_id,
+            collection_key,
+            entities_qset,
+            created_by=created_by,
+        )
+
+    # Emit event for library collection updated
+    LIBRARY_COLLECTION_UPDATED.send_event(
+        library_collection=LibraryCollectionData(
+            library_key=library_key,
+            collection_key=collection.key,
+        )
+    )
+
+    # Emit a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for each of the objects added/removed
+    for usage_key in usage_keys:
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            content_object=ContentObjectChangedData(
+                object_id=str(usage_key),
+                changes=["collections"],
+            ),
+        )
+
+    return collection
+
+
+def get_library_collection_usage_key(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> LibraryCollectionLocator:
+    """
+    Returns the LibraryCollectionLocator associated to a collection
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    return LibraryCollectionLocator(library_key, collection_key)
+
+
+def get_library_collection_from_usage_key(
+    collection_usage_key: LibraryCollectionLocator,
+) -> Collection:
+    """
+    Return a Collection using the LibraryCollectionLocator
+    """
+
+    library_key = collection_usage_key.library_key
+    collection_key = collection_usage_key.collection_id
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    try:
+        return authoring_api.get_collection(
+            content_library.learning_package_id,
+            collection_key,
+        )
+    except Collection.DoesNotExist as exc:
+        raise ContentLibraryCollectionNotFound from exc
 
 
 # V1/V2 Compatibility Helpers

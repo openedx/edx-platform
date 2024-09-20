@@ -2295,7 +2295,6 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.safe_sessions.middleware.EmailChangeMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
-    'openedx.core.djangoapps.contentserver.middleware.StaticContentServerMiddleware',
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
@@ -3687,6 +3686,9 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # because that decision might happen in a later config file. (The headers to
 # allow is an application logic, and not site policy.)
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'cache-control',
+    'expires',
+    'pragma',
     'use-jwt-cookie',
 )
 
@@ -4688,7 +4690,6 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_channel_worker',
     'enterprise_access_worker',
     'enterprise_subsidy_worker',
-    'subscriptions_worker'
 ]
 
 # Setting for Open API key and prompts used by edx-enterprise.
@@ -5382,17 +5383,6 @@ ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
 
-######################## Subscriptions API SETTINGS ########################
-SUBSCRIPTIONS_ROOT_URL = ""
-SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
-
-SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
-SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
-SUBSCRIPTIONS_TRIAL_LENGTH = 7
-SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
-
 ############## NOTIFICATIONS ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
@@ -5474,6 +5464,10 @@ EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.user.course_access_role.removed.v1': {
         'learning-course-access-role-lifecycle':
             {'event_key_field': 'course_access_role_data.course_key', 'enabled': False},
+    },
+    'org.openedx.enterprise.learner_credit_course_enrollment.revoked.v1': {
+        'learner-credit-course-enrollment-lifecycle':
+            {'event_key_field': 'learner_credit_course_enrollment.uuid', 'enabled': False},
     },
     # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
     # and the derivation fails if the keys are missing. If we ever fully decouple the lms and cms settings,

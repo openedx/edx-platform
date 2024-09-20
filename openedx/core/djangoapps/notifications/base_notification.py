@@ -181,8 +181,7 @@ COURSE_NOTIFICATION_TYPES = {
         'push': True,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new course update: '
-                              '<{strong}>{course_update_content}</{strong}></{p}>'),
+        'content_template': _('<{p}><{strong}>{course_update_content}</{strong}></{p}>'),
         'content_context': {
             'course_update_content': 'Course update',
         },
@@ -207,6 +206,26 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
         'visible_to': [CourseStaffRole.ROLE, CourseInstructorRole.ROLE]
+    },
+    'ora_grade_assigned': {
+        'notification_app': 'grading',
+        'name': 'ora_grade_assigned',
+        'is_core': False,
+        'info': '',
+        'web': False,
+        'email': False,
+        'push': False,
+        'email_cadence': EmailCadence.DAILY,
+        'non_editable': [],
+        'content_template': _('<{p}>You have received {points_earned} out of {points_possible} on your assessment: '
+                              '<{strong}>{ora_name}</{strong}></{p}>'),
+        'content_context': {
+            'ora_name': 'Name of ORA in course',
+            'points_earned': 'Points earned',
+            'points_possible': 'Points possible',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
     },
 }
 
