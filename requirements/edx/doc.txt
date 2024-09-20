@@ -547,7 +547,7 @@ edx-drf-extensions==10.3.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.25.9
+edx-enterprise==4.25.13
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -562,9 +562,9 @@ edx-i18n-tools==1.5.0
     #   ora2
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.3.7
+edx-name-affirmation==2.4.1
     # via -r requirements/edx/base.txt
-edx-opaque-keys[django]==2.10.0
+edx-opaque-keys[django]==2.11.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
@@ -970,7 +970,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==9.12.0
+openedx-events==9.14.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -983,7 +983,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.11.2
+openedx-learning==0.11.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -993,7 +993,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.11.2
+ora2==6.12.0
     # via -r requirements/edx/base.txt
 packaging==24.1
     # via

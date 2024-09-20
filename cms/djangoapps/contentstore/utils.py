@@ -1716,6 +1716,7 @@ def get_home_context(request, no_course=False):
         'allowed_organizations': get_allowed_organizations(user),
         'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),
         'can_create_organizations': user_can_create_organizations(user),
+        'can_access_advanced_settings': auth.has_studio_advanced_settings_access(user),
     }
 
     return home_context

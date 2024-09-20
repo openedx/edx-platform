@@ -5,21 +5,21 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_save
-from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 from xmodule.modulestore.django import SignalHandler, modulestore
 
 from common.djangoapps.student.models_api import get_name, get_pending_name_change
+from lms.djangoapps.verify_student.apps import VerifyStudentConfig  # pylint: disable=unused-import
+from lms.djangoapps.verify_student.signals.signals import idv_update_signal
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC
 
-from .models import SoftwareSecurePhotoVerification, VerificationDeadline, VerificationAttempt
+from lms.djangoapps.verify_student.models import (
+    SoftwareSecurePhotoVerification,
+    VerificationDeadline,
+    VerificationAttempt
+)
 
 log = logging.getLogger(__name__)
-
-
-# Signal for emitting IDV submission and review updates
-# providing_args = ["attempt_id", "user_id", "status", "full_name", "profile_name"]
-idv_update_signal = Signal()
 
 
 @receiver(SignalHandler.course_published)

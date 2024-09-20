@@ -7,7 +7,10 @@ import logging
 from hashlib import blake2b
 
 from django.utils.text import slugify
+from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from openedx_learning.api import authoring as authoring_api
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
@@ -26,7 +29,11 @@ class Fields:
     id = "id"
     usage_key = "usage_key"
     type = "type"  # DocType.course_block or DocType.library_block (see below)
-    block_id = "block_id"  # The block_id part of the usage key. Sometimes human-readable, sometimes a random hex ID
+    # The block_id part of the usage key for course or library blocks.
+    # If it's a collection, the collection.key is stored here.
+    # Sometimes human-readable, sometimes a random hex ID
+    # Is only unique within the given context_key.
+    block_id = "block_id"
     display_name = "display_name"
     description = "description"
     modified = "modified"
@@ -52,10 +59,20 @@ class Fields:
     tags_level1 = "level1"
     tags_level2 = "level2"
     tags_level3 = "level3"
+    # Collections (dictionary) that this object belongs to.
+    # Similarly to tags above, we collect the collection.titles and collection.keys into hierarchical facets.
+    collections = "collections"
+    collections_display_name = "display_name"
+    collections_key = "key"
+
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
     # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
     content = "content"
+
+    # Collections use this field to communicate how many entities/components they contain.
+    # Structural XBlocks may use this one day to indicate how many child blocks they ocntain.
+    num_children = "num_children"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
@@ -223,6 +240,51 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     return {Fields.tags: result}
 
 
+def _collections_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the collections for its index doc.
+
+    e.g. for something in Collections "COL_A" and "COL_B", this would return:
+        {
+            "collections":  {
+                "display_name": ["Collection A", "Collection B"],
+                "key": ["COL_A", "COL_B"],
+            }
+        }
+
+    If the object is in no collections, returns:
+        {
+            "collections":  {},
+        }
+
+    """
+    # Gather the collections associated with this object
+    collections = None
+    try:
+        component = lib_api.get_component_from_usage_key(object_id)
+        collections = authoring_api.get_entity_collections(
+            component.learning_package_id,
+            component.key,
+        )
+    except ObjectDoesNotExist:
+        log.warning(f"No component found for {object_id}")
+
+    if not collections:
+        return {Fields.collections: {}}
+
+    result = {
+        Fields.collections: {
+            Fields.collections_display_name: [],
+            Fields.collections_key: [],
+        }
+    }
+    for collection in collections:
+        result[Fields.collections][Fields.collections_display_name].append(collection.title)
+        result[Fields.collections][Fields.collections_key].append(collection.key)
+
+    return result
+
+
 def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetadata) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -265,6 +327,41 @@ def searchable_doc_tags(usage_key: UsageKey) -> dict:
     return doc
 
 
+def searchable_doc_collections(usage_key: UsageKey) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the collections data for the given content object.
+    """
+    doc = {
+        Fields.id: meili_id_from_opaque_key(usage_key),
+    }
+    doc.update(_collections_for_content_object(usage_key))
+
+    return doc
+
+
+def searchable_doc_tags_for_collection(
+    library_key: LibraryLocatorV2,
+    collection,
+) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the tags data for the given library collection.
+    """
+    doc = {
+        Fields.id: collection.id,
+    }
+
+    collection_usage_key = lib_api.get_library_collection_usage_key(
+        library_key,
+        collection.key,
+    )
+
+    doc.update(_tags_for_content_object(collection_usage_key))
+
+    return doc
+
+
 def searchable_doc_for_course_block(block) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -289,6 +386,7 @@ def searchable_doc_for_collection(collection) -> dict:
     """
     doc = {
         Fields.id: collection.id,
+        Fields.block_id: collection.key,
         Fields.type: DocType.collection,
         Fields.display_name: collection.title,
         Fields.description: collection.description,
@@ -298,6 +396,7 @@ def searchable_doc_for_collection(collection) -> dict:
         # If related contentlibrary is found, it will override this value below.
         # Mostly contentlibrary.library_key == learning_package.key
         Fields.context_key: collection.learning_package.key,
+        Fields.num_children: collection.entities.count(),
     }
     # Just in case learning_package is not related to a library
     try:
@@ -306,6 +405,7 @@ def searchable_doc_for_collection(collection) -> dict:
         doc.update({
             Fields.context_key: str(context_key),
             Fields.org: org,
+            Fields.usage_key: str(lib_api.get_library_collection_usage_key(context_key, collection.key)),
         })
     except LearningPackage.contentlibrary.RelatedObjectDoesNotExist:
         log.warning(f"Related library not found for {collection}")

@@ -177,25 +177,30 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Create a collection:
         self.learning_package = authoring_api.get_learning_package_by_key(self.library.key)
-        self.collection_dict = {
-            'id': 1,
-            'type': 'collection',
-            'display_name': 'my_collection',
-            'description': 'my collection description',
-            'context_key': 'lib:org1:lib',
-            'org': 'org1',
-            'created': created_date.timestamp(),
-            'modified': created_date.timestamp(),
-            "access_id": lib_access.id,
-            'breadcrumbs': [{'display_name': 'Library'}]
-        }
         with freeze_time(created_date):
             self.collection = authoring_api.create_collection(
                 learning_package_id=self.learning_package.id,
+                key="MYCOL",
                 title="my_collection",
                 created_by=None,
                 description="my collection description"
             )
+            self.collection_usage_key = "lib-collection:org1:lib:MYCOL"
+        self.collection_dict = {
+            "id": self.collection.id,
+            "block_id": self.collection.key,
+            "usage_key": self.collection_usage_key,
+            "type": "collection",
+            "display_name": "my_collection",
+            "description": "my collection description",
+            "num_children": 0,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
 
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
@@ -214,15 +219,20 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_vertical["tags"] = {}
         doc_problem1 = copy.deepcopy(self.doc_problem1)
         doc_problem1["tags"] = {}
+        doc_problem1["collections"] = {}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
+        doc_problem2["collections"] = {}
+        doc_collection = copy.deepcopy(self.collection_dict)
+        doc_collection["tags"] = {}
 
         api.rebuild_index()
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
                 call([doc_sequential, doc_vertical]),
                 call([doc_problem1, doc_problem2]),
-                call([self.collection_dict]),
+                call([doc_collection]),
             ],
             any_order=True,
         )
@@ -253,6 +263,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_vertical["tags"] = {}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
+        doc_problem2["collections"] = {}
 
         orig_from_component = library_api.LibraryXBlockMetadata.from_component
 
@@ -345,6 +356,7 @@ class TestSearchApi(ModuleStoreTestCase):
             }
         }
 
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_sequential_with_tags1]),
@@ -399,10 +411,139 @@ class TestSearchApi(ModuleStoreTestCase):
             }
         }
 
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_problem_with_tags1]),
                 call([doc_problem_with_tags2]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_library_block_and_collections(self, mock_meilisearch):
+        """
+        Test indexing an Library Block and the Collections it's in.
+        """
+        # Create collections (these internally call `upsert_library_collection_index_doc`)
+        created_date = datetime(2023, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            collection1 = library_api.create_library_collection(
+                self.library.key,
+                collection_key="COL1",
+                title="Collection 1",
+                created_by=None,
+                description="First Collection",
+            )
+
+            collection2 = library_api.create_library_collection(
+                self.library.key,
+                collection_key="COL2",
+                title="Collection 2",
+                created_by=None,
+                description="Second Collection",
+            )
+
+        # Add Problem1 to both Collections (these internally call `upsert_block_collections_index_docs` and
+        # `upsert_library_collection_index_doc`)
+        # (adding in reverse order to test sorting of collection tag)
+        updated_date = datetime(2023, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
+        with freeze_time(updated_date):
+            for collection in (collection2, collection1):
+                library_api.update_library_collection_components(
+                    self.library.key,
+                    collection_key=collection.key,
+                    usage_keys=[
+                        self.problem1.usage_key,
+                    ],
+                )
+
+        # Build expected docs at each stage
+        lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
+        doc_collection1_created = {
+            "id": collection1.id,
+            "block_id": collection1.key,
+            "usage_key": f"lib-collection:org1:lib:{collection1.key}",
+            "type": "collection",
+            "display_name": "Collection 1",
+            "description": "First Collection",
+            "num_children": 0,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
+        doc_collection2_created = {
+            "id": collection2.id,
+            "block_id": collection2.key,
+            "usage_key": f"lib-collection:org1:lib:{collection2.key}",
+            "type": "collection",
+            "display_name": "Collection 2",
+            "description": "Second Collection",
+            "num_children": 0,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
+        doc_collection2_updated = {
+            "id": collection2.id,
+            "block_id": collection2.key,
+            "usage_key": f"lib-collection:org1:lib:{collection2.key}",
+            "type": "collection",
+            "display_name": "Collection 2",
+            "description": "Second Collection",
+            "num_children": 1,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": updated_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
+        doc_collection1_updated = {
+            "id": collection1.id,
+            "block_id": collection1.key,
+            "usage_key": f"lib-collection:org1:lib:{collection1.key}",
+            "type": "collection",
+            "display_name": "Collection 1",
+            "description": "First Collection",
+            "num_children": 1,
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": updated_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+        }
+        doc_problem_with_collection1 = {
+            "id": self.doc_problem1["id"],
+            "collections": {
+                "display_name": ["Collection 2"],
+                "key": ["COL2"],
+            },
+        }
+        doc_problem_with_collection2 = {
+            "id": self.doc_problem1["id"],
+            "collections": {
+                "display_name": ["Collection 1", "Collection 2"],
+                "key": ["COL1", "COL2"],
+            },
+        }
+
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 6
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_collection1_created]),
+                call([doc_collection2_created]),
+                call([doc_collection2_updated]),
+                call([doc_collection1_updated]),
+                call([doc_problem_with_collection1]),
+                call([doc_problem_with_collection2]),
             ],
             any_order=True,
         )
@@ -442,4 +583,35 @@ class TestSearchApi(ModuleStoreTestCase):
         ]
         mock_meilisearch.return_value.index.return_value.delete_documents.assert_called_once_with(
             filter=delete_filter
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_tags_in_collections(self, mock_meilisearch):
+        # Tag collection
+        tagging_api.tag_object(self.collection_usage_key, self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(self.collection_usage_key, self.taxonomyB, ["three", "four"])
+
+        # Build expected docs with tags at each stage
+        doc_collection_with_tags1 = {
+            "id": self.collection.id,
+            "tags": {
+                'taxonomy': ['A'],
+                'level0': ['A > one', 'A > two']
+            }
+        }
+        doc_collection_with_tags2 = {
+            "id": self.collection.id,
+            "tags": {
+                'taxonomy': ['A', 'B'],
+                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
+            }
+        }
+
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_collection_with_tags1]),
+                call([doc_collection_with_tags2]),
+            ],
+            any_order=True,
         )
