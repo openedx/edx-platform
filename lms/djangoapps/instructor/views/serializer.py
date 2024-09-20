@@ -215,3 +215,10 @@ class BlockDueDateSerializer(serializers.Serializer):
             return None
 
         return user
+
+    def __init__(self, *args, **kwargs):
+        # Get context to check if `due_datetime` should be optional
+        disable_due_datetime = kwargs.get('context', {}).get('disable_due_datetime', False)
+        super().__init__(*args, **kwargs)
+        if disable_due_datetime:
+            self.fields['due_datetime'].required = False
