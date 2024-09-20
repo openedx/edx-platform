@@ -22,6 +22,7 @@ from openedx_learning.api.authoring_models import Collection
 
 from lms.djangoapps.grades.api import signals as grades_signals
 
+from .api import library_component_usage_key
 from .models import ContentLibrary, LtiGradedResource
 
 

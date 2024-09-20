@@ -239,10 +239,9 @@ class LibraryXBlockMetadata:
         last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
 
         return cls(
-            usage_key=LibraryUsageLocatorV2(
+            usage_key=library_component_usage_key(
                 library_key,
-                component.component_type.name,
-                component.local_key,
+                component,
             ),
             display_name=component.versioning.draft.title,
             created=component.created,
@@ -781,6 +780,20 @@ def set_library_block_olx(usage_key, new_olx_str):
             library_key=usage_key.context_key,
             usage_key=usage_key
         )
+    )
+
+
+def library_component_usage_key(
+    library_key: LibraryLocatorV2,
+    component: Component,
+) -> LibraryUsageLocatorV2:
+    """
+    Returns a LibraryUsageLocatorV2 for the given library + component.
+    """
+    return LibraryUsageLocatorV2(  # type: ignore[abstract]
+        library_key,
+        block_type=component.component_type.name,
+        usage_id=component.local_key,
     )
 
 
