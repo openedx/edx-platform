@@ -669,11 +669,15 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
             self.collection_dict["id"],
         )
-        ## TODO: ...and update the component's "collections" field
-        # mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
-        #     doc_problem_without_collection,
-        # ])
+        # ...and update the component's "collections" field
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
+            doc_problem_without_collection,
+        ])
         mock_meilisearch.return_value.index.reset_mock()
+
+        # We need to mock get_document here so that when we restore the collection below, meilisearch knows the
+        # collection is being re-added, so it will update its components too.
+        mock_meilisearch.return_value.get_index.return_value.get_document.return_value = None
 
         # Restore the collection
         restored_date = datetime(2023, 8, 9, 10, 11, 12, tzinfo=timezone.utc)
@@ -687,12 +691,12 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection["num_children"] = 1
         doc_collection["modified"] = restored_date.timestamp()
 
-        # Should update the collection TODO and its component's "collections" field
-        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 1  # TODO 2
+        # Should update the collection and its component's "collections" field
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
                 call([doc_collection]),
-                # TODO call([doc_problem_with_collection]),
+                call([doc_problem_with_collection]),
             ],
             any_order=True,
         )
@@ -709,7 +713,7 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
             self.collection_dict["id"],
         )
-        ## TODO ...and cascade delete updates the "collections" field for the associated components
-        # mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
-        #     doc_problem_without_collection,
-        # ])
+        # ...and cascade delete updates the "collections" field for the associated components
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
+            doc_problem_without_collection,
+        ])

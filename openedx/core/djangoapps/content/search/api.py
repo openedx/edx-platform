@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from meilisearch import Client as MeilisearchClient
-from meilisearch.errors import MeilisearchError
+from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
@@ -575,6 +575,24 @@ def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     _update_index_docs(docs)
 
 
+def _get_document_from_index(document_id: str) -> dict:
+    """
+    Returns the Document identified by the given ID, from the given index.
+
+    Returns None if the document or index do not exist.
+    """
+    client = _get_meilisearch_client()
+    document = None
+    try:
+        index = client.get_index(STUDIO_INDEX_NAME)
+        return index.get_document(id)
+    except (MeilisearchError, MeilisearchApiError) as err:
+        # The index or documennt doesn't exist
+        log.exception(err)
+
+    return None
+
+
 def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collection_key: str) -> None:
     """
     Creates, updates, or deletes the document for the given Library Collection in the search index.
@@ -582,20 +600,68 @@ def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collectio
     If the Collection is not found or disabled (i.e. soft-deleted), then delete it from the search index.
     """
     doc = searchable_doc_for_collection(library_key, collection_key)
+    update_components = False
 
     # Soft-deleted/disabled collections are removed from the index
+    # and their components updated.
     if doc.get('_disabled'):
 
         _delete_index_doc(doc[Fields.id])
 
-    # Hard-deleted collections are also deleted from the index
+        update_components = True
+
+    # Hard-deleted collections are also deleted from the index,
+    # but their components are automatically updated as part of the deletion process, so we don't have to.
     elif not doc.get(Fields.type):
 
         _delete_index_doc(doc[Fields.id])
 
     # Otherwise, upsert the collection.
+    # Newly-added/restored collection get their components updated too.
     else:
+        already_indexed = _get_document_from_index(doc[Fields.id])
+        if not already_indexed:
+            update_components = True
+
         _update_index_docs([doc])
+
+    # Asynchronously update the collection's components "collections" field
+    if update_components:
+        from .tasks import update_library_components_collections as update_task
+
+        update_task.delay(str(library_key), collection_key)
+
+
+def update_library_components_collections(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    batch_size: int = 1000,
+) -> None:
+    """
+    Updates the "collections" field for all components associated with a given Library Collection.
+
+    Because there may be a lot of components, we send these updates to Meilisearch in batches.
+    """
+    library = lib_api.get_library(library_key)
+    components = authoring_api.get_collection_components(library.learning_package.id, collection_key)
+
+    paginator = Paginator(components, batch_size)
+    for page in paginator.page_range:
+        docs = []
+
+        for component in paginator.page(page).object_list:
+            usage_key = lib_api.library_component_usage_key(
+                library_key,
+                component,
+            )
+            doc = searchable_doc_collections(usage_key)
+            docs.append(doc)
+
+        log.info(
+            f"Updating document.collections for library {library_key} components"
+            f" page {page} / {paginator.num_pages}"
+        )
+        _update_index_docs(docs)
 
 
 def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:

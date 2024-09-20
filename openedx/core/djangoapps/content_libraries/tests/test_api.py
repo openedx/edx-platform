@@ -455,11 +455,11 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         assert event_receiver.call_count == 3
         self.assertDictContainsSubset(
             {
-                "signal": LIBRARY_COLLECTION_UPDATED,
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
-                "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                "content_object": ContentObjectChangedData(
+                    object_id=self.lib1_problem_block["id"],
+                    changes=["collections"],
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -469,7 +469,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=self.lib1_problem_block["id"],
+                    object_id=self.lib1_html_block["id"],
                     changes=["collections"],
                 ),
             },
@@ -477,11 +477,11 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
         self.assertDictContainsSubset(
             {
-                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
-                "content_object": ContentObjectChangedData(
-                    object_id=self.lib1_html_block["id"],
-                    changes=["collections"],
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
                 ),
             },
             event_receiver.call_args_list[2].kwargs,
