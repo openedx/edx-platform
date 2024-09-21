@@ -1,6 +1,8 @@
 """
 Tests for methods defined in builtin_assets.py
 """
+from pathlib import PosixPath
+
 from django.conf import settings
 from unittest import TestCase
 from unittest.mock import patch
@@ -110,9 +112,12 @@ class AddCssToFragmentTests(TestCase):
     def test_happy_path(self):
         fragment = Fragment()
         builtin_assets.add_css_to_fragment(fragment, "VideoBlockEditor.css")
-        assert fragment.resources[0] == FragmentResource(
-            kind='url',
-            data=f'{settings.REPO_ROOT}/xmodule/assets/VideoBlockEditor.css',
+        fr = FragmentResource(
+            # kind='url',
+            # data=f'{settings.REPO_ROOT}/xmodule/assets/VideoBlockEditor.css',
+            kind='text',
+            data=PosixPath(f"{settings.REPO_ROOT}/xmodule/assets/VideoBlockEditor.css").read_text(encoding="utf-8"),
             mimetype='text/css',
             placement='head',
         )
+        assert fragment.resources[0] == fr

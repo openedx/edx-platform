@@ -29,7 +29,8 @@ def add_css_to_fragment(fragment, css_relative_path):
     css_absolute_path = Path(settings.REPO_ROOT) / "xmodule" / "assets" / css_relative_path
     if not css_absolute_path.is_file():
         raise FileNotFoundError(f"css file not found: {css_absolute_path}")
-    fragment.add_css_url(str(css_absolute_path))
+    # fragment.add_css_url(str(css_absolute_path))
+    fragment.add_css(css_absolute_path.read_text(encoding='utf-8'))
 
 
 def add_sass_to_fragment(fragment, sass_relative_path):
