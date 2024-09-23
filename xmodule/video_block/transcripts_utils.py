@@ -1074,7 +1074,7 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     """
     # TODO: Update to use Learning Core data models once static assets support
     # has been added.
-    raise NotImplementedError("Transcripts not supported.")
+    raise NotFoundError("No transcript - transcripts not supported yet by learning core components.")
 
 
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
