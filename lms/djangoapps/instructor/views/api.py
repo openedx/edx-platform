@@ -3540,7 +3540,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
-# @method_decorator(transaction.non_atomic_requests, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CertificateInvalidationView(APIView):
     """
     Invalidate/Re-Validate students to/from certificate.
@@ -3554,7 +3554,7 @@ class CertificateInvalidationView(APIView):
     http_method_names = ['post', 'delete']
 
     @method_decorator(ensure_csrf_cookie)
-    # @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(transaction.non_atomic_requests)
     def post(self, request, course_id):
         course_key = CourseKey.from_string(course_id)
         validation_response = self.validate_and_get_data(request, course_key)
@@ -3585,7 +3585,7 @@ class CertificateInvalidationView(APIView):
         return JsonResponse(certificate_invalidation)
 
     @method_decorator(ensure_csrf_cookie)
-    # @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(transaction.non_atomic_requests)
     def delete(self, request, course_id):
         # Re-Validate student certificate for the course course
         course_key = CourseKey.from_string(course_id)
