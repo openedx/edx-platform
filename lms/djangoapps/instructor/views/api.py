@@ -3539,12 +3539,9 @@ def generate_bulk_certificate_exceptions(request, course_id):
     return JsonResponse(results)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CERTIFICATE_INVALIDATION_VIEW)
-@require_http_methods(['POST', 'DELETE'])
-def certificate_invalidation_view(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+# @method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CertificateInvalidationView(APIView):
     """
     Invalidate/Re-Validate students to/from certificate.
 
@@ -3552,17 +3549,22 @@ def certificate_invalidation_view(request, course_id):
     :param course_id: course identifier of the course for whom to add/remove certificates exception.
     :return: JsonResponse object with success/error message or certificate invalidation data.
     """
-    course_key = CourseKey.from_string(course_id)
-    # Validate request data and return error response in case of invalid data
-    try:
-        certificate_invalidation_data = parse_request_data(request)
-        student = _get_student_from_request_data(certificate_invalidation_data)
-        certificate = _get_certificate_for_user(course_key, student)
-    except ValueError as error:
-        return JsonResponse({'message': str(error)}, status=400)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CERTIFICATE_INVALIDATION_VIEW
+    http_method_names = ['post', 'delete']
 
-    # Invalidate certificate of the given student for the course course
-    if request.method == 'POST':
+    @method_decorator(ensure_csrf_cookie)
+    # @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        course_key = CourseKey.from_string(course_id)
+        validation_response = self.validate_and_get_data(request, course_key)
+        # If validation fails, return the error response
+        if isinstance(validation_response, JsonResponse):
+            return validation_response
+        # Otherwise, extract the validated data
+
+        student, certificate, certificate_invalidation_data = validation_response
+        # Invalidate certificate of the given student for the course course
         try:
             if certs_api.is_on_allowlist(student, course_key):
                 log.warning(f"Invalidating certificate for student {student.id} in course {course_key} failed. "
@@ -3582,14 +3584,37 @@ def certificate_invalidation_view(request, course_id):
             return JsonResponse({'message': str(error)}, status=400)
         return JsonResponse(certificate_invalidation)
 
-    # Re-Validate student certificate for the course course
-    elif request.method == 'DELETE':
+    @method_decorator(ensure_csrf_cookie)
+    # @method_decorator(transaction.non_atomic_requests)
+    def delete(self, request, course_id):
+        # Re-Validate student certificate for the course course
+        course_key = CourseKey.from_string(course_id)
+        validation_response = self.validate_and_get_data(request, course_key)
+
+        # If validation fails, return the error response
+        if isinstance(validation_response, JsonResponse):
+            return validation_response
+
+        # Otherwise, extract the validated data
+        student, certificate, certificate_invalidation_data = validation_response
+
         try:
             re_validate_certificate(request, course_key, certificate, student)
         except ValueError as error:
             return JsonResponse({'message': str(error)}, status=400)
 
         return JsonResponse({}, status=204)
+
+    def validate_and_get_data(self, request, course_key):
+        try:
+            certificate_invalidation_data = parse_request_data(request)
+            student = _get_student_from_request_data(certificate_invalidation_data)
+            certificate = _get_certificate_for_user(course_key, student)
+            # Return the validated student and certificate
+            return student, certificate, certificate_invalidation_data
+        except ValueError as error:
+            # Return a JsonResponse with an error message if validation fails
+            return JsonResponse({'message': str(error)}, status=400)
 
 
 def invalidate_certificate(request, generated_certificate, certificate_invalidation_data, student):
