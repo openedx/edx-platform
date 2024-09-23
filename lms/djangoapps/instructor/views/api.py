@@ -3371,6 +3371,21 @@ def parse_request_data(request):
     return data
 
 
+def parse_request_data_drf(request):
+    """
+    Parse and return request data, raise ValueError in case of invalid JSON data.
+
+    :param request: HttpRequest request object.
+    :return: dict object containing parsed json data.
+    """
+    try:
+        data = request.data or '{}'
+    except ValueError:
+        raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))  # lint-amnesty, pylint: disable=raise-missing-from
+
+    return data
+
+
 def get_student(username_or_email):
     """
     Retrieve and return User object from db, raise ValueError
@@ -3556,9 +3571,13 @@ class CertificateInvalidationView(APIView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
     def post(self, request, course_id):
+        """
+         Invalidate/Re-Validate students to/from certificate.
+        """
         course_key = CourseKey.from_string(course_id)
-        validation_response = self.validate_and_get_data(request, course_key)
+        # Validate request data and return error response in case of invalid data
 
+        validation_response = self.validate_and_get_data(request, course_key)
         # If validation fails, return the error response
         if isinstance(validation_response, JsonResponse):
             return validation_response
@@ -3588,8 +3607,13 @@ class CertificateInvalidationView(APIView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
     def delete(self, request, course_id):
+        """
+        Invalidate/Re-Validate students to/from certificate.
+        """
         # Re-Validate student certificate for the course course
         course_key = CourseKey.from_string(course_id)
+        # Validate request data and return error response in case of invalid data
+
         validation_response = self.validate_and_get_data(request, course_key)
 
         # If validation fails, return the error response
@@ -3618,7 +3642,7 @@ class CertificateInvalidationView(APIView):
         and the method returns a JsonResponse with a 400 status code.
         """
         try:
-            certificate_invalidation_data = parse_request_data(request)
+            certificate_invalidation_data = parse_request_data_drf(request)
             student = _get_student_from_request_data(certificate_invalidation_data)
             certificate = _get_certificate_for_user(course_key, student)
             # Return the validated student and certificate
