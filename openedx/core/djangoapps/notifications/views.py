@@ -291,7 +291,7 @@ class NotificationListAPIView(generics.ListAPIView):
 
         if app_name:
             params['app_name'] = app_name
-        return Notification.objects.filter(**params).order_by('-id')
+        return Notification.objects.filter(**params).order_by('-created')
 
 
 @allow_any_authenticated_user()

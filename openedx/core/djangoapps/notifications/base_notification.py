@@ -479,45 +479,6 @@ class NotificationAppManager:
         return course_notification_preference_config
 
 
-def get_grouped_template_context(context):
-    """
-    Generates a grouped template context if 'grouped' is True in the context.
-
-    Args:
-        context (dict): A dictionary containing template data, including 'grouped',
-                        'user_key', 'group_key', and 'grouped_count'.
-
-    Returns:
-        dict: Formatted template with the grouped context or an empty string if 'grouped' is False.
-    """
-    # Ensure 'grouped' is in context and True, otherwise return an empty string
-    if not context.get('grouped'):
-        return context
-
-    # Retrieve keys from the context with error handling for missing keys
-    user_key = context['user_key']
-    group_key = context['group_key']
-    user_list = context.get(group_key, [])
-    grouped_count = context.get('grouped_count', 0)
-
-    # Validate that user_list and grouped_count are consistent
-    if not user_list or grouped_count <= 0:
-        raise ValueError("Invalid 'grouped_count' or empty 'user_list'.")
-
-    # Format the user display text based on the number of users in the group
-    if grouped_count == 2:
-        text = " and ".join(user_list)
-    else:
-        text = f"{user_list[0]} and {grouped_count - 1} others"
-
-    # Update the context with the new user text
-    new_context = context.copy()
-    new_context[user_key] = text
-
-    # Format and return the template with the new context
-    return new_context
-
-
 def get_notification_content(notification_type, context):
     """
     Returns notification content for the given notification type with provided context.
@@ -559,9 +520,6 @@ def get_notification_content(notification_type, context):
 
         if template:
             # Handle grouped templates differently by modifying the context using a different function.
-            if is_grouped:
-                context = get_grouped_template_context(context)
-
             return template.format(**context)
 
     return ''

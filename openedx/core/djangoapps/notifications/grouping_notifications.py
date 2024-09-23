@@ -74,15 +74,11 @@ class NewCommentGrouper(BaseNotificationGrouper):
         Groups new comment notifications based on the replier name.
         """
         context = old_notification.content_context.copy()
-        user_key = 'replier_name'
-        group_key = f'{user_key}_grouped'
         if not context.get('grouped'):
-            context['user_key'] = user_key
-            context['group_key'] = group_key
-            context[group_key] = [context[user_key]]
+            context['replier_name_list'] = [context['replier_name']]
             context['grouped_count'] = 1
             context['grouped'] = True
-        context[group_key].append(new_notification.content_context['replier_name'])
+        context['replier_name_list'].append(new_notification.content_context['replier_name'])
         context['grouped_count'] += 1
         return context
 
