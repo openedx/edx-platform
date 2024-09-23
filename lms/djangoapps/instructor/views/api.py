@@ -3558,6 +3558,7 @@ class CertificateInvalidationView(APIView):
     def post(self, request, course_id):
         course_key = CourseKey.from_string(course_id)
         validation_response = self.validate_and_get_data(request, course_key)
+
         # If validation fails, return the error response
         if isinstance(validation_response, JsonResponse):
             return validation_response
@@ -3606,6 +3607,16 @@ class CertificateInvalidationView(APIView):
         return JsonResponse({}, status=204)
 
     def validate_and_get_data(self, request, course_key):
+        """
+        Validates the request data, retrieves the student and certificate for the specified course.
+        This method performs the following steps:
+        1. Parses the request data to extract the necessary information.
+        2. Retrieves the student object from the parsed request data.
+        3. Fetches the certificate for the user and course specified by the course_key.
+
+        If any of the steps fail (e.g., invalid request data or missing certificate), a ValueError is raised,
+        and the method returns a JsonResponse with a 400 status code.
+        """
         try:
             certificate_invalidation_data = parse_request_data(request)
             student = _get_student_from_request_data(certificate_invalidation_data)
