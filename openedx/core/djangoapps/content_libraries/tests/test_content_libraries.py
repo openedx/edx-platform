@@ -5,9 +5,11 @@ from unittest.mock import Mock, patch
 from unittest import skip
 
 import ddt
+from datetime import datetime, timezone
 from uuid import uuid4
 from django.contrib.auth.models import Group
 from django.test.client import Client
+from freezegun import freeze_time
 from organizations.models import Organization
 from rest_framework.test import APITestCase
 
@@ -270,12 +272,18 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'problem' XBlock to the library:
-        block_data = self._add_block_to_library(lib_id, "problem", "ࠒröblæm1")
+        create_date = datetime(2024, 6, 6, 6, 6, 6, tzinfo=timezone.utc)
+        with freeze_time(create_date):
+            block_data = self._add_block_to_library(lib_id, "problem", "ࠒröblæm1")
         self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:téstlꜟط:problem:ࠒröblæm1",
             "display_name": "Blank Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
+            "last_published": None,
+            "published_by": None,
+            "last_draft_created": create_date.isoformat().replace('+00:00', 'Z'),
+            "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
         # Confirm that the result contains a definition key, but don't check its value,
@@ -287,10 +295,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        publish_date = datetime(2024, 7, 7, 7, 7, 7, tzinfo=timezone.utc)
+        with freeze_time(publish_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
@@ -311,13 +323,16 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             </multiplechoiceresponse>
         </problem>
         """.strip()
-        self._set_library_block_olx(block_id, new_olx)
+        update_date = datetime(2024, 8, 8, 8, 8, 8, tzinfo=timezone.utc)
+        with freeze_time(update_date):
+            self._set_library_block_olx(block_id, new_olx)
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
         assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "New Multi Choice Question",
             "has_unpublished_changes": True,
+            "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
 
         # Now view the XBlock's student_view (including draft changes):
@@ -358,12 +373,18 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'html' XBlock to the library:
-        block_data = self._add_block_to_library(lib_id, "html", "html1")
+        create_date = datetime(2024, 6, 6, 6, 6, 6, tzinfo=timezone.utc)
+        with freeze_time(create_date):
+            block_data = self._add_block_to_library(lib_id, "html", "html1")
         self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:testlib2:html:html1",
             "display_name": "Text",
             "block_type": "html",
             "has_unpublished_changes": True,
+            "last_published": None,
+            "published_by": None,
+            "last_draft_created": create_date.isoformat().replace('+00:00', 'Z'),
+            "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
 
@@ -372,10 +393,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        publish_date = datetime(2024, 7, 7, 7, 7, 7, tzinfo=timezone.utc)
+        with freeze_time(publish_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
@@ -383,13 +408,17 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         orig_olx = self._get_library_block_olx(block_id)
         assert '<html' in orig_olx
         new_olx = "<html><b>Hello world!</b></html>"
-        self._set_library_block_olx(block_id, new_olx)
+
+        update_date = datetime(2024, 8, 8, 8, 8, 8, tzinfo=timezone.utc)
+        with freeze_time(update_date):
+            self._set_library_block_olx(block_id, new_olx)
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
         assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "Text",
             "has_unpublished_changes": True,
+            "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
 
         # Now view the XBlock's studio view (including draft changes):
@@ -1019,6 +1048,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             # the the block in the clipboard
             self.assertDictContainsEntries(self._get_library_block(paste_data["id"]), {
                 **block_data,
+                "last_draft_created_by": None,
                 "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
             })
 

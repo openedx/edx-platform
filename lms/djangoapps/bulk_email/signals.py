@@ -55,5 +55,6 @@ def ace_email_sent_handler(sender, **kwargs):
             'channel': channel,
             'course_id': course_id,
             'user_id': user_id,
+            'user_email': message.recipient.email_address,
         }
     )

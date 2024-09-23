@@ -28,3 +28,13 @@ ENABLE_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification
 # .. toggle_warning: When the flag is ON, Email Notifications feature is enabled.
 # .. toggle_tickets: INF-1259
 ENABLE_EMAIL_NOTIFICATIONS = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_email_notifications', __name__)
+
+# .. toggle_name: notifications.enable_ora_grade_notifications
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable ORA grade notifications
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2024-09-10
+# .. toggle_target_removal_date: 2024-10-10
+# .. toggle_tickets: INF-1304
+ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora_grade_notifications", __name__)
