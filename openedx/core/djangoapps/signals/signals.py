@@ -36,9 +36,5 @@ COURSE_GRADE_NOW_PASSED = Signal()
 # ]
 COURSE_GRADE_NOW_FAILED = Signal()
 
-# Signal that indicates that a user has become verified for certificate purposes
-# providing_args=['user']
-LEARNER_NOW_VERIFIED = Signal()
-
 # providing_args=['user']
 USER_ACCOUNT_ACTIVATED = Signal()  # Signal indicating email verification

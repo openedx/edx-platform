@@ -84,3 +84,16 @@ def update_content_library_index_docs(library_key_str: str) -> None:
     # Delete all documents in this library that were not published by above function
     # as this task is also triggered on discard event.
     api.delete_all_draft_docs_for_library(library_key)
+
+
+@shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
+@set_code_owner_attribute
+def update_library_collection_index_doc(library_key_str: str, collection_key: str) -> None:
+    """
+    Celery task to update the content index documents for a library collection
+    """
+    library_key = LibraryLocatorV2.from_string(library_key_str)
+
+    log.info("Updating content index documents for collection %s in library%s", collection_key, library_key)
+
+    api.upsert_library_collection_index_doc(library_key, collection_key)

@@ -474,6 +474,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             'course_id': str(course_email.course_id),
             'to_list': [user_obj.get('email', '') for user_obj in to_list],
             'total_recipients': total_recipients,
+            'ace_enabled_for_bulk_email': is_bulk_email_edx_ace_enabled(),
         }
     )
     # Exclude optouts (if not a retry):
@@ -533,7 +534,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             email_context['email'] = email
             email_context['name'] = profile_name
             email_context['user_id'] = user_id
-            email_context['course_id'] = course_email.course_id
+            email_context['course_id'] = str(course_email.course_id)
             email_context['unsubscribe_link'] = get_unsubscribed_link(current_recipient['username'],
                                                                       str(course_email.course_id))
 

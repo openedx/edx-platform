@@ -4175,6 +4175,16 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # This operation regenerates the cache, so we can use cached results from edx-when.
         assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
 
+    def test_reset_due_date_with_reason(self):
+        url = reverse('reset_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'reason': 'Testing reason.'  # this is optional field.
+        })
+        assert response.status_code == 200
+        assert 'Successfully reset due date for student' in response.content.decode('utf-8')
+
     def test_change_to_invalid_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
@@ -4704,15 +4714,19 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
     Test endpoints using Oauth2 authentication.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create(
-            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
-        )
-
     def setUp(self):
         super().setUp()
+        self.course = CourseFactory.create(
+            org='test_org',
+            course='test_course',
+            run='test_run',
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
+        self.problem_location = msk_from_problem_urlname(
+            self.course.id,
+            'robot-some-problem-urlname'
+        )
+        self.problem_urlname = str(self.problem_location)
 
         self.other_user = UserFactory()
         dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
@@ -4744,7 +4758,14 @@ class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollm
                 "send-to": ["myself"],
                 "subject": "This is subject",
                 "message": "message"
-            }, 'data_researcher')
+            }, 'data_researcher'),
+            ('list_instructor_tasks',
+             {
+                 'problem_location_str': self.problem_urlname,
+                 'unique_student_identifier': self.other_user.email
+             },
+             'data_researcher'),
+            ('list_instructor_tasks', {}, 'data_researcher')
         ]
 
         self.fake_jwt = ('wyJUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjaGFuZ2UtbWUiLCJleHAiOjE3MjU4OTA2NzIsImdyY'

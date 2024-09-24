@@ -3,7 +3,7 @@ Serializers for Learner Home
 """
 
 from datetime import date, timedelta
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
 from django.urls import reverse
@@ -132,7 +132,13 @@ class CourseRunSerializer(serializers.Serializer):
         )
 
         if ecommerce_payment_page and verified_sku:
-            return f"{ecommerce_payment_page}?sku={verified_sku}"
+            query_params = {
+                'sku': verified_sku,
+                'course_run_key': str(instance.course_id)
+            }
+            encoded_params = urlencode(query_params)
+            upgrade_url = f"{ecommerce_payment_page}?{encoded_params}"
+            return upgrade_url
 
     def get_resumeUrl(self, instance):
         return self.context.get("resume_course_urls", {}).get(instance.course_id)
