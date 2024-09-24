@@ -78,7 +78,10 @@ class MockRequestSetupMixin:
         )
 
     def _set_mock_request_data(self, mock_request, data):
-        mock_request.return_value = self._create_response_mock(data)
+        if mock_request.mock._mock_name != "request":
+            mock_request.return_value = data
+        else: 
+            mock_request.return_value = self._create_response_mock(data)
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -184,16 +187,20 @@ class ThreadActionGroupIdTestCase(
         response = self.call_view("un_flag_abuse_for_thread", mock_request)
         self._assert_json_response_contains_group_info(response)
 
-    def test_pin(self, mock_request):
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.pin_thread', autospec=True)
+    def test_pin(self, mock_request, mock_pin_thread):
         response = self.call_view(
             "pin_thread",
-            mock_request,
+            mock_pin_thread,
             user=self.moderator
         )
         self._assert_json_response_contains_group_info(response)
+    
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.unpin_thread', autospec=True)
+    def test_unpin(self, mock_request, mock_unpin_thread):
         response = self.call_view(
             "un_pin_thread",
-            mock_request,
+            mock_unpin_thread,
             user=self.moderator
         )
         self._assert_json_response_contains_group_info(response)
@@ -551,6 +558,10 @@ class ViewsTestCase(
         assert response.status_code == 200
         assert mock_request.called
 
+    ### not working
+    # @patch('openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.delete_comment', autospec=True)
+    # def test_delete_comment(self, mock_request, mock_delete_comment):
+    #     self._set_mock_request_data(mock_delete_comment, {
     def test_delete_comment(self, mock_request):
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
@@ -568,6 +579,8 @@ class ViewsTestCase(
                 comment_id=test_comment_id
             )
         assert response.status_code == 200
+        # assert mock_delete_comment.called
+        # args = mock_delete_comment.call_args[0]
         assert mock_request.called
         args = mock_request.call_args[0]
         assert args[0] == 'delete'
@@ -1107,32 +1120,36 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     def setUp(self):
         super().setUp()
 
-    def test_pin_thread_as_student(self, mock_request):
-        self._set_mock_request_data(mock_request, {})
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.pin_thread', autospec=True)
+    def test_pin_thread_as_student(self, mock_request, mock_pin_thread):
+        self._set_mock_request_data(mock_pin_thread, {})
         self.client.login(username=self.student.username, password=self.password)
         response = self.client.post(
             reverse("pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
         )
         assert response.status_code == 401
 
-    def test_pin_thread_as_moderator(self, mock_request):
-        self._set_mock_request_data(mock_request, {})
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.pin_thread', autospec=True)
+    def test_pin_thread_as_moderator(self, mock_request, mock_pin_thread):
+        self._set_mock_request_data(mock_pin_thread, {})
         self.client.login(username=self.moderator.username, password=self.password)
         response = self.client.post(
             reverse("pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
         )
         assert response.status_code == 200
 
-    def test_un_pin_thread_as_student(self, mock_request):
-        self._set_mock_request_data(mock_request, {})
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.unpin_thread', autospec=True)
+    def test_un_pin_thread_as_student(self, mock_request, mock_unpin_thread):
+        self._set_mock_request_data(mock_unpin_thread, {})
         self.client.login(username=self.student.username, password=self.password)
         response = self.client.post(
             reverse("un_pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
         )
         assert response.status_code == 401
 
-    def test_un_pin_thread_as_moderator(self, mock_request):
-        self._set_mock_request_data(mock_request, {})
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.unpin_thread', autospec=True)
+    def test_un_pin_thread_as_moderator(self, mock_request, mock_unpin_thread):
+        self._set_mock_request_data(mock_unpin_thread, {})
         self.client.login(username=self.moderator.username, password=self.password)
         response = self.client.post(
             reverse("un_pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
@@ -1162,6 +1179,10 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         )
         assert response.status_code == 200
 
+    # @patch('openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.update_comment', autospec=True)
+    # def test_endorse_response_as_student(self, mock_update_comment, mock_request):
+    #     self._set_mock_request_thread_and_comment(
+    #         mock_update_comment,
     def test_endorse_response_as_student(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
@@ -1175,6 +1196,10 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         )
         assert response.status_code == 401
 
+    # @patch('openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.update_comment', autospec=True)
+    # def test_endorse_response_as_student_question_author(self, mock_request, mock_update_comment):
+    #     self._set_mock_request_thread_and_comment(
+    #         mock_update_comment,
     def test_endorse_response_as_student_question_author(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
@@ -1643,6 +1668,14 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         ('group_moderator', 'cohorted', 'team_commentable_id', 401, CourseDiscussionSettings.NONE)
     )
     @ddt.unpack
+    ###  not working
+    # @patch('openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.delete_comment', autospec=True)
+    # def test_delete_comment(self, user, comment_author, commentable_id, status_code, division_scheme, mock_request, mock_delete_comment):
+    #     commentable_id = getattr(self, commentable_id)
+    #     comment_author = getattr(self, comment_author)
+    #     self.change_divided_discussion_settings(division_scheme)
+
+    #     self._setup_mock(user, mock_delete_comment, {
     def test_delete_comment(self, user, comment_author, commentable_id, status_code, division_scheme, mock_request):
         commentable_id = getattr(self, commentable_id)
         comment_author = getattr(self, comment_author)
@@ -2041,7 +2074,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         request.view_name = "users"
         return views.users(request, course_id=str(course_id))
 
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user', autospec=True)
     def test_finds_exact_match(self, mock_request):
         self.set_post_counts(mock_request)
         response = self.make_request(username="other")
@@ -2085,7 +2118,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         assert 'errors' in content
         assert 'users' not in content
 
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user', autospec=True)
     def test_requires_matched_user_has_forum_content(self, mock_request):
         self.set_post_counts(mock_request, 0, 0)
         response = self.make_request(username="other")

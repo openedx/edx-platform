@@ -8,6 +8,7 @@ import json
 import re
 from contextlib import closing
 from datetime import datetime
+from unittest import mock
 from urllib.parse import parse_qs
 
 import httpretty
@@ -249,19 +250,14 @@ class CommentsServiceMockMixin:
             status=200
         )
 
-    def register_get_user_response(self, user, subscribed_thread_ids=None, upvoted_ids=None):
-        """Register a mock response for GET on the CS user instance endpoint"""
-        assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
-        httpretty.register_uri(
-            httpretty.GET,
-            f"http://localhost:4567/api/v1/users/{user.id}",
-            body=json.dumps({
-                "id": str(user.id),
-                "subscribed_thread_ids": subscribed_thread_ids or [],
-                "upvoted_ids": upvoted_ids or [],
-            }),
-            status=200
-        )
+    def register_get_user_response(self, mock_get_user, user, subscribed_thread_ids=None, upvoted_ids=None):
+        """Register a mock response for the get_user method."""
+        # Define the mock return value
+        mock_get_user.return_value = {
+            "id": str(user.id),
+            "subscribed_thread_ids": subscribed_thread_ids or [],
+            "upvoted_ids": upvoted_ids or [],
+        }
 
     def register_get_user_retire_response(self, user, status=200, body=""):
         """Register a mock response for GET on the CS user retirement endpoint"""

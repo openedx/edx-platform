@@ -4,9 +4,11 @@ Tests for Discussion API internal interface
 
 
 import itertools
+import json
 import random
 from datetime import datetime, timedelta
 from unittest import mock
+import unittest
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import ddt
@@ -706,6 +708,16 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         super().setUpClass()
         cls.course = CourseFactory.create()
 
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -715,7 +727,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -1241,6 +1253,16 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         super().setUpClass()
         cls.course = CourseFactory.create()
 
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -1250,7 +1272,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -1396,7 +1418,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             page_size=14
         )
         self.assert_query_params_equal(
-            httpretty.httpretty.latest_requests[-2],
+            httpretty.httpretty.latest_requests[-1],
             {
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
@@ -1706,6 +1728,19 @@ class GetUserCommentsTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedMod
     """
     Tests for get_user_comments.
     """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1721,7 +1756,7 @@ class GetUserCommentsTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedMod
         # create staff user so that we don't need to worry about
         # permissions here
         self.user = UserFactory.create(is_staff=True)
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
 
         self.request = RequestFactory().get(f'/api/discussion/v1/users/{self.user.username}/{self.course.id}')
         self.request.user = self.user
@@ -1864,6 +1899,20 @@ class CreateThreadTest(
         'nonummy metus.'
     )
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
+    
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -1873,7 +1922,7 @@ class CreateThreadTest(
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -2172,6 +2221,20 @@ class CreateThreadTest(
             create_thread(self.request, data)
 
 
+class MockRequestSetupMixin:
+    def _create_response_mock(self, data):
+        return mock.Mock(
+            text=json.dumps(data),
+            json=mock.Mock(return_value=data),
+            status_code=200
+        )
+
+    def _set_mock_request_data(self, mock_request, data):
+        if mock_request.mock._mock_name != "request":
+            mock_request.return_value = data
+        else: 
+            mock_request.return_value = self._create_response_mock(data)
+
 @ddt.ddt
 @disable_signal(api, 'comment_created')
 @disable_signal(api, 'comment_voted')
@@ -2189,6 +2252,16 @@ class CreateCommentTest(
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
+    
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -2199,7 +2272,7 @@ class CreateCommentTest(
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -2581,6 +2654,16 @@ class UpdateThreadTest(
         super().setUpClass()
         cls.course = CourseFactory.create()
 
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -2591,7 +2674,7 @@ class UpdateThreadTest(
         self.addCleanup(httpretty.disable)
 
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -2621,7 +2704,7 @@ class UpdateThreadTest(
         Create a user and an associated request for a specific course enrollment.
         """
         user = UserFactory.create()
-        self.register_get_user_response(user)
+        self.register_get_user_response(self.mock_get_user, user)
         request = RequestFactory().get("/test_path")
         request.user = user
         CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
@@ -2630,7 +2713,7 @@ class UpdateThreadTest(
     def test_empty(self):
         """Check that an empty update does not make any modifying requests."""
         # Ensure that the default following value of False is not applied implicitly
-        self.register_get_user_response(self.user, subscribed_thread_ids=["test_thread"])
+        self.register_get_user_response(self.mock_get_user, self.user, subscribed_thread_ids=["test_thread"])
         self.register_thread()
         update_thread(self.request, "test_thread", {})
         for request in httpretty.httpretty.latest_requests:
@@ -2753,7 +2836,7 @@ class UpdateThreadTest(
         DELETEd according to the new_following value.
         """
         if old_following:
-            self.register_get_user_response(self.user, subscribed_thread_ids=["test_thread"])
+            self.register_get_user_response(self.mock_get_user, self.user, subscribed_thread_ids=["test_thread"])
         self.register_subscription_response(self.user)
         self.register_thread()
         data = {"following": new_following}
@@ -2802,7 +2885,7 @@ class UpdateThreadTest(
         user1, request1 = self.create_user_with_request()
 
         if current_vote_status:
-            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
+            self.register_get_user_response(self.mock_get_user, user1, upvoted_ids=["test_thread"])
         self.register_thread_votes_response("test_thread")
         self.register_thread()
         data = {"voted": new_vote_status}
@@ -2848,7 +2931,7 @@ class UpdateThreadTest(
         starting_vote_count = 0
         user, request = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(user, upvoted_ids=["test_thread"])
+            self.register_get_user_response(self.mock_get_user, user, upvoted_ids=["test_thread"])
             starting_vote_count = 1
         self.register_thread_votes_response("test_thread")
         self.register_thread(overrides={"votes": {"up_count": starting_vote_count}})
@@ -2882,10 +2965,10 @@ class UpdateThreadTest(
 
         vote_count = 0
         if current_user1_vote:
-            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
+            self.register_get_user_response(self.mock_get_user, user1, upvoted_ids=["test_thread"])
             vote_count += 1
         if current_user2_vote:
-            self.register_get_user_response(user2, upvoted_ids=["test_thread"])
+            self.register_get_user_response(self.mock_get_user, user2, upvoted_ids=["test_thread"])
             vote_count += 1
 
         for (current_vote, user_vote, request) in \
@@ -2902,11 +2985,11 @@ class UpdateThreadTest(
             elif user_vote:
                 vote_count += 1
                 assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+                self.register_get_user_response(self.mock_get_user, self.user, upvoted_ids=["test_thread"])
             else:
                 vote_count -= 1
                 assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=[])
+                self.register_get_user_response(self.mock_get_user, self.user, upvoted_ids=[])
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
@@ -2921,7 +3004,7 @@ class UpdateThreadTest(
         update should be made. Otherwise, a PUT should be made to the flag or
         or unflag endpoint according to the new_flagged value.
         """
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.register_thread_flag_response("test_thread")
         self.register_thread({"abuse_flaggers": [str(self.user.id)] if old_flagged else []})
         data = {"abuse_flagged": new_flagged}
@@ -2977,7 +3060,7 @@ class UpdateThreadTest(
         thread as unreported.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.register_thread_flag_response("test_thread")
         self.register_thread({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
         data = {"abuse_flagged": False}
@@ -3031,6 +3114,7 @@ class UpdateThreadTest(
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
+        
         self.register_thread({"user_id": str(self.user.id + 1)})
         try:
             result = update_thread(self.request, "test_thread", {
@@ -3144,6 +3228,16 @@ class UpdateCommentTest(
         super().setUpClass()
         cls.course = CourseFactory.create()
 
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -3154,7 +3248,7 @@ class UpdateCommentTest(
         self.addCleanup(httpretty.disable)
 
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -3193,7 +3287,7 @@ class UpdateCommentTest(
         Create a user and an associated request for a specific course enrollment.
         """
         user = UserFactory.create()
-        self.register_get_user_response(user)
+        self.register_get_user_response(self.mock_get_user, user)
         request = RequestFactory().get("/test_path")
         request.user = user
         CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
@@ -3393,7 +3487,7 @@ class UpdateCommentTest(
         vote_count = 0
         user1, request1 = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
+            self.register_get_user_response(self.mock_get_user, user1, upvoted_ids=["test_comment"])
             vote_count = 1
         self.register_comment_votes_response("test_comment")
         self.register_comment(overrides={"votes": {"up_count": vote_count}})
@@ -3442,7 +3536,7 @@ class UpdateCommentTest(
         starting_vote_count = 0
         user1, request1 = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
+            self.register_get_user_response(self.mock_get_user, user1, upvoted_ids=["test_comment"])
             starting_vote_count = 1
         self.register_comment_votes_response("test_comment")
         self.register_comment(overrides={"votes": {"up_count": starting_vote_count}})
@@ -3475,10 +3569,10 @@ class UpdateCommentTest(
 
         vote_count = 0
         if current_user1_vote:
-            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
+            self.register_get_user_response(self.mock_get_user, user1, upvoted_ids=["test_comment"])
             vote_count += 1
         if current_user2_vote:
-            self.register_get_user_response(user2, upvoted_ids=["test_comment"])
+            self.register_get_user_response(self.mock_get_user, user2, upvoted_ids=["test_comment"])
             vote_count += 1
 
         for (current_vote, user_vote, request) in \
@@ -3489,17 +3583,19 @@ class UpdateCommentTest(
             self.register_comment(overrides={"votes": {"up_count": vote_count}})
 
             data = {"voted": user_vote}
+            # mock_path = f"djangoapps.discussion.rest_api.api.update_comment"
+            # with mock.patch(mock_path) as update_comment_patch:
             result = update_comment(request, "test_comment", data)
             if current_vote == user_vote:
                 assert result['vote_count'] == vote_count
             elif user_vote:
                 vote_count += 1
                 assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+                self.register_get_user_response(self.mock_get_user, self.user, upvoted_ids=["test_comment"])
             else:
                 vote_count -= 1
                 assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=[])
+                self.register_get_user_response(self.mock_get_user, self.user, upvoted_ids=[])
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
@@ -3514,7 +3610,7 @@ class UpdateCommentTest(
         update should be made. Otherwise, a PUT should be made to the flag or
         or unflag endpoint according to the new_flagged value.
         """
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.register_comment_flag_response("test_comment")
         self.register_comment({"abuse_flaggers": [str(self.user.id)] if old_flagged else []})
         data = {"abuse_flagged": new_flagged}
@@ -3566,7 +3662,7 @@ class UpdateCommentTest(
         comment as unreported.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.register_comment_flag_response("test_comment")
         self.register_comment({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
         data = {"abuse_flagged": False}
@@ -3663,6 +3759,16 @@ class DeleteThreadTest(
         super().setUpClass()
         cls.course = CourseFactory.create()
 
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -3671,7 +3777,7 @@ class DeleteThreadTest(
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         self.thread_id = "test_thread"
@@ -3815,6 +3921,16 @@ class DeleteCommentTest(
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
+    
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -3824,7 +3940,7 @@ class DeleteCommentTest(
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         self.thread_id = "test_thread"
@@ -3978,11 +4094,21 @@ class RetrieveThreadTest(
         UrlResetMixin,
         SharedModuleStoreTestCase
 ):
-    """Tests for get_thread"""
+    """Tests for get_thread"""    
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
+
+        # Patch get_user for the entire class
+        cls.patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
+        cls.mock_get_user = cls.patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # Stop the patcher
+        cls.patcher.stop()
+        super().tearDownClass()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -3992,7 +4118,7 @@ class RetrieveThreadTest(
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
+        self.register_get_user_response(self.mock_get_user, self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         self.thread_id = "test_thread"
@@ -4033,7 +4159,7 @@ class RetrieveThreadTest(
 
     def test_nonauthor_enrolled_in_course(self):
         non_author_user = UserFactory.create()
-        self.register_get_user_response(non_author_user)
+        self.register_get_user_response(self.mock_get_user, non_author_user)
         CourseEnrollmentFactory.create(user=non_author_user, course_id=self.course.id)
         self.register_thread()
         self.request.user = non_author_user
