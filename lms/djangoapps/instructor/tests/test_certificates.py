@@ -1105,7 +1105,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         assert response.status_code == 400
         res_json = json.loads(response.content.decode('utf-8'))
         # Assert Error Message
-        assert res_json['message'] ==  f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
+        assert res_json['message'] == f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
 
     def test_no_generated_certificate_error(self):
         """
