@@ -1238,6 +1238,11 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
     )
 
     @property
+    def status_changed(self):
+        """Named as such for backwards compatibility with existing IDVerification models"""
+        return self.created
+
+    @property
     def updated_at(self):
         """Backwards compatibility with existing IDVerification models"""
         return self.modified
@@ -1254,5 +1259,5 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
 
     @classmethod
     def should_display_status_to_user(cls):
-        """Temporary placeholder so that calls to this method do not break edx-platform"""
+        """When called, returns true or false based on the type of VerificationAttempt"""
         return False
