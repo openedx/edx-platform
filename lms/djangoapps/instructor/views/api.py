@@ -3653,7 +3653,7 @@ class CertificateInvalidationView(APIView):
 
         try:
             certificate = _get_certificate_for_user(course_key, student)
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             return JsonResponse({'message': str(ex)}, status=400)
 
         # Invalidate certificate of the given student for the course course
