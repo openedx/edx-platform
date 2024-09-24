@@ -316,6 +316,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
         client.index(temp_index_name).update_distinct_attribute(Fields.usage_key)
         # Mark which attributes can be used for filtering/faceted search:
         client.index(temp_index_name).update_filterable_attributes([
+            # Get specific block/collection using combination of block_id and context_key
+            Fields.block_id,
             Fields.block_type,
             Fields.context_key,
             Fields.org,
