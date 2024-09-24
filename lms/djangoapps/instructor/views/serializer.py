@@ -229,10 +229,10 @@ class CertificateSerializer(serializers.Serializer):
     Serializer for resetting a students attempts counter or starts a task to reset all students
     attempts counters.
     """
-    notes = serializers.CharField(max_length=128, write_only=True, required=False)
     user = serializers.CharField(
         help_text="Email or username of student.", required=True
     )
+    notes = serializers.CharField(required=False, allow_null=True)
 
     def validate_user(self, value):
         """
