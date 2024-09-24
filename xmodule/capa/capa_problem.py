@@ -26,7 +26,7 @@ from xml.sax.saxutils import unescape
 from django.conf import settings
 
 from lxml import etree
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 import xmodule.capa.customrender as customrender
 import xmodule.capa.inputtypes as inputtypes
@@ -431,7 +431,7 @@ class LoncapaProblem(object):
             if self.correct_map.is_queued(answer_id)
         ]
         queuetimes = [
-            datetime.strptime(qt_str, xqueue_interface.dateformat).replace(tzinfo=UTC)
+            datetime.strptime(qt_str, xqueue_interface.dateformat).replace(tzinfo=ZoneInfo("UTC"))
             for qt_str in queuetime_strs
         ]
 

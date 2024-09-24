@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contenttypegatingconfig',
             name='enabled_as_of',
-            field=models.DateField(blank=True, default=None, help_text='If the configuration is Enabled, then all enrollments created after this date (UTC) will be affected.', null=True, verbose_name='Enabled As Of'),
+            field=models.DateField(blank=True, default=None, help_text='If the configuration is Enabled, then all enrollments created after this date ZoneInfo("UTC") will be affected.', null=True, verbose_name='Enabled As Of'),
         ),
         migrations.AlterField(
             model_name='contenttypegatingconfig',

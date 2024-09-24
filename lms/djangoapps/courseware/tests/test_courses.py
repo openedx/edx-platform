@@ -9,7 +9,7 @@ import itertools
 from unittest import mock
 import pytest
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
@@ -313,7 +313,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
 class CourseEnrollmentOpenTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         super().setUp()
-        self.now = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+        self.now = datetime.datetime.now().replace(tzinfo=ZoneInfo("UTC"))
 
     def test_course_enrollment_open(self):
         start = self.now - datetime.timedelta(days=1)
@@ -486,7 +486,7 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
 @ddt.ddt
 class TestGetCourseAssignmentsORA(CompletionWaffleTestMixin, ModuleStoreTestCase):
     """ Tests for ora-related behavior in get_course_assignments """
-    TODAY = datetime.datetime(2023, 8, 2, 12, 23, 45, tzinfo=pytz.UTC)
+    TODAY = datetime.datetime(2023, 8, 2, 12, 23, 45, tzinfo=ZoneInfo("UTC"))
 
     def setUp(self):
         super().setUp()

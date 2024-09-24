@@ -7,7 +7,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from unittest import TestCase
 
-from pytz import utc
+from zoneinfo import ZoneInfo
 import pytest
 from xmodule.block_metadata_utils import (
     display_name_with_default,
@@ -29,7 +29,7 @@ from xmodule.modulestore.tests.utils import (
     VersioningModulestoreBuilder
 )
 
-_TODAY = datetime.now(utc)
+_TODAY = datetime.now(ZoneInfo("UTC"))
 _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
@@ -111,7 +111,7 @@ class CourseMetadataUtilsTestCase(TestCase):
             """Dummy implementation of gettext, so we don't need Django."""
             return text
 
-        test_datetime = datetime(1945, 2, 6, 4, 20, 00, tzinfo=utc)
+        test_datetime = datetime(1945, 2, 6, 4, 20, 00, tzinfo=ZoneInfo("UTC"))
         advertised_start_parsable = "2038-01-19 03:14:07"
 
         FunctionTest = namedtuple('FunctionTest', 'function scenarios')

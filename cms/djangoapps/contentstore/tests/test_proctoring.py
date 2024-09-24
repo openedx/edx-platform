@@ -9,7 +9,7 @@ from unittest.mock import patch, Mock
 import ddt
 from django.conf import settings
 from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_exam_id
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
@@ -97,7 +97,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             default_time_limit_minutes=default_time_limit_minutes,
             is_proctored_enabled=is_proctored_exam,
             is_practice_exam=is_practice_exam,
-            due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
+            due=datetime.now(ZoneInfo("UTC")) + timedelta(minutes=default_time_limit_minutes + 1),
             exam_review_rules="allow_use_of_paper",
             hide_after_due=True,
             is_onboarding_exam=is_onboarding_exam,
@@ -132,7 +132,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             default_time_limit_minutes=default_time_limit_minutes,
             is_proctored_enabled=is_proctored_exam,
             is_practice_exam=is_practice_exam,
-            due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
+            due=datetime.now(ZoneInfo("UTC")) + timedelta(minutes=default_time_limit_minutes + 1),
             exam_review_rules="allow_use_of_paper",
             hide_after_due=hide_after_due,
             is_onboarding_exam=False,
@@ -300,7 +300,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             default_time_limit_minutes=60,
             is_proctored_enabled=False,
             is_practice_exam=False,
-            due=datetime.now(UTC) + timedelta(minutes=60),
+            due=datetime.now(ZoneInfo("UTC")) + timedelta(minutes=60),
             exam_review_rules="allow_use_of_paper",
             hide_after_due=True,
             is_onboarding_exam=False,

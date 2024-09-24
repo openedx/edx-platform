@@ -5,7 +5,7 @@ import datetime
 from unittest.mock import patch  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
@@ -117,7 +117,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 0
 
         url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
-        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        start = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         title = 'A New Testing Strategy'
         user = UserFactory()
@@ -165,7 +165,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         """
         Test that update run updates the pacing type
         """
-        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        start = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         course_run = CourseFactory(start=start, end=None, self_paced=False)
         data = {
             'pacing_type': 'self_paced',
@@ -183,7 +183,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         Test that update creates a new instructor role only if it does not exist
         """
         instructor_role = 'instructor'
-        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        start = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         new_user = UserFactory()
         course_run = CourseFactory(start=start, end=None, self_paced=False)
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 0
@@ -214,7 +214,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         """
         staff_role = 'staff'
         instructor_role = 'instructor'
-        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        start = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         course_run = CourseFactory(start=start, end=None, self_paced=False)
 
         existing_user = UserFactory()
@@ -255,7 +255,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
     def test_create(self, pacing_type, expected_self_paced_value):
         """Tests successful course run creation"""
         user = UserFactory()
-        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        start = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         role = 'staff'
         data = self.get_course_run_data(user, start, end, pacing_type, role)
@@ -280,7 +280,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         with expected validation message
         """
         user = UserFactory()
-        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        start = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         data = self.get_course_run_data(user, start, end, 'self-paced')
         data['team'] = [{'user': 'invalid-username'}]
@@ -334,7 +334,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             'short_name': original_course_run.id.org,  # lint-amnesty, pylint: disable=no-member
             'description': 'Testing Organization Description',
         })
-        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        start = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         user = UserFactory()
         role = 'instructor'

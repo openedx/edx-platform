@@ -13,7 +13,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
@@ -203,7 +203,7 @@ class ForumTestCase(CourseTestCase):
         ]
 
     def test_blackouts(self):
-        now = datetime.datetime.now(UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         times1 = [
             (now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))

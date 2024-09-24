@@ -3,7 +3,7 @@
 <%def name="online_help_token()"><% return "learnerdashboard" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-import pytz
+from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -166,7 +166,7 @@ from common.djangoapps.student.models import CourseEnrollment
                 entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
                 entitlement_session = entitlement.enrollment_course_run if entitlement else None
                 entitlement_days_until_expiration = entitlement.get_days_until_expiration() if entitlement else None
-                entitlement_expiration = datetime.now(tz=pytz.UTC) + timedelta(days=entitlement_days_until_expiration) if (entitlement and entitlement_days_until_expiration < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD) else None
+                entitlement_expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(days=entitlement_days_until_expiration) if (entitlement and entitlement_days_until_expiration < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD) else None
                 entitlement_expiration_date = strftime_localized(entitlement_expiration, 'SHORT_DATE') if entitlement and entitlement_expiration else None
                 entitlement_expired_at = strftime_localized(entitlement.expired_at_datetime, 'SHORT_DATE') if entitlement and entitlement.expired_at_datetime else None
 

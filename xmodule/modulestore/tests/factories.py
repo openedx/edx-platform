@@ -14,7 +14,7 @@ from uuid import uuid4
 from unittest.mock import patch
 
 import pymongo.message
-import pytz
+from zoneinfo import ZoneInfo
 from factory import Factory, Sequence, lazy_attribute, lazy_attribute_sequence
 from factory.errors import CyclicDefinitionError
 from opaque_keys.edx.keys import UsageKey
@@ -207,7 +207,7 @@ class ToyCourseFactory(SampleCourseFactory):
             'graded': True,
             'discussion_topics': {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
             'graceperiod': datetime.timedelta(days=2, seconds=21599),
-            'start': datetime.datetime(2015, 7, 17, 12, tzinfo=pytz.utc),
+            'start': datetime.datetime(2015, 7, 17, 12, tzinfo=ZoneInfo("UTC")),
             'xml_attributes': {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
             'pdf_textbooks': [
                 {

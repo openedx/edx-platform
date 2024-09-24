@@ -9,7 +9,7 @@ import itertools
 from unittest.mock import Mock, patch
 import pytest
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -173,8 +173,8 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     TOMORROW = 'tomorrow'
     YESTERDAY = 'yesterday'
     DATES = {
-        TOMORROW: datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1),
-        YESTERDAY: datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1),
+        TOMORROW: datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1),
+        YESTERDAY: datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1),
         None: None,
     }
 
@@ -463,8 +463,8 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.verify_access(mock_unit, expected_access, expected_error_type)
 
     def test__has_access_course_can_enroll(self):
-        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
-        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+        yesterday = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1)
 
         # Non-staff can enroll if authenticated and specifically allowed for that course
         # even outside the open enrollment period
@@ -504,8 +504,8 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
     @override_settings(FEATURES={**settings.FEATURES, 'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': True})
     def test__has_access_course_with_disable_allowed_enrollment_flag(self):
-        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
-        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+        yesterday = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1)
 
         # Non-staff user invited to course, cannot enroll outside the open enrollment period
         # if DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED is True
@@ -583,8 +583,8 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertEqual(access._has_access_course(user, 'enroll', course).has_access, not old_mongo)
 
     def _mock_course_with_invitation(self, invitation, deprecated=False):
-        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
-        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+        yesterday = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1)
         return Mock(
             enrollment_start=yesterday, enrollment_end=tomorrow,
             id=CourseLocator('edX', 'test', '2012_Fall', deprecated=deprecated), enrollment_domain='',
@@ -771,7 +771,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
 
-        today = datetime.datetime.now(pytz.UTC)
+        today = datetime.datetime.now(ZoneInfo("UTC"))
         last_week = today - datetime.timedelta(days=7)
         next_week = today + datetime.timedelta(days=7)
 

@@ -6,7 +6,7 @@ import re
 import time
 
 import dateutil.parser
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.fields import JSONField, List
 from xblock.scorable import Score
 
@@ -18,9 +18,9 @@ class Date(JSONField):
     Date fields know how to parse and produce json (iso) compatible formats. Converts to tz aware datetimes.
     '''
     # See note below about not defaulting these
-    CURRENT_YEAR = datetime.datetime.now(UTC).year
-    PREVENT_DEFAULT_DAY_MON_SEED1 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=UTC)
-    PREVENT_DEFAULT_DAY_MON_SEED2 = datetime.datetime(CURRENT_YEAR, 2, 2, tzinfo=UTC)
+    CURRENT_YEAR = datetime.datetime.now(ZoneInfo("UTC")).year
+    PREVENT_DEFAULT_DAY_MON_SEED1 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=ZoneInfo("UTC"))
+    PREVENT_DEFAULT_DAY_MON_SEED2 = datetime.datetime(CURRENT_YEAR, 2, 2, tzinfo=ZoneInfo("UTC"))
 
     MUTABLE = False
 
@@ -38,7 +38,7 @@ class Date(JSONField):
             log.warning(f"Field {self.name} is missing month or day")
             return None
         if result.tzinfo is None:
-            result = result.replace(tzinfo=UTC)
+            result = result.replace(tzinfo=ZoneInfo("UTC"))
         return result
 
     def from_json(self, field):  # lint-amnesty, pylint: disable=arguments-differ
@@ -54,9 +54,9 @@ class Date(JSONField):
         elif isinstance(field, str):
             return self._parse_date_wo_default_month_day(field)
         elif isinstance(field, int) or isinstance(field, float):  # lint-amnesty, pylint: disable=consider-merging-isinstance
-            return datetime.datetime.fromtimestamp(field / 1000, UTC)
+            return datetime.datetime.fromtimestamp(field / 1000, ZoneInfo("UTC"))
         elif isinstance(field, time.struct_time):
-            return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
+            return datetime.datetime.fromtimestamp(time.mktime(field), ZoneInfo("UTC"))
         elif isinstance(field, datetime.datetime):
             return field
         else:

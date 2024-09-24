@@ -6,7 +6,7 @@ import datetime
 from unittest.mock import patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -101,7 +101,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
         # Move the eligibility deadline so it's within 30 days
         eligibility = CreditEligibility.objects.get(username=self.USERNAME)
-        eligibility.deadline = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=29)
+        eligibility.deadline = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=29)
         eligibility.save()
 
         # The user should still have the option to purchase credit,

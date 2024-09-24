@@ -18,7 +18,7 @@ from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.models.settings.course_grading import (
@@ -75,7 +75,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         doesn't work for these dates.
         """
         details = CourseDetails.fetch(self.course.id)
-        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC)
+        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=ZoneInfo("UTC"))
         details.enrollment_start = pre_1900
         dumped_jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         loaded_jsondetails = json.loads(dumped_jsondetails)
@@ -88,7 +88,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         details = {
             'number': 1,
             'string': 'string',
-            'datetime': datetime.datetime.now(UTC)
+            'datetime': datetime.datetime.now(ZoneInfo("UTC"))
         }
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
@@ -116,7 +116,6 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
     @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
     def test_mobile_field_available(self):
-
         """
         Test to check `Mobile Course Available` field is not viewable in Studio
         when DISABLE_MOBILE_COURSE_AVAILABLE is true.
@@ -235,12 +234,13 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get_json(url)
         self.compare_details_with_encoding(json.loads(resp.content.decode('utf-8')), details.__dict__, "virgin get")
 
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=UTC))
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=UTC))
-        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=UTC))
-        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=ZoneInfo("UTC")))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=ZoneInfo("UTC")))
+        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=ZoneInfo("UTC")))
+        self.alter_field(url, details, 'enrollment_start', datetime.datetime(
+            2012, 10, 12, 1, 30, tzinfo=ZoneInfo("UTC")))
 
-        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=ZoneInfo("UTC")))
         self.alter_field(url, details, 'short_description', "Short Description")
         self.alter_field(url, details, 'about_sidebar_html', "About Sidebar HTML")
         self.alter_field(url, details, 'overview', "Overview")
@@ -1470,7 +1470,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         Only admin users may update the provider if the course has started.
         """
         field_name = "proctoring_provider"
-        course = CourseFactory.create(start=datetime.datetime.now(UTC) - datetime.timedelta(days=1))
+        course = CourseFactory.create(start=datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1))
         user = UserFactory.create(is_staff=staff_user)
 
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(

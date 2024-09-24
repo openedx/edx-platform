@@ -27,7 +27,7 @@ from edx_proctoring.tests.utils import ProctoredExamTestCase
 from oauth2_provider.models import AccessToken, RefreshToken
 from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.tests.factories import OrganizationFactory
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from rest_framework import status
 from social_django.models import UserSocialAuth
 from xmodule.modulestore.tests.django_utils import (
@@ -316,7 +316,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         self.verification_deadline = VerificationDeadline(
             course_key=self.course.id,
-            deadline=datetime.now(UTC) + timedelta(days=365)
+            deadline=datetime.now(ZoneInfo("UTC")) + timedelta(days=365)
         )
         self.verification_deadline.save()
 
@@ -738,15 +738,15 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     def set_course_end_date_and_expiry(self):
         """ Set the course-end date and expire its verified mode."""
-        self.course.start = datetime(year=1970, month=1, day=1, tzinfo=UTC)
-        self.course.end = datetime(year=1970, month=1, day=10, tzinfo=UTC)
+        self.course.start = datetime(year=1970, month=1, day=1, tzinfo=ZoneInfo("UTC"))
+        self.course.end = datetime(year=1970, month=1, day=10, tzinfo=ZoneInfo("UTC"))
 
         # change verified mode expiry.
         verified_mode = CourseMode.objects.get(
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED
         )
-        verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
+        verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=ZoneInfo("UTC"))
         verified_mode.save()
 
 
@@ -2103,7 +2103,7 @@ class ResetCourseViewTestBase(SupportViewTestCase):
         """
         super().setUp()
         SupportStaffRole().add_users(self.user)
-        self.now = datetime.now().replace(tzinfo=UTC)
+        self.now = datetime.now().replace(tzinfo=ZoneInfo("UTC"))
         self.course = CourseFactory.create(
             start=self.now - timedelta(days=90),
             end=self.now + timedelta(days=90),

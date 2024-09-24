@@ -7,7 +7,7 @@ from datetime import datetime
 
 import ddt
 from django.test import TestCase
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from lms.djangoapps.mobile_api.models import AppVersionConfig, MobileApiConfig, MobileConfig
 
@@ -24,19 +24,19 @@ class TestAppVersionConfigModel(TestCase):
         AppVersionConfig(
             platform="ios",
             version="2.2.2",
-            expire_at=datetime(2014, 1, 1, tzinfo=UTC),
+            expire_at=datetime(2014, 1, 1, tzinfo=ZoneInfo("UTC")),
             enabled=True
         ).save()
         AppVersionConfig(
             platform="ios",
             version="4.1.1",
-            expire_at=datetime(5000, 1, 1, tzinfo=UTC),
+            expire_at=datetime(5000, 1, 1, tzinfo=ZoneInfo("UTC")),
             enabled=False
         ).save()
         AppVersionConfig(
             platform="ios",
             version="4.4.4",
-            expire_at=datetime(9000, 1, 1, tzinfo=UTC),
+            expire_at=datetime(9000, 1, 1, tzinfo=ZoneInfo("UTC")),
             enabled=True
         ).save()
         AppVersionConfig(platform="ios", version="6.6.6", expire_at=None, enabled=True).save()
@@ -46,13 +46,13 @@ class TestAppVersionConfigModel(TestCase):
         AppVersionConfig(
             platform="android",
             version="2.2.2",
-            expire_at=datetime(2014, 1, 1, tzinfo=UTC),
+            expire_at=datetime(2014, 1, 1, tzinfo=ZoneInfo("UTC")),
             enabled=True
         ).save()
         AppVersionConfig(
             platform="android",
             version="4.4.4",
-            expire_at=datetime(9000, 1, 1, tzinfo=UTC),
+            expire_at=datetime(9000, 1, 1, tzinfo=ZoneInfo("UTC")),
             enabled=True
         ).save()
         AppVersionConfig(platform="android", version="8.8.8", expire_at=None, enabled=True).save()
@@ -75,10 +75,10 @@ class TestAppVersionConfigModel(TestCase):
         assert latest_version == AppVersionConfig.latest_version(platform)
 
     @ddt.data(
-        ('ios', '3.3.3', datetime(9000, 1, 1, tzinfo=UTC)),
-        ('ios', '4.4.4', datetime(9000, 1, 1, tzinfo=UTC)),
+        ('ios', '3.3.3', datetime(9000, 1, 1, tzinfo=ZoneInfo("UTC"))),
+        ('ios', '4.4.4', datetime(9000, 1, 1, tzinfo=ZoneInfo("UTC"))),
         ('ios', '6.6.6', None),
-        ("android", '4.4.4', datetime(9000, 1, 1, tzinfo=UTC)),
+        ("android", '4.4.4', datetime(9000, 1, 1, tzinfo=ZoneInfo("UTC"))),
         ('android', '8.8.8', None)
     )
     @ddt.unpack

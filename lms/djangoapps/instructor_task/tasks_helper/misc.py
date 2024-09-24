@@ -17,7 +17,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import ValidationError
 from django.core.files.storage import DefaultStorage
 from openassessment.data import OraAggregateData, OraDownloadData
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.student.models import unique_id_for_user, anonymous_id_for_user
 from lms.djangoapps.instructor_analytics.basic import get_proctored_exam_results
@@ -44,7 +44,7 @@ def upload_course_survey_report(_xblock_instance_args, _entry_id, course_id, _ta
     For a given `course_id`, generate a html report containing the survey results for a course.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
 
@@ -103,7 +103,7 @@ def upload_proctored_exam_results_report(_xblock_instance_args, _entry_id, cours
     information about proctored exam results, and store using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
     current_step = {'step': 'Calculating info about proctored exam results in a course'}
@@ -171,7 +171,7 @@ def cohort_students_and_upload(_xblock_instance_args, _entry_id, course_id, task
     using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
 
     # Iterate through rows to get total assignments for task progress
     with DefaultStorage().open(task_input['file_name']) as f:
@@ -305,7 +305,7 @@ def _upload_ora2_data_common(
     """
     Common code for uploading data or summary csv report.
     """
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     start_time = time()
 
     num_attempted = 1
@@ -411,7 +411,7 @@ def upload_ora2_submission_files(
     """
 
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
 
     num_attempted = 1
     num_total = 1
@@ -511,7 +511,7 @@ def generate_anonymous_ids(_xblock_instance_args, _entry_id, course_id, task_inp
     TASK_LOG.info('%s, Task type: %s, Starting task execution', task_info_string, action_name)
 
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
 
     students = User.objects.filter(
         courseenrollment__course_id=course_id,

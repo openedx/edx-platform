@@ -15,7 +15,7 @@ from operator import itemgetter
 
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from sortedcontainers import SortedKeyList
 from xblock.core import XBlock
 from xblock.plugin import default_select
@@ -714,7 +714,7 @@ class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
                 ))
                 continue
             if not import_only:
-                asset_md.update({'edited_by': user_id, 'edited_on': datetime.datetime.now(UTC)})
+                asset_md.update({'edited_by': user_id, 'edited_on': datetime.datetime.now(ZoneInfo("UTC"))})
             asset_type = asset_md.asset_id.asset_type
             all_assets = assets_by_type[asset_type]
             all_assets.insert_or_update(asset_md)
@@ -857,7 +857,7 @@ class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
         For substring matching:
             pass a regex object.
         For arbitrary function comparison such as date time comparison:
-            pass the function as in start=lambda x: x < datetime.datetime(2014, 1, 1, 0, tzinfo=pytz.UTC)
+            pass the function as in start=lambda x: x < datetime.datetime(2014, 1, 1, 0, tzinfo=ZoneInfo("UTC"))
 
         Args:
             block (dict, XBlock, or BlockData): either the BlockData (transformed from the db) -or-

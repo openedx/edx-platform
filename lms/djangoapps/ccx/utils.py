@@ -10,7 +10,7 @@ import logging
 from contextlib import contextmanager
 from smtplib import SMTPException
 
-import pytz
+from zoneinfo import ZoneInfo
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -148,7 +148,7 @@ def parse_date(datestring):
         hour, minute = list(map(int, time.split(':')))
         if validate_date(year, month, day, hour, minute):
             return datetime.datetime(
-                year, month, day, hour, minute, tzinfo=pytz.UTC)
+                year, month, day, hour, minute, tzinfo=ZoneInfo("UTC"))
 
     return None
 

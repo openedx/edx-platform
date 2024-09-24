@@ -8,7 +8,7 @@ from unittest import mock
 from uuid import uuid4
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -272,7 +272,7 @@ class BasketsViewTests(UserMixin, ModuleStoreTestCase):
         """
         Verifies that the view returns HTTP 406 when a course is closed.
         """
-        self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
+        self.course.enrollment_end = datetime.now(ZoneInfo("UTC")) - timedelta(days=1)
         modulestore().update_item(self.course, self.user.id)
         assert self._post_to_view().status_code == 406
 

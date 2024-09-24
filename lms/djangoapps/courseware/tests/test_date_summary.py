@@ -11,7 +11,7 @@ from django.conf import settings
 from django.test import RequestFactory
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
-from pytz import utc
+from zoneinfo import ZoneInfo
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
@@ -129,7 +129,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         request = self.make_request(user)
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         assignment_title_html = ['<a href=', '</a>']
         with self.store.bulk_operations(course.id):
             section = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -318,7 +318,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         request = self.make_request(user)
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
 
         chapter = BlockFactory.create(
             parent=course,
@@ -350,7 +350,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.make_request(user)
         # These two lines are to trigger the course expired block to be rendered
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=utc))
+        CourseDurationLimitConfig.objects.create(
+            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
 
         expected_blocks = (
             TodaysDate, CourseEndDate, CourseExpiredDate, VerifiedUpgradeDeadlineDate
@@ -390,7 +391,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             block = TodaysDate(course, user)
             assert block.is_enabled
             assert block.is_allowed
-            assert block.date == datetime.now(utc)
+            assert block.date == datetime.now(ZoneInfo("UTC"))
             assert block.title == 'current_datetime'
 
     ## Tests Course Start Date
@@ -434,7 +435,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         In self-paced courses, the end date will only show up if the learner
         views the course within 365 days of the course end date.
         """
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         course = CourseFactory.create(
             start=now + timedelta(days=-7), end=now + timedelta(days=days_till_end), self_paced=True)
         user = create_user()
@@ -476,7 +477,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         course = create_self_paced_course_run()
         verified_user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
-        course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
+        course.certificate_available_date = datetime.now(ZoneInfo("UTC")) + timedelta(days=7)
         course.save()
         block = CertificateAvailableDate(course, verified_user)
         assert block.date is not None
@@ -497,7 +498,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         assert len(all_course_modes) == 1
         assert all_course_modes[0].slug == CourseMode.AUDIT
 
-        course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
+        course.certificate_available_date = datetime.now(ZoneInfo("UTC")) + timedelta(days=7)
         course.save()
 
         # Verify Certificate Available Date is not enabled for learner.
@@ -512,7 +513,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=audit_user, mode=CourseMode.AUDIT)
         verified_user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
-        course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
+        course.certificate_available_date = datetime.now(ZoneInfo("UTC")) + timedelta(days=7)
         enable_course_certificates(course)
         expected_blocks = [
             CourseEndDate, CourseStartDate, TodaysDate, VerificationDeadlineDate, CertificateAvailableDate
@@ -556,7 +557,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             block = VerificationDeadlineDate(course, user)
             assert block.css_class == 'verification-deadline-upcoming'
             assert block.title == 'Verification Deadline'
-            assert block.date == (datetime.now(utc) + timedelta(days=14))
+            assert block.date == (datetime.now(ZoneInfo("UTC")) + timedelta(days=14))
             assert block.description ==\
                    'You must successfully complete verification before this date to qualify for a Verified Certificate.'
             assert block.link_text == 'Verify My Identity'
@@ -571,7 +572,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             block = VerificationDeadlineDate(course, user)
             assert block.css_class == 'verification-deadline-retry'
             assert block.title == 'Verification Deadline'
-            assert block.date == (datetime.now(utc) + timedelta(days=14))
+            assert block.date == (datetime.now(ZoneInfo("UTC")) + timedelta(days=14))
             assert block.description ==\
                    'You must successfully complete verification before this date to qualify for a Verified Certificate.'
             assert block.link_text == 'Retry Verification'
@@ -586,7 +587,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             block = VerificationDeadlineDate(course, user)
             assert block.css_class == 'verification-deadline-passed'
             assert block.title == 'Missed Verification Deadline'
-            assert block.date == (datetime.now(utc) + timedelta(days=(- 1)))
+            assert block.date == (datetime.now(ZoneInfo("UTC")) + timedelta(days=(- 1)))
             assert block.description == "Unfortunately you missed this course's deadline for a successful verification."
             assert block.link_text == 'Learn More'
             assert block.link == ''
@@ -789,7 +790,7 @@ def create_course_run(
         days_till_verification_deadline (int): Number of days until the course run's verification deadline. If this
             value is set to `None` no deadline will be verification deadline will be created.
     """
-    now = datetime.now(utc)
+    now = datetime.now(ZoneInfo("UTC"))
     course = CourseFactory.create(start=now + timedelta(days=days_till_start))
 
     course.end = None
@@ -823,7 +824,7 @@ def create_self_paced_course_run(days_till_start=1, org_id=None):
         days_till_start (int): Number of days until the course starts.
         org_id (string): String org id to assign the course to (default: None; use CourseFactory default)
     """
-    now = datetime.now(utc)
+    now = datetime.now(ZoneInfo("UTC"))
     course = CourseFactory.create(start=now + timedelta(days=days_till_start), self_paced=True,
                                   org=org_id if org_id else 'TestedX')
 

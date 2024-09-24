@@ -3,8 +3,7 @@
 
 import json
 from datetime import date, datetime
-
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 
 class DateTimeJSONEncoder(json.JSONEncoder):
@@ -20,10 +19,10 @@ class DateTimeJSONEncoder(json.JSONEncoder):
         if isinstance(obj, datetime):
             if obj.tzinfo is None:
                 # Localize to UTC naive datetime objects
-                obj = UTC.localize(obj)  # lint-amnesty, pylint: disable=no-value-for-parameter
+                obj = obj.replace(tzinfo=ZoneInfo("UTC"))  # lint-amnesty, pylint: disable=no-value-for-parameter
             else:
                 # Convert to UTC datetime objects from other timezones
-                obj = obj.astimezone(UTC)
+                obj = obj.astimezone(ZoneInfo("UTC"))
             return obj.isoformat()
         elif isinstance(obj, date):
             return obj.isoformat()

@@ -3,7 +3,7 @@ import datetime
 import itertools
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from crum import set_current_request
 from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
@@ -109,7 +109,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     default_problem_metadata = {
         'graded': True,
         'weight': 2.5,
-        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
     }
 
     def setUp(self):
