@@ -32,6 +32,9 @@ def get_notification_context_with_author_pronoun(context: Dict) -> Dict:
 
 # Returns notification content for the new_comment notification.
 def get_new_comment_notification_context(context):
+    """
+    Returns the context for the new_comment notification
+    """
     if not context.get('grouped'):
         return get_notification_context_with_author_pronoun(context)
     num_repliers = context['grouped_count']

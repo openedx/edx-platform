@@ -64,7 +64,7 @@ class TestNewCommentGrouper(unittest.TestCase):
         """
         updated_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
 
-        self.assertIn('replier_name_grouped', updated_context)
+        self.assertIn('replier_name_list', updated_context)
         self.assertIn('grouped_count', updated_context)
         self.assertEqual(updated_context['grouped_count'], 2)
         self.assertTrue(updated_context['grouped'])
@@ -76,7 +76,7 @@ class TestNewCommentGrouper(unittest.TestCase):
         # Mock a pre-grouped notification
         self.old_notification.content_context = {
             'replier_name': 'User1',
-            'replier_name_grouped': ['User1', 'User2'],
+            'replier_name_list': ['User1', 'User2'],
             'grouped': True,
             'grouped_count': 2
         }
@@ -84,8 +84,8 @@ class TestNewCommentGrouper(unittest.TestCase):
 
         updated_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
 
-        self.assertIn('replier_name_grouped', updated_context)
-        self.assertEqual(len(updated_context['replier_name_grouped']), 3)
+        self.assertIn('replier_name_list', updated_context)
+        self.assertEqual(len(updated_context['replier_name_list']), 3)
         self.assertEqual(updated_context['grouped_count'], 3)
 
 
