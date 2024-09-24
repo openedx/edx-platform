@@ -3640,7 +3640,7 @@ class CertificateInvalidationView(APIView):
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
             # return HttpResponseBadRequest(reason=serializer_data.errors)
-            return JsonResponse({'errors': serializer_data.errors}, status=400)
+            return JsonResponse({'message': serializer_data.errors}, status=400)
 
         student = serializer_data.validated_data.get('user')
         notes = serializer_data.validated_data.get('notes')

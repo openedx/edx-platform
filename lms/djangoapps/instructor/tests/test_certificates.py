@@ -1085,7 +1085,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['errors'] == {'user': ['This field may not be blank.']}
+        assert res_json['message'] == {'user': ['This field may not be blank.']}
 
     def test_invalid_user_name_error(self):
         """
