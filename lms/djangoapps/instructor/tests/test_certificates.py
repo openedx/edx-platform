@@ -1085,9 +1085,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['message'] == \
-               'Student username/email field is required and can not be empty.' \
-               ' Kindly fill in username/email and then press "Invalidate Certificate" button.'
+        assert res_json['errors'] == {'user': ['This field may not be blank.']}
 
     def test_invalid_user_name_error(self):
         """
@@ -1106,9 +1104,9 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         # Assert 400 status code in response
         assert response.status_code == 400
         res_json = json.loads(response.content.decode('utf-8'))
-
         # Assert Error Message
-        assert res_json['message'] == f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
+        assert res_json['errors'] == ('test_invalid_user_name does not exist in the LMS. '
+                                      'Please check your spelling and retry.')
 
     def test_no_generated_certificate_error(self):
         """

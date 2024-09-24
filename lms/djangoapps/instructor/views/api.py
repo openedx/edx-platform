@@ -36,6 +36,8 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from cms.djangoapps.contentstore.views.transcripts_ajax import error_response
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
@@ -107,8 +109,15 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, Queue
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
-    AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer
+    AccessSerializer,
+    BlockDueDateSerializer,
+    CertificateSerializer,
+    ListInstructorTaskInputSerializer,
+    RoleNameSerializer,
+    SendEmailSerializer,
+    ShowStudentExtensionSerializer,
+    StudentAttemptsSerializer,
+    UserSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -3573,6 +3582,7 @@ class CertificateInvalidationView(APIView):
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.CERTIFICATE_INVALIDATION_VIEW
+    serializer_class = CertificateSerializer
     http_method_names = ['post', 'delete']
 
     @method_decorator(ensure_csrf_cookie)
@@ -3583,14 +3593,25 @@ class CertificateInvalidationView(APIView):
         """
         course_key = CourseKey.from_string(course_id)
         # Validate request data and return error response in case of invalid data
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            # return HttpResponseBadRequest(reason=serializer_data.errors)
+            return JsonResponse({'errors': serializer_data.errors}, status=400)
 
-        validation_response = self.validate_and_get_data(course_key, "post")
-        # If validation fails, return the error response
-        if isinstance(validation_response, JsonResponse):
-            return validation_response
-        # Otherwise, extract the validated data
+        student = serializer_data.validated_data.get('user')
+        notes = serializer_data.validated_data.get('notes')
 
-        student, certificate, certificate_invalidation_data = validation_response
+        if not student:
+            invalid_user = request.data.get('user')
+            response_payload = f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
+
+            return JsonResponse({'errors': response_payload}, status=400)
+
+        try:
+            certificate = _get_certificate_for_user(course_key, student)
+        except Exception as ex:
+            return JsonResponse({'errors': str(ex)}, status=400)
+
         # Invalidate certificate of the given student for the course course
         try:
             if certs_api.is_on_allowlist(student, course_key):
@@ -3604,9 +3625,10 @@ class CertificateInvalidationView(APIView):
             certificate_invalidation = invalidate_certificate(
                 request,
                 certificate,
-                certificate_invalidation_data,
+                notes,
                 student
             )
+
         except ValueError as error:
             return JsonResponse({'message': str(error)}, status=400)
         return JsonResponse(certificate_invalidation)
@@ -3619,15 +3641,18 @@ class CertificateInvalidationView(APIView):
         """
         # Re-Validate student certificate for the course course
         course_key = CourseKey.from_string(course_id)
-        # Validate request data and return error response in case of invalid data
-        validation_response = self.validate_and_get_data(course_key, "delete")
+        try:
+            data = json.loads(self.request.body.decode('utf8') or '{}')
+        except Exception:  # pylint: disable=broad-except
+            data = {}
 
-        # If validation fails, return the error response
-        if isinstance(validation_response, JsonResponse):
-            return validation_response
+        serializer_data = self.serializer_class(data=data)
 
-        # Otherwise, extract the validated data
-        student, certificate, certificate_invalidation_data = validation_response
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('user')
+        certificate = _get_certificate_for_user(course_key, student)
 
         try:
             re_validate_certificate(request, course_key, certificate, student)
@@ -3636,35 +3661,14 @@ class CertificateInvalidationView(APIView):
 
         return JsonResponse({}, status=204)
 
-    def validate_and_get_data(self, course_key, method):
-        """
-        Validates the request data, retrieves the student and certificate for the specified course.
-        This method performs the following steps:
-        1. Parses the request data to extract the necessary information.
-        2. Retrieves the student object from the parsed request data.
-        3. Fetches the certificate for the user and course specified by the course_key.
 
-        If any of the steps fail (e.g., invalid request data or missing certificate), a ValueError is raised,
-        and the method returns a JsonResponse with a 400 status code.
-        """
-        try:
-            certificate_invalidation_data = parse_request_data_drf(self.request, method)
-            student = _get_student_from_request_data(certificate_invalidation_data)
-            certificate = _get_certificate_for_user(course_key, student)
-            # Return the validated student and certificate
-            return student, certificate, certificate_invalidation_data
-        except ValueError as error:
-            # Return a JsonResponse with an error message if validation fails
-            return JsonResponse({'message': str(error)}, status=400)
-
-
-def invalidate_certificate(request, generated_certificate, certificate_invalidation_data, student):
+def invalidate_certificate(request, generated_certificate, notes, student):
     """
     Invalidate given GeneratedCertificate and add CertificateInvalidation record for future reference or re-validation.
 
     :param request: HttpRequest object
     :param generated_certificate: GeneratedCertificate object, the certificate we want to invalidate
-    :param certificate_invalidation_data: dict object containing data for CertificateInvalidation.
+    :param notes: notes values.
     :param student: User object, this user is tied to the generated_certificate we are going to invalidate
     :return: dict object containing updated certificate invalidation data.
     """
@@ -3687,7 +3691,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
     certificate_invalidation = certs_api.create_certificate_invalidation_entry(
         generated_certificate,
         request.user,
-        certificate_invalidation_data.get("notes", ""),
+        notes,
     )
 
     # Invalidate the certificate
@@ -3698,7 +3702,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
         'user': student.username,
         'invalidated_by': certificate_invalidation.invalidated_by.username,
         'created': certificate_invalidation.created.strftime("%B %d, %Y"),
-        'notes': certificate_invalidation.notes,
+        'notes': notes,
     }
 
 
