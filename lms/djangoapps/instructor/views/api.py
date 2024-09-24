@@ -3061,7 +3061,7 @@ class ResetDueDate(APIView):
             student (str): The email or username of the student whose access is being modified.
             reason (str): Optional param.
         """
-        serializer_data = self.serializer_class(data=request.data, context={'make_due_datetime': True})
+        serializer_data = self.serializer_class(data=request.data, context={'disable_due_datetime': True})
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
@@ -3438,32 +3438,10 @@ def parse_request_data(request):
     :param request: HttpRequest request object.
     :return: dict object containing parsed json data.
     """
-    # For DELETE requests: Django REST Framework does not automatically parse the request body.
     try:
         data = json.loads(request.body.decode('utf8') or '{}')
     except ValueError:
         raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))  # lint-amnesty, pylint: disable=raise-missing-from
-
-    return data
-
-
-def parse_request_data_drf(request, method):
-    """
-    This method is used in case of DRF apis.
-
-    Parse and return request data, raise ValueError in case of invalid JSON data.
-
-    :param request: HttpRequest request object.
-    :return: dict object containing parsed json data.
-    """
-    try:
-        if method == 'post':  # For POST requests Django REST Framework automatically parses the request body.
-            data = request.data or '{}'
-        elif method == 'delete':  # For DELETE requests Django REST Framework does not automatically parse the body.
-            data = json.loads(request.body.decode('utf8') or '{}')
-    except ValueError:
-        raise ValueError(
-            _('The record is not in the correct format. Please add a valid username or email address.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
     return data
 
