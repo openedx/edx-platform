@@ -10,7 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test.client import RequestFactory
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.student.models import (
     AccountRecovery,
@@ -91,8 +91,8 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
     is_staff = False
     is_active = True
     is_superuser = False
-    last_login = datetime(2012, 1, 1, tzinfo=UTC)
-    date_joined = datetime(2011, 1, 1, tzinfo=UTC)
+    last_login = datetime(2012, 1, 1, tzinfo=ZoneInfo("UTC"))
+    date_joined = datetime(2011, 1, 1, tzinfo=ZoneInfo("UTC"))
 
     @factory.post_generation
     def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, missing-function-docstring

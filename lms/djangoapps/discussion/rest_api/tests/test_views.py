@@ -16,7 +16,7 @@ from django.test import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
@@ -84,7 +84,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
             org="x",
             course="y",
             run="z",
-            start=datetime.now(UTC),
+            start=datetime.now(ZoneInfo("UTC")),
             discussion_topics={"Test Topic": {"id": "test_topic"}}
         )
         self.password = "Password1234"
@@ -169,7 +169,7 @@ class UploadFileViewTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMi
             ),
         }
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
-        self.course = CourseFactory.create(org='a', course='b', run='c', start=datetime.now(UTC))
+        self.course = CourseFactory.create(org='a', course='b', run='c', start=datetime.now(ZoneInfo("UTC")))
         self.url = reverse("upload_file", kwargs={"course_id": str(self.course.id)})
         patcher = mock.patch(
             'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
@@ -339,7 +339,7 @@ class CommentViewSetListByUserTest(
         self.other_user = UserFactory.create(password=self.TEST_PASSWORD)
         self.register_get_user_response(self.other_user)
 
-        self.course = CourseFactory.create(org="a", course="b", run="c", start=datetime.now(UTC))
+        self.course = CourseFactory.create(org="a", course="b", run="c", start=datetime.now(ZoneInfo("UTC")))
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
         self.url = self.build_url(self.user.username, self.course.id)
@@ -779,7 +779,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
             org="a",
             course="b",
             run="c",
-            start=datetime.now(UTC),
+            start=datetime.now(ZoneInfo("UTC")),
             default_store=module_store,
             discussion_topics=topics
         )
@@ -927,19 +927,19 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         sequential = BlockFactory.create(
             parent_location=chapter.location,
             category='sequential',
             display_name="Lesson 1",
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         BlockFactory.create(
             parent_location=sequential.location,
             category='vertical',
             display_name='vertical',
-            start=datetime(2015, 4, 1, tzinfo=UTC),
+            start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
         )
         DiscussionsConfiguration.objects.create(
             context_key=self.course.id,
@@ -988,20 +988,20 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         self.verticals = [
             BlockFactory.create(
                 parent_location=self.sequential.location,
                 category='vertical',
                 display_name='vertical',
-                start=datetime(2015, 4, 1, tzinfo=UTC),
+                start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
             )
         ]
         course_key = self.course.id
@@ -3007,7 +3007,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             org="x",
             course="y",
             run="z",
-            start=datetime.now(UTC),
+            start=datetime.now(ZoneInfo("UTC")),
             discussion_topics={"Test Topic": {"id": "test_topic"}}
         )
         self.path = reverse('discussion_course_settings', kwargs={'course_id': str(self.course.id)})
@@ -3318,7 +3318,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
             org="x",
             course="y",
             run="z",
-            start=datetime.now(UTC),
+            start=datetime.now(ZoneInfo("UTC")),
         )
         self.password = self.TEST_PASSWORD
         self.user = UserFactory(username='staff', password=self.password, is_staff=True)

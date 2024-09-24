@@ -12,7 +12,7 @@ from textwrap import dedent
 from unittest.mock import patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import connections
@@ -213,7 +213,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
                 metadata={
                     'graded': True,
                     'format': section_format,
-                    'due': datetime(2013, 5, 20, 23, 30, tzinfo=pytz.utc),
+                    'due': datetime(2013, 5, 20, 23, 30, tzinfo=ZoneInfo("UTC")),
                 },
             )
         elif reset:

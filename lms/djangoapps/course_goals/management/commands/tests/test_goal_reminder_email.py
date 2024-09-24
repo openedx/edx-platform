@@ -1,7 +1,7 @@
 """Tests for the goal_reminder_email command"""
 
 from datetime import datetime
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from unittest import mock  # lint-amnesty, pylint: disable=wrong-import-order
 
 import ddt
@@ -47,8 +47,8 @@ class TestGoalReminderEmailCommand(TestCase):
         """Creates a goal that will cause an email to be sent as the goal is valid but has been missed"""
         kwargs.setdefault('days_per_week', 6)
         kwargs.setdefault('subscribed_to_reminders', True)
-        kwargs.setdefault('overview__start', datetime(2021, 1, 1, tzinfo=UTC))
-        kwargs.setdefault('overview__end', datetime(2021, 4, 1, tzinfo=UTC))  # Have it end in the future
+        kwargs.setdefault('overview__start', datetime(2021, 1, 1, tzinfo=ZoneInfo("UTC")))
+        kwargs.setdefault('overview__end', datetime(2021, 4, 1, tzinfo=ZoneInfo("UTC")))  # Have it end in the future
         goal = CourseGoalFactory(**kwargs)
 
         with freeze_time('2021-02-01 10:00:00'):  # Create enrollment before March
@@ -106,7 +106,8 @@ class TestGoalReminderEmailCommand(TestCase):
         """Verify that via the normal conditions, we either send or not based on the days of activity"""
         goal = self.make_valid_goal(days_per_week=days_per_week)
         for day in range(days_of_activity):
-            UserActivityFactory(user=goal.user, course_key=goal.course_key, date=datetime(2021, 3, day + 1, tzinfo=UTC))
+            UserActivityFactory(user=goal.user, course_key=goal.course_key,
+                                date=datetime(2021, 3, day + 1, tzinfo=ZoneInfo("UTC")))
 
         self.call_command(day=current_day, expect_sent=expect_sent)
 
@@ -142,12 +143,12 @@ class TestGoalReminderEmailCommand(TestCase):
 
     def test_recent_enrollment(self):
         self.make_valid_goal()
-        CourseEnrollment.objects.update(created=datetime(2021, 3, 1, tzinfo=UTC))
+        CourseEnrollment.objects.update(created=datetime(2021, 3, 1, tzinfo=ZoneInfo("UTC")))
         self.call_command(expect_sent=False)
 
     @ddt.data(
-        (datetime(2021, 3, 8, tzinfo=UTC), True),
-        (datetime(2021, 3, 7, tzinfo=UTC), False),
+        (datetime(2021, 3, 8, tzinfo=ZoneInfo("UTC")), True),
+        (datetime(2021, 3, 7, tzinfo=ZoneInfo("UTC")), False),
     )
     @ddt.unpack
     @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.get_user_course_expiration_date')
@@ -175,8 +176,8 @@ class TestGoalReminderEmailCommand(TestCase):
         self.call_command(expect_sent=False)
 
     @ddt.data(
-        datetime(2021, 2, 1, tzinfo=UTC),  # very over and done with
-        datetime(2021, 3, 7, tzinfo=UTC),  # ending this Sunday
+        datetime(2021, 2, 1, tzinfo=ZoneInfo("UTC")),  # very over and done with
+        datetime(2021, 3, 7, tzinfo=ZoneInfo("UTC")),  # ending this Sunday
     )
     def test_old_course(self, end):
         self.make_valid_goal(overview__end=end)

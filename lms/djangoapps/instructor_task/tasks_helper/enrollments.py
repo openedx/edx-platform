@@ -6,7 +6,7 @@ Instructor tasks related to enrollments.
 import logging
 from datetime import datetime
 from time import time
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from lms.djangoapps.instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
@@ -25,7 +25,7 @@ def upload_may_enroll_csv(_xblock_instance_args, _entry_id, course_id, task_inpu
     yet, and store using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     num_reports = 1
     task_progress = TaskProgress(action_name, num_reports, start_time)
     current_step = {'step': 'Calculating info about students who may enroll'}
@@ -57,7 +57,7 @@ def upload_students_csv(_xblock_instance_args, _entry_id, course_id, task_input,
     `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now(UTC)
+    start_date = datetime.now(ZoneInfo("UTC"))
     enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 

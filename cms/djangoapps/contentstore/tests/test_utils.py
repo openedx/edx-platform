@@ -13,7 +13,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from rest_framework import status
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
@@ -116,8 +116,8 @@ class XBlockVisibilityTestCase(SharedModuleStoreTestCase):
         super().setUpClass()
 
         cls.dummy_user = ModuleStoreEnum.UserID.test
-        cls.past = datetime(1970, 1, 1, tzinfo=UTC)
-        cls.future = datetime.now(UTC) + timedelta(days=1)
+        cls.past = datetime(1970, 1, 1, tzinfo=ZoneInfo("UTC"))
+        cls.future = datetime.now(ZoneInfo("UTC")) + timedelta(days=1)
         cls.course = CourseFactory.create()
 
     def test_private_unreleased_xblock(self):
@@ -197,8 +197,8 @@ class ReleaseDateSourceTest(CourseTestCase):
         self.sequential = self.store.get_item(self.sequential.location)
         self.vertical = self.store.get_item(self.vertical.location)
 
-        self.date_one = datetime(1980, 1, 1, tzinfo=UTC)
-        self.date_two = datetime(2020, 1, 1, tzinfo=UTC)
+        self.date_one = datetime(1980, 1, 1, tzinfo=ZoneInfo("UTC"))
+        self.date_two = datetime(2020, 1, 1, tzinfo=ZoneInfo("UTC"))
 
     def _update_release_dates(self, chapter_start, sequential_start, vertical_start):
         """Sets the release dates of the chapter, sequential, and vertical"""

@@ -11,7 +11,7 @@ from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytz import common_timezones, utc
+from zoneinfo import ZoneInfo, available_timezones
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
@@ -370,7 +370,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
         profile = UserProfile.objects.get(user=user)
-        year_of_birth = datetime.datetime.now(utc).year - age
+        year_of_birth = datetime.datetime.now(ZoneInfo("UTC")).year - age
         profile.year_of_birth = year_of_birth
         profile.save()
 
@@ -401,23 +401,26 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
     """
 
     @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
-              (None, common_timezones[:10]),
-              ('AA', common_timezones[:10]))
+              (None, available_timezones()),
+              ('AA', available_timezones()))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
         """
         Verify that list of common country time zones dictionaries is returned
         An unrecognized country code (e.g. AA) will return the list of common timezones
         """
-        expected_dict = [
-            {
-                'time_zone': time_zone,
-                'description': get_display_time_zone(time_zone)
-            }
-            for time_zone in expected_time_zones
-        ]
+        expected_dict = sorted(
+            [
+                {
+                    'time_zone': time_zone_name,
+                    'description': get_display_time_zone(time_zone_name),
+                }
+                for time_zone_name in expected_time_zones
+            ],
+            key=lambda tz_dict: tz_dict['description']
+        )
         country_time_zones_dicts = get_country_time_zones(country_code)[:10]
-        assert country_time_zones_dicts == expected_dict
+        assert country_time_zones_dicts == expected_dict[:10]
 
 
 def get_expected_validation_developer_message(preference_key, preference_value):

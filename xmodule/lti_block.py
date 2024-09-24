@@ -68,7 +68,8 @@ import oauthlib.oauth1
 from django.conf import settings
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
-from pytz import UTC
+from zoneinfo import ZoneInfo
+from webob import Response
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import List, Scope, String, XBlock
@@ -983,7 +984,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             close_date = due_date + self.graceperiod  # pylint: disable=no-member
         else:
             close_date = due_date
-        return close_date is not None and datetime.datetime.now(UTC) > close_date
+        return close_date is not None and datetime.datetime.now(ZoneInfo("UTC")) > close_date
+
 
 
 LTIBlock = (

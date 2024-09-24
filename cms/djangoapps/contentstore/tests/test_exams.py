@@ -7,7 +7,7 @@ from unittest.mock import patch, Mock
 import ddt
 from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
@@ -51,7 +51,7 @@ class TestExamService(ModuleStoreTestCase):
             display_name='Homework 1',
             graded=True,
             is_time_limited=False,
-            due=datetime.now(UTC) + timedelta(minutes=60),
+            due=datetime.now(ZoneInfo("UTC")) + timedelta(minutes=60),
         )
 
     def _get_exams_url(self, course_id):
@@ -70,7 +70,7 @@ class TestExamService(ModuleStoreTestCase):
         When a course is published it will register all exams sections with the exams service
         """
         default_time_limit_minutes = 10
-        due_date = datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1)
+        due_date = datetime.now(ZoneInfo("UTC")) + timedelta(minutes=default_time_limit_minutes + 1)
 
         sequence = BlockFactory.create(
             parent=self.chapter,
@@ -191,7 +191,7 @@ class TestExamService(ModuleStoreTestCase):
         self.course.end = datetime(2035, 1, 1, 0, 0)
         self.course = self.update_course(self.course, 1)
 
-        sequential_due_date = datetime.now(UTC) + timedelta(minutes=60)
+        sequential_due_date = datetime.now(ZoneInfo("UTC")) + timedelta(minutes=60)
         BlockFactory.create(
             parent=self.chapter,
             category='sequential',
