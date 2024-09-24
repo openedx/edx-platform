@@ -1258,6 +1258,14 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
         verification_attempts.delete()
 
     @classmethod
-    def should_display_status_to_user(cls):
+    def should_display_status_to_user(cls, idv_type):
         """When called, returns true or false based on the type of VerificationAttempt"""
-        return False
+        # NOTE: Do we also need another one here for persona
+        if idv_type == 'VerificationAttempt':
+            return False # Not sure what to return for this one.
+        elif idv_type == 'SoftwareSecurePhotoVerification':
+            return True
+        elif idv_type == 'SSOVerification':
+            return False
+        elif idv_type == 'ManualVerification':
+            return False

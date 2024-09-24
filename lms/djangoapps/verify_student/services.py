@@ -187,7 +187,8 @@ class IDVerificationService:
         if not attempt:
             return user_status
 
-        user_status['should_display'] = attempt.should_display_status_to_user()
+        idv_type = attempt.__name__
+        user_status['should_display'] = attempt.should_display_status_to_user(idv_type=idv_type)
 
         if attempt.expiration_datetime < now() and attempt.status == 'approved':
             if user_status['should_display']:

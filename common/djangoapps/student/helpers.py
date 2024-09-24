@@ -168,7 +168,8 @@ def check_verify_status_by_course(user, course_enrollments):
 
             # Check whether the user was approved or is awaiting approval
             if relevant_verification is not None:
-                should_display = relevant_verification.should_display_status_to_user()
+                idv_type = relevant_verification.__name__
+                should_display = relevant_verification.should_display_status_to_user(idv_type=idv_type)
 
                 if relevant_verification.status == "approved":
                     if verification_expiring_soon:
