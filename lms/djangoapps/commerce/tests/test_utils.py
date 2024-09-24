@@ -11,7 +11,6 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 
@@ -21,7 +20,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
-from lms.djangoapps.commerce.waffle import ENABLE_TRANSITION_TO_COORDINATOR_CHECKOUT
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
 from xmodule.modulestore.tests.django_utils import \
@@ -185,27 +183,6 @@ class EcommerceServiceTests(TestCase):
         )
 
         assert url == expected_url
-
-    @override_settings(COMMERCE_COORDINATOR_URL_ROOT='http://coordinator_url')
-    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
-    @ddt.data(
-        {'coordinator_flag_active': True},
-        {'coordinator_flag_active': False}
-    )
-    @ddt.unpack
-    def test_get_add_to_basket_url(self, coordinator_flag_active):
-        with override_waffle_flag(ENABLE_TRANSITION_TO_COORDINATOR_CHECKOUT, active=coordinator_flag_active):
-
-            ecommerce_service = EcommerceService()
-            result = ecommerce_service.get_add_to_basket_url()
-
-            if coordinator_flag_active:
-                expected_url = 'http://coordinator_url/lms/payment_page_redirect/'
-            else:
-                expected_url = 'http://ecommerce_url/test_basket/add/'
-
-            self.assertIsNotNone(result)
-            self.assertEqual(expected_url, result)
 
 
 @ddt.ddt
