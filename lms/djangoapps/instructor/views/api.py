@@ -3649,12 +3649,12 @@ class CertificateInvalidationView(APIView):
             invalid_user = request.data.get('user')
             response_payload = f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
 
-            return JsonResponse({'errors': response_payload}, status=400)
+            return JsonResponse({'message': response_payload}, status=400)
 
         try:
             certificate = _get_certificate_for_user(course_key, student)
         except Exception as ex:
-            return JsonResponse({'errors': str(ex)}, status=400)
+            return JsonResponse({'message': str(ex)}, status=400)
 
         # Invalidate certificate of the given student for the course course
         try:
