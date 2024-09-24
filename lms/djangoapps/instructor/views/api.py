@@ -36,8 +36,6 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-
-from cms.djangoapps.contentstore.views.transcripts_ajax import error_response
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1685,18 +1683,31 @@ def get_proctored_exam_results(request, course_id):
     return JsonResponse({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_anon_ids(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetAnonIds(APIView):
     """
-    Respond with 2-column CSV output of user-id, anonymized-user-id
+    Respond with 2-column CSV output of user-id, anonymized-user-id.
+    This API processes the incoming request to generate a CSV file containing
+    two columns: `user-id` and `anonymized-user-id`. The CSV is returned as a
+    response to the client.
     """
-    report_type = _('Anonymized User IDs')
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-    task_api.generate_anonymous_ids(request, course_id)
-    return JsonResponse({"status": success_status})
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Handle POST request to generate a CSV output.
+
+        Returns:
+            Response: A CSV file with two columns: `user-id` and `anonymized-user-id`.
+        """
+        report_type = _('Anonymized User IDs')
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        task_api.generate_anonymous_ids(request, course_id)
+        return JsonResponse({"status": success_status})
 
 
 @require_POST
@@ -1814,23 +1825,24 @@ class StudentProgressUrl(APIView):
         return Response(serializer.data)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params(
-    problem_to_reset="problem urlname to reset"
-)
-@common_exceptions_400
-def reset_student_attempts(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ResetStudentAttempts(DeveloperErrorViewMixin, APIView):
     """
-
     Resets a students attempts counter or starts a task to reset all students
     attempts counters. Optionally deletes student state for a problem. Limited
     to staff access. Some sub-methods limited to instructor access.
+    """
+    http_method_names = ['post']
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+    serializer_class = StudentAttemptsSerializer
 
-    Takes some of the following query parameters
+    @method_decorator(ensure_csrf_cookie)
+    @transaction.non_atomic_requests
+    def post(self, request, course_id):
+        """
+        Takes some of the following query parameters
         - problem_to_reset is a urlname of a problem
         - unique_student_identifier is an email or username
         - all_students is a boolean
@@ -1840,65 +1852,74 @@ def reset_student_attempts(request, course_id):
         - delete_module is a boolean
             requires instructor access
             mutually exclusive with all_students
-    """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
-    all_students = _get_boolean_param(request, 'all_students')
+        """
+        course_id = CourseKey.from_string(course_id)
+        serializer_data = self.serializer_class(data=request.data)
 
-    if all_students and not has_access(request.user, 'instructor', course):
-        return HttpResponseForbidden("Requires instructor access.")
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    student = None
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-    delete_module = _get_boolean_param(request, 'delete_module')
-
-    # parameter combinations
-    if all_students and student:
-        return HttpResponseBadRequest(
-            "all_students and unique_student_identifier are mutually exclusive."
-        )
-    if all_students and delete_module:
-        return HttpResponseBadRequest(
-            "all_students and delete_module are mutually exclusive."
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    try:
-        module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
-    except InvalidKeyError:
-        return HttpResponseBadRequest()
+        all_students = serializer_data.validated_data.get('all_students')
 
-    response_payload = {}
-    response_payload['problem_to_reset'] = problem_to_reset
+        if all_students and not has_access(request.user, 'instructor', course):
+            return HttpResponseForbidden("Requires instructor access.")
 
-    if student:
-        try:
-            enrollment.reset_student_attempts(
-                course_id,
-                student,
-                module_state_key,
-                requesting_user=request.user,
-                delete_module=delete_module
+        problem_to_reset = strip_if_string(serializer_data.validated_data.get('problem_to_reset'))
+        student_identifier = request.POST.get('unique_student_identifier', None)
+        student = serializer_data.validated_data.get('unique_student_identifier')
+        delete_module = serializer_data.validated_data.get('delete_module')
+
+        # parameter combinations
+        if all_students and student:
+            return HttpResponseBadRequest(
+                "all_students and unique_student_identifier are mutually exclusive."
             )
-        except StudentModule.DoesNotExist:
-            return HttpResponseBadRequest(_("Module does not exist."))
-        except sub_api.SubmissionError:
-            # Trust the submissions API to log the error
-            error_msg = _("An error occurred while deleting the score.")
-            return HttpResponse(error_msg, status=500)
-        response_payload['student'] = student_identifier
-    elif all_students:
-        task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
-        response_payload['task'] = TASK_SUBMISSION_OK
-        response_payload['student'] = 'All Students'
-    else:
-        return HttpResponseBadRequest()
+        if all_students and delete_module:
+            return HttpResponseBadRequest(
+                "all_students and delete_module are mutually exclusive."
+            )
 
-    return JsonResponse(response_payload)
+        try:
+            module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
+        except InvalidKeyError:
+            return HttpResponseBadRequest()
+
+        response_payload = {}
+        response_payload['problem_to_reset'] = problem_to_reset
+
+        if student:
+            try:
+                enrollment.reset_student_attempts(
+                    course_id,
+                    student,
+                    module_state_key,
+                    requesting_user=request.user,
+                    delete_module=delete_module
+                )
+            except StudentModule.DoesNotExist:
+                return HttpResponseBadRequest(_("Module does not exist."))
+            except sub_api.SubmissionError:
+                # Trust the submissions API to log the error
+                error_msg = _("An error occurred while deleting the score.")
+                return HttpResponse(error_msg, status=500)
+            response_payload['student'] = student_identifier
+
+        elif all_students:
+            try:
+                task_api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
+                response_payload['task'] = TASK_SUBMISSION_OK
+                response_payload['student'] = 'All Students'
+            except Exception:  # pylint: disable=broad-except
+                error_msg = _("An error occurred while attempting to reset for all students.")
+                return HttpResponse(error_msg, status=500)
+        else:
+            return HttpResponseBadRequest()
+
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
@@ -1935,8 +1956,10 @@ def reset_student_attempts_for_entrance_exam(request, course_id):
 
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
+
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
+
     all_students = _get_boolean_param(request, 'all_students')
     delete_module = _get_boolean_param(request, 'delete_module')
 
@@ -2358,9 +2381,8 @@ class InstructorTasks(DeveloperErrorViewMixin, APIView):
         return _list_instructor_tasks(request=request, course_id=course_id)
 
 
-@require_POST
-@ensure_csrf_cookie
-def list_instructor_tasks(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListInstructorTasks(APIView):
     """
     List instructor tasks.
 
@@ -2370,21 +2392,44 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-    return _list_instructor_tasks(request=request, course_id=course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.SHOW_TASKS
+    serializer_class = ListInstructorTaskInputSerializer
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List instructor tasks.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return _list_instructor_tasks(
+            request=request, course_id=course_id, serialize_data=serializer.validated_data
+        )
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.SHOW_TASKS)
-def _list_instructor_tasks(request, course_id):
+def _list_instructor_tasks(request, course_id, serialize_data=None):
     """
     List instructor tasks.
 
     Internal function with common code for both DRF and and tradition views.
     """
+    # This method is also used by other APIs with the GET method.
+    # The query_params attribute is utilized for GET requests,
+    # where parameters are passed as query strings.
+
     course_id = CourseKey.from_string(course_id)
-    params = getattr(request, 'query_params', request.POST)
-    problem_location_str = strip_if_string(params.get('problem_location_str', False))
-    student = params.get('unique_student_identifier', None)
+    if serialize_data is not None:
+        problem_location_str = strip_if_string(serialize_data.get('problem_location_str', False))
+        student = serialize_data.get('unique_student_identifier', None)
+    else:
+        params = getattr(request, 'query_params', request.POST)
+        problem_location_str = strip_if_string(params.get('problem_location_str', False))
+        student = params.get('unique_student_identifier', None)
+
     if student is not None:
         student = get_student_from_identifier(student)
 
@@ -2538,16 +2583,22 @@ class ReportDownloads(DeveloperErrorViewMixin, APIView):
         return _list_report_downloads(request=request, course_id=course_id)
 
 
-@require_POST
-@ensure_csrf_cookie
-def list_report_downloads(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListReportDownloads(APIView):
+
     """
     List grade CSV files that are available for download for this course.
 
     Takes the following query parameters:
     - (optional) report_name - name of the report
     """
-    return _list_report_downloads(request=request, course_id=course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+
+        return _list_report_downloads(request=request, course_id=course_id)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -2761,81 +2812,96 @@ def list_forum_members(request, course_id):
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EMAIL)
-@require_post_params(send_to="sending to whom", subject="subject line", message="message text")
-@common_exceptions_400
-def send_email(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class SendEmail(DeveloperErrorViewMixin, APIView):
     """
     Send an email to self, staff, cohorts, or everyone involved in a course.
-    Query Parameters:
-    - 'send_to' specifies what group the email should be sent to
-       Options are defined by the CourseEmail model in
-       lms/djangoapps/bulk_email/models.py
-    - 'subject' specifies email's subject
-    - 'message' specifies email's content
     """
-    course_id = CourseKey.from_string(course_id)
-    course_overview = CourseOverview.get_from_id(course_id)
+    http_method_names = ['post']
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EMAIL
+    serializer_class = SendEmailSerializer
 
-    if not is_bulk_email_feature_enabled(course_id):
-        log.warning(f"Email is not enabled for course {course_id}")
-        return HttpResponseForbidden("Email is not enabled for this course.")
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Query Parameters:
+        - 'send_to' specifies what group the email should be sent to
+           Options are defined by the CourseEmail model in
+           lms/djangoapps/bulk_email/models.py
+        - 'subject' specifies email's subject
+        - 'message' specifies email's content
+        """
+        course_id = CourseKey.from_string(course_id)
+        course_overview = CourseOverview.get_from_id(course_id)
 
-    targets = json.loads(request.POST.get("send_to"))
-    subject = request.POST.get("subject")
-    message = request.POST.get("message")
-    # optional, this is a date and time in the form of an ISO8601 string
-    schedule = request.POST.get("schedule", "")
+        if not is_bulk_email_feature_enabled(course_id):
+            log.warning(f"Email is not enabled for course {course_id}")
+            return HttpResponseForbidden("Email is not enabled for this course.")
 
-    schedule_dt = None
-    if schedule:
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        # Skipping serializer validation to avoid potential disruptions.
+        # The API handles numerous input variations, and changes here could introduce breaking issues.
+
+        targets = json.loads(request.POST.get("send_to"))
+
+        subject = serializer_data.validated_data.get("subject")
+        message = serializer_data.validated_data.get("message")
+        # optional, this is a date and time in the form of an ISO8601 string
+        schedule = serializer_data.validated_data.get("schedule", "")
+
+        schedule_dt = None
+        if schedule:
+            try:
+                # convert the schedule from a string to a datetime, then check if its a
+                # valid future date and time, dateutil
+                # will throw a ValueError if the schedule is no good.
+                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
+                if schedule_dt < datetime.datetime.now(pytz.utc):
+                    raise ValueError("the requested schedule is in the past")
+            except ValueError as value_error:
+                error_message = (
+                    f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
+                    f"{value_error}"
+                )
+                log.error(error_message)
+                return HttpResponseBadRequest(error_message)
+
+        # Retrieve the customized email "from address" and email template from site configuration for the c
+        # ourse/partner.
+        # If there is no site configuration enabled for the current site then we use system defaults for both.
+        from_addr = _get_branded_email_from_address(course_overview)
+        template_name = _get_branded_email_template(course_overview)
+
+        # Create the CourseEmail object. This is saved immediately so that any transaction that has been
+        # pending up to this point will also be committed.
         try:
-            # convert the schedule from a string to a datetime, then check if its a valid future date and time, dateutil
-            # will throw a ValueError if the schedule is no good.
-            schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
-            if schedule_dt < datetime.datetime.now(pytz.utc):
-                raise ValueError("the requested schedule is in the past")
-        except ValueError as value_error:
-            error_message = (
-                f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
-                f"{value_error}"
+            email = create_course_email(
+                course_id,
+                request.user,
+                targets,
+                subject,
+                message,
+                template_name=template_name,
+                from_addr=from_addr,
             )
-            log.error(error_message)
-            return HttpResponseBadRequest(error_message)
+        except ValueError as err:
+            return HttpResponseBadRequest(repr(err))
 
-    # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
-    # there is no site configuration enabled for the current site then we use system defaults for both.
-    from_addr = _get_branded_email_from_address(course_overview)
-    template_name = _get_branded_email_template(course_overview)
+        # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+        task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt)
 
-    # Create the CourseEmail object. This is saved immediately so that any transaction that has been pending up to this
-    # point will also be committed.
-    try:
-        email = create_course_email(
-            course_id,
-            request.user,
-            targets,
-            subject,
-            message,
-            template_name=template_name,
-            from_addr=from_addr,
-        )
-    except ValueError as err:
-        return HttpResponseBadRequest(repr(err))
+        response_payload = {
+            'course_id': str(course_id),
+            'success': True,
+        }
 
-    # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt)
-
-    response_payload = {
-        'course_id': str(course_id),
-        'success': True,
-    }
-
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @require_POST
