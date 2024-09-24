@@ -3363,6 +3363,7 @@ def parse_request_data(request):
     :param request: HttpRequest request object.
     :return: dict object containing parsed json data.
     """
+    # For DELETE requests: Django REST Framework does not automatically parse the request body.
     try:
         data = json.loads(request.body.decode('utf8') or '{}')
     except ValueError:
@@ -3371,17 +3372,23 @@ def parse_request_data(request):
     return data
 
 
-def parse_request_data_drf(request):
+def parse_request_data_drf(request, method):
     """
+    This method is used in case of DRF apis.
+
     Parse and return request data, raise ValueError in case of invalid JSON data.
 
     :param request: HttpRequest request object.
     :return: dict object containing parsed json data.
     """
     try:
-        data = request.data or '{}'
+        if method == 'post':  # For POST requests Django REST Framework automatically parses the request body.
+            data = request.data or '{}'
+        elif method == 'delete':  # For DELETE requests Django REST Framework does not automatically parse the body.
+            data = json.loads(request.body.decode('utf8') or '{}')
     except ValueError:
-        raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise ValueError(
+            _('The record is not in the correct format. Please add a valid username or email address.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
     return data
 
@@ -3577,7 +3584,7 @@ class CertificateInvalidationView(APIView):
         course_key = CourseKey.from_string(course_id)
         # Validate request data and return error response in case of invalid data
 
-        validation_response = self.validate_and_get_data(request, course_key)
+        validation_response = self.validate_and_get_data(course_key, "post")
         # If validation fails, return the error response
         if isinstance(validation_response, JsonResponse):
             return validation_response
@@ -3613,8 +3620,7 @@ class CertificateInvalidationView(APIView):
         # Re-Validate student certificate for the course course
         course_key = CourseKey.from_string(course_id)
         # Validate request data and return error response in case of invalid data
-
-        validation_response = self.validate_and_get_data(request, course_key)
+        validation_response = self.validate_and_get_data(course_key, "delete")
 
         # If validation fails, return the error response
         if isinstance(validation_response, JsonResponse):
@@ -3630,7 +3636,7 @@ class CertificateInvalidationView(APIView):
 
         return JsonResponse({}, status=204)
 
-    def validate_and_get_data(self, request, course_key):
+    def validate_and_get_data(self, course_key, method):
         """
         Validates the request data, retrieves the student and certificate for the specified course.
         This method performs the following steps:
@@ -3642,7 +3648,7 @@ class CertificateInvalidationView(APIView):
         and the method returns a JsonResponse with a 400 status code.
         """
         try:
-            certificate_invalidation_data = parse_request_data_drf(request)
+            certificate_invalidation_data = parse_request_data_drf(self.request, method)
             student = _get_student_from_request_data(certificate_invalidation_data)
             certificate = _get_certificate_for_user(course_key, student)
             # Return the validated student and certificate
