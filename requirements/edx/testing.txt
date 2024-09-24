@@ -1034,7 +1034,7 @@ openedx-filters==1.9.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@jill/collection-delete
+openedx-learning==0.13.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
