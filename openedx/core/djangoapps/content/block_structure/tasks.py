@@ -42,8 +42,6 @@ def update_course_in_cache_v2(self, **kwargs):
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
     Keyword Arguments:
         course_id (string) - The string serialized value of the course key.
-        with_storage (boolean) - Whether or not storage backing should be
-            enabled for the generated block structure(s).
     """
     _update_course_in_cache(self, **kwargs)
 
@@ -71,8 +69,6 @@ def get_course_in_cache_v2(self, **kwargs):
     Gets the course blocks for the specified course, updating the cache if needed.
     Keyword Arguments:
         course_id (string) - The string serialized value of the course key.
-        with_storage (boolean) - Whether or not storage backing should be
-            enabled for any generated block structure(s).
     """
     _get_course_in_cache(self, **kwargs)
 
