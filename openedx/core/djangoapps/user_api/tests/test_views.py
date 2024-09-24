@@ -631,7 +631,7 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
     def _assert_time_zone_is_valid(self, time_zone_info):
         """ Asserts that the time zone is a valid pytz time zone """
         time_zone_name = time_zone_info['time_zone']
-        assert time_zone_name in common_timezones_set
+        assert time_zone_name in available_timezones()
         assert time_zone_info['description'] == get_display_time_zone(time_zone_name)
 
     def test_get_country_timezones(self):

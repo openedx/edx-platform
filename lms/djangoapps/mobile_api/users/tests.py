@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, Mock, patch
 from urllib.parse import parse_qs
 
 import ddt
-import pytz
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
@@ -20,6 +19,7 @@ from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -108,8 +108,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     ALLOW_ACCESS_TO_UNRELEASED_COURSE = True
     ALLOW_ACCESS_TO_MILESTONE_COURSE = True
     ALLOW_ACCESS_TO_NON_VISIBLE_COURSE = True
-    NEXT_WEEK = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=7)
-    LAST_WEEK = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
+    NEXT_WEEK = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=7)
+    LAST_WEEK = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=7)
     THREE_YEARS_AGO = now() - datetime.timedelta(days=(365 * 3))
     ADVERTISED_START = "Spring 2016"
     ENABLED_SIGNALS = ['course_published']

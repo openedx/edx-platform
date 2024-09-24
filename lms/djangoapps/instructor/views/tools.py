@@ -11,7 +11,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.http import HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from edx_when import api
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.student.models import CourseEnrollment, get_user_by_username_or_email
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -88,7 +88,7 @@ def parse_datetime(datestr):
     UTC.
     """
     try:
-        return dateutil.parser.parse(datestr).replace(tzinfo=UTC)
+        return dateutil.parser.parse(datestr).replace(tzinfo=ZoneInfo("UTC"))
     except ValueError:
         raise DashboardError(_("Unable to parse date: ") + datestr)  # lint-amnesty, pylint: disable=raise-missing-from
 

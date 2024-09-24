@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 
 import ddt
 import pytest
-import pytz
+from zoneinfo import ZoneInfo
 from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
@@ -36,7 +36,7 @@ from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
 UUID_REGEX = re.compile('{hex}{{8}}-{hex}{{4}}-{hex}{{4}}-{hex}{{4}}-{hex}{{12}}'.format(hex='[0-9a-f]'))
 
-FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=pytz.UTC)
+FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=ZoneInfo("UTC"))
 FROZEN_NOW_TIMESTAMP = to_timestamp(FROZEN_NOW_DATETIME)
 
 SUBMISSIONS_SCORE_SET_HANDLER = 'submissions_score_set_handler'
@@ -412,7 +412,7 @@ class CourseEventsSignalsTest(ModuleStoreTestCase):
                 minute=53,
                 second=24,
                 microsecond=354741,
-                tzinfo=pytz.UTC,
+                tzinfo=ZoneInfo("UTC"),
             ),
             "percent_grade": 77.7,
             "letter_grade": "Great job",

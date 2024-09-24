@@ -7,7 +7,7 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
-from pytz import utc
+from zoneinfo import ZoneInfo
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
@@ -59,7 +59,7 @@ class TestCCX(ModuleStoreTestCase):
         For this reason we test the difference between and make sure it is less
         than one second.
         """
-        expected = datetime.now(utc)
+        expected = datetime.now(ZoneInfo("UTC"))
         self.set_ccx_override('start', expected)
         actual = self.ccx.start
         diff = expected - actual
@@ -67,7 +67,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_start_caching(self):
         """verify that caching the start property works to limit queries"""
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         self.set_ccx_override('start', now)
         with check_mongo_calls(2):
             # these statements are used entirely to demonstrate the
@@ -84,7 +84,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_due_is_correct(self):
         """verify that the due datetime for a ccx is correctly retrieved"""
-        expected = datetime.now(utc)
+        expected = datetime.now(ZoneInfo("UTC"))
         self.set_ccx_override('due', expected)
         actual = self.ccx.due
         diff = expected - actual
@@ -92,7 +92,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_due_caching(self):
         """verify that caching the due property works to limit queries"""
-        expected = datetime.now(utc)
+        expected = datetime.now(ZoneInfo("UTC"))
         self.set_ccx_override('due', expected)
         with check_mongo_calls(2):
             # these statements are used entirely to demonstrate the
@@ -104,7 +104,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_has_started(self):
         """verify that a ccx marked as starting yesterday has started"""
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('start', then)
@@ -112,7 +112,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_has_not_started(self):
         """verify that a ccx marked as starting tomorrow has not started"""
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('start', then)
@@ -120,7 +120,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_has_ended(self):
         """verify that a ccx that has a due date in the past has ended"""
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('due', then)
@@ -129,7 +129,7 @@ class TestCCX(ModuleStoreTestCase):
     def test_ccx_has_not_ended(self):
         """verify that a ccx that has a due date in the future has not eneded
         """
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('due', then)

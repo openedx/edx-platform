@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from lms.djangoapps.mobile_api.mobile_platform import MobilePlatform
 from lms.djangoapps.mobile_api.models import AppVersionConfig
@@ -42,7 +42,7 @@ class AppVersionUpgrade(MiddlewareMixin):
         if version_data:
             last_supported_date = version_data[self.LAST_SUPPORTED_DATE_HEADER]
             if last_supported_date != self.NO_LAST_SUPPORTED_DATE:
-                if datetime.now().replace(tzinfo=UTC) > last_supported_date:
+                if datetime.now().replace(tzinfo=ZoneInfo("UTC")) > last_supported_date:
                     return HttpResponse(status=426)  # Http status 426; Update Required
 
     def process_response(self, __, response):

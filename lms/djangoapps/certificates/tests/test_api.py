@@ -7,7 +7,7 @@ from unittest import mock
 from unittest.mock import patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from config_models.models import cache
 from django.conf import settings
 from django.test import RequestFactory, TestCase
@@ -120,9 +120,9 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             org="edx",
             number="verified",
             display_name="Verified Course",
-            end=datetime.now(pytz.UTC),
+            end=datetime.now(ZoneInfo("UTC")),
             self_paced=False,
-            certificate_available_date=datetime.now(pytz.UTC) - timedelta(days=2),
+            certificate_available_date=datetime.now(ZoneInfo("UTC")) - timedelta(days=2),
         )
 
         GeneratedCertificateFactory.create(
@@ -231,7 +231,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         """
         Test 'downloadable status'
         """
-        cert_avail_date = datetime.now(pytz.UTC) + cert_avail_delta
+        cert_avail_date = datetime.now(ZoneInfo("UTC")) + cert_avail_delta
         self.course.self_paced = self_paced
         self.course.certificate_available_date = cert_avail_date
         self.course.certificates_display_behavior = certificates_display_behavior
@@ -1037,8 +1037,8 @@ class MockGeneratedCertificate:
         self.course_id = course_id
         self.mode = mode
         self.status = status
-        self.created_date = datetime.now(pytz.UTC)
-        self.modified_date = datetime.now(pytz.UTC)
+        self.created_date = datetime.now(ZoneInfo("UTC"))
+        self.modified_date = datetime.now(ZoneInfo("UTC"))
         self.date_override = None
 
     def is_valid(self):
@@ -1050,7 +1050,7 @@ class MockGeneratedCertificate:
 
 class MockCertificateDateOverride:
     def __init__(self, date=None):
-        self.date = date or datetime.now(pytz.UTC)
+        self.date = date or datetime.now(ZoneInfo("UTC"))
 
 
 @contextmanager
@@ -1071,8 +1071,8 @@ class CertificatesApiTestCase(TestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseOverviewFactory.create(
-            start=datetime(2017, 1, 1, tzinfo=pytz.UTC),
-            end=datetime(2017, 1, 31, tzinfo=pytz.UTC),
+            start=datetime(2017, 1, 1, tzinfo=ZoneInfo("UTC")),
+            end=datetime(2017, 1, 31, tzinfo=ZoneInfo("UTC")),
             certificate_available_date=None,
         )
         self.user = UserFactory.create()
@@ -1117,14 +1117,14 @@ class CertificatesApiTestCase(TestCase):
             assert self.certificate.modified_date == display_date_for_certificate(self.course, self.certificate)
 
             # With an available date set in the past, both return the available date (if configured)
-            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
+            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=ZoneInfo("UTC"))
             self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
             maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
             assert maybe_avail == available_date_for_certificate(self.course, self.certificate)
             assert maybe_avail == display_date_for_certificate(self.course, self.certificate)
 
             # With a future available date, they each return a different date
-            self.course.certificate_available_date = datetime.max.replace(tzinfo=pytz.UTC)
+            self.course.certificate_available_date = datetime.max.replace(tzinfo=ZoneInfo("UTC"))
             maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
             assert maybe_avail == available_date_for_certificate(self.course, self.certificate)
             assert self.certificate.modified_date == display_date_for_certificate(self.course, self.certificate)

@@ -13,7 +13,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from common.djangoapps.course_modes.models import CourseMode
@@ -369,14 +369,14 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             # This test needs to use a course that has already started --
             # discussion topics only show up if the course has already started,
             # and the default start date for courses is Jan 1, 2030.
-            start=datetime.datetime(2012, 2, 3, tzinfo=UTC)
+            start=datetime.datetime(2012, 2, 3, tzinfo=ZoneInfo("UTC"))
         )
         # Courses get a default discussion topic on creation, so remove it
         self.course.discussion_topics = {}
         self.discussion_num = 0
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.maxDiff = None  # pylint: disable=invalid-name
-        self.later = datetime.datetime(2050, 1, 1, tzinfo=UTC)
+        self.later = datetime.datetime(2050, 1, 1, tzinfo=ZoneInfo("UTC"))
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1

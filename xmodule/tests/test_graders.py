@@ -7,7 +7,7 @@ import unittest
 from datetime import datetime, timedelta
 import pytest
 import ddt
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from lms.djangoapps.grades.scores import compute_percent
 from xmodule import graders
@@ -347,7 +347,7 @@ class ShowCorrectnessTest(unittest.TestCase):
     def setUp(self):
         super().setUp()
 
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
         day_delta = timedelta(days=1)
         self.yesterday = now - day_delta
         self.today = now

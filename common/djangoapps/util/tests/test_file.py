@@ -17,7 +17,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from ccx_keys.locator import CCXLocator
 
@@ -99,7 +99,7 @@ class FilenameGeneratorTestCase(TestCase):
     """
     Tests for course_and_time_based_filename_generator
     """
-    NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC)
+    NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=ZoneInfo("UTC"))
 
     def setUp(self):
         super().setUp()

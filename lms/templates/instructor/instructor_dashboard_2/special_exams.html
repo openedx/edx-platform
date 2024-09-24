@@ -2,7 +2,7 @@
 <%!
 from django.utils.translation import gettext as _
 from datetime import datetime, timedelta
-import pytz
+from zoneinfo import ZoneInfo
 %>
 <div class="proctoring-wrapper">
   % if section_data.get('mfe_view_url'):

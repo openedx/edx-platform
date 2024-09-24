@@ -4,7 +4,7 @@ Start Date Transformer implementation.
 
 from datetime import datetime
 
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from lms.djangoapps.courseware.access_utils import check_start_date
 from openedx.core.djangoapps.content.block_structure.transformer import (
@@ -94,7 +94,7 @@ class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer)
         if usage_info.has_staff_access or usage_info.allow_start_dates_in_future:
             return [block_structure.create_universal_filter()]
 
-        now = datetime.now(UTC)
+        now = datetime.now(ZoneInfo("UTC"))
 
         def _removal_condition(block_key):
             return not check_start_date(

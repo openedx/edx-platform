@@ -8,7 +8,7 @@ from django.conf import settings
 from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from pytz import utc
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.student import models_api as student_api
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -160,7 +160,7 @@ def should_certificate_be_visible(
     past_available_date = (
         certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
         and certificate_available_date
-        and certificate_available_date < datetime.now(utc)
+        and certificate_available_date < datetime.now(ZoneInfo("UTC"))
     )
     ended_without_available_date = (
         certificates_display_behavior == CertificatesDisplayBehaviors.END

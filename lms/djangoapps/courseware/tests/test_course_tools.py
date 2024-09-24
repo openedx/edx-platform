@@ -7,7 +7,7 @@ import datetime
 
 from unittest.mock import patch
 import crum
-import pytz
+from zoneinfo import ZoneInfo
 from django.test import RequestFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -27,7 +27,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.now = datetime.datetime.now(pytz.UTC)
+        cls.now = datetime.datetime.now(ZoneInfo("UTC"))
 
         cls.course = CourseFactory.create(
             org='edX',

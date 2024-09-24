@@ -7,7 +7,7 @@ from datetime import datetime
 from unittest.mock import call, patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from freezegun import freeze_time
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -256,7 +256,7 @@ class GradesServiceTests(ModuleStoreTestCase):
             course_id=str(self.course.id),
             usage_id=str(self.subsection.location),
             only_if_higher=False,
-            modified=datetime.now().replace(tzinfo=pytz.UTC),
+            modified=datetime.now().replace(tzinfo=ZoneInfo("UTC")),
             score_deleted=True,
             score_db_table=ScoreDatabaseTableEnum.overrides
         )

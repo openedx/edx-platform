@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.urls import reverse
-from pytz import UTC, timezone
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.course_modes.admin import CourseModeForm
 from common.djangoapps.course_modes.models import CourseMode
@@ -41,7 +41,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
         user = UserFactory.create(is_staff=True, is_superuser=True)
         user.save()
         course = CourseFactory.create()
-        expiration = datetime(2015, 10, 20, 1, 10, 23, tzinfo=timezone(settings.TIME_ZONE))
+        expiration = datetime(2015, 10, 20, 1, 10, 23, tzinfo=ZoneInfo(settings.TIME_ZONE))
         CourseOverview.load_from_module_store(course.id)
 
         data = {
@@ -84,7 +84,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
     Test the course modes Django admin form validation and saving.
     """
 
-    UPGRADE_DEADLINE = datetime.now(UTC)
+    UPGRADE_DEADLINE = datetime.now(ZoneInfo("UTC"))
     VERIFICATION_DEADLINE = UPGRADE_DEADLINE + timedelta(days=5)
 
     def setUp(self):

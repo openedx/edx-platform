@@ -10,7 +10,7 @@ import warnings
 
 import pytest
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from bson import ObjectId
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH  # lint-amnesty, pylint: disable=wrong-import-order
 from completion.models import BlockCompletion  # lint-amnesty, pylint: disable=wrong-import-order
@@ -2161,7 +2161,7 @@ class TestXBlockRuntimeEvent(TestSubmittingProblems):
     @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send')
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
-        with freeze_time(datetime.now().replace(tzinfo=pytz.UTC)):
+        with freeze_time(datetime.now().replace(tzinfo=ZoneInfo("UTC"))):
             self.set_block_grade_using_publish(self.grade_dict)
             expected_signal_kwargs = {
                 'sender': None,
@@ -2172,7 +2172,7 @@ class TestXBlockRuntimeEvent(TestSubmittingProblems):
                 'course_id': str(self.course.id),
                 'usage_id': str(self.problem.location),
                 'only_if_higher': None,
-                'modified': datetime.now().replace(tzinfo=pytz.UTC),
+                'modified': datetime.now().replace(tzinfo=ZoneInfo("UTC")),
                 'score_db_table': 'csm',
                 'score_deleted': None,
                 'grader_response': None

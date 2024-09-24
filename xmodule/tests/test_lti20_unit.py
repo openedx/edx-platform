@@ -6,7 +6,7 @@ import textwrap
 import unittest
 from unittest.mock import Mock
 
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.field_data import DictFieldData
 
 from xmodule.lti_2_util import LTIError
@@ -380,7 +380,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         Test that we get a 404 when accept_grades_past_due is False and it is past due
         """
         self.setup_system_xblock_mocks_for_lti20_request_test()
-        self.xblock.due = datetime.datetime.now(UTC)
+        self.xblock.due = datetime.datetime.now(ZoneInfo("UTC"))
         self.xblock.accept_grades_past_due = False
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")

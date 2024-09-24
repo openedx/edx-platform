@@ -17,7 +17,7 @@ from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 from organizations.api import get_course_organization_id
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.api import is_user_enrolled_in_course
@@ -878,7 +878,7 @@ def display_date_for_certificate(course, certificate):
     except ObjectDoesNotExist:
         pass
 
-    if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(UTC):
+    if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(ZoneInfo("UTC")):
         return course.certificate_available_date
     # It is possible for a self-paced course run to end up configured with a display behavior of "END" even though it
     # shouldn't be a valid option. We must check if the course is instructor-paced here to ensure that we are selecting

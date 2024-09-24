@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='coursedurationlimitconfig',
             name='enabled_as_of',
-            field=models.DateTimeField(blank=True, default=None, help_text='If the configuration is Enabled, then all enrollments created after this date and time (UTC) will be affected.', null=True, verbose_name='Enabled As Of'),
+            field=models.DateTimeField(blank=True, default=None, help_text='If the configuration is Enabled, then all enrollments created after this date and time ZoneInfo("UTC") will be affected.', null=True, verbose_name='Enabled As Of'),
         ),
     ]

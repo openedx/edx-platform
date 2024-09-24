@@ -6,7 +6,7 @@ import datetime
 import logging
 
 import dateutil
-import pytz
+from zoneinfo import ZoneInfo
 from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
@@ -121,7 +121,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if not enrollment_start and not enrollment_end:
             return True  # early exit just to avoid any further lookups
 
-        now = datetime.datetime.now(pytz.utc)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
 
         # If the user isn't enrolled, act like they would enroll right now (this keeps the pre-enroll and post-enroll
@@ -131,7 +131,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # Enrollment must be after any enrollment_start date, if specified
         if enrollment_start:
             try:
-                start_date = dateutil.parser.parse(enrollment_start).replace(tzinfo=pytz.UTC)
+                start_date = dateutil.parser.parse(enrollment_start).replace(tzinfo=ZoneInfo("UTC"))
             except ValueError:
                 log.exception('Could not parse enrollment start date for experiment %d', self.experiment_id)
                 return False
@@ -141,7 +141,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # Enrollment must be before any enrollment_end date, if specified
         if enrollment_end:
             try:
-                end_date = dateutil.parser.parse(enrollment_end).replace(tzinfo=pytz.UTC)
+                end_date = dateutil.parser.parse(enrollment_end).replace(tzinfo=ZoneInfo("UTC"))
             except ValueError:
                 log.exception('Could not parse enrollment end date for experiment %d', self.experiment_id)
                 return False

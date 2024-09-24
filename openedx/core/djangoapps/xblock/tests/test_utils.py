@@ -44,7 +44,7 @@ REFERENCE_PARAMS = {
         # In the case where the validating server is really skewed
         # from the generating server.
         ({"validation_time_delta_s": 86400 * -5}, False),
-        # Setting reference_time to 20 seconds after start of a 2 day time period(UTC)
+        # Setting reference_time to 20 seconds after start of a 2 day time periodZoneInfo("UTC")
         # Demonstrating maximum possible validity period is just below 4 days
         # This passes because validation time is just below the cutoff point
         (
@@ -53,7 +53,7 @@ REFERENCE_PARAMS = {
              },
             True,
         ),
-        # Setting reference_time to 20 seconds after start of a 2 day time period(UTC)
+        # Setting reference_time to 20 seconds after start of a 2 day time periodZoneInfo("UTC")
         # Demonstrating maximum possible validity period is just below 4 days
         # This does not pass because validation time is just above the cutoff point
         (
@@ -62,7 +62,7 @@ REFERENCE_PARAMS = {
              },
             False,
         ),
-        # Setting reference_time to 20 seconds before end of a 2 day time period(UTC)
+        # Setting reference_time to 20 seconds before end of a 2 day time periodZoneInfo("UTC")
         # Demonstrating minimum possible validity period is just above 2 days
         # This passes because validation time is just below the cutoff point
         (
@@ -71,7 +71,7 @@ REFERENCE_PARAMS = {
              },
             True,
         ),
-        # Setting reference_time to 20 seconds before end of a 2 day time period(UTC)
+        # Setting reference_time to 20 seconds before end of a 2 day time periodZoneInfo("UTC")
         # Demonstrating minimum possible validity period is just above 2 days
         # This fails because validation time is just above the cutoff point
         (

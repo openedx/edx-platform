@@ -8,7 +8,7 @@ from unittest import skipUnless
 from unittest.mock import DEFAULT, Mock, patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
@@ -32,7 +32,7 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):  # lint-amnesty, pylint:
             self.command.handle(site_domain_name=self.site.domain, date='2017-09-29')
             send_emails.assert_called_once_with(
                 self.site,
-                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                datetime.datetime(2017, 9, 29, tzinfo=ZoneInfo("UTC")),
                 None
             )
 

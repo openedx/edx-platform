@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 import crum
 from django.utils.translation import get_language, gettext, pgettext
-from pytz import UnknownTimeZoneError, timezone, utc
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from openedx.core.djangolib.markup import HTML
@@ -48,17 +48,17 @@ def get_time_display(dtime, format_string=None, coerce_tz=None):
     If the format_string is None, or if format_string is improperly
     formatted, this method will return the value from `get_default_time_display`.
 
-    Coerces aware datetime to tz=coerce_tz if set. coerce_tz should be a pytz timezone string
-    like "US/Pacific", or None
+    Coerces aware datetime to tz=coerce_tz if set. coerce_tz should be a time zone string
+    like "US/Pacific" (compatible with ZoneInfo), or None.
 
     format_string should be a unicode string that is a valid argument for datetime's strftime method.
     """
     if dtime is not None and dtime.tzinfo is not None and coerce_tz:
         try:
-            to_tz = timezone(coerce_tz)
-        except UnknownTimeZoneError:
-            to_tz = utc
-        dtime = to_tz.normalize(dtime.astimezone(to_tz))
+            to_tz = ZoneInfo(coerce_tz)
+        except ZoneInfoNotFoundError:
+            to_tz = ZoneInfo("UTC")
+        dtime = dtime.astimezone(to_tz)
     if dtime is None or format_string is None:
         return get_default_time_display(dtime)
     try:
@@ -83,7 +83,7 @@ def to_timestamp(datetime_value):
     Convert a datetime into a timestamp, represented as the number
     of seconds since January 1, 1970 UTC.
     """
-    return int((datetime_value - datetime(1970, 1, 1, tzinfo=utc)).total_seconds())
+    return int((datetime_value - datetime(1970, 1, 1, tzinfo=ZoneInfo("UTC"))).total_seconds())
 
 
 def from_timestamp(timestamp):
@@ -94,7 +94,9 @@ def from_timestamp(timestamp):
     If the timestamp cannot be converted, returns None instead.
     """
     try:
-        return datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=utc)
+        return datetime.fromtimestamp(int(timestamp), tz=ZoneInfo("UTC"))
+        # replacing this depreciated 1099
+        # return datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=ZoneInfo("UTC"))
     except (ValueError, TypeError):
         return None
 
