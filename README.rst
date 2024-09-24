@@ -124,6 +124,35 @@ sites)::
   ./manage.py lms collectstatic
   ./manage.py cms collectstatic
 
+Set up CMS SSO (for Development)::
+
+  ./manage.py lms manage_user studio_worker example@example.com --unusable-password
+  # DO NOT DO THIS IN PRODUCTION. It will make your auth insecure.
+  ./manage.py lms create_dot_application studio-sso-id studio_worker \
+      --grant-type authorization-code \
+      --skip-authorization \
+      --redirect-uris 'http://localhost:18010/complete/edx-oauth2/' \
+      --scopes user_id  \
+      --client-id 'studio-sso-id' \
+      --client-secret 'studio-sso-secret'
+
+Set up CMS SSO (for Production):
+
+* Create the CMS user and the OAuth application::
+
+    ./manage.py lms manage_user studio_worker <email@yourcompany.com> --unusable-password
+    ./manage.py lms create_dot_application studio-sso-id studio_worker \
+        --grant-type authorization-code \
+        --skip-authorization \
+        --redirect-uris 'http://localhost:18010/complete/edx-oauth2/' \
+        --scopes user_id
+
+* Log into Django admin (eg. http://localhost:18000/admin/oauth2_provider/application/),
+  click into the application you created above (``studio-sso-id``), and copy its "Client secret".
+* In your private LMS_CFG yaml file or your private Django settings module:
+
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_KEY`` to the client ID (``studio-sso-id``).
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_SECRET`` to the client secret (which you copied).
 Run the Platform
 ----------------
 
@@ -131,11 +160,11 @@ First, ensure MySQL, Mongo, and Memcached are running.
 
 Start the LMS::
 
-  ./manage.py lms runserver
+  ./manage.py lms runserver 18000
 
 Start the CMS::
 
-  ./manage.py cms runserver
+  ./manage.py cms runserver 18010
 
 This will give you a mostly-headless Open edX platform. Most frontends have
 been migrated to "Micro-Frontends (MFEs)" which need to be installed and run
