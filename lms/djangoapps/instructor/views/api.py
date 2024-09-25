@@ -1377,7 +1377,6 @@ def get_grading_config(request, course_id):
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
-@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class GetIssuedCertificates(APIView):
     """
     Responds with JSON if CSV is not required. contains a list of issued certificates.
@@ -1386,15 +1385,22 @@ class GetIssuedCertificates(APIView):
     permission_name = permissions.VIEW_ISSUED_CERTIFICATES
 
     @method_decorator(ensure_csrf_cookie)
-    @method_decorator(transaction.non_atomic_requests)
     def post(self, request, course_id):
         """
-        Arguments:
-        course_id
+        Arguments: course_id
         Returns:
             {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
         """
+        return self.all_issue_certificates(request, course_id)
 
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request, course_id):
+        return self.all_issue_certificates(request, course_id)
+
+    def all_issue_certificates(self, request, course_id):
+        """
+        common method for both post and get.
+        """
         course_key = CourseKey.from_string(course_id)
         csv_required = request.GET.get('csv', 'false')
 
