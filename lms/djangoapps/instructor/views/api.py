@@ -3696,7 +3696,12 @@ class CertificateInvalidationView(APIView):
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
         student = serializer_data.validated_data.get('user')
-        certificate = _get_certificate_for_user(course_key, student)
+
+        try:
+            certificate = _get_certificate_for_user(course_key, student)
+        except Exception as ex:  # pylint: disable=broad-except
+            return JsonResponse({'message': str(ex)}, status=400)
+
 
         try:
             re_validate_certificate(request, course_key, certificate, student)
