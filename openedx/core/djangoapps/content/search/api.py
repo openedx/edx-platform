@@ -585,14 +585,15 @@ def _get_document_from_index(document_id: str) -> dict:
     """
     client = _get_meilisearch_client()
     document = None
+    index_name = STUDIO_INDEX_NAME
     try:
-        index = client.get_index(STUDIO_INDEX_NAME)
-        return index.get_document(id)
+        index = client.get_index(index_name)
+        document = index.get_document(document_id)
     except (MeilisearchError, MeilisearchApiError) as err:
-        # The index or documennt doesn't exist
-        log.exception(err)
+        # The index or document doesn't exist
+        log.warning(f"Unable to fetch document {document_id} from {index_name}: {err}")
 
-    return None
+    return document
 
 
 def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collection_key: str) -> None:
