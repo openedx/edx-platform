@@ -11,7 +11,7 @@ from django.db import transaction
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
+from rest_framework.status import HTTP_204_NO_CONTENT
 
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
@@ -163,13 +163,31 @@ class LibraryCollectionsView(ModelViewSet):
     @convert_exceptions
     def destroy(self, request, *args, **kwargs) -> Response:
         """
-        Deletes a Collection that belongs to a Content Library
-
-        Note: (currently not allowed)
+        Soft-deletes a Collection that belongs to a Content Library
         """
-        # TODO: Implement the deletion logic and emit event signal
+        collection = super().get_object()
+        assert collection.learning_package_id
+        authoring_api.delete_collection(
+            collection.learning_package_id,
+            collection.key,
+            hard_delete=False,
+        )
+        return Response(None, status=HTTP_204_NO_CONTENT)
 
-        return Response(None, status=HTTP_405_METHOD_NOT_ALLOWED)
+    @convert_exceptions
+    @action(detail=True, methods=['post'], url_path='restore', url_name='collection-restore')
+    def restore(self, request, *args, **kwargs) -> Response:
+        """
+        Restores a soft-deleted Collection that belongs to a Content Library
+        """
+        content_library = self.get_content_library()
+        assert content_library.learning_package_id
+        collection_key = kwargs["key"]
+        authoring_api.restore_collection(
+            content_library.learning_package_id,
+            collection_key,
+        )
+        return Response(None, status=HTTP_204_NO_CONTENT)
 
     @convert_exceptions
     @action(detail=True, methods=['delete', 'patch'], url_path='components', url_name='components-update')

@@ -17,6 +17,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 URL_PREFIX = '/api/libraries/v2/{lib_key}/'
 URL_LIB_COLLECTIONS = URL_PREFIX + 'collections/'
 URL_LIB_COLLECTION = URL_LIB_COLLECTIONS + '{collection_key}/'
+URL_LIB_COLLECTION_RESTORE = URL_LIB_COLLECTIONS + '{collection_key}/restore/'
 URL_LIB_COLLECTION_COMPONENTS = URL_LIB_COLLECTION + 'components/'
 
 
@@ -330,15 +331,33 @@ class ContentLibraryCollectionsViewsTest(ContentLibrariesRestApiTest):
 
     def test_delete_library_collection(self):
         """
-        Test deleting a Content Library Collection
-
-        Note: Currently not implemented and should return a 405
+        Test soft-deleting and restoring a Content Library Collection
         """
         resp = self.client.delete(
             URL_LIB_COLLECTION.format(lib_key=self.lib2.library_key, collection_key=self.col3.key)
         )
+        assert resp.status_code == 204
 
-        assert resp.status_code == 405
+        resp = self.client.get(
+            URL_LIB_COLLECTION.format(lib_key=self.lib2.library_key, collection_key=self.col3.key)
+        )
+        assert resp.status_code == 404
+
+        resp = self.client.post(
+            URL_LIB_COLLECTION_RESTORE.format(lib_key=self.lib2.library_key, collection_key=self.col3.key)
+        )
+        assert resp.status_code == 204
+
+        resp = self.client.get(
+            URL_LIB_COLLECTION.format(lib_key=self.lib2.library_key, collection_key=self.col3.key)
+        )
+        # Check that correct Content Library Collection data retrieved
+        expected_collection = {
+            "title": "Collection 3",
+            "description": "Description for Collection 3",
+        }
+        assert resp.status_code == 200
+        self.assertDictContainsEntries(resp.data, expected_collection)
 
     def test_get_components(self):
         """
