@@ -246,6 +246,8 @@ class IDVerificationService:
         if course_id:
             location += f'?course_id={quote(str(course_id))}'
 
+        # .. filter_implemented_name: IDVPageURLRequested
+        # .. filter_type: org.openedx.learning.idv.page.url.requested.v1
         return IDVPageURLRequested.run_filter(location)
 
     @classmethod
