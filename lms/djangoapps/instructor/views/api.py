@@ -3702,7 +3702,6 @@ class CertificateInvalidationView(APIView):
         except Exception as ex:  # pylint: disable=broad-except
             return JsonResponse({'message': str(ex)}, status=400)
 
-
         try:
             re_validate_certificate(request, course_key, certificate, student)
         except ValueError as error:
