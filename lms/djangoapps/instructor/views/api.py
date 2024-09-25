@@ -1391,15 +1391,15 @@ class GetIssuedCertificates(APIView):
         Returns:
             {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
         """
-        return self.all_issue_certificates(request, course_id)
+        return self.all_issued_certificates(request, course_id)
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, course_id):
-        return self.all_issue_certificates(request, course_id)
+        return self.all_issued_certificates(request, course_id)
 
-    def all_issue_certificates(self, request, course_id):
+    def all_issued_certificates(self, request, course_id):
         """
-        common method for both post and get.
+        common method for both post and get. This method will return all issued certificates.
         """
         course_key = CourseKey.from_string(course_id)
         csv_required = request.GET.get('csv', 'false')
