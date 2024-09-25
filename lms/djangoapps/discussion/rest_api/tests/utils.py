@@ -250,10 +250,10 @@ class CommentsServiceMockMixin:
             status=200
         )
 
-    def register_get_user_response(self, mock_get_user, user, subscribed_thread_ids=None, upvoted_ids=None):
+    def register_get_user_response(self, user, subscribed_thread_ids=None, upvoted_ids=None):
         """Register a mock response for the get_user method."""
         # Define the mock return value
-        mock_get_user.return_value = {
+        self.mock_get_user.return_value = {
             "id": str(user.id),
             "subscribed_thread_ids": subscribed_thread_ids or [],
             "upvoted_ids": upvoted_ids or [],
