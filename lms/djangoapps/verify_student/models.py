@@ -1259,9 +1259,10 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
 
     hide_status_from_user = models.BooleanField(
         default=False,
+        null=True,
     )
 
     # TODO: Get feedback from michael about adding these new fields/methods
-    def should_display_status_to_user(cls):
+    def should_display_status_to_user(self):
         """When called, returns true or false based on the type of VerificationAttempt"""
-        return not cls.hide_status_from_user
+        return not self.hide_status_from_user
