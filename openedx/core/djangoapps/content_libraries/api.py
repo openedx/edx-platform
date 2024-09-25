@@ -79,20 +79,15 @@ from opaque_keys.edx.locator import (
 from opaque_keys import InvalidKeyError
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
-    ContentObjectChangedData,
     LibraryBlockData,
-    LibraryCollectionData,
 )
 from openedx_events.content_authoring.signals import (
-    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
-    LIBRARY_COLLECTION_CREATED,
-    LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
@@ -242,10 +237,9 @@ class LibraryXBlockMetadata:
         last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
 
         return cls(
-            usage_key=LibraryUsageLocatorV2(
+            usage_key=library_component_usage_key(
                 library_key,
-                component.component_type.name,
-                component.local_key,
+                component,
             ),
             display_name=component.versioning.draft.title,
             created=component.created,
@@ -787,6 +781,20 @@ def set_library_block_olx(usage_key, new_olx_str):
     )
 
 
+def library_component_usage_key(
+    library_key: LibraryLocatorV2,
+    component: Component,
+) -> LibraryUsageLocatorV2:
+    """
+    Returns a LibraryUsageLocatorV2 for the given library + component.
+    """
+    return LibraryUsageLocatorV2(  # type: ignore[abstract]
+        library_key,
+        block_type=component.component_type.name,
+        usage_id=component.local_key,
+    )
+
+
 def validate_can_add_block_to_library(
     library_key: LibraryLocatorV2,
     block_type: str,
@@ -1103,8 +1111,7 @@ def create_library_collection(
     content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
-    Creates a Collection in the given ContentLibrary,
-    and emits a LIBRARY_COLLECTION_CREATED event.
+    Creates a Collection in the given ContentLibrary.
 
     If you've already fetched a ContentLibrary for the given library_key, pass it in here to avoid refetching.
     """
@@ -1125,14 +1132,6 @@ def create_library_collection(
     except IntegrityError as err:
         raise LibraryCollectionAlreadyExists from err
 
-    # Emit event for library collection created
-    LIBRARY_COLLECTION_CREATED.send_event(
-        library_collection=LibraryCollectionData(
-            library_key=library_key,
-            collection_key=collection.key,
-        )
-    )
-
     return collection
 
 
@@ -1146,8 +1145,7 @@ def update_library_collection(
     content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
-    Creates a Collection in the given ContentLibrary,
-    and emits a LIBRARY_COLLECTION_CREATED event.
+    Updates a Collection in the given ContentLibrary.
     """
     if not content_library:
         content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
@@ -1164,14 +1162,6 @@ def update_library_collection(
         )
     except Collection.DoesNotExist as exc:
         raise ContentLibraryCollectionNotFound from exc
-
-    # Emit event for library collection updated
-    LIBRARY_COLLECTION_UPDATED.send_event(
-        library_collection=LibraryCollectionData(
-            library_key=library_key,
-            collection_key=collection.key,
-        )
-    )
 
     return collection
 
@@ -1243,40 +1233,16 @@ def update_library_collection_components(
             created_by=created_by,
         )
 
-    # Emit event for library collection updated
-    LIBRARY_COLLECTION_UPDATED.send_event(
-        library_collection=LibraryCollectionData(
-            library_key=library_key,
-            collection_key=collection.key,
-        )
-    )
-
-    # Emit a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for each of the objects added/removed
-    for usage_key in usage_keys:
-        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
-            content_object=ContentObjectChangedData(
-                object_id=str(usage_key),
-                changes=["collections"],
-            ),
-        )
-
     return collection
 
 
 def get_library_collection_usage_key(
     library_key: LibraryLocatorV2,
     collection_key: str,
-    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
-    content_library: ContentLibrary | None = None,
 ) -> LibraryCollectionLocator:
     """
     Returns the LibraryCollectionLocator associated to a collection
     """
-    if not content_library:
-        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    assert content_library
-    assert content_library.learning_package_id
-    assert content_library.library_key == library_key
 
     return LibraryCollectionLocator(library_key, collection_key)
 

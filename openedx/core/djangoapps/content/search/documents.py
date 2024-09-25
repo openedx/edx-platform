@@ -16,7 +16,7 @@ from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
-from openedx_learning.api.authoring_models import LearningPackage
+from openedx_learning.api.authoring_models import Collection
 
 log = logging.getLogger(__name__)
 
@@ -110,6 +110,15 @@ def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
     """
     access, _ = SearchAccess.objects.get_or_create(context_key=context_key)
     return access.id
+
+
+def searchable_doc_for_usage_key(usage_key: UsageKey) -> dict:
+    """
+    Generates a base document identified by its usage key.
+    """
+    return {
+        Fields.id: meili_id_from_opaque_key(usage_key),
+    }
 
 
 def _fields_from_block(block) -> dict:
@@ -297,14 +306,14 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     library_name = lib_api.get_library(xblock_metadata.usage_key.context_key).title
     block = xblock_api.load_block(xblock_metadata.usage_key, user=None)
 
-    doc = {
-        Fields.id: meili_id_from_opaque_key(xblock_metadata.usage_key),
+    doc = searchable_doc_for_usage_key(xblock_metadata.usage_key)
+    doc.update({
         Fields.type: DocType.library_block,
         Fields.breadcrumbs: [],
         Fields.created: xblock_metadata.created.timestamp(),
         Fields.modified: xblock_metadata.modified.timestamp(),
         Fields.last_published: xblock_metadata.last_published.timestamp() if xblock_metadata.last_published else None,
-    }
+    })
 
     doc.update(_fields_from_block(block))
 
@@ -319,9 +328,7 @@ def searchable_doc_tags(usage_key: UsageKey) -> dict:
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the tags data for the given content object.
     """
-    doc = {
-        Fields.id: meili_id_from_opaque_key(usage_key),
-    }
+    doc = searchable_doc_for_usage_key(usage_key)
     doc.update(_tags_for_content_object(usage_key))
 
     return doc
@@ -332,9 +339,7 @@ def searchable_doc_collections(usage_key: UsageKey) -> dict:
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the collections data for the given content object.
     """
-    doc = {
-        Fields.id: meili_id_from_opaque_key(usage_key),
-    }
+    doc = searchable_doc_for_usage_key(usage_key)
     doc.update(_collections_for_content_object(usage_key))
 
     return doc
@@ -342,21 +347,17 @@ def searchable_doc_collections(usage_key: UsageKey) -> dict:
 
 def searchable_doc_tags_for_collection(
     library_key: LibraryLocatorV2,
-    collection,
+    collection_key: str,
 ) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the tags data for the given library collection.
     """
-    doc = {
-        Fields.id: collection.id,
-    }
-
     collection_usage_key = lib_api.get_library_collection_usage_key(
         library_key,
-        collection.key,
+        collection_key,
     )
-
+    doc = searchable_doc_for_usage_key(collection_usage_key)
     doc.update(_tags_for_content_object(collection_usage_key))
 
     return doc
@@ -368,49 +369,65 @@ def searchable_doc_for_course_block(block) -> dict:
     like Meilisearch or Elasticsearch, so that the given course block can be
     found using faceted search.
     """
-    doc = {
-        Fields.id: meili_id_from_opaque_key(block.usage_key),
+    doc = searchable_doc_for_usage_key(block.usage_key)
+    doc.update({
         Fields.type: DocType.course_block,
-    }
+    })
 
     doc.update(_fields_from_block(block))
 
     return doc
 
 
-def searchable_doc_for_collection(collection) -> dict:
+def searchable_doc_for_collection(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    *,
+    # Optionally provide the collection if we've already fetched one
+    collection: Collection | None = None,
+) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, so that the given collection can be
     found using faceted search.
+
+    If no collection is found for the given library_key + collection_key, the returned document will contain only basic
+    information derived from the collection usage key, and no Fields.type value will be included in the returned dict.
     """
-    doc = {
-        Fields.id: collection.id,
-        Fields.block_id: collection.key,
-        Fields.type: DocType.collection,
-        Fields.display_name: collection.title,
-        Fields.description: collection.description,
-        Fields.created: collection.created.timestamp(),
-        Fields.modified: collection.modified.timestamp(),
-        # Add related learning_package.key as context_key by default.
-        # If related contentlibrary is found, it will override this value below.
-        # Mostly contentlibrary.library_key == learning_package.key
-        Fields.context_key: collection.learning_package.key,
-        Fields.num_children: collection.entities.count(),
-    }
-    # Just in case learning_package is not related to a library
+    collection_usage_key = lib_api.get_library_collection_usage_key(
+        library_key,
+        collection_key,
+    )
+
+    doc = searchable_doc_for_usage_key(collection_usage_key)
+
     try:
-        context_key = collection.learning_package.contentlibrary.library_key
-        org = str(context_key.org)
+        collection = collection or lib_api.get_library_collection_from_usage_key(collection_usage_key)
+    except lib_api.ContentLibraryCollectionNotFound:
+        # Collection not found, so we can only return the base doc
+        pass
+
+    if collection:
+        assert collection.key == collection_key
+
         doc.update({
-            Fields.context_key: str(context_key),
-            Fields.org: org,
-            Fields.usage_key: str(lib_api.get_library_collection_usage_key(context_key, collection.key)),
+            Fields.context_key: str(library_key),
+            Fields.org: str(library_key.org),
+            Fields.usage_key: str(collection_usage_key),
+            Fields.block_id: collection.key,
+            Fields.type: DocType.collection,
+            Fields.display_name: collection.title,
+            Fields.description: collection.description,
+            Fields.created: collection.created.timestamp(),
+            Fields.modified: collection.modified.timestamp(),
+            Fields.num_children: collection.entities.count(),
+            Fields.access_id: _meili_access_id_from_context_key(library_key),
+            Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
-    except LearningPackage.contentlibrary.RelatedObjectDoesNotExist:
-        log.warning(f"Related library not found for {collection}")
-    doc[Fields.access_id] = _meili_access_id_from_context_key(doc[Fields.context_key])
-    # Add the breadcrumbs.
-    doc[Fields.breadcrumbs] = [{"display_name": collection.learning_package.title}]
+
+        # Disabled collections should be removed from the search index,
+        # so we mark them as _disabled
+        if not collection.enabled:
+            doc['_disabled'] = True
 
     return doc
