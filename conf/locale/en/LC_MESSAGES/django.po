@@ -1,45 +1,45 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2021 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2021 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-04-08 16:21+0000\n"
-"PO-Revision-Date: 2021-04-08 16:21:23.649627\n"
+"POT-Creation-Date: 2024-08-28 19:34+0000\n"
+"PO-Revision-Date: 2024-08-28 19:34:33.060037\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5541,12 +5541,12 @@ msgid "Course End"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "After this date, course content will be archived."
+msgid ""
+"To earn a certificate, you must complete all requirements before this date."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid ""
-"To earn a certificate, you must complete all requirements before this date."
+msgid "After this date, course content will be archived."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -11107,16 +11107,6 @@ msgstr ""
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr ""
-
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
@@ -15609,24 +15599,32 @@ msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid ""
-"¡Lo lamentamos! Las fotos que enviaste para verificar tu identidad no fueron"
-" aceptadas, detalles a continuación:"
+"Sorry! The photos you submitted for ID verification were not accepted, for "
+"the following reason(s):"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "Tu fotografía:"
+msgid "The photo(s) of you:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "La fotografía de tu ID:"
+msgid "The photo of you:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "Otras razones:"
+msgid "The photo of your ID:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "Volver a verificar: {reverify_url}"
+msgid "Other Reasons:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Resubmit Verification: {reverify_url}"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "ID Verification FAQ: {faq_url}"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
@@ -15647,17 +15645,17 @@ msgid "Your order number is: {order_number}"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Hola {full_name},"
+msgid "Hi {full_name}"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "¡Felicitaciones! Tu verificación de identidad fue exitosa."
+msgid "Congratulations! Your ID verification process was successful."
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Tu verificación es válida durante un año. Esta expirará el "
-"{expiration_datetime}."
+"Your verification is effective for one year. It will expire on "
+"{expiration_datetime}"
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -15670,10 +15668,10 @@ msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid ""
-"Hemos recibido su información y el proceso de verificación del ID ha "
-"empezado.Revise si tiene un correo electrónico de nosotros en los próximos "
-"días para confirmar si su verificación fue exitosa.También puede revisar el "
-"estado del proceso de verificación en su página de inicio ."
+"We've received your information and the ID verification process has "
+"begun.Check for an email from us in the next few days to confirm whether "
+"your verification was successful.You can also check the status of the "
+"verification process on your dashboard."
 msgstr ""
 
 #: lms/templates/emails/reject_name_change.txt
