@@ -9,10 +9,11 @@ from unittest.mock import patch
 
 import ddt
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from freezegun import freeze_time
+from openedx_filters import PipelineStep
 from pytz import utc
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -31,6 +32,16 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 365,
 }
+
+
+class TestIdvPageUrlRequestedPipelineStep(PipelineStep):
+    """ Utility function to test a configured pipeline step """
+    TEST_URL = 'example.com/verify'
+
+    def run_filter(self, url):  # pylint: disable=arguments-differ
+        return {
+            "url": self.TEST_URL
+        }
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
@@ -166,6 +177,26 @@ class TestIDVerificationService(ModuleStoreTestCase):
         path = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
         expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         assert path == (expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.idv.page.url.requested.v1": {
+                "pipeline": [
+                    "lms.djangoapps.verify_student.tests.test_services.TestIdvPageUrlRequestedPipelineStep",
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_get_verify_location_with_filter_step(self):
+        """
+        Test IDV flow location can be customized with an openedx filter
+        """
+        url = IDVerificationService.get_verify_location()
+        assert url == TestIdvPageUrlRequestedPipelineStep.TEST_URL
+
+        url = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
+        assert url == TestIdvPageUrlRequestedPipelineStep.TEST_URL
 
     def test_get_expiration_datetime(self):
         """

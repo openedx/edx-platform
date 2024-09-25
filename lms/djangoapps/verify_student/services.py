@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
+from openedx_filters.learning.filters import IDVPageURLRequested
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import User
@@ -244,7 +245,10 @@ class IDVerificationService:
         location = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         if course_id:
             location += f'?course_id={quote(str(course_id))}'
-        return location
+
+        # .. filter_implemented_name: IDVPageURLRequested
+        # .. filter_type: org.openedx.learning.idv.page.url.requested.v1
+        return IDVPageURLRequested.run_filter(location)
 
     @classmethod
     def get_verification_details_by_id(cls, attempt_id):
