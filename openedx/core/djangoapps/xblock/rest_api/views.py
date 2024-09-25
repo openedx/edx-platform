@@ -1,12 +1,16 @@
 """
 Views that implement a RESTful API for interacting with XBlocks.
 """
+import itertools
+import json
 
 from common.djangoapps.util.json_request import JsonResponse
 from corsheaders.signals import check_request_enabled
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
 from django.http import Http404
+from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -21,6 +25,7 @@ from xblock.fields import Scope
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
@@ -85,6 +90,47 @@ def render_block_view(request, usage_key_str, view_name):
     response_data = get_block_metadata(block)
     response_data.update(fragment.to_dict())
     return Response(response_data)
+
+
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=False)
+@permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
+@xframe_options_exempt
+def embed_block_view(request, usage_key_str, view_name):
+    """
+    Render the given XBlock in an <iframe>
+
+    Unstable - may change after Sumac
+    """
+    try:
+        usage_key = UsageKey.from_string(usage_key_str)
+    except InvalidKeyError as e:
+        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+
+    try:
+        block = load_block(usage_key, request.user)
+    except NoSuchUsage as exc:
+        raise NotFound(f"{usage_key} not found") from exc
+
+    fragment = _render_block_view(block, view_name, request.user)
+    handler_urls = {
+        str(key): _get_handler_url(key, 'handler_name', request.user)
+        for key in itertools.chain([block.scope_ids.usage_id], getattr(block, 'children', []))
+    }
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    context = {
+        'fragment': fragment,
+        'handler_urls_json': json.dumps(handler_urls),
+        'lms_root_url': lms_root_url,
+        'is_development': settings.DEBUG,
+    }
+    response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
+
+    # Only allow this iframe be embedded if the parent is in the CORS_ORIGIN_WHITELIST
+    cors_origin_whitelist = configuration_helpers.get_value('CORS_ORIGIN_WHITELIST', settings.CORS_ORIGIN_WHITELIST)
+    response["Content-Security-Policy"] = f"frame-ancestors 'self' {' '.join(cors_origin_whitelist)};"
+
+    return response
 
 
 @api_view(['GET'])
@@ -185,8 +231,8 @@ class BlockFieldsView(APIView):
     View to get/edit the field values of an XBlock as JSON (in the v2 runtime)
 
     This class mimics the functionality of xblock_handler in block.py (for v1 xblocks), but for v2 xblocks.
-    However, it only implements the exact subset of functionality needed to support the v2 editors (from
-    the frontend-lib-content-components project). As such, it only supports GET and POST, and only the
+    However, it only implements the exact subset of functionality needed to support the v2 editors (in
+    the Course Authoring MFE). As such, it only supports GET and POST, and only the
     POSTing of data/metadata fields.
     """
 

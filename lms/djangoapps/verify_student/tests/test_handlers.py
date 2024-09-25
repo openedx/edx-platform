@@ -10,17 +10,28 @@ from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-or
 
 from common.djangoapps.student.models_api import do_name_change_request
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire
-from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.models import (
+    SoftwareSecurePhotoVerification,
+    VerificationDeadline,
+    VerificationAttempt
+)
+from lms.djangoapps.verify_student.signals.handlers import (
+    _listen_for_course_publish,
+    _listen_for_lms_retire,
+    _listen_for_lms_retire_verification_attempts
+)
+from lms.djangoapps.verify_student.tests.factories import (
+    SoftwareSecurePhotoVerificationFactory,
+    VerificationAttemptFactory
+)
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-class VerificationDeadlineSignalTest(ModuleStoreTestCase):
+class VerificationDeadlineHandlerTest(ModuleStoreTestCase):
     """
-    Tests for the VerificationDeadline signal
+    Tests for the VerificationDeadline handler
     """
 
     def setUp(self):
@@ -30,13 +41,13 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
         VerificationDeadline.objects.all().delete()
 
     def test_no_deadline(self):
-        """ Verify the signal sets deadline to course end when no deadline exists."""
+        """ Verify the handler sets deadline to course end when no deadline exists."""
         _listen_for_course_publish('store', self.course.id)
 
         assert VerificationDeadline.deadline_for_course(self.course.id) == self.course.end
 
     def test_deadline(self):
-        """ Verify deadline is set to course end date by signal when changed. """
+        """ Verify deadline is set to course end date by handler when changed. """
         deadline = now() - timedelta(days=7)
         VerificationDeadline.set_deadline(self.course.id, deadline)
 
@@ -44,7 +55,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
         assert VerificationDeadline.deadline_for_course(self.course.id) == self.course.end
 
     def test_deadline_explicit(self):
-        """ Verify deadline is unchanged by signal when explicitly set. """
+        """ Verify deadline is unchanged by handler when explicitly set. """
         deadline = now() - timedelta(days=7)
         VerificationDeadline.set_deadline(self.course.id, deadline, is_explicit=True)
 
@@ -55,9 +66,9 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
         assert actual_deadline == deadline
 
 
-class RetirementSignalTest(ModuleStoreTestCase):
+class RetirementHandlerTest(ModuleStoreTestCase):
     """
-    Tests for the VerificationDeadline signal
+    Tests for the VerificationDeadline handler
     """
 
     def _create_entry(self):
@@ -108,8 +119,8 @@ class RetirementSignalTest(ModuleStoreTestCase):
 
 class PostSavePhotoVerificationTest(ModuleStoreTestCase):
     """
-    Tests for the post_save signal on the SoftwareSecurePhotoVerification model.
-    This receiver should emit another signal that contains limited data about
+    Tests for the post_save handler on the SoftwareSecurePhotoVerification model.
+    This receiver should emit another handler that contains limited data about
     the verification attempt that was updated.
     """
 
@@ -121,7 +132,7 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
         self.photo_id_image_url = 'https://test.photo'
         self.photo_id_key = 'test+key'
 
-    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+    @patch('lms.djangoapps.verify_student.signals.signals.idv_update_signal.send')
     def test_post_save_signal(self, mock_signal):
         # create new softwaresecureverification
         attempt = SoftwareSecurePhotoVerification.objects.create(
@@ -154,7 +165,7 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
             full_name=attempt.user.profile.name
         )
 
-    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+    @patch('lms.djangoapps.verify_student.signals.signals.idv_update_signal.send')
     def test_post_save_signal_pending_name(self, mock_signal):
         pending_name_change = do_name_change_request(self.user, 'Pending Name', 'test')[0]
 
@@ -174,3 +185,26 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
             photo_id_name=attempt.name,
             full_name=pending_name_change.new_name
         )
+
+
+class RetirementHandlerVerificationAttemptsTest(ModuleStoreTestCase):
+    """
+    Tests for the LMS User Retirement signal for Verification Attempts
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.other_user = UserFactory.create()
+        VerificationAttemptFactory.create(user=self.user)
+        VerificationAttemptFactory.create(user=self.other_user)
+
+    def test_retirement_signal(self):
+        _listen_for_lms_retire_verification_attempts(sender=self.__class__, user=self.user)
+        self.assertEqual(len(VerificationAttempt.objects.filter(user=self.user)), 0)
+        self.assertEqual(len(VerificationAttempt.objects.filter(user=self.other_user)), 1)
+
+    def test_retirement_signal_no_attempts(self):
+        no_attempt_user = UserFactory.create()
+        _listen_for_lms_retire_verification_attempts(sender=self.__class__, user=no_attempt_user)
+        self.assertEqual(len(VerificationAttempt.objects.all()), 2)

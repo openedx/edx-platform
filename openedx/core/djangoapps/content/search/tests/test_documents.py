@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from openedx_learning.api import authoring as authoring_api
 
 from openedx.core.djangoapps.content_tagging import api as tagging_api
+from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -15,12 +16,21 @@ from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
 try:
     # This import errors in the lms because content.search is not an installed app there.
-    from ..documents import searchable_doc_for_course_block, searchable_doc_tags, searchable_doc_for_collection
+    from ..documents import (
+        searchable_doc_for_course_block,
+        searchable_doc_tags,
+        searchable_doc_tags_for_collection,
+        searchable_doc_collections,
+        searchable_doc_for_collection,
+        searchable_doc_for_library_block,
+    )
     from ..models import SearchAccess
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
     searchable_doc_tags = lambda x: x
+    searchable_doc_tags_for_collection = lambda x: x
     searchable_doc_for_collection = lambda x: x
+    searchable_doc_for_library_block = lambda x: x
     SearchAccess = {}
 
 
@@ -38,12 +48,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.store = modulestore()
+        cls.org = Organization.objects.create(name="edX", short_name="edX")
         cls.toy_course = ToyCourseFactory.create()  # See xmodule/modulestore/tests/sample_courses.py
         cls.toy_course_key = cls.toy_course.id
 
         # Get references to some blocks in the toy course
         cls.html_block_key = cls.toy_course_key.make_usage_key("html", "toyjumpto")
-        # Create a problem in library
+        # Create a problem in course
         cls.problem_block = BlockFactory.create(
             category="problem",
             parent_location=cls.toy_course_key.make_usage_key("vertical", "vertical_test"),
@@ -51,8 +62,39 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             data="<problem>What is a test?<multiplechoiceresponse></multiplechoiceresponse></problem>",
         )
 
+        # Create a library and collection with a block
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            cls.library = library_api.create_library(
+                org=cls.org,
+                slug="2012_Fall",
+                title="some content_library",
+                description="some description",
+            )
+            cls.collection = library_api.create_library_collection(
+                cls.library.key,
+                collection_key="TOY_COLLECTION",
+                title="Toy Collection",
+                created_by=None,
+                description="my toy collection description"
+            )
+            cls.collection_usage_key = "lib-collection:edX:2012_Fall:TOY_COLLECTION"
+            cls.library_block = library_api.create_library_block(
+                cls.library.key,
+                "html",
+                "text2",
+            )
+
+            # Add the problem block to the collection
+            library_api.update_library_collection_components(
+                cls.library.key,
+                collection_key="TOY_COLLECTION",
+                usage_keys=[
+                    cls.library_block.usage_key,
+                ]
+            )
+
         # Create a couple taxonomies and some tags
-        cls.org = Organization.objects.create(name="edX", short_name="edX")
         cls.difficulty_tags = tagging_api.create_taxonomy(name="Difficulty", orgs=[cls.org], allow_multiple=False)
         tagging_api.add_tag_to_taxonomy(cls.difficulty_tags, tag="Easy")
         tagging_api.add_tag_to_taxonomy(cls.difficulty_tags, tag="Normal")
@@ -69,6 +111,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.problem_block.usage_key), cls.difficulty_tags, tags=["Easy"])
         tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
         tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.library_block.usage_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(cls.collection_usage_key, cls.difficulty_tags, tags=["Normal"])
 
     @property
     def toy_course_access_id(self):
@@ -79,6 +123,16 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         after this step, or risk a DoesNotExist error.
         """
         return SearchAccess.objects.get(context_key=self.toy_course_key).id
+
+    @property
+    def library_access_id(self):
+        """
+        Returns the SearchAccess.id created for the library.
+
+        This SearchAccess object is created when documents are added to the search index, so this method must be called
+        after this step, or risk a DoesNotExist error.
+        """
+        return SearchAccess.objects.get(context_key=self.library.key).id
 
     def test_problem_block(self):
         """
@@ -205,6 +259,69 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             # This video has no tags.
         }
 
+    def test_html_library_block(self):
+        """
+        Test how a library block gets represented in the search index
+        """
+        doc = {}
+        doc.update(searchable_doc_for_library_block(self.library_block))
+        doc.update(searchable_doc_tags(self.library_block.usage_key))
+        doc.update(searchable_doc_collections(self.library_block.usage_key))
+        assert doc == {
+            "id": "lbedx2012_fallhtmltext2-4bb47d67",
+            "type": "library_block",
+            "block_type": "html",
+            "usage_key": "lb:edX:2012_Fall:html:text2",
+            "block_id": "text2",
+            "context_key": "lib:edX:2012_Fall",
+            "org": "edX",
+            "access_id": self.library_access_id,
+            "display_name": "Text",
+            "breadcrumbs": [
+                {
+                    "display_name": "some content_library",
+                },
+            ],
+            "last_published": None,
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            "content": {
+                "html_content": "",
+            },
+            "collections": {
+                "key": ["TOY_COLLECTION"],
+                "display_name": ["Toy Collection"],
+            },
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"],
+            },
+        }
+
+    def test_collection_with_library(self):
+        doc = searchable_doc_for_collection(self.collection)
+        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection))
+
+        assert doc == {
+            "id": self.collection.id,
+            "block_id": self.collection.key,
+            "usage_key": self.collection_usage_key,
+            "type": "collection",
+            "org": "edX",
+            "display_name": "Toy Collection",
+            "description": "my toy collection description",
+            "num_children": 1,
+            "context_key": "lib:edX:2012_Fall",
+            "access_id": self.library_access_id,
+            "breadcrumbs": [{"display_name": "some content_library"}],
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            'tags': {
+                'taxonomy': ['Difficulty'],
+                'level0': ['Difficulty > Normal']
+            }
+        }
+
     def test_collection_with_no_library(self):
         created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
         with freeze_time(created_date):
@@ -215,6 +332,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             )
             collection = authoring_api.create_collection(
                 learning_package_id=learning_package.id,
+                key="MYCOL",
                 title="my_collection",
                 created_by=None,
                 description="my collection description"
@@ -222,12 +340,14 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         doc = searchable_doc_for_collection(collection)
         assert doc == {
             "id": collection.id,
+            "block_id": collection.key,
             "type": "collection",
-            "display_name": collection.title,
-            "description": collection.description,
+            "display_name": "my_collection",
+            "description": "my collection description",
+            "num_children": 0,
             "context_key": learning_package.key,
             "access_id": self.toy_course_access_id,
-            "breadcrumbs": [{"display_name": learning_package.title}],
+            "breadcrumbs": [{"display_name": "some learning_package"}],
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
         }

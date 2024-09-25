@@ -18,7 +18,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
@@ -34,7 +34,9 @@ from .documents import (
     searchable_doc_for_course_block,
     searchable_doc_for_collection,
     searchable_doc_for_library_block,
+    searchable_doc_collections,
     searchable_doc_tags,
+    searchable_doc_tags_for_collection,
 )
 
 log = logging.getLogger(__name__)
@@ -296,16 +298,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     status_cb("Counting courses...")
     num_courses = CourseOverview.objects.count()
 
-    # Get the list of collections
-    status_cb("Counting collections...")
-    num_collections = authoring_api.get_collections().count()
-
     # Some counters so we can track our progress as indexing progresses:
-    num_contexts = num_courses + num_libraries + num_collections
+    num_contexts = num_courses + num_libraries
     num_contexts_done = 0  # How many courses/libraries we've indexed
     num_blocks_done = 0  # How many individual components/XBlocks we've indexed
 
-    status_cb(f"Found {num_courses} courses, {num_libraries} libraries and {num_collections} collections.")
+    status_cb(f"Found {num_courses} courses, {num_libraries} libraries.")
     with _using_temp_index(status_cb) as temp_index_name:
         ############## Configure the index ##############
 
@@ -317,6 +315,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
         client.index(temp_index_name).update_distinct_attribute(Fields.usage_key)
         # Mark which attributes can be used for filtering/faceted search:
         client.index(temp_index_name).update_filterable_attributes([
+            # Get specific block/collection using combination of block_id and context_key
+            Fields.block_id,
             Fields.block_type,
             Fields.context_key,
             Fields.org,
@@ -326,6 +326,9 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level1,
             Fields.tags + "." + Fields.tags_level2,
             Fields.tags + "." + Fields.tags_level3,
+            Fields.collections,
+            Fields.collections + "." + Fields.collections_display_name,
+            Fields.collections + "." + Fields.collections_key,
             Fields.type,
             Fields.access_id,
             Fields.last_published,
@@ -337,8 +340,9 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.display_name,
             Fields.block_id,
             Fields.content,
-            Fields.tags,
             Fields.description,
+            Fields.tags,
+            Fields.collections,
             # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
             # are searchable only if at least one document in the index has a value. If we didn't list them here and,
             # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
@@ -348,6 +352,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level1,
             Fields.tags + "." + Fields.tags_level2,
             Fields.tags + "." + Fields.tags_level3,
+            Fields.collections + "." + Fields.collections_display_name,
+            Fields.collections + "." + Fields.collections_key,
         ])
         # Mark which attributes can be used for sorting search results:
         client.index(temp_index_name).update_sortable_attributes([
@@ -379,6 +385,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     doc = {}
                     doc.update(searchable_doc_for_library_block(metadata))
                     doc.update(searchable_doc_tags(metadata.usage_key))
+                    doc.update(searchable_doc_collections(metadata.usage_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing library component {component}: {err}")
@@ -390,10 +397,46 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     status_cb(f"Error indexing library {lib_key}: {err}")
             return docs
 
+        ############## Collections ##############
+        def index_collection_batch(batch, num_done, library_key) -> int:
+            docs = []
+            for collection in batch:
+                try:
+                    doc = searchable_doc_for_collection(collection)
+                    doc.update(searchable_doc_tags_for_collection(library_key, collection))
+                    docs.append(doc)
+                except Exception as err:  # pylint: disable=broad-except
+                    status_cb(f"Error indexing collection {collection}: {err}")
+                num_done += 1
+
+            if docs:
+                try:
+                    # Add docs in batch of 100 at once (usually faster than adding one at a time):
+                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                except (TypeError, KeyError, MeilisearchError) as err:
+                    status_cb(f"Error indexing collection batch {p}: {err}")
+            return num_done
+
         for lib_key in lib_keys:
-            status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing library {lib_key}")
+            status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing blocks in library {lib_key}")
             lib_docs = index_library(lib_key)
             num_blocks_done += len(lib_docs)
+
+            # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
+            library = lib_api.get_library(lib_key)
+            collections = authoring_api.get_collections(library.learning_package.id, enabled=True)
+            num_collections = collections.count()
+            num_collections_done = 0
+            status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
+            paginator = Paginator(collections, 100)
+            for p in paginator.page_range:
+                num_collections_done = index_collection_batch(
+                    paginator.page(p).object_list,
+                    num_collections_done,
+                    lib_key,
+                )
+            status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
+
             num_contexts_done += 1
 
         ############## Courses ##############
@@ -429,39 +472,6 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 course_docs = index_course(course)
                 num_contexts_done += 1
                 num_blocks_done += len(course_docs)
-
-        ############## Collections ##############
-        status_cb("Indexing collections...")
-
-        def index_collection_batch(batch, num_contexts_done) -> int:
-            docs = []
-            for collection in batch:
-                status_cb(
-                    f"{num_contexts_done + 1}/{num_contexts}. "
-                    f"Now indexing collection {collection.title} ({collection.id})"
-                )
-                try:
-                    doc = searchable_doc_for_collection(collection)
-                    # Uncomment below line once collections are tagged.
-                    # doc.update(searchable_doc_tags(collection.id))
-                    docs.append(doc)
-                except Exception as err:  # pylint: disable=broad-except
-                    status_cb(f"Error indexing collection {collection}: {err}")
-                finally:
-                    num_contexts_done += 1
-
-            if docs:
-                try:
-                    # Add docs in batch of 100 at once (usually faster than adding one at a time):
-                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
-                except (TypeError, KeyError, MeilisearchError) as err:
-                    status_cb(f"Error indexing collection batch {p}: {err}")
-            return num_contexts_done
-
-        # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
-        paginator = Paginator(authoring_api.get_collections(enabled=True), 100)
-        for p in paginator.page_range:
-            num_contexts_done = index_collection_batch(paginator.page(p).object_list, num_contexts_done)
 
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 
@@ -553,6 +563,22 @@ def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     _update_index_docs(docs)
 
 
+def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collection_key: str) -> None:
+    """
+    Creates or updates the document for the given Library Collection in the search index
+    """
+    content_library = lib_api.ContentLibrary.objects.get_by_key(library_key)
+    collection = authoring_api.get_collection(
+        learning_package_id=content_library.learning_package_id,
+        collection_key=collection_key,
+    )
+    docs = [
+        searchable_doc_for_collection(collection)
+    ]
+
+    _update_index_docs(docs)
+
+
 def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     """
     Creates or updates the documents for the given Content Library in the search index
@@ -572,6 +598,26 @@ def upsert_block_tags_index_docs(usage_key: UsageKey):
     """
     doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
     doc.update(searchable_doc_tags(usage_key))
+    _update_index_docs([doc])
+
+
+def upsert_block_collections_index_docs(usage_key: UsageKey):
+    """
+    Updates the collections data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
+    doc.update(searchable_doc_collections(usage_key))
+    _update_index_docs([doc])
+
+
+def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLocator):
+    """
+    Updates the tags data in documents for the given library collection
+    """
+    collection = lib_api.get_library_collection_from_usage_key(collection_usage_key)
+
+    doc = {Fields.id: collection.id}
+    doc.update(searchable_doc_tags_for_collection(collection_usage_key.library_key, collection))
     _update_index_docs([doc])
 
 

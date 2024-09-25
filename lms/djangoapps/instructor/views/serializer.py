@@ -67,6 +67,43 @@ class AccessSerializer(UniqueStudentIdentifierSerializer):
     )
 
 
+class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer for handling the input data for the problem response report generation API.
+
+Attributes:
+    unique_student_identifier (str): The email or username of the student.
+                                      This field is optional, but if provided, the `problem_location_str`
+                                      must also be provided.
+    problem_location_str (str): The string representing the location of the problem within the course.
+                                This field is optional, unless `unique_student_identifier` is provided.
+    """
+    unique_student_identifier = serializers.CharField(
+        max_length=255,
+        help_text="Email or username of student",
+        required=False
+    )
+    problem_location_str = serializers.CharField(
+        help_text="Problem location",
+        required=False
+    )
+
+    def validate(self, data):
+        """
+        Validate the data to ensure that if unique_student_identifier is provided,
+        problem_location_str must also be provided.
+        """
+        unique_student_identifier = data.get('unique_student_identifier')
+        problem_location_str = data.get('problem_location_str')
+
+        if unique_student_identifier and not problem_location_str:
+            raise serializers.ValidationError(
+                "unique_student_identifier must accompany problem_location_str"
+            )
+
+        return data
+
+
 class ShowStudentExtensionSerializer(serializers.Serializer):
     """
     Serializer for validating and processing the student identifier.
@@ -155,3 +192,39 @@ class SendEmailSerializer(serializers.Serializer):
     subject = serializers.CharField(max_length=128, write_only=True, required=True)
     message = serializers.CharField(required=True)
     schedule = serializers.CharField(required=False)
+
+
+class BlockDueDateSerializer(serializers.Serializer):
+    """
+    Serializer for handling block due date updates for a specific student.
+    Fields:
+        url (str): The URL related to the block that needs the due date update.
+        due_datetime (str): The new due date and time for the block.
+        student (str): The email or username of the student whose access is being modified.
+        reason (str): Reason why updating this.
+    """
+    url = serializers.CharField()
+    due_datetime = serializers.CharField()
+    student = serializers.CharField(
+        max_length=255,
+        help_text="Email or username of user to change access"
+    )
+    reason = serializers.CharField(required=False)
+
+    def validate_student(self, value):
+        """
+        Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
+
+    def __init__(self, *args, **kwargs):
+        # Get context to check if `due_datetime` should be optional
+        disable_due_datetime = kwargs.get('context', {}).get('disable_due_datetime', False)
+        super().__init__(*args, **kwargs)
+        if disable_due_datetime:
+            self.fields['due_datetime'].required = False
