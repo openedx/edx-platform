@@ -1257,15 +1257,11 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
         verification_attempts = cls.objects.filter(user_id=user_id)
         verification_attempts.delete()
 
-    @classmethod
-    def should_display_status_to_user(cls, idv_type):
+    hide_status_from_user = models.BooleanField(
+        default=False,
+    )
+
+    # TODO: Get feedback from michael about adding these new fields/methods
+    def should_display_status_to_user(cls):
         """When called, returns true or false based on the type of VerificationAttempt"""
-        # NOTE: Do we also need another one here for persona
-        if idv_type == 'VerificationAttempt':
-            return False # Not sure what to return for this one.
-        elif idv_type == 'SoftwareSecurePhotoVerification':
-            return True
-        elif idv_type == 'SSOVerification':
-            return False
-        elif idv_type == 'ManualVerification':
-            return False
+        return not cls.hide_status_from_user
