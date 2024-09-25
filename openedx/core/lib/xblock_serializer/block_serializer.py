@@ -133,7 +133,7 @@ class XBlockSerializer:
 
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")
-        olx_node.text = etree.CDATA("\n" + escaped_block_data + "\n")
+        olx_node.text = etree.CDATA(escaped_block_data)
         return olx_node
 
 
