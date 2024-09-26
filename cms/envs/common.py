@@ -2813,8 +2813,14 @@ EDX_BRAZE_API_SERVER = None
 
 BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
+######################## Discussion Forum settings ########################
+
+# Feedback link in upgraded discussion notification alert
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
-DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+# Learn More link in upgraded discussion notification alert
+# pylint: disable=line-too-long
+DISCUSSIONS_INCONTEXT_LEARNMORE_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_discussions/discussions.html"
 
 #### django-simple-history##
 # disable indexing on date field its coming django-simple-history.
