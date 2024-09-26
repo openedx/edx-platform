@@ -15,8 +15,11 @@ import json
 import logging
 import os.path
 import uuid
+
 from datetime import timedelta
 from email.utils import formatdate
+
+from typing import Any
 
 import requests
 from config_models.models import ConfigurationModel
@@ -1233,6 +1236,11 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
 
     status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
 
+    status_changed = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
     expiration_datetime = models.DateTimeField(
         null=True,
         blank=True,
@@ -1243,14 +1251,23 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
         null=True,
     )
 
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Overriding the save method in order to make sure that
+        status_changed field is updated whenever the status is
+        updated, even if it is not given as a parameter to the
+        update field argument.
+        """
+        update_fields = kwargs.get('update_fields', None)
+        if update_fields and 'status' in update_fields:
+            self.status_changed = now()
+            kwargs['update_fields'] = set(update_fields).union({'status_changed'})
+
+        super().save(*args, **kwargs)
+
     def should_display_status_to_user(self):
         """When called, returns true or false based on the type of VerificationAttempt"""
         return not self.hide_status_from_user
-
-    @property
-    def status_changed(self):
-        """Backwards compatibility with existing IDVerification models"""
-        return self.modified
 
     @property
     def updated_at(self):
