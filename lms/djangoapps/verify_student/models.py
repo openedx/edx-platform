@@ -1225,7 +1225,7 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
     name = models.CharField(blank=True, max_length=255)
 
     STATUS = Choices(
-        VerificationAttemptStatus.CREATED,
+        # VerificationAttemptStatus.CREATED,
         VerificationAttemptStatus.PENDING,
         VerificationAttemptStatus.APPROVED,
         VerificationAttemptStatus.DENIED,

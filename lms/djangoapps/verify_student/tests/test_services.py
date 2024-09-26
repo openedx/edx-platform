@@ -287,6 +287,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
     verifications and in order to control the recency,
     we just put everything inside of a frozen time
     """
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
