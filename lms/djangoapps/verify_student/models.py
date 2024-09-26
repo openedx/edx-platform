@@ -1230,7 +1230,7 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
         VerificationAttemptStatus.APPROVED,
         VerificationAttemptStatus.DENIED,
     )
-    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
+    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS])
 
     expiration_datetime = models.DateTimeField(
         null=True,
