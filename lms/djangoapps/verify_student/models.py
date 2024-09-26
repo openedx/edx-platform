@@ -19,7 +19,6 @@ import uuid
 from datetime import timedelta
 from email.utils import formatdate
 
-from typing import Any
 
 import requests
 from config_models.models import ConfigurationModel
