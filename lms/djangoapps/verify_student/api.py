@@ -75,7 +75,6 @@ def create_verification_attempt(
     Returns:
         id (int): The id of the created VerificationAttempt instance
     """
-    # TODO: make sure writing this API stuff is cool w/ michael
     verification_attempt = VerificationAttempt.objects.create(
         user=user,
         name=name,

@@ -1230,12 +1230,20 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
         VerificationAttemptStatus.APPROVED,
         VerificationAttemptStatus.DENIED,
     )
-    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS])
 
     expiration_datetime = models.DateTimeField(
         null=True,
         blank=True,
     )
+
+    hide_status_from_user = models.BooleanField(
+        default=False,
+        null=True,
+    )
+
+    def should_display_status_to_user(self):
+        """When called, returns true or false based on the type of VerificationAttempt"""
+        return not self.hide_status_from_user
 
     @property
     def updated_at(self):
@@ -1251,13 +1259,3 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
         """
         verification_attempts = cls.objects.filter(user_id=user_id)
         verification_attempts.delete()
-
-    hide_status_from_user = models.BooleanField(
-        default=False,
-        null=True,
-    )
-
-    # TODO: Get feedback from michael about adding these new fields/methods
-    def should_display_status_to_user(self):
-        """When called, returns true or false based on the type of VerificationAttempt"""
-        return not self.hide_status_from_user
