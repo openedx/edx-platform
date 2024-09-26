@@ -1251,11 +1251,6 @@ class VerificationAttempt(StatusModel):
         """When called, returns true or false based on the type of VerificationAttempt"""
         return not self.hide_status_from_user
 
-    @property
-    def updated_at(self):
-        """Backwards compatibility with existing IDVerification models"""
-        return self.modified
-
     @classmethod
     def retire_user(cls, user_id):
         """
