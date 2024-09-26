@@ -1224,12 +1224,14 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=255)
 
-    STATUS = Choices(
-        # VerificationAttemptStatus.CREATED,
+    STATUS_CHOICES = [
+        VerificationAttemptStatus.CREATED,
         VerificationAttemptStatus.PENDING,
         VerificationAttemptStatus.APPROVED,
         VerificationAttemptStatus.DENIED,
-    )
+    ]
+
+    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
 
     expiration_datetime = models.DateTimeField(
         null=True,
@@ -1244,6 +1246,11 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
     def should_display_status_to_user(self):
         """When called, returns true or false based on the type of VerificationAttempt"""
         return not self.hide_status_from_user
+
+    @property
+    def status_changed(self):
+        """Backwards compatibility with existing IDVerification models"""
+        return self.modified
 
     @property
     def updated_at(self):
