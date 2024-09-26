@@ -136,7 +136,7 @@ def update_verification_attempt(
                 'Status must be one of: %(status_list)s',
                 {
                     'status': status,
-                    'status_list': VerificationAttempt.STATUS_CHOICES,
+                    'status_list': VerificationAttempt.STATUS,
                 },
             )
             raise VerificationAttemptInvalidStatus

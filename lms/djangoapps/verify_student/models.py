@@ -1217,7 +1217,7 @@ class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-m
         return str(self.arguments)
 
 
-class VerificationAttempt(TimeStampedModel, StatusModel):
+class VerificationAttempt(StatusModel):
     """
     The model represents impelementation-agnostic information about identity verification (IDV) attempts.
 
@@ -1227,18 +1227,11 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=255)
 
-    STATUS_CHOICES = [
+    STATUS = Choices(
         VerificationAttemptStatus.CREATED,
         VerificationAttemptStatus.PENDING,
         VerificationAttemptStatus.APPROVED,
         VerificationAttemptStatus.DENIED,
-    ]
-
-    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
-
-    status_changed = models.DateTimeField(
-        null=True,
-        blank=True,
     )
 
     expiration_datetime = models.DateTimeField(
@@ -1251,19 +1244,8 @@ class VerificationAttempt(TimeStampedModel, StatusModel):
         null=True,
     )
 
-    def save(self, *args: Any, **kwargs: Any) -> None:
-        """
-        Overriding the save method in order to make sure that
-        status_changed field is updated whenever the status is
-        updated, even if it is not given as a parameter to the
-        update field argument.
-        """
-        update_fields = kwargs.get('update_fields', None)
-        if update_fields and 'status' in update_fields:
-            self.status_changed = now()
-            kwargs['update_fields'] = set(update_fields).union({'status_changed'})
-
-        super().save(*args, **kwargs)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     def should_display_status_to_user(self):
         """When called, returns true or false based on the type of VerificationAttempt"""
