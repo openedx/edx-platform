@@ -59,7 +59,7 @@ def create_verification_attempt(
     name: str,
     status: str,
     expiration_datetime: Optional[datetime] = None,
-    hide_status_from_user: Optional[bool] = None,
+    hide_status_from_user: Optional[bool] = False,
 ):
     """
     Create a verification attempt.
