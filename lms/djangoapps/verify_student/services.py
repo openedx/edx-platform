@@ -76,7 +76,7 @@ class IDVerificationService:
         Return a list of all verifications associated with the given user.
         """
         verifications = []
-        for verification in chain(VerificationAttempt.objects.filter(user=user).order_by('-created'),
+        for verification in chain(VerificationAttempt.objects.filter(user=user).order_by('-created_at'),
                                   SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-created_at'),
                                   SSOVerification.objects.filter(user=user).order_by('-created_at'),
                                   ManualVerification.objects.filter(user=user).order_by('-created_at')):
@@ -97,7 +97,7 @@ class IDVerificationService:
             VerificationAttempt.objects.filter(**{
                 'user__in': users,
                 'status': 'approved',
-                'created__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+                'created_at__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
             }).values_list('user_id', flat=True),
             SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
             SSOVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
