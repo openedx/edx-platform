@@ -67,6 +67,7 @@ from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
+from django.urls import reverse
 from edx_rest_api_client.client import OAuthAPIClient
 from lxml import etree
 from opaque_keys.edx.keys import BlockTypeKey, UsageKey, UsageKeyV2
@@ -997,7 +998,36 @@ def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticF
     TODO: This is not yet implemented for Learning Core backed libraries.
     TODO: Should this be in the general XBlock API rather than the libraries API?
     """
-    return []
+    component = get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+
+    # If there is no Draft version, then this was soft-deleted
+    if component_version is None:
+        return []
+
+    # cvc = the ComponentVersionContent through table
+    cvc_set = (
+        component_version
+        .componentversioncontent_set
+        .filter(content__has_file=True)
+        .order_by('key')
+        .select_related('content')
+    )
+
+    return [
+        LibraryXBlockStaticFile(
+            path=cvc.key,
+            size=cvc.content.size,
+            url=reverse(
+                'content_libraries:library-assets',
+                kwargs={
+                    'component_version_uuid': component_version.uuid,
+                    'asset_path': cvc.key,
+                }
+            ),
+        )
+        for cvc in cvc_set
+    ]
 
 
 def add_library_block_static_asset_file(usage_key, file_name, file_content) -> LibraryXBlockStaticFile:

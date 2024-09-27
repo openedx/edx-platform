@@ -172,7 +172,6 @@ def replace_static_urls(
     xblock: xblock where the static assets are stored
     lookup_url_func: Lookup function which returns the correct path of the asset
     """
-
     if static_paths_out is None:
         static_paths_out = []
 

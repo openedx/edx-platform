@@ -72,13 +72,14 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
 from django.db.transaction import atomic, non_atomic_requests
-from django.http import Http404, HttpResponseBadRequest, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_safe
 from django.views.generic.base import TemplateResponseMixin, View
 from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
 from pylti1p3.exception import LtiException, OIDCException
@@ -86,6 +87,7 @@ from pylti1p3.exception import LtiException, OIDCException
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_learning.api import authoring as authoring_api
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -1107,3 +1109,71 @@ class LtiToolJwksView(LtiToolView):
         Return the JWKS.
         """
         return JsonResponse(self.lti_tool_config.get_jwks(), safe=False)
+
+
+@require_safe
+def component_version_asset(request, component_version_uuid, asset_path):
+    """
+    Serves static assets associated with particular Component versions.
+
+    Important notes:
+
+    * This is meant for Studio/authoring use ONLY. It requires read access to
+      the content library.
+    * It uses the UUID because that's easier to parse than the key field (which
+      could be part of an OpaqueKey, but could also be almost anything else).
+    * This is not very performant, and we still want to use the X-Accel-Redirect
+      method for serving LMS traffic in the longer term (and probably Studio
+      eventually).
+    """
+    try:
+        component_version = authoring_api.get_component_version_by_uuid(
+            component_version_uuid
+        )
+    except ObjectDoesNotExist:
+        raise Http404()
+
+    learning_package = component_version.component.learning_package
+    library_key = LibraryLocatorV2.from_string(learning_package.key)
+
+    api.require_permission_for_library_key(
+        library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+    )
+
+    # We already have logic for getting the correct content and generating the
+    # proper headers in Learning Core, but the response generated here is an
+    # X-Accel-Redirect and lacks the actual content. We eventually want to use
+    # this response in conjunction with a media reverse proxy (Caddy or Nginx),
+    # but in the short term we're just going to remove the redirect and stream
+    # the content directly.
+    redirect_response = authoring_api.get_redirect_response_for_component_asset(
+        component_version_uuid,
+        asset_path,
+        public=False,
+        learner_downloadable_only=False,
+    )
+
+    # If there was any error, we return that response because it will have the
+    # correct headers set and won't have any X-Accel-Redirect header set.
+    if redirect_response.status_code != 200:
+        return redirect_response
+
+    cv_content = component_version.componentversioncontent_set.get(key=asset_path)
+    content = cv_content.content
+
+    # Delete the re-direct part of the response headers. We'll copy the rest.
+    headers = redirect_response.headers
+    headers.pop('X-Accel-Redirect')
+
+    # We need to set the content size header manually because this is a
+    # streaming response. It's not included in the redirect headers because it's
+    # not needed there (the reverse-proxy would have direct access to the file).
+    headers['Content-Length'] = content.size
+
+    if request.method == "HEAD":
+        return HttpResponse(headers=headers)
+
+    return StreamingHttpResponse(
+        content.read_file().chunks(),
+        headers=redirect_response.headers,
+    )

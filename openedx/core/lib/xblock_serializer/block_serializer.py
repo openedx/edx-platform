@@ -34,13 +34,14 @@ class XBlockSerializer:
         self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
 
         course_key = self.orig_block_key.course_key
+
         # Search the OLX for references to files stored in the course's
         # "Files & Uploads" (contentstore):
         self.olx_str = utils.rewrite_absolute_static_urls(self.olx_str, course_key)
-        for asset in utils.collect_assets_from_text(self.olx_str, course_key):
-            path = asset['path']
-            if path not in [sf.name for sf in self.static_files]:
-                self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
+       # for asset in utils.collect_assets_from_text(self.olx_str, course_key):
+       #     path = asset['path']
+       #     if path not in [sf.name for sf in self.static_files]:
+       #         self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
 
         if block.scope_ids.usage_id.block_type in ['problem', 'vertical']:
             py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)

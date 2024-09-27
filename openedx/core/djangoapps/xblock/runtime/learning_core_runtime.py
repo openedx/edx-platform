@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.transaction import atomic
+from django.urls import reverse
 
 from openedx_learning.api import authoring as authoring_api
 
@@ -291,6 +292,20 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         This is called by the XBlockRuntime superclass in the .runtime module.
 
-        TODO: Implement as part of larger static asset effort.
+        TODO: Like get_block, we currently assume that we're using the Draft
+        version. This should be a runtime parameter.
         """
-        return None
+        usage_key = block.scope_ids.usage_id
+        component = self._get_component_from_usage_key(usage_key)
+        component_version = component.versioning.draft
+        if component_version is None:
+            # This could happen if a Component was soft-deleted.
+            raise NoSuchUsage(usage_key)
+
+        return reverse(
+            'library-assets',
+            kwargs={
+                'component_version_uuid': component_version.uuid,
+                'asset_path': asset_path,
+            }
+        )

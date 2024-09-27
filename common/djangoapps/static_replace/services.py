@@ -51,6 +51,7 @@ class ReplaceURLService(Service):
             static_replace_only: If True, only static urls will be replaced
         """
         block = self.xblock()
+
         if self.lookup_asset_url:
             text = replace_static_urls(text, xblock=block, lookup_asset_url=self.lookup_asset_url)
         else:
