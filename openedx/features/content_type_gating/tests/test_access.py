@@ -545,7 +545,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         )
 
     @ddt.data(
-        ('problem', 'graded_problem', 'audit', 404),
+        ('problem', 'graded_problem', 'audit', 403),
         ('problem', 'graded_problem', 'verified', 200),
         ('problem', 'ungraded_problem', 'audit', 200),
         ('problem', 'ungraded_problem', 'verified', 200),
