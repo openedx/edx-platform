@@ -1297,6 +1297,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   forum
 newrelic==9.13.0
     # via
     #   -r requirements/edx/doc.txt

@@ -3831,7 +3831,6 @@ class DeleteCommentTest(
         super().setUpClass()
         cls.course = CourseFactory.create()
 
-
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()

@@ -1057,7 +1057,7 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
         super().setUp()
         self.cohorted_commentable_id = 'cohorted_topic'
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):  # pylint: disable=arguments-differ
         kwargs = {'commentable_id': self.cohorted_commentable_id}
         if group_id:
             # avoid causing a server error when the LMS chokes attempting
@@ -1304,7 +1304,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/subscribed_threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):  # pylint: disable=arguments-differ
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id

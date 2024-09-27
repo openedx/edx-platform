@@ -73,7 +73,7 @@ class Model:
     def _retrieve(self, *args, **kwargs):
         response = None
         if is_forum_v2_enabled(self.attributes.get("course_id")):
-            if self.type=="comment":
+            if self.type == "comment":
                 response = forum_api.get_parent_comment(self.attributes["id"])
         if response is None:
             url = self.url(action='get', params=self.attributes)
@@ -169,7 +169,7 @@ class Model:
     def delete(self):
         response = None
         if is_forum_v2_enabled(self.attributes.get("course_id")):
-            if self.type=="comment":
+            if self.type == "comment":
                 response = forum_api.delete_comment(self.attributes["id"])
         if response is None:
             url = self.url(action='delete', params=self.attributes)

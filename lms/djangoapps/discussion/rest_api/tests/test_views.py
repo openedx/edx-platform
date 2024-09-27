@@ -510,6 +510,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
         patcher.start()
         self.addCleanup(patcher.stop)
+
     def test_404(self):
         response = self.client.get(
             reverse("course_topics", kwargs={"course_id": "non/existent/course"})
