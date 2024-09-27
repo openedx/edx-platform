@@ -386,7 +386,7 @@ def get_block_for_descriptor(
     student_data: KvsFieldData | None = None,
     request_token: str | None = None,
     user_location: str | None = None,
-    raise_error: bool  = False,
+    raise_error: bool = False,
 ) -> XBlock | None:
     """
     Implements get_block, extracting out the request-specific functionality.

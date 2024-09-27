@@ -603,7 +603,7 @@ class CourseNavigationBlocksView(RetrieveAPIView):
         course_key_string = self.kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
         if self.request.user.is_anonymous:
-            completions=BlockCompletion.objects.none()
+            completions = BlockCompletion.objects.none()
         else:
             completions = BlockCompletion.objects.filter(user=self.request.user, context_key=course_key).values_list(
                 'block_key',
