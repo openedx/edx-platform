@@ -168,3 +168,29 @@ class TestCleanThreadHtmlBody(unittest.TestCase):
 
         result = clean_thread_html_body(html_body)
         self.assertEqual(result.strip(), expected_output)
+
+    def test_button_tag_replace(self):
+        """
+        Tests that the clean_thread_html_body function replaces the button tag with span tag
+        """
+        # Tests for button replacement tag with text
+        html_body = '<button class="abc">Button</button>'
+        expected_output = '<span class="abc">Button</span>'
+        result = clean_thread_html_body(html_body)
+        self.assertEqual(result, expected_output)
+
+        # Tests button tag replacement without text
+        html_body = '<button class="abc"></button>'
+        expected_output = '<span class="abc"></span>'
+        result = clean_thread_html_body(html_body)
+        self.assertEqual(result, expected_output)
+
+    def test_heading_tag_replace(self):
+        """
+        Tests that the clean_thread_html_body function replaces the h1, h2 and h3 tags with h4 tag
+        """
+        for tag in ['h1', 'h2', 'h3']:
+            html_body = f'<{tag}>Heading</{tag}>'
+            expected_output = '<h4>Heading</h4>'
+            result = clean_thread_html_body(html_body)
+            self.assertEqual(result, expected_output)

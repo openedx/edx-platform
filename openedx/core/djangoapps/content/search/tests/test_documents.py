@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from organizations.models import Organization
 
 from freezegun import freeze_time
-from openedx_learning.api import authoring as authoring_api
 
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_libraries import api as library_api
@@ -19,6 +18,7 @@ try:
     from ..documents import (
         searchable_doc_for_course_block,
         searchable_doc_tags,
+        searchable_doc_tags_for_collection,
         searchable_doc_collections,
         searchable_doc_for_collection,
         searchable_doc_for_library_block,
@@ -27,6 +27,7 @@ try:
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
     searchable_doc_tags = lambda x: x
+    searchable_doc_tags_for_collection = lambda x: x
     searchable_doc_for_collection = lambda x: x
     searchable_doc_for_library_block = lambda x: x
     SearchAccess = {}
@@ -76,6 +77,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 created_by=None,
                 description="my toy collection description"
             )
+            cls.collection_usage_key = "lib-collection:edX:2012_Fall:TOY_COLLECTION"
             cls.library_block = library_api.create_library_block(
                 cls.library.key,
                 "html",
@@ -109,6 +111,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
         tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
         tagging_api.tag_object(str(cls.library_block.usage_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(cls.collection_usage_key, cls.difficulty_tags, tags=["Normal"])
 
     @property
     def toy_course_access_id(self):
@@ -295,10 +298,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         }
 
     def test_collection_with_library(self):
-        doc = searchable_doc_for_collection(self.collection)
+        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
+        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+
         assert doc == {
-            "id": self.collection.id,
+            "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
+            "usage_key": self.collection_usage_key,
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -309,34 +315,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
-        }
-
-    def test_collection_with_no_library(self):
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            learning_package = authoring_api.create_learning_package(
-                key="course-v1:edX+toy+2012_Fall",
-                title="some learning_package",
-                description="some description",
-            )
-            collection = authoring_api.create_collection(
-                learning_package_id=learning_package.id,
-                key="MYCOL",
-                title="my_collection",
-                created_by=None,
-                description="my collection description"
-            )
-        doc = searchable_doc_for_collection(collection)
-        assert doc == {
-            "id": collection.id,
-            "block_id": collection.key,
-            "type": "collection",
-            "display_name": "my_collection",
-            "description": "my collection description",
-            "num_children": 0,
-            "context_key": learning_package.key,
-            "access_id": self.toy_course_access_id,
-            "breadcrumbs": [{"display_name": "some learning_package"}],
-            "created": created_date.timestamp(),
-            "modified": created_date.timestamp(),
+            'tags': {
+                'taxonomy': ['Difficulty'],
+                'level0': ['Difficulty > Normal']
+            }
         }

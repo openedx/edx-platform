@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
+from openedx_filters.learning.filters import IDVPageURLRequested
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import User
@@ -75,7 +76,7 @@ class IDVerificationService:
         Return a list of all verifications associated with the given user.
         """
         verifications = []
-        for verification in chain(VerificationAttempt.objects.filter(user=user).order_by('-created'),
+        for verification in chain(VerificationAttempt.objects.filter(user=user).order_by('-created_at'),
                                   SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-created_at'),
                                   SSOVerification.objects.filter(user=user).order_by('-created_at'),
                                   ManualVerification.objects.filter(user=user).order_by('-created_at')):
@@ -96,7 +97,7 @@ class IDVerificationService:
             VerificationAttempt.objects.filter(**{
                 'user__in': users,
                 'status': 'approved',
-                'created__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+                'created_at__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
             }).values_list('user_id', flat=True),
             SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
             SSOVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
@@ -244,7 +245,10 @@ class IDVerificationService:
         location = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         if course_id:
             location += f'?course_id={quote(str(course_id))}'
-        return location
+
+        # .. filter_implemented_name: IDVPageURLRequested
+        # .. filter_type: org.openedx.learning.idv.page.url.requested.v1
+        return IDVPageURLRequested.run_filter(location)
 
     @classmethod
     def get_verification_details_by_id(cls, attempt_id):

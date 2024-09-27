@@ -31,22 +31,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'first_name', 'last_name']
 
 
-class AccessSerializer(serializers.Serializer):
+class UniqueStudentIdentifierSerializer(serializers.Serializer):
     """
-    Serializer for managing user access changes.
-    This serializer validates and processes the data required to modify
-    user access within a system.
+    Serializer for identifying unique_student.
     """
     unique_student_identifier = serializers.CharField(
         max_length=255,
         help_text="Email or username of user to change access"
-    )
-    rolename = serializers.CharField(
-        help_text="Role name to assign to the user"
-    )
-    action = serializers.ChoiceField(
-        choices=['allow', 'revoke'],
-        help_text="Action to perform on the user's access"
     )
 
     def validate_unique_student_identifier(self, value):
@@ -59,6 +50,58 @@ class AccessSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class AccessSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for managing user access changes.
+    This serializer validates and processes the data required to modify
+    user access within a system.
+    """
+    rolename = serializers.CharField(
+        help_text="Role name to assign to the user"
+    )
+    action = serializers.ChoiceField(
+        choices=['allow', 'revoke'],
+        help_text="Action to perform on the user's access"
+    )
+
+
+class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer for handling the input data for the problem response report generation API.
+
+Attributes:
+    unique_student_identifier (str): The email or username of the student.
+                                      This field is optional, but if provided, the `problem_location_str`
+                                      must also be provided.
+    problem_location_str (str): The string representing the location of the problem within the course.
+                                This field is optional, unless `unique_student_identifier` is provided.
+    """
+    unique_student_identifier = serializers.CharField(
+        max_length=255,
+        help_text="Email or username of student",
+        required=False
+    )
+    problem_location_str = serializers.CharField(
+        help_text="Problem location",
+        required=False
+    )
+
+    def validate(self, data):
+        """
+        Validate the data to ensure that if unique_student_identifier is provided,
+        problem_location_str must also be provided.
+        """
+        unique_student_identifier = data.get('unique_student_identifier')
+        problem_location_str = data.get('problem_location_str')
+
+        if unique_student_identifier and not problem_location_str:
+            raise serializers.ValidationError(
+                "unique_student_identifier must accompany problem_location_str"
+            )
+
+        return data
 
 
 class ShowStudentExtensionSerializer(serializers.Serializer):
@@ -178,3 +221,10 @@ class BlockDueDateSerializer(serializers.Serializer):
             return None
 
         return user
+
+    def __init__(self, *args, **kwargs):
+        # Get context to check if `due_datetime` should be optional
+        disable_due_datetime = kwargs.get('context', {}).get('disable_due_datetime', False)
+        super().__init__(*args, **kwargs)
+        if disable_due_datetime:
+            self.fields['due_datetime'].required = False

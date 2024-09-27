@@ -108,7 +108,7 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer
+    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer, UniqueStudentIdentifierSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -137,7 +137,6 @@ from .tools import (
     handle_dashboard_error,
     keep_field_private,
     parse_datetime,
-    require_student_from_identifier,
     set_due_date_extension,
     strip_if_string,
 )
@@ -515,11 +514,13 @@ class RegisterAndEnrollStudents(APIView):
                                 reason='Enrolling via csv upload',
                                 state_transition=UNENROLLED_TO_ENROLLED,
                             )
-                            enroll_email(course_id=course_id,
-                                         student_email=email,
-                                         auto_enroll=True,
-                                         email_students=notify_by_email,
-                                         email_params=email_params)
+                            enroll_email(
+                                course_id=course_id,
+                                student_email=email,
+                                auto_enroll=True,
+                                message_students=notify_by_email,
+                                message_params=email_params,
+                            )
                         else:
                             # update the course mode if already enrolled
                             existing_enrollment = CourseEnrollment.get_enrollment(user, course_id)
@@ -1702,60 +1703,55 @@ class GetAnonIds(APIView):
         return JsonResponse({"status": success_status})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_ENROLLMENTS)
-@require_post_params(
-    unique_student_identifier="email or username of student for whom to get enrollment status"
-)
-def get_student_enrollment_status(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class GetStudentEnrollmentStatus(APIView):
     """
     Get the enrollment status of a student.
-    Limited to staff access.
-
-    Takes query parameter unique_student_identifier
     """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_ENROLLMENTS
 
-    error = ''
-    user = None
-    mode = None
-    is_active = None
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Permission: Limited to staff access.
+        Takes query parameter unique_student_identifier
+        """
+        error = ''
+        mode = None
+        is_active = None
 
-    course_id = CourseKey.from_string(course_id)
-    unique_student_identifier = request.POST.get('unique_student_identifier')
+        course_id = CourseKey.from_string(course_id)
+        unique_student_identifier = request.data.get("unique_student_identifier")
 
-    try:
-        user = get_student_from_identifier(unique_student_identifier)
-        mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-    except User.DoesNotExist:
-        # The student could have been invited to enroll without having
-        # registered. We'll also look at CourseEnrollmentAllowed
-        # records, so let the lack of a User slide.
-        pass
+        serializer_data = UniqueStudentIdentifierSerializer(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    enrollment_status = _('Enrollment status for {student}: unknown').format(student=unique_student_identifier)
+        user = serializer_data.validated_data.get('unique_student_identifier')
+        if user:
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
 
-    if user and mode:
-        if is_active:
-            enrollment_status = _('Enrollment status for {student}: active').format(student=user)
+        if user and mode:
+            if is_active:
+                enrollment_status = _('Enrollment status for {student}: active').format(student=user)
+            else:
+                enrollment_status = _('Enrollment status for {student}: inactive').format(student=user)
         else:
-            enrollment_status = _('Enrollment status for {student}: inactive').format(student=user)
-    else:
-        email = user.email if user else unique_student_identifier
-        allowed = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id)
-        if allowed and email in [cea.email for cea in allowed]:
-            enrollment_status = _('Enrollment status for {student}: pending').format(student=email)
-        else:
-            enrollment_status = _('Enrollment status for {student}: never enrolled').format(student=email)
+            email = user.email if user else unique_student_identifier
+            allowed = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id)
+            if allowed and email in [cea.email for cea in allowed]:
+                enrollment_status = _('Enrollment status for {student}: pending').format(student=email)
+            else:
+                enrollment_status = _('Enrollment status for {student}: never enrolled').format(student=email)
 
-    response_payload = {
-        'course_id': str(course_id),
-        'error': error,
-        'enrollment_status': enrollment_status
-    }
+        response_payload = {
+            'course_id': str(course_id),
+            'error': error,
+            'enrollment_status': enrollment_status
+        }
 
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 class StudentProgressUrlSerializer(serializers.Serializer):
@@ -2373,9 +2369,8 @@ class InstructorTasks(DeveloperErrorViewMixin, APIView):
         return _list_instructor_tasks(request=request, course_id=course_id)
 
 
-@require_POST
-@ensure_csrf_cookie
-def list_instructor_tasks(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListInstructorTasks(APIView):
     """
     List instructor tasks.
 
@@ -2385,21 +2380,44 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-    return _list_instructor_tasks(request=request, course_id=course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.SHOW_TASKS
+    serializer_class = ListInstructorTaskInputSerializer
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List instructor tasks.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return _list_instructor_tasks(
+            request=request, course_id=course_id, serialize_data=serializer.validated_data
+        )
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.SHOW_TASKS)
-def _list_instructor_tasks(request, course_id):
+def _list_instructor_tasks(request, course_id, serialize_data=None):
     """
     List instructor tasks.
 
     Internal function with common code for both DRF and and tradition views.
     """
+    # This method is also used by other APIs with the GET method.
+    # The query_params attribute is utilized for GET requests,
+    # where parameters are passed as query strings.
+
     course_id = CourseKey.from_string(course_id)
-    params = getattr(request, 'query_params', request.POST)
-    problem_location_str = strip_if_string(params.get('problem_location_str', False))
-    student = params.get('unique_student_identifier', None)
+    if serialize_data is not None:
+        problem_location_str = strip_if_string(serialize_data.get('problem_location_str', False))
+        student = serialize_data.get('unique_student_identifier', None)
+    else:
+        params = getattr(request, 'query_params', request.POST)
+        problem_location_str = strip_if_string(params.get('problem_location_str', False))
+        student = params.get('unique_student_identifier', None)
+
     if student is not None:
         student = get_student_from_identifier(student)
 
@@ -3013,37 +3031,59 @@ class ChangeDueDate(APIView):
                              due_date.strftime('%Y-%m-%d %H:%M')))
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('student', 'url')
-def reset_due_date(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ResetDueDate(APIView):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    student = require_student_from_identifier(request.POST.get('student'))
-    unit = find_unit(course, request.POST.get('url'))
-    reason = strip_tags(request.POST.get('reason', ''))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+    serializer_class = BlockDueDateSerializer
 
-    version = getattr(course, 'course_version', None)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        reset a due date extension to a student for a particular unit.
+        params:
+            url (str): The URL related to the block that needs the due date update.
+            student (str): The email or username of the student whose access is being modified.
+            reason (str): Optional param.
+        """
+        serializer_data = self.serializer_class(data=request.data, context={'disable_due_datetime': True})
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    original_due_date = get_date_for_block(course_id, unit.location, published_version=version)
+        student = serializer_data.validated_data.get('student')
+        if not student:
+            response_payload = {
+                'error': f'Could not find student matching identifier: {request.data.get("student")}'
+            }
+            return JsonResponse(response_payload)
 
-    set_due_date_extension(course, unit, student, None, request.user, reason=reason)
-    if not original_due_date:
-        # It's possible the normal due date was deleted after an extension was granted:
-        return JsonResponse(
-            _("Successfully removed invalid due date extension (unit has no due date).")
-        )
+        course = get_course_by_id(CourseKey.from_string(course_id))
+        unit = find_unit(course, serializer_data.validated_data.get('url'))
+        reason = strip_tags(serializer_data.validated_data.get('reason', ''))
 
-    original_due_date_str = original_due_date.strftime('%Y-%m-%d %H:%M')
-    return JsonResponse(_(
-        'Successfully reset due date for student {0} for {1} '
-        'to {2}').format(student.profile.name, _display_unit(unit),
-                         original_due_date_str))
+        version = getattr(course, 'course_version', None)
+
+        original_due_date = get_date_for_block(course_id, unit.location, published_version=version)
+
+        try:
+            set_due_date_extension(course, unit, student, None, request.user, reason=reason)
+            if not original_due_date:
+                # It's possible the normal due date was deleted after an extension was granted:
+                return JsonResponse(
+                    _("Successfully removed invalid due date extension (unit has no due date).")
+                )
+
+            original_due_date_str = original_due_date.strftime('%Y-%m-%d %H:%M')
+            return JsonResponse(_(
+                'Successfully reset due date for student {0} for {1} '
+                'to {2}').format(student.profile.name, _display_unit(unit),
+                                 original_due_date_str))
+
+        except Exception as error:  # pylint: disable=broad-except
+            return JsonResponse({'error': str(error)}, status=400)
 
 
 @handle_dashboard_error

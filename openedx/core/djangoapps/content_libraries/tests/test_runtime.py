@@ -3,6 +3,7 @@ Test the Learning-Core-based XBlock runtime and content libraries together.
 """
 import json
 from gettext import GNUTranslations
+from django.test import TestCase
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections, transaction
@@ -24,6 +25,7 @@ from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIG
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
+from openedx.core.lib.xblock_serializer import api as serializer_api
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -57,6 +59,86 @@ class ContentLibraryContentTestMixin:
                 allow_public_read=False,
                 library_license=ALL_RIGHTS_RESERVED,
             )
+
+
+@skip_unless_cms
+class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
+    """
+    Basic test of the Learning-Core-based XBlock serialization-deserialization, using XBlocks in a content library.
+    """
+
+    def test_html_round_trip(self):
+        """
+        Test that if we deserialize and serialize an HTMLBlock repeatedly, two things hold true:
+
+        1. Even if the OLX changes format, the inner content does not change format.
+        2. The OLX settles into a stable state after 1 round trip.
+
+        (We are particularly testing HTML, but it would be good to confirm that these principles hold true for
+         XBlocks in general.)
+        """
+        usage_key = library_api.create_library_block(self.library.key, "html", "roundtrip").usage_key
+
+        # The block's actual HTML has some extraneous spaces and newlines, as well as comment.
+        # We expect this to be preserved through the round-trips.
+        block_content = '''\
+<div class="i-like-double-quotes">
+    <div class='i-like-single-quotes'>
+        <p> There is a space on either side of this sentence. </p>
+        <p>\tThere is a tab on either side of this sentence.\t<p>
+        <p>🙃There is an emoji on either side of this sentence.🙂</p>
+        <p>There is nothing on either side of this sentence.</p>
+    </div>
+    <p><![CDATA[ This is an inner CDATA 🤯 Technically illegal in HTML, but let's test it anyway. ?!&<>\t ]]&gt;</p>
+    <!-- This is a comment within the HTML. -->
+</div>'''
+
+        # The OLX containing the HTML also has some extraneous stuff, which do *not* expect to survive the round-trip.
+        olx_1 = f'''\
+
+            <html
+                display_name="Round Trip Test HTML Block"
+                some_fake_field="some fake value"
+            ><![CDATA[{block_content}]]><!--
+                I am an OLX comment.
+            --></html>'''
+
+        # Here is what we expect the OLX to settle down to. Notable changes:
+        #  * url_name is added.
+        #  * some_fake_field is gone.
+        #  * The OLX comment is gone.
+        #  * A trailing newline is added at the end of the export.
+        # DEVS: If you are purposefully tweaking the formatting of the xblock serializer, then it's fine to
+        # update the value of this variable, as long as:
+        #  1. the {block_content} remains unchanged, and
+        #  2. the canonical_olx remains stable through the 2nd round trip.
+        canonical_olx = (
+            f'<html url_name="roundtrip" display_name="Round Trip Test HTML Block"><![CDATA[{block_content}]]></html>\n'
+        )
+
+        # Save the block to LC, and re-load it.
+        library_api.set_library_block_olx(usage_key, olx_1)
+        library_api.publish_changes(self.library.key)
+        block_saved_1 = xblock_api.load_block(usage_key, self.staff_user)
+
+        # Content should be preserved...
+        assert block_saved_1.data == block_content
+
+        # ...but the serialized OLX will have changed to match the 'canonical' OLX.
+        olx_2 = serializer_api.serialize_xblock_to_olx(block_saved_1).olx_str
+        assert olx_2 == canonical_olx
+
+        # Now, save that OLX back to LC, and re-load it again.
+        library_api.set_library_block_olx(usage_key, olx_2)
+        library_api.publish_changes(self.library.key)
+        block_saved_2 = xblock_api.load_block(usage_key, self.staff_user)
+
+        # Again, content should be preserved...
+        assert block_saved_2.data == block_saved_1.data == block_content
+
+        # ...and this time, the OLX should have settled too.
+        olx_3 = serializer_api.serialize_xblock_to_olx(block_saved_2).olx_str
+        assert olx_3 == olx_2 == canonical_olx
 
 
 class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin):

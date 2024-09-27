@@ -8,6 +8,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryCollectionLocator
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
     ContentObjectChangedData,
@@ -22,6 +23,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
@@ -32,7 +34,12 @@ from openedx_events.content_authoring.signals import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
 
-from .api import only_if_meilisearch_enabled, upsert_block_collections_index_docs, upsert_block_tags_index_docs
+from .api import (
+    only_if_meilisearch_enabled,
+    upsert_block_collections_index_docs,
+    upsert_block_tags_index_docs,
+    upsert_collection_tags_index_docs,
+)
 from .tasks import (
     delete_library_block_index_doc,
     delete_xblock_index_doc,
@@ -118,7 +125,9 @@ def library_block_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    upsert_library_block_index_doc.delay(str(library_block_data.usage_key))
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    upsert_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
 
 
 @receiver(LIBRARY_BLOCK_DELETED)
@@ -132,7 +141,9 @@ def library_block_deleted(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    delete_library_block_index_doc.delay(str(library_block_data.usage_key))
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    delete_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
 
 
 @receiver(CONTENT_LIBRARY_UPDATED)
@@ -156,6 +167,7 @@ def content_library_updated_handler(**kwargs) -> None:
 
 
 @receiver(LIBRARY_COLLECTION_CREATED)
+@receiver(LIBRARY_COLLECTION_DELETED)
 @receiver(LIBRARY_COLLECTION_UPDATED)
 @only_if_meilisearch_enabled
 def library_collection_updated_handler(**kwargs) -> None:
@@ -191,12 +203,19 @@ def content_object_associations_changed_handler(**kwargs) -> None:
         # Check if valid if course or library block
         usage_key = UsageKey.from_string(str(content_object.object_id))
     except InvalidKeyError:
-        log.error("Received invalid content object id")
-        return
+        try:
+            # Check if valid if library collection
+            usage_key = LibraryCollectionLocator.from_string(str(content_object.object_id))
+        except InvalidKeyError:
+            log.error("Received invalid content object id")
+            return
 
     # This event's changes may contain both "tags" and "collections", but this will happen rarely, if ever.
     # So we allow a potential double "upsert" here.
     if not content_object.changes or "tags" in content_object.changes:
-        upsert_block_tags_index_docs(usage_key)
+        if isinstance(usage_key, LibraryCollectionLocator):
+            upsert_collection_tags_index_docs(usage_key)
+        else:
+            upsert_block_tags_index_docs(usage_key)
     if not content_object.changes or "collections" in content_object.changes:
         upsert_block_collections_index_docs(usage_key)

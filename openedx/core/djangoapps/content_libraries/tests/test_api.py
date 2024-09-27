@@ -20,9 +20,11 @@ from openedx_events.content_authoring.data import (
 from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from openedx_learning.api import authoring as authoring_api
 
 from .. import api
 from ..models import ContentLibrary
@@ -264,6 +266,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
     ENABLED_OPENEDX_EVENTS = [
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.event_type,
         LIBRARY_COLLECTION_CREATED.event_type,
+        LIBRARY_COLLECTION_DELETED.event_type,
         LIBRARY_COLLECTION_UPDATED.event_type,
     ]
 
@@ -386,6 +389,29 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 self.col2.key,
             )
 
+    def test_delete_library_collection(self):
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_DELETED.connect(event_receiver)
+
+        authoring_api.delete_collection(
+            self.lib1.learning_package_id,
+            self.col1.key,
+            hard_delete=True,
+        )
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_DELETED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
     def test_update_library_collection_components(self):
         assert not list(self.col1.entities.all())
 
@@ -429,11 +455,11 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         assert event_receiver.call_count == 3
         self.assertDictContainsSubset(
             {
-                "signal": LIBRARY_COLLECTION_UPDATED,
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
-                "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                "content_object": ContentObjectChangedData(
+                    object_id=self.lib1_problem_block["id"],
+                    changes=["collections"],
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -443,7 +469,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=self.lib1_problem_block["id"],
+                    object_id=self.lib1_html_block["id"],
                     changes=["collections"],
                 ),
             },
@@ -451,11 +477,11 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
         self.assertDictContainsSubset(
             {
-                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
-                "content_object": ContentObjectChangedData(
-                    object_id=self.lib1_html_block["id"],
-                    changes=["collections"],
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
                 ),
             },
             event_receiver.call_args_list[2].kwargs,
