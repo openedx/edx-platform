@@ -171,10 +171,8 @@ class UploadFileViewTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMi
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
         self.course = CourseFactory.create(org='a', course='b', run='c', start=datetime.now(UTC))
         self.url = reverse("upload_file", kwargs={"course_id": str(self.course.id)})
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def user_login(self):
@@ -306,6 +304,7 @@ class UploadFileViewTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMi
 
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FORUM_V2": False})
 class CommentViewSetListByUserTest(
     ForumsEnableMixin,
     CommentsServiceMockMixin,
@@ -324,9 +323,8 @@ class CommentViewSetListByUserTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
@@ -509,12 +507,9 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("discussion_course", kwargs={"course_id": str(self.course.id)})
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
-
     def test_404(self):
         response = self.client.get(
             reverse("course_topics", kwargs={"course_id": "non/existent/course"})
@@ -575,10 +570,8 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.superuser_client = APIClient()
         self.retired_username = get_retired_username_by_username(self.user.username)
         self.url = reverse("retire_discussion_user")
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def assert_response_correct(self, response, expected_status, expected_content):
@@ -650,10 +643,8 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.worker_client = APIClient()
         self.new_username = "test_username_replacement"
         self.url = reverse("replace_discussion_username")
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def assert_response_correct(self, response, expected_status, expected_content):
@@ -757,10 +748,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
             "courseware-3": {"discussion": 7, "question": 2},
         }
         self.register_get_course_commentable_counts_response(self.course.id, self.thread_counts_map)
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def create_course(self, blocks_count, module_store, topics):
@@ -1017,10 +1006,8 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
         patcher.start()
         self.addCleanup(patcher.stop)
         self.url = reverse("course_topics_v3", kwargs={"course_id": str(self.course.id)})
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_basic(self):
@@ -1058,10 +1045,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         super().setUp()
         self.author = UserFactory.create()
         self.url = reverse("thread-list")
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def create_source_thread(self, overrides=None):
@@ -1404,10 +1389,8 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("thread-list")
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_basic(self):
@@ -1481,10 +1464,8 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         self.unsupported_media_type = JSONParser.media_type
         super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_basic(self):
@@ -1599,7 +1580,6 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         thread_owner_user = UserFactory.create(password=self.password)
         CourseEnrollmentFactory.create(user=thread_owner_user, course_id=self.course.id)
         self.register_get_user_response(thread_owner_user)
-        self.register_get_user_response(self.user)
         self.register_thread({
             "username": thread_owner_user.username,
             "user_id": str(thread_owner_user.id),
@@ -1631,10 +1611,8 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
         self.thread_id = "test_thread"
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_basic(self):
@@ -1736,10 +1714,8 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         ]
         self.url = reverse("discussion_learner_threads", kwargs={'course_id': str(self.course.id)})
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def update_thread(self, thread):
@@ -1983,10 +1959,8 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         self.url = reverse("comment-list")
         self.thread_id = "test_thread"
         self.storage = get_profile_image_storage()
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def create_source_comment(self, overrides=None):
@@ -2107,7 +2081,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             )
         )
         self.assert_query_params_equal(
-            httpretty.httpretty.latest_requests[-1],
+            httpretty.httpretty.latest_requests[-2],
             {
                 "resp_skip": ["0"],
                 "resp_limit": ["10"],
@@ -2143,7 +2117,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_query_params_equal(
-            httpretty.httpretty.latest_requests[-1],
+            httpretty.httpretty.latest_requests[-2],
             {
                 "resp_skip": ["68"],
                 "resp_limit": ["4"],
@@ -2418,7 +2392,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         })
         self.client.get(self.url, {"thread_id": self.thread_id, "reverse_order": True})
         self.assert_query_params_equal(
-            httpretty.httpretty.latest_requests[-1],
+            httpretty.httpretty.latest_requests[-2],
             {
                 "resp_skip": ["0"],
                 "resp_limit": ["10"],
@@ -2442,10 +2416,8 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
         self.comment_id = "test_comment"
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_basic(self):
@@ -2486,10 +2458,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("comment-list")
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_basic(self):
@@ -2593,12 +2563,9 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
-
         self.register_get_user_response(self.user)
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
 
@@ -2721,12 +2688,10 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
         self.thread_id = "test_thread"
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
-    
+
     def test_basic(self):
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
@@ -2779,10 +2744,8 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
         self.thread_id = "test_thread"
         self.comment_id = "test_comment"
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def make_comment_data(self, comment_id, parent_id=None, children=[]):  # pylint: disable=W0102
@@ -2929,10 +2892,8 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         self.path = reverse('discussion_course_settings', kwargs={'course_id': str(self.course.id)})
         self.password = self.TEST_PASSWORD
         self.user = UserFactory(username='staff', password=self.password, is_staff=True)
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
 
     def _get_oauth_headers(self, user):
@@ -3223,6 +3184,9 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.course = CourseFactory.create(
             org="x",
             course="y",
@@ -3233,11 +3197,6 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         self.user = UserFactory(username='staff', password=self.password, is_staff=True)
         course_key = CourseKey.from_string('course-v1:x+y+z')
         seed_permissions_roles(course_key)
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
-        self.addCleanup(patcher.stop)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def path(self, course_id=None, role=None):
@@ -3419,6 +3378,9 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self) -> None:
         super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.course = CourseFactory.create()
         self.course_key = str(self.course.id)
         seed_permissions_roles(self.course.id)
@@ -3450,11 +3412,6 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
         self.register_course_stats_response(self.course_key, self.stats, 1, 3)
         self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
-        self.addCleanup(patcher.stop)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def test_regular_user(self):

@@ -5,6 +5,7 @@ import logging
 
 from .utils import CommentClientRequestError, extract, perform_request
 from forum import api as forum_api
+from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
 log = logging.getLogger(__name__)
 
@@ -70,9 +71,11 @@ class Model:
         return self
 
     def _retrieve(self, *args, **kwargs):
-        if self.type=="comment":
-            response = forum_api.get_parent_comment(self.attributes["id"])
-        else:
+        response = None
+        if is_forum_v2_enabled(self.attributes.get("course_id")):
+            if self.type=="comment":
+                response = forum_api.get_parent_comment(self.attributes["id"])
+        if response is None:
             url = self.url(action='get', params=self.attributes)
             response = perform_request(
                 'get',
@@ -155,83 +158,20 @@ class Model:
         """
         self.before_save(self)
         if self.id:   # if we have id already, treat this as an update
-            request_params = self.updatable_attributes()
-            if params:
-                request_params.update(params)
-            if self.type=="comment":
-                try:
-                    body = request_params["body"]
-                    course_id = str(request_params["course_id"])
-                    user_id = request_params["user_id"]
-                except KeyError as e:
-                    raise e
-                response = forum_api.update_comment(
-                    self.attributes["id"],
-                    body,
-                    course_id,
-                    user_id,
-                    request_params.get("anonymous", False),
-                    request_params.get("anonymous_to_peers", False),
-                    request_params.get("endorsed", False),
-                    request_params.get("closed", False),
-                    request_params.get("editing_user_id"),
-                    request_params.get("edit_reason_code"),
-                    request_params.get("endorsement_user_id"),
-                )
-            else:
-                url = self.url(action='put', params=self.attributes)
-                response = perform_request(
-                    'put',
-                    url,
-                    request_params,
-                    metric_tags=self._metric_tags,
-                    metric_action='model.update'
-                )
+            response = self.handle_update(params)
         else:  # otherwise, treat this as an insert
-            if self.type=="comment":
-                request_data = self.initializable_attributes()
-                try:
-                    body = request_data["body"]
-                    user_id = request_data["user_id"]
-                    course_id = str(request_data["course_id"])
-                except KeyError as e:
-                    raise e
-                if parent_id := self.attributes.get("parent_id"):
-                    response = forum_api.create_child_comment(
-                        parent_id,
-                        body,
-                        user_id,
-                        course_id,
-                        request_data.get("anonymous", False),
-                        request_data.get("anonymous_to_peers", False),
-                    )
-                else:
-                    response = forum_api.create_parent_comment(
-                        self.attributes["thread_id"],
-                        body,
-                        user_id,
-                        course_id,
-                        request_data.get("anonymous", False),
-                        request_data.get("anonymous_to_peers", False),
-                    )
-            else:   # otherwise, treat this as an insert
-                url = self.url(action='post', params=self.attributes)
-                response = perform_request(
-                    'post',
-                    url,
-                    self.initializable_attributes(),
-                    metric_tags=self._metric_tags,
-                    metric_action='model.insert'
-                )
-                
+            response = self.handle_create()
+
         self.retrieved = True
         self._update_from_response(response)
         self.after_save(self)
 
     def delete(self):
-        if self.type=="comment":
-            response = forum_api.delete_comment(self.attributes["id"])
-        else:
+        response = None
+        if is_forum_v2_enabled(self.attributes.get("course_id")):
+            if self.type=="comment":
+                response = forum_api.delete_comment(self.attributes["id"])
+        if response is None:
             url = self.url(action='delete', params=self.attributes)
             response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
         self.retrieved = True
@@ -264,3 +204,96 @@ class Model:
                 raise CommentClientRequestError(f"Cannot perform action {action} without id")  # lint-amnesty, pylint: disable=raise-missing-from
         else:   # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()
+
+    def handle_update(self, params=None):
+        request_params = self.updatable_attributes()
+        if params:
+            request_params.update(params)
+        response = None
+        if is_forum_v2_enabled(request_params.get("course_id")):
+            if self.type == "comment":
+                response = self.handle_update_comment(request_params)
+        if response is None:
+            response = self.perform_http_put_request(request_params)
+        return response
+
+    def handle_update_comment(self, request_params):
+        try:
+            body = request_params["body"]
+            course_id = str(request_params["course_id"])
+            user_id = request_params["user_id"]
+        except KeyError as e:
+            raise e
+        response = forum_api.update_comment(
+            self.attributes["id"],
+            body,
+            course_id,
+            user_id,
+            request_params.get("anonymous", False),
+            request_params.get("anonymous_to_peers", False),
+            request_params.get("endorsed", False),
+            request_params.get("closed", False),
+            request_params.get("editing_user_id"),
+            request_params.get("edit_reason_code"),
+            request_params.get("endorsement_user_id"),
+        )
+        return response
+
+    def perform_http_put_request(self, request_params):
+        url = self.url(action="put", params=self.attributes)
+        response = perform_request(
+            "put",
+            url,
+            request_params,
+            metric_tags=self._metric_tags,
+            metric_action="model.update",
+        )
+        return response
+
+    def perform_http_post_request(self):
+        url = self.url(action="post", params=self.attributes)
+        response = perform_request(
+            "post",
+            url,
+            self.initializable_attributes(),
+            metric_tags=self._metric_tags,
+            metric_action="model.insert",
+        )
+        return response
+
+    def handle_create(self):
+        response = None
+        if is_forum_v2_enabled(self.attributes.get("course_id")):
+            if self.type == "comment":
+                response = self.handle_create_comment()
+        if response is None:
+            response = self.perform_http_post_request()
+        return response
+
+    def handle_create_comment(self):
+        request_data = self.initializable_attributes()
+        try:
+            body = request_data["body"]
+            user_id = request_data["user_id"]
+            course_id = str(request_data["course_id"])
+        except KeyError as e:
+            raise e
+        if parent_id := self.attributes.get("parent_id"):
+            response = forum_api.create_child_comment(
+                parent_id,
+                body,
+                user_id,
+                course_id,
+                request_data.get("anonymous", False),
+                request_data.get("anonymous_to_peers", False),
+            )
+        else:
+            response = forum_api.create_parent_comment(
+                self.attributes["thread_id"],
+                body,
+                user_id,
+                course_id,
+                request_data.get("anonymous", False),
+                request_data.get("anonymous_to_peers", False),
+            )
+        return response

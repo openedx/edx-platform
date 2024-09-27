@@ -7,6 +7,7 @@ from eventtracking import tracker
 
 from . import models, settings, utils
 from forum import api as forum_api
+from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
 log = logging.getLogger(__name__)
 
@@ -194,12 +195,34 @@ class Thread(models.Model):
         voteable._update_from_response(response)
 
     def pin(self, user, thread_id):
-        thread_data = forum_api.pin_thread(user.id, thread_id)
-        self._update_from_response(thread_data)
+        if is_forum_v2_enabled(self.attributes.get("course_id")):
+            response = forum_api.pin_thread(user.id, thread_id)
+        else:
+            url = _url_for_pin_thread(thread_id)
+            params = {'user_id': user.id}
+            response = utils.perform_request(
+                'put',
+                url,
+                params,
+                metric_tags=self._metric_tags,
+                metric_action='thread.pin'
+            )
+        self._update_from_response(response)
 
     def un_pin(self, user, thread_id):
-        thread_data = forum_api.unpin_thread(user.id, thread_id)
-        self._update_from_response(thread_data)
+        if is_forum_v2_enabled(self.attributes.get("course_id")):
+            response = forum_api.unpin_thread(user.id, thread_id)
+        else:
+            url = _url_for_un_pin_thread(thread_id)
+            params = {'user_id': user.id}
+            response = utils.perform_request(
+                'put',
+                url,
+                params,
+                metric_tags=self._metric_tags,
+                metric_action='thread.unpin'
+            )
+        self._update_from_response(response)
 
 
 def _url_for_flag_abuse_thread(thread_id):
@@ -208,3 +231,11 @@ def _url_for_flag_abuse_thread(thread_id):
 
 def _url_for_unflag_abuse_thread(thread_id):
     return f"{settings.PREFIX}/threads/{thread_id}/abuse_unflag"
+
+
+def _url_for_pin_thread(thread_id):
+    return f"{settings.PREFIX}/threads/{thread_id}/pin"
+
+
+def _url_for_un_pin_thread(thread_id):
+    return f"{settings.PREFIX}/threads/{thread_id}/unpin"

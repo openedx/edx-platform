@@ -54,12 +54,9 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
-
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -577,12 +574,9 @@ class ThreadSerializerDeserializationTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
-
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
@@ -814,12 +808,9 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-
-        # Patch get_user for the entire class
-        patcher = mock.patch('openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user')
-        self.mock_get_user = patcher.start()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
         self.addCleanup(patcher.stop)
-
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
