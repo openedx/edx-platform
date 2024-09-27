@@ -1046,6 +1046,7 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):  
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+@patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-class-docstring
         CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
@@ -1057,7 +1058,16 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
         super().setUp()
         self.cohorted_commentable_id = 'cohorted_topic'
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):  # pylint: disable=arguments-differ
+    def call_view(
+        self,
+        mock_is_forum_v2_enabled,
+        mock_request,
+        commentable_id,
+        user,
+        group_id,
+        pass_group_id=True
+    ):  # pylint: disable=arguments-differ
+        mock_is_forum_v2_enabled.return_value = False
         kwargs = {'commentable_id': self.cohorted_commentable_id}
         if group_id:
             # avoid causing a server error when the LMS chokes attempting
@@ -1084,8 +1094,9 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
             commentable_id
         )
 
-    def test_group_info_in_ajax_response(self, mock_request):
+    def test_group_info_in_ajax_response(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
+            mock_is_forum_v2_enabled,
             mock_request,
             self.cohorted_commentable_id,
             self.student,
@@ -1097,10 +1108,21 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+@patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
+    def call_view(
+        self,
+        mock_is_forum_v2_enabled,
+        mock_request,
+        commentable_id,
+        user,
+        group_id,
+        pass_group_id=True,
+        is_ajax=False
+    ):  # pylint: disable=arguments-differ
+        mock_is_forum_v2_enabled.return_value = False
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -1120,8 +1142,9 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
             **headers
         )
 
-    def test_group_info_in_html_response(self, mock_request):
+    def test_group_info_in_html_response(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
+            mock_is_forum_v2_enabled,
             mock_request,
             "cohorted_topic",
             self.student,
@@ -1129,8 +1152,9 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
         )
         self._assert_html_response_contains_group_info(response)
 
-    def test_group_info_in_ajax_response(self, mock_request):
+    def test_group_info_in_ajax_response(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
+            mock_is_forum_v2_enabled,
             mock_request,
             "cohorted_topic",
             self.student,
@@ -1143,16 +1167,25 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+@patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/active_threads"
 
     def call_view_for_profiled_user(
-            self, mock_request, requesting_user, profiled_user, group_id, pass_group_id, is_ajax=False
+        self,
+        mock_is_forum_v2_enabled,
+        mock_request,
+        requesting_user,
+        profiled_user,
+        group_id,
+        pass_group_id,
+        is_ajax=False
     ):
         """
         Calls "user_profile" view method on behalf of "requesting_user" to get information about
         the user "profiled_user".
         """
+        mock_is_forum_v2_enabled.return_value = False
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -1172,13 +1205,23 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
             **headers
         )
 
-    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
+    def call_view(
+        self,
+        mock_is_forum_v2_enabled,
+        mock_request,
+        _commentable_id,
+        user,
+        group_id,
+        pass_group_id=True,
+        is_ajax=False
+    ):  # pylint: disable=arguments-differ
         return self.call_view_for_profiled_user(
-            mock_request, user, user, group_id, pass_group_id=pass_group_id, is_ajax=is_ajax
+            mock_is_forum_v2_enabled, mock_request, user, user, group_id, pass_group_id=pass_group_id, is_ajax=is_ajax
         )
 
-    def test_group_info_in_html_response(self, mock_request):
+    def test_group_info_in_html_response(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
+            mock_is_forum_v2_enabled,
             mock_request,
             "cohorted_topic",
             self.student,
@@ -1187,8 +1230,9 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         )
         self._assert_html_response_contains_group_info(response)
 
-    def test_group_info_in_ajax_response(self, mock_request):
+    def test_group_info_in_ajax_response(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
+            mock_is_forum_v2_enabled,
             mock_request,
             "cohorted_topic",
             self.student,
@@ -1200,7 +1244,14 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         )
 
     def _test_group_id_passed_to_user_profile(
-            self, mock_request, expect_group_id_in_request, requesting_user, profiled_user, group_id, pass_group_id
+        self,
+        mock_is_forum_v2_enabled,
+        mock_request,
+        expect_group_id_in_request,
+        requesting_user,
+        profiled_user,
+        group_id,
+        pass_group_id
     ):
         """
         Helper method for testing whether or not group_id was passed to the user_profile request.
@@ -1225,6 +1276,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 
         mock_request.reset_mock()
         self.call_view_for_profiled_user(
+            mock_is_forum_v2_enabled,
             mock_request,
             requesting_user,
             profiled_user,
@@ -1243,7 +1295,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         else:
             assert 'group_id' not in params_with_course_id
 
-    def test_group_id_passed_to_user_profile_student(self, mock_request):
+    def test_group_id_passed_to_user_profile_student(self, mock_is_forum_v2_enabled, mock_request):
         """
         Test that the group id is always included when requesting user profile information for a particular
         course if the requester does not have discussion moderation privileges.
@@ -1254,7 +1306,13 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
             (non-privileged user).
             """
             self._test_group_id_passed_to_user_profile(
-                mock_request, True, self.student, profiled_user, self.student_cohort.id, pass_group_id
+                mock_is_forum_v2_enabled,
+                mock_request,
+                True,
+                self.student,
+                profiled_user,
+                self.student_cohort.id,
+                pass_group_id
             )
 
         # In all these test cases, the requesting_user is the student (non-privileged user).
@@ -1264,7 +1322,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=True)
         verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=False)
 
-    def test_group_id_user_profile_moderator(self, mock_request):
+    def test_group_id_user_profile_moderator(self, mock_is_forum_v2_enabled, mock_request):
         """
         Test that the group id is only included when a privileged user requests user profile information for a
         particular course and user if the group_id is explicitly passed in.
@@ -1274,7 +1332,13 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
             Helper method to verify that group_id is present.
             """
             self._test_group_id_passed_to_user_profile(
-                mock_request, True, self.moderator, profiled_user, requested_cohort.id, pass_group_id
+                mock_is_forum_v2_enabled,
+                mock_request,
+                True,
+                self.moderator,
+                profiled_user,
+                requested_cohort.id,
+                pass_group_id
             )
 
         def verify_group_id_not_present(profiled_user, pass_group_id, requested_cohort=self.moderator_cohort):
@@ -1282,7 +1346,13 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
             Helper method to verify that group_id is not present.
             """
             self._test_group_id_passed_to_user_profile(
-                mock_request, False, self.moderator, profiled_user, requested_cohort.id, pass_group_id
+                mock_is_forum_v2_enabled,
+                mock_request,
+                False,
+                self.moderator,
+                profiled_user,
+                requested_cohort.id,
+                pass_group_id
             )
 
         # In all these test cases, the requesting_user is the moderator (privileged user).
@@ -1301,10 +1371,20 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
+@patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/subscribed_threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):  # pylint: disable=arguments-differ
+    def call_view(
+        self,
+        mock_is_forum_v2_enabled,
+        mock_request,
+        commentable_id,
+        user,
+        group_id,
+        pass_group_id=True
+    ):  # pylint: disable=arguments-differ
+        mock_is_forum_v2_enabled.return_value = False
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -1325,8 +1405,9 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
             user.id
         )
 
-    def test_group_info_in_ajax_response(self, mock_request):
+    def test_group_info_in_ajax_response(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
+            mock_is_forum_v2_enabled,
             mock_request,
             "cohorted_topic",
             self.student,
