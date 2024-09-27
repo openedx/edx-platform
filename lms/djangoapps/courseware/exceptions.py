@@ -45,8 +45,12 @@ class CourseRunNotFound(ValueError):
 
 
 class XblockAccessDenied(ValueError):
+    """
+    Indicate that a XBlock is not publicly accessible.
+    """
+
     def __init__(self):
         """
         Initialize XblockAccessDenied exception.
         """
-        super().__init__(f"Please signin to view this xblock!")
+        super().__init__("Please signin to view this xblock!")
