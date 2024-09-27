@@ -692,7 +692,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         block_view_url = reverse('render_xblock', kwargs={'usage_key_string': str(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
         if is_gated:
-            assert response.status_code == 404
+            assert response.status_code == 403
         else:
             assert response.status_code == 200
 
