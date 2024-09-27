@@ -7,6 +7,7 @@ class Redirect(Exception):
     """
     Exception class that requires redirecting to a URL.
     """
+
     def __init__(self, url):
         super().__init__()
         self.url = url
@@ -41,3 +42,11 @@ class CourseRunNotFound(ValueError):
                 course run key or stringified version thereof.
         """
         super().__init__(f"Course run not found: {course_key}")
+
+
+class XblockAccessDenied(ValueError):
+    def __init__(self):
+        """
+        Initialize XblockAccessDenied exception.
+        """
+        super().__init__(f"Please signin to view this xblock!")
