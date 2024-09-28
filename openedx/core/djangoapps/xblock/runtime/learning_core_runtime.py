@@ -21,6 +21,7 @@ from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import FieldData
 
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
+from openedx.core.lib.xblock_serializer.data import StaticFile
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
 
@@ -215,6 +216,42 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         self.system.authored_data_store.mark_unchanged(block)
 
         return block
+
+    def get_block_assets(self, usage_key):
+        """
+        This currently doesn't copy any
+        """
+        component = self._get_component_from_usage_key(usage_key)
+        component_version = component.versioning.draft
+
+        # If there is no Draft version, then this was soft-deleted
+        if component_version is None:
+            return []
+
+        # cvc = the ComponentVersionContent through table
+        cvc_set = (
+            component_version
+            .componentversioncontent_set
+            .filter(content__has_file=True)
+            .order_by('key')
+            .select_related('content')
+        )
+
+        return [
+            StaticFile(
+                name=cvc.key,
+                url=None,
+#                url=reverse(
+#                    'content_libraries:library-assets',
+#                    kwargs={
+#                        'component_version_uuid': component_version.uuid,
+#                        'asset_path': cvc.key,
+#                    }
+#               ),
+                data=cvc.content.read_file().read()
+            )
+            for cvc in cvc_set
+        ]
 
     def save_block(self, block):
         """

@@ -38,10 +38,25 @@ class XBlockSerializer:
         # Search the OLX for references to files stored in the course's
         # "Files & Uploads" (contentstore):
         self.olx_str = utils.rewrite_absolute_static_urls(self.olx_str, course_key)
-       # for asset in utils.collect_assets_from_text(self.olx_str, course_key):
-       #     path = asset['path']
-       #     if path not in [sf.name for sf in self.static_files]:
-       #         self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
+
+        # If a block supports explicit assets, there's no need to scan the
+        # content looking for static assets that it *might* be using. Learning
+        # Core backed content supports this, which currently means v2 Content
+        # Libraries.
+        runtime_supports_explicit_assets = hasattr(block.runtime, 'get_block_assets')
+        if runtime_supports_explicit_assets:
+            self.static_files.extend(
+                block.runtime.get_block_assets(block.scope_ids.usage_id)
+            )
+            print(f"static_files: {self.static_files}")
+            return
+
+        # Otherwise, we have to scan the content to extract associated asset
+        # files that are stored in the course-global Files and Uploads.
+        for asset in utils.collect_assets_from_text(self.olx_str, course_key):
+            path = asset['path']
+            if path not in [sf.name for sf in self.static_files]:
+                self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
 
         if block.scope_ids.usage_id.block_type in ['problem', 'vertical']:
             py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)
