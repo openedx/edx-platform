@@ -306,6 +306,30 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             'library-assets',
             kwargs={
                 'component_version_uuid': component_version.uuid,
-                'asset_path': asset_path,
+
+                # The standard XBlock "static/{asset_path}"" substitution
+                # strips out the leading "static/" part because it assumes that
+                # all files will exist in a flat namespace. Learning Core treats
+                # directories differently, and there may one day be other files
+                # that are not meant to be externally downloadable at the root
+                # (e.g. LaTeX source files or graders).
+                #
+                # So the transformation looks like this:
+                #
+                # 1. The Learning Core ComponentVersion has an asset stored as
+                #    "static/test.png".
+                # 1. The original OLX content we store references
+                #     "/static/test.png" or "static/test.png".
+                # 2. The ReplaceURLService XBlock runtime service invokes
+                #    static_replace and strips out "/static/".
+                # 3. The method we're in now is invoked with a static_path of
+                #    just "test.png", because that's the transformation that
+                #    works for ModuleStore-based courses.
+                # 4. This method then builds a URL that adds the "static/"
+                #    prefix back when creating the URL.
+                #
+                # Which is a very long explanation for why we're re-adding the
+                # "static/" to the asset path below.
+                'asset_path': f"static/{asset_path}",
             }
         )
