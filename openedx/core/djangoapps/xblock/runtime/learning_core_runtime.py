@@ -219,7 +219,10 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
     def get_block_assets(self, usage_key):
         """
-        This currently doesn't copy any
+        Return a list of StaticFile entries.
+
+        TODO: When we want to copy a whole Section at a time, doing these
+        lookups one by one is going to get slow.
         """
         component = self._get_component_from_usage_key(usage_key)
         component_version = component.versioning.draft
@@ -241,13 +244,6 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             StaticFile(
                 name=cvc.key,
                 url=None,
-#                url=reverse(
-#                    'content_libraries:library-assets',
-#                    kwargs={
-#                        'component_version_uuid': component_version.uuid,
-#                        'asset_path': cvc.key,
-#                    }
-#               ),
                 data=cvc.content.read_file().read()
             )
             for cvc in cvc_set
