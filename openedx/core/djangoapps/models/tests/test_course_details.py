@@ -8,7 +8,6 @@ from django.test import override_settings
 import pytest
 import ddt
 from pytz import UTC
-from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.conf import settings
 from xmodule.modulestore import ModuleStoreEnum

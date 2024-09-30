@@ -522,9 +522,12 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         # ... with a certificate
         input_context = self.create_test_context(input_data.course)
 
-        # ... and some data preemptively gathered
+        # ... and some data preemptively gathered, including a certificate display behavior
         available_date = random_date()
         input_data.course.certificate_available_date = available_date
+        input_data.course.certificates_display_behavior = (
+            CertificatesDisplayBehaviors.END_WITH_DATE
+        )
         cert_url = input_context["cert_statuses"][input_data.course.id][
             "cert_web_view_url"
         ]
