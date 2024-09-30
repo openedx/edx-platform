@@ -209,7 +209,6 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             "uuid": cert_status["uuid"],
         }
 
-
     @ddt.data(
         (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
         (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),

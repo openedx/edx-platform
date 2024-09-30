@@ -655,6 +655,7 @@ def _is_certificate_earned_but_not_available(course_overview, status):
         )
     )
 
+
 def process_survey_link(survey_link, user):
     """
     If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.

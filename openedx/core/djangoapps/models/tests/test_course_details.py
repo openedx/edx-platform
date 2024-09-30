@@ -216,4 +216,3 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         assert CourseDetails.validate_certificate_settings(
             stored_date, stored_behavior
         ) == (expected_date, expected_behavior)
-
