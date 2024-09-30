@@ -66,7 +66,7 @@ def process_request(request):
     """Process the given request"""
     asset_path = request.path
 
-    if is_asset_request(request):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+    if is_asset_request(request):
         # Make sure we can convert this request into a location.
         if AssetLocator.CANONICAL_NAMESPACE in asset_path:
             asset_path = asset_path.replace('block/', 'block@', 1)
@@ -294,10 +294,7 @@ def load_asset_from_location(location):
     content = get_cached_content(location)
     if content is None:
         # Not in cache, so just try and load it from the asset manager.
-        try:
-            content = AssetManager.find(location, as_stream=True)
-        except (ItemNotFoundError, NotFoundError):  # lint-amnesty, pylint: disable=try-except-raise
-            raise
+        content = AssetManager.find(location, as_stream=True)
 
         # Now that we fetched it, let's go ahead and try to cache it. We cap this at 1MB
         # because it's the default for memcached and also we don't want to do too much
