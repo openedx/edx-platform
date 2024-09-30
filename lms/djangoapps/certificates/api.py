@@ -10,7 +10,6 @@ certificates models or any other certificates modules.
 import logging
 from datetime import datetime
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q

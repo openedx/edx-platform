@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import ddt
-from django.conf import settings
 from django.test import TestCase
 from pytz import utc
 
