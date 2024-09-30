@@ -92,18 +92,8 @@ notification_prefs_urls = [
     ),
 ]
 
-from openedx.core.djangoapps.content_libraries.views import component_version_asset
-
 urlpatterns = [
     path('', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
-
-    # this is definitely wrong for now, but I need it to test stuff end-to-end.
-    path(
-        'library_assets/<uuid:component_version_uuid>/<path:asset_path>',
-        component_version_asset,
-        name='library-assets',
-    ),
-
 
     path('', include('common.djangoapps.student.urls')),
     # TODO: Move lms specific student views out of common code

@@ -1041,6 +1041,13 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     """
     Get video transcript from Learning Core.
 
+    This whole tangle of transcript data is a crazy web of backwards
+    compatibility affordances with our bespoke SJSON format, which we should
+    completely abandon. We really shouldn't have to do anything other that
+    make the transcript files available to the frontend and let the VideoBlock
+    choose. But we'll jump through these hoops for now to avoid the pain of that
+    refactor a little longer. :-P
+
     HISTORIC INFORMATION FROM WHEN THIS FUNCTION WAS `get_transcript_from_blockstore`:
 
       Blockstore expects video transcripts to be placed into the 'static/'
@@ -1072,9 +1079,7 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     Returns:
         tuple containing content, filename, mimetype
     """
-    # TODO: Update to use Learning Core data models once static assets support
-    # has been added.
-    raise NotImplementedError("Transcripts not supported.")
+    raise NotImplementedError
 
 
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):

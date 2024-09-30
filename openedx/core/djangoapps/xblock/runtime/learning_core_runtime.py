@@ -336,7 +336,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             raise NoSuchUsage(usage_key)
 
         return reverse(
-            'library-assets',
+            'content_libraries:library-assets',
             kwargs={
                 'component_version_uuid': component_version.uuid,
 

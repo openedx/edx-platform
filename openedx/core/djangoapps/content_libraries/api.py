@@ -102,7 +102,11 @@ from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key, xblock_type_display_name
+from openedx.core.djangoapps.xblock.api import (
+    get_component_from_usage_key,
+    get_xblock_app_config,
+    xblock_type_display_name,
+)
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
 from xmodule.modulestore import ModuleStoreEnum
@@ -1077,11 +1081,13 @@ def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticF
         .select_related('content')
     )
 
+    site_root_url = get_xblock_app_config().get_site_root_url()
+
     return [
         LibraryXBlockStaticFile(
             path=cvc.key,
             size=cvc.content.size,
-            url=reverse(
+            url=site_root_url + reverse(
                 'content_libraries:library-assets',
                 kwargs={
                     'component_version_uuid': component_version.uuid,
