@@ -1159,7 +1159,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                     supports_onboarding = False
 
                 proctoring_exam_configuration_link = None
-                if xblock.is_proctored_exam:
+
+                # only call get_exam_configuration_dashboard_url if not using an LTI proctoring provider
+                if xblock.is_proctored_exam and (course.proctoring_provider != 'lti_external'):
                     proctoring_exam_configuration_link = (
                         get_exam_configuration_dashboard_url(
                             course.id, xblock_info["id"]
