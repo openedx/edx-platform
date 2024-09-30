@@ -1328,6 +1328,8 @@ def ist_to_utc(item):
         if item[date] != 'Jan 01, 1970 05:30 AM':
             dateobj = datetime.datetime.strptime(item[date], "%b %d, %Y %I:%M %p")
             utc_dt = utc.localize(dateobj)
+            if configuration_helpers.get_value("course_org_filter") == 'CMU':
+                utc_dt += datetime.timedelta(hours=5.5)
             local_dt = utc_dt.astimezone(pytz.timezone(configuration_helpers.get_value("TIME_ZONE", 'Asia/Kolkata')))
             item[date] = local_dt.strftime("%b %d, %Y %I:%M %p")
         else:
