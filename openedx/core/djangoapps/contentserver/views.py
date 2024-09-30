@@ -1,22 +1,9 @@
 """
 Views for serving course assets.
 
-Historically, this was implemented as a *middleware* (StaticContentServer) that
-intercepted requests with paths matching certain patterns, rather than using
-urlpatterns and a view. There wasn't any good reason for this, as far as I can
-tell. It causes some problems for telemetry: When the code-owner middleware asks
-Django what view handled the request, it does so by looking at the result of the
-`resolve` utility, but these URLs get a Resolver404 (because there's no
-registered urlpattern).
-
-We've turned it into a proper view, with a few warts remaining:
-
-- The view implementation is all bundled into a StaticContentServer class that
-  doesn't appear to have any state. The methods could likely just be extracted
-  as top-level functions.
-- All three urlpatterns are registered to the same view, which then has to
-  re-parse the URL to determine which pattern is in effect. We should probably
-  have 3 views as entry points.
+For historical reasons, this is just one view that matches to three different URL patterns, and then has to
+re-parse the URL to determine which pattern is in effect. We should probably
+have 3 views as entry points.
 """
 import datetime
 import logging
@@ -51,7 +38,7 @@ def course_assets_view(request):
     """
     Serve course assets to end users. Colloquially referred to as "contentserver."
     """
-    return IMPL.process_request(request)
+    return process_request(request)
 
 
 log = logging.getLogger(__name__)
@@ -62,7 +49,7 @@ log = logging.getLogger(__name__)
 HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
-def is_asset_request(self, request):
+def is_asset_request(request):
     """Determines whether the given request is an asset request"""
     # Don't change this without updating urls.py! See docstring of views.py.
     return (
@@ -73,12 +60,13 @@ def is_asset_request(self, request):
         StaticContent.is_versioned_asset_path(request.path)
     )
 
+
 # pylint: disable=too-many-statements
-def process_request(self, request):
+def process_request(request):
     """Process the given request"""
     asset_path = request.path
 
-    if self.is_asset_request(request):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+    if is_asset_request(request):  # lint-amnesty, pylint: disable=too-many-nested-blocks
         # Make sure we can convert this request into a location.
         if AssetLocator.CANONICAL_NAMESPACE in asset_path:
             asset_path = asset_path.replace('block/', 'block@', 1)
@@ -98,7 +86,7 @@ def process_request(self, request):
         # if we're able to load it.
         actual_digest = None
         try:
-            content = self.load_asset_from_location(loc)
+            content = load_asset_from_location(loc)
             actual_digest = getattr(content, "content_digest", None)
         except (ItemNotFoundError, NotFoundError):
             return HttpResponseNotFound()
@@ -121,15 +109,15 @@ def process_request(self, request):
         set_custom_attribute('contentserver.path', loc.path)
 
         # Figure out if this is a CDN using us as the origin.
-        is_from_cdn = StaticContentServer.is_cdn_request(request)
+        is_from_cdn = is_cdn_request(request)
         set_custom_attribute('contentserver.from_cdn', is_from_cdn)
 
         # Check if this content is locked or not.
-        locked = self.is_content_locked(content)
+        locked = is_content_locked(content)
         set_custom_attribute('contentserver.locked', locked)
 
         # Check that user has access to the content.
-        if not self.is_user_authorized(request, content, loc):
+        if not is_user_authorized(request, content, loc):
             return HttpResponseForbidden('Unauthorized')
 
         # Figure out if the client sent us a conditional request, and let them know
@@ -209,11 +197,12 @@ def process_request(self, request):
         # middleware we have in place, there's no easy way to use the built-in Django
         # utilities and properly sanitize and modify a response to ensure that it is as
         # cacheable as possible, which is why we do it ourselves.
-        self.set_caching_headers(content, response)
+        set_caching_headers(content, response)
 
         return response
 
-def set_caching_headers(self, content, response):
+
+def set_caching_headers(content, response):
     """
     Sets caching headers based on whether or not the asset is locked.
     """
@@ -229,7 +218,7 @@ def set_caching_headers(self, content, response):
     if cache_ttl > 0 and not is_locked:
         set_custom_attribute('contentserver.cacheable', True)
 
-        response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
+        response['Expires'] = get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
         response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
     elif is_locked:
         set_custom_attribute('contentserver.cacheable', False)
@@ -242,6 +231,7 @@ def set_caching_headers(self, content, response):
     # separately and don't screw over one another. i.e. a browser request that doesn't send Origin, and
     # caches a version of the response without CORS headers, in turn breaking XHR requests.
     force_header_for_response(response, 'Vary', 'Origin')
+
 
 @staticmethod
 def is_cdn_request(request):
@@ -259,23 +249,26 @@ def is_cdn_request(request):
 
     return False
 
+
 @staticmethod
 def get_expiration_value(now, cache_ttl):
     """Generates an RFC1123 datetime string based on a future offset."""
     expire_dt = now + datetime.timedelta(seconds=cache_ttl)
     return expire_dt.strftime(HTTP_DATE_FORMAT)
 
-def is_content_locked(self, content):
+
+def is_content_locked(content):
     """
     Determines whether or not the given content is locked.
     """
     return bool(getattr(content, "locked", False))
 
-def is_user_authorized(self, request, content, location):
+
+def is_user_authorized(request, content, location):
     """
     Determines whether or not the user for this request is authorized to view the given asset.
     """
-    if not self.is_content_locked(content):
+    if not is_content_locked(content):
         return True
 
     if not hasattr(request, "user") or not request.user.is_authenticated:
@@ -290,7 +283,8 @@ def is_user_authorized(self, request, content, location):
 
     return True
 
-def load_asset_from_location(self, location):
+
+def load_asset_from_location(location):
     """
     Loads an asset based on its location, either retrieving it from a cache
     or loading it directly from the contentstore.
@@ -313,9 +307,6 @@ def load_asset_from_location(self, location):
             set_cached_content(content)
 
     return content
-
-
-IMPL = StaticContentServer()
 
 
 def parse_range_header(header_value, content_length):
