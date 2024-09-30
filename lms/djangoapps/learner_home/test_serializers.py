@@ -544,23 +544,6 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
             },
         )
 
-    @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=False)
-    def test_available_date_old_format(self):
-        # Given new cert display settings are not enabled
-        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
-        input_data.course.certificate_available_date = random_date()
-        input_context = self.create_test_context(input_data.course)
-
-        # When I get certificate info
-        output_data = CertificateSerializer(input_data, context=input_context).data
-
-        # Then the available date is defaulted to the certificate available date
-        expected_available_date = datetime_to_django_format(
-            input_data.course.certificate_available_date
-        )
-        self.assertEqual(output_data["availableDate"], expected_available_date)
-
-    @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
     def test_available_date_course_end(self):
         # Given new cert display settings are enabled
         input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
@@ -578,7 +561,6 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         expected_available_date = datetime_to_django_format(input_data.course.end)
         self.assertEqual(output_data["availableDate"], expected_available_date)
 
-    @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
     def test_available_date_specific_end(self):
         # Given new cert display settings are enabled
         input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
