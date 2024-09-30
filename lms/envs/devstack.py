@@ -522,15 +522,9 @@ course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
 ]
 course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
 
-######################## Subscriptions API SETTINGS ########################
-SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
-SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
-
-SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
-SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
-SUBSCRIPTIONS_TRIAL_LENGTH = 7
+lc_enrollment_revoked_setting = \
+    EVENT_BUS_PRODUCER_CONFIG['org.openedx.enterprise.learner_credit_course_enrollment.revoked.v1']
+lc_enrollment_revoked_setting['learner-credit-course-enrollment-lifecycle']['enabled'] = True
 
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
@@ -552,6 +546,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:1992',  # frontend-app-ora
     'http://localhost:2002',  # frontend-app-discussions
     'http://localhost:1991',  # frontend-app-admin-portal
+    'http://localhost:8734',  # frontend-app-learner-portal-enterprise
     'http://localhost:1999',  # frontend-app-authn
     'http://localhost:18450',  # frontend-app-support-tools
     'http://localhost:1994',  # frontend-app-gradebook

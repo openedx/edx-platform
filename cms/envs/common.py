@@ -949,7 +949,6 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
-    'openedx.core.djangoapps.contentserver.middleware.StaticContentServerMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'common.djangoapps.track.middleware.TrackMiddleware',
@@ -1449,9 +1448,8 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/string-utils.js',
     'edx-ui-toolkit/js/utils/html-utils.js',
 
-    # Load Bootstrap and supporting libraries
-    'common/js/vendor/popper.js',
-    'common/js/vendor/bootstrap.js',
+    # Here we were loading Bootstrap and supporting libraries, but it no longer seems to be needed for any Studio UI.
+    # 'common/js/vendor/bootstrap.bundle.js',
 
     # Finally load RequireJS
     'common/js/vendor/require.js'
@@ -1880,6 +1878,7 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
+    "openedx_learning.apps.authoring.collections",
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
@@ -2814,8 +2813,14 @@ EDX_BRAZE_API_SERVER = None
 
 BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
+######################## Discussion Forum settings ########################
+
+# Feedback link in upgraded discussion notification alert
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
-DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+# Learn More link in upgraded discussion notification alert
+# pylint: disable=line-too-long
+DISCUSSIONS_INCONTEXT_LEARNMORE_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_discussions/discussions.html"
 
 #### django-simple-history##
 # disable indexing on date field its coming django-simple-history.
@@ -2937,3 +2942,10 @@ MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 # See https://www.meilisearch.com/docs/learn/security/tenant_tokens
 MEILISEARCH_INDEX_PREFIX = ""
 MEILISEARCH_API_KEY = "devkey"
+
+# .. setting_name: DISABLED_COUNTRIES
+# .. setting_default: []
+# .. setting_description: List of country codes that should be disabled
+# .. for now it wil impact country listing in auth flow and user profile.
+# .. eg ['US', 'CA']
+DISABLED_COUNTRIES = []
