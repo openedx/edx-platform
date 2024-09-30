@@ -1,18 +1,15 @@
 """
 Tests for Learning-Core-based Content Libraries
 """
-from unittest.mock import Mock, patch
+from datetime import datetime, timezone
 from unittest import skip
+from unittest.mock import Mock, patch
+from uuid import uuid4
 
 import ddt
-from datetime import datetime, timezone
-from uuid import uuid4
 from django.contrib.auth.models import Group
 from django.test.client import Client
 from freezegun import freeze_time
-from organizations.models import Organization
-from rest_framework.test import APITestCase
-
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
 from openedx_events.content_authoring.signals import (
@@ -21,20 +18,23 @@ from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
-    LIBRARY_BLOCK_UPDATED,
+    LIBRARY_BLOCK_UPDATED
 )
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from organizations.models import Organization
+from rest_framework.test import APITestCase
+
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.constants import CC_4_BY, COMPLEX, PROBLEM, VIDEO
 from openedx.core.djangoapps.content_libraries.tests.base import (
-    ContentLibrariesRestApiTest,
+    URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
     URL_BLOCK_RENDER_VIEW,
-    URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_XBLOCK_HANDLER,
+    ContentLibrariesRestApiTest
 )
-from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from common.djangoapps.student.tests.factories import UserFactory
 
 
 @skip_unless_cms
@@ -1049,6 +1049,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self.assertDictContainsEntries(self._get_library_block(paste_data["id"]), {
                 **block_data,
                 "last_draft_created_by": None,
+                "last_draft_created": paste_data["last_draft_created"],
+                "created": paste_data["created"],
+                "modified": paste_data["modified"],
                 "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
             })
 

@@ -9,7 +9,7 @@ on:
 jobs:
   lint-imports:
     name: Lint Python Imports
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out branch
