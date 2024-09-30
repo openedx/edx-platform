@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from organizations.models import Organization
 
 from freezegun import freeze_time
-from openedx_learning.api import authoring as authoring_api
 
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_libraries import api as library_api
@@ -299,11 +298,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         }
 
     def test_collection_with_library(self):
-        doc = searchable_doc_for_collection(self.collection)
-        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection))
+        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
+        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
 
         assert doc == {
-            "id": self.collection.id,
+            "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
             "usage_key": self.collection_usage_key,
             "type": "collection",
@@ -320,34 +319,4 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 'taxonomy': ['Difficulty'],
                 'level0': ['Difficulty > Normal']
             }
-        }
-
-    def test_collection_with_no_library(self):
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            learning_package = authoring_api.create_learning_package(
-                key="course-v1:edX+toy+2012_Fall",
-                title="some learning_package",
-                description="some description",
-            )
-            collection = authoring_api.create_collection(
-                learning_package_id=learning_package.id,
-                key="MYCOL",
-                title="my_collection",
-                created_by=None,
-                description="my collection description"
-            )
-        doc = searchable_doc_for_collection(collection)
-        assert doc == {
-            "id": collection.id,
-            "block_id": collection.key,
-            "type": "collection",
-            "display_name": "my_collection",
-            "description": "my collection description",
-            "num_children": 0,
-            "context_key": learning_package.key,
-            "access_id": self.toy_course_access_id,
-            "breadcrumbs": [{"display_name": "some learning_package"}],
-            "created": created_date.timestamp(),
-            "modified": created_date.timestamp(),
         }

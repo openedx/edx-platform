@@ -15,8 +15,10 @@ import json
 import logging
 import os.path
 import uuid
+
 from datetime import timedelta
 from email.utils import formatdate
+
 
 import requests
 from config_models.models import ConfigurationModel
@@ -1214,7 +1216,7 @@ class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-m
         return str(self.arguments)
 
 
-class VerificationAttempt(TimeStampedModel):
+class VerificationAttempt(StatusModel):
     """
     The model represents impelementation-agnostic information about identity verification (IDV) attempts.
 
@@ -1224,23 +1226,29 @@ class VerificationAttempt(TimeStampedModel):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=255)
 
-    STATUS_CHOICES = [
+    STATUS = Choices(
         VerificationAttemptStatus.CREATED,
         VerificationAttemptStatus.PENDING,
         VerificationAttemptStatus.APPROVED,
         VerificationAttemptStatus.DENIED,
-    ]
-    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
+    )
 
     expiration_datetime = models.DateTimeField(
         null=True,
         blank=True,
     )
 
-    @property
-    def updated_at(self):
-        """Backwards compatibility with existing IDVerification models"""
-        return self.modified
+    hide_status_from_user = models.BooleanField(
+        default=False,
+        null=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    def should_display_status_to_user(self):
+        """When called, returns true or false based on the type of VerificationAttempt"""
+        return not self.hide_status_from_user
 
     @classmethod
     def retire_user(cls, user_id):
