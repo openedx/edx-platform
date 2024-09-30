@@ -744,9 +744,6 @@ def set_library_block_olx(usage_key, new_olx_str):
     # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
     assert isinstance(usage_key, LibraryUsageLocatorV2)
 
-    # Make sure the block exists:
-    _block_metadata = get_library_block(usage_key)
-
     # Verify that the OLX parses, at least as generic XML, and the root tag is correct:
     node = etree.fromstring(new_olx_str)
     if node.tag != usage_key.block_type:
@@ -776,7 +773,7 @@ def set_library_block_olx(usage_key, new_olx_str):
             text=new_olx_str,
             created=now,
         )
-        authoring_api.create_next_version(
+        component_version = authoring_api.create_next_component_version(
             component.pk,
             title=new_title,
             content_to_replace={
@@ -791,6 +788,8 @@ def set_library_block_olx(usage_key, new_olx_str):
             usage_key=usage_key
         )
     )
+
+    return component_version
 
 
 def validate_can_add_block_to_library(
@@ -907,11 +906,23 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
 
     # Create component for block then populate it with clipboard data
     with transaction.atomic():
-        component_version = _create_component_for_block(
-            content_library,
-            usage_key,
-            user.id,
+        # First create the Component, but do not initialize it to anything (i.e.
+        # no ComponentVersion).
+        component_type = authoring_api.get_or_create_component_type(
+            "xblock.v1", usage_key.block_type
         )
+        component = authoring_api.create_component(
+            content_library.learning_package.id,
+            component_type=component_type,
+            local_key=usage_key.block_id,
+            created=now,
+            created_by=user.id,
+        )
+
+        # This will create the first component version and set the OLX/title
+        # appropriately. It will not publish. Once we get the newly created
+        # ComponentVersion back from this, we can attach all our files to it.
+        component_version = set_library_block_olx(usage_key, olx_str)
 
         for staged_content_file_data in staged_content_files:
             # The ``data`` attribute is going to be None because the clipboard
@@ -961,12 +972,6 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
                 key=filename,
                 learner_downloadable=True,
             )
-
-        # Right now the ordering of this is important and set_library_block_olx
-        # makes a new version (so pasting makes two version instead of one).
-        # Get this more cleanly refactored later.
-        set_library_block_olx(usage_key, olx_str)
-
 
     # Emit library block created event
     LIBRARY_BLOCK_CREATED.send_event(
