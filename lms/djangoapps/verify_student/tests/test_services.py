@@ -2,9 +2,7 @@
 Tests for the service classes in verify_student.
 """
 
-import itertools
 from datetime import datetime, timedelta, timezone
-from random import randint
 from unittest.mock import patch
 
 import ddt
@@ -230,52 +228,6 @@ class TestIDVerificationService(ModuleStoreTestCase):
 
         expiration_datetime = IDVerificationService.get_expiration_datetime(user, ['approved'])
         assert expiration_datetime == newest.expiration_datetime
-
-    @ddt.data(
-        {'status': 'denied', 'error_msg': '[{"generalReasons": ["Name mismatch"]}]'},
-        {'status': 'approved', 'error_msg': ''},
-        {'status': 'submitted', 'error_msg': ''},
-    )
-    def test_get_verification_details_by_id(self, kwargs):
-        user = UserFactory.create()
-        kwargs['user'] = user
-        sspv = SoftwareSecurePhotoVerification.objects.create(**kwargs)
-        attempt = IDVerificationService.get_verification_details_by_id(sspv.id)
-        assert attempt.id == sspv.id
-        assert attempt.user.id == user.id
-        assert attempt.status == kwargs['status']
-        assert attempt.error_msg == kwargs['error_msg']
-
-    @ddt.data(
-        *itertools.product(
-            [SSOVerification, ManualVerification],
-            [
-                {'status': 'denied'},
-                {'status': 'approved'},
-                {'status': 'submitted'},
-            ]
-        )
-    )
-    @ddt.unpack
-    def test_get_verification_details_other_types(self, verification_model, kwargs):
-        user = UserFactory.create()
-        kwargs['user'] = user
-        model_object = verification_model.objects.create(**kwargs)
-
-        attempt = IDVerificationService.get_verification_details_by_id(model_object.id)
-        assert attempt.id == model_object.id
-        assert attempt.user.id == user.id
-        assert attempt.status == kwargs['status']
-
-    @ddt.data(
-        SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
-    )
-    def test_get_verification_details_not_found(self, verification_model):
-        user = UserFactory.create()
-        model_object = verification_model.objects.create(user=user)
-        not_found_id = model_object.id + randint(100, 200)
-        attempt = IDVerificationService.get_verification_details_by_id(not_found_id)
-        assert attempt is None
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
