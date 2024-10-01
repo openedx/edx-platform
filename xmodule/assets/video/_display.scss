@@ -23,7 +23,7 @@ $secondary-light: rgb(219, 139, 175); // UXPL secondary light
 $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
 & {
-  margin-bottom: ($baseline*1.5);
+  margin-bottom: calc((var(--baseline)*1.5));
 }
 
 .is-hidden {
@@ -99,9 +99,9 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     .branding,
     .wrapper-transcript-feedback {
       flex: 1;
-      margin-top: $baseline;
+      margin-top: var(--baseline);
 
-      @include padding-right($baseline);
+      @include padding-right(var(--baseline));
 
       vertical-align: top;
     }
@@ -147,14 +147,14 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         left: -9999em;
         display: inline-block;
         vertical-align: middle;
-        color: $body-color;
+        color: var(--body-color);
       }
 
       .brand-logo {
         display: inline-block;
         max-width: 100%;
-        max-height: ($baseline*2);
-        padding: ($baseline/4) 0;
+        max-height: calc((var(--baseline)*2));
+        padding: calc((var(--baseline)/4)) 0;
         vertical-align: middle;
       }
     }
@@ -180,8 +180,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
   .google-disclaimer {
     display: none;
-    margin-top: $baseline;
-    @include padding-right($baseline);
+    margin-top: var(--baseline);
+    @include padding-right(var(--baseline));
     vertical-align: top;
   }
 
@@ -246,7 +246,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       opacity: 0.1;
 
       &::after {
-        background: $white;
+        background: var(--white);
         position: absolute;
         width: 50%;
         height: 50%;
@@ -271,23 +271,23 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     }
 
     .closed-captions.is-visible {
-      max-height: ($baseline * 3);
-      border-radius: ($baseline / 5);
-      padding: 8px ($baseline / 2) 8px ($baseline * 1.5);
+      max-height: calc((var(--baseline) * 3));
+      border-radius: calc((var(--baseline) / 5));
+      padding: 8px calc((var(--baseline) / 2)) 8px calc((var(--baseline) * 1.5));
       background: rgba(0, 0, 0, 0.75);
-      color: $yellow;
+      color: var(--yellow);
 
       &::before {
         position: absolute;
         display: inline-block;
         top: 50%;
 
-        @include left($baseline);
+        @include left(var(--baseline));
 
         margin-top: -0.6em;
         font-family: 'FontAwesome';
         content: "\f142";
-        color: $white;
+        color: var(--white);
         opacity: 0.5;
       }
 
@@ -316,7 +316,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
       .video-error,
       .video-hls-error {
-        padding: ($baseline / 5);
+        padding: calc((var(--baseline) / 5));
         background: black;
         color: white !important; // the pattern library headings shim is more scoped
       }
@@ -366,7 +366,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         margin: 0;
         border: 0;
         border-radius: 0;
-        padding: ($baseline / 2) ($baseline / 1.5);
+        padding: calc((var(--baseline) / 2)) calc((var(--baseline) / 1.5));
         background: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
         box-shadow: none;
         text-shadow: none;
@@ -409,7 +409,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         left: 0;
         right: 0;
         z-index: 1;
-        height: ($baseline / 4);
+        height: calc((var(--baseline) / 4));
         margin-left: 0;
         border: 1px solid $cool-dark;
         border-radius: 0;
@@ -436,11 +436,11 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
           box-sizing: border-box;
           top: -1px;
-          height: ($baseline / 4);
-          width: ($baseline / 4);
-          margin-left: -($baseline / 8); // center-center causes the control to be beyond the end of the sider
+          height: calc((var(--baseline) / 4));
+          width: calc((var(--baseline) / 4));
+          margin-left: calc(-1 * (var(--baseline) / 8)); // center-center causes the control to be beyond the end of the sider
           border: 1px solid $secondary-base;
-          border-radius: ($baseline / 5);
+          border-radius: calc((var(--baseline) / 5));
           padding: 0;
           background: $secondary-base;
           box-shadow: none;
@@ -527,7 +527,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
             position: absolute;
             display: none;
-            bottom: ($baseline * 2);
+            bottom: calc((var(--baseline) * 2));
 
             @include right(0); // right-align menus since this whole collection is on the right
 
@@ -571,9 +571,9 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
               &.is-active {
                 .speed-option,
                 .control-lang {
-                  @include border-left($baseline/10 solid rgb(14, 166, 236));
+                  @include border-left(calc(var(--baseline) / 10) solid rgb(14, 166, 236));
 
-                  font-weight: $font-bold;
+                  font-weight: var(--font-bold);
                   color: rgb(14, 166, 236); // UXPL primary accent
                 }
               }
@@ -610,9 +610,9 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
           .speed-button {
             .label {
-              @include padding(0 ($baseline/3) 0 0);
+              @include padding(0 calc((var(--baseline)/3)) 0 0);
 
-              font-family: $font-family-sans-serif;
+              font-family: var(--font-family-sans-serif);
               color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
 
               @media (max-width: 1120px) {
@@ -636,8 +636,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
         .lang {
           .language-menu {
-            width: $baseline;
-            padding: ($baseline / 2) 0;
+            width: var(--baseline);
+            padding: calc((var(--baseline) / 2)) 0;
           }
 
           .control {
@@ -685,7 +685,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
             display: none;
             position: absolute;
-            bottom: ($baseline * 2);
+            bottom: calc((var(--baseline) * 2));
 
             @include right(0);
 
@@ -695,7 +695,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
             .volume-slider {
               height: 100px;
-              width: ($baseline / 4);
+              width: calc((var(--baseline) / 4));
               margin: 14px auto;
               box-sizing: border-box;
               border: 1px solid $cool-dark;
@@ -704,14 +704,14 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
               .ui-slider-handle {
                 @extend %ui-fake-link;
 
-                @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
+                @include transition(height var(--tmg-s2) ease-in-out 0s, width var(--tmg-s2) ease-in-out 0s);
                 @include left(-5px);
 
                 box-sizing: border-box;
                 height: 13px;
                 width: 13px;
                 border: 1px solid $secondary-base;
-                border-radius: ($baseline / 5);
+                border-radius: calc((var(--baseline) / 5));
                 padding: 0;
                 background: $secondary-base;
                 box-shadow: none;
@@ -763,11 +763,11 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     &:hover {
       .video-controls {
         .slider {
-          height: ($baseline / 1.5);
+          height: calc((var(--baseline) / 1.5));
 
           .ui-slider-handle {
-            height: ($baseline / 1.5);
-            width: ($baseline / 1.5);
+            height: calc((var(--baseline) / 1.5));
+            width: calc((var(--baseline) / 1.5));
           }
         }
       }
@@ -887,7 +887,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       bottom: 0;
       top: 0;
       width: 275px;
-      padding: 0 $baseline;
+      padding: 0 var(--baseline);
       display: none;
     }
   }
@@ -973,14 +973,14 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       box-sizing: border-box;
       @include transition(none);
 
-      background: $black;
+      background: var(--black);
       visibility: visible;
 
       li {
         color: #aaa;
 
         &.current {
-          color: $white;
+          color: var(--white);
         }
       }
     }
@@ -1010,17 +1010,17 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: 100%;
-    background-color: $black;
+    background-color: var(--black);
 
     &.is-html5 {
       background-size: 15%;
     }
 
     .btn-play.btn-pre-roll {
-      padding: $baseline;
+      padding: var(--baseline);
       border: none;
-      border-radius: $baseline;
-      background: $black-t2;
+      border-radius: var(--baseline);
+      background: var(--black-t2);
       box-shadow: none;
 
       &::after {
@@ -1030,13 +1030,13 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       }
 
       img {
-        height: ($baseline * 4);
-        width: ($baseline * 4);
+        height: calc((var(--baseline) * 4));
+        width: calc((var(--baseline) * 4));
       }
 
       &:hover,
       &:focus {
-        background: $blue;
+        background: var(--blue);
       }
     }
   }
