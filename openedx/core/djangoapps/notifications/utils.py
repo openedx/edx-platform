@@ -2,10 +2,11 @@
 Utils function for notifications app
 """
 from typing import Dict, List
+from waffle import get_waffle_flag_model
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NEW_NOTIFICATION_VIEW
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -45,6 +46,19 @@ def get_show_notifications_tray(user):
             break
 
     return show_notifications_tray
+
+
+def get_is_new_notification_view_enabled():
+    """
+    Returns True if the waffle flag for the new notification view is enabled, False otherwise.
+    """
+    flag_model = get_waffle_flag_model()
+
+    try:
+        flag = flag_model.objects.get(name=ENABLE_NEW_NOTIFICATION_VIEW.name)
+        return flag.everyone if flag.everyone is not None else False
+    except flag_model.DoesNotExist:
+        return False
 
 
 def get_list_in_batches(input_list, batch_size):
