@@ -108,7 +108,7 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer
+    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer, UniqueStudentIdentifierSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -1703,60 +1703,55 @@ class GetAnonIds(APIView):
         return JsonResponse({"status": success_status})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_ENROLLMENTS)
-@require_post_params(
-    unique_student_identifier="email or username of student for whom to get enrollment status"
-)
-def get_student_enrollment_status(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class GetStudentEnrollmentStatus(APIView):
     """
     Get the enrollment status of a student.
-    Limited to staff access.
-
-    Takes query parameter unique_student_identifier
     """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_ENROLLMENTS
 
-    error = ''
-    user = None
-    mode = None
-    is_active = None
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Permission: Limited to staff access.
+        Takes query parameter unique_student_identifier
+        """
+        error = ''
+        mode = None
+        is_active = None
 
-    course_id = CourseKey.from_string(course_id)
-    unique_student_identifier = request.POST.get('unique_student_identifier')
+        course_id = CourseKey.from_string(course_id)
+        unique_student_identifier = request.data.get("unique_student_identifier")
 
-    try:
-        user = get_student_from_identifier(unique_student_identifier)
-        mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-    except User.DoesNotExist:
-        # The student could have been invited to enroll without having
-        # registered. We'll also look at CourseEnrollmentAllowed
-        # records, so let the lack of a User slide.
-        pass
+        serializer_data = UniqueStudentIdentifierSerializer(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    enrollment_status = _('Enrollment status for {student}: unknown').format(student=unique_student_identifier)
+        user = serializer_data.validated_data.get('unique_student_identifier')
+        if user:
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
 
-    if user and mode:
-        if is_active:
-            enrollment_status = _('Enrollment status for {student}: active').format(student=user)
+        if user and mode:
+            if is_active:
+                enrollment_status = _('Enrollment status for {student}: active').format(student=user)
+            else:
+                enrollment_status = _('Enrollment status for {student}: inactive').format(student=user)
         else:
-            enrollment_status = _('Enrollment status for {student}: inactive').format(student=user)
-    else:
-        email = user.email if user else unique_student_identifier
-        allowed = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id)
-        if allowed and email in [cea.email for cea in allowed]:
-            enrollment_status = _('Enrollment status for {student}: pending').format(student=email)
-        else:
-            enrollment_status = _('Enrollment status for {student}: never enrolled').format(student=email)
+            email = user.email if user else unique_student_identifier
+            allowed = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id)
+            if allowed and email in [cea.email for cea in allowed]:
+                enrollment_status = _('Enrollment status for {student}: pending').format(student=email)
+            else:
+                enrollment_status = _('Enrollment status for {student}: never enrolled').format(student=email)
 
-    response_payload = {
-        'course_id': str(course_id),
-        'error': error,
-        'enrollment_status': enrollment_status
-    }
+        response_payload = {
+            'course_id': str(course_id),
+            'error': error,
+            'enrollment_status': enrollment_status
+        }
 
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 class StudentProgressUrlSerializer(serializers.Serializer):

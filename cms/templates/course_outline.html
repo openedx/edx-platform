@@ -162,7 +162,7 @@ from django.urls import reverse
             % if mfe_proctored_exam_settings_url:
               <% url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='') %>
               ${Text(_("To update these settings go to the {link_start}Proctored Exam Settings page{link_end}.")).format(
-                link_start=HTML('<a href="${mfe_proctored_exam_settings_url}">').format(
+                link_start=HTML('<a href="{mfe_proctored_exam_settings_url}">').format(
                         mfe_proctored_exam_settings_url=mfe_proctored_exam_settings_url
                 ),
                 link_end=HTML("</a>")
