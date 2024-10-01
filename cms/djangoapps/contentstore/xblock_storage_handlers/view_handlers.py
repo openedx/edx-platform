@@ -1168,7 +1168,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                                 course.id, xblock_info["id"]
                             )
                         )
-                    except Exception as e:
+                    except Exception as e:  # pylint: disable=broad-except
                         log.error(
                             f"Error while getting proctoring exam configuration link: {e}"
                         )

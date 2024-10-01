@@ -3808,7 +3808,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
         assert xblock_info["was_exam_ever_linked_with_external"] is True
         assert xblock_info["is_time_limited"] is True
         assert xblock_info["default_time_limit_minutes"] == 100
-        assert xblock_info["proctoring_exam_configuration_link"] == None
+        assert xblock_info["proctoring_exam_configuration_link"] is None
         assert xblock_info["supports_onboarding"] is True
         assert xblock_info["is_onboarding_exam"] is False
 
