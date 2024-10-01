@@ -3589,7 +3589,6 @@ class GenerateBulkCertificateExceptions(APIView):
             """
             row_errors[key].append(_('user "{user}" in row# {row}').format(user=_user, row=row_count))
 
-
         if 'students_list' in request.FILES:
             try:
                 upload_file = request.FILES.get('students_list')
