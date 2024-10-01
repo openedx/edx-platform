@@ -8,9 +8,9 @@
     # via -r requirements/edx/github.in
 acid-xblock==0.3.1
     # via -r requirements/edx/kernel.in
-aiohappyeyeballs==2.4.0
+aiohappyeyeballs==2.4.3
     # via aiohttp
-aiohttp==3.10.6
+aiohttp==3.10.8
     # via
     #   geoip2
     #   openai
@@ -70,13 +70,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.35.27
+boto3==1.35.29
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.27
+botocore==1.35.29
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -87,7 +87,7 @@ cachecontrol==0.14.0
     # via firebase-admin
 cachetools==5.5.0
     # via google-auth
-camel-converter[pydantic]==3.1.2
+camel-converter[pydantic]==4.0.0
     # via meilisearch
 celery==5.4.0
     # via
@@ -621,11 +621,11 @@ googleapis-common-protos==1.65.0
     # via
     #   google-api-core
     #   grpcio-status
-grpcio==1.66.1
+grpcio==1.66.2
     # via
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.66.1
+grpcio-status==1.66.2
     # via google-api-core
 gunicorn==23.0.0
     # via -r requirements/edx/kernel.in
@@ -639,7 +639,7 @@ httplib2==0.22.0
     # via
     #   google-api-python-client
     #   google-auth-httplib2
-icalendar==5.0.13
+icalendar==6.0.0
     # via -r requirements/edx/kernel.in
 idna==3.10
     # via
@@ -769,7 +769,7 @@ multidict==6.1.0
     #   yarl
 mysqlclient==2.2.4
     # via -r requirements/edx/kernel.in
-newrelic==9.13.0
+newrelic==10.0.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -819,7 +819,7 @@ openedx-events==9.14.1
     #   edx-event-bus-redis
     #   event-tracking
     #   ora2
-openedx-filters==1.10.0
+openedx-filters==1.11.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
@@ -828,7 +828,7 @@ openedx-learning==0.13.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-openedx-mongodbproxy==0.2.1
+openedx-mongodbproxy==0.2.2
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via
@@ -1016,7 +1016,6 @@ pytz==2024.2
     #   edx-tincan-py35
     #   event-tracking
     #   fs
-    #   icalendar
     #   interchange
     #   olxcleaner
     #   ora2
@@ -1038,7 +1037,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==2.2.1
     # via -r requirements/edx/bundled.in
-redis==5.0.8
+redis==5.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1207,6 +1206,7 @@ typing-extensions==4.12.2
 tzdata==2024.2
     # via
     #   celery
+    #   icalendar
     #   kombu
 unicodecsv==0.14.1
     # via
@@ -1236,7 +1236,7 @@ voluptuous==0.15.2
     # via ora2
 walrus==0.9.4
     # via edx-event-bus-redis
-watchdog==5.0.2
+watchdog==5.0.3
     # via -r requirements/edx/paver.txt
 wcwidth==0.2.13
     # via prompt-toolkit
@@ -1290,7 +1290,7 @@ xmlsec==1.3.13
     #   python3-saml
 xss-utils==0.6.0
     # via -r requirements/edx/kernel.in
-yarl==1.12.1
+yarl==1.13.1
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata

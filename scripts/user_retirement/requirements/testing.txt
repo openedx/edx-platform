@@ -14,11 +14,11 @@ attrs==24.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.35.27
+boto3==1.35.29
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.35.27
+botocore==1.35.29
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -132,7 +132,7 @@ more-itertools==10.5.0
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==9.13.0
+newrelic==10.0.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils

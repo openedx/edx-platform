@@ -16,12 +16,12 @@ acid-xblock==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-aiohappyeyeballs==2.4.0
+aiohappyeyeballs==2.4.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   aiohttp
-aiohttp==3.10.6
+aiohttp==3.10.8
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -140,14 +140,14 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.35.27
+boto3==1.35.29
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.27
+botocore==1.35.29
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -172,7 +172,7 @@ cachetools==5.5.0
     #   -r requirements/edx/testing.txt
     #   google-auth
     #   tox
-camel-converter[pydantic]==3.1.2
+camel-converter[pydantic]==4.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -325,7 +325,7 @@ defusedxml==0.7.1
     #   social-auth-core
 diff-cover==9.2.0
     # via -r requirements/edx/testing.txt
-dill==0.3.8
+dill==0.3.9
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -879,7 +879,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.txt
-faker==30.0.0
+faker==30.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1009,13 +1009,13 @@ grimp==3.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
-grpcio==1.66.1
+grpcio==1.66.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.66.1
+grpcio-status==1.66.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1045,7 +1045,7 @@ httplib2==0.22.0
     #   google-auth-httplib2
 httpretty==1.1.4
     # via -r requirements/edx/testing.txt
-icalendar==5.0.13
+icalendar==6.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1290,7 +1290,7 @@ mysqlclient==2.2.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-newrelic==9.13.0
+newrelic==10.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1367,7 +1367,7 @@ openedx-events==9.14.1
     #   edx-event-bus-redis
     #   event-tracking
     #   ora2
-openedx-filters==1.10.0
+openedx-filters==1.11.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1378,7 +1378,7 @@ openedx-learning==0.13.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-mongodbproxy==0.2.1
+openedx-mongodbproxy==0.2.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1665,7 +1665,7 @@ pyproject-api==1.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-pyproject-hooks==1.1.0
+pyproject-hooks==1.2.0
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   build
@@ -1766,7 +1766,6 @@ pytz==2024.2
     #   edx-tincan-py35
     #   event-tracking
     #   fs
-    #   icalendar
     #   interchange
     #   olxcleaner
     #   ora2
@@ -1798,7 +1797,7 @@ recommender-xblock==2.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-redis==5.0.8
+redis==5.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2121,6 +2120,7 @@ typing-extensions==4.12.2
     #   django-stubs-ext
     #   djangorestframework-stubs
     #   edx-opaque-keys
+    #   faker
     #   fastapi
     #   grimp
     #   import-linter
@@ -2136,6 +2136,7 @@ tzdata==2024.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   celery
+    #   icalendar
     #   kombu
 unicodecsv==0.14.1
     # via
@@ -2164,7 +2165,7 @@ user-util==1.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-uvicorn==0.30.6
+uvicorn==0.31.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -2175,7 +2176,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.26.5
+virtualenv==20.26.6
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -2191,7 +2192,7 @@ walrus==0.9.4
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-redis
-watchdog==5.0.2
+watchdog==5.0.3
     # via
     #   -r requirements/edx/development.in
     #   -r requirements/edx/doc.txt
@@ -2275,7 +2276,7 @@ xss-utils==0.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-yarl==1.12.1
+yarl==1.13.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
