@@ -1353,27 +1353,27 @@ def _get_problem_responses(request, *, course_id, problem_locations, problem_typ
     return JsonResponse({"status": success_status, "task_id": task.task_id})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_grading_config(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class GetGradingConfig(APIView):
     """
     Respond with json which contains a html formatted grade summary.
     """
-    course_id = CourseKey.from_string(course_id)
-    # course = get_course_with_access(
-    #     request.user, 'staff', course_id, depth=None
-    # )
-    course = get_course_by_id(course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    grading_config_summary = instructor_analytics_basic.dump_grading_context(course)
-
-    response_payload = {
-        'course_id': str(course_id),
-        'grading_config_summary': grading_config_summary,
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Post method to return grading config.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_id)
+        grading_config_summary = instructor_analytics_basic.dump_grading_context(course)
+        response_payload = {
+            'course_id': str(course_id),
+            'grading_config_summary': grading_config_summary,
+        }
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
