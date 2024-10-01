@@ -299,7 +299,7 @@ class CertificateSerializer(serializers.Serializer):
     def get_availableDate(self, enrollment):
         """Available date changes based off of Certificate display behavior"""
         course_overview = enrollment.course_overview
-        available_date = course_overview.certificate_available_date
+        available_date = None
 
         if (
             course_overview.certificates_display_behavior
