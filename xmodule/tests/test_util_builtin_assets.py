@@ -1,9 +1,6 @@
 """
 Tests for methods defined in builtin_assets.py
 """
-from pathlib import PosixPath
-
-from django.conf import settings
 from unittest import TestCase
 from unittest.mock import patch
 
