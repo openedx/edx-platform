@@ -3776,6 +3776,42 @@ class TestSpecialExamXBlockInfo(ItemTest):
         assert xblock_info["was_exam_ever_linked_with_external"] is False
         assert mock_get_exam_by_content_id.call_count == 1
 
+    @patch_get_exam_configuration_dashboard_url
+    @patch_does_backend_support_onboarding
+    @patch_get_exam_by_content_id_success
+    def test_special_exam_xblock_info_get_dashboard_error(
+        self,
+        mock_get_exam_by_content_id,
+        _mock_does_backend_support_onboarding,
+        mock_get_exam_configuration_dashboard_url,
+    ):
+        sequential = BlockFactory.create(
+            parent_location=self.chapter.location,
+            category="sequential",
+            display_name="Test Lesson 1",
+            user_id=self.user.id,
+            is_proctored_enabled=True,
+            is_time_limited=True,
+            default_time_limit_minutes=100,
+            is_onboarding_exam=False,
+        )
+        sequential = modulestore().get_item(sequential.location)
+        mock_get_exam_configuration_dashboard_url.side_effect = Exception("proctoring error")
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+
+        # no errors should be raised and proctoring_exam_configuration_link is None
+        assert xblock_info["is_proctored_exam"] is True
+        assert xblock_info["was_exam_ever_linked_with_external"] is True
+        assert xblock_info["is_time_limited"] is True
+        assert xblock_info["default_time_limit_minutes"] == 100
+        assert xblock_info["proctoring_exam_configuration_link"] is None
+        assert xblock_info["supports_onboarding"] is True
+        assert xblock_info["is_onboarding_exam"] is False
+
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
     """

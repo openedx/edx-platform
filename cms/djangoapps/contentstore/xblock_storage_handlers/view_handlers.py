@@ -1162,11 +1162,16 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
 
                 # only call get_exam_configuration_dashboard_url if not using an LTI proctoring provider
                 if xblock.is_proctored_exam and (course.proctoring_provider != 'lti_external'):
-                    proctoring_exam_configuration_link = (
-                        get_exam_configuration_dashboard_url(
-                            course.id, xblock_info["id"]
+                    try:
+                        proctoring_exam_configuration_link = (
+                            get_exam_configuration_dashboard_url(
+                                course.id, xblock_info["id"]
+                            )
                         )
-                    )
+                    except Exception as e:  # pylint: disable=broad-except
+                        log.error(
+                            f"Error while getting proctoring exam configuration link: {e}"
+                        )
 
                 if course.proctoring_provider == "proctortrack":
                     show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(
