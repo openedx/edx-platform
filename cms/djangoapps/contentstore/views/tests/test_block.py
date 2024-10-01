@@ -3674,14 +3674,15 @@ class TestSpecialExamXBlockInfo(ItemTest):
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_success
     @ddt.data(
-        ("lti_external", False),
-        ("other_proctoring_backend", True),
+        ("lti_external", False, None),
+        ("other_proctoring_backend", True, "test_url"),
     )
     @ddt.unpack
-    def test_support_onboarding_is_correct_depending_on_lti_external(
+    def test_proctoring_values_correct_depending_on_lti_external(
         self,
         external_id,
-        expected_value,
+        expected_supports_onboarding_value,
+        expected_proctoring_link,
         mock_get_exam_by_content_id,
         mock_does_backend_support_onboarding,
         _mock_get_exam_configuration_dashboard_url,
@@ -3691,8 +3692,9 @@ class TestSpecialExamXBlockInfo(ItemTest):
             category="sequential",
             display_name="Test Lesson 1",
             user_id=self.user.id,
-            is_proctored_enabled=False,
-            is_time_limited=False,
+            is_proctored_enabled=True,
+            is_time_limited=True,
+            default_time_limit_minutes=100,
             is_onboarding_exam=False,
         )
 
@@ -3709,7 +3711,8 @@ class TestSpecialExamXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS,
             course=self.course,
         )
-        assert xblock_info["supports_onboarding"] is expected_value
+        assert xblock_info["supports_onboarding"] is expected_supports_onboarding_value
+        assert xblock_info["proctoring_exam_configuration_link"] == expected_proctoring_link
 
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
