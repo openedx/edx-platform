@@ -121,14 +121,15 @@ ${HTML(fragment.foot_html())}
     // document loads, window resizes, or DOM mutates.
     if (window !== window.parent) {
       document.body.className += ' view-in-mfe';
-      var lastHeight = window.offsetHeight;
+      const extraHeight = 250;  // Set extra height value.
+      var lastHeight = window.offsetHeight + extraHeight; // Add extra height to avoid clipping.
       var lastWidth = window.offsetWidth;
       var contentElement = document.getElementById('content');
 
       function dispatchResizeMessage(event) {
         // Note: event is actually an Array of MutationRecord objects when fired from the MutationObserver
         var isLoadEvent = event.type === 'load';
-        var newHeight = contentElement.offsetHeight;
+        var newHeight = contentElement.offsetHeight + extraHeight;  // Add extra height to avoid clipping.
         var newWidth = contentElement.offsetWidth;
         if (!isLoadEvent && newWidth === lastWidth && newHeight === lastHeight) {
             // Monitor when any anchor tag is clicked, it is checked to make sure
