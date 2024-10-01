@@ -17,6 +17,7 @@ lms/djangoapps/instructor_task/
 lms/djangoapps/mobile_api/
 openedx/core/djangoapps/credentials                                 @openedx/2U-aperture
 openedx/core/djangoapps/credit                                      @openedx/2U-aperture
+openedx/core/djangoapps/enrollments/                                @openedx/2U-aperture
 openedx/core/djangoapps/heartbeat/
 openedx/core/djangoapps/oauth_dispatch
 openedx/core/djangoapps/user_api/                                   @openedx/2U-aperture
@@ -37,8 +38,9 @@ lms/djangoapps/certificates/                                        @openedx/2U-
 # Discovery
 common/djangoapps/course_modes/
 common/djangoapps/enrollment/
+lms/djangoapps/branding/                                             @openedx/2U-aperture
 lms/djangoapps/commerce/
-lms/djangoapps/experiments/
+lms/djangoapps/experiments/                                          @openedx/2U-aperture
 lms/djangoapps/learner_dashboard/                                    @openedx/2U-aperture
 lms/djangoapps/learner_home/                                         @openedx/2U-aperture
 openedx/features/content_type_gating/
