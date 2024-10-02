@@ -41,8 +41,8 @@ class LibraryTabSerializer(serializers.Serializer):
     libraries = LibraryViewSerializer(many=True, required=False, allow_null=True)
 
 
-class CourseHomeSerializer(serializers.Serializer):
-    """Serializer for course home"""
+class StudioHomeSerializer(serializers.Serializer):
+    """Serializer for Studio home"""
     allow_course_reruns = serializers.BooleanField()
     allow_to_create_new_org = serializers.BooleanField()
     allow_unicode_course_id = serializers.BooleanField()
