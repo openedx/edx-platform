@@ -3,7 +3,11 @@ Subscription model is used to get users who are subscribed to the main thread/po
 """
 import logging
 
+from opaque_keys.edx.keys import CourseKey
+
 from . import models, settings, utils
+from forum import api as forum_api
+from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +25,7 @@ class Subscription(models.Model):
     base_url = f"{settings.PREFIX}/threads"
 
     @classmethod
-    def fetch(cls, thread_id, query_params):
+    def fetch(cls, thread_id, course_id, query_params):
         """
         Fetches the subscriptions for a given thread_id
         """
@@ -33,14 +37,20 @@ class Subscription(models.Model):
         params.update(
             utils.strip_blank(utils.strip_none(query_params))
         )
-        response = utils.perform_request(
-            'get',
-            cls.url(action='get', params=params) + "/subscriptions",
-            params,
-            metric_tags=[],
-            metric_action='subscription.get',
-            paged_results=True
-        )
+
+        if course_id and not isinstance(course_id, CourseKey):
+            course_id = CourseKey.from_string(course_id)
+        if is_forum_v2_enabled(course_id):
+            response = forum_api.get_thread_subscriptions(thread_id, params['page'], params['per_page'])
+        else:
+            response = utils.perform_request(
+                'get',
+                cls.url(action='get', params=params) + "/subscriptions",
+                params,
+                metric_tags=[],
+                metric_action='subscription.get',
+                paged_results=True
+            )
         return utils.SubscriptionsPaginatedResult(
             collection=response.get('collection', []),
             page=response.get('page', 1),
