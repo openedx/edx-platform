@@ -13,12 +13,12 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
-# Date: 2024-03-14
-# Temporary to Support the python 3.11 Upgrade
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35281
-backports.zoneinfo;python_version<"3.9"  # Newer versions have zoneinfo available in the standard library
+# Date: 2024-08-21
+# Description: This is the major upgrade of algoliasearch python client and it will
+# break one of the edX' platform plugin, so we need to make that compatible first.
+# Ticket: https://github.com/openedx/edx-platform/issues/35334
+algoliasearch<4.0.0
 
-# Date: 2020-02-26
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35280
@@ -34,6 +34,12 @@ click==8.1.6
 # Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35278
 charset-normalizer<2.1.0
+
+
+# The team that owns this package will manually bump this package rather than having it pulled in automatically.
+# This is to allow them to better control its deployment and to do it in a process that works better
+# for them.
+edx-enterprise==4.26.0
 
 # Date: 2024-02-02
 # Stay on LTS version, remove once this is added to common constraint
@@ -112,6 +118,11 @@ lxml<5.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35271
 markdown<3.4.0
 
+
+# Date: 2018-12-14
+# pinning this version to avoid updates while the library is being developed
+openedx-learning==0.13.1
+
 # Date: 2024-04-24
 # moto==5.0 contains breaking changes. Needs to be updated separately.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35270
@@ -175,19 +186,3 @@ pymongo<4.4.1
 # We are pinning this until after all the smaller migrations get handled and then we can migrate this all at once.
 # Issue for unpinning: https://github.com/edx/edx-arch-experiments/issues/760
 social-auth-app-django<=5.4.1
-
-# Date: 2023-11-05
-# urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
-# which require urllib3<2 for now.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
-urllib3<2.0.0
-
-# Date: 2024-08-07
-# Xblock==5.0.0 changed how entrypoints were loaded, breaking a workaround for overriding blocks.
-# Issue for unpinning: https://github.com/openedx/XBlock/issues/777
-xblock[django]==4.0.1
-
-# Date: 2024-04-24
-# xmlsec==1.3.14 breaking tests or all builds, can be removed once a fix is available
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35264
-xmlsec<1.3.14

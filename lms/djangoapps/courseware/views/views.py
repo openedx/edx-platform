@@ -825,9 +825,13 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
                 single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
 
             if single_paid_mode and single_paid_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(
+                    single_paid_mode.sku, course_run_keys=[course_id]
+                )
             if single_paid_mode and single_paid_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(
+                    single_paid_mode.bulk_sku, course_run_keys=[course_id]
+                )
 
         registration_price, course_price = get_course_prices(course)  # lint-amnesty, pylint: disable=unused-variable
 

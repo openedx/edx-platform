@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -291,7 +291,7 @@ class NotificationListAPIView(generics.ListAPIView):
 
         if app_name:
             params['app_name'] = app_name
-        return Notification.objects.filter(**params).order_by('-id')
+        return Notification.objects.filter(**params).order_by('-created')
 
 
 @allow_any_authenticated_user()
@@ -441,7 +441,4 @@ def preference_update_from_encrypted_username_view(request, username, patch):
     username and patch must be string
     """
     update_user_preferences_from_patch(username, patch)
-    context = {
-        "notification_preferences_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/notifications"
-    }
-    return render(request, "notifications/email_digest_preference_update.html", context=context)
+    return Response({"result": "success"}, status=status.HTTP_200_OK)

@@ -233,17 +233,29 @@ Content Authoring Events
      - 2023-07-20
 
    * - `LIBRARY_BLOCK_CREATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L167>`_
-     - org.openedx.content_authoring.content_library.created.v1
+     - org.openedx.content_authoring.library_block.created.v1
      - 2023-07-20
 
    * - `LIBRARY_BLOCK_UPDATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L178>`_
-     - org.openedx.content_authoring.content_library.updated.v1
+     - org.openedx.content_authoring.library_block.updated.v1
      - 2023-07-20
 
    * - `LIBRARY_BLOCK_DELETED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L189>`_
-     - org.openedx.content_authoring.content_library.deleted.v1
+     - org.openedx.content_authoring.library_block.deleted.v1
      - 2023-07-20
 
-   * - `CONTENT_OBJECT_TAGS_CHANGED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L207>`_
-     - org.openedx.content_authoring.content.object.tags.changed.v1
-     - 2024-03-31
+   * - `LIBRARY_COLLECTION_CREATED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L219>`_
+     - org.openedx.content_authoring.content_library.collection.created.v1
+     - 2024-08-23
+
+   * - `LIBRARY_COLLECTION_UPDATED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L230>`_
+     - org.openedx.content_authoring.content_library.collection.updated.v1
+     - 2024-08-23
+
+   * - `LIBRARY_COLLECTION_DELETED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L241>`_
+     - org.openedx.content_authoring.content_library.collection.deleted.v1
+     - 2024-08-23
+
+   * - `CONTENT_OBJECT_ASSOCIATIONS_CHANGED <https://github.com/openedx/openedx-events/blob/eb17e03f075b272ad8a29e8435d6a514f8884131/openedx_events/content_authoring/signals.py#L205-L214>`_
+     - org.openedx.content_authoring.content.object.associations.changed.v1
+     - 2024-09-06

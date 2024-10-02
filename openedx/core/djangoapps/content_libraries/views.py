@@ -84,6 +84,7 @@ from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, Dj
 from pylti1p3.exception import LtiException, OIDCException
 
 import edx_api_doc_tools as apidocs
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
@@ -112,6 +113,7 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     LibraryXBlockStaticFileSerializer,
     LibraryXBlockStaticFilesSerializer,
     ContentLibraryAddPermissionByEmailSerializer,
+    LibraryPasteClipboardSerializer,
 )
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -135,12 +137,21 @@ def convert_exceptions(fn):
     def wrapped_fn(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
+        except InvalidKeyError as exc:
+            log.exception(str(exc))
+            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
         except api.ContentLibraryNotFound:
             log.exception("Content library not found")
             raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
         except api.ContentLibraryBlockNotFound:
             log.exception("XBlock not found in content library")
             raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
+        except api.ContentLibraryCollectionNotFound:
+            log.exception("Collection not found in content library")
+            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
+        except api.LibraryCollectionAlreadyExists as exc:
+            log.exception(str(exc))
+            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
         except api.LibraryBlockAlreadyExists as exc:
             log.exception(str(exc))
             raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
@@ -500,6 +511,34 @@ class LibraryCommitView(APIView):
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.revert_changes(key)
         return Response({})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryPasteClipboardView(GenericAPIView):
+    """
+    Paste content of clipboard into Library.
+    """
+    @convert_exceptions
+    def post(self, request, lib_key_str):
+        """
+        Import the contents of the user's clipboard and paste them into the Library
+        """
+        library_key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        serializer = LibraryPasteClipboardSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            result = api.import_staged_content_from_user_clipboard(
+                library_key, request.user, **serializer.validated_data
+            )
+        except api.IncompatibleTypesError as err:
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+                detail={'block_type': str(err)},
+            )
+
+        return Response(LibraryXBlockMetadataSerializer(result).data)
 
 
 @method_decorator(non_atomic_requests, name="dispatch")

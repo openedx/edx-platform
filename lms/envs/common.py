@@ -56,7 +56,10 @@ from enterprise.constants import (
     ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
     ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
-    ENTERPRISE_OPERATOR_ROLE
+    ENTERPRISE_OPERATOR_ROLE,
+    SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE,
+    PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+    PROVISIONING_PENDING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
 )
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
@@ -2292,7 +2295,6 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.safe_sessions.middleware.EmailChangeMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
-    'openedx.core.djangoapps.contentserver.middleware.StaticContentServerMiddleware',
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
@@ -3391,6 +3393,7 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
+    "openedx_learning.apps.authoring.collections",
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
@@ -3683,6 +3686,9 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # because that decision might happen in a later config file. (The headers to
 # allow is an application logic, and not site policy.)
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'cache-control',
+    'expires',
+    'pragma',
     'use-jwt-cookie',
 )
 
@@ -4684,7 +4690,6 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_channel_worker',
     'enterprise_access_worker',
     'enterprise_subsidy_worker',
-    'subscriptions_worker'
 ]
 
 # Setting for Open API key and prompts used by edx-enterprise.
@@ -4744,6 +4749,10 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
         ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
+    ],
+    SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE: [
+        PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+        PROVISIONING_PENDING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
     ],
 }
 
@@ -5374,17 +5383,6 @@ ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
 
-######################## Subscriptions API SETTINGS ########################
-SUBSCRIPTIONS_ROOT_URL = ""
-SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
-
-SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
-SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
-SUBSCRIPTIONS_TRIAL_LENGTH = 7
-SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
-
 ############## NOTIFICATIONS ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
@@ -5467,6 +5465,10 @@ EVENT_BUS_PRODUCER_CONFIG = {
         'learning-course-access-role-lifecycle':
             {'event_key_field': 'course_access_role_data.course_key', 'enabled': False},
     },
+    'org.openedx.enterprise.learner_credit_course_enrollment.revoked.v1': {
+        'learner-credit-course-enrollment-lifecycle':
+            {'event_key_field': 'learner_credit_course_enrollment.uuid', 'enabled': False},
+    },
     # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
     # and the derivation fails if the keys are missing. If we ever fully decouple the lms and cms settings,
     # we can remove these.
@@ -5542,3 +5544,11 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_default: empty dictionary
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
+
+
+# .. setting_name: DISABLED_COUNTRIES
+# .. setting_default: []
+# .. setting_description: List of country codes that should be disabled
+# .. for now it wil impact country listing in auth flow and user profile.
+# .. eg ['US', 'CA']
+DISABLED_COUNTRIES = []
