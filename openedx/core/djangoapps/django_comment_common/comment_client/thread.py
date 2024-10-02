@@ -165,14 +165,17 @@ class Thread(models.Model):
             url = _url_for_flag_abuse_thread(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only flag/unflag threads or comments")
-        params = {'user_id': user.id}
-        response = utils.perform_request(
-            'put',
-            url,
-            params,
-            metric_action='thread.abuse.flagged',
-            metric_tags=self._metric_tags
-        )
+        if is_forum_v2_enabled(utils.get_course_key(self.attributes.get("course_id"))):
+            response = forum_api.update_thread_flag(voteable.id, "flag", user.id)
+        else:
+            params = {'user_id': user.id}
+            response = utils.perform_request(
+                'put',
+                url,
+                params,
+                metric_action='thread.abuse.flagged',
+                metric_tags=self._metric_tags
+            )
         voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll):
@@ -180,18 +183,21 @@ class Thread(models.Model):
             url = _url_for_unflag_abuse_thread(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only flag/unflag for threads or comments")
-        params = {'user_id': user.id}
-        #if you're an admin, when you unflag, remove ALL flags
-        if removeAll:
-            params['all'] = True
+        if is_forum_v2_enabled(utils.get_course_key(self.attributes.get("course_id"))):
+            response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, True if removeAll else False)
+        else:
+            params = {'user_id': user.id}
+            #if you're an admin, when you unflag, remove ALL flags
+            if removeAll:
+                params['all'] = True
 
-        response = utils.perform_request(
-            'put',
-            url,
-            params,
-            metric_tags=self._metric_tags,
-            metric_action='thread.abuse.unflagged'
-        )
+            response = utils.perform_request(
+                'put',
+                url,
+                params,
+                metric_tags=self._metric_tags,
+                metric_action='thread.abuse.unflagged'
+            )
         voteable._update_from_response(response)
 
     def pin(self, user, thread_id):

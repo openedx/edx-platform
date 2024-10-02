@@ -4,7 +4,9 @@ from bs4 import BeautifulSoup
 from openedx.core.djangoapps.django_comment_common.comment_client import models, settings
 
 from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
-from .utils import CommentClientRequestError, perform_request
+from .utils import CommentClientRequestError, get_course_key, perform_request
+from forum import api as forum_api
+from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
 
 class Comment(models.Model):
@@ -68,14 +70,20 @@ class Comment(models.Model):
             url = _url_for_flag_abuse_comment(voteable.id)
         else:
             raise CommentClientRequestError("Can only flag/unflag threads or comments")
-        params = {'user_id': user.id}
-        response = perform_request(
-            'put',
-            url,
-            params,
-            metric_tags=self._metric_tags,
-            metric_action='comment.abuse.flagged'
-        )
+        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
+            if voteable.type == 'thread':
+                response = forum_api.update_thread_flag(voteable.id, "flag", user.id)
+            else:
+                response = forum_api.update_comment_flag(voteable.id, "flag", user.id)
+        else:
+            params = {'user_id': user.id}
+            response = perform_request(
+                'put',
+                url,
+                params,
+                metric_tags=self._metric_tags,
+                metric_action='comment.abuse.flagged'
+            )
         voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll):
@@ -85,18 +93,24 @@ class Comment(models.Model):
             url = _url_for_unflag_abuse_comment(voteable.id)
         else:
             raise CommentClientRequestError("Can flag/unflag for threads or comments")
-        params = {'user_id': user.id}
+        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
+            if voteable.type == 'thread':
+                response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, True if removeAll else False)
+            else:
+                response = forum_api.update_comment_flag(voteable.id, "unflag", user.id, True if removeAll else False)
+        else:
+            params = {'user_id': user.id}
 
-        if removeAll:
-            params['all'] = True
+            if removeAll:
+                params['all'] = True
 
-        response = perform_request(
-            'put',
-            url,
-            params,
-            metric_tags=self._metric_tags,
-            metric_action='comment.abuse.unflagged'
-        )
+            response = perform_request(
+                'put',
+                url,
+                params,
+                metric_tags=self._metric_tags,
+                metric_action='comment.abuse.unflagged'
+            )
         voteable._update_from_response(response)
 
     @property

@@ -1,8 +1,6 @@
 # pylint: disable=missing-docstring,protected-access
 """ User model wrapper for comment service"""
 
-from opaque_keys.edx.keys import CourseKey
-
 from . import models, settings, utils
 from forum import api as forum_api
 from forum.utils import str_to_bool
@@ -38,34 +36,47 @@ class User(models.Model):
         """
         Calls cs_comments_service to mark thread as read for the user
         """
-        params = {'source_type': source.type, 'source_id': source.id}
-        utils.perform_request(
-            'post',
-            _url_for_read(self.id),
-            params,
-            metric_action='user.read',
-            metric_tags=self._metric_tags + [f'target.type:{source.type}'],
-        )
+        course_id = self.attributes.get("course_id")
+        course_key = utils.get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
+            forum_api.mark_thread_as_read(self.id, source.id, course_id=str(course_id))
+        else:
+            params = {'source_type': source.type, 'source_id': source.id}
+            utils.perform_request(
+                'post',
+                _url_for_read(self.id),
+                params,
+                metric_action='user.read',
+                metric_tags=self._metric_tags + [f'target.type:{source.type}'],
+            )
 
     def follow(self, source):
-        params = {'source_type': source.type, 'source_id': source.id}
-        utils.perform_request(
-            'post',
-            _url_for_subscription(self.id),
-            params,
-            metric_action='user.follow',
-            metric_tags=self._metric_tags + [f'target.type:{source.type}'],
-        )
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            forum_api.create_subscription(self.id, source.id)
+        else:
+            params = {'source_type': source.type, 'source_id': source.id}
+            utils.perform_request(
+                'post',
+                _url_for_subscription(self.id),
+                params,
+                metric_action='user.follow',
+                metric_tags=self._metric_tags + [f'target.type:{source.type}'],
+            )
 
     def unfollow(self, source):
-        params = {'source_type': source.type, 'source_id': source.id}
-        utils.perform_request(
-            'delete',
-            _url_for_subscription(self.id),
-            params,
-            metric_action='user.unfollow',
-            metric_tags=self._metric_tags + [f'target.type:{source.type}'],
-        )
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            forum_api.delete_subscription(self.id, source.id)
+        else:
+            params = {'source_type': source.type, 'source_id': source.id}
+            utils.perform_request(
+                'delete',
+                _url_for_subscription(self.id),
+                params,
+                metric_action='user.unfollow',
+                metric_tags=self._metric_tags + [f'target.type:{source.type}'],
+            )
 
     def vote(self, voteable, value):
         if voteable.type == 'thread':
@@ -74,14 +85,21 @@ class User(models.Model):
             url = _url_for_vote_comment(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only vote / unvote for threads or comments")
-        params = {'user_id': self.id, 'value': value}
-        response = utils.perform_request(
-            'put',
-            url,
-            params,
-            metric_action='user.vote',
-            metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
-        )
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            if voteable.type == 'thread':
+                response = forum_api.update_thread_votes(voteable.id, self.id, value)
+            else:
+                response = forum_api.update_comment_votes(voteable.id, self.id, value)
+        else:
+            params = {'user_id': self.id, 'value': value}
+            response = utils.perform_request(
+                'put',
+                url,
+                params,
+                metric_action='user.vote',
+                metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
+            )
         voteable._update_from_response(response)
 
     def unvote(self, voteable):
@@ -91,14 +109,21 @@ class User(models.Model):
             url = _url_for_vote_comment(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only vote / unvote for threads or comments")
-        params = {'user_id': self.id}
-        response = utils.perform_request(
-            'delete',
-            url,
-            params,
-            metric_action='user.unvote',
-            metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
-        )
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            if voteable.type == 'thread':
+                response = forum_api.delete_thread_vote(voteable.id, self.id)
+            else:
+                response = forum_api.delete_comment_vote(voteable.id, self.id)
+        else:
+            params = {'user_id': self.id}
+            response = utils.perform_request(
+                'delete',
+                url,
+                params,
+                metric_action='user.unvote',
+                metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
+            )
         voteable._update_from_response(response)
 
     def active_threads(self, query_params=None):
@@ -109,19 +134,16 @@ class User(models.Model):
         url = _url_for_user_active_threads(self.id)
         params = {'course_id': str(self.course_id)}
         params.update(query_params)
-        if user_id := params.get("user_id"):
-            params["user_id"] = str(user_id)
-        if page := params.get("page"):
-            params["page"] = int(page)
-        if per_page := params.get("per_page"):
-            params["per_page"] = int(per_page)
-        if count_flagged := params.get("count_flagged", False):
-            params["count_flagged"] = str_to_bool(count_flagged)
-
-        if course_id := self.attributes.get("course_id"):
-            if not isinstance(course_id, CourseKey):
-                course_id = CourseKey.from_string(course_id)
-        if is_forum_v2_enabled(course_id):
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            if user_id := params.get("user_id"):
+                params["user_id"] = str(user_id)
+            if page := params.get("page"):
+                params["page"] = int(page)
+            if per_page := params.get("per_page"):
+                params["per_page"] = int(per_page)
+            if count_flagged := params.get("count_flagged", False):
+                params["count_flagged"] = str_to_bool(count_flagged)
             response = forum_api.get_user_active_threads(**params)
         else:
             response = utils.perform_request(
@@ -144,14 +166,26 @@ class User(models.Model):
         url = _url_for_user_subscribed_threads(self.id)
         params = {'course_id': str(self.course_id)}
         params.update(query_params)
-        response = utils.perform_request(
-            'get',
-            url,
-            params,
-            metric_action='user.subscribed_threads',
-            metric_tags=self._metric_tags,
-            paged_results=True
-        )
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            if user_id := params.get("user_id"):
+                params["user_id"] = str(user_id)
+            if page := params.get("page"):
+                params["page"] = int(page)
+            if per_page := params.get("per_page"):
+                params["per_page"] = int(per_page)
+            if count_flagged := params.get("count_flagged", False):
+                params["count_flagged"] = str_to_bool(count_flagged)
+            response = forum_api.get_user_threads(**params)
+        else:
+            response = utils.perform_request(
+                'get',
+                url,
+                params,
+                metric_action='user.subscribed_threads',
+                metric_tags=self._metric_tags,
+                paged_results=True
+            )
         return utils.CommentClientPaginatedResult(
             collection=response.get('collection', []),
             page=response.get('page', 1),
@@ -160,16 +194,17 @@ class User(models.Model):
         )
 
     def _retrieve(self, *args, **kwargs):
+        url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params.copy()
         retrieve_params.update(kwargs)
         if self.attributes.get('course_id'):
-            retrieve_params['course_id'] = str(self.attributes["course_id"])
+            retrieve_params['course_id'] = str(self.attributes.get("course_id"))
         if self.attributes.get('group_id'):
             retrieve_params['group_id'] = self.attributes["group_id"]
-        if is_forum_v2_enabled(self.attributes.get("course_id")):
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
             response = forum_api.get_user(self.attributes["id"], retrieve_params)
         else:
-            url = self.url(action='get', params=self.attributes)
             try:
                 response = utils.perform_request(
                     'get',
@@ -195,28 +230,35 @@ class User(models.Model):
         self._update_from_response(response)
 
     def retire(self, retired_username):
-        url = _url_for_retire(self.id)
-        params = {'retired_username': retired_username}
-
-        utils.perform_request(
-            'post',
-            url,
-            params,
-            raw=True,
-            metric_action='user.retire',
-            metric_tags=self._metric_tags
-        )
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            forum_api.retire_user(self.id, retired_username)
+        else:
+            url = _url_for_retire(self.id)
+            params = {'retired_username': retired_username}
+            utils.perform_request(
+                'post',
+                url,
+                params,
+                raw=True,
+                metric_action='user.retire',
+                metric_tags=self._metric_tags
+            )
 
     def replace_username(self, new_username):
-        url = _url_for_username_replacement(self.id)
-        params = {"new_username": new_username}
+        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            forum_api.update_username(self.id, new_username)
+        else:
+            url = _url_for_username_replacement(self.id)
+            params = {"new_username": new_username}
 
-        utils.perform_request(
-            'post',
-            url,
-            params,
-            raw=True,
-        )
+            utils.perform_request(
+                'post',
+                url,
+                params,
+                raw=True,
+            )
 
 
 def _url_for_vote_comment(comment_id):

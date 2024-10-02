@@ -5,7 +5,7 @@ import logging
 
 from opaque_keys.edx.keys import CourseKey
 
-from .utils import CommentClientRequestError, extract, perform_request
+from .utils import CommentClientRequestError, extract, perform_request, get_course_key
 from forum import api as forum_api
 from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
@@ -74,10 +74,7 @@ class Model:
 
     def _retrieve(self, *args, **kwargs):
         response = None
-        if course_id := self.attributes.get("course_id"):
-            if not isinstance(course_id, CourseKey):
-                course_id = CourseKey.from_string(course_id)
-        if is_forum_v2_enabled(course_id):
+        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = forum_api.get_parent_comment(self.attributes["id"])
         if response is None:
@@ -173,10 +170,7 @@ class Model:
 
     def delete(self):
         response = None
-        if course_id := self.attributes.get("course_id"):
-            if not isinstance(course_id, CourseKey):
-                course_id = CourseKey.from_string(course_id)
-        if is_forum_v2_enabled(course_id):
+        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = forum_api.delete_comment(self.attributes["id"])
         if response is None:
@@ -218,10 +212,7 @@ class Model:
         if params:
             request_params.update(params)
         response = None
-        if course_id := self.attributes.get("course_id"):
-            if not isinstance(course_id, CourseKey):
-                course_id = CourseKey.from_string(course_id)
-        if is_forum_v2_enabled(course_id):
+        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = self.handle_update_comment(request_params)
         if response is None:
@@ -274,10 +265,7 @@ class Model:
 
     def handle_create(self):
         response = None
-        if course_id := self.attributes.get("course_id"):
-            if not isinstance(course_id, CourseKey):
-                course_id = CourseKey.from_string(course_id)
-        if is_forum_v2_enabled(course_id):
+        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = self.handle_create_comment()
         if response is None:
