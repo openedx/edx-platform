@@ -468,17 +468,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
 
-    # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Whether to use the reimagined certificates_display_behavior and certificate_available_date
-    # .. settings. Will eventually become the default.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2021-07-26
-    # .. toggle_target_removal_date: 2021-10-01
-    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
-    'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
-
     # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
