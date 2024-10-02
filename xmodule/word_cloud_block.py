@@ -6,9 +6,6 @@ If student does not yet answered - `num_inputs` numbers of text inputs.
 If student have answered - words he entered and cloud.
 """
 
-# TODO: Uncomment following once https://github.com/openedx/edx-platform/issues/34840 is done
-# from xblocks_contrib import WordCloudBlock as _ExtractedWordCloudBlock
-
 
 import json
 import logging
@@ -317,6 +314,7 @@ class _BuiltInWordCloudBlock(  # pylint: disable=abstract-method
 
 
 WordCloudBlock = (
+    # TODO: Revert following
     # _ExractedWordCloudBLock if USE_EXTRACTED_WORD_CLOUD_BLOCK.is_enabled()
     _BuiltInWordCloudBlock if USE_EXTRACTED_WORD_CLOUD_BLOCK.is_enabled()
     else _BuiltInWordCloudBlock
