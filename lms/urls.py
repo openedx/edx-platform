@@ -92,6 +92,7 @@ notification_prefs_urls = [
     ),
 ]
 
+
 urlpatterns = [
     path('', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
 
