@@ -55,6 +55,7 @@ from .capa.xqueue_interface import XQueueService
 
 from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
+from .toggles import USE_EXTRACTED_PROBLEM_BLOCK
 
 log = logging.getLogger("edx.courseware")
 
@@ -134,7 +135,7 @@ class Randomization(String):
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
 @XBlock.wants('call_to_action')
-class ProblemBlock(
+class _BuiltInProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
     XmlMixin,
@@ -160,6 +161,8 @@ class ProblemBlock(
     system is inspired.
     """
     INDEX_CONTENT_TYPE = 'CAPA'
+
+    is_extracted = False
 
     resources_dir = None
 
@@ -2509,3 +2512,11 @@ def randomization_bin(seed, problem_id):
     r_hash.update(str(problem_id).encode())
     # get the first few digits of the hash, convert to an int, then mod.
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
+
+
+ProblemBlock = (
+    # TODO: Revert following
+    # _ExractedProblemBlock if USE_EXTRACTED_PROBLEM_BLOCK.is_enabled()
+    _BuiltInProblemBlock if USE_EXTRACTED_PROBLEM_BLOCK.is_enabled()
+    else _BuiltInProblemBlock
+)

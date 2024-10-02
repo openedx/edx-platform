@@ -21,6 +21,7 @@ from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, py
 from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
+from xmodule.toggles import USE_EXTRACTED_POLL_BLOCK
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
@@ -36,7 +37,7 @@ _ = lambda text: text
 
 
 @XBlock.needs('mako')
-class PollBlock(
+class _BuiltInPollBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
@@ -44,6 +45,9 @@ class PollBlock(
     XModuleMixin,
 ):  # pylint: disable=abstract-method
     """Poll Block"""
+
+    is_extracted = False
+
     # Name of poll to use in links to this poll
     display_name = String(
         help=_("The display name for this component."),
@@ -244,3 +248,10 @@ class PollBlock(
             add_child(xml_object, answer)
 
         return xml_object
+
+PollBlock = (
+    # TODO: Revert following
+    # _ExractedPollBlock if USE_EXTRACTED_POLL_BLOCK.is_enabled()
+    _BuiltInPollBlock if USE_EXTRACTED_POLL_BLOCK.is_enabled()
+    else _BuiltInPollBlock
+)

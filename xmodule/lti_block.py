@@ -84,6 +84,7 @@ from common.djangoapps.xblock_django.constants import (
 )
 from xmodule.lti_2_util import LTI20BlockMixin, LTIError
 from xmodule.raw_block import EmptyDataRawMixin
+from xmodule.toggles import USE_EXTRACTED_LTI_BLOCK
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
@@ -274,7 +275,7 @@ class LTIFields:
 @XBlock.needs("mako")
 @XBlock.needs("user")
 @XBlock.needs("rebind_user")
-class LTIBlock(
+class _BuiltInLTIBlock(
     LTIFields,
     LTI20BlockMixin,
     EmptyDataRawMixin,
@@ -366,6 +367,7 @@ class LTIBlock(
 
         Otherwise error message from LTI provider is generated.
     """
+    is_extracted = False
     resources_dir = None
     uses_xmodule_styles_setup = True
 
@@ -984,3 +986,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         else:
             close_date = due_date
         return close_date is not None and datetime.datetime.now(UTC) > close_date
+
+
+LTIBlock = (
+    # TODO: Revert following
+    # _ExractedLTIBlock if USE_EXTRACTED_LTI_BLOCK.is_enabled()
+    _BuiltInLTIBlock if USE_EXTRACTED_LTI_BLOCK.is_enabled()
+    else _BuiltInLTIBlock
+)

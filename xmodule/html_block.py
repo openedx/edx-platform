@@ -22,6 +22,7 @@ from xmodule.editing_block import EditingMixin
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
+from xmodule.toggles import USE_EXTRACTED_HTML_BLOCK
 from xmodule.util.misc import escape_html_characters
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
@@ -50,6 +51,8 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     The HTML XBlock mixin.
     This provides the base class for all Html-ish blocks (including the HTML XBlock).
     """
+    is_extracted = False
+    
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -353,7 +356,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
 
 
 @edxnotes
-class HtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
+class _BuiltInHtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     This is the actual HTML XBlock.
     Nothing extra is required; this is just a wrapper to include edxnotes support.
@@ -489,3 +492,11 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
             return datetime.strptime(date, '%B %d, %Y')
         except ValueError:  # occurs for ill-formatted date values
             return datetime.today()
+
+
+HtmlBlock = (
+    # TODO: Revert following
+    # _ExractedHtmlBlock if USE_EXTRACTED_HTML_BLOCK.is_enabled()
+    _BuiltInHtmlBlock if USE_EXTRACTED_HTML_BLOCK.is_enabled()
+    else _BuiltInHtmlBlock
+)
