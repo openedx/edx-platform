@@ -1,9 +1,11 @@
 # pylint: disable=missing-docstring,protected-access
 """ User model wrapper for comment service"""
 
+from opaque_keys.edx.keys import CourseKey
 
 from . import models, settings, utils
 from forum import api as forum_api
+from forum.utils import str_to_bool
 from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
 
@@ -107,14 +109,29 @@ class User(models.Model):
         url = _url_for_user_active_threads(self.id)
         params = {'course_id': str(self.course_id)}
         params.update(query_params)
-        response = utils.perform_request(
-            'get',
-            url,
-            params,
-            metric_action='user.active_threads',
-            metric_tags=self._metric_tags,
-            paged_results=True,
-        )
+        if user_id := params.get("user_id"):
+            params["user_id"] = str(user_id)
+        if page := params.get("page"):
+            params["page"] = int(page)
+        if per_page := params.get("per_page"):
+            params["per_page"] = int(per_page)
+        if count_flagged := params.get("count_flagged", False):
+            params["count_flagged"] = str_to_bool(count_flagged)
+
+        if course_id := self.attributes.get("course_id"):
+            if not isinstance(course_id, CourseKey):
+                course_id = CourseKey.from_string(course_id)
+        if is_forum_v2_enabled(course_id):
+            response = forum_api.get_user_active_threads(**params)
+        else:
+            response = utils.perform_request(
+                'get',
+                url,
+                params,
+                metric_action='user.active_threads',
+                metric_tags=self._metric_tags,
+                paged_results=True,
+            )
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
     def subscribed_threads(self, query_params=None):
