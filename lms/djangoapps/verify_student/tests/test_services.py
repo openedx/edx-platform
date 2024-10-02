@@ -2,17 +2,16 @@
 Tests for the service classes in verify_student.
 """
 
-import itertools
 from datetime import datetime, timedelta, timezone
-from random import randint
 from unittest.mock import patch
 
 import ddt
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from freezegun import freeze_time
+from openedx_filters import PipelineStep
 from pytz import utc
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -31,6 +30,16 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 365,
 }
+
+
+class TestIdvPageUrlRequestedPipelineStep(PipelineStep):
+    """ Utility function to test a configured pipeline step """
+    TEST_URL = 'example.com/verify'
+
+    def run_filter(self, url):  # pylint: disable=arguments-differ
+        return {
+            "url": self.TEST_URL
+        }
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
@@ -167,6 +176,26 @@ class TestIDVerificationService(ModuleStoreTestCase):
         expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         assert path == (expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
 
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.idv.page.url.requested.v1": {
+                "pipeline": [
+                    "lms.djangoapps.verify_student.tests.test_services.TestIdvPageUrlRequestedPipelineStep",
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_get_verify_location_with_filter_step(self):
+        """
+        Test IDV flow location can be customized with an openedx filter
+        """
+        url = IDVerificationService.get_verify_location()
+        assert url == TestIdvPageUrlRequestedPipelineStep.TEST_URL
+
+        url = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
+        assert url == TestIdvPageUrlRequestedPipelineStep.TEST_URL
+
     def test_get_expiration_datetime(self):
         """
         Test that the latest expiration datetime is returned if there are multiple records
@@ -199,52 +228,6 @@ class TestIDVerificationService(ModuleStoreTestCase):
 
         expiration_datetime = IDVerificationService.get_expiration_datetime(user, ['approved'])
         assert expiration_datetime == newest.expiration_datetime
-
-    @ddt.data(
-        {'status': 'denied', 'error_msg': '[{"generalReasons": ["Name mismatch"]}]'},
-        {'status': 'approved', 'error_msg': ''},
-        {'status': 'submitted', 'error_msg': ''},
-    )
-    def test_get_verification_details_by_id(self, kwargs):
-        user = UserFactory.create()
-        kwargs['user'] = user
-        sspv = SoftwareSecurePhotoVerification.objects.create(**kwargs)
-        attempt = IDVerificationService.get_verification_details_by_id(sspv.id)
-        assert attempt.id == sspv.id
-        assert attempt.user.id == user.id
-        assert attempt.status == kwargs['status']
-        assert attempt.error_msg == kwargs['error_msg']
-
-    @ddt.data(
-        *itertools.product(
-            [SSOVerification, ManualVerification],
-            [
-                {'status': 'denied'},
-                {'status': 'approved'},
-                {'status': 'submitted'},
-            ]
-        )
-    )
-    @ddt.unpack
-    def test_get_verification_details_other_types(self, verification_model, kwargs):
-        user = UserFactory.create()
-        kwargs['user'] = user
-        model_object = verification_model.objects.create(**kwargs)
-
-        attempt = IDVerificationService.get_verification_details_by_id(model_object.id)
-        assert attempt.id == model_object.id
-        assert attempt.user.id == user.id
-        assert attempt.status == kwargs['status']
-
-    @ddt.data(
-        SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
-    )
-    def test_get_verification_details_not_found(self, verification_model):
-        user = UserFactory.create()
-        model_object = verification_model.objects.create(user=user)
-        not_found_id = model_object.id + randint(100, 200)
-        attempt = IDVerificationService.get_verification_details_by_id(not_found_id)
-        assert attempt is None
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)

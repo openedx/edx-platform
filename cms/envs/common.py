@@ -468,17 +468,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
 
-    # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Whether to use the reimagined certificates_display_behavior and certificate_available_date
-    # .. settings. Will eventually become the default.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2021-07-26
-    # .. toggle_target_removal_date: 2021-10-01
-    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
-    'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
-
     # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -2813,8 +2802,14 @@ EDX_BRAZE_API_SERVER = None
 
 BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
+######################## Discussion Forum settings ########################
+
+# Feedback link in upgraded discussion notification alert
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
-DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+# Learn More link in upgraded discussion notification alert
+# pylint: disable=line-too-long
+DISCUSSIONS_INCONTEXT_LEARNMORE_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_discussions/discussions.html"
 
 #### django-simple-history##
 # disable indexing on date field its coming django-simple-history.

@@ -1353,27 +1353,27 @@ def _get_problem_responses(request, *, course_id, problem_locations, problem_typ
     return JsonResponse({"status": success_status, "task_id": task.task_id})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_grading_config(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class GetGradingConfig(APIView):
     """
     Respond with json which contains a html formatted grade summary.
     """
-    course_id = CourseKey.from_string(course_id)
-    # course = get_course_with_access(
-    #     request.user, 'staff', course_id, depth=None
-    # )
-    course = get_course_by_id(course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    grading_config_summary = instructor_analytics_basic.dump_grading_context(course)
-
-    response_payload = {
-        'course_id': str(course_id),
-        'grading_config_summary': grading_config_summary,
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Post method to return grading config.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_id)
+        grading_config_summary = instructor_analytics_basic.dump_grading_context(course)
+        response_payload = {
+            'course_id': str(course_id),
+            'grading_config_summary': grading_config_summary,
+        }
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
@@ -3203,28 +3203,40 @@ def enable_certificate_generation(request, course_id=None):
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM)
-@require_POST
-def mark_student_can_skip_entrance_exam(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class MarkStudentCanSkipEntranceExam(APIView):
     """
     Mark a student to skip entrance exam.
-    Takes `unique_student_identifier` as required POST parameter.
     """
-    course_id = CourseKey.from_string(course_id)
-    student_identifier = request.POST.get('unique_student_identifier')
-    student = get_student_from_identifier(student_identifier)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM
 
-    __, created = EntranceExamConfiguration.objects.get_or_create(user=student, course_id=course_id)
-    if created:
-        message = _('This student (%s) will skip the entrance exam.') % student_identifier
-    else:
-        message = _('This student (%s) is already allowed to skip the entrance exam.') % student_identifier
-    response_payload = {
-        'message': message,
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Takes `unique_student_identifier` as required POST parameter.
+        """
+        course_id = CourseKey.from_string(course_id)
+        student_identifier = request.data.get("unique_student_identifier")
+
+        serializer_data = UniqueStudentIdentifierSerializer(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('unique_student_identifier')
+        if not student:
+            response_payload = f'Could not find student matching : {student_identifier}'
+            return JsonResponse({'error': response_payload}, status=400)
+
+        __, created = EntranceExamConfiguration.objects.get_or_create(user=student, course_id=course_id)
+        if created:
+            message = _('This student (%s) will skip the entrance exam.') % student_identifier
+        else:
+            message = _('This student (%s) is already allowed to skip the entrance exam.') % student_identifier
+        response_payload = {
+            'message': message,
+        }
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')

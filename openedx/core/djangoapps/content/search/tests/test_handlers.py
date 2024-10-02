@@ -148,7 +148,7 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             "context_key": "lib:orgA:lib_a",
             "org": "orgA",
             "breadcrumbs": [{"display_name": "Library Org A"}],
-            "content": {"problem_types": [], "capa_content": " "},
+            "content": {"problem_types": [], "capa_content": ""},
             "access_id": lib_access.id,
             "last_published": None,
             "created": created_date.timestamp(),

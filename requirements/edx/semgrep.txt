@@ -17,7 +17,7 @@ boltons==21.0.0
     #   semgrep
 bracex==2.5
     # via wcmatch
-certifi==2024.7.4
+certifi==2024.8.30
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -38,7 +38,7 @@ face==22.0.0
     # via glom
 glom==22.1.0
     # via semgrep
-idna==3.7
+idna==3.10
     # via requests
 jsonschema==4.23.0
     # via semgrep
@@ -60,7 +60,7 @@ referencing==0.35.1
     #   jsonschema-specifications
 requests==2.32.3
     # via semgrep
-rich==13.7.1
+rich==13.8.1
     # via semgrep
 rpds-py==0.20.0
     # via
@@ -76,7 +76,7 @@ tomli==2.0.1
     # via semgrep
 typing-extensions==4.12.2
     # via semgrep
-urllib3==1.26.19
+urllib3==1.26.20
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
