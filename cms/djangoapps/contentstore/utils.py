@@ -34,7 +34,11 @@ from milestones import api as milestones_api
 from pytz import UTC
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
+from cms.djangoapps.contentstore.toggles import (
+    exam_setting_view_enabled,
+    libraries_v1_enabled,
+    libraries_v2_enabled,
+)
 from common.djangoapps.course_action_state.models import CourseRerunUIStateManager, CourseRerunState
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_modes.models import CourseMode
@@ -1696,6 +1700,8 @@ def get_home_context(request, no_course=False):
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries_v1_enabled': libraries_v1_enabled(),
+        'libraries_v2_enabled': libraries_v2_enabled(),
         'taxonomies_enabled': not is_tagging_feature_disabled(),
         'taxonomy_list_mfe_url': get_taxonomy_list_url(),
         'libraries': libraries,

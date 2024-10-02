@@ -58,6 +58,8 @@ class StudioHomeSerializer(serializers.Serializer):
     in_process_course_actions = UnsucceededCourseSerializer(many=True, required=False, allow_null=True)
     libraries = LibraryViewSerializer(many=True, required=False, allow_null=True)
     libraries_enabled = serializers.BooleanField()
+    libraries_v1_enabled = serializers.BooleanField()
+    libraries_v2_enabled = serializers.BooleanField()
     taxonomies_enabled = serializers.BooleanField()
     taxonomy_list_mfe_url = serializers.CharField()
     optimization_enabled = serializers.BooleanField()
