@@ -61,14 +61,35 @@ class Thread(models.Model):
             url = cls.url(action='get_all', params=utils.extract(params, 'commentable_id'))
             if params.get('commentable_id'):
                 del params['commentable_id']
-        response = utils.perform_request(
-            'get',
-            url,
-            params,
-            metric_tags=['course_id:{}'.format(query_params['course_id'])],
-            metric_action='thread.search',
-            paged_results=True
-        )
+
+        if is_forum_v2_enabled(utils.get_course_key(query_params['course_id'])):
+            if query_params.get('text'):
+                search_params = utils.strip_none(params)
+                if user_id := search_params.get('user_id'):
+                    search_params['user_id'] = str(user_id)
+                if group_ids := search_params.get('group_ids'):
+                    search_params['group_ids'] = [int(group_id) for group_id in group_ids.split(',')]
+                elif group_id := search_params.get('group_id'):
+                    search_params['group_ids'] = [int(group_id)]
+                    search_params.pop('group_id', None)
+                if commentable_ids := search_params.get('commentable_ids'):
+                    search_params['commentable_ids'] = commentable_ids.split(',')
+                elif commentable_id := search_params.get('commentable_id'):
+                    search_params['commentable_ids'] = [commentable_id]
+                    search_params.pop('commentable_id', None)
+                response = forum_api.search_threads(**search_params)
+            else:
+                response = forum_api.get_user_threads(**params)
+        else:
+            response = utils.perform_request(
+                'get',
+                url,
+                params,
+                metric_tags=['course_id:{}'.format(query_params['course_id'])],
+                metric_action='thread.search',
+                paged_results=True
+            )
+        
         if query_params.get('text'):
             search_query = query_params['text']
             course_id = query_params['course_id']
@@ -151,13 +172,18 @@ class Thread(models.Model):
         }
         request_params = utils.strip_none(request_params)
 
-        response = utils.perform_request(
-            'get',
-            url,
-            request_params,
-            metric_action='model.retrieve',
-            metric_tags=self._metric_tags
-        )
+        if is_forum_v2_enabled(utils.get_course_key(self.attributes.get("course_id"))):
+            if user_id:= request_params.get('user_id'):
+                request_params['user_id'] = str(user_id)
+            response = forum_api.get_thread(self.id, request_params)
+        else:
+            response = utils.perform_request(
+                'get',
+                url,
+                request_params,
+                metric_action='model.retrieve',
+                metric_tags=self._metric_tags
+            )
         self._update_from_response(response)
 
     def flagAbuse(self, user, voteable):
