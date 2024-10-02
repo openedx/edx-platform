@@ -173,6 +173,8 @@ class Model:
         if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = forum_api.delete_comment(self.attributes["id"])
+            elif self.type == "thread":
+                response = forum_api.delete_thread(self.attributes["id"])
         if response is None:
             url = self.url(action='delete', params=self.attributes)
             response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
@@ -215,6 +217,8 @@ class Model:
         if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = self.handle_update_comment(request_params)
+            elif self.type == "thread":
+                response = self.handle_update_thread(request_params)
         if response is None:
             response = self.perform_http_put_request(request_params)
         return response
@@ -238,6 +242,27 @@ class Model:
             request_params.get("editing_user_id"),
             request_params.get("edit_reason_code"),
             request_params.get("endorsement_user_id"),
+        )
+        return response
+
+    def handle_update_thread(self, request_params):
+        response = forum_api.update_thread(
+            self.attributes["id"],
+            request_params.get("title"),
+            request_params.get("body"),
+            request_params.get("course_id"),
+            request_params.get("anonymous"),
+            request_params.get("anonymous_to_peers"),
+            request_params.get("closed"),
+            request_params.get("commentable_id"),
+            request_params.get("user_id"),
+            request_params.get("editing_user_id"),
+            request_params.get("pinned"),
+            request_params.get("thread_type"),
+            request_params.get("edit_reason_code"),
+            request_params.get("close_reason_code"),
+            request_params.get("closing_user_id"),
+            request_params.get("endorsed"),
         )
         return response
 
@@ -268,6 +293,8 @@ class Model:
         if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = self.handle_create_comment()
+            elif self.type == "thread":
+                response = self.handle_create_thread()
         if response is None:
             response = self.perform_http_post_request()
         return response
@@ -297,5 +324,26 @@ class Model:
                 course_id,
                 request_data.get("anonymous", False),
                 request_data.get("anonymous_to_peers", False),
+            )
+        return response
+
+    def handle_create_thread(self):
+        request_data = self.initializable_attributes()
+        try:
+            title = request_data["title"]
+            body = request_data["body"]
+            user_id = str(request_data["user_id"])
+            course_id = str(request_data["course_id"])
+        except KeyError as e:
+            raise e
+        response = forum_api.create_thread(
+                title,
+                body,
+                course_id,
+                user_id,
+                request_data.get("anonymous", False),
+                request_data.get("anonymous_to_peers", False),
+                request_data.get("commentable_id", "course"),
+                request_data.get("thread_type", "discussion"),
             )
         return response

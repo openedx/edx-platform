@@ -227,7 +227,7 @@ class Thread(models.Model):
         voteable._update_from_response(response)
 
     def pin(self, user, thread_id):
-        if is_forum_v2_enabled(self.attributes.get("course_id")):
+        if is_forum_v2_enabled(utils.get_course_key(self.attributes.get("course_id"))):
             response = forum_api.pin_thread(user.id, thread_id)
         else:
             url = _url_for_pin_thread(thread_id)
@@ -242,7 +242,7 @@ class Thread(models.Model):
         self._update_from_response(response)
 
     def un_pin(self, user, thread_id):
-        if is_forum_v2_enabled(self.attributes.get("course_id")):
+        if is_forum_v2_enabled(utils.get_course_key(self.attributes.get("course_id"))):
             response = forum_api.unpin_thread(user.id, thread_id)
         else:
             url = _url_for_un_pin_thread(thread_id)
