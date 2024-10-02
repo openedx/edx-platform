@@ -457,7 +457,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     log.info(
         f"BulkEmail ==> Task: {parent_task_id}, SubTask: {task_id}, EmailId: {email_id}, "
-        f"TotalRecipients: {total_recipients}"
+        f"TotalRecipients: {total_recipients}, ace_enabled: {is_bulk_email_edx_ace_enabled()}"
     )
 
     try:
