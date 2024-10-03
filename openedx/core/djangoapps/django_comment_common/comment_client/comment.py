@@ -95,9 +95,9 @@ class Comment(models.Model):
             raise CommentClientRequestError("Can flag/unflag for threads or comments")
         if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if voteable.type == 'thread':
-                response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, True if removeAll else False)
+                response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, bool(removeAll))
             else:
-                response = forum_api.update_comment_flag(voteable.id, "unflag", user.id, True if removeAll else False)
+                response = forum_api.update_comment_flag(voteable.id, "unflag", user.id, bool(removeAll))
         else:
             params = {'user_id': user.id}
 

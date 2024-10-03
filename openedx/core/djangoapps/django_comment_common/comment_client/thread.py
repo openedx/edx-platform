@@ -89,7 +89,7 @@ class Thread(models.Model):
                 metric_action='thread.search',
                 paged_results=True
             )
-        
+
         if query_params.get('text'):
             search_query = query_params['text']
             course_id = query_params['course_id']
@@ -210,7 +210,7 @@ class Thread(models.Model):
         else:
             raise utils.CommentClientRequestError("Can only flag/unflag for threads or comments")
         if is_forum_v2_enabled(utils.get_course_key(self.attributes.get("course_id"))):
-            response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, True if removeAll else False)
+            response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, bool(removeAll))
         else:
             params = {'user_id': user.id}
             #if you're an admin, when you unflag, remove ALL flags
