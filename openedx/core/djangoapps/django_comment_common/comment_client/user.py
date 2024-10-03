@@ -3,7 +3,7 @@
 
 from . import models, settings, utils
 from forum import api as forum_api
-from forum.utils import str_to_bool
+from forum.utils import ForumV2RequestError, str_to_bool
 from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
 
@@ -203,7 +203,11 @@ class User(models.Model):
             retrieve_params['group_id'] = self.attributes["group_id"]
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            response = forum_api.get_user(self.attributes["id"], retrieve_params)
+            try:
+                response = forum_api.get_user(self.attributes["id"], retrieve_params)
+            except ForumV2RequestError as e:
+                self.save()
+                response = forum_api.get_user(self.attributes["id"], retrieve_params)
         else:
             try:
                 response = utils.perform_request(

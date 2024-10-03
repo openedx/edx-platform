@@ -3,8 +3,6 @@
 
 import logging
 
-from opaque_keys.edx.keys import CourseKey
-
 from .utils import CommentClientRequestError, extract, perform_request, get_course_key
 from forum import api as forum_api
 from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
@@ -219,8 +217,22 @@ class Model:
                 response = self.handle_update_comment(request_params)
             elif self.type == "thread":
                 response = self.handle_update_thread(request_params)
+            elif self.type == "user":
+                response = self.handle_update_user(request_params)
         if response is None:
             response = self.perform_http_put_request(request_params)
+        return response
+
+    def handle_update_user(self, request_params):
+        try:
+            username = request_params["username"]
+            external_id = str(request_params["external_id"])
+        except KeyError as e:
+            raise e
+        response = forum_api.update_user(
+            external_id,
+            username,
+        )
         return response
 
     def handle_update_comment(self, request_params):
@@ -337,13 +349,13 @@ class Model:
         except KeyError as e:
             raise e
         response = forum_api.create_thread(
-                title,
-                body,
-                course_id,
-                user_id,
-                request_data.get("anonymous", False),
-                request_data.get("anonymous_to_peers", False),
-                request_data.get("commentable_id", "course"),
-                request_data.get("thread_type", "discussion"),
-            )
+            title,
+            body,
+            course_id,
+            user_id,
+            request_data.get("anonymous", False),
+            request_data.get("anonymous_to_peers", False),
+            request_data.get("commentable_id", "course"),
+            request_data.get("thread_type", "discussion"),
+        )
         return response

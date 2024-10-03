@@ -173,7 +173,7 @@ class Thread(models.Model):
         request_params = utils.strip_none(request_params)
 
         if is_forum_v2_enabled(utils.get_course_key(self.attributes.get("course_id"))):
-            if user_id:= request_params.get('user_id'):
+            if user_id := request_params.get('user_id'):
                 request_params['user_id'] = str(user_id)
             response = forum_api.get_thread(self.id, request_params)
         else:
