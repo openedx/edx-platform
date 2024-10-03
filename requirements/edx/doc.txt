@@ -959,7 +959,7 @@ openai==0.28.1
     #   edx-enterprise
 openedx-atlas==0.6.2
     # via -r requirements/edx/base.txt
-openedx-calc==3.1.0
+openedx-calc==3.1.2
     # via -r requirements/edx/base.txt
 openedx-django-pyfs==3.7.0
     # via
