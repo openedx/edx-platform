@@ -305,3 +305,11 @@ class ContentLibraryCollectionComponentsUpdateSerializer(serializers.Serializer)
     """
 
     usage_keys = serializers.ListField(child=UsageKeyV2Serializer(), allow_empty=False)
+
+
+class ContentLibraryComponentCollectionsUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing Collections to/from a Component.
+    """
+
+    collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=False)

@@ -1235,6 +1235,58 @@ def update_library_collection_components(
     return collection
 
 
+def update_library_component_collections(
+    library_key: LibraryLocatorV2,
+    component: Component,
+    *,
+    collection_keys: list[str],
+    created_by: int | None = None,
+    remove=False,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    This api has opposite then functionality from `update_library_collection_components`.
+    It Associates the component with collections for the given collection keys.
+
+    By default the Collections are added to the Component.
+    If remove=True, the Collections are removed from the Component.
+
+    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
+
+    Raises:
+    * ContentLibraryCollectionNotFound if any of the given collection_keys don't match Collections in the given library.
+
+    Returns the updated Component.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    # Note: Component.key matches its PublishableEntity.key
+    collection_qs = authoring_api.get_collections(content_library.learning_package_id).filter(
+        key__in=collection_keys
+    )
+
+    if remove:
+        component = authoring_api.remove_collections(
+            content_library.learning_package_id,
+            component,
+            collection_qs,
+        )
+    else:
+        component = authoring_api.add_collections(
+            content_library.learning_package_id,
+            component,
+            collection_qs,
+            created_by=created_by,
+        )
+
+    return component
+
+
 def get_library_collection_usage_key(
     library_key: LibraryLocatorV2,
     collection_key: str,
