@@ -35,9 +35,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
             $('.popover-icon').click(function(e){
                 e.stopPropagation();
                 if ($('.popover').css("visibility") == "hidden" || $('.popover').css("visibility") == "" ) {
-                    $('.popover').css({"visibility":"visible", "opacity": 1});   
+                    $('.popover').css({"visibility":"visible", "opacity": 1});
                 } else {
-                    $('.popover').css({"visibility":"hidden", "opacity": 0});   
+                    $('.popover').css({"visibility":"hidden", "opacity": 0});
                 }
             });
         });
@@ -52,7 +52,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         }
         window.addEventListener("resize", onresize);
 
-        // responsive: show more 
+        // responsive: show more
         $(function(){
             if($(window).width() <= 768) {
             $('.collapsible-item').css({"display":"none"});
@@ -64,7 +64,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                 e.preventDefault();
                 $('.collapsible').css({"display":"none"});
             $('.collapsible-item').css({"display":"list-item"});
-            }); 
+            });
         });
     </script>
 </%block>
@@ -112,7 +112,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                     </span>
                                     <p class="price-display upgrade-price-string">${currency_symbol}${min_price} ${currency}</p>
                                     <div class="choice-title"><h4>${_("Earn a certificate")}</h4></div>
-                                    <%block name="track_selection_certificate_bullets"/> 
+                                    <%block name="track_selection_certificate_bullets"/>
                                     <ul class="list-actions">
                                         <li class="action action-select track-selection-button">
                                             <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />

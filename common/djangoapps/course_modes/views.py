@@ -195,7 +195,6 @@ class ChooseModeView(View):
             "content_gating_enabled": gated_content,
             "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(request.user, course),
             "search_courses_url": urljoin(settings.MKTG_URLS.get('ROOT'), '/search?tab=course'),
-            "course_run_key": course_id,
         }
         context.update(
             get_experiment_user_metadata_context(
@@ -241,7 +240,7 @@ class ChooseModeView(View):
 
             if verified_mode.sku:
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
-                context["ecommerce_payment_page"] = ecommerce_service.get_add_to_basket_url()
+                context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 
