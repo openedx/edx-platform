@@ -14,8 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version:
-          - "3.11"
+        python-version: ["3.11", "3.12"]
         node-version: [20]
 
     steps:

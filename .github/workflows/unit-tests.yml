@@ -18,8 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version:
-          - "3.11"
+        python-version: ["3.11", "3.12"]
         django-version:
           - "pinned"
         # When updating the shards, remember to make the same changes in
@@ -170,7 +169,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.12
 
       - name: install system requirements
         run: |
@@ -292,8 +291,7 @@ jobs:
     needs: [run-tests]
     strategy:
       matrix:
-        python-version:
-          - 3.11
+        python-version: ["3.11", "3.12"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
