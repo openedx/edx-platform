@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-build==1.2.1
+build==1.2.2
     # via pip-tools
 click==8.1.6
     # via
@@ -18,7 +18,7 @@ pyproject-hooks==1.1.0
     # via
     #   build
     #   pip-tools
-wheel==0.43.0
+wheel==0.44.0
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
