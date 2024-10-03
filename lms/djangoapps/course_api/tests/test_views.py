@@ -262,6 +262,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         response = self.client.post(self.url, data={'course_keys': str(self.course.id)})
         assert all((course['org'] == self.course.org) for course in response.json()['results'])
 
+
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseDetailView.
