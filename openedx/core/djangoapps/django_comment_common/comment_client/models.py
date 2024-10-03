@@ -371,5 +371,6 @@ class Model:
             request_data.get("anonymous_to_peers", False),
             request_data.get("commentable_id", "course"),
             request_data.get("thread_type", "discussion"),
+            request_data.get("group_id", None),
         )
         return response
