@@ -123,6 +123,8 @@ urlpatterns = oauth2_urlpatterns + [
             name='course_rerun_handler'),
     re_path(fr'^container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.container_handler,
             name='container_handler'),
+    re_path(fr'^container_embed/{settings.USAGE_KEY_PATTERN}$', contentstore_views.container_embed_handler,
+            name='container_embed_handler'),
     re_path(fr'^orphan/{settings.COURSE_KEY_PATTERN}$', contentstore_views.orphan_handler,
             name='orphan_handler'),
     re_path(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',

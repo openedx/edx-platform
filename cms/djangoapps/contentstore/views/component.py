@@ -35,7 +35,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 __all__ = [
     'container_handler',
-    'component_handler'
+    'component_handler',
+    'container_embed_handler',
 ]
 
 log = logging.getLogger(__name__)
@@ -137,6 +138,38 @@ def container_handler(request, usage_key_string):  # pylint: disable=too-many-st
                 'published_preview_link': lms_link,
             })
             return render_to_response('container.html', container_handler_context)
+    else:
+        return HttpResponseBadRequest("Only supports HTML requests")
+
+
+@require_GET
+@login_required
+def container_embed_handler(request, usage_key_string):  # pylint: disable=too-many-statements
+    """
+    Returns an HttpResponse with HTML content for the container xBlock.
+    The returned HTML is a chromeless rendering of the xBlock.
+
+    GET
+        html: returns the HTML page for editing a container
+        json: not currently supported
+    """
+
+    from ..utils import get_container_handler_context
+
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+        with modulestore().bulk_operations(usage_key.course_key):
+            try:
+                course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+            except ItemNotFoundError:
+                return HttpResponseBadRequest()
+
+            container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
+            return render_to_response('container_chromeless.html', container_handler_context)
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
 
