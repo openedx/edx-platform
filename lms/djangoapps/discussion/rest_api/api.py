@@ -1645,9 +1645,8 @@ def get_thread(request, thread_id, requested_fields=None, course_id=None):
         retrieve_kwargs={
             "with_responses": True,
             "user_id": str(request.user.id),
-            # "course_id": course_id
         },
-        course_id=course_id
+        course_id=course_id, 
     )
     if course_id and course_id != cc_thread.course_id:
         raise ThreadNotFoundError("Thread not found.")

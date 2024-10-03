@@ -171,8 +171,12 @@ class Thread(models.Model):
             'merge_question_type_responses': kwargs.get('merge_question_type_responses', False)
         }
         request_params = utils.strip_none(request_params)
-        if is_forum_v2_enabled(utils.get_course_key(kwargs.get("course_id"))):
-            if user_id:= request_params.get('user_id'):
+        course_id = kwargs.get("course_id")
+        if not course_id:
+            course_id = forum_api.get_course_id_by_thread(self.id)
+        course_key = utils.get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
+            if user_id := request_params.get('user_id'):
                 request_params['user_id'] = str(user_id)
             response = forum_api.get_thread(self.id, request_params)
         else:

@@ -197,13 +197,18 @@ class User(models.Model):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params.copy()
         retrieve_params.update(kwargs)
-        if self.attributes.get('course_id'):
+        if not retrieve_params.get("course_id") and self.attributes.get('course_id'):
             retrieve_params['course_id'] = str(self.attributes.get("course_id"))
         if self.attributes.get('group_id'):
             retrieve_params['group_id'] = self.attributes["group_id"]
-        course_key = utils.get_course_key(kwargs.get("course_id"))
-        if is_forum_v2_enabled(course_key, raise_error=True):
-            response = forum_api.get_user(self.attributes["id"], retrieve_params)
+        course_id = self.attributes.get("course_id") or retrieve_params.get("course_id")
+        course_key = utils.get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
+            try:
+                response = forum_api.get_user(self.attributes["id"], retrieve_params)
+            except ForumV2RequestError as e:
+                self.save({"course_key": course_key})
+                response = forum_api.get_user(self.attributes["id"], retrieve_params)
         else:
             try:
                 response = utils.perform_request(
