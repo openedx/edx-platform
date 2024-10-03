@@ -55,16 +55,16 @@ def get_link_for_about_page(course):
     elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):
         course_about_url = course.marketing_url
     else:
-        ## .. filter_implemented_name: CourseAboutPageURLRequested
-        ## .. filter_type: org.openedx.learning.course_about.page.url.requested.v1
-        about_base, _ = CourseAboutPageURLRequested.run_filter(
-            url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
-            org=course.id.org,
+        course_about_url = '{about_base_url}/courses/{course_key}/about'.format(
+            about_base_url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+            course_key=str(course.id),
         )
 
-        course_about_url = '{about_base_url}/courses/{course_key}/about'.format(
-            about_base_url=about_base,
-            course_key=str(course.id),
+        ## .. filter_implemented_name: CourseAboutPageURLRequested
+        ## .. filter_type: org.openedx.learning.course_about.page.url.requested.v1
+        course_about_url, _ = CourseAboutPageURLRequested.run_filter(
+            url=course_about_url,
+            org=course.id.org,
         )
 
     return course_about_url
