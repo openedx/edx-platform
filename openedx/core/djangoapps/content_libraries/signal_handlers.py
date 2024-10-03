@@ -21,7 +21,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api.authoring import get_collection_components, get_component, get_components
-from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component
+from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component, PublishableEntity
 
 from lms.djangoapps.grades.api import signals as grades_signals
 
@@ -177,9 +177,6 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
     """
     Sends a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for components added/removed/cleared from a collection.
     """
-    if not isinstance(instance, Collection):
-        return
-
     if action not in ["post_add", "post_remove", "post_clear"]:
         return
 
@@ -189,6 +186,10 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
         )
     except ContentLibrary.DoesNotExist:
         log.error("{instance} is not associated with a content library.")
+        return
+
+    if isinstance(instance, PublishableEntity):
+        _library_collection_component_changed(instance.component, library.library_key)
         return
 
     if pk_set:
