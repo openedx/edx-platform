@@ -582,6 +582,8 @@ future==1.0.0
     # via pyjwkest
 geoip2==4.8.0
     # via -r requirements/edx/kernel.in
+gevent==24.2.1
+    # via -r requirements/edx/bundled.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
 google-api-core[grpc]==2.20.0
@@ -621,6 +623,8 @@ googleapis-common-protos==1.65.0
     # via
     #   google-api-core
     #   grpcio-status
+greenlet==3.1.1
+    # via gevent
 grpcio==1.66.1
     # via
     #   google-api-core
@@ -1294,6 +1298,10 @@ yarl==1.12.1
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata
+zope-event==5.0
+    # via gevent
+zope-interface==7.0.3
+    # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
