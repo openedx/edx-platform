@@ -17,7 +17,7 @@
                     padding: 1px 1px 1px 15px;
                     margin: 20px 20px 30px 30px;
                     color: rgba(0,0,0,.75);">
-                {{ comment_body }}
+                {{ comment_body|safe }}
             </div>
 
             {% filter force_escape %}
