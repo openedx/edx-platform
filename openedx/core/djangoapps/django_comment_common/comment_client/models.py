@@ -75,7 +75,7 @@ class Model:
         if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
             if self.type == "comment":
                 response = forum_api.get_parent_comment(self.attributes["id"])
-        if response is None:
+        else:
             url = self.url(action='get', params=self.attributes)
             response = perform_request(
                 'get',

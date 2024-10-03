@@ -30,8 +30,14 @@ ENABLE_FORUM_V2 = CourseWaffleFlag(
 )
 
 
-def is_forum_v2_enabled(course_id):
+def is_forum_v2_enabled(course_id, raise_error=True):
     """
     Returns a boolean if individualized anonymous_user_id is enabled on the course
     """
+    if not course_id:
+        if raise_error:
+            print("Course ID is required to check if forum v2 is enabled")
+            raise ValueError("Course ID is required to check if forum v2 is enabled")
+        else:
+            print("Course ID is required to check if forum v2 is enabled")
     return ENABLE_FORUM_V2.is_enabled(course_id)
