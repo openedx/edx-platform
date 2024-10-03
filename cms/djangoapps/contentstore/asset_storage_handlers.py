@@ -467,6 +467,7 @@ def _get_assets_in_json_format(assets, course_key, assets_usage_locations_map):
             course_key,
             asset_file_size,
             usage_locations,
+            asset['import_path'],
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -709,7 +710,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
 
 
 def get_asset_json(display_name, content_type, date, location, thumbnail_location,
-                   locked, course_key, file_size=None, usage=None):
+                   locked, course_key, file_size=None, usage=None, import_path=None):
     '''
     Helper method for formatting the asset information to send to client.
     '''
@@ -731,4 +732,6 @@ def get_asset_json(display_name, content_type, date, location, thumbnail_locatio
         'id': str(location),
         'file_size': file_size,
         'usage_locations': usage_locations,
+        'import_path': import_path,
+        'expanded_path': import_path if import_path else display_name,
     }
