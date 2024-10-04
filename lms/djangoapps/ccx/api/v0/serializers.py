@@ -19,6 +19,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
     due = serializers.CharField(allow_blank=True)
     max_students_allowed = serializers.IntegerField(source='max_student_enrollments_allowed')
     course_modules = serializers.SerializerMethodField()
+    other_course_settings = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = CustomCourseForEdX
@@ -31,6 +32,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
             "due",
             "max_students_allowed",
             "course_modules",
+            "other_course_settings",
         )
         read_only_fields = (
             "ccx_course_id",

@@ -152,6 +152,10 @@ def get_valid_input(request_data, ignore_missing=False):
     elif 'max_students_allowed' in request_data:
         field_errors['max_students_allowed'] = {'error_code': 'null_field_max_students_allowed'}
 
+    other_course_settings = request_data.get('other_course_settings')
+    if other_course_settings and isinstance(other_course_settings, dict):
+        valid_input['other_course_settings'] = other_course_settings
+
     course_modules = request_data.get('course_modules')
     if course_modules is not None:
         if isinstance(course_modules, list):
@@ -221,6 +225,7 @@ class CCXListView(GenericAPIView):
                 "display_name": "CCX example title",
                 "coach_email": "john@example.com",
                 "max_students_allowed": 123,
+                "other_course_settings": {"custom_field": "CCX custom content example"},
                 "course_modules" : [
                     "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
                     "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
@@ -255,6 +260,8 @@ class CCXListView(GenericAPIView):
             * max_students_allowed: An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
 
+            * other_course_settings: Optional. A dictionary representation of the custom content.
+
             * course_modules: Optional. A list of course modules id keys.
 
         **GET Response Values**
@@ -278,6 +285,8 @@ class CCXListView(GenericAPIView):
 
                 * max_students_allowed: An integer representing he maximum number of students that
                   can be enrolled in the CCX Course.
+
+                * other_course_settings: A dictionary with the custom content for the CCX Course.
 
                 * course_modules: A list of course modules id keys.
 
@@ -303,6 +312,7 @@ class CCXListView(GenericAPIView):
                         "start": "2019-01-01",
                         "due": "2019-06-01",
                         "max_students_allowed": 123,
+                        "other_course_settings": {"custom_field": "CCX custom content example"},
                         "course_modules" : [
                             "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
                             "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
@@ -333,6 +343,8 @@ class CCXListView(GenericAPIView):
             * max_students_allowed: An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
 
+            * other_course_settings: A dictionary with the custom content for the CCX Course.
+
             * course_modules: A list of course modules id keys.
 
         **Example POST Response**
@@ -344,6 +356,7 @@ class CCXListView(GenericAPIView):
                 "start": "2019-01-01",
                 "due": "2019-06-01",
                 "max_students_allowed": 123,
+                "other_course_settings": {"custom_field": "CCX custom content example"},
                 "course_modules" : [
                     "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
                     "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
@@ -455,12 +468,16 @@ class CCXListView(GenericAPIView):
         # prepare the course_modules to be stored in a json stringified field
         course_modules_json = json.dumps(valid_input.get('course_modules'))
 
+        # Include the json array to add/storage custom content, if it exist.
+        custom_content_json = valid_input.get('other_course_settings')
+
         with transaction.atomic():
             ccx_course_object = CustomCourseForEdX(
                 course_id=master_course_object.id,
                 coach=coach,
                 display_name=valid_input['display_name'],
-                structure_json=course_modules_json
+                structure_json=course_modules_json,
+                other_course_settings=custom_content_json,
             )
             ccx_course_object.save()
 
@@ -552,6 +569,7 @@ class CCXDetailView(GenericAPIView):
                 "display_name": "CCX example title modified",
                 "coach_email": "joe@example.com",
                 "max_students_allowed": 111,
+                "other_course_settings": {"custom_field": "CCX custom content example"},
                 "course_modules" : [
                     "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
                     "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
@@ -580,6 +598,8 @@ class CCXDetailView(GenericAPIView):
             * max_students_allowed: Optional. An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
 
+            * other_course_settings: Optional. A dictionary representation of the custom content.
+
             * course_modules: Optional. A list of course modules id keys.
 
         **GET Response Values**
@@ -601,6 +621,8 @@ class CCXDetailView(GenericAPIView):
 
             * max_students_allowed: An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
+
+            * other_course_settings: A dictionary with the custom content for the CCX Course.
 
             * course_modules: A list of course modules id keys.
 
@@ -733,6 +755,8 @@ class CCXDetailView(GenericAPIView):
                 if ccx_course_object.coach.id != coach.id:
                     old_coach = ccx_course_object.coach
                     ccx_course_object.coach = coach
+            if 'other_course_settings' in valid_input:
+                ccx_course_object.other_course_settings = valid_input.get('other_course_settings')
             if 'course_modules' in valid_input:
                 if valid_input.get('course_modules'):
                     if not valid_course_modules(valid_input['course_modules'], master_course_key):
