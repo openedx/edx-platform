@@ -42,7 +42,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
     rsa_decrypt,
     rsa_encrypt
 )
-from openedx.core.djangoapps.signals.signals import LEARNER_SSO_VERIFIED
+from openedx.core.djangoapps.signals.signals import LEARNER_SSO_VERIFIED, PHOTO_VERIFICATION_APPROVED
 from openedx.core.storage import get_storage
 
 from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date, submit_request_to_ss
@@ -453,17 +453,12 @@ class PhotoVerification(IDVerificationAttempt):
         self.save()
 
         # Emit signal to find and generate eligible certificates
-        # This model uses the LEARNER_SSO_VERIFIED signal for backwards compatibility with changes
-        # to existing records. This model is being deprecated and all future IDV records
-        # will use the new VerificationAttempt model and corresponding openedx events signal.
-        # This is temporary until this model can be removed.
-        # DEPR details: https://github.com/openedx/edx-platform/issues/35128
-        LEARNER_SSO_VERIFIED.send_robust(
+        PHOTO_VERIFICATION_APPROVED.send_robust(
             sender=PhotoVerification,
             user=self.user,
         )
 
-        message = 'LEARNER_SSO_VERIFIED signal fired for {user} from PhotoVerification'
+        message = 'PHOTO_VERIFICATION_APPROVED signal fired for {user} from PhotoVerification'
         log.info(message.format(user=self.user.username))
 
     @status_before_must_be("ready", "must_retry")

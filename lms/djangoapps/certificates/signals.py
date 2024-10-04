@@ -33,6 +33,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED,
     LEARNER_SSO_VERIFIED,
+    PHOTO_VERIFICATION_APPROVED,
 )
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, IDV_ATTEMPT_APPROVED
 
@@ -143,6 +144,7 @@ def _handle_id_verification_approved(user):
 
 
 @receiver(LEARNER_SSO_VERIFIED, dispatch_uid="sso_learner_verified")
+@receiver(PHOTO_VERIFICATION_APPROVED, dispatch_uid="photo_verification_approved")
 def _listen_for_sso_verification_approved(sender, user, **kwargs):  # pylint: disable=unused-argument
     """
     Listen for a signal on SSOVerification indicating that the user has been verified.
