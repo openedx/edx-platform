@@ -90,7 +90,6 @@ from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.parsers import MultiPartParser
@@ -645,6 +644,9 @@ class LibraryBlockView(APIView):
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockCollectionsView(APIView):
+    """
+    View to set collections for a component.
+    """
     @convert_exceptions
     def patch(self, request, usage_key_str) -> Response:
         """
