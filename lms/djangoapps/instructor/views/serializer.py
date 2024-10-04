@@ -238,7 +238,7 @@ class CertificateSerializer(serializers.Serializer):
     user = serializers.CharField(
         help_text="Email or username of student.", required=True
     )
-    notes = serializers.CharField(required=False, allow_null=True)
+    notes = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     def validate_user(self, value):
         """
