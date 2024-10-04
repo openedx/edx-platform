@@ -81,7 +81,7 @@ class Command(BaseCommand):
                 self.change_enrollments(csv_file)
 
         else:
-            CommandError('No file is provided. File is required')
+            CommandError('No file is provided. File is required')   # pylint: disable=pointless-exception-statement
 
     def change_enrollments(self, csv_file):
         """ change the enrollments of the learners. """

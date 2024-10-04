@@ -14,7 +14,7 @@ packaging==24.1
     # via build
 pip-tools==7.4.1
     # via -r requirements/pip-tools.in
-pyproject-hooks==1.1.0
+pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
