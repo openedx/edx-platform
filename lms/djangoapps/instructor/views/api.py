@@ -115,7 +115,8 @@ from lms.djangoapps.instructor.views.serializer import (
     SendEmailSerializer,
     ShowStudentExtensionSerializer,
     StudentAttemptsSerializer,
-    UserSerializer
+    UserSerializer,
+    UniqueStudentIdentifierSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
