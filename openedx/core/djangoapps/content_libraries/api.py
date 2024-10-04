@@ -1268,12 +1268,16 @@ def update_library_component_collections(
         key__in=collection_keys
     )
 
-    component = authoring_api.set_collections(
+    affected_collections = authoring_api.set_collections(
         content_library.learning_package_id,
         component,
         collection_qs,
         created_by=created_by,
     )
+
+    from ..content.search.tasks import update_library_collection_index_doc
+    for collection in affected_collections:
+        update_library_collection_index_doc.delay(str(library_key), collection.key)
 
     return component
 
