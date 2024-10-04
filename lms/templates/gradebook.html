@@ -88,7 +88,7 @@
                                                                                         {%endif%}
 											{% if assignment.itemtype != "course" %}
 											 {% if assignment.grademax %}
-                                                                                        <td>{{assignment.grademax}}</td>
+                                                                                        <td>{{assignment.grademax|floatformat:2}}</td>
                                                                                         {%else%}
                                                                                         <td>-</td>
                                                                                         {%endif%}
