@@ -100,7 +100,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
                 # Update selected
                 previous_count = len(selected)
-                block_keys = LibraryContentBlock.make_selection(selected, library_children, max_count, mode)
+                block_keys = LibraryContentBlock.make_selection(selected, library_children, max_count)
                 selected = block_keys['selected']
 
                 # Save back any changes

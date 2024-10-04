@@ -13,7 +13,6 @@ from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries import tasks as library_tasks
 from xmodule.library_content_block import LibraryContentBlock
 from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 def normalize_key_for_search(library_key):
@@ -51,44 +50,6 @@ class LibraryToolsService:
             return str(library.location.library_key.version_guid)
         elif isinstance(library, library_api.ContentLibraryMetadata):
             return str(library.version)
-
-    def create_block_analytics_summary(self, course_key, block_keys):
-        """
-        Given a CourseKey and a list of (block_type, block_id) pairs,
-        prepare the JSON-ready metadata needed for analytics logging.
-
-        This is [
-            {"usage_key": x, "original_usage_key": y, "original_usage_version": z, "descendants": [...]}
-        ]
-        where the main list contains all top-level blocks, and descendants contains a *flat* list of all
-        descendants of the top level blocks, if any.
-        """
-        def summarize_block(usage_key):
-            """ Basic information about the given block """
-            orig_key, orig_version = self.store.get_block_original_usage(usage_key)
-            return {
-                "usage_key": str(usage_key),
-                "original_usage_key": str(orig_key) if orig_key else None,
-                "original_usage_version": str(orig_version) if orig_version else None,
-            }
-
-        result_json = []
-        for block_key in block_keys:
-            key = course_key.make_usage_key(*block_key)
-            info = summarize_block(key)
-            info['descendants'] = []
-            try:
-                block = self.store.get_item(key, depth=None)  # Load the item and all descendants
-                children = list(getattr(block, "children", []))
-                while children:
-                    child_key = children.pop()
-                    child = self.store.get_item(child_key)
-                    info['descendants'].append(summarize_block(child_key))
-                    children.extend(getattr(child, "children", []))
-            except ItemNotFoundError:
-                pass  # The block has been deleted
-            result_json.append(info)
-        return result_json
 
     def can_use_library_content(self, block):
         """

@@ -9,7 +9,7 @@ import ddt
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocator
 from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
@@ -93,24 +93,17 @@ class LibraryContentGeneralTest(LibraryContentTest):
     Test the base functionality of the LibraryContentBlock.
     """
 
-    @ddt.data(
-        ('library-v1:ProblemX+PR0B', LibraryLocator),
-        ('lib:ORG:test-1', LibraryLocatorV2)
-    )
-    @ddt.unpack
-    def test_source_library_key(self, library_key, expected_locator_type):
+    def test_source_library_key(self):
         """
         Test the source_library_key property of the xblock.
-
-        The method should correctly work either with V1 or V2 libraries.
         """
         library = self.make_block(
             "library_content",
             self.vertical,
             max_count=1,
-            source_library_id=library_key
+            source_library_id="library-v1:ProblemX+PROB",
         )
-        assert isinstance(library.source_library_key, expected_locator_type)
+        assert isinstance(library.source_library_key, LibraryLocator)
 
     def test_initial_sync_from_library(self):
         """
@@ -173,7 +166,6 @@ class TestLibraryContentExportImport(LibraryContentTest):
         assert imported_lc_block.display_name == self.lc_block.display_name
         assert imported_lc_block.source_library_id == self.lc_block.source_library_id
         assert imported_lc_block.source_library_version == self.lc_block.source_library_version
-        assert imported_lc_block.mode == self.lc_block.mode
         assert imported_lc_block.max_count == self.lc_block.max_count
         assert imported_lc_block.capa_type == self.lc_block.capa_type
         assert len(imported_lc_block.children) == len(self.lc_block.children)
@@ -424,7 +416,6 @@ class LibraryContentBlockTestMixin:
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
-        assert LibraryContentBlock.mode in non_editable_metadata_fields
         assert LibraryContentBlock.display_name not in non_editable_metadata_fields
 
     def test_overlimit_blocks_chosen_randomly(self):

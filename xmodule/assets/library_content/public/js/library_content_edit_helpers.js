@@ -16,7 +16,6 @@ function checkProblemTypeShouldBeVisible(editor) {
         .segment(editor.find('.xblock.xblock-studio_view.xblock-studio_view-library_content.xblock-initialized')
         .data('usage-id'))
         .segment('handler')
-        .segment('is_v2_library');
 
     $.ajax({
         type: 'POST',
@@ -25,7 +24,7 @@ function checkProblemTypeShouldBeVisible(editor) {
         success: function(data) {
             var problemTypeSelect = editor.find("select[name='Problem Type']")
                 .parents("li.field.comp-setting-entry.metadata_entry");
-            data.is_v2 ? problemTypeSelect.hide() : problemTypeSelect.show();
+            problemTypeSelect.hide();
         }
     });
 }
