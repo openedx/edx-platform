@@ -645,7 +645,13 @@ class LibraryBlockView(APIView):
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockCollectionsView(APIView):
-    def _handle_request(self, request, usage_key_str) -> Response:
+    @convert_exceptions
+    def patch(self, request, usage_key_str) -> Response:
+        """
+        Adds Collections to a Component.
+
+        Collection and Components must all be part of the given library/learning package.
+        """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         content_library = api.require_permission_for_library_key(key.lib_key, request.user,
                                                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
@@ -659,29 +665,11 @@ class LibraryBlockCollectionsView(APIView):
             component=component,
             collection_keys=collection_keys,
             created_by=self.request.user.id,
-            remove=(request.method == "DELETE"),
             content_library=content_library,
         )
 
         return Response({'count': len(collection_keys)})
 
-    @convert_exceptions
-    def patch(self, request, usage_key_str) -> Response:
-        """
-        Adds Collections to a Component.
-
-        Collection and Components must all be part of the given library/learning package.
-        """
-        return self._handle_request(request, usage_key_str)
-
-    @convert_exceptions
-    def delete(self, request, usage_key_str) -> Response:
-        """
-        Removes Collections from a Component.
-
-        Collection and Components must all be part of the given library/learning package.
-        """
-        return self._handle_request(request, usage_key_str)
 
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
