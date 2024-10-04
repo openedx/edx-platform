@@ -80,7 +80,7 @@ class Model:
             if self.type == "comment":
                 response = forum_api.get_parent_comment(self.attributes["id"])
             if response is None:
-                raise "Forum v2 API call is missing"
+                raise CommentClientRequestError("Forum v2 API call is missing")
         else:
             url = self.url(action='get', params=self.attributes)
             response = perform_request(
@@ -180,7 +180,7 @@ class Model:
             elif self.type == "thread":
                 response = forum_api.delete_thread(self.attributes["id"])
             if response is None:
-                raise "Forum v2 API call is missing"
+                raise CommentClientRequestError("Forum v2 API call is missing")
         else:
             url = self.url(action='delete', params=self.attributes)
             response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
@@ -229,7 +229,7 @@ class Model:
             elif self.type == "user":
                 response = self.handle_update_user(request_params)
             if response is None:
-                raise "Forum v2 API call is missing"
+                raise CommentClientRequestError("Forum v2 API call is missing")
         else:
             response = self.perform_http_put_request(request_params)
         return response
@@ -320,7 +320,7 @@ class Model:
             elif self.type == "thread":
                 response = self.handle_create_thread()
             if response is None:
-                raise "Forum v2 API call is missing"
+                raise CommentClientRequestError("Forum v2 API call is missing")
         else:
             response = self.perform_http_post_request()
         return response
