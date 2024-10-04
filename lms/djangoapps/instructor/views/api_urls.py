@@ -43,7 +43,7 @@ urlpatterns = [
     path('rescore_entrance_exam', api.rescore_entrance_exam, name='rescore_entrance_exam'),
     path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),
          name='list_entrance_exam_instructor_tasks'),
-    path('mark_student_can_skip_entrance_exam', api.mark_student_can_skip_entrance_exam,
+    path('mark_student_can_skip_entrance_exam', api.MarkStudentCanSkipEntranceExam.as_view(),
          name='mark_student_can_skip_entrance_exam'),
     path('list_instructor_tasks', api.ListInstructorTasks.as_view(), name='list_instructor_tasks'),
     path('list_background_email_tasks', api.list_background_email_tasks, name='list_background_email_tasks'),
@@ -82,7 +82,7 @@ urlpatterns = [
 
     # Certificates
     path('enable_certificate_generation', api.enable_certificate_generation, name='enable_certificate_generation'),
-    path('start_certificate_generation', api.start_certificate_generation, name='start_certificate_generation'),
+    path('start_certificate_generation', api.StartCertificateGeneration.as_view(), name='start_certificate_generation'),
     path('start_certificate_regeneration', api.start_certificate_regeneration, name='start_certificate_regeneration'),
     path('certificate_exception_view/', api.certificate_exception_view, name='certificate_exception_view'),
     re_path(r'^generate_certificate_exceptions/(?P<generate_for>[^/]*)', api.generate_certificate_exceptions,

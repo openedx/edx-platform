@@ -14,19 +14,24 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
     get_notification_content
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.events import notification_generated_event
-from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
+from openedx.core.djangoapps.notifications.grouping_notifications import (
+    get_user_existing_notifications,
+    group_user_notifications, NotificationRegistry,
+)
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
     get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
+
 
 logger = get_task_logger(__name__)
 
@@ -124,7 +129,10 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
-
+    group_by_id = context.pop('group_by_id', '')
+    grouping_function = NotificationRegistry.get_grouper(notification_type)
+    waffle_flag_enabled = ENABLE_NOTIFICATION_GROUPING.is_enabled(course_key)
+    grouping_enabled = waffle_flag_enabled and group_by_id and grouping_function is not None
     notifications_generated = False
     notification_content = ''
     sender_id = context.pop('sender_id', None)
@@ -135,6 +143,10 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         logger.debug(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
         batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)
         logger.debug(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
+
+        existing_notifications = (
+            get_user_existing_notifications(batch_user_ids, notification_type, group_by_id, course_key))\
+            if grouping_enabled else {}
 
         # check if what is preferences of user and make decision to send notification or not
         preferences = CourseNotificationPreference.objects.filter(
@@ -160,19 +172,22 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                 preference.get_app_config(app_name).get('enabled', False)
             ):
                 notification_preferences = preference.get_channels_for_notification_type(app_name, notification_type)
-                notifications.append(
-                    Notification(
-                        user_id=user_id,
-                        app_name=app_name,
-                        notification_type=notification_type,
-                        content_context=context,
-                        content_url=content_url,
-                        course_id=course_key,
-                        web='web' in notification_preferences,
-                        email='email' in notification_preferences,
-                    )
+                new_notification = Notification(
+                    user_id=user_id,
+                    app_name=app_name,
+                    notification_type=notification_type,
+                    content_context=context,
+                    content_url=content_url,
+                    course_id=course_key,
+                    web='web' in notification_preferences,
+                    email='email' in notification_preferences,
+                    group_by_id=group_by_id,
                 )
-                generated_notification_audience.append(user_id)
+                if grouping_enabled and existing_notifications.get(user_id, None):
+                    group_user_notifications(new_notification, existing_notifications[user_id])
+                else:
+                    notifications.append(new_notification)
+                    generated_notification_audience.append(user_id)
 
         # send notification to users but use bulk_create
         notification_objects = Notification.objects.bulk_create(notifications)
