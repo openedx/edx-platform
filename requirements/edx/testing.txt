@@ -588,7 +588,7 @@ edx-lint==5.4.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.4.2
+edx-name-affirmation==3.0.0
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.11.0
     # via
@@ -1027,6 +1027,7 @@ openedx-events==9.14.1
     #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
+    #   edx-name-affirmation
     #   event-tracking
     #   ora2
 openedx-filters==1.10.0
