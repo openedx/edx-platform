@@ -27,8 +27,12 @@ class CoursewareContent:
             "usage_key": str(item.scope_ids.usage_id),
             "location": self.get_location(item)
         }
-        _index_dictionary = item.index_dictionary()
-        _index_dictionary.update(location_info)
+        try:
+            _index_dictionary = item.index_dictionary()
+            _index_dictionary.update(location_info)
+        except Exception as ex:
+            log.info(str(ex))
+            _index_dictionary = location_info
         children = []
         if item.has_children:
             for child_item in item.get_children():
