@@ -269,10 +269,11 @@ class TestEnterpriseUtils(TestCase):
         mock_get_fields.assert_called_once_with(user)
         assert expected_context == context
 
+    @ddt.data(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS, ['username', 'email', 'country'])
     @mock.patch('openedx.features.enterprise_support.utils.get_current_request')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     def test_get_enterprise_readonly_account_fields_no_sync_learner_profile_data(
-            self, mock_customer_for_request, mock_get_current_request,
+            self, readonly_fields, mock_customer_for_request, mock_get_current_request,
     ):
         mock_get_current_request.return_value = mock.Mock(
             GET={'enterprise_customer': 'some-uuid'},
@@ -284,7 +285,8 @@ class TestEnterpriseUtils(TestCase):
         }
         user = mock.Mock()
 
-        actual_fields = get_enterprise_readonly_account_fields(user)
+        with override_settings(ENTERPRISE_READONLY_ACCOUNT_FIELDS=readonly_fields):
+            actual_fields = get_enterprise_readonly_account_fields(user)
         assert set() == actual_fields
         mock_customer_for_request.assert_called_once_with(mock_get_current_request.return_value)
         mock_get_current_request.assert_called_once_with()
