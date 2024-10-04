@@ -1241,16 +1241,14 @@ def update_library_component_collections(
     *,
     collection_keys: list[str],
     created_by: int | None = None,
-    remove=False,
     # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
     content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
-    This api has opposite then functionality from `update_library_collection_components`.
     It Associates the component with collections for the given collection keys.
 
-    By default the Collections are added to the Component.
-    If remove=True, the Collections are removed from the Component.
+    Only collections in queryset are associated with component, all previous component-collections
+    associations are removed.
 
     If you've already fetched the ContentLibrary, pass it in to avoid refetching.
 
@@ -1270,19 +1268,12 @@ def update_library_component_collections(
         key__in=collection_keys
     )
 
-    if remove:
-        component = authoring_api.remove_collections(
-            content_library.learning_package_id,
-            component,
-            collection_qs,
-        )
-    else:
-        component = authoring_api.add_collections(
-            content_library.learning_package_id,
-            component,
-            collection_qs,
-            created_by=created_by,
-        )
+    component = authoring_api.set_collections(
+        content_library.learning_package_id,
+        component,
+        collection_qs,
+        created_by=created_by,
+    )
 
     return component
 
