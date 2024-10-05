@@ -3550,6 +3550,7 @@ class GenerateBulkCertificateExceptions(APIView):
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.GENERATE_BULK_CERTIFICATE_EXCEPTIONS
 
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
         Arguments:
