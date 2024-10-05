@@ -132,6 +132,18 @@ if xblock.upstream:
             <ul class="actions-list nav-dd ui-right">
                 % if not is_root:
                     % if can_edit:
+                        % if upstream_info and upstream_info.prompt_sync:
+                            <li class="action-item">
+                                <button
+                                    class="btn-default library-sync-button action-button"
+                                    title="${_("Update available - click to sync")}"
+                                    onclick="$.post('/api/contentstore/v2/downstreams/${xblock.usage_key}/sync').done(() => { location.reload(); })"
+                                >
+                                    <span class="icon fa fa-refresh" aria-hidden="true"></span>
+                                    <span>${_("Update available")}</span>
+                                </button>
+                            </li>
+                        % endif
                         % if use_tagging:
                             <li class="action-item tag-count" data-locator="${xblock.location}"></li>
                         % endif
