@@ -154,6 +154,7 @@ class DiscussionNotificationSender:
                 "author_name": str(author_name),
                 "author_pronoun": str(author_pronoun),
                 "email_content": clean_thread_html_body(self.comment.body),
+                "group_by_id": self.parent_response.id
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
@@ -398,5 +399,19 @@ def clean_thread_html_body(html_body):
     for tag in tags_to_remove:
         for match in html_body.find_all(tag):
             match.unwrap()
+
+    # Replace tags that are not allowed in email
+    tags_to_update = [
+        {"source": "button", "target": "span"},
+        {"source": "h1", "target": "h4"},
+        {"source": "h2", "target": "h4"},
+        {"source": "h3", "target": "h4"},
+    ]
+    for tag_dict in tags_to_update:
+        for source_tag in html_body.find_all(tag_dict['source']):
+            target_tag = html_body.new_tag(tag_dict['target'], **source_tag.attrs)
+            if source_tag.string:
+                target_tag.string = source_tag.string
+            source_tag.replace_with(target_tag)
 
     return str(html_body)

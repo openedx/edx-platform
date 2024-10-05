@@ -15,7 +15,7 @@ defaults:
 
 jobs:
   recompile-python-dependencies:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out target branch
