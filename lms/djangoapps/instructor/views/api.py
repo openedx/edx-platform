@@ -108,7 +108,8 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer, UniqueStudentIdentifierSerializer
+    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer,
+    UniqueStudentIdentifierSerializer, CertificateStatusesSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -3270,6 +3271,7 @@ class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
     """
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.START_CERTIFICATE_REGENERATION
+    serializer_class = CertificateStatusesSerializer
     http_method_names = ['post']
 
     @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -3279,27 +3281,15 @@ class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
         certificate_statuses 'certificate_statuses' in POST data.
         """
         course_key = CourseKey.from_string(course_id)
-        certificates_statuses = request.POST.getlist('certificate_statuses', [])
-        if not certificates_statuses:
-            return JsonResponse(
-                {'message': _('Please select one or more certificate statuses that require certificate regeneration.')},
-                status=400
-            )
+        serializer = self.serializer_class(data=request.data)
 
-        # Check if the selected statuses are allowed
-        allowed_statuses = [
-            CertificateStatuses.downloadable,
-            CertificateStatuses.error,
-            CertificateStatuses.notpassing,
-            CertificateStatuses.audit_passing,
-            CertificateStatuses.audit_notpassing,
-        ]
-        if not set(certificates_statuses).issubset(allowed_statuses):
+        if not serializer.is_valid():
             return JsonResponse(
                 {'message': _('Please select certificate statuses from the list only.')},
                 status=400
             )
 
+        certificates_statuses = serializer.validated_data['certificate_statuses']
         task_api.regenerate_certificates(request, course_key, certificates_statuses)
         response_payload = {
             'message': _('Certificate regeneration task has been started. '
