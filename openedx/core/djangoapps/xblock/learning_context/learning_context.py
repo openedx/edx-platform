@@ -37,6 +37,14 @@ class LearningContext:
         """
         return False
 
+    def can_view_block_for_editing(self, user, usage_key):
+        """
+        Does the specified usage key exist in its context, and if so, does the
+        specified user have permission to view its fields and OLX details (but
+        not necessarily to make changes to it).
+        """
+        return self.can_edit_block(user, usage_key)
+
     def can_view_block(self, user, usage_key):  # pylint: disable=unused-argument
         """
         Does the specified usage key exist in its context, and if so, does the

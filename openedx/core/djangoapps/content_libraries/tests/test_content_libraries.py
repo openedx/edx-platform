@@ -635,21 +635,27 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         # A random user cannot read OLX nor assets (this library has allow_public_read False):
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key, expect_response=403)
+            self._get_library_block_fields(block3_key, expect_response=404)
             self._get_library_block_assets(block3_key, expect_response=403)
             self._get_library_block_asset(block3_key, file_name="whatever.png", expect_response=403)
+            # Nor can they preview the block:
+            self._render_block_view(block3_key, view_name="student_view", expect_response=404)
         # But if we grant allow_public_read, then they can:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
             # self._set_library_block_asset(block3_key, "whatever.png", b"data")
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key)
+            self._render_block_view(block3_key, view_name="student_view")
+            f = self._get_library_block_fields(block3_key)
             # self._get_library_block_assets(block3_key)
             # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
-        # Users without authoring permission cannot edit nor delete XBlocks (this library has allow_public_read False):
+        # Users without authoring permission cannot edit nor delete XBlocks:
         for user in [reader, random_user]:
             with self.as_user(user):
                 self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
+                self._set_library_block_fields(block3_key, {"data": "<problem />", "metadata": {}}, expect_response=404)
                 # self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
                 self._delete_library_block(block3_key, expect_response=403)
                 self._commit_library_changes(lib_id, expect_response=403)
@@ -659,6 +665,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         with self.as_user(author_group_member):
             olx = self._get_library_block_olx(block3_key)
             self._set_library_block_olx(block3_key, olx)
+            self._set_library_block_fields(block3_key, {"data": olx, "metadata": {}})
             # self._get_library_block_assets(block3_key)
             # self._set_library_block_asset(block3_key, "test.txt", b"data")
             # self._get_library_block_asset(block3_key, file_name="test.txt")

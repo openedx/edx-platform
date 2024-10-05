@@ -49,6 +49,19 @@ class LibraryContextImpl(LearningContext):
 
         return self.block_exists(usage_key)
 
+    def can_view_block_for_editing(self, user, usage_key):
+        """
+        Does the specified usage key exist in its context, and if so, does the
+        specified user have permission to view its fields and OLX details (but
+        not necessarily to make changes to it).
+        """
+        try:
+            api.require_permission_for_library_key(usage_key.lib_key, user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+        except (PermissionDenied, api.ContentLibraryNotFound):
+            return False
+
+        return self.block_exists(usage_key)
+
     def can_view_block(self, user, usage_key):
         """
         Does the specified usage key exist in its context, and if so, does the

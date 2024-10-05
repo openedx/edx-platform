@@ -8,7 +8,7 @@ Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 # pylint: disable=unused-import
-
+from enum import Enum
 from datetime import datetime
 import logging
 import threading
@@ -43,6 +43,16 @@ from openedx.core.djangoapps.xblock.learning_context import LearningContext
 log = logging.getLogger(__name__)
 
 
+class CheckPerm(Enum):
+    """ Options for the default permission check done by load_block() """
+    # can view the published block and call handlers etc. but not necessarily view its OLX source nor field data
+    CAN_LEARN = 1
+    # read-only studio view: can see the block (draft or published), see its OLX, see its field data, etc.
+    CAN_READ_AS_AUTHOR = 2
+    # can view everything and make changes to the block
+    CAN_EDIT = 3
+
+
 def get_runtime_system():
     """
     Return a new XBlockRuntimeSystem.
@@ -74,7 +84,7 @@ def get_runtime_system():
     return runtime
 
 
-def load_block(usage_key, user):
+def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPerm.CAN_LEARN):
     """
     Load the specified XBlock for the given user.
 
@@ -94,10 +104,19 @@ def load_block(usage_key, user):
 
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
-    if user is not None and not context_impl.can_view_block(user, usage_key):
-        # We do not know if the block was not found or if the user doesn't have
-        # permission, but we want to return the same result in either case:
-        raise NotFound(f"XBlock {usage_key} does not exist, or you don't have permission to view it.")
+    if check_permission and user is not None:
+        if check_permission == CheckPerm.CAN_EDIT:
+            has_perm = context_impl.can_edit_block(user, usage_key)
+        elif check_permission == CheckPerm.CAN_READ_AS_AUTHOR:
+            has_perm = context_impl.can_view_block_for_editing(user, usage_key)
+        elif check_permission == CheckPerm.CAN_LEARN:
+            has_perm = context_impl.can_view_block(user, usage_key)
+        else:
+            has_perm = False
+        if not has_perm:
+            # We do not know if the block was not found or if the user doesn't have
+            # permission, but we want to return the same result in either case:
+            raise NotFound(f"XBlock {usage_key} does not exist, or you don't have permission to view it.")
 
     # TODO: load field overrides from the context
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
