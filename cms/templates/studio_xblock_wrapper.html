@@ -8,6 +8,7 @@ from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
 from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow
+from cms.lib.xblock.upstream_sync import UpstreamLink
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 %>
 <%
@@ -23,6 +24,10 @@ label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block
 messages = xblock.validate().to_json()
 has_not_configured_message = messages.get('summary',{}).get('type', None) == 'not-configured'
 block_is_unit = is_unit(xblock)
+
+upstream_info = None
+if xblock.upstream:
+    upstream_info = UpstreamLink.try_fetch_for_block(xblock)
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -103,7 +108,20 @@ block_is_unit = is_unit(xblock)
                     ${label}
                 </label>
                 % else:
-                <span class="xblock-display-name">${label}</span>
+                    % if upstream_info:
+                        % if upstream_info.error_message:
+                            <!-- TODO: replace this fa-stack with a proper icon which is the correct size. This one is too big. -->
+                            <span class="fa-stack" aria-hidden="true" title="${_("Sourced from a library - but the upstream link is broken/invalid.")}">
+                                <i class="fa fa-book fa-stack-1x"></i>
+                                <i class="fa fa-ban fa-stack-2x"></i>
+                            </span>
+                            <span class="sr-only">${_("Sourced from a library - but the upstream link is broken/invalid.")}</span>
+                        % else:
+                            <span class="icon fa fa-book" aria-hidden="true" title="${_("Sourced from a library.")}"></span>
+                            <span class="sr-only">${_("Sourced from a library.")}</span>
+                        % endif
+                    % endif
+                    <span class="xblock-display-name">${label}</span>
                 % endif
                 % if selected_groups_label:
                 <p class="xblock-group-visibility-label">${selected_groups_label}</p>
