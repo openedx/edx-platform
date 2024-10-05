@@ -17,6 +17,8 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from openedx.core.djangoapps.content_tagging import api as tagging_api
+from openedx.core.djangoapps.content_tagging.tests.test_api import TestTaxonomyMixin
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -24,7 +26,7 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 @skip_unless_cms
 @ddt.ddt
-class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
+class ContentLibraryToolsTest(TestTaxonomyMixin, MixedSplitTestCase, ContentLibrariesRestApiTest):
     """
     Tests for LibraryToolsService.
 
@@ -104,7 +106,8 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         library = self._create_library(
             slug="cool-v2-lib", title="The best Library", description="Spectacular description"
         )
-        self._add_block_to_library(library["id"], "unit", "unit1_id")
+        block = self._add_block_to_library(library["id"], "unit", "unit1_id")
+        tagging_api.tag_object(block["id"], self.taxonomy_all_orgs, [self.tag_all_orgs.value])
 
         course = CourseFactory.create(modulestore=self.store, user_id=self.user.id)
         CourseInstructorRole(course.id).add_users(self.user)
@@ -125,6 +128,15 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         content_block = self.store.get_item(content_block.location)
 
         assert len(content_block.children) == 1
+
+        # Verify that tags are copied to children
+        child_key = str(content_block.children[0])
+        tags = tagging_api.get_object_tags(child_key)
+        assert len(tags) == 1
+        object_tag = tags[0]
+        assert object_tag.value == self.tag_all_orgs.value
+        assert object_tag.taxonomy == self.taxonomy_all_orgs
+        assert object_tag.object_id == child_key
 
     def test_update_children_for_v1_lib(self):
         """

@@ -39,6 +39,7 @@ from common.djangoapps.student.auth import has_studio_write_access
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.lib import ensure_cms
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
@@ -142,6 +143,9 @@ def _import_block(store, user_id, source_block, dest_parent_key):
             setattr(new_block, field_name, field_value)
     new_block.save()
     store.update_item(new_block, user_id)
+
+    # Copy/Sync tags of this block
+    tagging_api.copy_tags(source_key, new_block_key)
 
     if new_block.has_children:
         # Delete existing children in the new block, which can be reimported again if they still exist in the
