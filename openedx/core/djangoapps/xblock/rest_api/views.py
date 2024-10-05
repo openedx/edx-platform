@@ -125,7 +125,7 @@ def embed_block_view(request, usage_key_str, view_name):
         'lms_root_url': lms_root_url,
         'is_development': settings.DEBUG,
     }
-    response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
+    response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html', using='django')
 
     # Only allow this iframe be embedded if the parent is in the CORS_ORIGIN_WHITELIST
     cors_origin_whitelist = configuration_helpers.get_value('CORS_ORIGIN_WHITELIST', settings.CORS_ORIGIN_WHITELIST)
