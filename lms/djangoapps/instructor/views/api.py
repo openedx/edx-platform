@@ -3261,46 +3261,52 @@ def start_certificate_generation(request, course_id):
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.START_CERTIFICATE_REGENERATION)
-@require_POST
-@common_exceptions_400
-def start_certificate_regeneration(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
     """
     Start regenerating certificates for students whose certificate statuses lie with in 'certificate_statuses'
     entry in POST data.
     """
-    course_key = CourseKey.from_string(course_id)
-    certificates_statuses = request.POST.getlist('certificate_statuses', [])
-    if not certificates_statuses:
-        return JsonResponse(
-            {'message': _('Please select one or more certificate statuses that require certificate regeneration.')},
-            status=400
-        )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.START_CERTIFICATE_REGENERATION
+    http_method_names = ['post']
 
-    # Check if the selected statuses are allowed
-    allowed_statuses = [
-        CertificateStatuses.downloadable,
-        CertificateStatuses.error,
-        CertificateStatuses.notpassing,
-        CertificateStatuses.audit_passing,
-        CertificateStatuses.audit_notpassing,
-    ]
-    if not set(certificates_statuses).issubset(allowed_statuses):
-        return JsonResponse(
-            {'message': _('Please select certificate statuses from the list only.')},
-            status=400
-        )
+    @method_decorator(transaction.non_atomic_requests, name='dispatch')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        certificate_statuses 'certificate_statuses' in POST data.
+        """
+        course_key = CourseKey.from_string(course_id)
+        certificates_statuses = request.POST.getlist('certificate_statuses', [])
+        if not certificates_statuses:
+            return JsonResponse(
+                {'message': _('Please select one or more certificate statuses that require certificate regeneration.')},
+                status=400
+            )
 
-    task_api.regenerate_certificates(request, course_key, certificates_statuses)
-    response_payload = {
-        'message': _('Certificate regeneration task has been started. '
-                     'You can view the status of the generation task in the "Pending Tasks" section.'),
-        'success': True
-    }
-    return JsonResponse(response_payload)
+        # Check if the selected statuses are allowed
+        allowed_statuses = [
+            CertificateStatuses.downloadable,
+            CertificateStatuses.error,
+            CertificateStatuses.notpassing,
+            CertificateStatuses.audit_passing,
+            CertificateStatuses.audit_notpassing,
+        ]
+        if not set(certificates_statuses).issubset(allowed_statuses):
+            return JsonResponse(
+                {'message': _('Please select certificate statuses from the list only.')},
+                status=400
+            )
+
+        task_api.regenerate_certificates(request, course_key, certificates_statuses)
+        response_payload = {
+            'message': _('Certificate regeneration task has been started. '
+                         'You can view the status of the generation task in the "Pending Tasks" section.'),
+            'success': True
+        }
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
