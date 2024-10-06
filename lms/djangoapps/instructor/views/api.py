@@ -3285,7 +3285,8 @@ class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
 
         if not serializer.is_valid():
             return JsonResponse(
-                {'message': _('Please select certificate statuses from the list only.')},
+                {'message': _('Please select one or more certificate statuses that '
+                              'require certificate regeneration.')},
                 status=400
             )
 
