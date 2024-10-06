@@ -1,15 +1,15 @@
 """
 Tests for Learning-Core-based Content Libraries
 """
-from unittest.mock import Mock, patch
+from datetime import datetime, timezone
 from unittest import skip
+from unittest.mock import Mock, patch
+from uuid import uuid4
 
 import ddt
 from django.contrib.auth.models import Group
 from django.test.client import Client
-from organizations.models import Organization
-from rest_framework.test import APITestCase
-
+from freezegun import freeze_time
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
 from openedx_events.content_authoring.signals import (
@@ -18,19 +18,23 @@ from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
-    LIBRARY_BLOCK_UPDATED,
+    LIBRARY_BLOCK_UPDATED
 )
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from organizations.models import Organization
+from rest_framework.test import APITestCase
+
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.constants import CC_4_BY, COMPLEX, PROBLEM, VIDEO
 from openedx.core.djangoapps.content_libraries.tests.base import (
-    ContentLibrariesRestApiTest,
+    URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
     URL_BLOCK_RENDER_VIEW,
-    URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_XBLOCK_HANDLER,
+    ContentLibrariesRestApiTest
 )
-from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY
+from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from common.djangoapps.student.tests.factories import UserFactory
 
 
 @skip_unless_cms
@@ -230,6 +234,27 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                                          'text_search': 'library-title-4'})) == 1
         assert len(self._list_libraries({'type': VIDEO})) == 3
 
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'title'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-title'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'created'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-created'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        # An invalid order doesn't apply any specific ordering to the result, so just
+        # check if successfully returned libraries
+        assert len(self._list_libraries({'order': 'invalid'})) == 5
+        assert len(self._list_libraries({'order': '-invalid'})) == 5
+
     # General Content Library XBlock tests:
 
     def test_library_blocks(self):
@@ -247,12 +272,18 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'problem' XBlock to the library:
-        block_data = self._add_block_to_library(lib_id, "problem", "ࠒröblæm1")
+        create_date = datetime(2024, 6, 6, 6, 6, 6, tzinfo=timezone.utc)
+        with freeze_time(create_date):
+            block_data = self._add_block_to_library(lib_id, "problem", "ࠒröblæm1")
         self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:téstlꜟط:problem:ࠒröblæm1",
             "display_name": "Blank Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
+            "last_published": None,
+            "published_by": None,
+            "last_draft_created": create_date.isoformat().replace('+00:00', 'Z'),
+            "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
         # Confirm that the result contains a definition key, but don't check its value,
@@ -264,10 +295,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        publish_date = datetime(2024, 7, 7, 7, 7, 7, tzinfo=timezone.utc)
+        with freeze_time(publish_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
@@ -288,13 +323,16 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             </multiplechoiceresponse>
         </problem>
         """.strip()
-        self._set_library_block_olx(block_id, new_olx)
+        update_date = datetime(2024, 8, 8, 8, 8, 8, tzinfo=timezone.utc)
+        with freeze_time(update_date):
+            self._set_library_block_olx(block_id, new_olx)
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
         assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "New Multi Choice Question",
             "has_unpublished_changes": True,
+            "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
 
         # Now view the XBlock's student_view (including draft changes):
@@ -335,12 +373,18 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'html' XBlock to the library:
-        block_data = self._add_block_to_library(lib_id, "html", "html1")
+        create_date = datetime(2024, 6, 6, 6, 6, 6, tzinfo=timezone.utc)
+        with freeze_time(create_date):
+            block_data = self._add_block_to_library(lib_id, "html", "html1")
         self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:testlib2:html:html1",
             "display_name": "Text",
             "block_type": "html",
             "has_unpublished_changes": True,
+            "last_published": None,
+            "published_by": None,
+            "last_draft_created": create_date.isoformat().replace('+00:00', 'Z'),
+            "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
 
@@ -349,10 +393,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        publish_date = datetime(2024, 7, 7, 7, 7, 7, tzinfo=timezone.utc)
+        with freeze_time(publish_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
@@ -360,13 +408,17 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         orig_olx = self._get_library_block_olx(block_id)
         assert '<html' in orig_olx
         new_olx = "<html><b>Hello world!</b></html>"
-        self._set_library_block_olx(block_id, new_olx)
+
+        update_date = datetime(2024, 8, 8, 8, 8, 8, tzinfo=timezone.utc)
+        with freeze_time(update_date):
+            self._set_library_block_olx(block_id, new_olx)
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
         assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "Text",
             "has_unpublished_changes": True,
+            "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
 
         # Now view the XBlock's studio view (including draft changes):
@@ -952,6 +1004,56 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             },
             event_receiver.call_args.kwargs
         )
+
+    def test_library_paste_clipboard(self):
+        """
+        Check the a new block is created in the library after pasting from clipboard.
+        The content of the new block should match the content of the block in the clipboard.
+        """
+        # Importing here since this was failing when tests ran in the LMS
+        from openedx.core.djangoapps.content_staging.api import save_xblock_to_user_clipboard
+
+        # Create user to perform tests on
+        author = UserFactory.create(username="Author", email="author@example.com")
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_paste_clipboard",
+                title="Paste Clipboard Test Library",
+                description="Testing pasting clipboard in library"
+            )
+            lib_id = lib["id"]
+
+            # Add a 'problem' XBlock to the library:
+            block_data = self._add_block_to_library(lib_id, "problem", "problem1")
+
+            # Get the usage_key of the created block
+            library_key = LibraryLocatorV2.from_string(lib_id)
+            usage_key = LibraryUsageLocatorV2(
+                lib_key=library_key,
+                block_type="problem",
+                usage_id="problem1"
+            )
+
+            # Get the XBlock created in the previous step
+            block = xblock_api.load_block(usage_key, user=author)
+
+            # Copy the block to the user's clipboard
+            save_xblock_to_user_clipboard(block, author.id)
+
+            # Paste the content of the clipboard into the library
+            pasted_block_id = str(uuid4())
+            paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
+
+            # Check that the new block was created after the paste and it's content matches
+            # the the block in the clipboard
+            self.assertDictContainsEntries(self._get_library_block(paste_data["id"]), {
+                **block_data,
+                "last_draft_created_by": None,
+                "last_draft_created": paste_data["last_draft_created"],
+                "created": paste_data["created"],
+                "modified": paste_data["modified"],
+                "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
+            })
 
 
 @ddt.ddt

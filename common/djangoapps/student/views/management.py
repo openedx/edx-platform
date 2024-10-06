@@ -62,6 +62,7 @@ from openedx.core.djangoapps.user_authn.toggles import (
 )
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.features.discounts.applicability import FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
 from openedx.features.enterprise_support.utils import is_enterprise_learner
 from common.djangoapps.student.email_helpers import generate_activation_email_context
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
@@ -206,12 +207,13 @@ def compose_activation_email(
     message_context = generate_activation_email_context(user, user_registration)
     message_context.update({
         'confirm_activation_link': _get_activation_confirmation_link(message_context['key'], redirect_url),
+        'is_enterprise_learner': is_enterprise_learner(user),
+        'is_first_purchase_discount_overridden': FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG.is_enabled(),
         'route_enabled': route_enabled,
         'routed_user': user.username,
         'routed_user_email': user.email,
         'routed_profile_name': profile_name,
         'registration_flow': registration_flow,
-        'is_enterprise_learner': is_enterprise_learner(user),
         'show_auto_generated_username': show_auto_generated_username(user.username),
     })
 

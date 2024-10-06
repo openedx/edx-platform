@@ -14,8 +14,10 @@ from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_course_notification_preference_config_version
 )
+from .events import send_user_email_digest_sent_event
 from .message_type import EmailNotificationMessageType
 from .utils import (
+    add_headers_to_email_message,
     create_app_notifications_dict,
     create_email_digest_context,
     filter_notification_with_email_enabled_preferences,
@@ -68,10 +70,12 @@ def get_user_preferences_for_courses(course_ids, user):
     return new_preferences
 
 
-def send_digest_email_to_user(user, cadence_type, course_language='en', courses_data=None):
+def send_digest_email_to_user(user, cadence_type, start_date, end_date, course_language='en', courses_data=None):
     """
     Send [cadence_type] email to user.
     Cadence Type can be EmailCadence.DAILY or EmailCadence.WEEKLY
+    start_date: Datetime object
+    end_date: Datetime object
     """
     if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
@@ -79,7 +83,6 @@ def send_digest_email_to_user(user, cadence_type, course_language='en', courses_
     if not is_email_notification_flag_enabled(user):
         logger.info(f'<Email Cadence> Flag disabled for {user.username} ==Temp Log==')
         return
-    start_date, end_date = get_start_end_date(cadence_type)
     notifications = Notification.objects.filter(user=user, email=True,
                                                 created__gte=start_date, created__lte=end_date)
     if not notifications:
@@ -92,13 +95,15 @@ def send_digest_email_to_user(user, cadence_type, course_language='en', courses_
         logger.info(f'<Email Cadence> No filtered notification for {user.username} ==Temp Log==')
         return
     apps_dict = create_app_notifications_dict(notifications)
-    message_context = create_email_digest_context(apps_dict, start_date, end_date, cadence_type,
-                                                  courses_data=courses_data)
+    message_context = create_email_digest_context(apps_dict, user.username, start_date, end_date,
+                                                  cadence_type, courses_data=courses_data)
     recipient = Recipient(user.id, user.email)
     message = EmailNotificationMessageType(
         app_label="notifications", name="email_digest"
     ).personalize(recipient, course_language, message_context)
+    message = add_headers_to_email_message(message, message_context)
     ace.send(message)
+    send_user_email_digest_sent_event(user, cadence_type, notifications)
     logger.info(f'<Email Cadence> Email sent to {user.username} ==Temp Log==')
 
 
@@ -111,6 +116,7 @@ def send_digest_email_to_all_users(cadence_type):
     logger.info(f'<Email Cadence> Sending cadence email of type {cadence_type}')
     users = get_audience_for_cadence_email(cadence_type)
     courses_data = {}
+    start_date, end_date = get_start_end_date(cadence_type)
     logger.info(f'<Email Cadence> Email Cadence Audience {len(users)}')
     for user in users:
-        send_digest_email_to_user(user, cadence_type, courses_data=courses_data)
+        send_digest_email_to_user(user, cadence_type, start_date, end_date, courses_data=courses_data)

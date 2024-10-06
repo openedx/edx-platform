@@ -9,7 +9,7 @@ on:
 jobs:
   lint-imports:
     name: Lint Python Imports
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out branch
@@ -28,7 +28,7 @@ jobs:
 
       - name: Get pip cache dir
         id: pip-cache-dir
-        run: echo "::set-output name=dir::$(pip cache dir)"
+        run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
 
       - name: Cache pip dependencies
         id: cache-dependencies

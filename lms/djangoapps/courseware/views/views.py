@@ -33,10 +33,11 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
+from lms.djangoapps.static_template_view.views import render_500
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_filters.learning.filters import CourseAboutRenderStarted
+from openedx_filters.learning.filters import CourseAboutRenderStarted, RenderXBlockStarted
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from pytz import UTC
 from rest_framework import status
@@ -824,9 +825,13 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
                 single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
 
             if single_paid_mode and single_paid_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(
+                    single_paid_mode.sku, course_run_keys=[course_id]
+                )
             if single_paid_mode and single_paid_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(
+                    single_paid_mode.bulk_sku, course_run_keys=[course_id]
+                )
 
         registration_price, course_price = get_course_prices(course)  # lint-amnesty, pylint: disable=unused-variable
 
@@ -1532,7 +1537,7 @@ def _check_sequence_exam_access(request, location):
 @xframe_options_exempt
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
-def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_staff_debug_info=False):
+def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_staff_debug_info=False):  # pylint: disable=too-many-statements
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
@@ -1641,11 +1646,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
                 if not _check_sequence_exam_access(request, seq_block.location):
                     return HttpResponseForbidden("Access to exam content is restricted")
 
-        fragment = block.render(requested_view, context=student_view_context)
-        optimization_flags = get_optimization_flags_for_content(block, fragment)
-
         context = {
-            'fragment': fragment,
             'course': course,
             'block': block,
             'disable_accordion': True,
@@ -1666,10 +1667,33 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_mobile_app,
             'render_course_wide_assets': True,
-
-            **optimization_flags,
         }
-        return render_to_response('courseware/courseware-chromeless.html', context)
+
+        try:
+            # .. filter_implemented_name: RenderXBlockStarted
+            # .. filter_type: org.openedx.learning.xblock.render.started.v1
+            context, student_view_context = RenderXBlockStarted.run_filter(
+                context=context, student_view_context=student_view_context
+            )
+        except RenderXBlockStarted.PreventXBlockBlockRender as exc:
+            log.info("Halted rendering block %s. Reason: %s", usage_key_string, exc.message)
+            return render_500(request)
+        except RenderXBlockStarted.RenderCustomResponse as exc:
+            log.info("Rendering custom exception for block %s. Reason: %s", usage_key_string, exc.message)
+            context.update({
+                'fragment': Fragment(exc.response)
+            })
+            return render_to_response('courseware/courseware-chromeless.html', context, request=request)
+
+        fragment = block.render(requested_view, context=student_view_context)
+        optimization_flags = get_optimization_flags_for_content(block, fragment)
+
+        context.update({
+            'fragment': fragment,
+            **optimization_flags,
+        })
+
+        return render_to_response('courseware/courseware-chromeless.html', context, request=request)
 
 
 def get_optimization_flags_for_content(block, fragment):

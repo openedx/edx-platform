@@ -616,11 +616,15 @@ class ProblemBlock(
             "",
             capa_content
         )
+        # Strip out all other tags, leaving their content. But we want spaces between adjacent tags, so that
+        # <choice correct="true"><div>Option A</div></choice><choice correct="false"><div>Option B</div></choice>
+        # becomes "Option A Option B" not "Option AOption B" (these will appear in search results)
+        capa_content = re.sub(r"</(\w+)><([^>]+)>", r"</\1> <\2>", capa_content)
         capa_content = re.sub(
             r"(\s|&nbsp;|//)+",
             " ",
             nh3.clean(capa_content, tags=set())
-        )
+        ).strip()
 
         capa_body = {
             "capa_content": capa_content,
@@ -796,11 +800,24 @@ class ProblemBlock(
                 yield (user_state.username, report)
 
     @property
+    def course_end_date(self):
+        """
+        Return the end date of the problem's course
+        """
+
+        try:
+            course_block_key = self.runtime.course_entry.structure['root']
+            return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
+        except (AttributeError, KeyError):
+            return None
+
+    @property
     def close_date(self):
         """
         Return the date submissions should be closed from.
         """
-        due_date = self.due
+
+        due_date = self.due or self.course_end_date
 
         if self.graceperiod is not None and due_date:
             return due_date + self.graceperiod

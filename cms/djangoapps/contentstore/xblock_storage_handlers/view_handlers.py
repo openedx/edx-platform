@@ -33,6 +33,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.toggles import ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from common.djangoapps.static_replace import replace_static_urls
@@ -184,6 +185,11 @@ def handle_xblock(request, usage_key_string=None):
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = get_block_info(get_xblock(usage_key, request.user))
+                    # TODO: remove after beta testing for the new problem editor parser
+                    if response["category"] == "problem":
+                        response["metadata"]["default_to_advanced"] = (
+                            ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG.is_enabled()
+                        )
                     if "customReadToken" in fields:
                         parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
                         response.update(parent_children)
@@ -305,13 +311,10 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
         old_metadata = own_metadata(xblock)
     if old_content is None:
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
-    if hasattr(xblock, "editor_saved"):
-        load_services_for_studio(xblock.runtime, user)
-        xblock.editor_saved(user, old_metadata, old_content)
+    load_services_for_studio(xblock.runtime, user)
+    xblock.editor_saved(user, old_metadata, old_content)
     xblock_updated = modulestore().update_item(xblock, user.id)
-    if hasattr(xblock_updated, "post_editor_saved"):
-        load_services_for_studio(xblock_updated.runtime, user)
-        xblock_updated.post_editor_saved(user, old_metadata, old_content)
+    xblock_updated.post_editor_saved(user, old_metadata, old_content)
     return xblock_updated
 
 
@@ -1156,12 +1159,19 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                     supports_onboarding = False
 
                 proctoring_exam_configuration_link = None
-                if xblock.is_proctored_exam:
-                    proctoring_exam_configuration_link = (
-                        get_exam_configuration_dashboard_url(
-                            course.id, xblock_info["id"]
+
+                # only call get_exam_configuration_dashboard_url if not using an LTI proctoring provider
+                if xblock.is_proctored_exam and (course.proctoring_provider != 'lti_external'):
+                    try:
+                        proctoring_exam_configuration_link = (
+                            get_exam_configuration_dashboard_url(
+                                course.id, xblock_info["id"]
+                            )
                         )
-                    )
+                    except Exception as e:  # pylint: disable=broad-except
+                        log.error(
+                            f"Error while getting proctoring exam configuration link: {e}"
+                        )
 
                 if course.proctoring_provider == "proctortrack":
                     show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(

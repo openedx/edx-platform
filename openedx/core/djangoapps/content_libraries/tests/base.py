@@ -1,7 +1,6 @@
 """
 Tests for Learning-Core-based Content Libraries
 """
-import uuid
 from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
@@ -26,6 +25,7 @@ URL_LIB_BLOCKS = URL_LIB_DETAIL + 'blocks/'  # Get the list of XBlocks in this l
 URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authorized to use this library
 URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user's permission to use this library
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
+URL_LIB_PASTE_CLIPBOARD = URL_LIB_DETAIL + 'paste_clipboard/'  # Paste user clipboard (POST) containing Xblock data
 URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'  # Get data about a block, or delete it
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
@@ -90,6 +90,13 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """
         assert big_dict.items() >= subset_dict.items()
 
+    def assertOrderEqual(self, libraries_list, expected_order):
+        """
+        Assert that the provided list of libraries match the order of expected
+        list by comparing the slugs.
+        """
+        assert [lib["slug"] for lib in libraries_list] == expected_order
+
     # API helpers
 
     def _api(self, method, url, data, expect_response):
@@ -128,10 +135,6 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             "description": description,
             "type": library_type,
             "license": license_type,
-            # We're not actually using this value any more, but we're keeping it
-            # in the API testing for backwards compatibility for just a little
-            # longer. TODO: Remove this once the frontend stops sending it.
-            "collection_uuid": uuid.uuid4(),
         }, expect_response)
 
     def _list_libraries(self, query_params_dict=None, expect_response=200):
@@ -281,6 +284,12 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Delete a static asset file. """
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         return self._api('delete', url, None, expect_response)
+
+    def _paste_clipboard_content_in_library(self, lib_key, block_id, expect_response=200):
+        """ Paste's the users clipboard content into Library """
+        url = URL_LIB_PASTE_CLIPBOARD.format(lib_key=lib_key)
+        data = {"block_id": block_id}
+        return self._api('post', url, data, expect_response)
 
     def _render_block_view(self, block_key, view_name, expect_response=200):
         """

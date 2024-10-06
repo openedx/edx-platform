@@ -1,10 +1,10 @@
 """Helper functions for working with Credentials."""
+
 import logging
 from typing import Dict, List
 from urllib.parse import urljoin
 
 import requests
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_rest_api_client.auth import SuppliedJwtAuth
 
@@ -36,7 +36,7 @@ def get_credentials_records_url(program_uuid=None):
     return base_url
 
 
-def get_credentials_api_client(user):
+def get_credentials_api_client(user) -> requests.Session:
     """
     Returns an authenticated Credentials API client.
 
@@ -104,9 +104,7 @@ def get_credentials(
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
     use_cache = credential_configuration.is_cache_enabled and not user.is_staff
-    cache_key = (
-        f"{credential_configuration.CACHE_KEY}.{user.username}" if use_cache else None
-    )
+    cache_key = f"{credential_configuration.CACHE_KEY}.{user.username}" if use_cache else None
     if cache_key and program_uuid:
         cache_key = f"{cache_key}.{program_uuid}"
 
@@ -122,64 +120,3 @@ def get_credentials(
         cache_key=cache_key,
         raise_on_error=raise_on_error,
     )
-
-
-def get_courses_completion_status(username, course_run_ids):
-    """
-    Given the username and course run ids, checks for course completion status
-    Arguments:
-        username (User): Username of the user whose credentials are being requested.
-        course_run_ids(List): list of course run ids for which we need to check the completion status
-    Returns:
-        list of course_run_ids for which user has completed the course
-        Boolean: True if an exception occurred while calling the api, False otherwise
-    """
-    credential_configuration = CredentialsApiConfig.current()
-    if not credential_configuration.enabled:
-        log.warning("%s configuration is disabled.", credential_configuration.API_NAME)
-        return [], False
-
-    completion_status_url = (
-        f"{settings.CREDENTIALS_INTERNAL_SERVICE_URL}/api"
-        "/credentials/v1/learner_cert_status/"
-    )
-    try:
-        api_client = get_credentials_api_client(
-            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
-        )
-        api_response = api_client.post(
-            completion_status_url,
-            json={
-                "username": username,
-                "course_runs": course_run_ids,
-            },
-        )
-        api_response.raise_for_status()
-        course_completion_response = api_response.json()
-    except Exception as exc:  # pylint: disable=broad-except
-        log.exception(
-            "An unexpected error occurred while reqeusting course completion statuses "
-            "for user [%s] for course_run_ids [%s] with exc [%s]:",
-            username,
-            course_run_ids,
-            exc,
-        )
-        return [], True
-    log.info(
-        "Course completion status response for user [%s] for course_run_ids [%s] is [%s]",
-        username,
-        course_run_ids,
-        course_completion_response,
-    )
-    # Yes, This is course_credentials_data. The key is named status but
-    # it contains all the courses data from credentials.
-    course_credentials_data = course_completion_response.get("status", [])
-    if course_credentials_data is not None:
-        filtered_records = [
-            course_data["course_run"]["key"]
-            for course_data in course_credentials_data
-            if course_data["course_run"]["key"] in course_run_ids
-            and course_data["status"] == settings.CREDENTIALS_COURSE_COMPLETION_STATE
-        ]
-        return filtered_records, False
-    return [], False

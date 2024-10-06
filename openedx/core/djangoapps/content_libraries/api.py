@@ -69,14 +69,18 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from edx_rest_api_client.client import OAuthAPIClient
 from lxml import etree
-from opaque_keys.edx.keys import UsageKey, UsageKeyV2
+from opaque_keys.edx.keys import BlockTypeKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import (
     LibraryLocatorV2,
     LibraryUsageLocatorV2,
-    LibraryLocator as LibraryLocatorV1
+    LibraryLocator as LibraryLocatorV1,
+    LibraryCollectionLocator,
 )
 from opaque_keys import InvalidKeyError
-from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    LibraryBlockData,
+)
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
@@ -86,7 +90,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, MediaType
+from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -111,6 +115,8 @@ log = logging.getLogger(__name__)
 
 ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
+ContentLibraryCollectionNotFound = Collection.DoesNotExist
+
 
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """
@@ -118,6 +124,10 @@ class ContentLibraryBlockNotFound(XBlockNotFoundError):
 
 class LibraryAlreadyExists(KeyError):
     """ A library with the specified slug already exists """
+
+
+class LibraryCollectionAlreadyExists(IntegrityError):
+    """ A Collection with that key already exists in the library """
 
 
 class LibraryBlockAlreadyExists(KeyError):
@@ -150,12 +160,16 @@ class ContentLibraryMetadata:
     Class that represents the metadata about a content library.
     """
     key = attr.ib(type=LibraryLocatorV2)
+    learning_package = attr.ib(type=LearningPackage)
     title = attr.ib("")
     description = attr.ib("")
     num_blocks = attr.ib(0)
     version = attr.ib(0)
     type = attr.ib(default=COMPLEX)
     last_published = attr.ib(default=None, type=datetime)
+    last_draft_created = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib(default=None, type=datetime)
+    published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     # has_unpublished_deletes will be true when the draft version of the library's bundle
     # contains deletes of any XBlocks that were in the most recently published version
@@ -168,6 +182,8 @@ class ContentLibraryMetadata:
     # Studio, use it in their courses, and copy content out of this library.
     allow_public_read = attr.ib(False)
     license = attr.ib("")
+    created = attr.ib(default=None, type=datetime)
+    updated = attr.ib(default=None, type=datetime)
 
 
 class AccessLevel:
@@ -194,23 +210,44 @@ class LibraryXBlockMetadata:
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
+    created = attr.ib(type=datetime)
+    modified = attr.ib(type=datetime)
     display_name = attr.ib("")
+    last_published = attr.ib(default=None, type=datetime)
+    last_draft_created = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib("")
+    published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
-    tags_count = attr.ib(0)
+    created = attr.ib(default=None, type=datetime)
 
     @classmethod
     def from_component(cls, library_key, component):
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
+        last_publish_log = component.versioning.last_publish_log
+
+        published_by = None
+        if last_publish_log and last_publish_log.published_by:
+            published_by = last_publish_log.published_by.username
+
+        draft = component.versioning.draft
+        last_draft_created = draft.created if draft else None
+        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
+
         return cls(
-            usage_key=LibraryUsageLocatorV2(
+            usage_key=library_component_usage_key(
                 library_key,
-                component.component_type.name,
-                component.local_key,
+                component,
             ),
             display_name=component.versioning.draft.title,
-            has_unpublished_changes=component.versioning.has_unpublished_changes
+            created=component.created,
+            modified=component.versioning.draft.created,
+            last_published=None if last_publish_log is None else last_publish_log.published_at,
+            published_by=published_by,
+            last_draft_created=last_draft_created,
+            last_draft_created_by=last_draft_created_by,
+            has_unpublished_changes=component.versioning.has_unpublished_changes,
         )
 
 
@@ -242,7 +279,7 @@ class LibraryXBlockType:
 # ============
 
 
-def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
+def get_libraries_for_user(user, org=None, library_type=None, text_search=None, order=None):
     """
     Return content libraries that the user has permission to view.
     """
@@ -263,7 +300,22 @@ def get_libraries_for_user(user, org=None, library_type=None, text_search=None):
             Q(learning_package__description__icontains=text_search)
         )
 
-    return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+    filtered = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+
+    if order:
+        order_query = 'learning_package__'
+        valid_order_fields = ['title', 'created', 'updated']
+        # If order starts with a -, that means order descending (default is ascending)
+        if order.startswith('-'):
+            order_query = f"-{order_query}"
+            order = order[1:]
+
+        if order in valid_order_fields:
+            return filtered.order_by(f"{order_query}{order}")
+        else:
+            log.exception(f"Error ordering libraries by {order}: Invalid order field")
+
+    return filtered
 
 
 def get_metadata(queryset, text_search=None):
@@ -295,13 +347,14 @@ def get_metadata(queryset, text_search=None):
             has_unpublished_changes=False,
             has_unpublished_deletes=False,
             license=lib.license,
+            learning_package=lib.learning_package,
         )
         for lib in queryset
     ]
     return libraries
 
 
-def require_permission_for_library_key(library_key, user, permission):
+def require_permission_for_library_key(library_key, user, permission) -> ContentLibrary:
     """
     Given any of the content library permission strings defined in
     openedx.core.djangoapps.content_libraries.permissions,
@@ -311,9 +364,11 @@ def require_permission_for_library_key(library_key, user, permission):
     Raises django.core.exceptions.PermissionDenied if the user doesn't have
     permission.
     """
-    library_obj = ContentLibrary.objects.get_by_key(library_key)
+    library_obj = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     if not user.has_perm(permission, obj=library_obj):
         raise PermissionDenied
+
+    return library_obj
 
 
 def get_library(library_key):
@@ -327,8 +382,11 @@ def get_library(library_key):
     learning_package = ref.learning_package
     num_blocks = authoring_api.get_all_drafts(learning_package.id).count()
     last_publish_log = authoring_api.get_last_publish(learning_package.id)
-    has_unpublished_changes = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
-                                           .exists()
+    last_draft_log = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
+        .order_by('-created').first()
+    last_draft_created = last_draft_log.created if last_draft_log else None
+    last_draft_created_by = last_draft_log.created_by.username if last_draft_log and last_draft_log.created_by else None
+    has_unpublished_changes = last_draft_log is not None
 
     # TODO: I'm doing this one to match already-existing behavior, but this is
     # something that we should remove. It exists to accomodate some complexities
@@ -354,6 +412,9 @@ def get_library(library_key):
     # libraries. The top level version stays for now because LibraryContentBlock
     # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
+    published_by = None
+    if last_publish_log and last_publish_log.published_by:
+        published_by = last_publish_log.published_by.username
 
     return ContentLibraryMetadata(
         key=library_key,
@@ -363,12 +424,18 @@ def get_library(library_key):
         num_blocks=num_blocks,
         version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
+        published_by=published_by,
+        last_draft_created=last_draft_created,
+        last_draft_created_by=last_draft_created_by,
         allow_lti=ref.allow_lti,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
         has_unpublished_deletes=has_unpublished_deletes,
         license=ref.license,
+        created=learning_package.created,
+        updated=learning_package.updated,
+        learning_package=learning_package
     )
 
 
@@ -440,6 +507,7 @@ def create_library(
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         license=library_license,
+        learning_package=ref.learning_package
     )
 
 
@@ -645,13 +713,11 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
     if not draft_version:
         raise ContentLibraryBlockNotFound(usage_key)
 
-    published_version = component.versioning.published
-
-    return LibraryXBlockMetadata(
-        usage_key=usage_key,
-        display_name=draft_version.title,
-        has_unpublished_changes=(draft_version != published_version),
+    xblock_metadata = LibraryXBlockMetadata.from_component(
+        library_key=usage_key.context_key,
+        component=component,
     )
+    return xblock_metadata
 
 
 def set_library_block_olx(usage_key, new_olx_str):
@@ -714,27 +780,44 @@ def set_library_block_olx(usage_key, new_olx_str):
     )
 
 
-def create_library_block(library_key, block_type, definition_id):
+def library_component_usage_key(
+    library_key: LibraryLocatorV2,
+    component: Component,
+) -> LibraryUsageLocatorV2:
     """
-    Create a new XBlock in this library of the specified type (e.g. "html").
+    Returns a LibraryUsageLocatorV2 for the given library + component.
     """
-    # It's in the serializer as ``definition_id``, but for our purposes, it's
-    # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
-    # more details. TODO: Change the param name once we change the serializer.
-    block_id = definition_id
+    return LibraryUsageLocatorV2(  # type: ignore[abstract]
+        library_key,
+        block_type=component.component_type.name,
+        usage_id=component.local_key,
+    )
 
+
+def validate_can_add_block_to_library(
+    library_key: LibraryLocatorV2,
+    block_type: str,
+    block_id: str,
+) -> tuple[ContentLibrary, LibraryUsageLocatorV2]:
+    """
+    Perform checks to validate whether a new block with `block_id` and type `block_type` can be added to
+    the library with key `library_key`.
+
+    Returns the ContentLibrary that has the passed in `library_key` and  newly created LibraryUsageLocatorV2 if
+    validation successful, otherwise raises errors.
+    """
     assert isinstance(library_key, LibraryLocatorV2)
-    ref = ContentLibrary.objects.get_by_key(library_key)
-    if ref.type != COMPLEX:
-        if block_type != ref.type:
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    if content_library.type != COMPLEX:
+        if block_type != content_library.type:
             raise IncompatibleTypesError(
                 _('Block type "{block_type}" is not compatible with library type "{library_type}".').format(
-                    block_type=block_type, library_type=ref.type,
+                    block_type=block_type, library_type=content_library.type,
                 )
             )
 
     # If adding a component would take us over our max, return an error.
-    component_count = authoring_api.get_all_drafts(ref.learning_package.id).count()
+    component_count = authoring_api.get_all_drafts(content_library.learning_package.id).count()
     if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
             _("Library cannot have more than {} Components").format(
@@ -747,7 +830,7 @@ def create_library_block(library_key, block_type, definition_id):
     # Ensure the XBlock type is valid and installed:
     XBlock.load_class(block_type)  # Will raise an exception if invalid
     # Make sure the new ID is not taken already:
-    usage_key = LibraryUsageLocatorV2(
+    usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
         lib_key=library_key,
         block_type=block_type,
         usage_id=block_id,
@@ -756,12 +839,26 @@ def create_library_block(library_key, block_type, definition_id):
     if _component_exists(usage_key):
         raise LibraryBlockAlreadyExists(f"An XBlock with ID '{usage_key}' already exists")
 
-    _create_component_for_block(ref, usage_key)
+    return content_library, usage_key
+
+
+def create_library_block(library_key, block_type, definition_id, user_id=None):
+    """
+    Create a new XBlock in this library of the specified type (e.g. "html").
+    """
+    # It's in the serializer as ``definition_id``, but for our purposes, it's
+    # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
+    # more details. TODO: Change the param name once we change the serializer.
+    block_id = definition_id
+
+    content_library, usage_key = validate_can_add_block_to_library(library_key, block_type, block_id)
+
+    _create_component_for_block(content_library, usage_key, user_id)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
-            library_key=ref.library_key,
+            library_key=content_library.library_key,
             usage_key=usage_key
         )
     )
@@ -783,6 +880,46 @@ def _component_exists(usage_key: UsageKeyV2) -> bool:
     return True
 
 
+def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user, block_id) -> XBlock:
+    """
+    Create a new library block and populate it with staged content from clipboard
+
+    Returns the newly created library block
+    """
+    from openedx.core.djangoapps.content_staging import api as content_staging_api
+    if not content_staging_api:
+        raise RuntimeError("The required content_staging app is not installed")
+
+    user_clipboard = content_staging_api.get_user_clipboard(user)
+    if not user_clipboard:
+        return None
+
+    olx_str = content_staging_api.get_staged_content_olx(user_clipboard.content.id)
+
+    # TODO: Handle importing over static assets
+
+    content_library, usage_key = validate_can_add_block_to_library(
+        library_key,
+        user_clipboard.content.block_type,
+        block_id
+    )
+
+    # Create component for block then populate it with clipboard data
+    _create_component_for_block(content_library, usage_key, user.id)
+    set_library_block_olx(usage_key, olx_str)
+
+    # Emit library block created event
+    LIBRARY_BLOCK_CREATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=content_library.library_key,
+            usage_key=usage_key
+        )
+    )
+
+    # Now return the metadata about the new block
+    return get_library_block(usage_key)
+
+
 def get_or_create_olx_media_type(block_type: str) -> MediaType:
     """
     Get or create a MediaType for the block type.
@@ -795,7 +932,7 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def _create_component_for_block(content_lib, usage_key):
+def _create_component_for_block(content_lib, usage_key, user_id=None):
     """
     Create a Component for an XBlock type, and initialize it.
 
@@ -826,7 +963,7 @@ def _create_component_for_block(content_lib, usage_key):
             local_key=usage_key.block_id,
             title=display_name,
             created=now,
-            created_by=None,
+            created_by=user_id,
         )
         content = authoring_api.get_or_create_text_content(
             learning_package.id,
@@ -930,13 +1067,13 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     return info
 
 
-def publish_changes(library_key):
+def publish_changes(library_key, user_id=None):
     """
     Publish all pending changes to the specified library.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
 
-    authoring_api.publish_all_drafts(learning_package.id)
+    authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
@@ -960,6 +1097,172 @@ def revert_changes(library_key):
             update_blocks=True
         )
     )
+
+
+def create_library_collection(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    title: str,
+    *,
+    description: str = "",
+    created_by: int | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Creates a Collection in the given ContentLibrary.
+
+    If you've already fetched a ContentLibrary for the given library_key, pass it in here to avoid refetching.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    try:
+        collection = authoring_api.create_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+            created_by=created_by,
+        )
+    except IntegrityError as err:
+        raise LibraryCollectionAlreadyExists from err
+
+    return collection
+
+
+def update_library_collection(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    *,
+    title: str | None = None,
+    description: str | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Updates a Collection in the given ContentLibrary.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    try:
+        collection = authoring_api.update_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+        )
+    except Collection.DoesNotExist as exc:
+        raise ContentLibraryCollectionNotFound from exc
+
+    return collection
+
+
+def update_library_collection_components(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    *,
+    usage_keys: list[UsageKeyV2],
+    created_by: int | None = None,
+    remove=False,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Associates the Collection with Components for the given UsageKeys.
+
+    By default the Components are added to the Collection.
+    If remove=True, the Components are removed from the Collection.
+
+    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
+
+    Raises:
+    * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
+    * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
+
+    Returns the updated Collection.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    # Fetch the Component.key values for the provided UsageKeys.
+    component_keys = []
+    for usage_key in usage_keys:
+        # Parse the block_family from the key to use as namespace.
+        block_type = BlockTypeKey.from_string(str(usage_key))
+
+        try:
+            component = authoring_api.get_component_by_key(
+                content_library.learning_package_id,
+                namespace=block_type.block_family,
+                type_name=usage_key.block_type,
+                local_key=usage_key.block_id,
+            )
+        except Component.DoesNotExist as exc:
+            raise ContentLibraryBlockNotFound(usage_key) from exc
+
+        component_keys.append(component.key)
+
+    # Note: Component.key matches its PublishableEntity.key
+    entities_qset = PublishableEntity.objects.filter(
+        key__in=component_keys,
+    )
+
+    if remove:
+        collection = authoring_api.remove_from_collection(
+            content_library.learning_package_id,
+            collection_key,
+            entities_qset,
+        )
+    else:
+        collection = authoring_api.add_to_collection(
+            content_library.learning_package_id,
+            collection_key,
+            entities_qset,
+            created_by=created_by,
+        )
+
+    return collection
+
+
+def get_library_collection_usage_key(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+) -> LibraryCollectionLocator:
+    """
+    Returns the LibraryCollectionLocator associated to a collection
+    """
+
+    return LibraryCollectionLocator(library_key, collection_key)
+
+
+def get_library_collection_from_usage_key(
+    collection_usage_key: LibraryCollectionLocator,
+) -> Collection:
+    """
+    Return a Collection using the LibraryCollectionLocator
+    """
+
+    library_key = collection_usage_key.library_key
+    collection_key = collection_usage_key.collection_id
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    try:
+        return authoring_api.get_collection(
+            content_library.learning_package_id,
+            collection_key,
+        )
+    except Collection.DoesNotExist as exc:
+        raise ContentLibraryCollectionNotFound from exc
 
 
 # V1/V2 Compatibility Helpers

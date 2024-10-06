@@ -2,7 +2,6 @@
 Tests for programs celery tasks.
 """
 
-
 import json
 import logging
 from datetime import datetime, timedelta
@@ -22,21 +21,13 @@ from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.tests.factories import (
-    CertificateDateOverrideFactory,
-    GeneratedCertificateFactory,
-)
+from lms.djangoapps.certificates.tests.factories import CertificateDateOverrideFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.content.course_overviews.tests.factories import (
-    CourseOverviewFactory,
-)
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.programs import tasks
-from openedx.core.djangoapps.site_configuration.tests.factories import (
-    SiteConfigurationFactory,
-    SiteFactory,
-)
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.data import CertificatesDisplayBehaviors
 
@@ -109,7 +100,7 @@ class AwardProgramCertificateTestCase(TestCase):
             "http://test-server/credentials/",
         )
 
-        tasks.award_program_certificate(test_client, student, 123, datetime(2010, 5, 30))
+        tasks.award_program_certificate(test_client, student, 123)
 
         expected_body = {
             "username": student.username,
@@ -118,15 +109,39 @@ class AwardProgramCertificateTestCase(TestCase):
                 "program_uuid": 123,
                 "type": tasks.PROGRAM_CERTIFICATE,
             },
-            "attributes": [
-                {
-                    "name": "visible_date",
-                    "value": "2010-05-30T00:00:00Z",
-                }
-            ],
         }
         last_request_body = httpretty.last_request().body.decode("utf-8")
         assert json.loads(last_request_body) == expected_body
+
+
+@skip_unless_lms
+@ddt.ddt
+@override_settings(CREDENTIALS_SERVICE_USERNAME="test-service-username")
+class AwardProgramCertificatesUtilitiesTestCase(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
+    """
+    Tests for the utility methods for the 'award_program_certificates' celery task.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.create_credentials_config()
+        self.student = UserFactory.create(username="test-student")
+        self.site = SiteFactory()
+        self.site_configuration = SiteConfigurationFactory(site=self.site)
+        self.catalog_integration = self.create_catalog_integration()
+        ApplicationFactory.create(name="credentials")
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+
+    def test_get_completed_programs(self):
+        """get_completed_programs returns result of ProgramProgressMeter.completed_programs_with_available_dates"""
+        expected = {1: 1, 2: 2, 3: 3}
+        with mock.patch(
+            TASKS_MODULE + ".ProgramProgressMeter.completed_programs_with_available_dates",
+            new_callable=mock.PropertyMock,
+        ) as mock_completed_programs_with_available_dates:
+            mock_completed_programs_with_available_dates.return_value = expected
+            completed_programs = tasks.get_completed_programs(self.site, self.student)
+            assert expected == completed_programs
 
 
 @skip_unless_lms
@@ -189,10 +204,6 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         actual_program_uuids = [call[0][2] for call in mock_award_program_certificate.call_args_list]
         assert actual_program_uuids == expected_awarded_program_uuids
 
-        actual_visible_dates = [call[0][3] for call in mock_award_program_certificate.call_args_list]
-        assert actual_visible_dates == expected_awarded_program_uuids
-        # program uuids are same as mock dates
-
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration")
     def test_awarding_certs_with_skip_program_certificate(
         self,
@@ -224,9 +235,6 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         tasks.award_program_certificates.delay(self.student.username).get()
         actual_program_uuids = [call[0][2] for call in mock_award_program_certificate.call_args_list]
         assert actual_program_uuids == expected_awarded_program_uuids
-        actual_visible_dates = [call[0][3] for call in mock_award_program_certificate.call_args_list]
-        assert actual_visible_dates == expected_awarded_program_uuids
-        # program uuids are same as mock dates
 
     @ddt.data(
         ("credentials", "enable_learner_issuance"),
@@ -311,7 +319,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
                 tasks.award_program_certificates.delay(self.student.username).get()
 
         assert mock_exception.called
-        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
+        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES)
         assert not mock_award_program_certificate.called
 
     def _make_side_effect(self, side_effects):
@@ -480,9 +488,7 @@ class PostCourseCertificateTestCase(TestCase):
             "http://test-server/credentials/",
         )
 
-        visible_date = datetime.now()
-
-        tasks.post_course_certificate(test_client, self.student.username, self.certificate, visible_date)
+        tasks.post_course_certificate(test_client, self.student.username, self.certificate)
 
         expected_body = {
             "username": self.student.username,
@@ -493,12 +499,6 @@ class PostCourseCertificateTestCase(TestCase):
                 "type": tasks.COURSE_CERTIFICATE,
             },
             "date_override": None,
-            "attributes": [
-                {
-                    "name": "visible_date",
-                    "value": visible_date.strftime("%Y-%m-%dT%H:%M:%SZ"),  # text representation of date
-                }
-            ],
         }
         last_request_body = httpretty.last_request().body.decode("utf-8")
         assert json.loads(last_request_body) == expected_body
@@ -564,7 +564,6 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         call_args, _ = mock_post_course_certificate.call_args
         assert call_args[1] == self.student.username
         assert call_args[2] == self.certificate
-        assert call_args[3] == self.certificate.modified_date
 
     def test_award_course_certificates_available_date(self, mock_post_course_certificate):
         """
@@ -576,7 +575,6 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         call_args, _ = mock_post_course_certificate.call_args
         assert call_args[1] == self.student.username
         assert call_args[2] == self.certificate
-        assert call_args[3] == self.available_date
 
     def test_award_course_certificates_override_date(self, mock_post_course_certificate):
         """
@@ -587,8 +585,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         call_args, _ = mock_post_course_certificate.call_args
         assert call_args[1] == self.student.username
         assert call_args[2] == self.certificate
-        assert call_args[3] == self.certificate.modified_date
-        assert call_args[4] == self.certificate.date_override.date
+        assert call_args[3] == self.certificate.date_override.date
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """
@@ -611,16 +608,6 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         assert mock_exception.called
         assert not mock_post_course_certificate.called
 
-    def test_award_course_cert_not_called_if_certificate_not_found(self, mock_post_course_certificate):
-        """
-        Test that the post method is never called if the certificate doesn't exist for the user and course
-        """
-        self.certificate.delete()
-        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
-            tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
-        assert mock_exception.called
-        assert not mock_post_course_certificate.called
-
     def test_award_course_cert_not_called_if_course_overview_not_found(self, mock_post_course_certificate):
         """
         Test that the post method is never called if the CourseOverview isn't found
@@ -631,6 +618,32 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
             tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
         assert mock_exception.called
         assert not mock_post_course_certificate.called
+
+    def test_award_course_cert_not_called_if_certificate_not_found(self, mock_post_course_certificate):
+        """
+        Test that the post method is never called if the certificate doesn't exist for the user and course
+        """
+        self.certificate.delete()
+        with mock.patch(TASKS_MODULE + ".LOGGER.warning") as mock_exception:
+            tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
+        assert mock_exception.called
+        assert not mock_post_course_certificate.called
+
+    def test_award_course_cert_not_called_if_course_run_key_is_bad(self, mock_post_course_certificate):
+        """
+        Test that the post method is never called if the course run key is invalid
+        """
+        bad_course_run_key = "I/Am/The/Keymaster"
+        expected_message = (
+            f"Failed to award course certificate for user {self.student.id} for course "
+            f"{bad_course_run_key}. Reason: Failed to determine course key"
+        )
+        with LogCapture(level=logging.WARNING) as log_capture:
+            tasks.award_course_certificate.delay(self.student.username, bad_course_run_key).get()
+            assert not mock_post_course_certificate.called
+            log_capture.check_present(
+                ("openedx.core.djangoapps.programs.tasks", "WARNING", expected_message),
+            )
 
     def test_award_course_cert_not_called_if_certificated_not_verified_mode(self, mock_post_course_certificate):
         """
@@ -922,7 +935,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
             with pytest.raises(MaxRetriesExceededError):
                 tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
         assert mock_exception.called
-        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
+        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES)
         assert not mock_revoke_program_certificate.called
 
 
@@ -1003,74 +1016,6 @@ class PostCourseCertificateConfigurationTestCase(TestCase):
 
 
 @skip_unless_lms
-class UpdateCertificateVisibleDatesOnCourseUpdateTestCase(CredentialsApiConfigMixin, TestCase):
-    """
-    Tests for the `update_certificate_visible_date_on_course_update` task.
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.credentials_api_config = self.create_credentials_config(enabled=False)
-        # setup course
-        self.course = CourseOverviewFactory.create()
-        # setup users
-        self.student1 = UserFactory.create(username="test-student1")
-        self.student2 = UserFactory.create(username="test-student2")
-        self.student3 = UserFactory.create(username="test-student3")
-        # award certificates to users in course we created
-        self.certificate_student1 = GeneratedCertificateFactory.create(
-            user=self.student1,
-            mode="verified",
-            course_id=self.course.id,
-            status="downloadable",
-        )
-        self.certificate_student2 = GeneratedCertificateFactory.create(
-            user=self.student2,
-            mode="verified",
-            course_id=self.course.id,
-            status="downloadable",
-        )
-        self.certificate_student3 = GeneratedCertificateFactory.create(
-            user=self.student3,
-            mode="verified",
-            course_id=self.course.id,
-            status="downloadable",
-        )
-
-    def tearDown(self):
-        super().tearDown()
-        self.credentials_api_config = self.create_credentials_config(enabled=False)
-
-    def test_update_visible_dates_but_credentials_config_disabled(self):
-        """
-        This test verifies the behavior of the `update_certificate_visible_date_on_course_update` task when the
-        CredentialsApiConfig is disabled.
-
-        If the system is configured to _not_ use the Credentials IDA, we should expect this task to eventually throw an
-        exception when the max number of retries has reached.
-        """
-        with pytest.raises(MaxRetriesExceededError):
-            tasks.update_certificate_visible_date_on_course_update(self.course.id)  # pylint: disable=no-value-for-parameter
-
-    def test_update_visible_dates(self):
-        """
-        Happy path test.
-
-        This test verifies the behavior of the `update_certificate_visible_date_on_course_update` task. This test
-        verifies attempts by the system to queue a number of `award_course_certificate` tasks to ensure the
-        `visible_date` attribute is updated on all eligible course certificates.
-        """
-        # enable the CredentialsApiConfig to issue certificates using the Credentials service
-        self.credentials_api_config.enabled = True
-        self.credentials_api_config.enable_learner_issuance = True
-
-        with mock.patch(f"{TASKS_MODULE}.award_course_certificate.delay") as award_course_cert:
-            tasks.update_certificate_visible_date_on_course_update(self.course.id)  # pylint: disable=no-value-for-parameter
-
-        assert award_course_cert.call_count == 3
-
-
-@skip_unless_lms
 class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigMixin, TestCase):
     """
     Tests for the `update_certificate_available_date_on_course_update` task.
@@ -1117,7 +1062,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
         )
 
         with pytest.raises(MaxRetriesExceededError):
-            tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+            # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_available_date_on_course_update(course_overview.id)
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
     def test_update_certificate_available_date_instructor_paced_cdb_early_no_info(self, mock_update):
@@ -1143,7 +1089,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), None)
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
@@ -1168,7 +1115,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), str(self.end_date))
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
@@ -1196,7 +1144,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), str(certificate_available_date))
 
     @mock.patch(f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay")
@@ -1228,7 +1177,8 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
             self.end_date,
         )
 
-        tasks.update_certificate_available_date_on_course_update(course_overview.id)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        tasks.update_certificate_available_date_on_course_update(course_overview.id)
         mock_update.assert_called_once_with(str(course_overview.id), None)
 
     def test_update_certificate_available_date_no_course_overview(self):
@@ -1246,8 +1196,9 @@ class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigM
         self._update_credentials_api_config(True)
 
         with LogCapture(level=logging.WARNING) as log_capture:
-            tasks.update_certificate_available_date_on_course_update(bad_course_run_key)  # pylint: disable=no-value-for-parameter
+            # pylint: disable=no-value-for-parameter
+            tasks.update_certificate_available_date_on_course_update(bad_course_run_key)
 
         log_capture.check_present(
-            ('openedx.core.djangoapps.programs.tasks', 'WARNING', expected_message),
+            ("openedx.core.djangoapps.programs.tasks", "WARNING", expected_message),
         )

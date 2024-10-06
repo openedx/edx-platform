@@ -13,8 +13,11 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from openedx_events.content_authoring.data import ContentObjectData
-from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
+from openedx_events.content_authoring.data import ContentObjectData, ContentObjectChangedData
+from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    CONTENT_OBJECT_TAGS_CHANGED,
+)
 
 from ...auth import has_view_object_tags_access
 from ...api import (
@@ -149,14 +152,24 @@ class ObjectTagOrgView(ObjectTagView):
 
     def update(self, request, *args, **kwargs) -> Response:
         """
-        Extend the update method to fire CONTENT_OBJECT_TAGS_CHANGED event
+        Extend the update method to fire CONTENT_OBJECT_ASSOCIATIONS_CHANGED event
         """
         response = super().update(request, *args, **kwargs)
         if response.status_code == 200:
             object_id = kwargs.get('object_id')
+
+            CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                content_object=ContentObjectChangedData(
+                    object_id=object_id,
+                    changes=["tags"],
+                )
+            )
+
+            # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
             CONTENT_OBJECT_TAGS_CHANGED.send_event(
                 content_object=ContentObjectData(object_id=object_id)
             )
+
         return response
 
 

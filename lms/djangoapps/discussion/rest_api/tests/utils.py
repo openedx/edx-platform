@@ -88,6 +88,7 @@ def _get_comment_callback(comment_data, thread_id, parent_id):
 
 class CommentsServiceMockMixin:
     """Mixin with utility methods for mocking the comments service"""
+
     def register_get_threads_response(self, threads, page, num_pages):
         """Register a mock response for GET on the CS thread list endpoint"""
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
@@ -489,7 +490,6 @@ class CommentsServiceMockMixin:
                 "title",
                 "topic_id",
                 "type",
-                "voted",
             ],
             "course_id": str(self.course.id),
             "topic_id": "test_topic",
@@ -675,12 +675,13 @@ class ThreadMock(object):
     A mock thread object
     """
 
-    def __init__(self, thread_id, creator, title, parent_id=None):
+    def __init__(self, thread_id, creator, title, parent_id=None, body=''):
         self.id = thread_id
         self.user_id = str(creator.id)
         self.username = creator.username
         self.title = title
         self.parent_id = parent_id
+        self.body = body
 
     def url_with_id(self, params):
         return f"http://example.com/{params['id']}"

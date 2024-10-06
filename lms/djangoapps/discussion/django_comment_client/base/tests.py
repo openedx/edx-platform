@@ -1458,6 +1458,8 @@ class CreateSubCommentUnicodeTestCase(
 @disable_signal(views, 'comment_created')
 @disable_signal(views, 'comment_voted')
 @disable_signal(views, 'comment_deleted')
+@disable_signal(views, 'comment_flagged')
+@disable_signal(views, 'thread_flagged')
 class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
     # Most of the test points use the same ddt data.
     # args: user, commentable_id, status_code
