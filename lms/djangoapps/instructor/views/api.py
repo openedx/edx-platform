@@ -76,7 +76,7 @@ from common.djangoapps.util.file import (
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from common.djangoapps.util.views import require_global_staff  # pylint: disable=unused-import
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled, create_course_email
-from lms.djangoapps.certificates import api as certs_api    
+from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -3287,8 +3287,7 @@ class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
 
         if not serializer.is_valid():
             return JsonResponse(
-                {'message': _('Please select one or more certificate statuses that '
-                              'require certificate regeneration.')},
+                {'message': _('Please select certificate statuses from the list only.')},
                 status=400
             )
 
