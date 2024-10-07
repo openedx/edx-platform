@@ -650,7 +650,7 @@ class LibraryBlockCollectionsView(APIView):
     @convert_exceptions
     def patch(self, request, usage_key_str) -> Response:
         """
-        Adds Collections to a Component.
+        Sets Collections for a Component.
 
         Collection and Components must all be part of the given library/learning package.
         """
