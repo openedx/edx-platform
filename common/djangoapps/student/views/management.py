@@ -108,6 +108,8 @@ from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.grades.api import constants as grades_constants
 from completion import handlers
+from lms.djangoapps.course_blocks.api import get_course_blocks
+
 
 log = logging.getLogger("edx.student")
 
