@@ -3239,26 +3239,31 @@ class MarkStudentCanSkipEntranceExam(APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.START_CERTIFICATE_GENERATION)
-@require_POST
-@common_exceptions_400
-def start_certificate_generation(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class StartCertificateGeneration(DeveloperErrorViewMixin, APIView):
     """
     Start generating certificates for all students enrolled in given course.
     """
-    course_key = CourseKey.from_string(course_id)
-    task = task_api.generate_certificates_for_students(request, course_key)
-    message = _('Certificate generation task for all students of this course has been started. '
-                'You can view the status of the generation task in the "Pending Tasks" section.')
-    response_payload = {
-        'message': message,
-        'task_id': task.task_id
-    }
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.START_CERTIFICATE_GENERATION
 
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+         Generating certificates for all students enrolled in given course.
+        """
+        course_key = CourseKey.from_string(course_id)
+        task = task_api.generate_certificates_for_students(request, course_key)
+        message = _('Certificate generation task for all students of this course has been started. '
+                    'You can view the status of the generation task in the "Pending Tasks" section.')
+        response_payload = {
+            'message': message,
+            'task_id': task.task_id
+        }
+
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests

@@ -238,6 +238,7 @@ def refund_entitlement(course_entitlement):
         return False
 
 
+@pluggable_override('OVERRIDE_REFUND_SEAT')
 def refund_seat(course_enrollment, change_mode=False):
     """
     Attempt to initiate a refund for any orders associated with the seat being unenrolled,
@@ -287,7 +288,7 @@ def refund_seat(course_enrollment, change_mode=False):
             user=enrollee,
         )
         if change_mode:
-            _auto_enroll(course_enrollment)
+            auto_enroll(course_enrollment)
     else:
         log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
@@ -354,7 +355,7 @@ def _refund_in_commerce_coordinator(course_enrollment, change_mode):
         log.info('Refund successfully sent to Commerce Coordinator for user [%s], course [%s].',
                  course_enrollment.user_id, course_key_str)
         if change_mode:
-            _auto_enroll(course_enrollment)
+            auto_enroll(course_enrollment)
         return True
     else:
         # Refund was not meant to be sent to Commerce Coordinator
@@ -363,7 +364,7 @@ def _refund_in_commerce_coordinator(course_enrollment, change_mode):
         return False
 
 
-def _auto_enroll(course_enrollment):
+def auto_enroll(course_enrollment):
     """
     Helper method to update an enrollment to a default course mode.
 

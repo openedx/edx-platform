@@ -39,7 +39,7 @@ charset-normalizer<2.1.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.26.0
+edx-enterprise==4.26.1
 
 # Date: 2024-02-02
 # Stay on LTS version, remove once this is added to common constraint
