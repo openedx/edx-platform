@@ -57,7 +57,7 @@ urlpatterns = [
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
 
     # proctored exam downloads...
-    path('get_proctored_exam_results', api.get_proctored_exam_results, name='get_proctored_exam_results'),
+    path('get_proctored_exam_results', api.GetProctoredExamResults.as_view(), name='get_proctored_exam_results'),
 
     # Grade downloads...
     path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
