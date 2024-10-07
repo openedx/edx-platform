@@ -1229,6 +1229,22 @@ class VerificationAttempt(StatusModel):
         """When called, returns true or false based on the type of VerificationAttempt"""
         return not self.hide_status_from_user
 
+    def active_at_datetime(self, deadline):
+        """Check whether the verification was active at a particular datetime.
+
+        Arguments:
+            deadline (datetime): The date at which the verification was active
+                (created before and expiration datetime is after today).
+
+        Returns:
+            bool
+
+        """
+        return (
+            self.created_at <= deadline and
+            (self.expiration_datetime is None or self.expiration_datetime > now())
+        )
+
     @classmethod
     def retire_user(cls, user_id):
         """
