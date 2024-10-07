@@ -125,9 +125,9 @@ def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPer
 
     try:
         return runtime.get_block(usage_key)
-    except NoSuchUsage:
+    except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
-        raise NotFound(f"The component '{usage_key}' does not exist.")
+        raise NotFound(f"The component '{usage_key}' does not exist.") from exc
 
 
 def get_block_metadata(block, includes=()):

@@ -508,7 +508,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=valid_not_found_key))
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json(), {
-            'detail': f"Content Library 'lib:valid:key' does not exist",
+            'detail': "Content Library 'lib:valid:key' does not exist",
         })
 
     def test_block_not_found(self):

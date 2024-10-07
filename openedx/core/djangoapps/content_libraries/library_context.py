@@ -46,9 +46,9 @@ class LibraryContextImpl(LearningContext):
             return True
         except PermissionDenied:
             return False
-        except api.ContentLibraryNotFound:
+        except api.ContentLibraryNotFound as exc:
             # A 404 is probably what you want in this case, not a 500 error, so do that by default.
-            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist")
+            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist") from exc
 
     def can_view_block_for_editing(self, user: UserType, usage_key: UsageKeyV2) -> bool:
         """
@@ -64,9 +64,9 @@ class LibraryContextImpl(LearningContext):
             return True
         except PermissionDenied:
             return False
-        except api.ContentLibraryNotFound:
+        except api.ContentLibraryNotFound as exc:
             # A 404 is probably what you want in this case, not a 500 error, so do that by default.
-            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist")
+            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist") from exc
 
     def can_view_block(self, user: UserType, usage_key: UsageKeyV2) -> bool:
         """
@@ -84,9 +84,9 @@ class LibraryContextImpl(LearningContext):
             return True
         except PermissionDenied:
             return False
-        except api.ContentLibraryNotFound:
+        except api.ContentLibraryNotFound as exc:
             # A 404 is probably what you want in this case, not a 500 error, so do that by default.
-            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist")
+            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist") from exc
 
     def block_exists(self, usage_key: LibraryUsageLocatorV2):
         """
