@@ -137,6 +137,11 @@ class ThreadActionGroupIdTestCase(
             post_params=None,
             view_args=None
     ):
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         mock_is_forum_v2_enabled.return_value = False
         self._set_mock_request_data(
             mock_request,
@@ -407,6 +412,11 @@ class ViewsQueryCountTestCase(
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def count_queries(func):  # pylint: disable=no-self-argument
         """
@@ -479,7 +489,16 @@ class ViewsTestCase(
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
         super().setUp()
-
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
         with patch('common.djangoapps.student.models.user.cc.User.save'):
@@ -1148,6 +1167,16 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_pin_thread_as_student(self, mock_is_forum_v2_enabled, mock_request):
         mock_is_forum_v2_enabled.return_value = False
@@ -1287,6 +1316,13 @@ class UpdateThreadUnicodeTestCase(
         UnicodeTestMixin,
         MockRequestSetupMixin
 ):
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
 
     @classmethod
     def setUpClass(cls):
@@ -1334,6 +1370,13 @@ class CreateCommentUnicodeTestCase(
         UnicodeTestMixin,
         MockRequestSetupMixin
 ):
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
 
     @classmethod
     def setUpClass(cls):
@@ -1383,6 +1426,13 @@ class UpdateCommentUnicodeTestCase(
         UnicodeTestMixin,
         MockRequestSetupMixin
 ):
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
 
     @classmethod
     def setUpClass(cls):
@@ -1433,6 +1483,11 @@ class CommentActionTestCase(
             view_args=None
     ):
         mock_is_forum_v2_enabled.return_value = False
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         self._set_mock_request_data(
             mock_request,
             {
@@ -1471,6 +1526,14 @@ class CreateSubCommentUnicodeTestCase(
     """
     Make sure comments under a response can handle unicode.
     """
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
@@ -1634,6 +1697,16 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         user = getattr(self, user)
         mock_is_forum_v2_enabled.return_value = False
         self._set_mock_request_data(mock_request, data)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         self.client.login(username=user.username, password=self.password)
 
     @ddt.data(
@@ -1837,6 +1910,19 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
     """
     Forum actions are expected to launch analytics events. Test these here.
     """
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called

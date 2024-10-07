@@ -811,6 +811,16 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
         patcher.start()
         self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")

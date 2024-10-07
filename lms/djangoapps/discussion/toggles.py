@@ -34,6 +34,4 @@ def is_forum_v2_enabled(course_id):
     """
     Returns a boolean if forum V2 is enabled on the course
     """
-    if not course_id:
-        raise ValueError("Course ID is required to check if forum v2 is enabled")
     return ENABLE_FORUM_V2.is_enabled(course_id)
