@@ -524,7 +524,7 @@ class LTIBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('lti.html', self.get_context()))
-        add_css_to_fragment(fragment, 'LTIBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'LTIBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'LTIBlockDisplay')
         shim_xmodule_js(fragment, 'LTI')
         return fragment
