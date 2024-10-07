@@ -78,7 +78,6 @@ typing-extensions==4.12.2
     # via semgrep
 urllib3==1.26.20
     # via
-    #   -c requirements/edx/../constraints.txt
     #   requests
     #   semgrep
 wcmatch==8.5.2

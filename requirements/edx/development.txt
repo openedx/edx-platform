@@ -2153,7 +2153,6 @@ uritemplate==4.1.1
     #   google-api-python-client
 urllib3==1.26.20
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   botocore
@@ -2267,7 +2266,6 @@ xblock-utils==4.0.0
     #   xblock-poll
 xmlsec==1.3.13
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   python3-saml

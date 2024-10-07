@@ -35,7 +35,7 @@ click==8.1.6
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35278
 charset-normalizer<2.1.0
 
-
+# Date: 2019-08-16
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
@@ -78,12 +78,6 @@ djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this w
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35170
 django-storages<1.14.4
 
-# Date: 2019-08-16
-# The team that owns this package will manually bump this package rather than having it pulled in automatically.
-# This is to allow them to better control its deployment and to do it in a process that works better
-# for them.
-edx-enterprise==4.23.4
-
 # Date: 2024-05-09
 # This has to be constrained as well because newer versions of edx-i18n-tools need the
 # newer version of lxml but that requirement was not made expilict in the 1.6.0 version
@@ -119,8 +113,9 @@ lxml<5.0
 markdown<3.4.0
 
 
-# Date: 2018-12-14
+# Date: 2023-09-18
 # pinning this version to avoid updates while the library is being developed
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35269
 openedx-learning==0.13.1
 
 # Date: 2024-04-24
@@ -141,11 +136,6 @@ numpy<2.0.0
 # needs to be fixed in the follow up issue
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/34103
 optimizely-sdk<5.0
-
-# Date: 2023-09-18
-# pinning this version to avoid updates while the library is being developed
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35269
-openedx-learning==0.10.1
 
 # Date: 2023-11-29
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.

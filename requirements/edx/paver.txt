@@ -58,9 +58,7 @@ stevedore==5.3.0
 typing-extensions==4.12.2
     # via edx-opaque-keys
 urllib3==1.26.20
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   requests
+    # via requests
 watchdog==5.0.2
     # via -r requirements/edx/paver.in
 wrapt==1.16.0
