@@ -1235,7 +1235,7 @@ def update_library_collection_components(
     return collection
 
 
-def update_library_component_collections(
+def set_library_component_collections(
     library_key: LibraryLocatorV2,
     component: Component,
     *,
