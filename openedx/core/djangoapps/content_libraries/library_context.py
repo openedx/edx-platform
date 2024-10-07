@@ -9,7 +9,7 @@ from rest_framework.exceptions import NotFound
 from openedx_events.content_authoring.data import LibraryBlockData
 from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 
 from openedx.core.djangoapps.content_libraries import api, permissions
@@ -41,14 +41,7 @@ class LibraryContextImpl(LearningContext):
         May raise ContentLibraryNotFound if the library does not exist.
         """
         assert isinstance(usage_key, LibraryUsageLocatorV2)
-        try:
-            api.require_permission_for_library_key(usage_key.lib_key, user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-            return True
-        except PermissionDenied:
-            return False
-        except api.ContentLibraryNotFound as exc:
-            # A 404 is probably what you want in this case, not a 500 error, so do that by default.
-            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist") from exc
+        return self._check_perm(user, usage_key.lib_key, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
 
     def can_view_block_for_editing(self, user: UserType, usage_key: UsageKeyV2) -> bool:
         """
@@ -59,14 +52,7 @@ class LibraryContextImpl(LearningContext):
         May raise ContentLibraryNotFound if the library does not exist.
         """
         assert isinstance(usage_key, LibraryUsageLocatorV2)
-        try:
-            api.require_permission_for_library_key(usage_key.lib_key, user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-            return True
-        except PermissionDenied:
-            return False
-        except api.ContentLibraryNotFound as exc:
-            # A 404 is probably what you want in this case, not a 500 error, so do that by default.
-            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist") from exc
+        return self._check_perm(user, usage_key.lib_key, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
 
     def can_view_block(self, user: UserType, usage_key: UsageKeyV2) -> bool:
         """
@@ -77,16 +63,18 @@ class LibraryContextImpl(LearningContext):
         May raise ContentLibraryNotFound if the library does not exist.
         """
         assert isinstance(usage_key, LibraryUsageLocatorV2)
+        return self._check_perm(user, usage_key.lib_key, permissions.CAN_LEARN_FROM_THIS_CONTENT_LIBRARY)
+
+    def _check_perm(self, user: UserType, lib_key: LibraryLocatorV2, perm) -> bool:
+        """ Helper method to check a permission for the various can_ methods"""
         try:
-            api.require_permission_for_library_key(
-                usage_key.lib_key, user, permissions.CAN_LEARN_FROM_THIS_CONTENT_LIBRARY,
-            )
+            api.require_permission_for_library_key(lib_key, user, perm)
             return True
         except PermissionDenied:
             return False
         except api.ContentLibraryNotFound as exc:
             # A 404 is probably what you want in this case, not a 500 error, so do that by default.
-            raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist") from exc
+            raise NotFound(f"Content Library '{lib_key}' does not exist") from exc
 
     def block_exists(self, usage_key: LibraryUsageLocatorV2):
         """
