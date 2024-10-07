@@ -18,8 +18,8 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q, prefetch_related_objects
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect
-from django.http import JsonResponse, Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -33,30 +33,24 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
-from lms.djangoapps.static_template_view.views import render_500
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters.learning.filters import CourseAboutRenderStarted, RenderXBlockStarted
-from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from pytz import UTC
+from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
-from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.tabs import CourseTabList
-from xmodule.x_module import STUDENT_VIEW
 
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from common.djangoapps.student import auth
-from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.course import course_location_from_key
 from common.djangoapps.util.db import outer_atomic
@@ -84,16 +78,16 @@ from lms.djangoapps.courseware.courses import (
     sort_by_start_date
 )
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect, XblockAccessDenied
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.toggles import (
-    course_is_invitation_only,
-    courseware_mfe_search_is_enabled,
-    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
     COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
+    COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
+    course_is_invitation_only,
+    courseware_mfe_search_is_enabled
 )
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
@@ -106,6 +100,7 @@ from lms.djangoapps.experiments.utils import get_experiment_user_metadata_contex
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
+from lms.djangoapps.static_template_view.views import render_500
 from lms.djangoapps.survey import views as survey_views
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
@@ -142,13 +137,15 @@ from openedx.features.course_experience.url_helpers import (
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.tabs import CourseTabList
+from xmodule.x_module import STUDENT_VIEW
 
 from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor
 from ..tabs import _get_dynamic_tabs
-from ..toggles import (
-    COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
-    ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER,
-)
+from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK, ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER
 
 log = logging.getLogger("edx.courseware")
 
@@ -1586,14 +1583,17 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
 
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
-        block, _ = get_block_by_usage_id(
-            request,
-            str(course_key),
-            str(usage_key),
-            disable_staff_debug_info=disable_staff_debug_info,
-            course=course,
-            will_recheck_access=recheck_access,
-        )
+        try:
+            block, _ = get_block_by_usage_id(
+                request,
+                str(course_key),
+                str(usage_key),
+                disable_staff_debug_info=disable_staff_debug_info,
+                course=course,
+                will_recheck_access=recheck_access,
+            )
+        except XblockAccessDenied as ex:
+            return HttpResponseForbidden(str(ex))
 
         student_view_context = request.GET.dict()
         student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
