@@ -1374,7 +1374,7 @@ openedx-filters==1.10.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.13.1
+openedx-learning @ git+https://github.com/open-craft/openedx-learning@navin/component-collection-api
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
