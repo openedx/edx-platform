@@ -308,6 +308,13 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             description="Description for Collection 2",
             created_by=self.user.id,
         )
+        self.col3 = api.create_library_collection(
+            self.lib2.library_key,
+            collection_key="COL3",
+            title="Collection 3",
+            description="Description for Collection 3",
+            created_by=self.user.id,
+        )
 
         # Create some library blocks in lib1
         self.lib1_problem_block = self._add_block_to_library(
@@ -315,6 +322,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
         self.lib1_html_block = self._add_block_to_library(
             self.lib1.library_key, "html", "html1",
+        )
+        # Create some library blocks in lib2
+        self.lib2_problem_block = self._add_block_to_library(
+            self.lib2.library_key, "problem", "problem2",
         )
 
     def test_create_library_collection(self):
@@ -498,3 +509,38 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 ],
             )
             assert self.lib1_problem_block["id"] in str(exc.exception)
+
+    @mock.patch('openedx.core.djangoapps.content.search.api.upsert_library_collection_index_doc')
+    def test_set_library_component_collections(self, mock_update_collection_index_doc):
+        event_receiver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_receiver)
+        assert not list(self.col2.entities.all())
+        component = api.get_component_from_usage_key(UsageKey.from_string(self.lib2_problem_block["id"]))
+
+        api.set_library_component_collections(
+            self.lib2.library_key,
+            component,
+            collection_keys=[self.col2.key, self.col3.key],
+        )
+
+        assert len(authoring_api.get_collection(self.lib2.learning_package_id, self.col2.key).entities.all()) == 1
+        assert len(authoring_api.get_collection(self.lib2.learning_package_id, self.col3.key).entities.all()) == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=self.lib2_problem_block["id"],
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertListEqual(
+            list(mock_update_collection_index_doc.call_args_list[0][0]),
+            [self.lib2.library_key, self.col2.key]
+        )
+        self.assertListEqual(
+            list(mock_update_collection_index_doc.call_args_list[1][0]),
+            [self.lib2.library_key, self.col3.key]
+        )

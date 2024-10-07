@@ -662,7 +662,7 @@ class LibraryBlockCollectionsView(APIView):
         serializer.is_valid(raise_exception=True)
 
         collection_keys = serializer.validated_data['collection_keys']
-        api.update_library_component_collections(
+        api.set_library_component_collections(
             library_key=key.lib_key,
             component=component,
             collection_keys=collection_keys,
