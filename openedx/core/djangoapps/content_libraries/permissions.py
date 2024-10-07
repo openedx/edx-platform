@@ -45,7 +45,7 @@ has_explicit_admin_permission_for_library = (
 # Are we in Studio? (Is there a better or more contextual way to define this, e.g. get from learning context?)
 @blanket_rule
 def is_studio_request(_):
-    return settings.ROOT_URLCONF == "cms.urls"
+    return settings.SERVICE_VARIANT == "cms"
 
 
 ########################### Permissions ###########################
