@@ -228,3 +228,57 @@ class BlockDueDateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         if disable_due_datetime:
             self.fields['due_datetime'].required = False
+
+
+class ModifyAccessSerializer(serializers.Serializer):
+    identifiers = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=False,
+        help_text="A list of stringified emails or usernames."
+    )
+    action = serializers.ChoiceField(
+        choices=["add", "remove"],
+        help_text="Action to perform: add or remove."
+    )
+
+    email_students = serializers.BooleanField(
+        default=False,
+        help_text="Boolean flag to indicate if students should be emailed."
+    )
+
+    auto_enroll = serializers.BooleanField(
+        default=False,
+        help_text="Boolean flag to indicate if the user should be auto-enrolled."
+    )
+
+    def validate_identifiers(self, value):
+        """
+        Validate the 'identifiers' field which is now a list of strings.
+        """
+        # Iterate over the list of identifiers and validate each one
+        validated_list = []
+        for identifier in value:
+            identifier = identifier.strip()  # Strip leading/trailing whitespace
+            if identifier:  # Skip empty identifiers
+                validated_list.append(identifier)
+
+        if not validated_list:
+            raise serializers.ValidationError("The identifiers list cannot be empty.")
+
+        return validated_list
+
+    def validate_email_students(self, value):
+        """
+        Override this method to handle string values like 'true' or 'false'.
+        """
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return bool(value)
+
+    def validate_auto_enroll(self, value):
+        """
+        Validate the 'auto_enroll' field to handle string values like 'true' or 'false'.
+        """
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return bool(value)

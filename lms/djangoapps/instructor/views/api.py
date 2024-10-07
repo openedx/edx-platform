@@ -108,7 +108,9 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer, UniqueStudentIdentifierSerializer
+    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer,
+    UniqueStudentIdentifierSerializer,
+    ModifyAccessSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -908,88 +910,100 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_BETATEST)
-@common_exceptions_400
-@require_post_params(
-    identifiers="stringified list of emails and/or usernames",
-    action="add or remove",
-)
-def bulk_beta_modify_access(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class BulkBetaModifyAccess(DeveloperErrorViewMixin, APIView):
     """
     Enroll or unenroll users in beta testing program.
-
-    Query parameters:
-    - identifiers is string containing a list of emails and/or usernames separated by
-      anything split_input_list can handle.
-    - action is one of ['add', 'remove']
     """
-    course_id = CourseKey.from_string(course_id)
-    action = request.POST.get('action')
-    identifiers_raw = request.POST.get('identifiers')
-    identifiers = _split_input_list(identifiers_raw)
-    email_students = _get_boolean_param(request, 'email_students')
-    auto_enroll = _get_boolean_param(request, 'auto_enroll')
-    results = []
-    rolename = 'beta'
-    course = get_course_by_id(course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_BETATEST
+    serializer_class = ModifyAccessSerializer
 
-    email_params = {}
-    if email_students:
-        secure = request.is_secure()
-        email_params = get_email_params(course, auto_enroll=auto_enroll, secure=secure)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Enroll or unenroll users in beta testing program.
 
-    for identifier in identifiers:
-        try:
-            error = False
-            user_does_not_exist = False
-            user = get_student_from_identifier(identifier)
-            user_active = user.is_active
+        Query parameters:
+        - identifiers is string containing a list of emails and/or usernames separated by
+          anything split_input_list can handle.
+        - action is one of ['add', 'remove']
+        """
+        course_id = CourseKey.from_string(course_id)
 
-            if action == 'add':
-                allow_access(course, user, rolename)
-            elif action == 'remove':
-                revoke_access(course, user, rolename)
+        serializer = self.serializer_class(data=request.data)
+        import pdb;
+        pdb.set_trace()
+
+        if not serializer.is_valid():
+            return JsonResponse(
+                {'message': _('Data is not valid.')},
+                status=400
+            )
+
+        action = serializer.validated_data['action']
+        identifiers = serializer.validated_data['identifiers']
+        email_students = serializer.validated_data['email_students']
+        auto_enroll = serializer.validated_data['auto_enroll']
+
+        results = []
+        rolename = 'beta'
+        course = get_course_by_id(course_id)
+
+        email_params = {}
+        if email_students:
+            secure = request.is_secure()
+            email_params = get_email_params(course, auto_enroll=auto_enroll, secure=secure)
+
+        for identifier in identifiers:
+            try:
+                error = False
+                user_does_not_exist = False
+                user = get_student_from_identifier(identifier)
+                user_active = user.is_active
+
+                if action == 'add':
+                    allow_access(course, user, rolename)
+                elif action == 'remove':
+                    revoke_access(course, user, rolename)
+                else:
+                    return HttpResponseBadRequest(strip_tags(
+                        f"Unrecognized action '{action}'"
+                    ))
+            except User.DoesNotExist:
+                error = True
+                user_does_not_exist = True
+                user_active = None
+            # catch and log any unexpected exceptions
+            # so that one error doesn't cause a 500.
+            except Exception as exc:  # pylint: disable=broad-except
+                log.exception("Error while #{}ing student")
+                log.exception(exc)
+                error = True
             else:
-                return HttpResponseBadRequest(strip_tags(
-                    f"Unrecognized action '{action}'"
-                ))
-        except User.DoesNotExist:
-            error = True
-            user_does_not_exist = True
-            user_active = None
-        # catch and log any unexpected exceptions
-        # so that one error doesn't cause a 500.
-        except Exception as exc:  # pylint: disable=broad-except
-            log.exception("Error while #{}ing student")
-            log.exception(exc)
-            error = True
-        else:
-            # If no exception thrown, see if we should send an email
-            if email_students:
-                send_beta_role_email(action, user, email_params)
-            # See if we should autoenroll the student
-            if auto_enroll:
-                # Check if student is already enrolled
-                if not is_user_enrolled_in_course(user, course_id):
-                    CourseEnrollment.enroll(user, course_id)
+                # If no exception thrown, see if we should send an email
+                if email_students:
+                    send_beta_role_email(action, user, email_params)
+                # See if we should autoenroll the student
+                if auto_enroll:
+                    # Check if student is already enrolled
+                    if not is_user_enrolled_in_course(user, course_id):
+                        CourseEnrollment.enroll(user, course_id)
 
-        finally:
-            # Tabulate the action result of this email address
-            results.append({
-                'identifier': identifier,
-                'error': error,  # pylint: disable=used-before-assignment
-                'userDoesNotExist': user_does_not_exist,  # pylint: disable=used-before-assignment
-                'is_active': user_active  # pylint: disable=used-before-assignment
-            })
+            finally:
+                # Tabulate the action result of this email address
+                results.append({
+                    'identifier': identifier,
+                    'error': error,  # pylint: disable=used-before-assignment
+                    'userDoesNotExist': user_does_not_exist,  # pylint: disable=used-before-assignment
+                    'is_active': user_active  # pylint: disable=used-before-assignment
+                })
 
-    response_payload = {
-        'action': action,
-        'results': results,
-    }
-    return JsonResponse(response_payload)
+        response_payload = {
+            'action': action,
+            'results': results,
+        }
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
