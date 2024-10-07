@@ -271,7 +271,7 @@ class ModifyAccessSerializer(serializers.Serializer):
 
     def validate_email_students(self, value):
         """
-        Override this method to handle string values like 'true' or 'false'.
+        handle string values like 'true' or 'false'.
         """
         if isinstance(value, str):
             return value.lower() == 'true'
@@ -279,7 +279,7 @@ class ModifyAccessSerializer(serializers.Serializer):
 
     def validate_auto_enroll(self, value):
         """
-        Validate the 'auto_enroll' field to handle string values like 'true' or 'false'.
+        handle string values like 'true' or 'false'.
         """
         if isinstance(value, str):
             return value.lower() == 'true'
