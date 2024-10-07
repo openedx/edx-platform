@@ -1243,7 +1243,7 @@ def set_library_component_collections(
     created_by: int | None = None,
     # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
     content_library: ContentLibrary | None = None,
-) -> Collection:
+) -> Component:
     """
     It Associates the component with collections for the given collection keys.
 

@@ -655,8 +655,11 @@ class LibraryBlockCollectionsView(APIView):
         Collection and Components must all be part of the given library/learning package.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        content_library = api.require_permission_for_library_key(key.lib_key, request.user,
-                                               permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        content_library = api.require_permission_for_library_key(
+            key.lib_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
         component = api.get_component_from_usage_key(key)
         serializer = ContentLibraryComponentCollectionsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
