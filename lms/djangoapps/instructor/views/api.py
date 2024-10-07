@@ -922,8 +922,6 @@ class BulkBetaModifyAccess(DeveloperErrorViewMixin, APIView):
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
-        Enroll or unenroll users in beta testing program.
-
         Query parameters:
         - identifiers is string containing a list of emails and/or usernames separated by
           anything split_input_list can handle.
