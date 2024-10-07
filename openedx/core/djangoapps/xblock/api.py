@@ -13,6 +13,7 @@ from datetime import datetime
 import logging
 import threading
 
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
@@ -21,7 +22,7 @@ from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
-from xblock.exceptions import NoSuchViewError
+from xblock.exceptions import NoSuchUsage, NoSuchViewError
 from xblock.plugin import PluginMissingError
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
@@ -91,8 +92,8 @@ def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPer
     Returns an instantiated XBlock.
 
     Exceptions:
-        NotFound - if the XBlock doesn't exist or if the user doesn't have the
-                   necessary permissions
+        NotFound - if the XBlock doesn't exist
+        PermissionDenied - if the user doesn't have the necessary permissions
 
     Args:
         usage_key(OpaqueKey): block identifier
@@ -114,9 +115,7 @@ def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPer
         else:
             has_perm = False
         if not has_perm:
-            # We do not know if the block was not found or if the user doesn't have
-            # permission, but we want to return the same result in either case:
-            raise NotFound(f"XBlock {usage_key} does not exist, or you don't have permission to view it.")
+            raise PermissionDenied(f"You don't have permission to access the component '{usage_key}'.")
 
     # TODO: load field overrides from the context
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
@@ -124,7 +123,11 @@ def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPer
     # field_overrides = context_impl.get_field_overrides(usage_key)
     runtime = get_runtime_system().get_runtime(user=user)
 
-    return runtime.get_block(usage_key)
+    try:
+        return runtime.get_block(usage_key)
+    except NoSuchUsage:
+        # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
+        raise NotFound(f"The component '{usage_key}' does not exist.")
 
 
 def get_block_metadata(block, includes=()):
