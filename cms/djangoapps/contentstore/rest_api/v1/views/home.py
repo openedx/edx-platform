@@ -1,6 +1,8 @@
 """ API Views for course home """
 
 import edx_api_doc_tools as apidocs
+from waffle import flag_is_active
+from waffle.models import Flag
 from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -72,6 +74,10 @@ class HomePageView(APIView):
             "tech_support_email": "technical@example.com",
             "platform_name": "Your Platform Name Here"
             "user_is_active": true,
+            "waffle_flags": {
+                "flag_name_1": true,
+                "flag_name_2": false
+            }
         }
         ```
         """
@@ -86,6 +92,14 @@ class HomePageView(APIView):
             'platform_name': settings.PLATFORM_NAME,
             'user_is_active': request.user.is_active,
         })
+
+        waffle_flags = {}
+        flags = Flag.objects.all()
+        for flag in flags:
+            waffle_flags[flag.name] = flag_is_active(request, flag.name)
+
+        home_context['waffle_flags'] = waffle_flags
+
         serializer = CourseHomeSerializer(home_context)
         return Response(serializer.data)
 
