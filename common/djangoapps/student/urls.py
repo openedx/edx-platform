@@ -25,6 +25,7 @@ urlpatterns = [
     re_path(r'^extras/emiitk_get_grades', views.extras_emiitk_get_grades, name = "extras_emiitk_get_grades"),
     re_path(r'^extras/start_mettl_test', views.extras_start_mettl_test, name = "extras_start_mettl_test"),
     re_path(r'^extras/get_mettl_report', views.extras_get_mettl_report, name = "extras_get_mettl_report"), 
+    re_path(r'^extras/update_lti_grades', views.extras_update_lti_grades, name = "extras_update_lti_grades"),
 
     re_path(r'^extras/get_user_enrolled_courses', views.extras_get_user_enrolled_courses, name = "extras_get_user_enrolled_courses"),
     re_path(r'^extras/get_last_login', views.extras_get_last_login, name = "extras_get_last_login"),

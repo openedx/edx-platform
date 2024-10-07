@@ -104,6 +104,11 @@ from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.grades.api import signals as grades_signals
+from lms.djangoapps.grades.api import constants as grades_constants
+from completion import handlers
+
 log = logging.getLogger("edx.student")
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -1528,3 +1533,65 @@ def extras_get_payment_details(request):
 
     except Exception as e:
         return HttpResponse(f"error: {e}")
+
+
+@csrf_exempt
+def extras_update_lti_grades(request):
+    user_email = request.POST.get("user_email", "")
+    usage_id = request.POST.get("usage_id", "")
+    user_object = User.objects.get(email = user_email)
+    user_id = user_object.id
+    grade = request.POST.get("user_grade", "")
+    course_id = request.POST.get("course_id", "")
+    block_data = get_course_blocks(User.objects.get(id = user_id), modulestore().make_course_usage_key(CourseKey.from_string(str(course_id))), allow_start_dates_in_future=True, include_completion=True)
+
+    try:
+        studentmodule = StudentModule.objects.get(student_id = user_id, module_state_key = usage_id)
+        
+        #Update Grades
+        studentmodule.grade = grade
+        student_state = json.loads(studentmodule.state)
+        student_state["module_score"] = grade
+        studentmodule.state = json.dumps(student_state)
+        studentmodule.save()
+        grades_signals.PROBLEM_RAW_SCORE_CHANGED.send(
+            sender=None,
+            raw_earned=grade,
+            raw_possible=studentmodule.max_grade,
+            weight=block_data.get_xblock_field(studentmodule.module_state_key, 'weight'),
+            user_id=user_id,
+            course_id=str(studentmodule.course_id),
+            usage_id=str(usage_id),
+            score_deleted=True,
+            only_if_higher=False,
+            modified=datetime.datetime.now().replace(tzinfo=pytz.UTC),
+            score_db_table=grades_constants.ScoreDatabaseTableEnum.courseware_student_module,
+        )
+    except StudentModule.DoesNotExist:
+        studentmodule = StudentModule.objects.create(student_id=user_id,course_id=request.POST.get("course_id"),module_state_key=usage_id,state=json.dumps({"module_score" : grade, "score_comment" : ""}), max_grade= block_data.get_xblock_field(studentmodule.module_state_key, 'weight'))
+
+        log.info("Student module created {0}".format(studentmodule))
+        
+        grades_signals.SCORE_PUBLISHED.send(
+            sender=None,
+            block=modulestore().get_item(studentmodule.module_state_key),
+            user=user_object,
+            raw_earned=grade,
+            raw_possible=block_data.get_xblock_field(studentmodule.module_state_key, 'weight'),
+            only_if_higher=False,
+            score_deleted=False,
+        )
+    
+    handlers.scorable_block_completion(
+            sender="",
+            user_id=user_id,
+            course_id=course_id,
+            usage_id=usage_id,
+            weighted_earned=grade,
+            weighted_possible=block_data.get_xblock_field(studentmodule.module_state_key, 'weight'),
+            modified=datetime.datetime.now().replace(tzinfo=pytz.UTC),
+            score_db_table=grades_constants.ScoreDatabaseTableEnum.courseware_student_module
+        )
+
+
+    return JsonResponse({"Status" : "Success", "message" : "Grades updated successfully"})
