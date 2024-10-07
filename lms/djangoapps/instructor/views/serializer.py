@@ -234,7 +234,7 @@ class ModifyAccessSerializer(serializers.Serializer):
     identifiers = serializers.ListField(
         child=serializers.CharField(),
         allow_empty=False,
-        help_text="A list of stringified emails or usernames.",
+        help_text="A comma separated list of emails or usernames.",
         required=True
     )
     action = serializers.ChoiceField(
