@@ -234,11 +234,13 @@ class ModifyAccessSerializer(serializers.Serializer):
     identifiers = serializers.ListField(
         child=serializers.CharField(),
         allow_empty=False,
-        help_text="A list of stringified emails or usernames."
+        help_text="A list of stringified emails or usernames.",
+        required=True
     )
     action = serializers.ChoiceField(
         choices=["add", "remove"],
-        help_text="Action to perform: add or remove."
+        help_text="Action to perform: add or remove.",
+        required=True
     )
 
     email_students = serializers.BooleanField(

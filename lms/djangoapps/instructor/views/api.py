@@ -928,16 +928,9 @@ class BulkBetaModifyAccess(DeveloperErrorViewMixin, APIView):
         - action is one of ['add', 'remove']
         """
         course_id = CourseKey.from_string(course_id)
-
         serializer = self.serializer_class(data=request.data)
-        import pdb;
-        pdb.set_trace()
-
         if not serializer.is_valid():
-            return JsonResponse(
-                {'message': _('Data is not valid.')},
-                status=400
-            )
+            return JsonResponse({'message': serializer.errors}, status=400)
 
         action = serializer.validated_data['action']
         identifiers = serializer.validated_data['identifiers']
