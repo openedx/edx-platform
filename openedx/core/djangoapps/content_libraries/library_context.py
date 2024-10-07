@@ -9,6 +9,7 @@ from rest_framework.exceptions import NotFound
 from openedx_events.content_authoring.data import LibraryBlockData
 from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED
 from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from openedx_learning.api import authoring as authoring_api
 
 from openedx.core.djangoapps.content_libraries import api, permissions
@@ -39,6 +40,7 @@ class LibraryContextImpl(LearningContext):
 
         May raise ContentLibraryNotFound if the library does not exist.
         """
+        assert isinstance(usage_key, LibraryUsageLocatorV2)
         try:
             api.require_permission_for_library_key(usage_key.lib_key, user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
             return True
@@ -56,6 +58,7 @@ class LibraryContextImpl(LearningContext):
 
         May raise ContentLibraryNotFound if the library does not exist.
         """
+        assert isinstance(usage_key, LibraryUsageLocatorV2)
         try:
             api.require_permission_for_library_key(usage_key.lib_key, user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
             return True
@@ -73,6 +76,7 @@ class LibraryContextImpl(LearningContext):
 
         May raise ContentLibraryNotFound if the library does not exist.
         """
+        assert isinstance(usage_key, LibraryUsageLocatorV2)
         try:
             api.require_permission_for_library_key(
                 usage_key.lib_key, user, permissions.CAN_LEARN_FROM_THIS_CONTENT_LIBRARY,
@@ -84,7 +88,7 @@ class LibraryContextImpl(LearningContext):
             # A 404 is probably what you want in this case, not a 500 error, so do that by default.
             raise NotFound(f"Content Library '{usage_key.lib_key}' does not exist")
 
-    def block_exists(self, usage_key: UsageKeyV2):
+    def block_exists(self, usage_key: LibraryUsageLocatorV2):
         """
         Does the block for this usage_key exist in this Library?
 
@@ -96,7 +100,7 @@ class LibraryContextImpl(LearningContext):
         version of it.
         """
         try:
-            content_lib = ContentLibrary.objects.get_by_key(usage_key.context_key)
+            content_lib = ContentLibrary.objects.get_by_key(usage_key.context_key)  # type: ignore[attr-defined]
         except ContentLibrary.DoesNotExist:
             return False
 
@@ -114,9 +118,8 @@ class LibraryContextImpl(LearningContext):
     def send_block_updated_event(self, usage_key: UsageKeyV2):
         """
         Send a "block updated" event for the library block with the given usage_key.
-
-        usage_key: the UsageKeyV2 subclass used for this learning context
         """
+        assert isinstance(usage_key, LibraryUsageLocatorV2)
         LIBRARY_BLOCK_UPDATED.send_event(
             library_block=LibraryBlockData(
                 library_key=usage_key.lib_key,
