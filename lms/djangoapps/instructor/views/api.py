@@ -1416,13 +1416,9 @@ def get_issued_certificates(request, course_id):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -1431,86 +1427,108 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
 
     TO DO accept requests for different attribute sets.
     """
-    course_key = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_key)
-    report_type = _('enrolled learner profile')
-    available_features = instructor_analytics_basic.AVAILABLE_FEATURES
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    # Allow for sites to be able to define additional columns.
-    # Note that adding additional columns has the potential to break
-    # the student profile report due to a character limit on the
-    # asynchronous job input which in this case is a JSON string
-    # containing the list of columns to include in the report.
-    # TODO: Refactor the student profile report code to remove the list of columns
-    # that should be included in the report from the asynchronous job input.
-    # We need to clone the list because we modify it below
-    query_features = list(configuration_helpers.get_value('student_profile_download_fields', []))
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id, csv=False):  # pylint: disable=redefined-outer-name
+        """
+        Handle POST requests to retrieve student profile information for a specific course.
 
-    if not query_features:
-        query_features = [
-            'id', 'username', 'name', 'email', 'language', 'location',
-            'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
-        ]
-    keep_field_private(query_features, 'year_of_birth')  # protected information
+        Args:
+            request: The HTTP request object.
+            course_id: The ID of the course for which to retrieve student information.
+            csv: Optional; if 'csv' is present in the URL, it indicates that the response should be in CSV format.
+            Defaults to None.
 
-    # Provide human-friendly and translatable names for these features. These names
-    # will be displayed in the table generated in data_download.js. It is not (yet)
-    # used as the header row in the CSV, but could be in the future.
-    query_features_names = {
-        'id': _('User ID'),
-        'username': _('Username'),
-        'name': _('Name'),
-        'email': _('Email'),
-        'language': _('Language'),
-        'location': _('Location'),
-        #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683, not to go in reports
-        'gender': _('Gender'),
-        'level_of_education': _('Level of Education'),
-        'mailing_address': _('Mailing Address'),
-        'goals': _('Goals'),
-        'enrollment_mode': _('Enrollment Mode'),
-        'last_login': _('Last Login'),
-        'date_joined': _('Date Joined'),
-        'external_user_key': _('External User Key'),
-    }
+        Returns:
+            Response: A JSON response containing student profile information, or CSV if the `csv` parameter is provided.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+        report_type = _('enrolled learner profile')
+        available_features = instructor_analytics_basic.AVAILABLE_FEATURES
 
-    if is_course_cohorted(course.id):
-        # Translators: 'Cohort' refers to a group of students within a course.
-        query_features.append('cohort')
-        query_features_names['cohort'] = _('Cohort')
+        # Allow for sites to be able to define additional columns.
+        # Note that adding additional columns has the potential to break
+        # the student profile report due to a character limit on the
+        # asynchronous job input which in this case is a JSON string
+        # containing the list of columns to include in the report.
+        # TODO: Refactor the student profile report code to remove the list of columns
+        # that should be included in the report from the asynchronous job input.
+        # We need to clone the list because we modify it below
+        query_features = list(configuration_helpers.get_value('student_profile_download_fields', []))
 
-    if course.teams_enabled:
-        query_features.append('team')
-        query_features_names['team'] = _('Team')
+        if not query_features:
+            query_features = [
+                'id', 'username', 'name', 'email', 'language', 'location',
+                'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
+            ]
+        keep_field_private(query_features, 'year_of_birth')  # protected information
 
-    # For compatibility reasons, city and country should always appear last.
-    query_features.append('city')
-    query_features_names['city'] = _('City')
-    query_features.append('country')
-    query_features_names['country'] = _('Country')
-
-    if not csv:
-        student_data = instructor_analytics_basic.enrolled_students_features(course_key, query_features)
-        response_payload = {
-            'course_id': str(course_key),
-            'students': student_data,
-            'students_count': len(student_data),
-            'queried_features': query_features,
-            'feature_names': query_features_names,
-            'available_features': available_features,
+        # Provide human-friendly and translatable names for these features. These names
+        # will be displayed in the table generated in data_download.js. It is not (yet)
+        # used as the header row in the CSV, but could be in the future.
+        query_features_names = {
+            'id': _('User ID'),
+            'username': _('Username'),
+            'name': _('Name'),
+            'email': _('Email'),
+            'language': _('Language'),
+            'location': _('Location'),
+            #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683,
+            #  not to go in reports
+            'gender': _('Gender'),
+            'level_of_education': _('Level of Education'),
+            'mailing_address': _('Mailing Address'),
+            'goals': _('Goals'),
+            'enrollment_mode': _('Enrollment Mode'),
+            'last_login': _('Last Login'),
+            'date_joined': _('Date Joined'),
+            'external_user_key': _('External User Key'),
         }
-        return JsonResponse(response_payload)
 
-    else:
-        task_api.submit_calculate_students_features_csv(
-            request,
-            course_key,
-            query_features
-        )
-        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        if is_course_cohorted(course.id):
+            # Translators: 'Cohort' refers to a group of students within a course.
+            query_features.append('cohort')
+            query_features_names['cohort'] = _('Cohort')
 
-        return JsonResponse({"status": success_status})
+        if course.teams_enabled:
+            query_features.append('team')
+            query_features_names['team'] = _('Team')
+
+        # For compatibility reasons, city and country should always appear last.
+        query_features.append('city')
+        query_features_names['city'] = _('City')
+        query_features.append('country')
+        query_features_names['country'] = _('Country')
+
+        if not csv:
+            student_data = instructor_analytics_basic.enrolled_students_features(course_key, query_features)
+            response_payload = {
+                'course_id': str(course_key),
+                'students': student_data,
+                'students_count': len(student_data),
+                'queried_features': query_features,
+                'feature_names': query_features_names,
+                'available_features': available_features,
+            }
+            return JsonResponse(response_payload)
+
+        else:
+            try:
+                task_api.submit_calculate_students_features_csv(
+                    request,
+                    course_key,
+                    query_features
+                )
+                success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            except Exception as e:
+                raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'Requested task is already running')
+
+            return JsonResponse({"status": success_status})
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -1637,6 +1655,7 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
             task_api.submit_cohort_students(request, course_key, file_name)
         except (FileValidationException, ValueError) as e:
             raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'failed-validation')
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
