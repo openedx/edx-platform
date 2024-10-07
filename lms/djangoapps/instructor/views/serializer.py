@@ -231,6 +231,9 @@ class BlockDueDateSerializer(serializers.Serializer):
 
 
 class ModifyAccessSerializer(serializers.Serializer):
+    """
+    serializers for enroll or un-enroll users in beta testing program.
+    """
     identifiers = serializers.ListField(
         child=serializers.CharField(),
         allow_empty=False,
