@@ -1598,7 +1598,7 @@ class AddUsersToCohorts(DeveloperErrorViewMixin, APIView):
             )
             # The task will assume the default file storage.
             task_api.submit_cohort_students(request, course_key, filename)
-        except (FileValidationException, PermissionDenied) as err:
+        except (FileValidationException, PermissionDenied, ValueError) as err:
             return JsonResponse({"error": str(err)}, status=400)
 
         return JsonResponse()
