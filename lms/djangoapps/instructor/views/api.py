@@ -1268,66 +1268,75 @@ class ProblemResponseReportInitiate(DeveloperErrorViewMixin, APIView):
         )
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_problem_responses(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetProblemResponses(DeveloperErrorViewMixin, APIView):
     """
     Initiate generation of a CSV file containing all student answers
     to a given problem.
-
-    **Example requests**
-
-        POST /courses/{course_id}/instructor/api/get_problem_responses {
-            "problem_location": "{usage_key1},{usage_key2},{usage_key3}""
-        }
-        POST /courses/{course_id}/instructor/api/get_problem_responses {
-            "problem_location": "{usage_key}",
-            "problem_types_filter": "problem"
-        }
-
-        **POST Parameters**
-
-        A POST request can include the following parameters:
-
-        * problem_location: A comma-separated list of usage keys for the blocks
-          to include in the report. If the location is a block that contains
-          other blocks, (such as the course, section, subsection, or unit blocks)
-          then all blocks under that block will be included in the report.
-        * problem_types_filter: Optional. A comma-separated list of block types
-          to include in the repot. If set, only blocks of the specified types will
-          be included in the report.
-
-        To get data on all the poll and survey blocks in a course, you could
-        POST the usage key of the course for `problem_location`, and
-        "poll, survey" as the value for `problem_types_filter`.
-
-
-    **Example Response:**
-    If initiation is successful (or generation task is already running):
-    ```json
-    {
-        "status": "The problem responses report is being created. ...",
-        "task_id": "4e49522f-31d9-431a-9cff-dd2a2bf4c85a"
-    }
-    ```
-
-    Responds with BadRequest if any of the provided problem locations are faulty.
     """
-    # A comma-separated list of problem locations
-    # The name of the POST parameter is `problem_location` (not pluralised) in
-    # order to preserve backwards compatibility with existing third-party
-    # scripts.
-    problem_locations = request.POST.get('problem_location', '').split(',')
-    # A comma-separated list of block types
-    problem_types_filter = request.POST.get('problem_types_filter')
-    return _get_problem_responses(
-        request,
-        course_id=course_id,
-        problem_locations=problem_locations,
-        problem_types_filter=problem_types_filter,
-    )
+
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing all student answers
+        to a given problem.
+
+        **Example requests**
+
+            POST /courses/{course_id}/instructor/api/get_problem_responses {
+                "problem_location": "{usage_key1},{usage_key2},{usage_key3}""
+            }
+            POST /courses/{course_id}/instructor/api/get_problem_responses {
+                "problem_location": "{usage_key}",
+                "problem_types_filter": "problem"
+            }
+
+            **POST Parameters**
+
+            A POST request can include the following parameters:
+
+            * problem_location: A comma-separated list of usage keys for the blocks
+              to include in the report. If the location is a block that contains
+              other blocks, (such as the course, section, subsection, or unit blocks)
+              then all blocks under that block will be included in the report.
+            * problem_types_filter: Optional. A comma-separated list of block types
+              to include in the repot. If set, only blocks of the specified types will
+              be included in the report.
+
+            To get data on all the poll and survey blocks in a course, you could
+            POST the usage key of the course for `problem_location`, and
+            "poll, survey" as the value for `problem_types_filter`.
+
+
+        **Example Response:**
+        If initiation is successful (or generation task is already running):
+        ```json
+        {
+            "status": "The problem responses report is being created. ...",
+            "task_id": "4e49522f-31d9-431a-9cff-dd2a2bf4c85a"
+        }
+        ```
+
+        Responds with BadRequest if any of the provided problem locations are faulty.
+        """
+        # A comma-separated list of problem locations
+        # The name of the POST parameter is `problem_location` (not pluralised) in
+        # order to preserve backwards compatibility with existing third-party
+        # scripts.
+        problem_locations = request.POST.get('problem_location', '').split(',')
+        # A comma-separated list of block types
+        problem_types_filter = request.POST.get('problem_types_filter')
+        return _get_problem_responses(
+            request,
+            course_id=course_id,
+            problem_locations=problem_locations,
+            problem_types_filter=problem_types_filter,
+        )
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
