@@ -110,14 +110,16 @@ if xblock.upstream:
                 % else:
                     % if upstream_info:
                         % if upstream_info.error_message:
-                            <!-- TODO: replace this fa-stack with a proper icon which is the correct size. This one is too big. -->
-                            <span class="fa-stack" aria-hidden="true" title="${_("Sourced from a library - but the upstream link is broken/invalid.")}">
-                                <i class="fa fa-book fa-stack-1x"></i>
-                                <i class="fa fa-ban fa-stack-2x"></i>
-                            </span>
+                            <!-- "broken link" icon from https://fonts.google.com/icons?selected=Material+Symbols+Outlined:link_off:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24&icon.color=%235f6368&icon.query=link -->
+                            <svg role="img" data-tooltip="${_("Sourced from a library - but the upstream link is broken/invalid.")}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 -960 960 960" style="vertical-align: middle; padding-bottom: 4px;">
+                                <path d="m770-302-60-62q40-11 65-42.5t25-73.5q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 57-29.5 105T770-302ZM634-440l-80-80h86v80h-6ZM792-56 56-792l56-56 736 736-56 56ZM440-280H280q-83 0-141.5-58.5T80-480q0-69 42-123t108-71l74 74h-24q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h65l79 80H320Z"/>
+                            </svg>
                             <span class="sr-only">${_("Sourced from a library - but the upstream link is broken/invalid.")}</span>
                         % else:
-                            <span class="icon fa fa-book" aria-hidden="true" title="${_("Sourced from a library.")}"></span>
+                            <!-- "library" icon from https://fonts.google.com/icons?selected=Material+Symbols+Outlined:newsstand:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24 -->
+                            <svg role="img" data-tooltip="${_("Sourced from a library.")}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 -960 960 960" fill="currentColor" style="vertical-align: middle; padding-bottom: 4px;">
+                                <path d="M80-160v-80h800v80H80Zm80-160v-320h80v320h-80Zm160 0v-480h80v480h-80Zm160 0v-480h80v480h-80Zm280 0L600-600l70-40 160 280-70 40Z"/>
+                            </svg>
                             <span class="sr-only">${_("Sourced from a library.")}</span>
                         % endif
                     % endif
@@ -136,7 +138,7 @@ if xblock.upstream:
                             <li class="action-item">
                                 <button
                                     class="btn-default library-sync-button action-button"
-                                    title="${_("Update available - click to sync")}"
+                                    data-tooltip="${_("Update available - click to sync")}"
                                     onclick="$.post('/api/contentstore/v2/downstreams/${xblock.usage_key}/sync').done(() => { location.reload(); })"
                                 >
                                     <span class="icon fa fa-refresh" aria-hidden="true"></span>
