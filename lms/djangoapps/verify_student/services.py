@@ -176,10 +176,20 @@ class IDVerificationService:
         if verifications:
             attempt = verifications[0]
             for verification in verifications:
-                if verification.expiration_datetime > now() and verification.status == 'approved':
-                    # Always select the LATEST non-expired approved verification if there is such
-                    if attempt.status != 'approved' or (
-                        attempt.expiration_datetime < verification.expiration_datetime
+                # If a verification has no expiration_datetime, it's implied that it never expires, so we should still
+                # consider verifications in the approved state that have no expiration date.
+                if (
+                    not verification.expiration_datetime or
+                        verification.expiration_datetime > now()
+                ) and verification.status == 'approved':
+                    # Always select the LATEST non-expired approved verification if there is such.
+                    if (
+                        attempt.status != 'approved' or
+                        (
+                            attempt.expiration_datetime and
+                            verification.expiration_datetime and
+                            attempt.expiration_datetime < verification.expiration_datetime
+                        )
                     ):
                         attempt = verification
 
@@ -188,7 +198,7 @@ class IDVerificationService:
 
         user_status['should_display'] = attempt.should_display_status_to_user()
 
-        if attempt.expiration_datetime < now() and attempt.status == 'approved':
+        if attempt.expiration_datetime and attempt.expiration_datetime < now() and attempt.status == 'approved':
             if user_status['should_display']:
                 user_status['status'] = 'expired'
                 user_status['error'] = _("Your {platform_name} verification has expired.").format(
