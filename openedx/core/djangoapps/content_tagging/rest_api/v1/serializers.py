@@ -6,10 +6,13 @@ from __future__ import annotations
 
 from rest_framework import serializers, fields
 
+from opaque_keys.edx.keys import UsageKey
 from openedx_tagging.core.tagging.rest_api.v1.serializers import (
+    ObjectTagMinimalSerializer,
     TaxonomyListQueryParamsSerializer,
     TaxonomySerializer,
 )
+from xmodule.modulestore.django import modulestore
 
 from organizations.models import Organization
 
@@ -94,3 +97,18 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
         model = TaxonomySerializer.Meta.model
         fields = TaxonomySerializer.Meta.fields + ["orgs", "all_orgs"]
         read_only_fields = ["orgs", "all_orgs"]
+
+class ObjectTagOrgMinimalSerializer(ObjectTagMinimalSerializer):
+    """
+    Serializer for Object Tags
+    """
+
+    def get_can_delete_objecttag(self, instance):
+        """
+        Verify if the user can delete the object tag.
+        """
+        if instance.is_copied:
+            # The user can't delete copied tags.
+            return False
+
+        return super().get_can_delete_objecttag(instance)
