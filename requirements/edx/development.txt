@@ -766,7 +766,7 @@ edx-milestones==0.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-name-affirmation==2.4.2
+edx-name-affirmation==3.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1365,6 +1365,7 @@ openedx-events==9.14.1
     #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
+    #   edx-name-affirmation
     #   event-tracking
     #   ora2
 openedx-filters==1.10.0
