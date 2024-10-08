@@ -11,7 +11,7 @@ click==8.1.6
     #   click-log
 click-log==0.4.0
     # via -r scripts/structures_pruning/requirements/base.in
-dnspython==2.6.1
+dnspython==2.7.0
     # via pymongo
 edx-opaque-keys==2.11.0
     # via -r scripts/structures_pruning/requirements/base.in

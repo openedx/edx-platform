@@ -31,7 +31,7 @@ lxml==4.9.4
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/base.in
     #   openedx-calc
-markupsafe==2.1.5
+markupsafe==3.0.0
     # via
     #   chem
     #   openedx-calc
