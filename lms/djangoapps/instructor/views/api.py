@@ -1674,12 +1674,15 @@ class GetProctoredExamResults(DeveloperErrorViewMixin, APIView):
         """
         get the proctored exam results report for the particular course.
         """
-        course_key = CourseKey.from_string(course_id)
-        report_type = _('proctored exam results')
-        task_api.submit_proctored_exam_results_report(request, course_key)
-        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-        return JsonResponse({"status": success_status})
+        try:
+            course_key = CourseKey.from_string(course_id)
+            report_type = _('proctored exam results')
+            task_api.submit_proctored_exam_results_report(request, course_key)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            return JsonResponse({"status": success_status})
+        except AlreadyRunningError as error:
+            # Return a 400 status code with the error message
+            return JsonResponse({"error": str(error)}, status=400)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
