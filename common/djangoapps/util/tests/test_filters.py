@@ -27,7 +27,7 @@ class TestPageURLRequestedPipelineStep(PipelineStep):
 @skip_unless_lms
 class CourseAboutPageURLRequestedFiltersTest(ModuleStoreTestCase):
     """
-    Tests for the Open edX Filters associated with the lms url creation process.
+    Tests for the Open edX Filters associated with the course about page url requested.
     This class guarantees that the following filters are triggered during the microsite render:
     - CourseAboutPageURLRequested
     """
@@ -48,8 +48,8 @@ class CourseAboutPageURLRequestedFiltersTest(ModuleStoreTestCase):
     )
     def test_course_about_page_url_requested_filter_executed(self):
         """
-        Test whether the lms url requested filter is triggered before the user's
-        render site process.
+        Test that filter get new course about URL based
+        on the course organization settings for org.
         Expected result:
             - CourseAboutPageURLRequested is triggered and executes TestPageURLRequestedPipelineStep.
             - The arguments that the receiver gets are the arguments used by the filter.
@@ -61,10 +61,10 @@ class CourseAboutPageURLRequestedFiltersTest(ModuleStoreTestCase):
     @override_settings(OPEN_EDX_FILTERS_CONFIG={}, LMS_ROOT_URL="https://lms-base")
     def test_course_about_page_url_requested_without_filter_configuration(self):
         """
-        Test usual get link for about page process, without filter's intervention.
+        Test that filter get new course about URL based
+        on the LMS_ROOT_URL settings because OPEN_EDX_FILTERS_CONFIG is not set.
         Expected result:
-            - Returns the course sharing url, this can be one of course's social sharing url, marketing url, or
-                lms course about url.
+            - Returns the course about URL with domain base LMS_ROOT_URL.
             - The get process ends successfully.
         """
         course_about_url = course.get_link_for_about_page(self.course)

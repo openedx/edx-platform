@@ -58,8 +58,8 @@ class LMSPageURLRequestedFiltersTest(ModuleStoreTestCase):
     )
     def test_lms_url_requested_filter_executed(self):
         """
-        Test whether the lms url requested filter is triggered before the user's
-        render site process.
+        Test that filter get new LMS URL for asset URL generation
+        based on the course organization settings for org.
         Expected result:
             - LMSPageURLRequested is triggered and executes TestPageURLRequestedPipelineStep.
             - The arguments that the receiver gets are the arguments used by the filter.
@@ -79,10 +79,10 @@ class LMSPageURLRequestedFiltersTest(ModuleStoreTestCase):
     @override_settings(OPEN_EDX_FILTERS_CONFIG={}, LMS_ROOT_URL="https://lms-base")
     def test_lms_url_requested_without_filter_configuration(self):
         """
-        Test usual get link for about page process, without filter's intervention.
+        Test that filter get new LMS URL for asset URL generation
+        based on LMS_ROOT_URL settings because OPEN_EDX_FILTERS_CONFIG is not set.
         Expected result:
-            - Returns the course sharing url, this can be one of course's social sharing url, marketing url, or
-                lms course about url.
+            - Returns the asset URL with domain base LMS_ROOT_URL.
             - The get process ends successfully.
         """
         output = asset_storage_handlers.get_asset_json(
