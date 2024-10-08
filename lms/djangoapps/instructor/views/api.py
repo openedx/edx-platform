@@ -1567,33 +1567,41 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
             raise FileValidationException(msg)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_POST
-@require_course_permission(permissions.ASSIGN_TO_COHORTS)
-@common_exceptions_400
-def add_users_to_cohorts(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class AddUsersToCohorts(DeveloperErrorViewMixin, APIView):
     """
     View method that accepts an uploaded file (using key "uploaded-file")
     containing cohort assignments for users. This method spawns a celery task
     to do the assignments, and a CSV file with results is provided via data downloads.
     """
-    course_key = CourseKey.from_string(course_id)
 
-    try:
-        __, filename = store_uploaded_file(
-            request, 'uploaded-file', ['.csv'],
-            course_and_time_based_filename_generator(course_key, "cohorts"),
-            max_file_size=2000000,  # limit to 2 MB
-            validator=_cohorts_csv_validator
-        )
-        # The task will assume the default file storage.
-        task_api.submit_cohort_students(request, course_key, filename)
-    except (FileValidationException, PermissionDenied) as err:
-        return JsonResponse({"error": str(err)}, status=400)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.ASSIGN_TO_COHORTS
 
-    return JsonResponse()
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        This method spawns a celery task to do the assignments, and a CSV file with results
+         is provided via data downloads.
+        """
+
+        course_key = CourseKey.from_string(course_id)
+
+        try:
+            __, filename = store_uploaded_file(
+                request, 'uploaded-file', ['.csv'],
+                course_and_time_based_filename_generator(course_key, "cohorts"),
+                max_file_size=2000000,  # limit to 2 MB
+                validator=_cohorts_csv_validator
+            )
+            # The task will assume the default file storage.
+            task_api.submit_cohort_students(request, course_key, filename)
+        except (FileValidationException, PermissionDenied) as err:
+            return JsonResponse({"error": str(err)}, status=400)
+
+        return JsonResponse()
 
 
 # The non-atomic decorator is required because this view calls a celery
