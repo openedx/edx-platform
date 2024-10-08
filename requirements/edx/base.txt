@@ -824,7 +824,7 @@ openedx-filters==1.10.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.13.1
+openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@chris/FAL-3616-copy-tags
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
