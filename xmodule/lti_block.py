@@ -84,7 +84,7 @@ from common.djangoapps.xblock_django.constants import (
 )
 from xmodule.lti_2_util import LTI20BlockMixin, LTIError
 from xmodule.raw_block import EmptyDataRawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     ResourceTemplates,
@@ -524,7 +524,7 @@ class LTIBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('lti.html', self.get_context()))
-        add_sass_to_fragment(fragment, 'LTIBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'LTIBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'LTIBlockDisplay')
         shim_xmodule_js(fragment, 'LTI')
         return fragment
