@@ -641,11 +641,12 @@ class UserEnrollmentsStatus(views.APIView):
         """
         Gets course ids where user has completions.
         """
-        user_completions_last_month = BlockCompletion.objects.filter(
+        context_keys = BlockCompletion.objects.filter(
             user__username=username,
             created__gte=active_status_date
-        )
-        return [str(completion.block_key.course_key) for completion in user_completions_last_month]
+        ).values_list('context_key', flat=True).distinct()
+
+        return [str(context_key) for context_key in context_keys]
 
 
 class UserCourseEnrollmentsV4Pagination(DefaultPagination):
