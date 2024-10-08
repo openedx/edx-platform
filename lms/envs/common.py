@@ -5534,3 +5534,6 @@ SURVEY_REPORT_EXTRA_DATA = {}
 # .. for now it wil impact country listing in auth flow and user profile.
 # .. eg ['US', 'CA']
 DISABLED_COUNTRIES = []
+
+
+LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
