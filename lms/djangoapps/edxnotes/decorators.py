@@ -7,6 +7,7 @@ import json
 
 from django.conf import settings
 from xblock.exceptions import NoSuchServiceError
+from openedx.core.djangoapps.plugins.plugins_hooks import run_extension_point
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student.auth import is_ccx_course
@@ -50,6 +51,8 @@ def edxnotes(cls):
         except NoSuchServiceError:
             user = None
 
+        is_llm_summarize_enabled = run_extension_point('PEARSON_CORE_ENABLE_LLM_SUMMARIZE', course_id=str(course.id))
+
         if is_studio or not is_feature_enabled(course, user):
             return original_get_html(self, *args, **kwargs)
         else:
@@ -69,6 +72,10 @@ def edxnotes(cls):
                     "endpoint": get_public_endpoint(),
                     "debug": settings.DEBUG,
                     "eventStringLimit": settings.TRACK_MAX_EVENT / 6,
+                    "llmSummarize": {
+                        "isEnabled": is_llm_summarize_enabled,
+                        "courseId": str(course.id),
+                    },
                 },
             })
 

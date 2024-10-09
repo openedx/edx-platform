@@ -87,17 +87,17 @@
                 let annotator = this.annotator;
                 document.head.appendChild(style);
                 this.modifyDom(this.annotator);
-
+                annotator.editor.options.llmSummarize = annotator.options.llmSummarize
                 const summarizeButton = document.getElementById('summarizeButton');
 
                 summarizeButton.addEventListener('click', function(ev) {
-                    annotator.editor.element[0].setAttribute('is_summarizing', true);
+                    annotator.editor.options.isSummarizing = true;
                 });
                 annotator.subscribe('annotationEditorShown', this.handleSummarize);
                 annotator.subscribe('annotationEditorHidden', this.cleanupSummarize);
             },
             handleSummarize: function (editor, annotation) {
-                if (editor.element[0].getAttribute('is_summarizing') !== 'true') return;
+                if (!editor.options || !editor.options.isSummarizing) return;
 
                 function toggleLoader() {
                     const saveButton = document.querySelector('.annotator-controls .annotator-save');
@@ -115,6 +115,7 @@
                     },
                     body: JSON.stringify({
                         text_to_summarize: annotation.quote,
+                        course_id: editor.options && editor.options.llmSummarize && editor.options.llmSummarize.courseId,
                     }),
                 });
 
@@ -140,7 +141,7 @@
 
                 textAreaWrapper.children[0].value = '';
                 textAreaWrapper.children[1].value = '';
-                editor.element[0].setAttribute('is_summarizing', 'false');
+                editor.options.isSummarizing = false;
                 loaderWrapper.classList.add('d-none');
             },
             modifyDom: function(annotator) {
