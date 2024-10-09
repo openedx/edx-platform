@@ -2028,7 +2028,7 @@ class RescoreProblem(DeveloperErrorViewMixin, APIView):
         if all_students and not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
-        student_identifier = serializer_data.validated_data.get("unique_student_identifier")
+        student = serializer_data.validated_data.get("unique_student_identifier")
 
         if not (problem_to_reset and (all_students or student)):
             return HttpResponseBadRequest("Missing query parameters.")
