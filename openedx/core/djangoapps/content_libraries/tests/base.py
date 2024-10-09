@@ -308,3 +308,12 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """
         url = URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name=handler_name)
         return self._api('get', url, None, expect_response=200)["handler_url"]
+
+    def _get_library_block_fields(self, block_key, expect_response=200):
+        """ Get the fields of a specific block in the library. This API is only used by the MFE editors. """
+        result = self._api('get', URL_BLOCK_FIELDS_URL.format(block_key=block_key), None, expect_response)
+        return result
+
+    def _set_library_block_fields(self, block_key, new_fields, expect_response=200):
+        """ Set the fields of a specific block in the library. This API is only used by the MFE editors. """
+        return self._api('post', URL_BLOCK_FIELDS_URL.format(block_key=block_key), new_fields, expect_response)

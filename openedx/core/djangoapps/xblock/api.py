@@ -8,11 +8,12 @@ Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 # pylint: disable=unused-import
-
+from enum import Enum
 from datetime import datetime
 import logging
 import threading
 
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
@@ -21,7 +22,7 @@ from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
-from xblock.exceptions import NoSuchViewError
+from xblock.exceptions import NoSuchUsage, NoSuchViewError
 from xblock.plugin import PluginMissingError
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
@@ -41,6 +42,16 @@ from openedx.core.djangoapps.xblock.learning_context import LearningContext
 # Implementation:
 
 log = logging.getLogger(__name__)
+
+
+class CheckPerm(Enum):
+    """ Options for the default permission check done by load_block() """
+    # can view the published block and call handlers etc. but not necessarily view its OLX source nor field data
+    CAN_LEARN = 1
+    # read-only studio view: can see the block (draft or published), see its OLX, see its field data, etc.
+    CAN_READ_AS_AUTHOR = 2
+    # can view everything and make changes to the block
+    CAN_EDIT = 3
 
 
 def get_runtime_system():
@@ -74,15 +85,15 @@ def get_runtime_system():
     return runtime
 
 
-def load_block(usage_key, user):
+def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPerm.CAN_LEARN):
     """
     Load the specified XBlock for the given user.
 
     Returns an instantiated XBlock.
 
     Exceptions:
-        NotFound - if the XBlock doesn't exist or if the user doesn't have the
-                   necessary permissions
+        NotFound - if the XBlock doesn't exist
+        PermissionDenied - if the user doesn't have the necessary permissions
 
     Args:
         usage_key(OpaqueKey): block identifier
@@ -94,10 +105,17 @@ def load_block(usage_key, user):
 
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
-    if user is not None and not context_impl.can_view_block(user, usage_key):
-        # We do not know if the block was not found or if the user doesn't have
-        # permission, but we want to return the same result in either case:
-        raise NotFound(f"XBlock {usage_key} does not exist, or you don't have permission to view it.")
+    if check_permission and user is not None:
+        if check_permission == CheckPerm.CAN_EDIT:
+            has_perm = context_impl.can_edit_block(user, usage_key)
+        elif check_permission == CheckPerm.CAN_READ_AS_AUTHOR:
+            has_perm = context_impl.can_view_block_for_editing(user, usage_key)
+        elif check_permission == CheckPerm.CAN_LEARN:
+            has_perm = context_impl.can_view_block(user, usage_key)
+        else:
+            has_perm = False
+        if not has_perm:
+            raise PermissionDenied(f"You don't have permission to access the component '{usage_key}'.")
 
     # TODO: load field overrides from the context
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
@@ -105,7 +123,11 @@ def load_block(usage_key, user):
     # field_overrides = context_impl.get_field_overrides(usage_key)
     runtime = get_runtime_system().get_runtime(user=user)
 
-    return runtime.get_block(usage_key)
+    try:
+        return runtime.get_block(usage_key)
+    except NoSuchUsage as exc:
+        # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
+        raise NotFound(f"The component '{usage_key}' does not exist.") from exc
 
 
 def get_block_metadata(block, includes=()):

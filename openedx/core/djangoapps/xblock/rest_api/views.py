@@ -29,6 +29,7 @@ import openedx.core.djangoapps.site_configuration.helpers as configuration_helpe
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
+    CheckPerm,
     get_block_metadata,
     get_block_display_name,
     get_handler_url as _get_handler_url,
@@ -108,7 +109,7 @@ def embed_block_view(request, usage_key_str, view_name):
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
     try:
-        block = load_block(usage_key, request.user)
+        block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_LEARN)
     except NoSuchUsage as exc:
         raise NotFound(f"{usage_key} not found") from exc
 
@@ -246,7 +247,8 @@ class BlockFieldsView(APIView):
         except InvalidKeyError as e:
             raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-        block = load_block(usage_key, request.user)
+        # The "fields" view requires "read as author" permissions because the fields can contain answers, etc.
+        block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_READ_AS_AUTHOR)
         block_dict = {
             "display_name": get_block_display_name(block),  # potentially duplicated from metadata
             "data": block.data,
@@ -265,7 +267,7 @@ class BlockFieldsView(APIView):
             raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
         user = request.user
-        block = load_block(usage_key, user)
+        block = load_block(usage_key, user, check_permission=CheckPerm.CAN_EDIT)
         data = request.data.get("data")
         metadata = request.data.get("metadata")
 
