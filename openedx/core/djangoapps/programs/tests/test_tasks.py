@@ -365,10 +365,10 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
             tasks.award_program_certificates.delay(self.student.username).get()
         assert mock_award_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            f"Failed to award program certificate to user {self.student} in program 1: boom"
+            f"Failed to award program certificate to user {self.student.id} in program 1: boom"
         )
-        mock_info.assert_any_call(f"Awarded program certificate to user {self.student} in program 1")
-        mock_info.assert_any_call(f"Awarded program certificate to user {self.student} in program 2")
+        mock_info.assert_any_call(f"Awarded program certificate to user {self.student.id} in program 1")
+        mock_info.assert_any_call(f"Awarded program certificate to user {self.student.id} in program 2")
 
     def test_retry_on_programs_api_errors(self, mock_get_completed_programs, *_mock_helpers):
         """
@@ -835,10 +835,10 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 
         assert mock_revoke_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            f"Failed to revoke program certificate from user {self.student} in program 1: boom"
+            f"Failed to revoke program certificate from user {self.student.id} in program 1: boom"
         )
-        mock_info.assert_any_call(f"Revoked program certificate from user {self.student} in program 1")
-        mock_info.assert_any_call(f"Revoked program certificate from user {self.student} in program 2")
+        mock_info.assert_any_call(f"Revoked program certificate from user {self.student.id} in program 1")
+        mock_info.assert_any_call(f"Revoked program certificate from user {self.student.id} in program 2")
 
     def test_retry_on_credentials_api_errors(
         self,
