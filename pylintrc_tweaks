@@ -1,7 +1,7 @@
 # pylintrc tweaks for use with edx_lint.
 [MASTER]
 ignore+ = ,.git,.tox,migrations,node_modules,.pycharm_helpers
-load-plugins = edx_lint.pylint,pylint_django,pylint_celery,pylint_pytest
+load-plugins = edx_lint.pylint,pylint_django_settings,pylint_django,pylint_celery,pylint_pytest
 
 [MESSAGES CONTROL]
 disable+ =
