@@ -134,6 +134,14 @@ class ContentLibraryFilterSerializer(BaseFilterSerializer):
     type = serializers.ChoiceField(choices=LIBRARY_TYPES, default=None, required=False)
 
 
+class CollectionMetadataSerializer(serializers.Serializer):
+    """
+    Serializer for CollectionMetadata
+    """
+    key = serializers.CharField()
+    title = serializers.CharField()
+
+
 class LibraryXBlockMetadataSerializer(serializers.Serializer):
     """
     Serializer for LibraryXBlockMetadata
@@ -160,6 +168,8 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
     tags_count = serializers.IntegerField(read_only=True)
+
+    collections = CollectionMetadataSerializer(many=True, required=False)
 
 
 class LibraryXBlockTypeSerializer(serializers.Serializer):
