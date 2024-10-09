@@ -205,6 +205,15 @@ class ContentLibraryPermissionEntry:
 
 
 @attr.s
+class CollectionMetadata:
+    """
+    Class to represent collection metadata in a content library.
+    """
+    key = attr.ib(type=str)
+    title = attr.ib(type=str)
+
+
+@attr.s
 class LibraryXBlockMetadata:
     """
     Class that represents the metadata about an XBlock in a content library.
@@ -219,9 +228,10 @@ class LibraryXBlockMetadata:
     published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     created = attr.ib(default=None, type=datetime)
+    collections = attr.ib(type=list[CollectionMetadata], factory=list)
 
     @classmethod
-    def from_component(cls, library_key, component):
+    def from_component(cls, library_key, component, collections=None):
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
@@ -248,6 +258,7 @@ class LibraryXBlockMetadata:
             last_draft_created=last_draft_created,
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=component.versioning.has_unpublished_changes,
+            collections=collections or [],
         )
 
 
@@ -690,7 +701,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
     return components
 
 
-def get_library_block(usage_key) -> LibraryXBlockMetadata:
+def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMetadata:
     """
     Get metadata about (the draft version of) one specific XBlock in a library.
 
@@ -713,9 +724,16 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
     if not draft_version:
         raise ContentLibraryBlockNotFound(usage_key)
 
+    collections = []
+    if include_collections:
+        collections = authoring_api.get_entity_collections(
+            component.learning_package_id,
+            component.key,
+        ).values('key', 'title')
     xblock_metadata = LibraryXBlockMetadata.from_component(
         library_key=usage_key.context_key,
         component=component,
+        collections=collections,
     )
     return xblock_metadata
 
