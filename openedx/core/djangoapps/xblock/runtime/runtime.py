@@ -38,7 +38,7 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.types import User as UserType
 from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-from openedx.core.djangoapps.xblock.data import StudentDataMode
+from openedx.core.djangoapps.xblock.data import AuthoredDataMode, StudentDataMode
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
@@ -101,6 +101,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         *,
         handler_url: Callable[[UsageKey, str, UserType | None], str],
         student_data_mode: StudentDataMode,
+        authored_data_mode: AuthoredDataMode,
         id_reader: Optional[IdReader] = None,
         authored_data_store: Optional[FieldData] = None,
     ):
@@ -115,6 +116,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             id_generator=MemoryIdManager(),  # We don't really use id_generator until we need to support asides
         )
         assert student_data_mode in (StudentDataMode.Ephemeral, StudentDataMode.Persisted)
+        self.authored_data_mode = authored_data_mode
         self.authored_data_store = authored_data_store
         self.children_data_store = None
         self.student_data_mode = student_data_mode

@@ -32,6 +32,7 @@ from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreFieldData,
     LearningCoreXBlockRuntime,
 )
+from .data import CheckPerm, LatestVersion
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
 from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
@@ -42,16 +43,6 @@ from openedx.core.djangoapps.xblock.learning_context import LearningContext
 # Implementation:
 
 log = logging.getLogger(__name__)
-
-
-class CheckPerm(Enum):
-    """ Options for the default permission check done by load_block() """
-    # can view the published block and call handlers etc. but not necessarily view its OLX source nor field data
-    CAN_LEARN = 1
-    # read-only studio view: can see the block (draft or published), see its OLX, see its field data, etc.
-    CAN_READ_AS_AUTHOR = 2
-    # can view everything and make changes to the block
-    CAN_EDIT = 3
 
 
 def get_runtime(user: UserType):
@@ -73,7 +64,13 @@ def get_runtime(user: UserType):
     return runtime
 
 
-def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPerm.CAN_LEARN):
+def load_block(
+    usage_key: UsageKeyV2,
+    user: UserType,
+    *,
+    check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
+    version: int | LatestVersion = LatestVersion.AUTO,
+):
     """
     Load the specified XBlock for the given user.
 
@@ -112,7 +109,7 @@ def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPer
     runtime = get_runtime(user=user)
 
     try:
-        return runtime.get_block(usage_key)
+        return runtime.get_block(usage_key, version=version)
     except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The component '{usage_key}' does not exist.") from exc
