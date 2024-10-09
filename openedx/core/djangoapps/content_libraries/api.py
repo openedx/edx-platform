@@ -231,7 +231,7 @@ class LibraryXBlockMetadata:
     collections = attr.ib(type=list[CollectionMetadata], factory=list)
 
     @classmethod
-    def from_component(cls, library_key, component, collections=None):
+    def from_component(cls, library_key, component, associated_collections=None):
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
@@ -258,7 +258,7 @@ class LibraryXBlockMetadata:
             last_draft_created=last_draft_created,
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=component.versioning.has_unpublished_changes,
-            collections=collections or [],
+            collections=associated_collections or [],
         )
 
 
@@ -724,16 +724,17 @@ def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMeta
     if not draft_version:
         raise ContentLibraryBlockNotFound(usage_key)
 
-    collections = []
     if include_collections:
-        collections = authoring_api.get_entity_collections(
+        associated_collections = authoring_api.get_entity_collections(
             component.learning_package_id,
             component.key,
         ).values('key', 'title')
+    else:
+        associated_collections = None
     xblock_metadata = LibraryXBlockMetadata.from_component(
         library_key=usage_key.context_key,
         component=component,
-        collections=collections,
+        associated_collections=associated_collections,
     )
     return xblock_metadata
 
