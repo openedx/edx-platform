@@ -502,6 +502,30 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         # Add a 'problem' XBlock to the library:
         self._add_block_to_library(lib_id, block_type, 'test-block', expect_response=expect_response)
 
+    def test_library_not_found(self):
+        """Test that requests fail with 404 when the library does not exist"""
+        valid_not_found_key = 'lb:valid:key:video:1'
+        response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=valid_not_found_key))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {
+            'detail': "Content Library 'lib:valid:key' does not exist",
+        })
+
+    def test_block_not_found(self):
+        """Test that requests fail with 404 when the library exists but the XBlock does not"""
+        lib = self._create_library(
+            slug="test_lib_block_event_delete",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        library_key = LibraryLocatorV2.from_string(lib['id'])
+        non_existent_block_key = LibraryUsageLocatorV2(lib_key=library_key, block_type='video', usage_id='123')
+        response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=non_existent_block_key))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {
+            'detail': f"The component '{non_existent_block_key}' does not exist.",
+        })
+
     # Test that permissions are enforced for content libraries
 
     def test_library_permissions(self):  # pylint: disable=too-many-statements
@@ -635,21 +659,27 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         # A random user cannot read OLX nor assets (this library has allow_public_read False):
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key, expect_response=403)
+            self._get_library_block_fields(block3_key, expect_response=403)
             self._get_library_block_assets(block3_key, expect_response=403)
             self._get_library_block_asset(block3_key, file_name="whatever.png", expect_response=403)
+            # Nor can they preview the block:
+            self._render_block_view(block3_key, view_name="student_view", expect_response=403)
         # But if we grant allow_public_read, then they can:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
             # self._set_library_block_asset(block3_key, "whatever.png", b"data")
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key)
+            self._render_block_view(block3_key, view_name="student_view")
+            f = self._get_library_block_fields(block3_key)
             # self._get_library_block_assets(block3_key)
             # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
-        # Users without authoring permission cannot edit nor delete XBlocks (this library has allow_public_read False):
+        # Users without authoring permission cannot edit nor delete XBlocks:
         for user in [reader, random_user]:
             with self.as_user(user):
                 self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
+                self._set_library_block_fields(block3_key, {"data": "<problem />", "metadata": {}}, expect_response=403)
                 # self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
                 self._delete_library_block(block3_key, expect_response=403)
                 self._commit_library_changes(lib_id, expect_response=403)
@@ -659,6 +689,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         with self.as_user(author_group_member):
             olx = self._get_library_block_olx(block3_key)
             self._set_library_block_olx(block3_key, olx)
+            self._set_library_block_fields(block3_key, {"data": olx, "metadata": {}})
             # self._get_library_block_assets(block3_key)
             # self._set_library_block_asset(block3_key, "test.txt", b"data")
             # self._get_library_block_asset(block3_key, file_name="test.txt")
@@ -1087,12 +1118,3 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             secure_token='random',
         )))
         self.assertEqual(response.status_code, 404)
-
-    def test_not_found_fails_correctly(self):
-        """Test fails with 404 when xblock key is valid but not found."""
-        valid_not_found_key = 'lb:valid:key:video:1'
-        response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=valid_not_found_key))
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {
-            'detail': f"XBlock {valid_not_found_key} does not exist, or you don't have permission to view it.",
-        })

@@ -919,7 +919,7 @@ class LtiToolLaunchView(TemplateResponseMixin, LtiToolView):
     LTI platform.  Other features and resouces are ignored.
     """
 
-    template_name = 'content_libraries/xblock_iframe.html'
+    template_name = 'xblock_v2/xblock_iframe.html'
 
     @property
     def launch_data(self):

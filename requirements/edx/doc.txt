@@ -547,7 +547,7 @@ edx-drf-extensions==10.4.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.26.0
+edx-enterprise==4.27.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -562,7 +562,7 @@ edx-i18n-tools==1.5.0
     #   ora2
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.4.2
+edx-name-affirmation==3.0.1
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.11.0
     # via
@@ -581,7 +581,7 @@ edx-opaque-keys[django]==2.11.0
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/base.txt
-edx-proctoring==4.18.1
+edx-proctoring==4.18.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -959,7 +959,7 @@ openai==0.28.1
     #   edx-enterprise
 openedx-atlas==0.6.2
     # via -r requirements/edx/base.txt
-openedx-calc==3.1.0
+openedx-calc==3.1.2
     # via -r requirements/edx/base.txt
 openedx-django-pyfs==3.7.0
     # via
@@ -976,6 +976,7 @@ openedx-events==9.14.1
     #   edx-enterprise
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
+    #   edx-name-affirmation
     #   event-tracking
     #   ora2
 openedx-filters==1.10.0

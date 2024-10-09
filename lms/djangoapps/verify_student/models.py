@@ -44,9 +44,8 @@ from lms.djangoapps.verify_student.ssencrypt import (
     rsa_decrypt,
     rsa_encrypt
 )
+from openedx.core.djangoapps.signals.signals import LEARNER_SSO_VERIFIED, PHOTO_VERIFICATION_APPROVED
 from openedx.core.storage import get_storage
-from openedx_events.learning.signals import IDV_ATTEMPT_APPROVED
-from openedx_events.learning.data import UserData, VerificationAttemptData
 
 from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date, submit_request_to_ss
 
@@ -251,23 +250,13 @@ class SSOVerification(IDVerificationAttempt):
             user_id=self.user, reviewer=approved_by
         ))
 
-        # Emit event to find and generate eligible certificates
-        verification_data = VerificationAttemptData(
-            attempt_id=self.id,
-            user=UserData(
-                pii=None,
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-            status=self.status,
-            name=self.name,
-            expiration_date=self.expiration_datetime,
-        )
-        IDV_ATTEMPT_APPROVED.send_event(
-            idv_attempt=verification_data,
+        # Emit signal to find and generate eligible certificates
+        LEARNER_SSO_VERIFIED.send_robust(
+            sender=PhotoVerification,
+            user=self.user,
         )
 
-        message = 'IDV_ATTEMPT_APPROVED signal fired for {user} from SSOVerification'
+        message = 'LEARNER_SSO_VERIFIED signal fired for {user} from SSOVerification'
         log.info(message.format(user=self.user.username))
 
 
@@ -465,23 +454,13 @@ class PhotoVerification(IDVerificationAttempt):
         )
         self.save()
 
-        # Emit event to find and generate eligible certificates
-        verification_data = VerificationAttemptData(
-            attempt_id=self.id,
-            user=UserData(
-                pii=None,
-                id=self.user.id,
-                is_active=self.user.is_active,
-            ),
-            status=self.status,
-            name=self.name,
-            expiration_date=self.expiration_datetime,
-        )
-        IDV_ATTEMPT_APPROVED.send_event(
-            idv_attempt=verification_data,
+        # Emit signal to find and generate eligible certificates
+        PHOTO_VERIFICATION_APPROVED.send_robust(
+            sender=PhotoVerification,
+            user=self.user,
         )
 
-        message = 'IDV_ATTEMPT_APPROVED signal fired for {user} from PhotoVerification'
+        message = 'PHOTO_VERIFICATION_APPROVED signal fired for {user} from PhotoVerification'
         log.info(message.format(user=self.user.username))
 
     @status_before_must_be("ready", "must_retry")
@@ -1249,6 +1228,22 @@ class VerificationAttempt(StatusModel):
     def should_display_status_to_user(self):
         """When called, returns true or false based on the type of VerificationAttempt"""
         return not self.hide_status_from_user
+
+    def active_at_datetime(self, deadline):
+        """Check whether the verification was active at a particular datetime.
+
+        Arguments:
+            deadline (datetime): The date at which the verification was active
+                (created before and expiration datetime is after today).
+
+        Returns:
+            bool
+
+        """
+        return (
+            self.created_at <= deadline and
+            (self.expiration_datetime is None or self.expiration_datetime > now())
+        )
 
     @classmethod
     def retire_user(cls, user_id):
