@@ -336,16 +336,8 @@ class CommentsServiceMockMixin:
 
     def register_flag_response(self, content_type, content_id):
         """Register a mock response for PUT on the CS flag endpoints"""
-        assert httpretty.is_enabled(), "httpretty must be enabled to mock calls."
-        for path in ["abuse_flag", "abuse_unflag"]:
-            httpretty.register_uri(
-                "PUT",
-                "http://localhost:4567/api/v1/{content_type}s/{content_id}/{path}".format(
-                    content_type=content_type, content_id=content_id, path=path
-                ),
-                body=json.dumps({}),  # body is unused
-                status=200,
-            )
+        self.mock_update_thread_flag.return_value = {}
+        self.mock_update_thread_flag_in_comment.return_value = {}
 
     def register_read_response(self, user, content_type, content_id):
         """

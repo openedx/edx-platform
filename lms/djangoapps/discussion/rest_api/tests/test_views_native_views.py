@@ -1311,413 +1311,433 @@ class ThreadViewSetListTest(
             page=1,
             per_page=10,
             group_id=None,
-            text='',
+            text="",
             author_id=None,
             flagged=None,
-            thread_type='',
-            count_flagged=None
+            thread_type="",
+            count_flagged=None,
         )
 
-    # @ddt.data(False, "false", "0")
-    # def test_following_false(self, following):
-    #     response = self.client.get(
-    #         self.url,
-    #         {
-    #             "course_id": str(self.course.id),
-    #             "following": following,
-    #         },
-    #     )
-    #     self.assert_response_correct(
-    #         response,
-    #         400,
-    #         {
-    #             "field_errors": {
-    #                 "following": {
-    #                     "developer_message": "The value of the 'following' parameter must be true."
-    #                 }
-    #             }
-    #         },
-    #     )
+    @ddt.data(False, "false", "0")
+    def test_following_false(self, following):
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "following": following,
+            },
+        )
+        self.assert_response_correct(
+            response,
+            400,
+            {
+                "field_errors": {
+                    "following": {
+                        "developer_message": "The value of the 'following' parameter must be true."
+                    }
+                }
+            },
+        )
 
-    # def test_following_error(self):
-    #     response = self.client.get(
-    #         self.url,
-    #         {
-    #             "course_id": str(self.course.id),
-    #             "following": "invalid-boolean",
-    #         },
-    #     )
-    #     self.assert_response_correct(
-    #         response,
-    #         400,
-    #         {
-    #             "field_errors": {
-    #                 "following": {"developer_message": "Invalid Boolean Value."}
-    #             }
-    #         },
-    #     )
+    def test_following_error(self):
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "following": "invalid-boolean",
+            },
+        )
+        self.assert_response_correct(
+            response,
+            400,
+            {
+                "field_errors": {
+                    "following": {"developer_message": "Invalid Boolean Value."}
+                }
+            },
+        )
 
-    # @ddt.data(
-    #     ("last_activity_at", "activity"),
-    #     ("comment_count", "comments"),
-    #     ("vote_count", "votes"),
-    # )
-    # @ddt.unpack
-    # def test_order_by(self, http_query, cc_query):
-    #     """
-    #     Tests the order_by parameter
+    @ddt.data(
+        ("last_activity_at", "activity"),
+        ("comment_count", "comments"),
+        ("vote_count", "votes"),
+    )
+    @ddt.unpack
+    def test_order_by(self, http_query, cc_query):
+        """
+        Tests the order_by parameter
 
-    #     Arguments:
-    #         http_query (str): Query string sent in the http request
-    #         cc_query (str): Query string used for the comments client service
-    #     """
-    #     threads = [make_minimal_cs_thread()]
-    #     self.register_get_user_response(self.user)
-    #     self.register_get_threads_response(threads, page=1, num_pages=1)
-    #     self.client.get(
-    #         self.url,
-    #         {
-    #             "course_id": str(self.course.id),
-    #             "order_by": http_query,
-    #         },
-    #     )
-    #     self.assert_last_query_params(
-    #         {
-    #             "user_id": [str(self.user.id)],
-    #             "course_id": [str(self.course.id)],
-    #             "page": ["1"],
-    #             "per_page": ["10"],
-    #             "sort_key": [cc_query],
-    #         }
-    #     )
+        Arguments:
+            http_query (str): Query string sent in the http request
+            cc_query (str): Query string used for the comments client service
+        """
+        threads = [make_minimal_cs_thread()]
+        self.register_get_user_response(self.user)
+        self.register_get_threads_response(threads, page=1, num_pages=1)
+        self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "order_by": http_query,
+            },
+        )
+        self.mock_get_user_threads.assert_called_once_with(
+            user_id=str(self.user.id),
+            course_id=str(self.course.id),
+            sort_key=cc_query,
+            page=1,
+            per_page=10,
+        )
 
-    # def test_order_direction(self):
-    #     """
-    #     Test order direction, of which "desc" is the only valid option.  The
-    #     option actually just gets swallowed, so it doesn't affect the params.
-    #     """
-    #     threads = [make_minimal_cs_thread()]
-    #     self.register_get_user_response(self.user)
-    #     self.register_get_threads_response(threads, page=1, num_pages=1)
-    #     self.client.get(
-    #         self.url,
-    #         {
-    #             "course_id": str(self.course.id),
-    #             "order_direction": "desc",
-    #         },
-    #     )
-    #     self.assert_last_query_params(
-    #         {
-    #             "user_id": [str(self.user.id)],
-    #             "course_id": [str(self.course.id)],
-    #             "sort_key": ["activity"],
-    #             "page": ["1"],
-    #             "per_page": ["10"],
-    #         }
-    #     )
+    def test_order_direction(self):
+        """
+        Test order direction, of which "desc" is the only valid option.  The
+        option actually just gets swallowed, so it doesn't affect the params.
+        """
+        threads = [make_minimal_cs_thread()]
+        self.register_get_user_response(self.user)
+        self.register_get_threads_response(threads, page=1, num_pages=1)
+        self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "order_direction": "desc",
+            },
+        )
+        self.mock_get_user_threads.assert_called_once_with(
+            user_id=str(self.user.id),
+            course_id=str(self.course.id),
+            sort_key="activity",
+            page=1,
+            per_page=10,
+        )
 
-    # def test_mutually_exclusive(self):
-    #     """
-    #     Tests GET thread_list api does not allow filtering on mutually exclusive parameters
-    #     """
-    #     self.register_get_user_response(self.user)
-    #     self.register_get_threads_search_response([], None, num_pages=0)
-    #     response = self.client.get(
-    #         self.url,
-    #         {
-    #             "course_id": str(self.course.id),
-    #             "text_search": "test search string",
-    #             "topic_id": "topic1, topic2",
-    #         },
-    #     )
-    #     self.assert_response_correct(
-    #         response,
-    #         400,
-    #         {
-    #             "developer_message": "The following query parameters are mutually exclusive: topic_id, "
-    #             "text_search, following"
-    #         },
-    #     )
+    def test_mutually_exclusive(self):
+        """
+        Tests GET thread_list api does not allow filtering on mutually exclusive parameters
+        """
+        self.register_get_user_response(self.user)
+        self.mock_search_threads.side_effect = ValueError(
+            "The following query parameters are mutually exclusive: topic_id, text_search, following"
+        )
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "text_search": "test search string",
+                "topic_id": "topic1, topic2",
+            },
+        )
+        self.assert_response_correct(
+            response,
+            400,
+            {
+                "developer_message": "The following query parameters are mutually exclusive: topic_id, "
+                "text_search, following"
+            },
+        )
 
-    # def test_profile_image_requested_field(self):
-    #     """
-    #     Tests thread has user profile image details if called in requested_fields
-    #     """
-    #     user_2 = UserFactory.create(password=self.password)
-    #     # Ensure that parental controls don't apply to this user
-    #     user_2.profile.year_of_birth = 1970
-    #     user_2.profile.save()
-    #     source_threads = [
-    #         self.create_source_thread(),
-    #         self.create_source_thread(
-    #             {"user_id": str(user_2.id), "username": user_2.username}
-    #         ),
-    #     ]
+    def test_profile_image_requested_field(self):
+        """
+        Tests thread has user profile image details if called in requested_fields
+        """
+        user_2 = UserFactory.create(password=self.password)
+        # Ensure that parental controls don't apply to this user
+        user_2.profile.year_of_birth = 1970
+        user_2.profile.save()
+        source_threads = [
+            self.create_source_thread(),
+            self.create_source_thread(
+                {"user_id": str(user_2.id), "username": user_2.username}
+            ),
+        ]
 
-    #     self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-    #     self.register_get_threads_response(source_threads, page=1, num_pages=1)
-    #     self.create_profile_image(self.user, get_profile_image_storage())
-    #     self.create_profile_image(user_2, get_profile_image_storage())
+        self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+        self.register_get_threads_response(source_threads, page=1, num_pages=1)
+        self.create_profile_image(self.user, get_profile_image_storage())
+        self.create_profile_image(user_2, get_profile_image_storage())
 
-    #     response = self.client.get(
-    #         self.url,
-    #         {"course_id": str(self.course.id), "requested_fields": "profile_image"},
-    #     )
-    #     assert response.status_code == 200
-    #     response_threads = json.loads(response.content.decode("utf-8"))["results"]
+        response = self.client.get(
+            self.url,
+            {"course_id": str(self.course.id), "requested_fields": "profile_image"},
+        )
+        assert response.status_code == 200
+        response_threads = json.loads(response.content.decode("utf-8"))["results"]
 
-    #     for response_thread in response_threads:
-    #         expected_profile_data = self.get_expected_user_profile(
-    #             response_thread["author"]
-    #         )
-    #         response_users = response_thread["users"]
-    #         assert expected_profile_data == response_users[response_thread["author"]]
+        for response_thread in response_threads:
+            expected_profile_data = self.get_expected_user_profile(
+                response_thread["author"]
+            )
+            response_users = response_thread["users"]
+            assert expected_profile_data == response_users[response_thread["author"]]
 
-    # def test_profile_image_requested_field_anonymous_user(self):
-    #     """
-    #     Tests profile_image in requested_fields for thread created with anonymous user
-    #     """
-    #     source_threads = [
-    #         self.create_source_thread(
-    #             {
-    #                 "user_id": None,
-    #                 "username": None,
-    #                 "anonymous": True,
-    #                 "anonymous_to_peers": True,
-    #             }
-    #         ),
-    #     ]
+    def test_profile_image_requested_field_anonymous_user(self):
+        """
+        Tests profile_image in requested_fields for thread created with anonymous user
+        """
+        source_threads = [
+            self.create_source_thread(
+                {
+                    "user_id": None,
+                    "username": None,
+                    "anonymous": True,
+                    "anonymous_to_peers": True,
+                }
+            ),
+        ]
 
-    #     self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-    #     self.register_get_threads_response(source_threads, page=1, num_pages=1)
+        self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+        self.register_get_threads_response(source_threads, page=1, num_pages=1)
 
-    #     response = self.client.get(
-    #         self.url,
-    #         {"course_id": str(self.course.id), "requested_fields": "profile_image"},
-    #     )
-    #     assert response.status_code == 200
-    #     response_thread = json.loads(response.content.decode("utf-8"))["results"][0]
-    #     assert response_thread["author"] is None
-    #     assert {} == response_thread["users"]
+        response = self.client.get(
+            self.url,
+            {"course_id": str(self.course.id), "requested_fields": "profile_image"},
+        )
+        assert response.status_code == 200
+        response_thread = json.loads(response.content.decode("utf-8"))["results"][0]
+        assert response_thread["author"] is None
+        assert {} == response_thread["users"]
 
 
-# @httpretty.activate
-# @disable_signal(api, "thread_created")
-# @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-# class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
-#     """Tests for ThreadViewSet create"""
+@httpretty.activate
+@disable_signal(api, "thread_created")
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ThreadViewSet create"""
 
-#     def setUp(self):
-#         super().setUp()
-#         self.url = reverse("thread-list")
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("thread-list")
+        patcher = mock.patch(
+            "lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled",
+            return_value=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user"
+        )
+        self.mock_get_user = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.create_thread"
+        )
+        self.mock_create_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
-#         patcher = mock.patch(
-#             "lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled",
-#             return_value=True,
-#         )
-#         patcher.start()
-#         self.addCleanup(patcher.stop)
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread(
+            {
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            }
+        )
+        self.register_post_thread_response(cs_thread)
+        request_data = {
+            "course_id": str(self.course.id),
+            "topic_id": "test_topic",
+            "type": "discussion",
+            "title": "Test Title",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+        }
+        self.client.post(
+            self.url, json.dumps(request_data), content_type="application/json"
+        )
+        self.mock_create_thread.assert_called_once_with(
+            "Test Title",
+            "# Test \n This is a very long body but will not be truncated for the preview.",
+            str(self.course.id),
+            str(self.user.id),
+            False,
+            False,
+            "test_topic",
+            "discussion",
+            None,
+        )
 
-#         patcher = mock.patch(
-#             "openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user"
-#         )
-#         self.mock_get_user = patcher.start()
-#         self.addCleanup(patcher.stop)
-
-#     def test_basic(self):
-#         self.register_get_user_response(self.user)
-#         cs_thread = make_minimal_cs_thread(
-#             {
-#                 "id": "test_thread",
-#                 "username": self.user.username,
-#                 "read": True,
-#             }
-#         )
-#         self.register_post_thread_response(cs_thread)
-#         request_data = {
-#             "course_id": str(self.course.id),
-#             "topic_id": "test_topic",
-#             "type": "discussion",
-#             "title": "Test Title",
-#             "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
-#         }
-#         response = self.client.post(
-#             self.url, json.dumps(request_data), content_type="application/json"
-#         )
-#         assert response.status_code == 200
-#         response_data = json.loads(response.content.decode("utf-8"))
-#         assert response_data == self.expected_thread_data(
-#             {
-#                 "read": True,
-#                 "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
-#                 "preview_body": "Test This is a very long body but will not be truncated for the preview.",
-#                 "rendered_body": "<h1>Test</h1>\n<p>This is a very long body but will not be truncated for"
-#                 " the preview.</p>",
-#             }
-#         )
-#         assert parsed_body(httpretty.last_request()) == {
-#             "course_id": [str(self.course.id)],
-#             "commentable_id": ["test_topic"],
-#             "thread_type": ["discussion"],
-#             "title": ["Test Title"],
-#             "body": [
-#                 "# Test \n This is a very long body but will not be truncated for the preview."
-#             ],
-#             "user_id": [str(self.user.id)],
-#             "anonymous": ["False"],
-#             "anonymous_to_peers": ["False"],
-#         }
-
-#     def test_error(self):
-#         request_data = {
-#             "topic_id": "dummy",
-#             "type": "discussion",
-#             "title": "dummy",
-#             "raw_body": "dummy",
-#         }
-#         response = self.client.post(
-#             self.url, json.dumps(request_data), content_type="application/json"
-#         )
-#         expected_response_data = {
-#             "field_errors": {
-#                 "course_id": {"developer_message": "This field is required."}
-#             }
-#         }
-#         assert response.status_code == 400
-#         response_data = json.loads(response.content.decode("utf-8"))
-#         assert response_data == expected_response_data
+    def test_error(self):
+        request_data = {
+            "topic_id": "dummy",
+            "type": "discussion",
+            "title": "dummy",
+            "raw_body": "dummy",
+        }
+        response = self.client.post(
+            self.url, json.dumps(request_data), content_type="application/json"
+        )
+        expected_response_data = {
+            "field_errors": {
+                "course_id": {"developer_message": "This field is required."}
+            }
+        }
+        assert response.status_code == 400
+        response_data = json.loads(response.content.decode("utf-8"))
+        assert response_data == expected_response_data
 
 
-# @ddt.ddt
-# @httpretty.activate
-# @disable_signal(api, "thread_edited")
-# @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-# class ThreadViewSetPartialUpdateTest(
-#     DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin
-# ):
-#     """Tests for ThreadViewSet partial_update"""
+@ddt.ddt
+@httpretty.activate
+@disable_signal(api, "thread_edited")
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class ThreadViewSetPartialUpdateTest(
+    DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin
+):
+    """Tests for ThreadViewSet partial_update"""
 
-#     def setUp(self):
-#         self.unsupported_media_type = JSONParser.media_type
-#         super().setUp()
-#         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
+    def setUp(self):
+        self.unsupported_media_type = JSONParser.media_type
+        super().setUp()
+        self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
+        from openedx.core.djangoapps.django_comment_common.comment_client.thread import (
+            Thread,
+        )
 
-#         patcher = mock.patch(
-#             "lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled",
-#             return_value=True,
-#         )
-#         patcher.start()
-#         self.addCleanup(patcher.stop)
+        self.existing_thread = Thread(
+            **make_minimal_cs_thread(
+                {
+                    "id": "existing_thread",
+                    "course_id": str(self.course.id),
+                    "commentable_id": "original_topic",
+                    "thread_type": "discussion",
+                    "title": "Original Title",
+                    "body": "Original body",
+                    "user_id": str(self.user.id),
+                    "username": self.user.username,
+                    "read": "False",
+                    "endorsed": "False",
+                }
+            )
+        )
+        patcher = mock.patch(
+            "lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled",
+            return_value=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
-#         patcher = mock.patch(
-#             "openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user"
-#         )
-#         self.mock_get_user = patcher.start()
-#         self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.user.forum_api.get_user"
+        )
+        self.mock_get_user = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_thread"
+        )
+        self.mock_get_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.update_thread"
+        )
+        self.mock_update_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.update_thread_flag"
+        )
+        self.mock_update_thread_flag = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.comment.forum_api.update_thread_flag"
+        )
+        self.mock_update_thread_flag_in_comment = patcher.start()
+        self.addCleanup(patcher.stop)
 
-#     def test_basic(self):
-#         self.register_get_user_response(self.user)
-#         self.register_thread(
-#             {
-#                 "created_at": "Test Created Date",
-#                 "updated_at": "Test Updated Date",
-#                 "read": True,
-#                 "resp_total": 2,
-#             }
-#         )
-#         request_data = {"raw_body": "Edited body"}
-#         response = self.request_patch(request_data)
-#         assert response.status_code == 200
-#         response_data = json.loads(response.content.decode("utf-8"))
-#         assert response_data == self.expected_thread_data(
-#             {
-#                 "raw_body": "Edited body",
-#                 "rendered_body": "<p>Edited body</p>",
-#                 "preview_body": "Edited body",
-#                 "editable_fields": [
-#                     "abuse_flagged",
-#                     "anonymous",
-#                     "copy_link",
-#                     "following",
-#                     "raw_body",
-#                     "read",
-#                     "title",
-#                     "topic_id",
-#                     "type",
-#                 ],
-#                 "created_at": "Test Created Date",
-#                 "updated_at": "Test Updated Date",
-#                 "comment_count": 1,
-#                 "read": True,
-#                 "response_count": 2,
-#             }
-#         )
-#         assert parsed_body(httpretty.last_request()) == {
-#             "course_id": [str(self.course.id)],
-#             "commentable_id": ["test_topic"],
-#             "thread_type": ["discussion"],
-#             "title": ["Test Title"],
-#             "body": ["Edited body"],
-#             "user_id": [str(self.user.id)],
-#             "anonymous": ["False"],
-#             "anonymous_to_peers": ["False"],
-#             "closed": ["False"],
-#             "pinned": ["False"],
-#             "read": ["True"],
-#             "editing_user_id": [str(self.user.id)],
-#         }
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        self.register_thread(
+            {
+                "id": "existing_thread",  # Ensure the correct thread ID is used
+                "title": "Edited Title",  # Ensure the correct title is used
+                "topic_id": "edited_topic",  # Ensure the correct topic is used
+                "thread_type": "question",  # Ensure the correct thread type is used
+                "created_at": "Test Created Date",
+                "updated_at": "Test Updated Date",
+                "read": True,
+                "resp_total": 2,
+            }
+        )
+        request_data = {
+            "raw_body": "Edited body",
+            "topic_id": "edited_topic",  # Ensure the correct topic is used in the request
+        }
+        self.request_patch(request_data)
+        self.mock_update_thread.assert_called_once_with(
+            "existing_thread",  # Use the correct thread ID
+            "Edited Title",  # Use the correct title
+            "Edited body",
+            str(self.course.id),
+            False,  # anonymous
+            False,  # anonymous_to_peers
+            False,  # closed
+            "edited_topic",  # Use the correct topic
+            str(self.user.id),
+            str(self.user.id),  # editing_user_id
+            False,  # pinned
+            "question",  # Use the correct thread type
+            None,  # edit_reason_code
+            None,  # close_reason_code
+            None,  # closing_user_id
+            None,  # endorsed
+        )
 
-#     def test_error(self):
-#         self.register_get_user_response(self.user)
-#         self.register_thread()
-#         request_data = {"title": ""}
-#         response = self.request_patch(request_data)
-#         expected_response_data = {
-#             "field_errors": {
-#                 "title": {"developer_message": "This field may not be blank."}
-#             }
-#         }
-#         assert response.status_code == 400
-#         response_data = json.loads(response.content.decode("utf-8"))
-#         assert response_data == expected_response_data
+    def test_error(self):
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        request_data = {"title": ""}
+        response = self.request_patch(request_data)
+        expected_response_data = {
+            "field_errors": {
+                "title": {"developer_message": "This field may not be blank."}
+            }
+        }
+        assert response.status_code == 400
+        response_data = json.loads(response.content.decode("utf-8"))
+        assert response_data == expected_response_data
 
-#     @ddt.data(
-#         ("abuse_flagged", True),
-#         ("abuse_flagged", False),
-#     )
-#     @ddt.unpack
-#     def test_closed_thread(self, field, value):
-#         self.register_get_user_response(self.user)
-#         self.register_thread({"closed": True, "read": True})
-#         self.register_flag_response("thread", "test_thread")
-#         request_data = {field: value}
-#         response = self.request_patch(request_data)
-#         assert response.status_code == 200
-#         response_data = json.loads(response.content.decode("utf-8"))
-#         assert response_data == self.expected_thread_data(
-#             {
-#                 "read": True,
-#                 "closed": True,
-#                 "abuse_flagged": value,
-#                 "editable_fields": ["abuse_flagged", "copy_link", "read"],
-#                 "comment_count": 1,
-#                 "unread_comment_count": 0,
-#             }
-#         )
+    @ddt.data(
+        ("abuse_flagged", True),
+        ("abuse_flagged", False),
+    )
+    @ddt.unpack
+    def test_closed_thread(self, field, value):
+        self.register_get_user_response(self.user)
+        self.register_thread({"closed": True, "read": True})
+        self.register_flag_response("thread", "test_thread")
+        request_data = {field: value}
+        response = self.request_patch(request_data)
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode("utf-8"))
+        assert response_data == self.expected_thread_data(
+            {
+                "read": True,
+                "closed": True,
+                "abuse_flagged": value,
+                "editable_fields": ["abuse_flagged", "copy_link", "read"],
+                "comment_count": 1,
+                "unread_comment_count": 0,
+            }
+        )
 
-#     @ddt.data(
-#         ("raw_body", "Edited body"),
-#         ("voted", True),
-#         ("following", True),
-#     )
-#     @ddt.unpack
-#     def test_closed_thread_error(self, field, value):
-#         self.register_get_user_response(self.user)
-#         self.register_thread({"closed": True})
-#         self.register_flag_response("thread", "test_thread")
-#         request_data = {field: value}
-#         response = self.request_patch(request_data)
-#         assert response.status_code == 400
+    @ddt.data(
+        ("raw_body", "Edited body"),
+        ("voted", True),
+        ("following", True),
+    )
+    @ddt.unpack
+    def test_closed_thread_error(self, field, value):
+        self.register_get_user_response(self.user)
+        self.register_thread({"closed": True})
+        self.register_flag_response("thread", "test_thread")
+        request_data = {field: value}
+        response = self.request_patch(request_data)
+        assert response.status_code == 400
+
 
 #     def test_patch_read_owner_user(self):
 #         self.register_get_user_response(self.user)
