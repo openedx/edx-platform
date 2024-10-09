@@ -243,5 +243,11 @@ class ProblemResetSerializer(UniqueStudentIdentifierSerializer):
     )
     only_if_higher = serializers.BooleanField(
         default=False,
-        help_text=_("Whether to reset the problem for all students."),
+    )
+
+    # Override the unique_student_identifier field to make it optional
+    unique_student_identifier = serializers.CharField(
+        required=False,  # Make this field optional
+        allow_null=True,
+        help_text=_("unique student identifier.")
     )

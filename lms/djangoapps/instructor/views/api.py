@@ -2012,11 +2012,11 @@ class RescoreProblem(DeveloperErrorViewMixin, APIView):
 
         all_students and unique_student_identifier cannot both be present.
         """
+
         course_id = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'staff', course_id)
 
         serializer_data = self.serializer_class(data=request.data)
-        student = None
 
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
@@ -2025,10 +2025,14 @@ class RescoreProblem(DeveloperErrorViewMixin, APIView):
         all_students = serializer_data.validated_data.get("all_students")
         only_if_higher = serializer_data.validated_data.get("only_if_higher")
 
+        student = serializer_data.validated_data.get("unique_student_identifier")
+        student_identifier = request.data.get("unique_student_identifier")
+
+        import pdb;
+        pdb.set_trace()
+
         if all_students and not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
-
-        student = serializer_data.validated_data.get("unique_student_identifier")
 
         if not (problem_to_reset and (all_students or student)):
             return HttpResponseBadRequest("Missing query parameters.")
