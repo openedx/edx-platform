@@ -2,6 +2,8 @@
 A "Learning Context" is a course, a library, a program, or some other collection
 of content where learning happens.
 """
+from openedx.core.types import User as UserType
+from opaque_keys.edx.keys import UsageKeyV2
 
 
 class LearningContext:
@@ -23,11 +25,11 @@ class LearningContext:
         parameters without changing the API.
         """
 
-    def can_edit_block(self, user, usage_key):  # pylint: disable=unused-argument
+    def can_edit_block(self, user: UserType, usage_key: UsageKeyV2) -> bool:  # pylint: disable=unused-argument
         """
-        Does the specified usage key exist in its context, and if so, does the
-        specified user have permission to edit it (make changes to the authored
-        data store)?
+        Assuming a block with the specified ID (usage_key) exists, does the
+        specified user have permission to edit it (make changes to the
+        fields / authored data store)?
 
         user: a Django User object (may be an AnonymousUser)
 
@@ -37,11 +39,20 @@ class LearningContext:
         """
         return False
 
-    def can_view_block(self, user, usage_key):  # pylint: disable=unused-argument
+    def can_view_block_for_editing(self, user: UserType, usage_key: UsageKeyV2) -> bool:
         """
-        Does the specified usage key exist in its context, and if so, does the
+        Assuming a block with the specified ID (usage_key) exists, does the
+        specified user have permission to view its fields and OLX details (but
+        not necessarily to make changes to it)?
+        """
+        return self.can_edit_block(user, usage_key)
+
+    def can_view_block(self, user: UserType, usage_key: UsageKeyV2) -> bool:  # pylint: disable=unused-argument
+        """
+        Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to view it and interact with it (call
-        handlers, save user state, etc.)?
+        handlers, save user state, etc.)? This is also sometimes called the
+        "can_learn" permission.
 
         user: a Django User object (may be an AnonymousUser)
 

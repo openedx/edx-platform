@@ -26,7 +26,7 @@ celery>=5.2.2,<6.0.0
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.25.17
+edx-enterprise==4.27.0
 
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0

@@ -299,23 +299,20 @@ class CertificateSerializer(serializers.Serializer):
     def get_availableDate(self, enrollment):
         """Available date changes based off of Certificate display behavior"""
         course_overview = enrollment.course_overview
-        available_date = course_overview.certificate_available_date
+        available_date = None
 
-        if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
-            if (
-                course_overview.certificates_display_behavior
-                == CertificatesDisplayBehaviors.END_WITH_DATE
-                and course_overview.certificate_available_date
-            ):
-                available_date = course_overview.certificate_available_date
-            elif (
-                course_overview.certificates_display_behavior
-                == CertificatesDisplayBehaviors.END
-                and course_overview.end
-            ):
-                available_date = course_overview.end
-        else:
+        if (
+            course_overview.certificates_display_behavior
+            == CertificatesDisplayBehaviors.END_WITH_DATE
+            and course_overview.certificate_available_date
+        ):
             available_date = course_overview.certificate_available_date
+        elif (
+            course_overview.certificates_display_behavior
+            == CertificatesDisplayBehaviors.END
+            and course_overview.end
+        ):
+            available_date = course_overview.end
 
         return serializers.DateTimeField().to_representation(available_date)
 

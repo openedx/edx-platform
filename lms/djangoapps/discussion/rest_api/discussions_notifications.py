@@ -154,6 +154,7 @@ class DiscussionNotificationSender:
                 "author_name": str(author_name),
                 "author_pronoun": str(author_pronoun),
                 "email_content": clean_thread_html_body(self.comment.body),
+                "group_by_id": self.parent_response.id
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
@@ -391,7 +392,8 @@ def clean_thread_html_body(html_body):
         "video", "track",  # Video Tags
         "audio",  # Audio Tags
         "embed", "object", "iframe",  # Embedded Content
-        "script"
+        "script",
+        "b", "strong", "i", "em", "u", "s", "strike", "del", "ins", "mark", "sub", "sup",  # Text Formatting
     ]
 
     # Remove the specified tags while keeping their content
@@ -402,9 +404,10 @@ def clean_thread_html_body(html_body):
     # Replace tags that are not allowed in email
     tags_to_update = [
         {"source": "button", "target": "span"},
-        {"source": "h1", "target": "h4"},
-        {"source": "h2", "target": "h4"},
-        {"source": "h3", "target": "h4"},
+        *[
+            {"source": tag, "target": "p"}
+            for tag in ["div", "section", "article", "h1", "h2", "h3", "h4", "h5", "h6"]
+        ],
     ]
     for tag_dict in tags_to_update:
         for source_tag in html_body.find_all(tag_dict['source']):
@@ -413,4 +416,7 @@ def clean_thread_html_body(html_body):
                 target_tag.string = source_tag.string
             source_tag.replace_with(target_tag)
 
+    for tag in html_body.find_all(True):
+        tag.attrs = {}
+        tag['style'] = 'margin: 0'
     return str(html_body)

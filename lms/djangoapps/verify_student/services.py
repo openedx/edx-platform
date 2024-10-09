@@ -8,7 +8,6 @@ from itertools import chain
 from urllib.parse import quote
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from openedx_filters.learning.filters import IDVPageURLRequested
@@ -177,10 +176,20 @@ class IDVerificationService:
         if verifications:
             attempt = verifications[0]
             for verification in verifications:
-                if verification.expiration_datetime > now() and verification.status == 'approved':
-                    # Always select the LATEST non-expired approved verification if there is such
-                    if attempt.status != 'approved' or (
-                        attempt.expiration_datetime < verification.expiration_datetime
+                # If a verification has no expiration_datetime, it's implied that it never expires, so we should still
+                # consider verifications in the approved state that have no expiration date.
+                if (
+                    not verification.expiration_datetime or
+                        verification.expiration_datetime > now()
+                ) and verification.status == 'approved':
+                    # Always select the LATEST non-expired approved verification if there is such.
+                    if (
+                        attempt.status != 'approved' or
+                        (
+                            attempt.expiration_datetime and
+                            verification.expiration_datetime and
+                            attempt.expiration_datetime < verification.expiration_datetime
+                        )
                     ):
                         attempt = verification
 
@@ -189,7 +198,7 @@ class IDVerificationService:
 
         user_status['should_display'] = attempt.should_display_status_to_user()
 
-        if attempt.expiration_datetime < now() and attempt.status == 'approved':
+        if attempt.expiration_datetime and attempt.expiration_datetime < now() and attempt.status == 'approved':
             if user_status['should_display']:
                 user_status['status'] = 'expired'
                 user_status['error'] = _("Your {platform_name} verification has expired.").format(
@@ -249,33 +258,3 @@ class IDVerificationService:
         # .. filter_implemented_name: IDVPageURLRequested
         # .. filter_type: org.openedx.learning.idv.page.url.requested.v1
         return IDVPageURLRequested.run_filter(location)
-
-    @classmethod
-    def get_verification_details_by_id(cls, attempt_id):
-        """
-        Returns a verification attempt object by attempt_id
-        If the verification object cannot be found, returns None
-
-        This method does not take into account verifications stored in the
-        VerificationAttempt model used for pluggable IDV implementations.
-
-        As part of the work to implement pluggable IDV, this method's use
-        will be deprecated: https://openedx.atlassian.net/browse/OSPR-1011
-        """
-        verification = None
-
-        # This does not look at the VerificationAttempt model since the provided id would become
-        # ambiguous between tables. The verification models in this list all inherit from the same
-        # base class and share the same id space.
-        verification_models = [
-            SoftwareSecurePhotoVerification,
-            SSOVerification,
-            ManualVerification,
-        ]
-        for ver_model in verification_models:
-            if not verification:
-                try:
-                    verification = ver_model.objects.get(id=attempt_id)
-                except ObjectDoesNotExist:
-                    pass
-        return verification

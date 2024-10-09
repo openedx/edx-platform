@@ -46,7 +46,7 @@ django-crum==0.7.9
     # via edx-django-utils
 django-waffle==4.1.0
     # via edx-django-utils
-edx-django-utils==5.15.0
+edx-django-utils==5.16.0
     # via edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.in
