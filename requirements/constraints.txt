@@ -13,6 +13,12 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
+# Date: 2024-08-21
+# Description: This is the major upgrade of algoliasearch python client and it will
+# break one of the edX' platform plugin, so we need to make that compatible first.
+# Ticket: https://github.com/openedx/edx-platform/issues/35334
+algoliasearch<4.0.0
+
 # Date: 2024-03-14
 # Temporary to Support the python 3.11 Upgrade
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35281
@@ -181,11 +187,6 @@ social-auth-app-django<=5.4.1
 # which require urllib3<2 for now.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
 urllib3<2.0.0
-
-# Date: 2024-08-07
-# Xblock==5.0.0 changed how entrypoints were loaded, breaking a workaround for overriding blocks.
-# Issue for unpinning: https://github.com/openedx/XBlock/issues/777
-xblock[django]==4.0.1
 
 # Date: 2024-04-24
 # xmlsec==1.3.14 breaking tests or all builds, can be removed once a fix is available
