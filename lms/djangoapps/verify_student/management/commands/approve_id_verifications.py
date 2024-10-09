@@ -151,11 +151,11 @@ class Command(BaseCommand):
         for verification in existing_id_verifications:
             verification.approve(service='idv_verifications command')
             send_approval_email(verification)
-            self._update_verified_name(verification)
+            self._approve_verified_name_for_software_secure_verification(verification)
 
         return list(failed_user_ids)
 
-    def _update_verified_name(self, verification):
+    def _approve_verified_name_for_software_secure_verification(self, verification):
         """
         This method manually creates a verified name given a SoftwareSecurePhotoVerification object.
         """
