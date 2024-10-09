@@ -66,6 +66,10 @@ class HomePageViewTest(CourseTestCase):
             "tech_support_email": "technical@example.com",
             "platform_name": settings.PLATFORM_NAME,
             "user_is_active": True,
+            "waffle_flags": {
+                "ENABLE_NEW_TEXTBOOKS_PAGE": True,
+                "ENABLE_NEW_CUSTOM_PAGES": True,
+            },
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
