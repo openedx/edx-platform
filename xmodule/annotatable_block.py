@@ -11,6 +11,7 @@ from xblock.fields import Scope, String
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
+from xmodule.toggles import USE_EXTRACTED_ANNOTATABLE_BLOCK
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
@@ -28,7 +29,7 @@ _ = lambda text: text
 
 
 @XBlock.needs('mako')
-class AnnotatableBlock(
+class _BuiltInAnnotatableBlock(
     RawMixin,
     XmlMixin,
     EditingMixin,
@@ -39,6 +40,8 @@ class AnnotatableBlock(
     """
     Annotatable XBlock.
     """
+
+    is_extracted = False
 
     data = String(
         help=_("XML data for the annotation"),
@@ -197,3 +200,10 @@ class AnnotatableBlock(
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
+
+AnnotatableBlock = (
+    # TODO: Revert following
+    # _ExractedAnnotatableBlock if USE_EXTRACTED_ANNOTATABLE_BLOCK.is_enabled()
+    _BuiltInAnnotatableBlock if USE_EXTRACTED_ANNOTATABLE_BLOCK.is_enabled()
+    else _BuiltInAnnotatableBlock
+)

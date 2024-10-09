@@ -70,6 +70,7 @@ from .transcripts_utils import (
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
+from ..toggles import USE_EXTRACTED_VIDEO_BLOCK
 
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
@@ -119,7 +120,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 
 @XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
 @XBlock.needs('mako', 'user')
-class VideoBlock(
+class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
@@ -134,6 +135,7 @@ class VideoBlock(
             <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
         </video>
     """
+    is_extracted = False
     has_custom_completion = True
     completion_mode = XBlockCompletionMode.COMPLETABLE
 
@@ -1260,3 +1262,11 @@ class VideoBlock(
                 edx_video_id=self.edx_video_id.strip()
             )
         return None
+
+
+VideoBlock = (
+    # TODO: Revert following
+    # _ExractedVideoBlock if USE_EXTRACTED_VIDEO_BLOCK.is_enabled()
+    _BuiltInVideoBlock if USE_EXTRACTED_VIDEO_BLOCK.is_enabled()
+    else _BuiltInVideoBlock
+)
