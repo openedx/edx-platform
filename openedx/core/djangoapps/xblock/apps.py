@@ -5,7 +5,7 @@ from django.apps import AppConfig, apps
 from django.conf import settings
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from .data import StudentDataMode
+from .data import StudentDataMode, AuthoredDataMode
 
 
 class XBlockAppConfig(AppConfig):
@@ -50,6 +50,7 @@ class LmsXBlockAppConfig(XBlockAppConfig):
         """
         return dict(
             student_data_mode=StudentDataMode.Persisted,
+            authored_data_mode=AuthoredDataMode.STRICTLY_PUBLISHED,
         )
 
     def get_site_root_url(self):
@@ -72,6 +73,7 @@ class StudioXBlockAppConfig(XBlockAppConfig):
         """
         return dict(
             student_data_mode=StudentDataMode.Ephemeral,
+            authored_data_mode=AuthoredDataMode.DEFAULT_DRAFT,
         )
 
     def get_site_root_url(self):
