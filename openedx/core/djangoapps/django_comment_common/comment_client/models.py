@@ -363,14 +363,14 @@ class Model:
         except KeyError as e:
             raise e
         response = forum_api.create_thread(
-            title,
-            body,
-            course_id,
-            user_id,
-            request_data.get("anonymous", False),
-            request_data.get("anonymous_to_peers", False),
-            request_data.get("commentable_id", "course"),
-            request_data.get("thread_type", "discussion"),
-            request_data.get("group_id", None),
+            title=title,
+            body=body,
+            course_id=course_id,
+            user_id=user_id,
+            anonymous=request_data.get("anonymous", False),
+            anonymous_to_peers=request_data.get("anonymous_to_peers", False),
+            commentable_id=request_data.get("commentable_id", "course"),
+            thread_type=request_data.get("thread_type", "discussion"),
+            group_id=request_data.get("group_id", None),
         )
         return response
