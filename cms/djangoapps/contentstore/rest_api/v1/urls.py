@@ -17,6 +17,7 @@ from .views import (
     CourseRerunView,
     CourseSettingsView,
     CourseVideosView,
+    CourseWaffleFlagsView,
     HomePageView,
     HomePageCoursesView,
     HomePageLibrariesView,
@@ -130,6 +131,11 @@ urlpatterns = [
         fr'^container/vertical/{settings.USAGE_KEY_PATTERN}/children$',
         VerticalContainerView.as_view(),
         name="container_vertical"
+    ),
+    re_path(
+        fr'^course_waffle_flags(?:/{COURSE_ID_PATTERN})?$',
+        CourseWaffleFlagsView.as_view(),
+        name="course_waffle_flags"
     ),
 
     # Authoring API
