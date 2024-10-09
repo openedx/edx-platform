@@ -8,14 +8,14 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-    'js/views/utils/tagging_drawer_utils', 'js/utils/module',
+    'js/views/utils/tagging_drawer_utils', 'js/utils/module','xblock/runtime.v1',
 ],
 function($, _, Backbone, gettext, BasePage,
     ViewUtils, ContainerView, XBlockView,
     AddXBlockComponent, EditXBlockModal, MoveXBlockModal,
     XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils,
-    NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils) {
+    NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils, XBlock) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -131,7 +131,7 @@ function($, _, Backbone, gettext, BasePage,
             return {
                 el: this.$('.wrapper-xblock'),
                 model: this.model,
-                view: this.view
+                view: this.options.asidesOnly ? "studio_view" : this.view
             };
         },
 
@@ -151,14 +151,27 @@ function($, _, Backbone, gettext, BasePage,
 
             // Hide both blocks until we know which one to show
             xblockView.$el.addClass(hiddenCss);
-
+            
             // Render the xblock
             xblockView.render({
                 done: function() {
-                    // Show the xblock and hide the loading indicator
-                    xblockView.$el.removeClass(hiddenCss);
-                    loadingElement.addClass(hiddenCss);
+                // If request needs to render asides only
+                if (self.options.asidesOnly){
+                    self.$('.xblock_asides-v1').each(function() {
+                        if (!$(this).hasClass('xblock-initialized')) {
+                        var aside = XBlock.initializeBlock($(this));
+                        self.initRuntimeData(aside, options);
+                    }
+                    self.$('.wrapper-comp-plugins').addClass('is-active');
 
+                    // Removing Xblock as we only need Asides
+                    xblockView.remove();
+                });
+                }
+                    // Show the xblock
+                else{
+                    xblockView.$el.removeClass(hiddenCss);
+                
                     // Notify the runtime that the page has been successfully shown
                     xblockView.notifyRuntime('page-shown', self);
 
@@ -185,12 +198,21 @@ function($, _, Backbone, gettext, BasePage,
                         var target = document.getElementById(targetId);
                         target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
                     }
+                }
+                // Hide the loading indicator
+                loadingElement.addClass(hiddenCss);
 
                 },
                 block_added: options && options.block_added
             });
+            
         },
-
+        initRuntimeData: function(xblock, options) {
+            if (options && options.initRuntimeData && xblock && xblock.runtime && !xblock.runtime.page) {
+                xblock.runtime.page = options.initRuntimeData;
+            }
+            return xblock;
+        },
         findXBlockElement: function(target) {
             return $(target).closest('.studio-xblock-wrapper');
         },
