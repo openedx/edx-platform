@@ -1008,6 +1008,7 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,
+    'cms.lib.xblock.upstream_sync.UpstreamSyncMixin',
 )
 
 # .. setting_name: XBLOCK_EXTRA_MIXINS
