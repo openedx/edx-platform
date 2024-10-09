@@ -601,7 +601,7 @@ class SequenceBlock(
         self._capture_full_seq_item_metrics(children)
         self._capture_current_unit_metrics(children)
 
-        add_sass_to_fragment(fragment, 'SequenceBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'SequenceBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'SequenceBlockDisplay')
         shim_xmodule_js(fragment, 'Sequence')
         return fragment
