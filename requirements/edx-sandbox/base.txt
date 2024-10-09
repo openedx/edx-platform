@@ -53,7 +53,7 @@ numpy==1.26.4
     #   matplotlib
     #   openedx-calc
     #   scipy
-openedx-calc==3.1.0
+openedx-calc==3.1.2
     # via -r requirements/edx-sandbox/base.in
 packaging==24.1
     # via matplotlib
