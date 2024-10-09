@@ -2028,9 +2028,6 @@ class RescoreProblem(DeveloperErrorViewMixin, APIView):
         student = serializer_data.validated_data.get("unique_student_identifier")
         student_identifier = request.data.get("unique_student_identifier")
 
-        import pdb;
-        pdb.set_trace()
-
         if all_students and not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
