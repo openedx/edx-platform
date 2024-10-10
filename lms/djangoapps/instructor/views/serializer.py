@@ -228,3 +228,29 @@ class BlockDueDateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         if disable_due_datetime:
             self.fields['due_datetime'].required = False
+
+
+class BaseProblemSerializer(UniqueStudentIdentifierSerializer):
+    all_students = serializers.BooleanField(
+        default=False,
+        help_text=_("Whether to reset the problem for all students."),
+    )
+    only_if_higher = serializers.BooleanField(
+        default=False,
+    )
+
+    # Override unique_student_identifier to be optional
+    unique_student_identifier = serializers.CharField(
+        required=False,  # Make this field optional
+        allow_null=True,
+        help_text=_("Unique student identifier.")
+    )
+
+
+class ProblemResetSerializer(BaseProblemSerializer):
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to reset."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
