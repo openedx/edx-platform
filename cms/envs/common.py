@@ -2724,6 +2724,7 @@ PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
+LIBRARY_UNSUPPORTED_BLOCKS = ['openassessment', 'lti', 'library_content']
 
 ################# Student Verification #################
 VERIFY_STUDENT = {

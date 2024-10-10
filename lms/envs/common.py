@@ -5202,6 +5202,7 @@ SUPPORT_HOW_TO_UNENROLL_LINK = ''
 
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
+LIBRARY_UNSUPPORTED_BLOCKS = ['openassessment', 'lti', 'library_content']
 
 ######################## Setting for django-countries ########################
 # django-countries provides an option to make the desired countries come up in
