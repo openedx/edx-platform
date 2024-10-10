@@ -26,12 +26,11 @@ joblib==1.4.2
     # via nltk
 kiwisolver==1.4.7
     # via matplotlib
-lxml==4.9.4
+lxml==5.3.0
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/base.in
     #   openedx-calc
-markupsafe==2.1.5
+markupsafe==3.0.1
     # via
     #   chem
     #   openedx-calc

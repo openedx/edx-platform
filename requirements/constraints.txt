@@ -84,13 +84,6 @@ django-storages<1.14.4
 # for them.
 edx-enterprise==4.27.2
 
-# Date: 2024-05-09
-# This has to be constrained as well because newer versions of edx-i18n-tools need the
-# newer version of lxml but that requirement was not made expilict in the 1.6.0 version
-# of the package.  This can be un-pinned when we're upgrading lxml.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35274
-edx-i18n-tools<1.6.0
-
 # Date: 2024-07-26
 # To override the constraint of edx-lint
 # This can be removed once https://github.com/openedx/edx-platform/issues/34586 is resolved
@@ -104,13 +97,6 @@ event-tracking==3.0.0
 # away from legacy LMS/CMS frontends:
 # https://github.com/openedx/edx-platform/issues/31616
 libsass==0.10.0
-
-# Date: 2024-04-30
-# lxml>=5.0 introduced breaking changes related to system dependencies
-# lxml==5.2.1 introduced new extra so we'll nee to rename lxml --> lxml[html-clean]
-# This constraint can be removed once we upgrade to Python 3.11
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35272
-lxml<5.0
 
 # Date: 2018-12-14
 # markdown>=3.4.0 has failures due to internal refactorings which causes the tests to fail
@@ -187,8 +173,3 @@ social-auth-app-django<=5.4.1
 # which require urllib3<2 for now.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
 urllib3<2.0.0
-
-# Date: 2024-04-24
-# xmlsec==1.3.14 breaking tests or all builds, can be removed once a fix is available
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35264
-xmlsec<1.3.14
