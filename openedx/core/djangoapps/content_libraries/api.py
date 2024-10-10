@@ -815,6 +815,12 @@ def validate_can_add_block_to_library(
                     block_type=block_type, library_type=content_library.type,
                 )
             )
+    if block_type in settings.LIBRARY_UNSUPPORTED_BLOCKS:
+        raise IncompatibleTypesError(
+            _('Libraries do not support this type: "{block_type}" of content yet.').format(
+                block_type=block_type
+            )
+        )
 
     # If adding a component would take us over our max, return an error.
     component_count = authoring_api.get_all_drafts(content_library.learning_package.id).count()

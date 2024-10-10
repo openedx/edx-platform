@@ -572,6 +572,7 @@ SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_
 
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY', MAX_BLOCKS_PER_CONTENT_LIBRARY)
+LIBRARY_UNSUPPORTED_BLOCKS = ENV_TOKENS.get('LIBRARY_UNSUPPORTED_BLOCKS', LIBRARY_UNSUPPORTED_BLOCKS)
 
 ########################## Derive Any Derived Settings  #######################
 
