@@ -2079,6 +2079,8 @@ class OverrideProblemScore(DeveloperErrorViewMixin, APIView):
     permission_name = permissions.OVERRIDE_GRADES
     serializer_class = ProblemSerializer
 
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
     def post(self, request, course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
         """
         Takes either of the following query parameters
