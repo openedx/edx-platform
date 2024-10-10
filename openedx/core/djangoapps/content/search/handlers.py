@@ -179,13 +179,19 @@ def library_collection_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    # Update collection index synchronously to make sure that search index is updated before
-    # the frontend invalidates/refetches index.
-    # See content_library_updated_handler for more details.
-    update_library_collection_index_doc.apply(args=[
-        str(library_collection.library_key),
-        library_collection.collection_key,
-    ])
+    if library_collection.lazy:
+        update_library_collection_index_doc.delay(
+            str(library_collection.library_key),
+            library_collection.collection_key,
+        )
+    else:
+        # Update collection index synchronously to make sure that search index is updated before
+        # the frontend invalidates/refetches index.
+        # See content_library_updated_handler for more details.
+        update_library_collection_index_doc.apply(args=[
+            str(library_collection.library_key),
+            library_collection.collection_key,
+        ])
 
 
 @receiver(CONTENT_OBJECT_ASSOCIATIONS_CHANGED)
