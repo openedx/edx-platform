@@ -7,9 +7,10 @@
         'js/edxnotes/plugins/events', 'js/edxnotes/plugins/accessibility',
         'js/edxnotes/plugins/caret_navigation',
         'js/edxnotes/plugins/store_error_handler',
-        'js/edxnotes/plugins/search_override'
+        'js/edxnotes/plugins/search_override',
+        'js/edxnotes/plugins/llm_summarize',
     ], function($, _, Annotator, NotesLogger, NotesCollector) {
-        var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
+        var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags', 'LlmSummarize'],
             getOptions, setupPlugins, getAnnotator;
 
     /**
