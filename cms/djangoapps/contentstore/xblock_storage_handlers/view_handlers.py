@@ -27,7 +27,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from opaque_keys.edx.locator import LibraryUsageLocator
+from opaque_keys.edx.locator import LibraryUsageLocator, LibraryUsageLocatorV2
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
@@ -77,6 +77,7 @@ from ..utils import (
 from .create_xblock import create_xblock
 from .xblock_helpers import usage_key_with_run
 from ..helpers import (
+    import_from_library_content,
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
     is_unit,
@@ -557,6 +558,30 @@ def _create_block(request):
             "locator": str(created_xblock.location),
             "courseKey": str(created_xblock.location.course_key),
             "static_file_notices": asdict(notices),
+        })
+
+    if request.json.get("library_content_key"):
+        # Add library content into 'usage_key':
+        try:
+            content_key = LibraryUsageLocatorV2.from_string(
+                request.json["library_content_key"]
+            )
+            created_xblock = import_from_library_content(
+                parent_key=usage_key,
+                content_key=content_key,
+                request=request,
+            )
+        except Exception:  # pylint: disable=broad-except
+            log.exception(
+                "Could not add library component into location {}".format(usage_key)
+            )
+            return JsonResponse(
+                {"error": _("There was a problem adding your component.")}, status=400
+            )
+
+        return JsonResponse({
+            "locator": str(created_xblock.location),
+            "courseKey": str(created_xblock.location.course_key),
         })
 
     category = request.json["category"]
