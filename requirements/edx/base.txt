@@ -811,7 +811,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.14.1
+openedx-events @ git+https://github.com/open-craft/openedx-events@navin/update-library-collection-data
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
