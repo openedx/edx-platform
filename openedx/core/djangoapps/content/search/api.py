@@ -320,6 +320,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.block_id,
             Fields.block_type,
             Fields.context_key,
+            Fields.usage_key,
             Fields.org,
             Fields.tags,
             Fields.tags + "." + Fields.tags_taxonomy,

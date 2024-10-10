@@ -57,6 +57,8 @@ urlpatterns = [
         path('blocks/<str:usage_key_str>/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:
             path('', views.LibraryBlockView.as_view()),
+            # Update collections for a given component
+            path('collections/', views.LibraryBlockCollectionsView.as_view(), name='update-collections'),
             # Get the LTI URL of a specific XBlock
             path('lti/', views.LibraryBlockLtiUrlView.as_view(), name='lti-url'),
             # Get the OLX source code of the specified block:
