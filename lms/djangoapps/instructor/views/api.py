@@ -2088,10 +2088,9 @@ class OverrideProblemScore(DeveloperErrorViewMixin, APIView):
             - score a value
         unique_student_identifier student username or email.
         """
-
         course_key = CourseKey.from_string(course_id)
-
         serializer_data = self.serializer_class(data=request.data)
+
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
@@ -2120,6 +2119,7 @@ class OverrideProblemScore(DeveloperErrorViewMixin, APIView):
             'problem_to_reset': problem_to_reset,
             'student': student_identifier
         }
+
         try:
             task_api.submit_override_score(
                 request,

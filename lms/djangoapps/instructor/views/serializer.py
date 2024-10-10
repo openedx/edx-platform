@@ -237,6 +237,6 @@ class ProblemSerializer(UniqueStudentIdentifierSerializer):
             'blank': _("Problem URL name cannot be blank."),
         }
     )
-    score = serializers.BooleanField(
-        help_text=_("new score value"),
+    score = serializers.CharField(
+        help_text="Score must be a valid number or decimal, e.g., 1.00"
     )
