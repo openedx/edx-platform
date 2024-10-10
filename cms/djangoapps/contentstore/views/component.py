@@ -41,9 +41,13 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video', 'drag-and-drop-v2']
+COMPONENT_TYPES = ['discussion', 'library', 'library-v2', 'html', 'openassessment', 'problem', 'video', 'drag-and-drop-v2']
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
+
+# Log the list of XBlocks that are loaded
+for block in XBlock.load_classes():
+    log.error(block)
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
@@ -215,7 +219,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'problem': _("Problem"),
         'video': _("Video"),
         'openassessment': _("Open Response"),
-        'library': _("Library Content"),
+        'library': _("Legacy Library"),
+        'library-v2': _("Library Content"),
         'drag-and-drop-v2': _("Drag and Drop"),
     }
 
@@ -226,7 +231,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     component_types = COMPONENT_TYPES[:]
 
     # Libraries do not support discussions, drag-and-drop, and openassessment and other libraries
-    component_not_supported_by_library = ['discussion', 'library', 'openassessment', 'drag-and-drop-v2']
+    component_not_supported_by_library = ['discussion', 'library', 'library-v2', 'openassessment', 'drag-and-drop-v2']
     if library:
         component_types = [component for component in component_types
                            if component not in set(component_not_supported_by_library)]
@@ -245,7 +250,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         templates_for_category = []
         component_class = _load_mixed_class(category)
 
-        if support_level_without_template and category != 'library':
+        if support_level_without_template and category not in ['library', 'library-v2']:
             # add the default template with localized display name
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
@@ -418,6 +423,12 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     if advanced_component_templates['templates']:
         component_templates.insert(0, advanced_component_templates)
 
+    # component_templates.append({
+    #     "type": "abc",
+    #     "templates": "abc",
+    #     "display_name": "ABC",
+    #     "support_legend": create_support_legend_dict()
+    # })
     return component_templates
 
 
