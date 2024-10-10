@@ -48,36 +48,36 @@ RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8"
 
 # Setting up ppa deadsnakes to get python 3.11
 RUN apt-get update && \
-  apt-get install -y software-properties-common && \
-  apt-add-repository -y ppa:deadsnakes/ppa
+    apt-get install -y software-properties-common && \
+    apt-add-repository -y ppa:deadsnakes/ppa
 
 # Install requirements that are absolutely necessary
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \
-        python3-pip \
-        python3.11 \
-        # python3-dev: required for building mysqlclient python package
-        python3.11-dev \
-        python3.11-venv \
-        libpython3.11 \
-        libpython3.11-stdlib \
-        libmysqlclient21 \
-        # libmysqlclient-dev: required for building mysqlclient python package
-        libmysqlclient-dev \
-        pkg-config \
-        libssl1.1 \
-        libxmlsec1-openssl \
-        # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
-        lynx \
-        ntp \
-        git \
-        build-essential \
-        gettext \
-        gfortran \
-        graphviz \
-        locales \
-        swig \
+    python3-pip \
+    python3.11 \
+    # python3-dev: required for building mysqlclient python package
+    python3.11-dev \
+    python3.11-venv \
+    libpython3.11 \
+    libpython3.11-stdlib \
+    libmysqlclient21 \
+    # libmysqlclient-dev: required for building mysqlclient python package
+    libmysqlclient-dev \
+    pkg-config \
+    libssl1.1 \
+    libxmlsec1-openssl \
+    # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
+    lynx \
+    ntp \
+    git \
+    build-essential \
+    gettext \
+    gfortran \
+    graphviz \
+    locales \
+    swig \
     && \
     apt-get clean all && \
     rm -rf /var/lib/apt/*
@@ -93,19 +93,19 @@ FROM minimal-system as builder-production
 
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
-        curl \
-        libssl-dev \
-        libffi-dev \
-        libfreetype6-dev \
-        libgeos-dev \
-        libgraphviz-dev \
-        libjpeg8-dev \
-        liblapack-dev \
-        libpng-dev \
-        libsqlite3-dev \
-        libxml2-dev \
-        libxmlsec1-dev \
-        libxslt1-dev
+    curl \
+    libssl-dev \
+    libffi-dev \
+    libfreetype6-dev \
+    libgeos-dev \
+    libgraphviz-dev \
+    libjpeg8-dev \
+    liblapack-dev \
+    libpng-dev \
+    libsqlite3-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libxslt1-dev
 
 # Setup python virtual environment
 # It is already 'activated' because $VIRTUAL_ENV/bin was put on $PATH
@@ -118,8 +118,8 @@ RUN pip install -r requirements/pip.txt
 RUN pip install -r requirements/edx/base.txt
 
 # Install node and npm
-RUN nodeenv /edx/app/edxapp/nodeenv --node=18.19.0 --prebuilt
-RUN npm install -g npm@10.5.x
+RUN nodeenv /edx/app/edxapp/nodeenv --node=20.15.1 --prebuilt
+RUN npm install -g npm@10.7.x
 
 # This script is used by an npm post-install hook.
 # We copy it into the image now so that it will be available when we run `npm install` in the next step.
@@ -178,8 +178,8 @@ FROM base as development
 
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
-        # wget is used in Makefile for common_constraints.txt
-        wget \
+    # wget is used in Makefile for common_constraints.txt
+    wget \
     && \
     apt-get clean all && \
     rm -rf /var/lib/apt/*
