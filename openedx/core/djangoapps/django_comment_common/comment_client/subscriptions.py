@@ -35,9 +35,11 @@ class Subscription(models.Model):
         params.update(
             utils.strip_blank(utils.strip_none(query_params))
         )
-
-        if is_forum_v2_enabled(utils.get_course_key(course_id)):
-            response = forum_api.get_thread_subscriptions(thread_id, params['page'], params['per_page'])
+        course_key = utils.get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
+            response = forum_api.get_thread_subscriptions(
+                thread_id, params["page"], params["per_page"], str(course_key)
+            )
         else:
             response = utils.perform_request(
                 'get',

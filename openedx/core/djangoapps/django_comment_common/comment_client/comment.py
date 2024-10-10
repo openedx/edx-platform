@@ -70,11 +70,12 @@ class Comment(models.Model):
             url = _url_for_flag_abuse_comment(voteable.id)
         else:
             raise CommentClientRequestError("Can only flag/unflag threads or comments")
-        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
+        course_key = get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
-                response = forum_api.update_thread_flag(voteable.id, "flag", user.id)
+                response = forum_api.update_thread_flag(voteable.id, "flag", user.id, str(course_key))
             else:
-                response = forum_api.update_comment_flag(voteable.id, "flag", user.id)
+                response = forum_api.update_comment_flag(voteable.id, "flag", user.id, str(course_key))
         else:
             params = {'user_id': user.id}
             response = perform_request(
@@ -93,11 +94,16 @@ class Comment(models.Model):
             url = _url_for_unflag_abuse_comment(voteable.id)
         else:
             raise CommentClientRequestError("Can flag/unflag for threads or comments")
-        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
-            if voteable.type == 'thread':
-                response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, bool(removeAll))
+        course_key = get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            if voteable.type == "thread":
+                response = forum_api.update_thread_flag(
+                    voteable.id, "unflag", user.id, bool(removeAll), str(course_key)
+                )
             else:
-                response = forum_api.update_comment_flag(voteable.id, "unflag", user.id, bool(removeAll))
+                response = forum_api.update_comment_flag(
+                    voteable.id, "unflag", user.id, bool(removeAll), str(course_key)
+                )
         else:
             params = {'user_id': user.id}
 

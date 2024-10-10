@@ -78,7 +78,7 @@ class Model:
         response = None
         if is_forum_v2_enabled(course_key):
             if self.type == "comment":
-                response = forum_api.get_parent_comment(self.attributes["id"])
+                response = forum_api.get_parent_comment(self.attributes["id"], str(course_key))
             if response is None:
                 raise CommentClientRequestError("Forum v2 API call is missing")
         else:
@@ -173,12 +173,13 @@ class Model:
         self.after_save(self)
 
     def delete(self):
-        if is_forum_v2_enabled(get_course_key(self.attributes.get("course_id"))):
+        course_key = get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
             response = None
             if self.type == "comment":
-                response = forum_api.delete_comment(self.attributes["id"])
+                response = forum_api.delete_comment(self.attributes["id"], str(course_key))
             elif self.type == "thread":
-                response = forum_api.delete_thread(self.attributes["id"])
+                response = forum_api.delete_thread(self.attributes["id"], str(course_key))
             if response is None:
                 raise CommentClientRequestError("Forum v2 API call is missing")
         else:
@@ -220,21 +221,22 @@ class Model:
         if params:
             request_params.update(params)
         course_id = self.attributes.get("course_id") or request_params.get("course_id")
-        if is_forum_v2_enabled(get_course_key(course_id)):
+        course_key = get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
             response = None
             if self.type == "comment":
-                response = self.handle_update_comment(request_params)
+                response = self.handle_update_comment(request_params, str(course_key))
             elif self.type == "thread":
-                response = self.handle_update_thread(request_params)
+                response = self.handle_update_thread(request_params, str(course_key))
             elif self.type == "user":
-                response = self.handle_update_user(request_params)
+                response = self.handle_update_user(request_params, str(course_key))
             if response is None:
                 raise CommentClientRequestError("Forum v2 API call is missing")
         else:
             response = self.perform_http_put_request(request_params)
         return response
 
-    def handle_update_user(self, request_params):
+    def handle_update_user(self, request_params, course_id):
         try:
             username = request_params["username"]
             external_id = str(request_params["external_id"])
@@ -243,10 +245,11 @@ class Model:
         response = forum_api.update_user(
             external_id,
             username,
+            course_id,
         )
         return response
 
-    def handle_update_comment(self, request_params):
+    def handle_update_comment(self, request_params, course_id):
         try:
             body = request_params["body"]
             course_id = str(request_params["course_id"])
@@ -265,10 +268,11 @@ class Model:
             request_params.get("editing_user_id"),
             request_params.get("edit_reason_code"),
             request_params.get("endorsement_user_id"),
+            course_id,
         )
         return response
 
-    def handle_update_thread(self, request_params):
+    def handle_update_thread(self, request_params, course_id):
         response = forum_api.update_thread(
             self.attributes["id"],
             request_params.get("title"),
@@ -286,6 +290,7 @@ class Model:
             request_params.get("close_reason_code"),
             request_params.get("closing_user_id"),
             request_params.get("endorsed"),
+            course_id,
         )
         return response
 
@@ -313,24 +318,25 @@ class Model:
 
     def handle_create(self, params=None):
         course_id = self.attributes.get("course_id") or params.get("course_id")
-        if is_forum_v2_enabled(get_course_key(course_id)):
+        course_key = get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
             response = None
             if self.type == "comment":
-                response = self.handle_create_comment()
+                response = self.handle_create_comment(str(course_key))
             elif self.type == "thread":
-                response = self.handle_create_thread()
+                response = self.handle_create_thread(str(course_key))
             if response is None:
                 raise CommentClientRequestError("Forum v2 API call is missing")
         else:
             response = self.perform_http_post_request()
         return response
 
-    def handle_create_comment(self):
+    def handle_create_comment(self, course_id):
         request_data = self.initializable_attributes()
         try:
             body = request_data["body"]
             user_id = request_data["user_id"]
-            course_id = str(request_data["course_id"])
+            course_id = course_id or str(request_data["course_id"])
         except KeyError as e:
             raise e
         if parent_id := self.attributes.get("parent_id"):
@@ -353,13 +359,13 @@ class Model:
             )
         return response
 
-    def handle_create_thread(self):
+    def handle_create_thread(self, course_id):
         request_data = self.initializable_attributes()
         try:
             title = request_data["title"]
             body = request_data["body"]
             user_id = str(request_data["user_id"])
-            course_id = str(request_data["course_id"])
+            course_id = course_id or str(request_data["course_id"])
         except KeyError as e:
             raise e
         response = forum_api.create_thread(
