@@ -4,6 +4,7 @@ Tests the forum notification views.
 import json
 import logging
 from datetime import datetime
+from unittest import mock
 from unittest.mock import ANY, Mock, call, patch
 
 import ddt
@@ -109,9 +110,17 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         config = ForumsConfig.current()
         config.enabled = True
         config.save()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.user.cc.User.active_threads')
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.user.User.active_threads')
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -323,6 +332,14 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
 
     def setUp(self):
         super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create()
@@ -513,6 +530,17 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     Ensures the number of modulestore queries and number of sql queries are
     independent of the number of responses retrieved for a given discussion thread.
     """
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+
     @ddt.data(
         # split mongo: 3 queries, regardless of thread response size.
         (False, 1, 2, 2, 21, 8),
@@ -582,6 +610,17 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 @patch('requests.request', autospec=True)
 class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def _create_mock_cohorted_thread(self, mock_request):  # lint-amnesty, pylint: disable=missing-function-docstring
         mock_text = "dummy content"
         mock_thread_id = "test_thread_id"
@@ -643,6 +682,17 @@ class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: d
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):  # lint-amnesty, pylint: disable=missing-function-docstring
         thread_id = "test_thread_id"
@@ -745,6 +795,17 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
 class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/threads/dummy_thread_id"
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # lint-amnesty, pylint: disable=missing-function-docstring
         mock_request.side_effect = make_mock_request_impl(
@@ -881,6 +942,14 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def assert_can_access(self, user, discussion_id, thread_id, should_have_access):
         """
@@ -1057,6 +1126,11 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
     def setUp(self):
         super().setUp()
         self.cohorted_commentable_id = 'cohorted_topic'
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def call_view(
         self,
@@ -1111,6 +1185,14 @@ class InlineDiscussionGroupIdTestCase(  # lint-amnesty, pylint: disable=missing-
 @patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/threads"
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def call_view(
         self,
@@ -1170,6 +1252,14 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 @patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/active_threads"
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def call_view_for_profiled_user(
         self,
@@ -1374,6 +1464,14 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 @patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', autospec=True)
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
     cs_endpoint = "/subscribed_threads"
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def call_view(
         self,
@@ -1823,6 +1921,17 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         with super().setUpClassAndTestData():
             cls.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
 
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -1939,7 +2048,14 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
     def setUp(self):
         # Invoke UrlResetMixin setUp
         super().setUp()
-
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
         username = "foo"
         password = "bar"
 
@@ -2276,6 +2392,14 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp('lms.djangoapps.discussion.django_comment_client.base.views.tracker')
 
+        patcher = mock.patch('lms.djangoapps.discussion.toggles.ENABLE_FORUM_V2.is_enabled', return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
         self.course = CourseFactory.create(
             teams_configuration=TeamsConfig({
                 'topics': [{
