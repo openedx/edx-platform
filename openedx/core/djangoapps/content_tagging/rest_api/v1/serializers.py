@@ -6,13 +6,11 @@ from __future__ import annotations
 
 from rest_framework import serializers, fields
 
-from opaque_keys.edx.keys import UsageKey
 from openedx_tagging.core.tagging.rest_api.v1.serializers import (
     ObjectTagMinimalSerializer,
     TaxonomyListQueryParamsSerializer,
     TaxonomySerializer,
 )
-from xmodule.modulestore.django import modulestore
 
 from organizations.models import Organization
 
@@ -97,6 +95,7 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
         model = TaxonomySerializer.Meta.model
         fields = TaxonomySerializer.Meta.fields + ["orgs", "all_orgs"]
         read_only_fields = ["orgs", "all_orgs"]
+
 
 class ObjectTagOrgMinimalSerializer(ObjectTagMinimalSerializer):
     """
