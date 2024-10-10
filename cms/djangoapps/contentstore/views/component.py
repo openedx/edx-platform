@@ -277,7 +277,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         templates_for_category = []
         component_class = _load_mixed_class(category)
 
-        if support_level_without_template and category != 'library':
+        if support_level_without_template and category not in ['library']:
             # add the default template with localized display name
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
@@ -450,6 +450,12 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     if advanced_component_templates['templates']:
         component_templates.insert(0, advanced_component_templates)
 
+    # component_templates.append({
+    #     "type": "abc",
+    #     "templates": "abc",
+    #     "display_name": "ABC",
+    #     "support_legend": create_support_legend_dict()
+    # })
     return component_templates
 
 
