@@ -249,11 +249,15 @@ class BlockFieldsView(APIView):
 
         # The "fields" view requires "read as author" permissions because the fields can contain answers, etc.
         block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_READ_AS_AUTHOR)
+        # It would make more sense if this just had a "fields" dict with all the content+settings fields, but
+        # for backwards compatibility we call the settings metadata and split it up like this, ignoring all content
+        # fields except "data".
         block_dict = {
-            "display_name": get_block_display_name(block),  # potentially duplicated from metadata
-            "data": block.data,
-            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
+            "display_name": get_block_display_name(block),  # note this is also present in metadata
+            "metadata": self.get_explicitly_set_fields_by_scope(block, Scope.settings),
         }
+        if hasattr(block, "data"):
+            block_dict["data"] = block.data
         return Response(block_dict)
 
     @atomic
@@ -271,8 +275,8 @@ class BlockFieldsView(APIView):
         data = request.data.get("data")
         metadata = request.data.get("metadata")
 
-        old_metadata = block.get_explicitly_set_fields_by_scope(Scope.settings)
-        old_content = block.get_explicitly_set_fields_by_scope(Scope.content)
+        old_metadata = self.get_explicitly_set_fields_by_scope(block, Scope.settings)
+        old_content = self.get_explicitly_set_fields_by_scope(block, Scope.content)
 
         # only update data if it was passed
         if data is not None:
@@ -309,8 +313,26 @@ class BlockFieldsView(APIView):
         context_impl = get_learning_context_impl(usage_key)
         context_impl.send_block_updated_event(usage_key)
 
-        return Response({
-            "id": str(block.location),
-            "data": data,
-            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
-        })
+        block_dict = {
+            "id": str(block.usage_key),
+            "display_name": get_block_display_name(block),  # note this is also present in metadata
+            "metadata": self.get_explicitly_set_fields_by_scope(block, Scope.settings),
+        }
+        if hasattr(block, "data"):
+            block_dict["data"] = block.data
+        return Response(block_dict)
+
+    def get_explicitly_set_fields_by_scope(self, block, scope=Scope.content):
+        """
+        Get a dictionary of the fields for the given scope which are set explicitly on the given xblock.
+
+        (Including any set to None.)
+        """
+        result = {}
+        for field in block.fields.values():  # lint-amnesty, pylint: disable=no-member
+            if field.scope == scope and field.is_set_on(block):
+                try:
+                    result[field.name] = field.read_json(block)
+                except TypeError as exc:
+                    raise TypeError(f"Unable to read field {field.name} from block {block.usage_key}") from exc
+        return result
