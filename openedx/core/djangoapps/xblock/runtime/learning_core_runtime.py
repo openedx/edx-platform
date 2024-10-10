@@ -177,7 +177,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         if version == LatestVersion.AUTO:
             if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
-                version = LatestVersion.DRAFT 
+                version = LatestVersion.DRAFT
             else:
                 version = LatestVersion.PUBLISHED
         if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:

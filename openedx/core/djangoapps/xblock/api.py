@@ -17,7 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component
+from openedx_learning.api.authoring_models import Component, ComponentVersion
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
@@ -113,6 +113,9 @@ def load_block(
     except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The component '{usage_key}' does not exist.") from exc
+    except ComponentVersion.DoesNotExist as exc:
+        # Convert ComponentVersion.DoesNotExist to NotFound so we do the right thing (404 not 500) by default.
+        raise NotFound(f"The requested version of component '{usage_key}' does not exist.") from exc
 
 
 def get_block_metadata(block, includes=()):

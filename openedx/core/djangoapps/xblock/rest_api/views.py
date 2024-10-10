@@ -14,7 +14,7 @@ from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import permissions
+from rest_framework import permissions, serializers
 from rest_framework.decorators import api_view, permission_classes  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound
 from rest_framework.response import Response
@@ -30,6 +30,7 @@ from openedx.core.djangoapps.xblock.learning_context.manager import get_learning
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
     CheckPerm,
+    LatestVersion,
     get_block_metadata,
     get_block_display_name,
     get_handler_url as _get_handler_url,
@@ -108,8 +109,23 @@ def embed_block_view(request, usage_key_str, view_name):
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
+    # Check if a specific version has been requested
+    version = LatestVersion.AUTO  # AUTO = published if we're in the LMS, draft if we're in Studio.
+    if version_request := request.GET.get("version"):
+        if version_request == "draft":
+            version = LatestVersion.DRAFT
+        elif version_request == "published":
+            version = LatestVersion.PUBLISHED
+        else:
+            try:
+                version = int(version_request)
+            except ValueError:
+                raise serializers.ValidationError(
+                    "Invalid version specifier. Expected 'draft', 'published', or an integer."
+                )
+
     try:
-        block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_LEARN)
+        block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_LEARN, version=version)
     except NoSuchUsage as exc:
         raise NotFound(f"{usage_key} not found") from exc
 
