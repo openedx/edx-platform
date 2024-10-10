@@ -8,17 +8,20 @@ import copy
 import html
 import logging
 import os
+import pathlib
 import re
 from functools import wraps
 
 import requests
 import simplejson as json
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -1041,6 +1044,8 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     """
     Get video transcript from Learning Core.
 
+    Limitation: This is only going to grab from the Draft version.
+
     HISTORIC INFORMATION FROM WHEN THIS FUNCTION WAS `get_transcript_from_blockstore`:
 
       Blockstore expects video transcripts to be placed into the 'static/'
@@ -1072,9 +1077,71 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     Returns:
         tuple containing content, filename, mimetype
     """
-    # TODO: Update to use Learning Core data models once static assets support
-    # has been added.
-    raise NotFoundError("No transcript - transcripts not supported yet by learning core components.")
+    usage_key = video_block.scope_ids.usage_id
+
+    # Validate that the format is something we even support...
+    if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
+        raise NotFoundError(f'Invalid transcript format `{output_format}`')
+
+    # See if the requested language exists.
+    transcripts = transcripts_info['transcripts']
+    if language not in transcripts:
+        raise NotFoundError(
+            f"Video {usage_key} does not have a transcript file defined for the "
+            f"'{language}' language in its OLX."
+        )
+
+    # Grab the underlying Component. There's no version parameter to this call,
+    # so we're just going to grab the file associated with the latest draft
+    # version for now.
+    component = get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+    if not component_version:
+        raise NotFoundError(
+            f"No transcript for {usage_key} because Component {component.uuid} "
+            "was soft-deleted."
+        )
+
+    file_path = pathlib.Path(f"static/{transcripts[language]}")
+    if file_path.suffix != '.srt':
+        # We want to standardize on .srt
+        raise NotFoundError(
+            "Video XBlocks in Content Libraries only support storing .srt "
+            f"transcript files, but we tried to look up {file_path} for {usage_key}"
+        )
+
+    # TODO: There should be a Learning Core API call for this:
+    try:
+        content = (
+            component_version
+            .componentversioncontent_set
+            .filter(content__has_file=True)
+            .select_related('content')
+            .get(key=file_path)
+            .content
+        )
+        data = content.read_file().read()
+    except ObjectDoesNotExist as exc:
+        raise NotFoundError(
+            f"No file {file_path} found for {usage_key} "
+            f"(ComponentVersion {component_version.uuid})"
+        ) from exc
+
+    # Now convert the transcript data to the requested format:
+    output_filename = f'{file_path.stem}.{output_format}'
+    output_transcript = Transcript.convert(
+        data.decode('utf-8'),
+        input_format=Transcript.SRT,
+        output_format=output_format,
+    )
+    if not output_transcript.strip():
+        raise NotFoundError(
+            f"Transcript file {file_path} found for {usage_key} "
+            f"(ComponentVersion {component_version.uuid}), but it has no "
+            "content or is malformed."
+        )
+
+    return output_transcript, output_filename, Transcript.mime_types[output_format]
 
 
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
