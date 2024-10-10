@@ -993,6 +993,7 @@ DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
 
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY', MAX_BLOCKS_PER_CONTENT_LIBRARY)
+LIBRARY_UNSUPPORTED_BLOCKS = ENV_TOKENS.get('LIBRARY_UNSUPPORTED_BLOCKS', LIBRARY_UNSUPPORTED_BLOCKS)
 
 ########################## Derive Any Derived Settings  #######################
 
