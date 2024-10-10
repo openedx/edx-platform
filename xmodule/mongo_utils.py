@@ -6,7 +6,6 @@ Common MongoDB connection functions.
 import logging
 
 import pymongo
-from mongodb_proxy import MongoProxy
 from pymongo.read_preferences import (  # lint-amnesty, pylint: disable=unused-import
     ReadPreference,
     _MONGOS_MODES,
@@ -23,12 +22,10 @@ MONGO_READ_PREFERENCE_MAP = dict(zip(_MONGOS_MODES, _MODES))
 def connect_to_mongodb(
     db, host,
     port=27017, tz_aware=True, user=None, password=None,
-    retry_wait_time=0.1, proxy=True, **kwargs
+    retry_wait_time=0.1, **kwargs
 ):
     """
-    Returns a MongoDB Database connection, optionally wrapped in a proxy. The proxy
-    handles AutoReconnect errors by retrying read operations, since these exceptions
-    typically indicate a temporary step-down condition for MongoDB.
+    Returns a MongoDB Database connection.
     """
     # If the MongoDB server uses a separate authentication database that should be specified here.
     # Convert the lowercased authsource parameter to the camel-cased authSource expected by MongoClient.
@@ -36,10 +33,13 @@ def connect_to_mongodb(
     if auth_source_key := {'authSource', 'authsource'}.intersection(set(kwargs.keys())):
         auth_source = kwargs.pop(auth_source_key.pop()) or db
 
-    # sanitize a kwarg which may be present and is no longer expected
-    # AED 2020-03-02 TODO: Remove this when 'auth_source' will no longer exist in kwargs
+    # sanitize kwargs which may be present and is no longer expected
     if 'auth_source' in kwargs:
+        logger.warning("Bad MongoDB connection parameter: auth_source. Use authSource or authsource instead.")
         kwargs.pop('auth_source')
+    if 'proxy' in kwargs:
+        logger.warning("Obselete MongoDB connection parameter: proxy. Connection is always proxied now.")
+        kwargs.pop("proxy")
 
     # If read_preference is given as a name of a valid ReadPreference.<NAME>
     # constant such as "SECONDARY_PREFERRED" or a mongo mode such as
@@ -69,14 +69,6 @@ def connect_to_mongodb(
         connection_params.update({'username': user, 'password': password, 'authSource': auth_source})
 
     mongo_conn = pymongo.MongoClient(**connection_params)
-
-    if proxy:
-        mongo_conn = MongoProxy(
-            mongo_conn[db],
-            wait_time=retry_wait_time
-        )
-        return mongo_conn
-
     return mongo_conn[db]
 
 

@@ -16,11 +16,17 @@ class TestHeartbeatFailureException(unittest.TestCase):
 
     @patch('pymongo.MongoClient')
     @patch('pymongo.database.Database')
-    def test_heartbeat_raises_exception_when_connection_alive_is_false(self, *calls):
-        # pylint: disable=W0613
-        with patch('mongodb_proxy.MongoProxy') as mock_proxy:
-            mock_proxy.return_value.admin.command.side_effect = ConnectionFailure('Test')
-            useless_conn = MongoPersistenceBackend('useless', 'useless', 'useless')
+    def test_heartbeat_retries_on_failure(self, MockDatabase, MockClient):
+        # Setup mock client and database
+        mock_client = MockClient.return_value
+        mock_database = MockDatabase.return_value
+        mock_database.admin.command.side_effect = ConnectionFailure('Test')
 
-            with pytest.raises(HeartbeatFailure):
-                useless_conn.heartbeat()
+        useless_conn = MongoPersistenceBackend('useless', 'useless', 'useless')
+
+        # Verify that the heartbeat method raises a HeartbeatFailure
+        with pytest.raises(HeartbeatFailure):
+            useless_conn.heartbeat()
+
+        # Assert that retries are handled correctly
+        self.assertGreater(mock_database.admin.command.call_count, 1)  # Ensure retries happened
