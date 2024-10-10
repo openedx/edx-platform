@@ -108,7 +108,8 @@ from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
     AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer, UniqueStudentIdentifierSerializer
+    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer,
+    UniqueStudentIdentifierSerializer, ProblemSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2067,64 +2068,71 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.OVERRIDE_GRADES)
-@require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
-@common_exceptions_400
-def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
-    course_key = CourseKey.from_string(course_id)
-    score = strip_if_string(request.POST.get('score'))
-    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
-    student_identifier = request.POST.get('unique_student_identifier', None)
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class OverrideProblemScore(DeveloperErrorViewMixin, APIView):
+    """
+    Starts a background process a students override problem score.
+    """
 
-    if not problem_to_reset:
-        return HttpResponseBadRequest("Missing query parameter problem_to_reset.")
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.OVERRIDE_GRADES
+    serializer_class = ProblemSerializer
 
-    if not student_identifier:
-        return HttpResponseBadRequest("Missing query parameter student_identifier.")
+    def post(self, request, course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
+        """
+        Takes either of the following query parameters
+            - problem_to_reset is a urlname of a problem
+            - score a value
+        unique_student_identifier student username or email.
+        """
 
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-    else:
-        return _create_error_response(request, f"Invalid student ID {student_identifier}.")
+        course_key = CourseKey.from_string(course_id)
 
-    try:
-        usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
-        block = modulestore().get_item(usage_key)
-    except InvalidKeyError:
-        return _create_error_response(request, f"Unable to parse problem id {problem_to_reset}.")
-    except ItemNotFoundError:
-        return _create_error_response(request, f"Unable to find problem id {problem_to_reset}.")
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    # check the user's access to this specific problem
-    if not has_access(request.user, "staff", block):
-        _create_error_response(request, "User {} does not have permission to override scores for problem {}.".format(
-            request.user.id,
-            problem_to_reset
-        ))
+        score = serializer_data.validated_data.get("score")
+        problem_to_reset = serializer_data.validated_data.get("problem_to_reset")
+        student = serializer_data.validated_data.get("unique_student_identifier")
+        student_identifier = request.data.get("unique_student_identifier")
 
-    response_payload = {
-        'problem_to_reset': problem_to_reset,
-        'student': student_identifier
-    }
-    try:
-        task_api.submit_override_score(
-            request,
-            usage_key,
-            student,
-            score,
-        )
-    except NotImplementedError as exc:  # if we try to override the score of a non-scorable block, catch it here
-        return _create_error_response(request, str(exc))
+        try:
+            usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
+            block = modulestore().get_item(usage_key)
+        except InvalidKeyError:
+            return _create_error_response(request, f"Unable to parse problem id {problem_to_reset}.")
+        except ItemNotFoundError:
+            return _create_error_response(request, f"Unable to find problem id {problem_to_reset}.")
 
-    except ValueError as exc:
-        return _create_error_response(request, str(exc))
+        # check the user's access to this specific problem
+        if not has_access(request.user, "staff", block):
+            _create_error_response(request,
+                                   "User {} does not have permission to override scores for problem {}.".format(
+                                       request.user.id,
+                                       problem_to_reset
+                                   ))
 
-    response_payload['task'] = TASK_SUBMISSION_OK
-    return JsonResponse(response_payload)
+        response_payload = {
+            'problem_to_reset': problem_to_reset,
+            'student': student_identifier
+        }
+        try:
+            task_api.submit_override_score(
+                request,
+                usage_key,
+                student,
+                score,
+            )
+        except NotImplementedError as exc:  # if we try to override the score of a non-scorable block, catch it here
+            return _create_error_response(request, str(exc))
+
+        except ValueError as exc:
+            return _create_error_response(request, str(exc))
+
+        response_payload['task'] = TASK_SUBMISSION_OK
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests

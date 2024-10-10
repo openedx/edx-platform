@@ -37,7 +37,7 @@ urlpatterns = [
     path('get_student_progress_url', api.StudentProgressUrl.as_view(), name='get_student_progress_url'),
     path('reset_student_attempts', api.ResetStudentAttempts.as_view(), name='reset_student_attempts'),
     path('rescore_problem', api.rescore_problem, name='rescore_problem'),
-    path('override_problem_score', api.override_problem_score, name='override_problem_score'),
+    path('override_problem_score', api.OverrideProblemScore.as_view(), name='override_problem_score'),
     path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
          name='reset_student_attempts_for_entrance_exam'),
     path('rescore_entrance_exam', api.rescore_entrance_exam, name='rescore_entrance_exam'),
