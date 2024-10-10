@@ -510,10 +510,11 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             )
             assert self.lib1_problem_block["id"] in str(exc.exception)
 
-    @mock.patch('openedx.core.djangoapps.content.search.api.upsert_library_collection_index_doc')
-    def test_set_library_component_collections(self, mock_update_collection_index_doc):
+    def test_set_library_component_collections(self):
         event_receiver = mock.Mock()
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_receiver)
+        collection_update_event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(collection_update_event_receiver)
         assert not list(self.col2.entities.all())
         component = api.get_component_from_usage_key(UsageKey.from_string(self.lib2_problem_block["id"]))
 
@@ -536,11 +537,27 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             },
             event_receiver.call_args_list[0].kwargs,
         )
-        self.assertListEqual(
-            list(mock_update_collection_index_doc.call_args_list[0][0]),
-            [self.lib2.library_key, self.col2.key]
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib2.library_key,
+                    collection_key=self.col2.key,
+                    lazy=True,
+                ),
+            },
+            collection_update_event_receiver.call_args_list[0].kwargs,
         )
-        self.assertListEqual(
-            list(mock_update_collection_index_doc.call_args_list[1][0]),
-            [self.lib2.library_key, self.col3.key]
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib2.library_key,
+                    collection_key=self.col3.key,
+                    lazy=True,
+                ),
+            },
+            collection_update_event_receiver.call_args_list[1].kwargs,
         )

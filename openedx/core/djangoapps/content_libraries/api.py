@@ -80,6 +80,7 @@ from opaque_keys import InvalidKeyError
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
+    LibraryCollectionData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -88,6 +89,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
@@ -1294,9 +1296,16 @@ def set_library_component_collections(
         created_by=created_by,
     )
 
-    from ..content.search.tasks import update_library_collection_index_doc
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set lazy=True to trigger
+    # collection indexing asynchronously.
     for collection in affected_collections:
-        update_library_collection_index_doc.delay(str(library_key), collection.key)
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                lazy=True,
+            )
+        )
 
     return component
 
