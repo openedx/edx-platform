@@ -12,7 +12,7 @@
         $.extend(Annotator.Plugin.LlmSummarize.prototype, new Annotator.Plugin(), {
             pluginInit: function() {
                 // Overrides of annotatorjs HTML/CSS to add summarize button.
-                var style = document.createElement('style');
+                const style = document.createElement('style');
                 style.innerHTML = `
                     .annotator-adder::before {
                         content: '';
@@ -68,9 +68,84 @@
                         background-color: white;
                         border: 1px solid gray;
                     }
+
+                    // Defining content loader since fontawesome icons don't work
+                    // inside the annotatorjs modal.
+                    .loader {
+                        width: 5em !important;
+                        border-color: red !important;
+                    }
+
+                    @keyframes rotation {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
                 `;
+                let annotator = this.annotator;
                 document.head.appendChild(style);
-                var annotator = this.annotator;
+                this.modifyDom(this.annotator);
+
+                const summarizeButton = document.getElementById('summarizeButton');
+
+                summarizeButton.addEventListener('click', function(ev) {
+                    annotator.editor.element[0].setAttribute('is_summarizing', true);
+                });
+                annotator.subscribe('annotationEditorShown', this.handleSummarize);
+                annotator.subscribe('annotationEditorHidden', this.cleanupSummarize);
+            },
+            handleSummarize: function (editor, annotation) {
+                if (editor.element[0].getAttribute('is_summarizing') !== 'true') return;
+
+                function toggleLoader() {
+                    const saveButton = document.querySelector('.annotator-controls .annotator-save');
+                    const loaderWrapper = document.querySelector('.summarize-loader-wrapper');
+                    editor.fields[0].element.children[0].classList.toggle('d-none');
+                    loaderWrapper.classList.toggle('d-none');
+                    saveButton.disabled = !saveButton.disabled;
+                }
+                const textAreaWrapper = editor.fields[0].element;
+                const request = new Request('/pearson-core/llm-assistance/api/v0/summarize-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': $.cookie('csrftoken'),
+                    },
+                    body: JSON.stringify({
+                        text_to_summarize: annotation.quote,
+                    }),
+                });
+
+                editor.fields[1].element.children[0].value = 'ai_summary';
+                toggleLoader(editor);
+                fetch(request)
+                    .then((response) => {
+                        toggleLoader();
+                        if (response.ok) return response.json();
+                        throw new Error(gettext('There was an error while summarizing the content.'));
+                    })
+                    .then((data) => {
+                        textAreaWrapper.children[0].value = data.summary;
+                    })
+                    .catch((error) => {
+                        alert(error.message);
+                        editor.hide();
+                    });
+            },
+            cleanupSummarize: function(editor) {
+                const textAreaWrapper = editor.fields[0].element;
+                const loaderWrapper = document.querySelector('.summarize-loader-wrapper');
+
+                textAreaWrapper.children[0].value = '';
+                textAreaWrapper.children[1].value = '';
+                editor.element[0].setAttribute('is_summarizing', 'false');
+                loaderWrapper.classList.add('d-none');
+            },
+            modifyDom: function(annotator) {
+                const textAreaWrapper = annotator.editor.fields[0].element;
+
                 annotator.adder[0].children[0].id = 'annotateButton';
                 annotator.adder[0].children[0].innerHTML = '<i class="fa fa-pencil" aria-hidden="true"></i>';
                 annotator.adder[0].innerHTML += `
@@ -78,6 +153,26 @@
                     <i class="fa fa-star" aria-hidden="true"></i>
                 </button>
                 `;
+                // Style is being defined here since classes styling not working
+                // for this element.
+                textAreaWrapper.innerHTML += `
+                <div class="summarize-loader-wrapper d-none">
+                    <span class="loader" style="
+                        width: 1.2em;
+                        height: 1.2em;
+                        border: 3px solid rgb(0, 48, 87);
+                        border-bottom-color: white;
+                        border-radius: 50%;
+                        display: inline-block;
+                        box-sizing: border-box;
+                        animation: rotation 3s linear infinite;
+                        margin-right: 5px;
+                        transform-origin: center;">
+                    </span>
+                    <span style="font-size: 1.2em; color: rgb(0, 48, 87);">
+                        ${gettext('Summarizing...')}
+                    </span>
+                </div>`;
             },
         });
     });
