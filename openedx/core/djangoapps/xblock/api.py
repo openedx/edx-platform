@@ -57,7 +57,7 @@ class CheckPerm(Enum):
 def get_runtime(user: UserType):
     """
     Return a new XBlockRuntime.
-    
+
     Each XBlockRuntime is bound to one user (and usually one request or one
     celery task). It is typically used just to load and render a single block,
     but the API _does_ allow a single runtime instance to load multiple blocks
