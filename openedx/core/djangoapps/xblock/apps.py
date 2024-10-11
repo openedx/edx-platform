@@ -16,9 +16,9 @@ class XBlockAppConfig(AppConfig):
     verbose_name = 'New XBlock Runtime'
     label = 'xblock_new'  # The name 'xblock' is already taken by ORA2's 'openassessment.xblock' app :/
 
-    def get_runtime_system_params(self):
+    def get_runtime_params(self):
         """
-        Get the XBlockRuntimeSystem parameters appropriate for viewing and/or
+        Get the LearningCoreXBlockRuntime parameters appropriate for viewing and/or
         editing XBlock content.
         """
         raise NotImplementedError
@@ -43,9 +43,9 @@ class LmsXBlockAppConfig(XBlockAppConfig):
     LMS-specific configuration of the XBlock Runtime django app.
     """
 
-    def get_runtime_system_params(self):
+    def get_runtime_params(self):
         """
-        Get the XBlockRuntimeSystem parameters appropriate for viewing and/or
+        Get the LearningCoreXBlockRuntime parameters appropriate for viewing and/or
         editing XBlock content in the LMS
         """
         return dict(
@@ -65,9 +65,9 @@ class StudioXBlockAppConfig(XBlockAppConfig):
     Studio-specific configuration of the XBlock Runtime django app.
     """
 
-    def get_runtime_system_params(self):
+    def get_runtime_params(self):
         """
-        Get the XBlockRuntimeSystem parameters appropriate for viewing and/or
+        Get the LearningCoreXBlockRuntime parameters appropriate for viewing and/or
         editing XBlock content in Studio
         """
         return dict(
