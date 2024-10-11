@@ -218,7 +218,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             block = block_class.parse_xml(xml_node, runtime=self, keys=keys)
 
         # Store the version request on the block so we can retrieve it when needed for generating handler URLs etc.
-        block._runtime_requested_version = version
+        block._runtime_requested_version = version  # pylint: disable=protected-access
 
         # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
         block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
@@ -239,7 +239,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         if not self.authored_data_store.has_changes(block):
             return  # No changes, so no action needed.
 
-        if block._runtime_requested_version != LatestVersion.DRAFT:
+        if block._runtime_requested_version != LatestVersion.DRAFT:  # pylint: disable=protected-access
             # Not sure if this is an important restriction but it seems like overwriting the latest version based on
             # an old version is likely an accident, so for now we're not going to allow it.
             raise ValidationError(

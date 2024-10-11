@@ -251,7 +251,7 @@ def render_block_view(block, view_name, user):  # pylint: disable=unused-argumen
 def get_handler_url(
     usage_key: UsageKeyV2,
     handler_name: str,
-    user: UserType,
+    user: UserType | None,
     *,
     version: int | LatestVersion = LatestVersion.AUTO,
 ):
@@ -281,9 +281,9 @@ def get_handler_url(
     """
     usage_key_str = str(usage_key)
     site_root_url = get_xblock_app_config().get_site_root_url()
-    if not user:  # lint-amnesty, pylint: disable=no-else-raise
+    if not user:
         raise TypeError("Cannot get handler URLs without specifying a specific user ID.")
-    elif user.is_authenticated:
+    if user.is_authenticated:
         user_id = user.id
     elif user.is_anonymous:
         user_id = get_xblock_id_for_anonymous_user(user)

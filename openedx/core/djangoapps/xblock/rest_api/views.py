@@ -1,7 +1,6 @@
 """
 Views that implement a RESTful API for interacting with XBlocks.
 """
-import itertools
 import json
 
 from common.djangoapps.util.json_request import JsonResponse
@@ -58,7 +57,9 @@ def parse_version_request(version_str: str | None) -> LatestVersion | int:
     try:
         return int(version_str)
     except ValueError:
-        raise serializers.ValidationError("Invalid version specifier. Expected 'draft', 'published', or an integer.")
+        raise serializers.ValidationError(  # pylint: disable=raise-missing-from
+            "Invalid version specifier '{version_str}'. Expected 'draft', 'published', or an integer."
+        )
 
 
 @api_view(['GET'])

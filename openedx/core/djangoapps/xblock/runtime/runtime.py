@@ -1,9 +1,8 @@
 """
 Common base classes for all new XBlock runtimes.
 """
-from __future__ import annotations
 import logging
-from typing import Callable, Optional, Protocol
+from typing import Callable, Protocol
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
@@ -64,11 +63,12 @@ def make_track_function():
 
 
 class GetHandlerFunction(Protocol):
+    """ Type definition for our "get handler" callback """
     def __call__(
         self,
         usage_key: UsageKeyV2,
         handler_name: str,
-        user: UserType,
+        user: UserType | None,
         *,
         version: int | LatestVersion = LatestVersion.AUTO,
     ) -> str:
@@ -106,6 +106,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
     # keep track of view name (student_view, studio_view, etc)
     # currently only used to track if we're in the studio_view (see below under service())
     view_name: str | None
+    # backing store for authored field data (mostly content+settings scopes)
+    authored_data_store: FieldData
 
     def __init__(
         self,
@@ -114,8 +116,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         handler_url: GetHandlerFunction,
         student_data_mode: StudentDataMode,
         authored_data_mode: AuthoredDataMode,
-        id_reader: Optional[IdReader] = None,
-        authored_data_store: Optional[FieldData] = None,
+        authored_data_store: FieldData,
+        id_reader: IdReader | None = None,
     ):
         super().__init__(
             id_reader=id_reader or OpaqueKeyReader(),
@@ -154,7 +156,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
 
         # Note: it's important that we call handlers based on the same version of the block
         # (draft block -> draft data available to handler; published block -> published data available to handler)
-        kwargs = {"version": block._runtime_requested_version} if hasattr(block, "_runtime_requested_version") else {}
+        kwargs = {"version": block._runtime_requested_version} if hasattr(block, "_runtime_requested_version") else {}  # pylint: disable=protected-access
         url = self.handler_url_fn(block.usage_key, handler_name, self.user, **kwargs)
         if suffix:
             if not url.endswith('/'):
