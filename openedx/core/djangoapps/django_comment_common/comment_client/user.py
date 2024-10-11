@@ -55,7 +55,11 @@ class User(models.Model):
     def follow(self, source):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            forum_api.create_subscription(self.id, source.id, str(course_key))
+            forum_api.create_subscription(
+                user_id=self.id,
+                source_id=source.id,
+                course_id=str(course_key)
+            )
         else:
             params = {'source_type': source.type, 'source_id': source.id}
             utils.perform_request(
@@ -69,7 +73,11 @@ class User(models.Model):
     def unfollow(self, source):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            forum_api.delete_subscription(self.id, source.id, str(course_key))
+            forum_api.delete_subscription(
+                user_id=self.id,
+                source_id=source.id,
+                course_id=str(course_key)
+            )
         else:
             params = {'source_type': source.type, 'source_id': source.id}
             utils.perform_request(
@@ -90,9 +98,19 @@ class User(models.Model):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
-                response = forum_api.update_thread_votes(voteable.id, self.id, value, str(course_key))
+                response = forum_api.update_thread_votes(
+                    thread_id=voteable.id,
+                    user_id=self.id,
+                    value=value,
+                    course_id=str(course_key)
+                )
             else:
-                response = forum_api.update_comment_votes(voteable.id, self.id, value, str(course_key))
+                response = forum_api.update_comment_votes(
+                    comment_id=voteable.id,
+                    user_id=self.id,
+                    value=value,
+                    course_id=str(course_key)
+                )
         else:
             params = {'user_id': self.id, 'value': value}
             response = utils.perform_request(
@@ -114,9 +132,17 @@ class User(models.Model):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
-                response = forum_api.delete_thread_vote(voteable.id, self.id, str(course_key))
+                response = forum_api.delete_thread_vote(
+                    thread_id=voteable.id,
+                    user_id=self.id,
+                    course_id=str(course_key)
+                )
             else:
-                response = forum_api.delete_comment_vote(voteable.id, self.id, str(course_key))
+                response = forum_api.delete_comment_vote(
+                    comment_id=voteable.id,
+                    user_id=self.id,
+                    course_id=str(course_key)
+                )
         else:
             params = {'user_id': self.id}
             response = utils.perform_request(
@@ -245,7 +271,7 @@ class User(models.Model):
     def retire(self, retired_username):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            forum_api.retire_user(self.id, retired_username, str(course_key))
+            forum_api.retire_user(user_id=self.id, retired_username=retired_username, course_id=str(course_key))
         else:
             url = _url_for_retire(self.id)
             params = {'retired_username': retired_username}
@@ -261,7 +287,7 @@ class User(models.Model):
     def replace_username(self, new_username):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            forum_api.update_username(self.id, new_username, str(course_key))
+            forum_api.update_username(user_id=self.id, new_username=new_username, course_id=str(course_key))
         else:
             url = _url_for_username_replacement(self.id)
             params = {"new_username": new_username}

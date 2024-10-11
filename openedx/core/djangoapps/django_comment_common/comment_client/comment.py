@@ -98,11 +98,19 @@ class Comment(models.Model):
         if is_forum_v2_enabled(course_key):
             if voteable.type == "thread":
                 response = forum_api.update_thread_flag(
-                    voteable.id, "unflag", user.id, bool(removeAll), str(course_key)
+                    thread_id=voteable.id,
+                    action="unflag",
+                    user_id=user.id,
+                    update_all=bool(removeAll),
+                    course_id=str(course_key)
                 )
             else:
                 response = forum_api.update_comment_flag(
-                    voteable.id, "unflag", user.id, bool(removeAll), str(course_key)
+                    comment_id=voteable.id,
+                    action="unflag",
+                    user_id=user.id,
+                    update_all=bool(removeAll),
+                    course_id=str(course_key)
                 )
         else:
             params = {'user_id': user.id}

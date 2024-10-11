@@ -38,7 +38,10 @@ class Subscription(models.Model):
         course_key = utils.get_course_key(course_id)
         if is_forum_v2_enabled(course_key):
             response = forum_api.get_thread_subscriptions(
-                thread_id, params["page"], params["per_page"], str(course_key)
+                thread_id=thread_id,
+                page=params["page"],
+                per_page=params["per_page"],
+                course_id=str(course_key)
             )
         else:
             response = utils.perform_request(

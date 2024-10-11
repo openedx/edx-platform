@@ -78,7 +78,7 @@ class Model:
         response = None
         if is_forum_v2_enabled(course_key):
             if self.type == "comment":
-                response = forum_api.get_parent_comment(self.attributes["id"], str(course_key))
+                response = forum_api.get_parent_comment(comment_id=self.attributes["id"], course_id=str(course_key))
             if response is None:
                 raise CommentClientRequestError("Forum v2 API call is missing")
         else:
@@ -177,9 +177,9 @@ class Model:
         if is_forum_v2_enabled(course_key):
             response = None
             if self.type == "comment":
-                response = forum_api.delete_comment(self.attributes["id"], str(course_key))
+                response = forum_api.delete_comment(comment_id=self.attributes["id"], course_id=str(course_key))
             elif self.type == "thread":
-                response = forum_api.delete_thread(self.attributes["id"], str(course_key))
+                response = forum_api.delete_thread(thread_id=self.attributes["id"], course_id=str(course_key))
             if response is None:
                 raise CommentClientRequestError("Forum v2 API call is missing")
         else:
@@ -365,7 +365,7 @@ class Model:
             user_id = str(request_data["user_id"])
         except KeyError as e:
             raise e
-        
+
         request_data = {
             "title": title,
             "body": body,

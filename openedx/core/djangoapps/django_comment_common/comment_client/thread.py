@@ -180,7 +180,11 @@ class Thread(models.Model):
         if is_forum_v2_enabled(course_key):
             if user_id := request_params.get('user_id'):
                 request_params['user_id'] = str(user_id)
-            response = forum_api.get_thread(self.id, request_params, str(course_key))
+            response = forum_api.get_thread(
+                thread_id=self.id,
+                params=request_params,
+                course_id=str(course_key)
+            )
         else:
             response = utils.perform_request(
                 'get',
@@ -217,7 +221,13 @@ class Thread(models.Model):
             raise utils.CommentClientRequestError("Can only flag/unflag for threads or comments")
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            response = forum_api.update_thread_flag(voteable.id, "unflag", user.id, bool(removeAll), str(course_key))
+            response = forum_api.update_thread_flag(
+                thread_id=voteable.id,
+                action="unflag",
+                user_id=user.id,
+                update_all=bool(removeAll),
+                course_id=str(course_key)
+            )
         else:
             params = {'user_id': user.id}
             #if you're an admin, when you unflag, remove ALL flags
@@ -236,7 +246,11 @@ class Thread(models.Model):
     def pin(self, user, thread_id):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            response = forum_api.pin_thread(user.id, thread_id, str(course_key))
+            response = forum_api.pin_thread(
+                user_id=user.id,
+                thread_id=thread_id,
+                course_id=str(course_key)
+            )
         else:
             url = _url_for_pin_thread(thread_id)
             params = {'user_id': user.id}
@@ -252,7 +266,11 @@ class Thread(models.Model):
     def un_pin(self, user, thread_id):
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            response = forum_api.unpin_thread(user.id, thread_id, str(course_key))
+            response = forum_api.unpin_thread(
+                user_id=user.id,
+                thread_id=thread_id,
+                course_id=str(course_key)
+            )
         else:
             url = _url_for_un_pin_thread(thread_id)
             params = {'user_id': user.id}
