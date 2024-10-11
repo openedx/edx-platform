@@ -66,7 +66,7 @@ urlpatterns = [
 
     # Reports..
     path('get_course_survey_results', api.get_course_survey_results, name='get_course_survey_results'),
-    path('export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
+    path('export_ora2_data', api.ExportOra2Data.as_view(), name='export_ora2_data'),
     path('export_ora2_summary', api.export_ora2_summary, name='export_ora2_summary'),
 
     path('export_ora2_submission_files', api.export_ora2_submission_files,
