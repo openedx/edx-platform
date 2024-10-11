@@ -241,7 +241,7 @@ class ChooseModeView(View):
 
             if verified_mode.sku:
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
-                context["ecommerce_payment_page"] = ecommerce_service.get_add_to_basket_url()
+                context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 

@@ -25,13 +25,13 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage, NoSuchViewError
 from xblock.plugin import PluginMissingError
 
+from openedx.core.types import User as UserType
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreFieldData,
     LearningCoreXBlockRuntime,
 )
-from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
 from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
@@ -54,33 +54,21 @@ class CheckPerm(Enum):
     CAN_EDIT = 3
 
 
-def get_runtime_system():
+def get_runtime(user: UserType):
     """
-    Return a new XBlockRuntimeSystem.
+    Return a new XBlockRuntime.
 
-    TODO: Refactor to get rid of the XBlockRuntimeSystem entirely and just
-    create the LearningCoreXBlockRuntime and return it. We used to want to keep
-    around a long lived runtime system (a factory that returns runtimes) for
-    caching purposes, and have it dynamically construct a runtime on request.
-    Now we're just re-constructing both the system and the runtime in this call
-    and returning it every time, because:
-
-    1. We no longer have slow, Blockstore-style definitions to cache, so the
-       performance of this is perfectly acceptable.
-    2. Having a singleton increases complexity and the chance of bugs.
-    3. Creating the XBlockRuntimeSystem every time only takes about 10-30 µs.
-
-    Given that, the extra XBlockRuntimeSystem class just adds confusion. But
-    despite that, it's tested, working code, and so I'm putting off refactoring
-    for now.
+    Each XBlockRuntime is bound to one user (and usually one request or one
+    celery task). It is typically used just to load and render a single block,
+    but the API _does_ allow a single runtime instance to load multiple blocks
+    (as long as they're for the same user).
     """
-    params = get_xblock_app_config().get_runtime_system_params()
+    params = get_xblock_app_config().get_runtime_params()
     params.update(
-        runtime_class=LearningCoreXBlockRuntime,
         handler_url=get_handler_url,
         authored_data_store=LearningCoreFieldData(),
     )
-    runtime = _XBlockRuntimeSystem(**params)
+    runtime = LearningCoreXBlockRuntime(user, **params)
 
     return runtime
 
@@ -121,7 +109,7 @@ def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPer
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
     # set to 3.
     # field_overrides = context_impl.get_field_overrides(usage_key)
-    runtime = get_runtime_system().get_runtime(user=user)
+    runtime = get_runtime(user=user)
 
     try:
         return runtime.get_block(usage_key)

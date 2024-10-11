@@ -82,7 +82,7 @@ django-storages<1.14.4
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.27.2
+edx-enterprise==4.27.3
 
 # Date: 2024-05-09
 # This has to be constrained as well because newer versions of edx-i18n-tools need the
