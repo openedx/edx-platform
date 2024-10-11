@@ -6,8 +6,10 @@ This view is used in the MFE to preview XBlocks that are in the library.
 import re
 
 import ddt
+from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
+import pytest
 from xblock.core import XBlock
 
 from openedx.core.djangoapps.content_libraries.tests.base import (
@@ -115,8 +117,62 @@ class LibrariesEmbedViewTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestM
         html = self._embed_block(block_id, version=2)
         check_fields('Field Test Block (Old, v2)', 'Old setting value 2.', 'Old content value 2.')
 
-    # TODO: if we requested any version other than "draft", the handlers should not allow _writing_ to authored field
-    # data. Writing to student state is OK.
+    @XBlock.register_temp_plugin(FieldsTestBlock, FieldsTestBlock.BLOCK_TYPE)
+    def test_handlers_modifying_published_data(self):
+        """
+        Test that if we requested any version other than "draft", the handlers should not allow _writing_ to authored
+        field data (because you'd be overwriting the latest draft version with changes based on an old version).
+
+        We may decide to relax this restriction in the future. Not sure how important it is.
+
+        Writing to student state is OK.
+        """
+        # Create a library:
+        lib = self._create_library(slug="test-eb-2", title="Test Library", description="")
+        lib_id = lib["id"]
+        # Create an XBlock. This will be the empty version 1:
+        create_response = self._add_block_to_library(lib_id, FieldsTestBlock.BLOCK_TYPE, "block1")
+        block_id = create_response["id"]
+
+        # Now render the "embed block" view. This test only runs in CMS so it should default to the draft:
+        html = self._embed_block(block_id)
+
+        def call_update_handler(**kwargs):
+            handler_url = re.search(r'<p>handler URL: ([^<]+)</p>', html).group(1)
+            assert handler_url.startswith('http')
+            handler_url = handler_url.replace('get_fields', 'update_fields')
+            response = self.client.post(handler_url, kwargs, format='json')
+            assert response.status_code == 200
+
+        def check_fields(display_name, setting_field, content_field):
+            assert f'<h1>{display_name}</h1>' in html
+            assert f'<p>SF: {setting_field}</p>' in html
+            assert f'<p>CF: {content_field}</p>' in html
+
+        # Call the update handler to change the fields on the draft:
+        call_update_handler(display_name="DN-01", setting_field="SV-01", content_field="CV-01")
+
+        # Render the block again and check that the handler was able to update the fields:
+        html = self._embed_block(block_id)
+        check_fields(display_name="DN-01", setting_field="SV-01", content_field="CV-01")
+
+        # Publish the library:
+        self._commit_library_changes(lib_id)
+
+        # Now try changing the authored fields of the published version using a handler:
+        html = self._embed_block(block_id, version="published")
+        expected_msg = "Do not make changes to a component starting from the published or past versions."
+        with pytest.raises(ValidationError, match=expected_msg) as err:
+            call_update_handler(display_name="DN-X", setting_field="SV-X", content_field="CV-X")
+
+        # Now try changing the authored fields of a specific past version using a handler:
+        html = self._embed_block(block_id, version=2)
+        with pytest.raises(ValidationError, match=expected_msg) as err:
+            call_update_handler(display_name="DN-X", setting_field="SV-X", content_field="CV-X")
+
+        # Make sure the fields were not updated:
+        html = self._embed_block(block_id)
+        check_fields(display_name="DN-01", setting_field="SV-01", content_field="CV-01")
 
     # TODO: test that any static assets referenced in the student_view html are loaded as the correct version, and not
     # always loaded as "latest draft".
