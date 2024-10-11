@@ -250,48 +250,46 @@ class Model:
         return response
 
     def handle_update_comment(self, request_params, course_id):
-        try:
-            body = request_params["body"]
-            course_id = str(request_params["course_id"])
-            user_id = request_params["user_id"]
-        except KeyError as e:
-            raise e
-        response = forum_api.update_comment(
-            self.attributes["id"],
-            body,
-            course_id,
-            user_id,
-            request_params.get("anonymous", False),
-            request_params.get("anonymous_to_peers", False),
-            request_params.get("endorsed", False),
-            request_params.get("closed", False),
-            request_params.get("editing_user_id"),
-            request_params.get("edit_reason_code"),
-            request_params.get("endorsement_user_id"),
-            course_id,
-        )
+        request_data = {
+            "comment_id": self.attributes["id"],
+            "body": request_params.get("body"),
+            "course_id": request_params.get("course_id"),
+            "user_id": request_params.get("user_id"),
+            "anonymous": request_params.get("anonymous"),
+            "anonymous_to_peers": request_params.get("anonymous_to_peers"),
+            "endorsed": request_params.get("endorsed"),
+            "closed": request_params.get("closed"),
+            "editing_user_id": request_params.get("editing_user_id"),
+            "edit_reason_code": request_params.get("edit_reason_code"),
+            "endorsement_user_id": request_params.get("endorsement_user_id"),
+            "course_key": course_id
+        }
+        request_data = {k: v for k, v in request_data.items() if v is not None}
+        response = forum_api.update_comment(**request_data)
         return response
 
     def handle_update_thread(self, request_params, course_id):
-        response = forum_api.update_thread(
-            self.attributes["id"],
-            request_params.get("title"),
-            request_params.get("body"),
-            request_params.get("course_id"),
-            request_params.get("anonymous"),
-            request_params.get("anonymous_to_peers"),
-            request_params.get("closed"),
-            request_params.get("commentable_id"),
-            request_params.get("user_id"),
-            request_params.get("editing_user_id"),
-            request_params.get("pinned"),
-            request_params.get("thread_type"),
-            request_params.get("edit_reason_code"),
-            request_params.get("close_reason_code"),
-            request_params.get("closing_user_id"),
-            request_params.get("endorsed"),
-            course_id,
-        )
+        request_data = {
+            "thread_id": self.attributes["id"],
+            "title": request_params.get("title"),
+            "body": request_params.get("body"),
+            "course_id": request_params.get("course_id"),
+            "anonymous": request_params.get("anonymous"),
+            "anonymous_to_peers": request_params.get("anonymous_to_peers"),
+            "closed": request_params.get("closed"),
+            "commentable_id": request_params.get("commentable_id"),
+            "user_id": request_params.get("user_id"),
+            "editing_user_id": request_params.get("editing_user_id"),
+            "pinned": request_params.get("pinned"),
+            "thread_type": request_params.get("thread_type"),
+            "edit_reason_code": request_params.get("edit_reason_code"),
+            "close_reason_code": request_params.get("close_reason_code"),
+            "closing_user_id": request_params.get("closing_user_id"),
+            "endorsed": request_params.get("endorsed"),
+            "course_key": course_id
+        }
+        request_data = {k: v for k, v in request_data.items() if v is not None}
+        response = forum_api.update_thread(**request_data)
         return response
 
     def perform_http_put_request(self, request_params):
@@ -365,18 +363,21 @@ class Model:
             title = request_data["title"]
             body = request_data["body"]
             user_id = str(request_data["user_id"])
-            course_id = course_id or str(request_data["course_id"])
         except KeyError as e:
             raise e
-        response = forum_api.create_thread(
-            title=title,
-            body=body,
-            course_id=course_id,
-            user_id=user_id,
-            anonymous=request_data.get("anonymous", False),
-            anonymous_to_peers=request_data.get("anonymous_to_peers", False),
-            commentable_id=request_data.get("commentable_id", "course"),
-            thread_type=request_data.get("thread_type", "discussion"),
-            group_id=request_data.get("group_id", None),
-        )
+        
+        request_data = {
+            "title": title,
+            "body": body,
+            "course_id": course_id or str(request_data["course_id"]),
+            "user_id": user_id,
+            "anonymous": request_data.get("anonymous", None),
+            "anonymous_to_peers": request_data.get("anonymous_to_peers", None),
+            "commentable_id": request_data.get("commentable_id", None),
+            "thread_type": request_data.get("thread_type", None),
+            "group_id": request_data.get("group_id", None),
+            "context": request_data.get("context", None),
+        }
+        request_data = {k: v for k, v in request_data.items() if v is not None}
+        response = forum_api.create_thread(**request_data)
         return response
