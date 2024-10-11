@@ -1296,14 +1296,14 @@ def set_library_component_collections(
         created_by=created_by,
     )
 
-    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set lazy=True to trigger
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
     # collection indexing asynchronously.
     for collection in affected_collections:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library_key,
                 collection_key=collection.key,
-                lazy=True,
+                background=True,
             )
         )
 

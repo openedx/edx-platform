@@ -544,7 +544,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "library_collection": LibraryCollectionData(
                     self.lib2.library_key,
                     collection_key=self.col2.key,
-                    lazy=True,
+                    background=True,
                 ),
             },
             collection_update_event_receiver.call_args_list[0].kwargs,
@@ -556,7 +556,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "library_collection": LibraryCollectionData(
                     self.lib2.library_key,
                     collection_key=self.col3.key,
-                    lazy=True,
+                    background=True,
                 ),
             },
             collection_update_event_receiver.call_args_list[1].kwargs,

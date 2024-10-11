@@ -179,7 +179,7 @@ def library_collection_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    if library_collection.lazy:
+    if library_collection.background:
         update_library_collection_index_doc.delay(
             str(library_collection.library_key),
             library_collection.collection_key,
