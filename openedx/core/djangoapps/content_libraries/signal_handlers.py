@@ -162,6 +162,18 @@ def library_collection_entity_saved(sender, instance, created, **kwargs):
         _library_collection_component_changed(component)
 
 
+@receiver(post_delete, sender=CollectionPublishableEntity, dispatch_uid="library_collection_entity_deleted")
+def library_collection_entity_deleted(sender, instance, **kwargs):
+    """
+    Sends a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for components removed from a collection.
+    """
+    # Only trigger component updates if CollectionPublishableEntity was cascade deleted due to deletion of a collection.
+    if isinstance(kwargs.get('origin'), Collection):
+        # Component.pk matches its entity.pk
+        component = get_component(instance.entity_id)
+        _library_collection_component_changed(component)
+
+
 @receiver(m2m_changed, sender=CollectionPublishableEntity, dispatch_uid="library_collection_entities_changed")
 def library_collection_entities_changed(sender, instance, action, pk_set, **kwargs):
     """
