@@ -322,7 +322,9 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
             completed_programs.update(get_completed_programs(site, student))
 
         if not completed_programs:
-            LOGGER.warning(f"Task award_program_certificates was called for user {student.id} with no completed programs")
+            LOGGER.warning(
+                f"Task award_program_certificates was called for user {student.id} with no completed programs"
+            )
             return
 
         # determine which program certificates have been awarded to the user
