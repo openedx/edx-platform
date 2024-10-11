@@ -239,6 +239,13 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         if not self.authored_data_store.has_changes(block):
             return  # No changes, so no action needed.
 
+        if block._runtime_requested_version != LatestVersion.DRAFT:
+            # Not sure if this is an important restriction but it seems like overwriting the latest version based on
+            # an old version is likely an accident, so for now we're not going to allow it.
+            raise ValidationError(
+                "Do not make changes to a component starting from the published or past versions. Use the latest draft."
+            )
+
         # Verify that the user has permission to write to authored data in this
         # learning context:
         if self.user is not None:

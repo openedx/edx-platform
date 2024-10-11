@@ -44,6 +44,23 @@ User = get_user_model()
 invalid_not_found_fmt = "XBlock {usage_key} does not exist, or you don't have permission to view it."
 
 
+def parse_version_request(version_str: str | None) -> LatestVersion | int:
+    """
+    Given a version parameter from a query string (?version=14, ?version=draft,
+    ?version=published), get the LatestVersion parameter to use with the API.
+    """
+    if version_str is None:
+        return LatestVersion.AUTO  # AUTO = published if we're in the LMS, draft if we're in Studio.
+    if version_str == "draft":
+        return LatestVersion.DRAFT
+    if version_str == "published":
+        return LatestVersion.PUBLISHED
+    try:
+        return int(version_str)
+    except ValueError:
+        raise serializers.ValidationError("Invalid version specifier. Expected 'draft', 'published', or an integer.")
+
+
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
@@ -110,19 +127,7 @@ def embed_block_view(request, usage_key_str, view_name):
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
     # Check if a specific version has been requested
-    version = LatestVersion.AUTO  # AUTO = published if we're in the LMS, draft if we're in Studio.
-    if version_request := request.GET.get("version"):
-        if version_request == "draft":
-            version = LatestVersion.DRAFT
-        elif version_request == "published":
-            version = LatestVersion.PUBLISHED
-        else:
-            try:
-                version = int(version_request)
-            except ValueError:
-                raise serializers.ValidationError(
-                    "Invalid version specifier. Expected 'draft', 'published', or an integer."
-                )
+    version = parse_version_request(request.GET.get("version"))
 
     try:
         block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_LEARN, version=version)
@@ -131,9 +136,13 @@ def embed_block_view(request, usage_key_str, view_name):
 
     fragment = _render_block_view(block, view_name, request.user)
     handler_urls = {
-        str(key): _get_handler_url(key, 'handler_name', request.user)
-        for key in itertools.chain([block.scope_ids.usage_id], getattr(block, 'children', []))
+        str(block.usage_key): _get_handler_url(block.usage_key, 'handler_name', request.user, version=version)
     }
+    # Currently we don't support child blocks so we don't need this pre-loading of child handler URLs:
+    # handler_urls = {
+    #     str(key): _get_handler_url(key, 'handler_name', request.user)
+    #     for key in itertools.chain([block.scope_ids.usage_id], getattr(block, 'children', []))
+    # }
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     context = {
         'fragment': fragment,
@@ -221,7 +230,8 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
         raise AuthenticationFailed("Invalid user ID format.")
 
     request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
-    block = load_block(usage_key, user)
+
+    block = load_block(usage_key, user, version=parse_version_request(request.GET.get("version")))
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)

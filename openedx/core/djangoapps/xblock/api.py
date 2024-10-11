@@ -248,7 +248,13 @@ def render_block_view(block, view_name, user):  # pylint: disable=unused-argumen
     return fragment
 
 
-def get_handler_url(usage_key, handler_name, user):
+def get_handler_url(
+    usage_key: UsageKeyV2,
+    handler_name: str,
+    user: UserType,
+    *,
+    version: int | LatestVersion = LatestVersion.AUTO,
+):
     """
     A method for getting the URL to any XBlock handler. The URL must be usable
     without any authentication (no cookie, no OAuth/JWT), and may expire. (So
@@ -265,6 +271,11 @@ def get_handler_url(usage_key, handler_name, user):
         usage_key       - Usage Key (Opaque Key object or string)
         handler_name    - Name of the handler or a dummy name like 'any_handler'
         user            - Django User (registered or anonymous)
+        version         - Run the handler against a specific version of the
+                          block (e.g. when viewing an old version of it in
+                          Studio). Some blocks use handlers to load their data
+                          so it's important the handler matches the student_view
+                          etc.
 
     This view does not check/care if the XBlock actually exists.
     """
@@ -282,12 +293,16 @@ def get_handler_url(usage_key, handler_name, user):
     # and this XBlock:
     secure_token = get_secure_token_for_xblock_handler(user_id, usage_key_str)
     # Now generate the URL to that handler:
-    path = reverse('xblock_api:xblock_handler', kwargs={
+    kwargs = {
         'usage_key_str': usage_key_str,
         'user_id': user_id,
         'secure_token': secure_token,
         'handler_name': handler_name,
-    })
+    }
+    path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
+    if version != LatestVersion.AUTO:
+        path += "?version=" + (str(version) if isinstance(version, int) else version.value)
+
     # We must return an absolute URL. We can't just use
     # rest_framework.reverse.reverse to get the absolute URL because this method
     # can be called by the XBlock from python as well and in that case we don't

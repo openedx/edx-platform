@@ -3,7 +3,7 @@ Common base classes for all new XBlock runtimes.
 """
 from __future__ import annotations
 import logging
-from typing import Callable, Optional
+from typing import Callable, Optional, Protocol
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from eventtracking import tracker
-from opaque_keys.edx.keys import UsageKey, LearningContextKey
+from opaque_keys.edx.keys import UsageKeyV2, LearningContextKey
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
@@ -38,7 +38,7 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.types import User as UserType
 from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-from openedx.core.djangoapps.xblock.data import AuthoredDataMode, StudentDataMode
+from openedx.core.djangoapps.xblock.data import AuthoredDataMode, StudentDataMode, LatestVersion
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
@@ -61,6 +61,18 @@ def make_track_function():
     def function(event_type, event):
         return track_views.server_track(current_request, event_type, event, page='x_module')
     return function
+
+
+class GetHandlerFunction(Protocol):
+    def __call__(
+        self,
+        usage_key: UsageKeyV2,
+        handler_name: str,
+        user: UserType,
+        *,
+        version: int | LatestVersion = LatestVersion.AUTO,
+    ) -> str:
+        ...
 
 
 class XBlockRuntime(RuntimeShim, Runtime):
@@ -99,7 +111,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         self,
         user: UserType | None,
         *,
-        handler_url: Callable[[UsageKey, str, UserType | None], str],
+        handler_url: GetHandlerFunction,
         student_data_mode: StudentDataMode,
         authored_data_mode: AuthoredDataMode,
         id_reader: Optional[IdReader] = None,
@@ -140,7 +152,10 @@ class XBlockRuntime(RuntimeShim, Runtime):
         if thirdparty:
             log.warning("thirdparty handlers are not supported by this runtime for XBlock %s.", type(block))
 
-        url = self.handler_url_fn(block.scope_ids.usage_id, handler_name, self.user)
+        # Note: it's important that we call handlers based on the same version of the block
+        # (draft block -> draft data available to handler; published block -> published data available to handler)
+        kwargs = {"version": block._runtime_requested_version} if hasattr(block, "_runtime_requested_version") else {}
+        url = self.handler_url_fn(block.usage_key, handler_name, self.user, **kwargs)
         if suffix:
             if not url.endswith('/'):
                 url += '/'

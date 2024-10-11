@@ -32,6 +32,6 @@ urlpatterns = [
     path('xblocks/v2/<str:usage_key_str>/', include([
         # render one of this XBlock's views (e.g. student_view) for embedding in an iframe
         # NOTE: this endpoint is **unstable** and subject to changes after Sumac
-        re_path(r'^embed/(?P<view_name>[\w\-]+)/$', views.embed_block_view),
+        path('embed/<str:view_name>/', views.embed_block_view),
     ])),
 ]
