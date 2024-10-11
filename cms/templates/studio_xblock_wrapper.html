@@ -27,7 +27,7 @@ block_is_unit = is_unit(xblock)
 
 upstream_info = None
 if xblock.upstream:
-    upstream_info = UpstreamLink.try_fetch_for_block(xblock)
+    upstream_info = UpstreamLink.try_get_for_block(xblock)
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -134,7 +134,7 @@ if xblock.upstream:
             <ul class="actions-list nav-dd ui-right">
                 % if not is_root:
                     % if can_edit:
-                        % if upstream_info and upstream_info.prompt_sync:
+                        % if upstream_info and upstream_info.ready_to_sync:
                             <li class="action-item">
                                 <button
                                     class="btn-default library-sync-button action-button"
