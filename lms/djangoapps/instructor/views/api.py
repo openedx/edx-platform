@@ -2667,26 +2667,34 @@ def export_ora2_summary(request, course_id):
     return JsonResponse({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def export_ora2_submission_files(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ExportOra2SubmissionFiles(DeveloperErrorViewMixin, APIView):
     """
     Pushes a Celery task which will download and compress all submission
     files (texts, attachments) into a zip archive.
     """
-    course_key = CourseKey.from_string(course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    task_api.submit_export_ora2_submission_files(request, course_key)
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Pushes a Celery task which will download and compress all submission
+        files (texts, attachments) into a zip archive.
+        """
+        course_key = CourseKey.from_string(course_id)
+        try:
+            task_api.submit_export_ora2_submission_files(request, course_key)
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
+            return JsonResponseBadRequest(str(err))
 
-    return JsonResponse({
-        "status": _(
-            "Attachments archive is being created."
-        )
-    })
+        return JsonResponse({
+            "status": _(
+                "Attachments archive is being created."
+            )
+        })
 
 
 @transaction.non_atomic_requests
