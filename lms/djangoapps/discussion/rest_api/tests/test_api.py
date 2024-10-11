@@ -1259,7 +1259,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
@@ -2225,7 +2225,7 @@ class CreateCommentTest(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -2624,7 +2624,7 @@ class UpdateThreadTest(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
         self.user = UserFactory.create()
@@ -3201,7 +3201,7 @@ class UpdateCommentTest(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -3731,7 +3731,7 @@ class DeleteThreadTest(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -3897,7 +3897,7 @@ class DeleteCommentTest(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -4073,7 +4073,7 @@ class RetrieveThreadTest(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)

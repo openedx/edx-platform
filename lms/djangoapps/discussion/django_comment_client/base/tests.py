@@ -91,6 +91,19 @@ class CreateThreadGroupIdTestCase(
 ):
     cs_endpoint = "/threads"
 
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def call_view(self, mock_is_forum_v2_enabled, mock_request, commentable_id, user, group_id, pass_group_id=True):
         mock_is_forum_v2_enabled.return_value = False
         self._set_mock_request_data(mock_request, {})
@@ -140,7 +153,7 @@ class ThreadActionGroupIdTestCase(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         mock_is_forum_v2_enabled.return_value = False
         self._set_mock_request_data(
@@ -415,7 +428,7 @@ class ViewsQueryCountTestCase(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
     def count_queries(func):  # pylint: disable=no-self-argument
@@ -497,7 +510,7 @@ class ViewsTestCase(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
@@ -1175,7 +1188,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_pin_thread_as_student(self, mock_is_forum_v2_enabled, mock_request):
@@ -1321,7 +1334,7 @@ class UpdateThreadUnicodeTestCase(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
     @classmethod
@@ -1375,7 +1388,7 @@ class CreateCommentUnicodeTestCase(
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
     @classmethod
@@ -1705,7 +1718,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
         self.client.login(username=user.username, password=self.password)
 
@@ -1920,7 +1933,7 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
     @classmethod

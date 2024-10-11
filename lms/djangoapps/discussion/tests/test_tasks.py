@@ -243,7 +243,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
-        self.mock_get_course_id_by_comment = patcher.start()
+        self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
 
     def tearDown(self):
