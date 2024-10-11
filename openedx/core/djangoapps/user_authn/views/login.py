@@ -23,11 +23,14 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from edx_django_utils.monitoring import set_custom_attribute
 from eventtracking import tracker
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import SESSION_LOGIN_COMPLETED
 from openedx_filters.learning.filters import StudentLoginRequested
+from rest_framework import status
 from rest_framework.views import APIView
 
 from common.djangoapps import third_party_auth
@@ -702,6 +705,20 @@ def redirect_to_lms_login(request):
     """
     return redirect('/login?next=/admin')
 
+login_user_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "email": openapi.Schema(type=openapi.TYPE_STRING),
+        "password": openapi.Schema(type=openapi.TYPE_STRING),
+    },
+)
+
+login_user_return_success_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "success": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+    },
+)
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -710,24 +727,27 @@ class LoginSessionView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
+    # TODO also add:
+    #
+    #    HttpResponse: 400 if the request failed.
+    #        Ex. {'success': false, 'value': '{'success': false, 'value: 'Email or password is incorrect.'}
+    #    HttpResponse: 403 if successful authentication with a third party provider but does not have a linked account.
+    #        Ex. {'success': false, 'error_code': 'third-party-auth-with-no-linked-account'}
+    login_user_responses = {
+        status.HTTP_200_OK: login_user_return_success_schema,
+    }
+
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
+    @swagger_auto_schema(
+        request_body=login_user_schema,
+        responses=login_user_responses,
+    )
     @method_decorator(csrf_protect)
     def post(self, request, api_version):
-        """Log in a user.
-
-        See `login_user` for details.
-
-        Example Usage:
-
-            POST /api/user/v1/login_session
-            with POST params `email`, `password`.
-
-            200 {'success': true}
-
-        """
+        """Log in a user."""
         return login_user(request, api_version)
 
     @method_decorator(sensitive_post_parameters("password"))
