@@ -811,7 +811,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events @ git+https://github.com/open-craft/openedx-events@navin/update-library-collection-data
+openedx-events==9.15.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -825,7 +825,7 @@ openedx-filters==1.10.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning @ git+https://github.com/open-craft/openedx-learning@navin/component-collection-api
+openedx-learning @ git+https://github.com/openedx/openedx-learning@main
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
