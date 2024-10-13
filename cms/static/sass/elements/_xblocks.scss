@@ -64,7 +64,6 @@
 
       .xblock-display-name {
         @extend %t-copy-lead1;
-
         font-weight: font-weight(semi-bold);
       }
 
@@ -1074,4 +1073,40 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
     // to make sure the padding is correctly overridden
     padding: ($baseline / 2) 0 ($baseline * 0.4);
   }
+}
+
+
+body .wrapper-xblock .xblock-header-primary .header-details .xblock-display-name {
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 700;
+  color: #000;
+}
+
+.wrapper-xblock {
+  background-color: transparent;
+  border-radius: 6px;
+  border: none;
+
+  &:hover {
+    border-color: none;
+  }
+}
+
+.wrapper-xblock.level-element {
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.15),0 .125rem .5rem rgba(0,0,0,.15);
+}
+
+.wrapper-xblock.level-element .xblock-header-primary {
+  background-color: #fff;
+}
+
+.view-container .content-primary {
+  background-color: transparent !important;
+  width: 100% !important;
+}
+
+.wrapper-xblock.level-element .xblock-render {
+  background: white;
+  margin: 0;
 }
