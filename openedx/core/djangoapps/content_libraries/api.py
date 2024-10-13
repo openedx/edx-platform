@@ -76,7 +76,6 @@ from opaque_keys.edx.locator import (
     LibraryLocator as LibraryLocatorV1,
     LibraryCollectionLocator,
 )
-from opaque_keys import InvalidKeyError
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
@@ -97,10 +96,7 @@ from xblock.exceptions import XBlockNotFoundError
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key, xblock_type_display_name
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
-from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import permissions, tasks
 from .constants import ALL_RIGHTS_RESERVED, COMPLEX
@@ -408,8 +404,8 @@ def get_library(library_key):
     # updated version of content that a course could pull in. But more recently,
     # we've decided to do those version references at the level of the
     # individual blocks being used, since a Learning Core backed library is
-    # intended to be used for many LibraryContentBlocks and not 1:1 like v1
-    # libraries. The top level version stays for now because LibraryContentBlock
+    # intended to be referenced in multiple course locations and not 1:1 like v1
+    # libraries. The top level version stays for now because LegacyLibraryContentBlock
     # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
     published_by = None
@@ -1263,77 +1259,6 @@ def get_library_collection_from_usage_key(
         )
     except Collection.DoesNotExist as exc:
         raise ContentLibraryCollectionNotFound from exc
-
-
-# V1/V2 Compatibility Helpers
-# (Should be removed as part of
-#  https://github.com/openedx/edx-platform/issues/32457)
-# ======================================================
-
-def get_v1_or_v2_library(
-    library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
-    version: str | int | None,
-) -> LibraryRootV1 | ContentLibraryMetadata | None:
-    """
-    Fetch either a V1 or V2 content library from a V1/V2 key (or key string) and version.
-
-    V1 library versions are Mongo ObjectID strings.
-    V2 library versions can be positive ints, or strings of positive ints.
-    Passing version=None will return the latest version the library.
-
-    Returns None if not found.
-    If key is invalid, raises InvalidKeyError.
-    For V1, if key has a version, it is ignored in favor of `version`.
-    For V2, if version is provided but it isn't an int or parseable to one, we raise a ValueError.
-
-    Examples:
-    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", None)       -> <LibraryRootV1>
-    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", "65ff...")  -> <LibraryRootV1>
-    * get_v1_or_v2_library("lib:RG:rg-1", None)                    -> <ContentLibraryMetadata>
-    * get_v1_or_v2_library("lib:RG:rg-1", "36")                    -> <ContentLibraryMetadata>
-    * get_v1_or_v2_library("lib:RG:rg-1", "xyz")                   -> <ValueError>
-    * get_v1_or_v2_library("notakey", "xyz")                       -> <InvalidKeyError>
-
-    If you just want to get a V2 library, use `get_library` instead.
-    """
-    library_key: LibraryLocatorV1 | LibraryLocatorV2
-    if isinstance(library_id, str):
-        try:
-            library_key = LibraryLocatorV1.from_string(library_id)
-        except InvalidKeyError:
-            library_key = LibraryLocatorV2.from_string(library_id)
-    else:
-        library_key = library_id
-    if isinstance(library_key, LibraryLocatorV2):
-        v2_version: int | None
-        if version:
-            v2_version = int(version)
-        else:
-            v2_version = None
-        try:
-            library = get_library(library_key)
-            if v2_version is not None and library.version != v2_version:
-                raise NotImplementedError(
-                    f"Tried to load version {v2_version} of learning_core-based library {library_key}. "
-                    f"Currently, only the latest version ({library.version}) may be loaded. "
-                    "This is a known issue. "
-                    "It will be fixed before the production release of learning_core-based (V2) content libraries. "
-                )
-            return library
-        except ContentLibrary.DoesNotExist:
-            return None
-    elif isinstance(library_key, LibraryLocatorV1):
-        v1_version: str | None
-        if version:
-            v1_version = str(version)
-        else:
-            v1_version = None
-        store = modulestore()
-        library_key = library_key.for_branch(ModuleStoreEnum.BranchName.library).for_version(v1_version)
-        try:
-            return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
-        except ItemNotFoundError:
-            return None
 
 
 # Import from Courseware
