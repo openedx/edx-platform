@@ -7,6 +7,7 @@ from here.
 
 from django.conf import settings
 
+
 # Enable Studio search features (powered by Meilisearch) (beta, off by default)
 MEILISEARCH_ENABLED = getattr(settings, "MEILISEARCH_ENABLED", False)
 # Meilisearch URL that the python backend can use. Often points to another docker container or k8s service.
