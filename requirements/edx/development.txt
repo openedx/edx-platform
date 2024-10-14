@@ -657,7 +657,7 @@ drf-yasg==1.21.7
     #   -r requirements/edx/testing.txt
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.11.2
+edx-ace==1.11.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
