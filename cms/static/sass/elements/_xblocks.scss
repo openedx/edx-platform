@@ -1083,6 +1083,11 @@ body .wrapper-xblock .xblock-header-primary .header-details .xblock-display-name
   color: #000;
 }
 
+.wrapper-xblock .xblock-header-primary {
+  padding: 24px;
+  padding-bottom: 12px;
+}
+
 .wrapper-xblock {
   background-color: transparent;
   border-radius: 6px;
@@ -1107,6 +1112,70 @@ body .wrapper-xblock .xblock-header-primary .header-details .xblock-display-name
 }
 
 .wrapper-xblock.level-element .xblock-render {
-  background: white;
+  background: #fff;
   margin: 0;
+  padding: 24px;
+  padding-top: 12px;
+}
+
+.action-edit {
+  .action-button-text {
+    display: none;
+  }
+
+  .edit-button.action-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50% !important;
+
+    &:hover {
+      background-color: #00262B;
+    }
+
+    &:focus {
+      outline: 2px rgba(0,0,0,0);
+      background-color: rgba(0,0,0,0);
+      box-shadow: inset 0 0 0 2px #00262b;
+    }
+  }
+}
+
+.wrapper-xblock .wrapper-xblock .header-actions .actions-list .action-item .action-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+
+  &:hover {
+    background-color: #00262B;
+  }
+
+  &:focus {
+    outline: 2px rgba(0,0,0,0);
+    background-color: rgba(0,0,0,0);
+    box-shadow: inset 0 0 0 2px #00262b;
+  }
+}
+
+body .nav-dd .nav-sub {
+  box-shadow: 0px 4px 10px 0px rgba(0,0,0,.15),0px 8px 16px 0px rgba(0,0,0,.15);
+  border-radius: .375rem;
+  padding: 10px 0;
+  border: none;
+
+  .nav-item {
+    padding: .625rem 1rem;
+    border-bottom: none;
+    color: #212529;
+    font-size: 18px;
+
+    &:hover {
+      background-color: #f2f0ef;
+      color: #212529;
+    }
+
+    &:active {
+      background-color: #00262b;
+      color: #fff;
+    }
+  }
 }
