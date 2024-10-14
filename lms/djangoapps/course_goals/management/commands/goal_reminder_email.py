@@ -94,7 +94,7 @@ def send_ace_message(goal):
         options = {
             'transactional': True,
             'from_address': settings.LMS_COMM_DEFAULT_FROM_EMAIL,
-            'override_default_channel': is_ses_enabled,
+            'override_default_channel': 'django_email',
         }
 
     msg = Message(

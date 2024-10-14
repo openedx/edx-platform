@@ -195,7 +195,7 @@ class TestGoalReminderEmailCommand(TestCase):
 
             assert mock_ace.call_count == 1
             msg = mock_ace.call_args[0][0]
-            assert msg.options['override_default_channel'] is True
+            assert msg.options['override_default_channel'] == 'django_email'
             assert msg.options['from_address'] == settings.LMS_COMM_DEFAULT_FROM_EMAIL
 
     @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send')
