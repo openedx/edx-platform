@@ -331,12 +331,9 @@ class Model:
 
     def handle_create_comment(self, course_id):
         request_data = self.initializable_attributes()
-        try:
-            body = request_data["body"]
-            user_id = request_data["user_id"]
-            course_id = course_id or str(request_data["course_id"])
-        except KeyError as e:
-            raise e
+        body = request_data["body"]
+        user_id = request_data["user_id"]
+        course_id = course_id or str(request_data["course_id"])
         if parent_id := self.attributes.get("parent_id"):
             response = forum_api.create_child_comment(
                 parent_id,
@@ -359,25 +356,16 @@ class Model:
 
     def handle_create_thread(self, course_id):
         request_data = self.initializable_attributes()
-        try:
-            title = request_data["title"]
-            body = request_data["body"]
-            user_id = str(request_data["user_id"])
-        except KeyError as e:
-            raise e
-
-        request_data = {
-            "title": title,
-            "body": body,
-            "course_id": course_id or str(request_data["course_id"]),
-            "user_id": user_id,
-            "anonymous": request_data.get("anonymous", None),
-            "anonymous_to_peers": request_data.get("anonymous_to_peers", None),
-            "commentable_id": request_data.get("commentable_id", None),
-            "thread_type": request_data.get("thread_type", None),
-            "group_id": request_data.get("group_id", None),
-            "context": request_data.get("context", None),
-        }
-        request_data = {k: v for k, v in request_data.items() if v is not None}
-        response = forum_api.create_thread(**request_data)
+        response = forum_api.create_thread(
+            title=request_data["title"],
+            body=request_data["body"],
+            course_id=course_id or str(request_data["course_id"]),
+            user_id=str(request_data["user_id"]),
+            anonymous=request_data.get("anonymous", False),
+            anonymous_to_peers=request_data.get("anonymous_to_peers", False),
+            commentable_id=request_data.get("commentable_id", "course"),
+            thread_type=request_data.get("thread_type", "discussion"),
+            group_id=request_data.get("group_id", None),
+            context=request_data.get("context", None),
+        )
         return response
