@@ -231,6 +231,9 @@ class BlockDueDateSerializer(serializers.Serializer):
 
 
 class ProblemResetSerializer(UniqueStudentIdentifierSerializer):
+    """
+    serializer for resetting problem.
+    """
     problem_to_reset = serializers.CharField(
         help_text=_("The URL name of the problem to reset."),
         error_messages={
