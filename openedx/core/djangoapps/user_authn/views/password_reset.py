@@ -149,7 +149,8 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
     """
     message_context, user_language_preference = get_user_default_email_params(user)
-    site_name = settings.AUTHN_MICROFRONTEND_DOMAIN if should_redirect_to_authn_microfrontend() \
+    mfe_config = configuration_helpers.get_value('MFE_CONFIG', {})
+    site_name = (mfe_config["AUTHN_MICROFRONTEND_DOMAIN"] if mfe_config else settings.AUTHN_MICROFRONTEND_DOMAIN) if should_redirect_to_authn_microfrontend() \
         else configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
