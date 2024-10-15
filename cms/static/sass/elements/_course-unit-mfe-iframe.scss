@@ -21,3 +21,45 @@
   padding: 10px 16px;
   border-radius: $btn-border-radius;
 }
+
+%primary-button {
+  @extend %modal-actions-button;
+
+  background-color: $primary;
+  color: $white;
+  border: 1px solid $primary;
+  cursor: pointer;
+  background-image: none;
+  display: block;
+
+  &:hover {
+    background: darken($primary, 5%);
+    border-color: #2d494e;
+    box-shadow: none;
+    color: $white;
+  }
+
+  &:focus {
+    background: $primary;
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+%light-button {
+  @extend %modal-actions-button;
+
+  color: $black;
+  background-color: $light-background-color;
+  border-color: $light-background-color;
+  box-shadow: none;
+  border: 1px solid $transparent;
+  font-weight: 500;
+}
+
+%icon-position {
+  top: 11px;
+  left: 11px;
+  width: 20px;
+  height: 20px;
+}

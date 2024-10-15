@@ -1,96 +1,350 @@
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
-.wrapper-content.wrapper {
-  padding: 5px;
-}
-
-body .wrapper-xblock {
-  background-color: $transparent;
-  border-radius: 6px;
-  border: none;
-
-  &:hover {
-    border-color: none;
-  }
-
-  .xblock-header-primary {
-    padding: 24px;
-    padding-bottom: 12px;
-    border-bottom: none !important;
-
-    .header-details .xblock-display-name {
-      font-size: 22px;
-      line-height: 28px;
-      font-weight: 700;
-      color: $black;
-    }
-  }
-
-  &.level-element {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
-    margin: 0 0 28px 0;
-  }
-
-  &.level-element .xblock-header-primary {
-    background-color: $white;
-  }
-
-  &.level-element .xblock-render {
-    background: $white;
-    margin: 0;
-    padding: 24px;
-    padding-top: 12px;
-  }
-
-  .wrapper-xblock .header-actions .actions-list .action-item .action-button {
-    color: $black;
-
-    @extend %button-styles;
-
-    .fa-ellipsis-v {
-      font-size: $base-font-size;
-    }
+.wrapper {
+  .wrapper-xblock {
+    background-color: $transparent;
+    border-radius: 6px;
+    border: none;
 
     &:hover {
-      background-color: $primary;
+      border-color: none;
+    }
+
+    .xblock-header-primary {
+      padding: ($baseline * 1.2) ($baseline * 1.2) ($baseline / 1.67);
+      border-bottom: none;
+
+      .header-details .xblock-display-name {
+        font-size: 22px;
+        line-height: 28px;
+        font-weight: 700;
+        color: $black;
+      }
+    }
+
+    &.level-element {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
+      margin: 0 0 ($baseline * 1.4) 0;
+    }
+
+    &.level-element .xblock-header-primary {
+      background-color: $white;
+    }
+
+    &.level-element .xblock-render {
+      background: $white;
+      margin: 0;
+      padding: $baseline;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    .wrapper-xblock .header-actions .actions-list .action-item .action-button {
+      @extend %button-styles;
+
+      color: $black;
+
+      .fa-ellipsis-v {
+        font-size: $base-font-size;
+      }
+
+      &:hover {
+        background-color: $primary;
+        border-color: $transparent;
+      }
+
+      &:focus {
+        outline: 2px $transparent;
+        background-color: $transparent;
+        box-shadow: inset 0 0 0 2px $primary;
+        color: $primary;
+        border-color: $transparent;
+      }
+    }
+
+    .xblock-header-primary .header-actions .nav-dd .nav-sub {
+      border: 1px solid rgba(0, 0, 0, .15);
+      border-radius: 6px;
+      padding: ($baseline / 2) 0;
+      min-width: 288px;
+      right: 90px;
+
+      .nav-item {
+        border-bottom: none;
+        color: $dark;
+        font-size: $base-font-size;
+
+        a {
+          padding: ($baseline / 2) ($baseline / 1.25);
+        }
+
+        &:hover {
+          background-color: #f2f0ef;
+          color: $dark;
+        }
+
+        a:hover {
+          color: $dark;
+        }
+
+        a:focus {
+          outline: none;
+        }
+
+        &:active {
+          background-color: $primary;
+
+          a {
+            color: $white;
+          }
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  &.wrapper-modal-window .modal-window .modal-actions a {
+    color: $text-color;
+    background-color: $transparent;
+    border-color: $transparent;
+    box-shadow: none;
+    font-weight: 500;
+    border: 1px solid $transparent;
+    padding: ($baseline / 2) ($baseline / 1.25);
+    font-size: $base-font-size;
+    line-height: 20px;
+    border-radius: $btn-border-radius;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    background-image: none;
+    display: block;
+
+    &:hover {
+      background-color: $light-background-color;
       border-color: $transparent;
+      color: $text-color;
     }
 
     &:focus {
-      outline: 2px $transparent;
-      background-color: $transparent;
-      box-shadow: inset 0 0 0 2px $primary;
-      color: $primary;
-      border-color: $transparent;
+      background: $transparent;
+      outline: none;
     }
+  }
+
+  .modal-window.modal-editor {
+    background-color: $white;
+    border-radius: 6px;
+
+    a {
+      color: #00688d;
+    }
+
+    select {
+      &:focus {
+        background-color: $white;
+        color: $text-color;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    input:not([type="radio"], [type="checkbox"], [type="submit"]) {
+      @extend %input-styles;
+
+      line-height: 20px;
+      height: 44px;
+
+      &:hover {
+        border: solid 1px #002121;
+      }
+
+      &:focus {
+        color: $text-color;
+        background-color: $white;
+        border-color: $primary;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    #student_training_settings_editor .openassessment_training_example .openassessment_training_example_body
+    .openassessment_training_example_essay_wrapper textarea {
+      @extend %input-styles;
+
+      box-shadow: none;
+    }
+
+    textarea {
+      @extend %input-styles;
+
+      box-shadow: none;
+
+      &#poll-question-editor,
+      &#poll-feedback-editor {
+        box-shadow: none;
+
+        &:focus {
+          color: $text-color;
+          background-color: $white;
+          border-color: $primary;
+          outline: 0;
+          box-shadow: 0 0 0 1px $primary;
+        }
+      }
+
+      &:hover {
+        border: solid 1px #002121;
+      }
+
+      &:focus {
+        color: $text-color;
+        background-color: $white;
+        border-color: $primary;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    .tip.setting-help {
+      color: $border-color;
+      font-size: 14px;
+      line-height: $base-font-size;
+    }
+
+    label,
+    .label.setting-label {
+      font-size: $base-font-size;
+      line-height: 28px;
+      color: $text-color;
+      font-weight: 400;
+    }
+
+    .title.modal-window-title {
+      color: $black;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 28px;
+    }
+
+    .xblock-actions {
+      background-color: $white;
+
+      .action-button {
+        background-color: $transparent;
+        border: 1px solid $transparent;
+        padding: ($baseline / 2.22) ($baseline / 1.25);
+        border-radius: $input-border-radius;
+        font-weight: 400;
+        color: #00688d;
+        font-size: $base-font-size;
+        line-height: 20px;
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      .openassessment_save_button,
+      .save-button,
+      .continue-button {
+        color: $white;
+        background-color: $primary;
+        border-color: $primary;
+        box-shadow: none;
+        font-weight: 500;
+        border: 1px solid $transparent;
+        padding: ($baseline / 2) ($baseline / 1.25);
+        font-size: $base-font-size;
+        line-height: 20px;
+        border-radius: $btn-border-radius;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        background-image: none;
+        height: auto;
+        display: block;
+
+        &:hover {
+          background: darken($primary, 5%);
+          border-color: $transparent;
+          color: $white;
+        }
+
+        &:focus {
+          background: $primary;
+          outline: none;
+        }
+      }
+
+      .openassessment_cancel_button,
+      .cancel-button {
+        color: $text-color;
+        background-color: $transparent;
+        border-color: $transparent;
+        box-shadow: none;
+        font-weight: 500;
+        border: 1px solid $transparent;
+        padding: ($baseline / 2) ($baseline / 1.25);
+        font-size: $base-font-size;
+        line-height: 20px;
+        border-radius: $btn-border-radius;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        background-image: none;
+        display: block;
+
+        &:hover {
+          background-color: $light-background-color;
+          border-color: $transparent;
+          color: $text-color;
+        }
+
+        &:focus {
+          background: $transparent;
+          outline: none;
+        }
+      }
+    }
+  }
+
+  .modal-lg.modal-window.confirm.openassessment_modal_window {
+    height: 635px;
   }
 }
 
 .view-container .content-primary {
-  background-color: $transparent !important;
-  width: 100% !important;
+  background-color: $transparent;
+  width: 100%;
+}
+
+.wrapper-content.wrapper {
+  padding: $baseline / 4;
 }
 
 .btn-default.action-edit.title-edit-button {
+  @extend %button-styles;
+
   position: relative;
   top: 7px;
-
-  @extend %button-styles;
 
   .fa-pencil {
     display: none;
   }
 
   &::before {
+    @extend %icon-position;
+
     content: '';
     position: absolute;
     background-color: $black;
     mask: url('#{$static-path}/images/pencil-icon.svg') center no-repeat;
-    top: 11px;
-    left: 11px;
-    width: 20px;
-    height: 20px;
   }
 
   &:hover {
@@ -125,23 +379,21 @@ body .wrapper-xblock {
   }
 
   .edit-button.action-button {
-    position: relative;
-
     @extend %button-styles;
+
+    position: relative;
 
     .fa-pencil {
       display: none;
     }
 
     &::before {
+      @extend %icon-position;
+
       content: '';
       position: absolute;
       background-color: $black;
       mask: url('#{$static-path}/images/pencil-icon.svg') center no-repeat;
-      top: 11px;
-      left: 11px;
-      width: 20px;
-      height: 20px;
     }
 
     &:hover {
@@ -178,130 +430,26 @@ body .wrapper-xblock {
   }
 }
 
-[class*="view-"] .modal-lg.modal-editor .modal-header .editor-modes .action-item .editor-button,
-[class*="view-"] .modal-lg.modal-editor .modal-header .editor-modes .action-item .settings-button,
-#openassessment-editor #openassessment_editor_header .editor_tabs .oa_editor_tab {
-  color: $black;
-  background-color: $light-background-color;
-  border-color: $light-background-color;
-  box-shadow: none;
-  border: 1px solid $transparent;
-  font-weight: 500;
-
-  @extend %modal-actions-button;
-}
-
-[class*="view-"] .modal-window .modal-actions .action-primary,
-body .xblock--drag-and-drop--editor .btn,
-body #openassessment-editor .openassessment_container_add_button,
-body #openassessment-editor #oa_rubric_editor_wrapper .openassessment_criterion .openassessment_criterion_add_option {
-  background-color: $primary;
-  color: $white;
-  border: 1px solid $primary;
-  cursor: pointer;
-  background-image: none;
-  display: block;
-
-  @extend %modal-actions-button;
-
-  &:hover {
-    background: darken($primary, 5%);
-    border-color: #2d494e;
-    box-shadow: none;
-  }
-
-  &:focus {
-    background: $primary;
-    outline: none;
-    box-shadow: none;
+[class*="view-"] .modal-lg.modal-editor .modal-header .editor-modes .action-item {
+  .editor-button,
+  .settings-button {
+    @extend %light-button;
   }
 }
 
-body .xblock--drag-and-drop--editor .btn {
-  display: inline-block;
-}
-
-[class*="view-"] .modal-window .modal-actions a {
-  color: $text-color;
-  background-color: $transparent;
-  border-color: $transparent;
-  box-shadow: none;
-  font-weight: 500;
-  border: 1px solid $transparent !important;
-  padding: 10px 16px !important;
-  font-size: $base-font-size;
-  line-height: 20px;
-  border-radius: $btn-border-radius !important;
-  text-align: center;
-  vertical-align: middle;
-  user-select: none;
-  background-image: none;
-  display: block;
-
-  &:hover {
-    background-color: $light-background-color;
-    border-color: $transparent;
-    color: $text-color;
-  }
-
-  &:focus {
-    background: $transparent;
-    outline: none;
-  }
-}
-
-body .nav-dd .nav-sub {
-  border: 1px solid rgba(0, 0, 0, .15);
-  border-radius: 6px;
-  padding: 10px 0;
-  min-width: 288px;
-  right: 90px;
-
-  .nav-item {
-    border-bottom: none;
-    color: #212529;
-    font-size: $base-font-size;
-
-    a {
-      padding: 10px 16px;
-    }
-
-    &:hover {
-      background-color: #f2f0ef;
-      color: #212529;
-    }
-
-    a:hover {
-      color: #212529 !important;
-    }
-
-    a:focus {
-      outline: none;
-    }
-
-    &:active {
-      background-color: $primary;
-
-      a {
-        color: $white !important;
-      }
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+[class*="view-"] .wrapper.wrapper-modal-window .modal-window .modal-actions .action-primary {
+  @extend %primary-button;
 }
 
 .wrapper-comp-settings {
   .list-input.settings-list {
     .metadata-list-enum .create-setting {
+      @extend %modal-actions-button;
+
       background-color: $primary;
       color: $white;
       border: 1px solid $primary;
       cursor: pointer;
-
-      @extend %modal-actions-button;
 
       &:hover {
         background: darken($primary, 5%);
@@ -315,238 +463,82 @@ body .nav-dd .nav-sub {
     }
   }
 
-  .list-input.settings-list .field.comp-setting-entry.is-set .setting-input {
-    color: $text-color;
-  }
-
-  .list-input.settings-list select {
-    border: 1px solid $border-color;
-    border-radius: $input-border-radius;
-    color: $text-color;
-    height: 44px;
-
-    &:focus {
-      background-color: $white;
+  .list-input.settings-list {
+    .field.comp-setting-entry.is-set .setting-input {
       color: $text-color;
-      outline: 0;
-      box-shadow: 0 0 0 1px #0a3055;
-    }
-  }
-
-  .list-input.settings-list .setting-label {
-    font-size: $base-font-size;
-    line-height: 28px;
-    color: $text-color;
-    font-weight: 400;
-  }
-
-  .list-input.settings-list input[type="number"] {
-    width: 45%;
-  }
-
-  .list-input.settings-list .action.setting-clear {
-    background-color: $transparent;
-    color: $primary;
-    border: none;
-
-    @extend %button-styles;
-
-    &:hover {
-      background-color: $primary;
-      color: $white;
-      border: none;
     }
 
-    &:focus {
-      outline: 2px $transparent;
+    select {
+      border: 1px solid $border-color;
+      border-radius: $input-border-radius;
+      color: $text-color;
+      height: 44px;
+
+      &:focus {
+        background-color: $white;
+        color: $text-color;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    .setting-label {
+      font-size: $base-font-size;
+      line-height: 28px;
+      color: $text-color;
+      font-weight: 400;
+    }
+
+    input[type="number"] {
+      width: 45%;
+    }
+
+    .action.setting-clear {
+      @extend %button-styles;
+
       background-color: $transparent;
-      box-shadow: inset 0 0 0 2px $primary;
       color: $primary;
+      border: none;
+
+      &:hover {
+        background-color: $primary;
+        color: $white;
+        border: none;
+      }
+
+      &:focus {
+        outline: 2px $transparent;
+        background-color: $transparent;
+        box-shadow: inset 0 0 0 2px $primary;
+        color: $primary;
+      }
     }
+  }
+
+  .list-input.settings-list .metadata-list-enum .remove-setting .fa-times-circle {
+    color: $primary;
   }
 }
 
-body select {
+select {
   border: 1px solid $border-color;
   border-radius: $input-border-radius;
   color: $text-color;
   height: 44px;
-  padding: 10px 16px;
+  padding: ($baseline / 2) ($baseline / 1.25);
 
   &:focus {
     background-color: $white;
     color: $text-color;
     outline: 0;
-    box-shadow: 0 0 0 1px #0a3055;
+    box-shadow: 0 0 0 1px $primary;
   }
 }
 
-body .modal-window.modal-editor {
-  background-color: $white;
-  border-radius: 6px;
-
-  a {
-    color: #00688d;
-  }
-
-  select {
-    &:focus {
-      background-color: $white;
-      color: $text-color;
-      outline: 0;
-      box-shadow: 0 0 0 1px #0a3055;
-    }
-  }
-
-  input:not([type="radio"]):not([type="checkbox"]):not([type="submit"]) {
-    line-height: 20px;
-    height: 44px !important;
-
-    @extend %input-styles;
-
-    &:hover {
-      border: solid 1px #002121;
-    }
-
-    &:focus {
-      color: $text-color;
-      background-color: $white;
-      border-color: $primary;
-      outline: 0;
-      box-shadow: 0 0 0 1px $primary;
-    }
-  }
-
-  textarea {
-    box-shadow: none !important;
-
-    @extend %input-styles;
-
-    &:hover {
-      border: solid 1px #002121;
-    }
-
-    &:focus {
-      color: $text-color !important;
-      background-color: $white;
-      border-color: $primary !important;
-      outline: 0;
-      box-shadow: 0 0 0 1px $primary !important;
-    }
-  }
-
-  .tip.setting-help {
-    color: $border-color;
-    font-size: 14px;
-    line-height: $base-font-size;
-  }
-
-  label,
-  .label.setting-label {
-    font-size: $base-font-size;
-    line-height: 28px;
-    color: $text-color;
-    font-weight: 400;
-  }
-
-  .title.modal-window-title {
-    color: $black;
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 28px;
-  }
-
-  .xblock-actions {
-    background-color: $white !important;
-
-    .action-button {
-      background-color: $transparent;
-      border: 1px solid $transparent;
-      padding: 9px 16px;
-      border-radius: $input-border-radius;
-      font-weight: 400;
-      color: #00688d;
-      font-size: $base-font-size;
-      line-height: 20px;
-      cursor: pointer;
-
-      &:focus {
-        outline: none;
-      }
-    }
-
-    .openassessment_save_button,
-    .save-button,
-    .continue-button {
-      color: $white !important;
-      background-color: $primary;
-      border-color: $primary !important;
-      box-shadow: none;
-      font-weight: 500;
-      border: 1px solid $transparent !important;
-      padding: 10px 16px !important;
-      font-size: $base-font-size;
-      line-height: 20px;
-      border-radius: $btn-border-radius !important;
-      text-align: center;
-      vertical-align: middle;
-      user-select: none;
-      background-image: none;
-      height: auto !important;
-      display: block;
-
-      &:hover {
-        background: darken($primary, 5%);
-        border-color: $transparent;
-        color: $white;
-      }
-
-      &:focus {
-        background: $primary;
-        outline: none;
-      }
-    }
-
-    .openassessment_cancel_button,
-    .cancel-button {
-      color: $text-color;
-      background-color: $transparent;
-      border-color: $transparent;
-      box-shadow: none;
-      font-weight: 500;
-      border: 1px solid $transparent !important;
-      padding: 10px 16px !important;
-      font-size: $base-font-size;
-      line-height: 20px;
-      border-radius: $btn-border-radius !important;
-      text-align: center;
-      vertical-align: middle;
-      user-select: none;
-      background-image: none;
-      display: block;
-
-      &:hover {
-        background-color: $light-background-color;
-        border-color: $transparent;
-        color: $text-color;
-      }
-
-      &:focus {
-        background: $transparent;
-        outline: none;
-      }
-    }
-  }
-}
-
-body #openassessment-editor #openassessment_editor_header,
-body #openassessment-editor .openassessment_tab_instructions {
-  background-color: $white;
-}
-
-body {
+.xblock {
   .xblock--drag-and-drop--editor .tab {
     background-color: $white;
+    display: inline-block;
   }
 
   #openassessment-editor #oa_rubric_editor_wrapper {
@@ -558,67 +550,77 @@ body {
     .openassessment_criterion_option .openassessment_criterion_option_point_wrapper label,
     .openassessment_criterion_option .openassessment_criterion_option_name_wrapper label input,
     .openassessment_criterion .openassessment_criterion_basic_editor .comp-setting-entry .wrapper-comp-settings .openassessment_criterion_prompt,
-    #openassessment_rubric_feedback_wrapper textarea {
+    #openassessment_rubric_feedback_wrapper textarea,
+    .openassessment_criterion_option
+    .openassessment_criterion_option_explanation_wrapper label textarea,
+    input[type=number] {
       font-size: $base-font-size;
       background-color: $white;
       background-image: none;
     }
   }
 
-  #oa_rubric_editor_wrapper .openassessment_criterion_option
-  .openassessment_criterion_option_explanation_wrapper label textarea,
-  #openassessment-editor input[type=number] {
-    font-size: $base-font-size !important;
-    background-color: $white !important;
-    background-image: none !important;
+  #openassessment-editor {
+    #openassessment_editor_header .editor_tabs .oa_editor_tab {
+      @extend %light-button;
+
+      padding: 0 10px;
+    }
+
+    #openassessment_editor_header,
+    .openassessment_tab_instructions {
+      background-color: $white;
+    }
+
+    #oa_schedule_editor_wrapper #dates_config_new_badge {
+      background-color: $primary;
+    }
+
+    .openassessment_description {
+      font-size: 14px;
+      line-height: $base-font-size;
+    }
+
+    #oa_rubric_editor_wrapper .openassessment_criterion
+    .openassessment_criterion_basic_editor .comp-setting-entry
+    .wrapper-comp-settings label {
+      font-size: $base-font-size;
+      line-height: 28px;
+      color: $text-color;
+      font-weight: 400;
+    }
+
+    #oa_rubric_editor_wrapper .openassessment_criterion_option
+    .openassessment_criterion_option_point_wrapper label input {
+      min-width: 70px;
+      font-size: 18px;
+      height: 44px;
+    }
+
+    .openassessment_assessment_module_settings_editor:hover {
+      border-color: $primary;
+
+      .drag-handle {
+        background-color: $primary;
+        border-color: $primary;
+      }
+    }
+
+    .setting-help,
+    .ti.wrapper-comp-settings .list-input.settings-list .setting-help {
+      color: $border-color;
+      font-size: 14px;
+      line-height: $base-font-size;
+    }
   }
 
-  #openassessment-editor input[type=number] {
-    min-width: 70px !important;
-  }
-
-  #openassessment-editor #oa_rubric_editor_wrapper .openassessment_criterion
-  .openassessment_criterion_basic_editor .comp-setting-entry
-  .wrapper-comp-settings label {
-    font-size: $base-font-size;
-    line-height: 28px;
-    color: $text-color;
-    font-weight: 400;
-  }
-
-  #openassessment-editor .openassessment_description {
-    font-size: 14px;
-    line-height: $base-font-size;
-  }
-
-  .modal-lg.modal-window.confirm.openassessment_modal_window {
-    height: 635px;
-  }
-
-  #openassessment-editor #oa_schedule_editor_wrapper #dates_config_new_badge {
-    background-color: $primary;
+  .xblock--drag-and-drop--editor .btn,
+  #openassessment-editor .openassessment_container_add_button,
+  #openassessment-editor #oa_rubric_editor_wrapper .openassessment_criterion .openassessment_criterion_add_option,
+  #student_training_settings_editor .openassessment_add_training_example {
+    @extend %primary-button;
   }
 }
-
-.setting-help,
-.ti.wrapper-comp-settings .list-input.settings-list .setting-help {
-  color: $border-color;
-  font-size: 14px !important;
-  line-height: $base-font-size !important;
-}
-
-#openassessment-editor .openassessment_assessment_module_settings_editor:hover {
-  border-color: $primary !important;
-}
-
-#openassessment-editor .openassessment_assessment_module_settings_editor:hover .drag-handle {
-  background-color: $primary !important;
-  border-color: $primary !important;
-}
-
-// [class*="view-"] .modal-window .editor-with-buttons .xblock-actions {
-//   bottom: -6px;
-// }
 
 .xblock-header-primary {
   position: relative;
@@ -642,4 +644,8 @@ body {
   .copy {
     color: $primary;
   }
+}
+
+.wrapper-comp-setting.metadata-list-enum .action.setting-clear.active {
+  margin-top: 0;
 }
