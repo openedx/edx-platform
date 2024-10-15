@@ -106,7 +106,8 @@ class Command(BaseCommand):
         message_context = get_base_template_context(site)
         email = user.email
         if should_redirect_to_authn_microfrontend():
-            site_url = settings.AUTHN_MICROFRONTEND_URL
+            mfe_config = configuration_helpers.get_value('MFE_CONFIG', {})
+            site_url = mfe_config["AUTHN_MICROFRONTEND_URL"] if mfe_config else settings.AUTHN_MICROFRONTEND_URL
         else:
             site_url = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
         message_context.update({
