@@ -3,6 +3,8 @@
 
 <%! main_css = "style-main-v1" %>
 
+<%! course_unit_mfe_iframe_css = "course-unit-mfe-iframe-bundle" %>
+
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.urls import reverse
@@ -77,6 +79,8 @@ from openedx.core.release import RELEASE_LINE
         % else:
         <%static:css group='${self.attr.main_css}'/>
         % endif
+
+        <%static:css group='${self.attr.course_unit_mfe_iframe_css}'/>
 
         <%include file="widgets/segment-io.html" />
 

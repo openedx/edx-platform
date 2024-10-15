@@ -1418,6 +1418,12 @@ PIPELINE['STYLESHEETS'] = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
+    'course-unit-mfe-iframe-bundle': {
+        'source_filenames': [
+            'css/course-unit-mfe-iframe-bundle.css',
+        ],
+        'output_filename': 'css/course-unit-mfe-iframe-bundle.css',
+    },
 }
 
 base_vendor_js = [
