@@ -1418,6 +1418,13 @@ PIPELINE['STYLESHEETS'] = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
+    'my_new_bundle': {
+        'source_filenames': [
+            'css/my_new_bundle.css',
+        ],
+        'output_filename': 'css/my_new_bundle.css',
+    },
+
 }
 
 base_vendor_js = [

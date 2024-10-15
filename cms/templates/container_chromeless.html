@@ -2,6 +2,7 @@
 ## mako
 
 <%! main_css = "style-main-v1" %>
+<%! my_new_bundle = "my_new_bundle" %>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -77,6 +78,8 @@ from openedx.core.release import RELEASE_LINE
         % else:
         <%static:css group='${self.attr.main_css}'/>
         % endif
+
+        <%static:css group='${self.attr.my_new_bundle}'/>
 
         <%include file="widgets/segment-io.html" />
 
