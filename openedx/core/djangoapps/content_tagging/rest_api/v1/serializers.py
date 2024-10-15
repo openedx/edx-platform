@@ -97,14 +97,19 @@ class TaxonomyOrgSerializer(TaxonomySerializer):
         read_only_fields = ["orgs", "all_orgs"]
 
 
-class ObjectTagOrgMinimalSerializer(ObjectTagMinimalSerializer):
+class ObjectTagCopiedMinimalSerializer(ObjectTagMinimalSerializer):
     """
-    Serializer for Object Tags
+    Serializer for Object Tags.
+
+    This override `get_can_delete_objecttag` to avoid delete
+    object tags if is copied.
     """
 
     def get_can_delete_objecttag(self, instance):
         """
         Verify if the user can delete the object tag.
+
+        Override to return `False` if the object tag is copied.
         """
         if instance.is_copied:
             # The user can't delete copied tags.
