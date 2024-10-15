@@ -267,6 +267,13 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
         }
 
     """
+    result = {
+        Fields.collections: {
+            Fields.collections_display_name: [],
+            Fields.collections_key: [],
+        }
+    }
+
     # Gather the collections associated with this object
     collections = None
     try:
@@ -279,14 +286,8 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
         log.warning(f"No component found for {object_id}")
 
     if not collections:
-        return {Fields.collections: {}}
+        return result
 
-    result = {
-        Fields.collections: {
-            Fields.collections_display_name: [],
-            Fields.collections_key: [],
-        }
-    }
     for collection in collections:
         result[Fields.collections][Fields.collections_display_name].append(collection.title)
         result[Fields.collections][Fields.collections_key].append(collection.key)

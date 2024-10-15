@@ -80,6 +80,7 @@ from opaque_keys import InvalidKeyError
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
+    LibraryCollectionData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -88,6 +89,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
@@ -205,6 +207,15 @@ class ContentLibraryPermissionEntry:
 
 
 @attr.s
+class CollectionMetadata:
+    """
+    Class to represent collection metadata in a content library.
+    """
+    key = attr.ib(type=str)
+    title = attr.ib(type=str)
+
+
+@attr.s
 class LibraryXBlockMetadata:
     """
     Class that represents the metadata about an XBlock in a content library.
@@ -219,9 +230,10 @@ class LibraryXBlockMetadata:
     published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
     created = attr.ib(default=None, type=datetime)
+    collections = attr.ib(type=list[CollectionMetadata], factory=list)
 
     @classmethod
-    def from_component(cls, library_key, component):
+    def from_component(cls, library_key, component, associated_collections=None):
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
@@ -248,6 +260,7 @@ class LibraryXBlockMetadata:
             last_draft_created=last_draft_created,
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=component.versioning.has_unpublished_changes,
+            collections=associated_collections or [],
         )
 
 
@@ -690,7 +703,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
     return components
 
 
-def get_library_block(usage_key) -> LibraryXBlockMetadata:
+def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMetadata:
     """
     Get metadata about (the draft version of) one specific XBlock in a library.
 
@@ -713,9 +726,17 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
     if not draft_version:
         raise ContentLibraryBlockNotFound(usage_key)
 
+    if include_collections:
+        associated_collections = authoring_api.get_entity_collections(
+            component.learning_package_id,
+            component.key,
+        ).values('key', 'title')
+    else:
+        associated_collections = None
     xblock_metadata = LibraryXBlockMetadata.from_component(
         library_key=usage_key.context_key,
         component=component,
+        associated_collections=associated_collections,
     )
     return xblock_metadata
 
@@ -1233,6 +1254,60 @@ def update_library_collection_components(
         )
 
     return collection
+
+
+def set_library_component_collections(
+    library_key: LibraryLocatorV2,
+    component: Component,
+    *,
+    collection_keys: list[str],
+    created_by: int | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Component:
+    """
+    It Associates the component with collections for the given collection keys.
+
+    Only collections in queryset are associated with component, all previous component-collections
+    associations are removed.
+
+    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
+
+    Raises:
+    * ContentLibraryCollectionNotFound if any of the given collection_keys don't match Collections in the given library.
+
+    Returns the updated Component.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    # Note: Component.key matches its PublishableEntity.key
+    collection_qs = authoring_api.get_collections(content_library.learning_package_id).filter(
+        key__in=collection_keys
+    )
+
+    affected_collections = authoring_api.set_collections(
+        content_library.learning_package_id,
+        component,
+        collection_qs,
+        created_by=created_by,
+    )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                background=True,
+            )
+        )
+
+    return component
 
 
 def get_library_collection_usage_key(

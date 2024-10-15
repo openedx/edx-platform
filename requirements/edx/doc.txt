@@ -970,7 +970,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==9.14.1
+openedx-events==9.15.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -984,7 +984,7 @@ openedx-filters==1.10.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.13.1
+openedx-learning==0.15.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

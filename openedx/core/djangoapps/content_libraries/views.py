@@ -106,6 +106,7 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryPermissionLevelSerializer,
     ContentLibraryPermissionSerializer,
     ContentLibraryUpdateSerializer,
+    ContentLibraryComponentCollectionsUpdateSerializer,
     LibraryXBlockCreationSerializer,
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
@@ -617,7 +618,7 @@ class LibraryBlockView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_library_block(key)
+        result = api.get_library_block(key, include_collections=True)
 
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
@@ -638,6 +639,41 @@ class LibraryBlockView(APIView):
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.delete_library_block(key)
         return Response({})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryBlockCollectionsView(APIView):
+    """
+    View to set collections for a component.
+    """
+    @convert_exceptions
+    def patch(self, request, usage_key_str) -> Response:
+        """
+        Sets Collections for a Component.
+
+        Collection and Components must all be part of the given library/learning package.
+        """
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        content_library = api.require_permission_for_library_key(
+            key.lib_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
+        component = api.get_component_from_usage_key(key)
+        serializer = ContentLibraryComponentCollectionsUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        collection_keys = serializer.validated_data['collection_keys']
+        api.set_library_component_collections(
+            library_key=key.lib_key,
+            component=component,
+            collection_keys=collection_keys,
+            created_by=self.request.user.id,
+            content_library=content_library,
+        )
+
+        return Response({'count': len(collection_keys)})
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
