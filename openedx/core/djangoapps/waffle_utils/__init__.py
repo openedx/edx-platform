@@ -99,7 +99,11 @@ class CourseWaffleFlag(WaffleFlag):
 
     def is_enabled(self, course_key=None):  # pylint: disable=arguments-differ
         """
-        Returns whether or not the flag is enabled within the context of a given course.
+        Returns whether or not the flag is enabled within the context of a given
+        course.
+
+        Can also be given the key of any other learning context (like a content
+        library), but it will act like a regular waffle flag in that case.
 
         Arguments:
             course_key (Optional[CourseKey]): The course to check for override before
@@ -114,5 +118,5 @@ class CourseWaffleFlag(WaffleFlag):
             else:
                 # In case this gets called with a content library key, that's fine - just ignore it and
                 # act like a normal waffle flag. We currently don't support library-specific overrides.
-                assert isinstance(course_key, LearningContextKey)
+                assert isinstance(course_key, LearningContextKey), "expected a course key or other learning context key"
         return super().is_enabled()

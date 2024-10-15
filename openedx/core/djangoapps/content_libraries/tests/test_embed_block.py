@@ -117,6 +117,9 @@ class LibrariesEmbedViewTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestM
         html = self._embed_block(block_id, version=2)
         check_fields('Field Test Block (Old, v2)', 'Old setting value 2.', 'Old content value 2.')
 
+        html = self._embed_block(block_id, version=4)
+        check_fields('Field Test Block (Draft, v4)', 'Draft setting value 4.', 'Draft content value 4.')
+
     @XBlock.register_temp_plugin(FieldsTestBlock, FieldsTestBlock.BLOCK_TYPE)
     def test_handlers_modifying_published_data(self):
         """
