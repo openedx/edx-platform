@@ -51,7 +51,11 @@
                         destroy: '/annotations/:id/',
                         search: '/search/'
                     }
-                }
+                },
+                llmSummarize: {
+                    isEnabled: params && params.llmSummarize && params.llmSummarize.isEnabled,
+                    courseId: params && params.llmSummarize && params.llmSummarize.courseId,
+                },
             };
         };
 
@@ -85,6 +89,9 @@
                 logger = NotesLogger.getLogger(element.id, params.debug),
                 annotator;
 
+            if (options && options.llmSummarize && options.llmSummarize.isEnabled) {
+                plugins.push('LlmSummarize');
+            }
             annotator = $el.annotator(options).data('annotator');
             setupPlugins(annotator, plugins, options);
             NotesCollector.storeNotesRequestData(
