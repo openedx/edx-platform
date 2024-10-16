@@ -1,0 +1,20 @@
+<div class="page-banner">
+    <div class="alert alert-warning has-warning" style="display: flex;align-items: center;" role="alert">
+          <span class="feedback-symbol fa fa-warning" style="color: rgb(237, 189, 60)" aria-hidden="true"></span><span class="sr"><%- gettext("Warning") %></span>
+        <div class="message-content">
+            <strong><%- gettext("You are editing content from a Library.") %></strong>
+            <p>
+            <%- gettext("Edits made here will only be reflected in this course. These edits may be overridden later if updates are accepted.") %>
+            </p>
+        </div>
+        <a
+            href="<%- upstreamLink %>"
+            target="_blank"
+            class="btn-primary btn cta-primary view-button"
+            style="text-wrap: nowrap; background-color: black; margin-left: auto"
+        >
+            <%- gettext('View in Library') %>
+            <span class="fa fa-external-link" aria-hidden="true" style="margin-left: 10px"></span>
+        </a>
+    </div>
+</div>

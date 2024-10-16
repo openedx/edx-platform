@@ -15,6 +15,7 @@ import logging
 import typing as t
 from dataclasses import dataclass, asdict
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import NotFound
@@ -90,6 +91,19 @@ class UpstreamLink:
             self.version_available > (self.version_declined or 0)
         )
 
+    @property
+    def upstream_link(self) -> str:
+        """
+        Link to edit/view upstream block in library.
+        """
+        if self.version_available is None:
+            return None
+        try:
+            usage_key = LibraryUsageLocatorV2.from_string(self.upstream_ref)
+        except InvalidKeyError:
+            return None
+        return _get_library_authoring_url(usage_key.lib_key)
+
     def to_json(self) -> dict[str, t.Any]:
         """
         Get an JSON-API-friendly representation of this upstream link.
@@ -97,6 +111,7 @@ class UpstreamLink:
         return {
             **asdict(self),
             "ready_to_sync": self.ready_to_sync,
+            "upstream_link": self.upstream_link,
         }
 
     @classmethod
@@ -347,6 +362,17 @@ def sever_upstream_link(downstream: XBlock) -> None:
     downstream.upstream_version = None
     for _, fetched_upstream_field in downstream.get_customizable_fields().items():
         setattr(downstream, fetched_upstream_field, None)  # Null out upstream_display_name, et al.
+
+
+def _get_library_authoring_url(library_key: str):
+    """
+    Gets authoring url for given library_key.
+    """
+    library_url = None
+    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+    if mfe_base_url:
+        library_url = f'{mfe_base_url}/library/{library_key}'
+    return library_url
 
 
 class UpstreamSyncMixin(XBlockMixin):
