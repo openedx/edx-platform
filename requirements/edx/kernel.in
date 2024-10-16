@@ -119,7 +119,7 @@ openedx-calc                        # Library supporting mathematical calculatio
 openedx-django-require
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
-git+https://github.com/open-craft/openedx-learning.git@chris/FAL-3616-copy-tags#egg=openedx-learning                    # Open edX Learning core (experimental)
+openedx-learning                    # Open edX Learning core (experimental)
 openedx-mongodbproxy
 openedx-django-wiki
 path
