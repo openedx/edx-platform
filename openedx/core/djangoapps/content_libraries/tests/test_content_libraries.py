@@ -661,13 +661,13 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._get_library_block_olx(block3_key, expect_response=403)
             self._get_library_block_fields(block3_key, expect_response=403)
             self._get_library_block_assets(block3_key, expect_response=403)
-            self._get_library_block_asset(block3_key, file_name="whatever.png", expect_response=403)
+            self._get_library_block_asset(block3_key, file_name="static/whatever.png", expect_response=403)
             # Nor can they preview the block:
             self._render_block_view(block3_key, view_name="student_view", expect_response=403)
         # But if we grant allow_public_read, then they can:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
-            # self._set_library_block_asset(block3_key, "whatever.png", b"data")
+            self._set_library_block_asset(block3_key, "static/whatever.png", b"data")
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key)
             self._render_block_view(block3_key, view_name="student_view")
@@ -680,7 +680,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             with self.as_user(user):
                 self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
                 self._set_library_block_fields(block3_key, {"data": "<problem />", "metadata": {}}, expect_response=403)
-                # self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
+                self._set_library_block_asset(block3_key, "static/test.txt", b"data", expect_response=403)
                 self._delete_library_block(block3_key, expect_response=403)
                 self._commit_library_changes(lib_id, expect_response=403)
                 self._revert_library_changes(lib_id, expect_response=403)
@@ -690,9 +690,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             olx = self._get_library_block_olx(block3_key)
             self._set_library_block_olx(block3_key, olx)
             self._set_library_block_fields(block3_key, {"data": olx, "metadata": {}})
-            # self._get_library_block_assets(block3_key)
-            # self._set_library_block_asset(block3_key, "test.txt", b"data")
-            # self._get_library_block_asset(block3_key, file_name="test.txt")
+            self._get_library_block_assets(block3_key)
+            self._set_library_block_asset(block3_key, "static/test.txt", b"data")
+            self._get_library_block_asset(block3_key, file_name="static/test.txt")
             self._delete_library_block(block3_key)
             self._commit_library_changes(lib_id)
             self._revert_library_changes(lib_id)  # This is a no-op after the commit, but should still have 200 response
@@ -915,7 +915,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             event_receiver.call_args.kwargs
         )
 
-    @skip("We still need to re-implement static asset handling.")
     def test_library_block_add_asset_update_event(self):
         """
         Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
@@ -934,7 +933,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         block = self._add_block_to_library(lib_id, "unit", "u1")
         block_id = block["id"]
-        self._set_library_block_asset(block_id, "test.txt", b"data")
+        self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
@@ -955,7 +954,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             event_receiver.call_args.kwargs
         )
 
-    @skip("We still need to re-implement static asset handling.")
     def test_library_block_del_asset_update_event(self):
         """
         Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
@@ -974,9 +972,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         block = self._add_block_to_library(lib_id, "unit", "u1")
         block_id = block["id"]
-        self._set_library_block_asset(block_id, "test.txt", b"data")
+        self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
-        self._delete_library_block_asset(block_id, 'text.txt')
+        self._delete_library_block_asset(block_id, 'static/text.txt')
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
