@@ -14,13 +14,14 @@ from xblock.core import XBlock
 from xblock.fields import UNIQUE_ID, Scope, String
 from xblock.utils.resources import ResourceLoader
 from xblock.utils.studio_editable import StudioEditableXBlockMixin
+from xblocks_contrib.discussion import DiscussionXBlock as _ExtractedDiscussionXBlock
 
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependencies
+from xmodule.toggles import USE_EXTRACTED_DISCUSSION_BLOCK
 from xmodule.xml_block import XmlMixin
-
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -36,10 +37,11 @@ def _(text):
 @XBlock.needs('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
 @XBlock.needs('mako')
-class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amnesty, pylint: disable=abstract-method
+class _BuiltInDiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     Provides a discussion forum that is inline with other content in the courseware.
     """
+    is_extracted = False
     completion_mode = XBlockCompletionMode.EXCLUDED
 
     discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
@@ -275,3 +277,10 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
         for field_name, value in metadata.items():
             if field_name in block.fields:
                 setattr(block, field_name, value)
+
+
+DiscussionXBlock = (
+    _ExtractedDiscussionXBlock if USE_EXTRACTED_DISCUSSION_BLOCK.is_enabled()
+    else _BuiltInDiscussionXBlock
+)
+
