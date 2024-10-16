@@ -10,7 +10,6 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 from typing import Callable, Generator
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.paginator import Paginator
@@ -39,18 +38,21 @@ from .documents import (
     searchable_doc_tags,
     searchable_doc_tags_for_collection,
 )
+from .settings import (
+    MEILISEARCH_ENABLED,
+    MEILISEARCH_INDEX_PREFIX,
+    MEILISEARCH_API_KEY,
+    MEILISEARCH_URL,
+    MEILISEARCH_PUBLIC_URL,
+)
 
 log = logging.getLogger(__name__)
 
 User = get_user_model()
 
+
 STUDIO_INDEX_SUFFIX = "studio_content"
-
-if hasattr(settings, "MEILISEARCH_INDEX_PREFIX"):
-    STUDIO_INDEX_NAME = settings.MEILISEARCH_INDEX_PREFIX + STUDIO_INDEX_SUFFIX
-else:
-    STUDIO_INDEX_NAME = STUDIO_INDEX_SUFFIX
-
+STUDIO_INDEX_NAME = MEILISEARCH_INDEX_PREFIX + STUDIO_INDEX_SUFFIX
 
 _MEILI_CLIENT = None
 _MEILI_API_KEY_UID = None
@@ -104,7 +106,7 @@ def _get_meilisearch_client():
     if _MEILI_CLIENT is not None:
         return _MEILI_CLIENT
 
-    _MEILI_CLIENT = MeilisearchClient(settings.MEILISEARCH_URL, settings.MEILISEARCH_API_KEY)
+    _MEILI_CLIENT = MeilisearchClient(MEILISEARCH_URL, MEILISEARCH_API_KEY)
     try:
         _MEILI_CLIENT.health()
     except MeilisearchError as err:
@@ -125,7 +127,7 @@ def _get_meili_api_key_uid():
     """
     global _MEILI_API_KEY_UID  # pylint: disable=global-statement
     if _MEILI_API_KEY_UID is None:
-        _MEILI_API_KEY_UID = _get_meilisearch_client().get_key(settings.MEILISEARCH_API_KEY).uid
+        _MEILI_API_KEY_UID = _get_meilisearch_client().get_key(MEILISEARCH_API_KEY).uid
     return _MEILI_API_KEY_UID
 
 
@@ -273,10 +275,7 @@ def is_meilisearch_enabled() -> bool:
     """
     Returns whether Meilisearch is enabled
     """
-    if hasattr(settings, "MEILISEARCH_ENABLED"):
-        return settings.MEILISEARCH_ENABLED
-
-    return False
+    return MEILISEARCH_ENABLED
 
 
 # pylint: disable=too-many-statements
@@ -757,7 +756,7 @@ def generate_user_token_for_studio_search(request):
     )
 
     return {
-        "url": settings.MEILISEARCH_PUBLIC_URL,
+        "url": MEILISEARCH_PUBLIC_URL,
         "index_name": STUDIO_INDEX_NAME,
         "api_key": restricted_api_key,
     }
