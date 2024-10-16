@@ -135,6 +135,8 @@ def xblock_handler(request, usage_key_string=None):
                      if duplicate_source_locator is not present
                 :staged_content: use "clipboard" to paste from the OLX user's clipboard. (Incompatible with all other
                      fields except parent_locator)
+                :library_content_key: the key of the library content to add. (Incompatible with
+                     all other fields except parent_locator)
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     return handle_xblock(request, usage_key_string)

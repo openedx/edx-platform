@@ -178,6 +178,10 @@ def get_user_clipboard_json(user_id: int, request: HttpRequest | None = None):
     except _UserClipboard.DoesNotExist:
         # This user does not have any content on their clipboard.
         return {"content": None, "source_usage_key": "", "source_context_title": "", "source_edit_url": ""}
+
+    # FIXME: This is a temporary workaround to avoid missing migration
+    return {"content": None, "source_usage_key": "", "source_context_title": "", "source_edit_url": ""}
+
     serializer = _UserClipboardSerializer(
         _user_clipboard_model_to_data(clipboard),
         context={'request': request},
@@ -205,6 +209,7 @@ def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardDat
             block_type=content.block_type,
             display_name=content.display_name,
             tags=content.tags,
+            version_num=content.version_num,
         ),
         source_usage_key=clipboard.source_usage_key,
         source_context_title=clipboard.get_source_context_title(),

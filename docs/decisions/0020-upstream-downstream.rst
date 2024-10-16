@@ -257,6 +257,11 @@ To support the Libraries Relaunch in Sumac:
 For reference, here are some excerpts of a potential implementation. This may
 change through development and code review.
 
+(UPDATE: When implementing, we ended up factoring this code differently.
+Particularly, we opted to use regular functions rather than add new
+XBlock Runtime methods, allowing us to avoid mucking with the complicated
+inheritance hierarchy of CachingDescriptorSystem and SplitModuleStoreRuntime.)
+
 .. code-block:: python
 
     ###########################################################################
