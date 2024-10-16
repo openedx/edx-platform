@@ -23,7 +23,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import WaffleFlag, SettingDictToggle
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
@@ -459,7 +459,7 @@ class SequenceBlock(
                 banner_text, special_html = special_html_view
                 if special_html and not masquerading_as_specific_student:
                     fragment = Fragment(special_html)
-                    add_sass_to_fragment(fragment, 'SequenceBlockDisplay.scss')
+                    add_css_to_fragment(fragment, 'SequenceBlockDisplay.css')
                     add_webpack_js_to_fragment(fragment, 'SequenceBlockDisplay')
                     shim_xmodule_js(fragment, 'Sequence')
                     return fragment
@@ -601,7 +601,7 @@ class SequenceBlock(
         self._capture_full_seq_item_metrics(children)
         self._capture_current_unit_metrics(children)
 
-        add_sass_to_fragment(fragment, 'SequenceBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'SequenceBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'SequenceBlockDisplay')
         shim_xmodule_js(fragment, 'Sequence')
         return fragment
