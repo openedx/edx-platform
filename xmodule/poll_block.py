@@ -13,14 +13,16 @@ import logging
 from collections import OrderedDict
 from copy import deepcopy
 
-from web_fragments.fragment import Fragment
-
 from lxml import etree
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, pylint: disable=wrong-import-order
+from xblocks_contrib.poll import PollBlock as _ExtractedPollBlock
+
 from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
+from xmodule.toggles import USE_EXTRACTED_POLL_BLOCK
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
@@ -30,13 +32,12 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin
 
-
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
 @XBlock.needs('mako')
-class PollBlock(
+class _BuiltInPollBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
@@ -44,6 +45,9 @@ class PollBlock(
     XModuleMixin,
 ):  # pylint: disable=abstract-method
     """Poll Block"""
+
+    is_extracted = False
+
     # Name of poll to use in links to this poll
     display_name = String(
         help=_("The display name for this component."),
@@ -244,3 +248,8 @@ class PollBlock(
             add_child(xml_object, answer)
 
         return xml_object
+
+PollBlock = (
+    _ExtractedPollBlock if USE_EXTRACTED_POLL_BLOCK.is_enabled()
+    else _BuiltInPollBlock
+)

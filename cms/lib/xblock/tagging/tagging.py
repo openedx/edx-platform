@@ -8,7 +8,6 @@ from xblock.core import XBlock, XBlockAside
 from xblock.fields import Dict, Scope
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from xmodule.capa_block import ProblemBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import AUTHOR_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 _ = lambda text: text
@@ -42,6 +41,7 @@ class StructuredTagsAside(XBlockAside):
         Display the tag selector with specific categories and allowed values,
         depending on the context.
         """
+        from xmodule.capa_block import ProblemBlock
         if isinstance(block, ProblemBlock):
             tags = []
             for tag in self.get_available_tags():
