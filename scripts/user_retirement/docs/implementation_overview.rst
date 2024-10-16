@@ -1,6 +1,5 @@
 .. _Implmentation:
 
-#######################
 Implementation Overview
 #######################
 
@@ -11,11 +10,10 @@ these services. As a consequence, to remove a user's PII, you must be able
 to request each service containing PII to remove, delete, or unlink the
 data for that user in that service.
 
-In the user retirement feature, a centralized process (the *driver* scripts) 
-orchestrates all of these requests. For information about how to configure the 
+In the user retirement feature, a centralized process (the *driver* scripts)
+orchestrates all of these requests. For information about how to configure the
 driver scripts, see :ref:`driver-setup`.
 
-****************************
 The User Retirement Workflow
 ****************************
 
@@ -49,9 +47,8 @@ possible states required by all members of the Open edX community.
 This example state diagram outlines the pathways users follow throughout the
 workflow:
 
-.. graphviz::
-    digraph retirement_states_example {
-        ranksep = "0.3";
+.. digraph:: retirement_states_example
+   :align: center
 
         node[fontname=Courier,fontsize=12,shape=box,group=main]
         { rank = same INIT[style=invis] PENDING }
@@ -69,7 +66,6 @@ workflow:
             labelloc = b  // put label at bottom
             {rank = same ERRORED COMPLETE ABORTED}
         }
-    }
 
 Unless an error occurs internal to the user retirement tooling, a user's
 retirement state should always land in one of the terminal states.  At that
@@ -78,7 +74,6 @@ point, either their entry should be cleaned up from the
 administrator needs to examine the error and resolve it. For more information,
 see :ref:`recovering-from-errored`.
 
-*******************
 The User Experience
 *******************
 
@@ -103,7 +98,6 @@ enabled, allowing account deletions to queue up.  The
 ``ENABLE_ACCOUNT_DELETION`` feature in django settings toggles the visibility
 of this section.  See :ref:`django-settings`.
 
-================
 Third Party Auth
 ================
 
