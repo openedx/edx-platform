@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
             Thank you for your pull request! Congratulations on completing the Open edX tutorial! A team member will be by to take a look shortly.
