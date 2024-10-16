@@ -204,3 +204,29 @@ migrate: migrate-lms migrate-cms
 # Part of https://github.com/openedx/wg-developer-experience/issues/136
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
+
+eslint:	## check javascript for quality issues
+	python scripts/quality_test.py eslint
+
+stylelint: ## check css/scss for quality issues
+	python scripts/quality_test.py stylelint
+
+xsslint: ## check xss for quality issues
+	python scripts/quality_test.py xsslint
+
+pycodestyle: ## check python files for quality issues 
+	pycodestyle .
+
+pii_check: ## check django models for pii annotations
+	python scripts/quality_test.py pii_check
+
+check_keywords: ## check django models for reserve keywords
+	python scripts/quality_test.py check_keywords
+
+test-js: ## run javascript tests
+	python scripts/js_test.py --option jstest
+
+coverage-js: ## run javascript coverage test
+	python scripts/js_test.py --option coverage
+
+quality: pycodestyle eslint stylelint xsslint pii_check check_keywords
