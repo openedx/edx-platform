@@ -188,7 +188,7 @@ class VerticalBlock(
         if has_access_error:
             return True
 
-        # Check child nodes if they exist (e.g. randomized library question aka LibraryContentBlock)
+        # Check child nodes if they exist (e.g. randomized library question aka LegacyLibraryContentBlock)
         for child in block.get_children():
             has_access_error = getattr(child, 'has_access_error', False)
             if has_access_error:

@@ -1,5 +1,12 @@
 """
-LibraryContent: The XBlock used to include blocks from a library in a course.
+LegacyLibraryContent: The XBlock used to randomly select a subset of blocks from a "v1" (modulestore-backed) library.
+
+In Studio, it's called the "Randomized Content Module".
+
+In the long-term, this block is deprecated in favor of "v2" (learning core-backed) library references:
+https://github.com/openedx/edx-platform/issues/32457
+
+We need to retain backwards-compatibility, but please do not build any new features into this.
 """
 from __future__ import annotations
 
@@ -15,8 +22,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.functional import classproperty
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocator
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -78,7 +84,7 @@ class LibraryToolsUnavailable(ValueError):
 @XBlock.wants('studio_user_permissions')  # Only available in CMS.
 @XBlock.wants('user')
 @XBlock.needs('mako')
-class LibraryContentBlock(
+class LegacyLibraryContentBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
@@ -87,7 +93,7 @@ class LibraryContentBlock(
     StudioEditableBlock,
 ):
     """
-    An XBlock whose children are chosen dynamically from a content library.
+    An XBlock whose children are chosen dynamically from a legacy (v1) content library.
     Can be used to create randomized assessments among other things.
 
     Note: technically, all matching blocks from the content library are added
@@ -135,17 +141,6 @@ class LibraryContentBlock(
         display_name=_("Library Version"),
         scope=Scope.settings,
     )
-    mode = String(
-        display_name=_("Mode"),
-        help=_("Determines how content is drawn from the library"),
-        default="random",
-        values=[
-            {"display_name": _("Choose n at random"), "value": "random"}
-            # Future addition: Choose a new random set of n every time the student refreshes the block, for self tests
-            # Future addition: manually selected blocks
-        ],
-        scope=Scope.settings,
-    )
     max_count = Integer(
         display_name=_("Count"),
         help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
@@ -179,15 +174,12 @@ class LibraryContentBlock(
         """
         Convenience method to get the library ID as a LibraryLocator and not just a string.
 
-        Supports either library v1 or library v2 locators.
+        Supports only v1 libraries.
         """
-        try:
-            return LibraryLocator.from_string(self.source_library_id)
-        except InvalidKeyError:
-            return LibraryLocatorV2.from_string(self.source_library_id)
+        return LibraryLocator.from_string(self.source_library_id)
 
     @classmethod
-    def make_selection(cls, selected, children, max_count, mode):
+    def make_selection(cls, selected, children, max_count):
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
 
@@ -195,7 +187,6 @@ class LibraryContentBlock(
             selected - list of (block_type, block_id) tuples assigned to this student
             children - children of this block
             max_count - number of components to display to each student
-            mode - how content is drawn from the library
 
         Returns:
             A dict containing the following keys:
@@ -231,12 +222,9 @@ class LibraryContentBlock(
         if num_to_add > 0:
             # We need to select [more] blocks to display to this user:
             pool = valid_block_keys - selected_keys
-            if mode == "random":
-                num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(rand.sample(list(pool), num_to_add))
-                # We now have the correct n random children to show for this user.
-            else:
-                raise NotImplementedError("Unsupported mode.")
+            num_to_add = min(len(pool), num_to_add)
+            added_block_keys = set(rand.sample(list(pool), num_to_add))
+            # We now have the correct n random children to show for this user.
             selected_keys |= added_block_keys
 
         if any((invalid_block_keys, overlimit_block_keys, added_block_keys)):
@@ -334,7 +322,7 @@ class LibraryContentBlock(
         if max_count < 0:
             max_count = len(self.children)
 
-        block_keys = self.make_selection(self.selected, self.children, max_count, "random")  # pylint: disable=no-member
+        block_keys = self.make_selection(self.selected, self.children, max_count)  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
         lib_tools = self.get_tools()
@@ -467,7 +455,6 @@ class LibraryContentBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -481,16 +468,12 @@ class LibraryContentBlock(
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super().non_editable_metadata_fields
-        # The only supported mode is currently 'random'.
-        # Add the mode field to non_editable_metadata_fields so that it doesn't
-        # render in the edit form.
         non_editable_fields.extend([
-            LibraryContentBlock.mode,
-            LibraryContentBlock.source_library_version,
+            LegacyLibraryContentBlock.source_library_version,
         ])
         return non_editable_fields
 
-    def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
+    def get_tools(self, to_read_library_content: bool = False) -> 'LegacyLibraryToolsService':
         """
         Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
         """
@@ -563,22 +546,6 @@ class LibraryContentBlock(
             dest_block=self,
             library_version=(None if upgrade_to_latest else self.source_library_version),
         )
-
-    @XBlock.json_handler
-    def is_v2_library(self, data, suffix=''):  # pylint: disable=unused-argument
-        """
-        Check the library version by library_id.
-
-        This is a temporary handler needed for hiding the Problem Type xblock editor field for V2 libraries.
-        """
-        lib_key = data.get('library_key')
-        try:
-            LibraryLocatorV2.from_string(lib_key)
-        except InvalidKeyError:
-            is_v2 = False
-        else:
-            is_v2 = True
-        return {'is_v2': is_v2}
 
     @XBlock.handler
     def children_are_syncing(self, request, suffix=''):  # pylint: disable=unused-argument
@@ -809,14 +776,14 @@ class LibraryContentBlock(
         return xml_object
 
 
-class LibrarySummary:
+class LegacyLibrarySummary:
     """
     A library summary object which contains the fields required for library listing on studio.
     """
 
     def __init__(self, library_locator, display_name):
         """
-        Initialize LibrarySummary
+        Initialize LegacyLibrarySummary
 
         Arguments:
         library_locator (LibraryLocator):  LibraryLocator object of the library.

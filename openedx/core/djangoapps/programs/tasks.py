@@ -315,14 +315,16 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
         if str(programs_without_certificates[0]).lower() == "all":
             return
 
-    LOGGER.info(f"Running task award_program_certificates for user {student}")
+    LOGGER.info(f"Running task award_program_certificates for user {student.id}")
     try:
         completed_programs = {}
         for site in Site.objects.all():
             completed_programs.update(get_completed_programs(site, student))
 
         if not completed_programs:
-            LOGGER.warning(f"Task award_program_certificates was called for user {student} with no completed programs")
+            LOGGER.warning(
+                f"Task award_program_certificates was called for user {student.id} with no completed programs"
+            )
             return
 
         # determine which program certificates have been awarded to the user
@@ -331,7 +333,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
         # program is part of the "programs without certificates" list in our site configuration
         awarded_and_skipped_program_uuids = list(set(existing_program_uuids + list(programs_without_certificates)))
     except Exception as exc:
-        error_msg = f"Failed to determine program certificates to be awarded for user {student}: {exc}"
+        error_msg = f"Failed to determine program certificates to be awarded for user {student.id}: {exc}"
         LOGGER.exception(error_msg)
         raise MaxRetriesExceededError(
             f"Failed to award a program certificate to user {student.id}. Reason: {error_msg}"
@@ -360,18 +362,18 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
         for program_uuid in new_program_uuids:
             try:
                 award_program_certificate(credentials_client, student, program_uuid)
-                LOGGER.info(f"Awarded program certificate to user {student} in program {program_uuid}")
+                LOGGER.info(f"Awarded program certificate to user {student.id} in program {program_uuid}")
             except HTTPError as exc:
                 if exc.response.status_code == 404:
                     LOGGER.warning(
-                        f"Unable to award a program certificate to user {student} in program {program_uuid}. A "
+                        f"Unable to award a program certificate to user {student.id} in program {program_uuid}. A "
                         f"certificate configuration for program {program_uuid} could not be found, the program might "
                         "not be configured correctly in Credentials"
                     )
                 elif exc.response.status_code == 429:
                     # Let celery handle retry attempts and backoff
                     error_msg = (
-                        f"Rate limited. Attempting to award certificate to user {student} in program {program_uuid}."
+                        f"Rate limited. Attempting to award certificate to user {student.id} in program {program_uuid}."
                     )
                     LOGGER.warning(error_msg)
                     raise MaxRetriesExceededError(
@@ -379,33 +381,33 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                     ) from exc
                 else:
                     LOGGER.warning(
-                        f"Unable to award program certificate to user {student} in program {program_uuid}. The program "
-                        "might not be configured correctly in Credentials"
+                        f"Unable to award program certificate to user {student.id} in program {program_uuid}. The "
+                        "program might not be configured correctly in Credentials"
                     )
             except Exception as exc:  # pylint: disable=broad-except
                 # keep trying to award other certs, but let celery retry the whole task to fix any missing entries
                 LOGGER.exception(
-                    f"Failed to award program certificate to user {student} in program {program_uuid}: {exc}"
+                    f"Failed to award program certificate to user {student.id} in program {program_uuid}: {exc}"
                 )
                 failed_program_certificate_award_attempts.append(program_uuid)
 
         if failed_program_certificate_award_attempts:
             # N.B. This logic assumes that this task is idempotent
-            LOGGER.info(f"Retrying failed tasks to award program certificate(s) to user {student}")
+            LOGGER.info(f"Retrying failed tasks to award program certificate(s) to user {student.id}")
             # The error message may change on each reattempt but will never be raised until the max number of retries
             # have been exceeded. It is unlikely that this list will change by the time it reaches its maximimum number
             # of attempts.
             error_msg = (
-                f"Failed to award program certificate(s) for user {student} in programs "
+                f"Failed to award program certificate(s) for user {student.id} in programs "
                 f"{failed_program_certificate_award_attempts}"
             )
             raise MaxRetriesExceededError(
                 f"Failed to award a program certificate to user {student.id}. Reason: {error_msg}"
             )
     else:
-        LOGGER.warning(f"User {student} is not eligible for any new program certificates")
+        LOGGER.warning(f"User {student.id} is not eligible for any new program certificates")
 
-    LOGGER.info(f"Successfully completed the task award_program_certificates for user {student}")
+    LOGGER.info(f"Successfully completed the task award_program_certificates for user {student.id}")
 
 
 # pylint: disable=W0613
@@ -504,7 +506,7 @@ def award_course_certificate(self, username, course_run_key):
         )
         return
 
-    LOGGER.info(f"Running task award_course_certificate for user {user}")
+    LOGGER.info(f"Running task award_course_certificate for user {user.id}")
     try:
         course_key = CourseKey.from_string(course_run_key)
     except InvalidKeyError as exc:
@@ -574,7 +576,7 @@ def award_course_certificate(self, username, course_run_key):
             org=course_key.org,
         )
     except Exception as exc:
-        error_msg = f"Failed to post course certificate to be awarded for user {user}."
+        error_msg = f"Failed to post course certificate to be awarded for user {user.id}."
         raise MaxRetriesExceededError(
             f"Failed to award course certificate for user {user.id} for course {course_run_key}. Reason: {error_msg}"
         ) from exc
@@ -628,14 +630,14 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
         )
         return
 
-    LOGGER.info(f"Running task revoke_program_certificates for user {student}")
+    LOGGER.info(f"Running task revoke_program_certificates for user {student.id}")
     try:
         inverted_programs = get_inverted_programs(student)
         course_specific_programs = inverted_programs.get(course_key)
         if not course_specific_programs:
             LOGGER.warning(
-                f"Task revoke_program_certificates was called for user {student} and course run {course_key} with no "
-                "engaged programs"
+                f"Task revoke_program_certificates was called for user {student.id} and course run {course_key} with "
+                "no engaged programs"
             )
             return
 
@@ -644,7 +646,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
     except Exception as exc:
         error_msg = (
             f"Failed to determine if any program certificates associated with course run {course_key} should be "
-            f"revoked from user {student}"
+            f"revoked from user {student.id}"
         )
         LOGGER.exception(error_msg)
         raise MaxRetriesExceededError(
@@ -668,17 +670,17 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
         for program_uuid in program_uuids_to_revoke:
             try:
                 revoke_program_certificate(credentials_client, username, program_uuid)
-                LOGGER.info(f"Revoked program certificate from user {student} in program {program_uuid}")
+                LOGGER.info(f"Revoked program certificate from user {student.id} in program {program_uuid}")
             except HTTPError as exc:
                 if exc.response.status_code == 404:
                     LOGGER.warning(
-                        f"Unable to revoke program certificate from user {student} in program {program_uuid}, a "
+                        f"Unable to revoke program certificate from user {student.id} in program {program_uuid}, a "
                         "program certificate could not be found"
                     )
                 elif exc.response.status_code == 429:
                     # Let celery handle retry attempts and backoff
                     error_msg = (
-                        f"Rate limited. Attempting to revoke a program certificate from user {student} in program "
+                        f"Rate limited. Attempting to revoke a program certificate from user {student.id} in program "
                         f"{program_uuid}."
                     )
                     LOGGER.warning(error_msg)
@@ -687,23 +689,23 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
                     ) from exc
                 else:
                     LOGGER.warning(
-                        f"Unable to revoke program certificate from user {student} in program {program_uuid}"
+                        f"Unable to revoke program certificate from user {student.id} in program {program_uuid}"
                     )
             except Exception as exc:  # pylint: disable=broad-except
                 # keep trying to revoke other certs, but let celery retry the whole task to fix any missing entries
                 LOGGER.exception(
-                    f"Failed to revoke program certificate from user {student} in program {program_uuid}: {exc}"
+                    f"Failed to revoke program certificate from user {student.id} in program {program_uuid}: {exc}"
                 )
                 failed_program_certificate_revoke_attempts.append(program_uuid)
 
         if failed_program_certificate_revoke_attempts:
             # N.B. This logic assumes that this task is idempotent
-            LOGGER.info(f"Failed task to revoke program certificate(s) from user {student}")
+            LOGGER.info(f"Failed task to revoke program certificate(s) from user {student .id}")
             # The error message may change on each reattempt but will never be raised until the max number of retries
             # have been exceeded. It is unlikely that this list will change by the time it reaches its maximimum number
             # of attempts.
             error_msg = (
-                f"Failed to revoke program certificate(s) from user {student} for programs "
+                f"Failed to revoke program certificate(s) from user {student.id} for programs "
                 f"{failed_program_certificate_revoke_attempts}"
             )
             raise MaxRetriesExceededError(
@@ -711,9 +713,9 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
                 f"Reason: {error_msg}"
             )
     else:
-        LOGGER.info(f"No program certificates to revoke from user {student}")
+        LOGGER.info(f"No program certificates to revoke from user {student.id}")
 
-    LOGGER.info(f"Successfully completed the task revoke_program_certificates for user {student}")
+    LOGGER.info(f"Successfully completed the task revoke_program_certificates for user {student.id}")
 
 
 @shared_task(

@@ -7,13 +7,11 @@ import ddt
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
 from openedx_tagging.core.tagging.models import Tag
-from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
-from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory, LibraryFactory
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
-from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 
 CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
@@ -165,12 +163,12 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
                 publish_item=True,
             ).location
 
-        library = ClipboardLibraryContentPasteTestCase.setup_library()
+        library = ClipboardPasteFromV1LibraryTestCase.setup_library()
         with self.store.bulk_operations(course_key):
             library_content_block_key = BlockFactory.create(
                 parent=self.store.get_item(unit_key),
                 category="library_content",
-                source_library_id=str(library.key),
+                source_library_id=str(library.context_key),
                 display_name="LC Block",
                 publish_item=True,
             ).location
@@ -393,27 +391,27 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
 
 
-class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
+class ClipboardPasteFromV1LibraryTestCase(ModuleStoreTestCase):
     """
-    Test Clipboard Paste functionality with library content
+    Test Clipboard Paste functionality with legacy (v1) library content
     """
 
     def setUp(self):
         """
-        Set up a v2 Content Library and a library content block
+        Set up a v1 Content Library and a library content block
         """
         super().setUp()
         self.client = APIClient()
         self.client.login(username=self.user.username, password=self.user_password)
         self.store = modulestore()
-        library = self.setup_library()
+        self.library = self.setup_library()
 
         # Create a library content block (lc), point it out our library, and sync it.
         self.course = CourseFactory.create(display_name='Course')
         self.orig_lc_block = BlockFactory.create(
             parent=self.course,
             category="library_content",
-            source_library_id=str(library.key),
+            source_library_id=str(self.library.context_key),
             display_name="LC Block",
             publish_item=False,
         )
@@ -426,18 +424,15 @@ class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
     @classmethod
     def setup_library(cls):
         """
-        Creates and returns a content library.
+        Creates and returns a legacy content library with 1 problem
         """
-        library = library_api.create_library(
-            library_type=library_api.COMPLEX,
-            org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
-            slug="lib",
-            title="Library",
-        )
-        # Populate it with a problem:
-        problem_key = library_api.create_library_block(library.key, "problem", "p1").usage_key
-        library_api.set_library_block_olx(problem_key, """
-        <problem display_name="MCQ" max_attempts="1">
+        library = LibraryFactory.create(display_name='Library')
+        lib_block = BlockFactory.create(
+            parent_location=library.usage_key,
+            category="problem",
+            display_name="MCQ",
+            max_attempts=1,
+            data="""
             <multiplechoiceresponse>
                 <label>Q</label>
                 <choicegroup type="MultipleChoice">
@@ -445,9 +440,9 @@ class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
                     <choice correct="true">Right</choice>
                 </choicegroup>
             </multiplechoiceresponse>
-        </problem>
-        """)
-        library_api.publish_changes(library.key)
+            """,
+            publish_item=False,
+        )
         return library
 
     def test_paste_library_content_block(self):
