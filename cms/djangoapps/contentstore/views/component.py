@@ -43,7 +43,16 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video', 'drag-and-drop-v2']
+COMPONENT_TYPES = [
+    'discussion',
+    'library',
+    'library_v2',
+    'html',
+    'openassessment',
+    'problem',
+    'video',
+    'drag-and-drop-v2',
+]
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
@@ -97,6 +106,10 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
+    # Libraries v2 content doesn't have an XBlock.
+    if category == 'library_v2':
+        return None
+
     component_class = XBlock.load_class(category)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
@@ -247,7 +260,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'problem': _("Problem"),
         'video': _("Video"),
         'openassessment': _("Open Response"),
-        'library': _("Library Content"),
+        'library': _("Legacy Library"),
+        'library_v2': _("Library Content"),
         'drag-and-drop-v2': _("Drag and Drop"),
     }
 

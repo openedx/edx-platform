@@ -431,6 +431,17 @@ def get_course_outline_url(course_locator) -> str:
     return course_outline_url
 
 
+def get_library_content_picker_url(block_locator) -> str:
+    """
+    Gets course authoring microfrontend library content picker URL for the given parent block.
+    """
+    course_locator = block_locator.course_key
+    mfe_base_url = get_course_authoring_url(course_locator)
+    content_picker_url = f'{mfe_base_url}/component-picker?parentLocator={block_locator}'
+
+    return content_picker_url
+
+
 def get_unit_url(course_locator, unit_locator) -> str:
     """
     Gets course authoring microfrontend URL for unit page view.
@@ -2045,6 +2056,7 @@ def get_container_handler_context(request, usage_key, course, xblock):  # pylint
         'user_clipboard': user_clipboard,
         'is_fullwidth_content': is_library_xblock,
         'course_sequence_ids': course_sequence_ids,
+        'library_content_picker_url': get_library_content_picker_url(xblock.location),
     }
     return context
 

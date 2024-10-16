@@ -3,8 +3,9 @@
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
     'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu',
+    'js/views/components/add_library_content',
     'edx-ui-toolkit/js/utils/html-utils'],
-function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, HtmlUtils) {
+function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, AddLibraryContent, HtmlUtils) {
     'use strict';
 
     var AddXBlockComponent = BaseView.extend({
@@ -67,14 +68,19 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
                 oldOffset = ViewUtils.getScrollOffset(this.$el);
             event.preventDefault();
             this.closeNewComponent(event);
-            ViewUtils.runOperationShowingMessage(
-                gettext('Adding'),
-                _.bind(this.options.createComponent, this, saveData, $element)
-            ).always(function() {
-                // Restore the scroll position of the buttons so that the new
-                // component appears above them.
-                ViewUtils.setScrollOffset(self.$el, oldOffset);
-            });
+
+            if (saveData.type === 'library_v2') {
+                AddLibraryContent.createComponent(this.options.libraryContentPickerUrl);
+            } else {
+                ViewUtils.runOperationShowingMessage(
+                    gettext('Adding'),
+                    _.bind(this.options.createComponent, this, saveData, $element),
+                ).always(function() {
+                    // Restore the scroll position of the buttons so that the new
+                    // component appears above them.
+                    ViewUtils.setScrollOffset(self.$el, oldOffset);
+                });
+            }
         }
     });
 
