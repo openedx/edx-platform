@@ -214,7 +214,7 @@ def is_block_structure_complete_for_assignments(block_data, block_key):
 
     complete = block_data.get_xblock_field(block_key, 'complete', False)
     graded = block_data.get_xblock_field(block_key, 'graded', False)
-    has_score = block_data.get_xblock_field(block_key, 'has_score', False)
+    has_score = True if block_key.block_type == "html" else block_data.get_xblock_field(block_key, 'has_score', False)
     weight = block_data.get_xblock_field(block_key, 'weight', 1)
     scored = has_score and (weight is None or weight > 0)
 
