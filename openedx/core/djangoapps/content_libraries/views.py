@@ -1212,7 +1212,7 @@ def component_version_asset(request, component_version_uuid, asset_path):
 
     # Otherwise it's going to be a GET response. We don't support response
     # offsets or anything fancy, because we don't expect to run this view at
-    # scale.
+    # LMS-scale.
     return StreamingHttpResponse(
         content.read_file().chunks(),
         headers=redirect_response.headers,

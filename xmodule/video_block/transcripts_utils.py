@@ -1042,29 +1042,29 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
 
 def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
     """
-    Get video transcript from Learning Core.
+    Get video transcript from Learning Core (used for Content Libraries)
 
     Limitation: This is only going to grab from the Draft version.
 
-    HISTORIC INFORMATION FROM WHEN THIS FUNCTION WAS `get_transcript_from_blockstore`:
+    Learning Core models a VideoBlock's data in a more generic thing it calls a
+    Component. Each Component has its own virtual space for file-like data. The
+    OLX for the VideoBlock itself is stored at the root of that space, as
+    ``block.xml``. Static assets that are meant to be user-downloadable are
+    placed in a `static/` directory for that Component, and this is where we
+    expect to store transcript files.
 
-      Blockstore expects video transcripts to be placed into the 'static/'
-      subfolder of the XBlock's folder in a Blockstore bundle. For example, if the
-      video XBlock's definition is in the standard location of
-          video/video1/definition.xml
-      Then the .srt files should be placed at e.g.
-          video/video1/static/video1-en.srt
-      This is the same place where other public static files are placed for other
-      XBlocks, such as image files used by HTML blocks.
+    So if there is a ``video1-en.srt`` file for a particular VideoBlock, we
+    expect that to be stored as ``static/video1-en.srt`` in the Component. Any
+    other downloadable files would be here as well, such as thumbnails.
 
-      Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
-      JSON dictionary listing the filename of the transcript for each language:
-          <video
-              youtube_id_1_0="3_yD_cEKoCk"
-              transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
-              display_name="Welcome Video with Transcript"
-              download_track="true"
-          />
+    Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
+    JSON dictionary listing the filename of the transcript for each language:
+        <video
+            youtube_id_1_0="3_yD_cEKoCk"
+            transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
+            display_name="Welcome Video with Transcript"
+            download_track="true"
+        />
 
       This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
 
@@ -1077,7 +1077,7 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     Returns:
         tuple containing content, filename, mimetype
     """
-    usage_key = video_block.scope_ids.usage_id
+    usage_key = video_block.usage_key
 
     # Validate that the format is something we even support...
     if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
