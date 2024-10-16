@@ -1,7 +1,8 @@
 // studio - elements - side drawers
 // ====================
 
-.drawer-cover {
+.drawer-cover,
+.picker-cover {
   @extend %ui-depth3;
 
   display: none;
@@ -13,7 +14,8 @@
   background: rgba(0, 0, 0, 0.8);
 }
 
-.drawer-cover.gray-cover {
+.drawer-cover.gray-cover,
+.picker-cover.gray-cover {
   background: rgba(112, 112, 112, 0.8);
 }
 
@@ -29,6 +31,20 @@
   background-color: $gray-l4;
 }
 
-body.drawer-open {
+body.drawer-open,
+body.picker-open {
   overflow: hidden;
 }
+
+.picker {
+  @extend %ui-depth4;
+
+  display: none;
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  right: 1em;
+  bottom: 1em;
+  background-color: $gray-l4;
+}
+

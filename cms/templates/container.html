@@ -52,6 +52,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
                 canEdit: true,
                 outlineURL: "${outline_url | n, js_escaped_string}",
+                libraryContentPickerUrl: "${library_content_picker_url | n, js_escaped_string}",
                 clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             }
         );
@@ -299,4 +300,7 @@ use_new_video_gallery_flow = use_video_gallery_flow()
 
 <div id="manage-tags-drawer" class="drawer"></div>
 <div class="drawer-cover gray-cover"></div>
+
+<div id="library-content-picker" class="picker"></div>
+<div class="picker-cover gray-cover"></div>
 </%block>

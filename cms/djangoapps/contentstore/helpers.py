@@ -190,6 +190,8 @@ def xblock_type_display_name(xblock, default_display_name=None):
         # description like "Multiple Choice Problem", but that won't work if our 'block' argument is just the block_type
         # string ("problem").
         return _('Problem')
+    elif category == 'library_v2':
+        return _('Library Content')
     component_class = XBlock.load_class(category)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
         return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string

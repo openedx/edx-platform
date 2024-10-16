@@ -212,7 +212,8 @@ function($, _, Backbone, gettext, BasePage,
                     var component = new AddXBlockComponent({
                         el: element,
                         createComponent: _.bind(self.createComponent, self),
-                        collection: self.options.templates
+                        collection: self.options.templates,
+                        libraryContentPickerUrl: self.options.libraryContentPickerUrl,
                     });
                     component.render();
                 });
