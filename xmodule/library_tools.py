@@ -1,18 +1,17 @@
 """
-XBlock runtime services for LibraryContentBlock
+XBlock runtime services for LegacyLibraryContentBlock
 """
 from __future__ import annotations
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from opaque_keys.edx.locator import LibraryLocator
 from user_tasks.models import UserTaskStatus
 
 from openedx.core.lib import ensure_cms
-from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries import tasks as library_tasks
-from xmodule.library_content_block import LibraryContentBlock
-from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
+from xmodule.library_content_block import LegacyLibraryContentBlock
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -21,9 +20,9 @@ def normalize_key_for_search(library_key):
     return library_key.replace(version_guid=None, branch=None)
 
 
-class LibraryToolsService:
+class LegacyLibraryToolsService:
     """
-    Service for LibraryContentBlock.
+    Service for LegacyLibraryContentBlock.
 
     Allows to interact with libraries in the modulestore and learning core.
 
@@ -33,24 +32,31 @@ class LibraryToolsService:
         self.store = modulestore
         self.user_id = user_id
 
-    def get_latest_library_version(self, lib_key) -> str | None:
+    def get_latest_library_version(self, library_id: str | LibraryLocator) -> str | None:
         """
         Get the version of the given library as string.
 
         The return value (library version) could be:
             str(<ObjectID>) - for V1 library;
-            str(<int>)      - for V2 library.
             None            - if the library does not exist.
         """
-        library = library_api.get_v1_or_v2_library(lib_key, version=None)
+        library_key: LibraryLocator
+        if isinstance(library_id, str):
+            library_key = LibraryLocator.from_string(library_id)
+        else:
+            library_key = library_id
+        library_key = library_key.for_branch(ModuleStoreEnum.BranchName.library).for_version(None)
+        try:
+            library = self.store.get_library(
+                library_key, remove_version=False, remove_branch=False, head_validation=False
+            )
+        except ItemNotFoundError:
+            return None
         if not library:
             return None
-        elif isinstance(library, LibraryRootV1):
-            # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
-            assert library.location.library_key.version_guid is not None
-            return str(library.location.library_key.version_guid)
-        elif isinstance(library, library_api.ContentLibraryMetadata):
-            return str(library.version)
+        # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
+        assert library.location.library_key.version_guid is not None
+        return str(library.location.library_key.version_guid)
 
     def create_block_analytics_summary(self, course_key, block_keys):
         """
@@ -96,7 +102,7 @@ class LibraryToolsService:
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def trigger_library_sync(self, dest_block: LibraryContentBlock, library_version: str | int | None) -> None:
+    def trigger_library_sync(self, dest_block: LegacyLibraryContentBlock, library_version: str | None) -> None:
         """
         Queue task to synchronize the children of `dest_block` with it source library (at `library_version` or latest).
 
@@ -118,16 +124,20 @@ class LibraryToolsService:
             `dest_block.children`.
         """
         ensure_cms("library_content block children may only be synced in a CMS context")
-        if not isinstance(dest_block, LibraryContentBlock):
+        if not isinstance(dest_block, LegacyLibraryContentBlock):
             raise ValueError(f"Can only sync children for library_content blocks, not {dest_block.tag} blocks.")
         if not dest_block.source_library_id:
             dest_block.source_library_version = ""
             return
-        library_key = dest_block.source_library_key
-        if not library_api.get_v1_or_v2_library(library_key, version=library_version):
+        library_key = dest_block.source_library_key.for_branch(
+            ModuleStoreEnum.BranchName.library
+        ).for_version(library_version)
+        try:
+            self.store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
+        except ItemNotFoundError as exc:
             if library_version:
-                raise ObjectDoesNotExist(f"Version {library_version} of library {library_key} not found.")
-            raise ObjectDoesNotExist(f"Library {library_key} not found.")
+                raise ObjectDoesNotExist(f"Version {library_version} of library {library_key} not found.") from exc
+            raise ObjectDoesNotExist(f"Library {library_key} not found.") from exc
 
         # TODO: This task is synchronous until we can figure out race conditions with import.
         # These race conditions lead to failed imports of library content from course import.
@@ -140,12 +150,14 @@ class LibraryToolsService:
             ),
         )
 
-    def trigger_duplication(self, source_block: LibraryContentBlock, dest_block: LibraryContentBlock) -> None:
+    def trigger_duplication(
+        self, source_block: LegacyLibraryContentBlock, dest_block: LegacyLibraryContentBlock
+    ) -> None:
         """
         Queue a task to duplicate the children of `source_block` to `dest_block`.
         """
         ensure_cms("library_content block children may only be duplicated in a CMS context")
-        if not isinstance(dest_block, LibraryContentBlock):
+        if not isinstance(dest_block, LegacyLibraryContentBlock):
             raise ValueError(f"Can only duplicate children for library_content blocks, not {dest_block.tag} blocks.")
         if source_block.scope_ids.usage_id.context_key != source_block.scope_ids.usage_id.context_key:
             raise ValueError(
@@ -163,7 +175,7 @@ class LibraryToolsService:
             dest_block_id=str(dest_block.scope_ids.usage_id),
         )
 
-    def are_children_syncing(self, library_content_block: LibraryContentBlock) -> bool:
+    def are_children_syncing(self, library_content_block: LegacyLibraryContentBlock) -> bool:
         """
         Is a task currently running to sync the children of `library_content_block`?
 
@@ -179,21 +191,12 @@ class LibraryToolsService:
 
     def list_available_libraries(self):
         """
-        List all known libraries.
+        List all known legacy libraries.
 
-        Collects Only V2 Libaries if the FEATURES[ENABLE_LIBRARY_AUTHORING_MICROFRONTEND] setting is True.
-        Otherwise, return all v1 and v2 libraries.
         Returns tuples of (library key, display_name).
         """
         user = User.objects.get(id=self.user_id)
-        v1_libs = [
+        return [
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
             for lib in self.store.get_library_summaries()
         ]
-        v2_query = library_api.get_libraries_for_user(user)
-        v2_libs_with_meta = library_api.get_metadata(v2_query)
-        v2_libs = [(lib.key, lib.title) for lib in v2_libs_with_meta]
-
-        if settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND'):
-            return v2_libs
-        return v1_libs + v2_libs

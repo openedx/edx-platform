@@ -211,7 +211,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # We've pre-loaded the fields for this block, so the FieldData shouldn't
         # consider these values "changed" in its sense of "you have to persist
         # these because we've altered the field values from what was stored".
-        self.system.authored_data_store.mark_unchanged(block)
+        self.authored_data_store.mark_unchanged(block)
 
         return block
 
@@ -221,7 +221,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         This gets called by block.save() - do not call this directly.
         """
-        if not self.system.authored_data_store.has_changes(block):
+        if not self.authored_data_store.has_changes(block):
             return  # No changes, so no action needed.
 
         # Verify that the user has permission to write to authored data in this
@@ -254,7 +254,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 },
                 created=now,
             )
-        self.system.authored_data_store.mark_unchanged(block)
+        self.authored_data_store.mark_unchanged(block)
 
     def _get_component_from_usage_key(self, usage_key):
         """

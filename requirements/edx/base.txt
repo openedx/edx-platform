@@ -401,7 +401,7 @@ drf-yasg==1.21.7
     # via
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.11.2
+edx-ace==1.11.3
     # via -r requirements/edx/kernel.in
 edx-api-doc-tools==2.0.0
     # via
@@ -467,7 +467,7 @@ edx-drf-extensions==10.4.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.27.0
+edx-enterprise==4.27.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -811,7 +811,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.14.1
+openedx-events==9.15.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -825,7 +825,7 @@ openedx-filters==1.11.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.13.1
+openedx-learning==0.15.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

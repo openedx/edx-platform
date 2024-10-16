@@ -20,8 +20,8 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
 )
-from openedx_learning.api.authoring import get_collection_components, get_component, get_components
-from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component
+from openedx_learning.api.authoring import get_component, get_components
+from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component, PublishableEntity
 
 from lms.djangoapps.grades.api import signals as grades_signals
 
@@ -167,9 +167,11 @@ def library_collection_entity_deleted(sender, instance, **kwargs):
     """
     Sends a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for components removed from a collection.
     """
-    # Component.pk matches its entity.pk
-    component = get_component(instance.entity_id)
-    _library_collection_component_changed(component)
+    # Only trigger component updates if CollectionPublishableEntity was cascade deleted due to deletion of a collection.
+    if isinstance(kwargs.get('origin'), Collection):
+        # Component.pk matches its entity.pk
+        component = get_component(instance.entity_id)
+        _library_collection_component_changed(component)
 
 
 @receiver(m2m_changed, sender=CollectionPublishableEntity, dispatch_uid="library_collection_entities_changed")
@@ -177,9 +179,6 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
     """
     Sends a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for components added/removed/cleared from a collection.
     """
-    if not isinstance(instance, Collection):
-        return
-
     if action not in ["post_add", "post_remove", "post_clear"]:
         return
 
@@ -191,18 +190,16 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
         log.error("{instance} is not associated with a content library.")
         return
 
+    if isinstance(instance, PublishableEntity):
+        _library_collection_component_changed(instance.component, library.library_key)
+        return
+
+    # When action=="post_clear", pk_set==None
+    # Since the collection instance now has an empty entities set,
+    # we don't know which ones were removed, so we need to update associations for all library components.
+    components = get_components(instance.learning_package_id)
     if pk_set:
-        components = get_collection_components(
-            instance.learning_package_id,
-            instance.key,
-        ).filter(pk__in=pk_set)
-    else:
-        # When action=="post_clear", pk_set==None
-        # Since the collection instance now has an empty entities set,
-        # we don't know which ones were removed, so we need to update associations for all library components.
-        components = get_components(
-            instance.learning_package_id,
-        )
+        components = components.filter(pk__in=pk_set)
 
     for component in components.all():
         _library_collection_component_changed(component, library.library_key)
