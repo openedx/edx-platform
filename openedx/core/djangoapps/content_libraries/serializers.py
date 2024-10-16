@@ -217,6 +217,7 @@ class LibraryXBlockOlxSerializer(serializers.Serializer):
     Serializer for representing an XBlock's OLX
     """
     olx = serializers.CharField()
+    version_num = serializers.IntegerField(read_only=True, required=False)
 
 
 class LibraryXBlockStaticFileSerializer(serializers.Serializer):
