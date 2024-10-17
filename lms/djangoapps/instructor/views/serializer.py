@@ -228,3 +228,15 @@ class BlockDueDateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         if disable_due_datetime:
             self.fields['due_datetime'].required = False
+
+
+class ProblemSerializer(UniqueStudentIdentifierSerializer):
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to reset."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
+    score = serializers.CharField(
+        help_text="Score must be a valid number or decimal, e.g., 1.00"
+    )
