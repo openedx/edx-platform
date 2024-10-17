@@ -3,7 +3,6 @@ Email Notifications Utils
 """
 import datetime
 import json
-import logging
 
 from bs4 import BeautifulSoup
 from django.conf import settings
@@ -32,7 +31,6 @@ from .notification_icons import NotificationTypeIcons
 
 
 User = get_user_model()
-log = logging.getLogger(__name__)
 
 
 def is_email_notification_flag_enabled(user=None):
@@ -413,6 +411,4 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
                                 if pref_value else EmailCadence.NEVER
                             type_prefs['email_cadence'] = cadence_value
         preference.save()
-    if not user.id:
-        log.info(f"<Digest-One-Click-Unsubscribe> - user.id is null - {encrypted_username} ")
     notification_preference_unsubscribe_event(user)
