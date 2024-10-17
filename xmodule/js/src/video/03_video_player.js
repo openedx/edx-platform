@@ -480,7 +480,9 @@
                     // finish bufferization and then rewind the video.
                     if (this.isYoutubeType() && this.videoPlayer.isBuffering()) {
                         this.el.on('play.seek', function() {
+                            if (this.videoPlayer.isBuffering()){
                             this.videoPlayer.player.seekTo(time, true);
+                            }
                         }.bind(this));
                     } else {
                         // Otherwise, just seek the video
