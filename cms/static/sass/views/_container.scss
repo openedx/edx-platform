@@ -562,6 +562,19 @@
   }
 }
 
+// Modal for previewing changes to a library-sourced block
+// cms/static/js/views/modals/preview_v2_library_changes.js
+.modal-lib-preview {
+  .modal-content {
+    padding: 0 !important;
+
+    & > iframe {
+      width: 100%;
+      min-height: 350px;
+    }
+  }
+}
+
 .ltiLaunchFrame{
     width:100%;
     height:100%
