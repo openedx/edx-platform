@@ -225,6 +225,8 @@ class LibraryXBlockMetadata:
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
     created = attr.ib(type=datetime)
     modified = attr.ib(type=datetime)
+    draft_version_num = attr.ib(type=int)
+    published_version_num = attr.ib(default=None, type=int)
     display_name = attr.ib("")
     last_published = attr.ib(default=None, type=datetime)
     last_draft_created = attr.ib(default=None, type=datetime)
@@ -246,6 +248,7 @@ class LibraryXBlockMetadata:
             published_by = last_publish_log.published_by.username
 
         draft = component.versioning.draft
+        published = component.versioning.published
         last_draft_created = draft.created if draft else None
         last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
 
@@ -254,9 +257,11 @@ class LibraryXBlockMetadata:
                 library_key,
                 component,
             ),
-            display_name=component.versioning.draft.title,
+            display_name=draft.title,
             created=component.created,
-            modified=component.versioning.draft.created,
+            modified=draft.created,
+            draft_version_num=draft.version_num,
+            published_version_num=published.version_num if published else None,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
             published_by=published_by,
             last_draft_created=last_draft_created,
@@ -743,13 +748,15 @@ def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMeta
     return xblock_metadata
 
 
-def set_library_block_olx(usage_key, new_olx_str):
+def set_library_block_olx(usage_key, new_olx_str) -> int:
     """
     Replace the OLX source of the given XBlock.
 
     This is only meant for use by developers or API client applications, as
     very little validation is done and this can easily result in a broken XBlock
     that won't load.
+
+    Returns the version number of the newly created ComponentVersion.
     """
     # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
     assert isinstance(usage_key, LibraryUsageLocatorV2)
@@ -786,7 +793,7 @@ def set_library_block_olx(usage_key, new_olx_str):
             text=new_olx_str,
             created=now,
         )
-        authoring_api.create_next_version(
+        new_component_version = authoring_api.create_next_component_version(
             component.pk,
             title=new_title,
             content_to_replace={
@@ -801,6 +808,8 @@ def set_library_block_olx(usage_key, new_olx_str):
             usage_key=usage_key
         )
     )
+
+    return new_component_version.version_num
 
 
 def library_component_usage_key(

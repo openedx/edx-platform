@@ -10,7 +10,7 @@ charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-dnspython==2.6.1
+dnspython==2.7.0
     # via pymongo
 edx-opaque-keys==2.11.0
     # via -r requirements/edx/paver.in
@@ -22,7 +22,7 @@ libsass==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.in
-markupsafe==2.1.5
+markupsafe==3.0.1
     # via -r requirements/edx/paver.in
 mock==5.1.0
     # via -r requirements/edx/paver.in
@@ -61,7 +61,7 @@ urllib3==1.26.20
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-watchdog==5.0.2
+watchdog==5.0.3
     # via -r requirements/edx/paver.in
 wrapt==1.16.0
     # via -r requirements/edx/paver.in
