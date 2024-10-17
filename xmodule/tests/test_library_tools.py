@@ -21,7 +21,7 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 @skip_unless_cms
 @ddt.ddt
-class ContentLibraryToolsTest(TestTaxonomyMixin, MixedSplitTestCase, ContentLibrariesRestApiTest):
+class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
     """
     Tests for LegacyLibraryToolsService.
     """
