@@ -14,7 +14,5 @@ idna==3.10
     # via requests
 requests==2.32.3
     # via -r scripts/xblock/requirements.in
-urllib3==1.26.20
-    # via
-    #   -c scripts/xblock/../../requirements/constraints.txt
-    #   requests
+urllib3==2.2.3
+    # via requests
