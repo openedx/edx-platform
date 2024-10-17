@@ -9,7 +9,8 @@ from edx_proctoring.runtime import set_runtime_service
 
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 
-
+# PERSONA_DEBUG: import stuff from name-affirmation w/o actually importing to prevent CIRCLES
+# exposes api.py functions from name affirmation
 class NameAffirmationApiConfig(AppConfig):
     """
     Application Configuration for Name Affirmation API.

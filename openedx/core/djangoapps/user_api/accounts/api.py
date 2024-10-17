@@ -281,7 +281,7 @@ def _validate_name_change(user_profile, data, field_errors):
 
     return old_name
 
-
+# PERSONA_DEBUG: This class determines if a "full name" change requires IDV
 def _does_name_change_require_verification(user_profile, old_name, new_name):
     """
     If name change requires ID verification, do not update it through this API.

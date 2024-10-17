@@ -5,7 +5,9 @@ Utility functions for integration with Name Affirmation plugin
 
 from edx_django_utils.plugins import PluginError, PluginManager
 
-
+# PERSONA_DEBUG: before we interact edx_name_affirmation, we check that it's installed as a plugin.
+# if is_name_affirmation_installed: get_name_affirmation_service
+# return NameAffirmationService
 def is_name_affirmation_installed():
     """
     Returns boolean describing whether Name Affirmation plugin is installed.

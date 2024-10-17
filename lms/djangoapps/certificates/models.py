@@ -352,6 +352,7 @@ class GeneratedCertificate(models.Model):
         self._revoke_certificate(status=CertificateStatuses.unverified, mode=mode, source=source)
 
     def _revoke_certificate(self, status, mode=None, grade=None, source=None):
+        # PERSONA_DEBUG: the name on the cert is updated/removed when its revoked
         """
         Revokes a course certificate from a learner, updating the certificate's status as specified by the value of the
         `status` argument. This will prevent the learner from being able to access their certificate in the associated
@@ -447,6 +448,8 @@ class GeneratedCertificate(models.Model):
         name_to_use = student_api.get_name(user.id)
         name_affirmation_service = get_name_affirmation_service()
 
+        # PERSONA_DEBUG: What should appear on cert based on verified name?
+        # If user's name on a cert is not correct, look here!
         if name_affirmation_service and name_affirmation_service.should_use_verified_name_for_certs(user):
             verified_name_obj = name_affirmation_service.get_verified_name(user, is_verified=True)
             if verified_name_obj:

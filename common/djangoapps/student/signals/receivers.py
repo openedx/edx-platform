@@ -126,7 +126,9 @@ def listen_for_verified_name_approved(sender, user_id, profile_name, **kwargs):
     except PendingNameChange.DoesNotExist:
         pass
 
-
+        # PERSONA_DEBUG: "complete" the PendingNameChange is verified name is approved via IDV.
+        # Signal is emitted when a VerifiedName status --> approved. from name affirmation
+        # and recieved here
 if is_name_affirmation_installed():
     # pylint: disable=import-error
     from edx_name_affirmation.signals import VERIFIED_NAME_APPROVED

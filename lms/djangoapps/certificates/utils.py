@@ -222,6 +222,7 @@ def certificate_status_for_student(student, course_id):
 
 
 def get_preferred_certificate_name(user):
+    # PERSONA_DEBUG: sees if verified name would be used for cert, otherwise uses full name
     """
     If the verified name feature is enabled and the user has their preference set to use their
     verified name for certificates, return their verified name. Else, return the user's profile
