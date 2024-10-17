@@ -14,17 +14,39 @@ data: |
             &lt;img alt="<i>Text for screen readers</i>"
               src="<i>path to the image you want to display in the unit</i>" /&gt;
           &lt;/a>
-          &lt;div class="script_placeholder"
-            data-src="<i>path to the jquery.loupeAndLightbox.js JavaScript file in your course</i>"/&gt;
-        &lt;/div&gt;
         &lt;script type="text/javascript"&gt;// &gt;![CDATA[
-        JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
-          $('.loupe').loupeAndLightbox({
-            width: 350,
-            height: 350,
-            lightbox: false
+        function loadScript(url, callback) {
+          let script = document.createElement("script");
+          script.type = "text/javascript";
+
+          if (script.readyState) {  // IE
+            script.onreadystatechange = function() {
+              if (script.readyState === "loaded" || script.readyState === "complete") {
+                script.onreadystatechange = null;
+                callback();
+              }
+            };
+          } else {  // Other browsers
+            script.onload = function() {
+              callback();
+            };
+          }
+
+          script.src = url;
+          document.head.appendChild(script);
+        }
+
+        function callback() {
+          JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
+            $('.loupe').loupeAndLightbox({
+              width: 350,
+              height: 350,
+              lightbox: false
+            });
           });
-        });
+        }
+
+        loadScript("<i>path to jquery.loupeAndLightbox.js JavaScript file to your course</i>", callback);
         // ]]&gt;&lt;/script&gt;
         &lt;div id="ap_listener_added"&gt;&lt;/div&gt;
         </pre>
@@ -34,24 +56,48 @@ data: |
         <li>Replace the value of the link's <strong>href</strong> attribute with the path to the magnified image. Do not change the value of the class attribute.</li>
         <li>Replace the value of the image's <strong>src</strong> attribute with the path to the image that will appear in the unit.</li>
         <li>Replace the value of the image's <strong>alt</strong> attribute with text that both describes the image and the action or destination of clicking on the image. You <strong>must</strong> include alt text to provide an accessible label.</li>
-        <li>Replace the value of the div element's <strong>data-src</strong> attribute with the path to the jquery.loupeAndLightbox.js JavaScript file in your course.</li>
+        <li>Replace the value of the first parameter in <strong>loadScript</strong> function with the path to the jquery.loupeAndLightbox.js JavaScript file in your course.</li>
       </ol>
       <p>The example below shows a subset of the biochemical reactions that cells carry out. </p>
       <p>You can view the chemical structures of the molecules by clicking on them. The magnified view also lists the enzymes involved in each step.</p>
       <p class="sr">Press spacebar to open the magnifier.</p>
       <div class="zooming-image-place" style="position: relative;">
         <a class="loupe" href="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_detail_01.png">
-            <img alt="magnify" src="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_overview_01.png" />
-          </a>
-        <div class="script_placeholder" data-src="https://studio.edx.org/c4x/edX/DemoX/asset/jquery.loupeAndLightbox.js" />
+          <img alt="magnify" src="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_detail_01.png" />
+        </a>
       </div>
       <script type="text/javascript">// <![CDATA[
-      JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
-        $('.loupe').loupeAndLightbox({
-          width: 350,
-          height: 350,
-          lightbox: false
-        });
-      });
+        function loadScript(url, callback) {
+          let script = document.createElement("script");
+          script.type = "text/javascript";
+
+          if (script.readyState) {  // IE
+            script.onreadystatechange = function() {
+              if (script.readyState === "loaded" || script.readyState === "complete") {
+                script.onreadystatechange = null;
+                callback();
+              }
+            };
+          } else {  // Other browsers
+            script.onload = function() {
+              callback();
+            };
+          }
+
+          script.src = url;
+          document.head.appendChild(script);
+        }
+
+        function callback() {
+          JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
+            $('.loupe').loupeAndLightbox({
+              width: 350,
+              height: 350,
+              lightbox: false
+            });
+          });
+        }
+
+        loadScript("https://studio.edx.org/c4x/edX/DemoX/asset/jquery.loupeAndLightbox.js", callback);
       // ]]></script>
       <div id="ap_listener_added"></div>
