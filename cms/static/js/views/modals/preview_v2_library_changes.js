@@ -27,8 +27,6 @@ function($, _, gettext, BaseModal, ViewUtils, XBlockViewUtils) {
 
         initialize: function() {
             BaseModal.prototype.initialize.call(this);
-            // this.template = this.loadTemplate('edit-xblock-modal');
-            // this.editorModeButtonTemplate = this.loadTemplate('editor-mode-button');
         },
 
         /**
