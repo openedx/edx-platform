@@ -1318,7 +1318,8 @@ def extras_reset_password_link(request):
             return HttpResponse("")
 	uid = int_to_base36(user.id)
 	token = PasswordResetTokenGenerator().make_token(user)
-	url = "https://{0}/password_reset_confirm/{1}-{2}".format(domain, uid, token)
+	mfe_url_addon = "/authn" if should_redirect_to_authn_microfrontend() else ""
+    url = "https://{0}{1}/password_reset_confirm/{2}-{3}".format(domain, mfe_url_addon, uid, token)
 	return HttpResponse(url)
 
 
