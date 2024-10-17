@@ -1309,14 +1309,14 @@ def attendance_report(request):
 
 @csrf_exempt
 def extras_reset_password_link(request):
-	email = request.POST.get("email")
-	domain = request.POST.get("domain")
-	try:
-            user = User.objects.get(email__iexact=email.strip())
-	except Exception as err:
-            log.error("Reset Password Error: "+ str(err) + " Email:" + email)
-            return HttpResponse("")
-	uid = int_to_base36(user.id)
+    email = request.POST.get("email")
+    domain = request.POST.get("domain")
+    try:
+        user = User.objects.get(email__iexact=email.strip())
+    except Exception as err:
+        log.error("Reset Password Error: "+ str(err) + " Email:" + email)
+        return HttpResponse("")
+    uid = int_to_base36(user.id)
     token = PasswordResetTokenGenerator().make_token(user)
     mfe_url_addon = "/authn" if should_redirect_to_authn_microfrontend() else ""
     url = "https://{0}{1}/password_reset_confirm/{2}-{3}".format(domain, mfe_url_addon, uid, token)
