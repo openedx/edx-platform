@@ -7,7 +7,7 @@ import logging
 from collections import defaultdict
 from datetime import datetime, timezone
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.transaction import atomic
 
 from openedx_learning.api import authoring as authoring_api
@@ -20,6 +20,7 @@ from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import FieldData
 
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
+from ..data import AuthoredDataMode, LatestVersion
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
 
@@ -161,7 +162,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
     (eventually) asset storage.
     """
 
-    def get_block(self, usage_key, for_parent=None):
+    def get_block(self, usage_key, for_parent=None, *, version: int | LatestVersion = LatestVersion.AUTO):
         """
         Fetch an XBlock from Learning Core data models.
 
@@ -173,10 +174,21 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # We can do this more efficiently in a single query later, but for now
         # just get it the easy way.
         component = self._get_component_from_usage_key(usage_key)
-        # TODO: For now, this runtime will only be used in CMS, so it's fine to just return the Draft version.
-        #       However, we will need the runtime to return the Published version for LMS (and Draft for LMS-Preview).
-        #       We should base this Draft vs Published decision on a runtime initialization parameter.
-        component_version = component.versioning.draft
+
+        if version == LatestVersion.AUTO:
+            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
+                version = LatestVersion.DRAFT
+            else:
+                version = LatestVersion.PUBLISHED
+        if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
+            raise ValidationError("This runtime only allows accessing the published version of components")
+        if version == LatestVersion.DRAFT:
+            component_version = component.versioning.draft
+        elif version == LatestVersion.PUBLISHED:
+            component_version = component.versioning.published
+        else:
+            assert isinstance(version, int)
+            component_version = component.versioning.version_num(version)
         if component_version is None:
             raise NoSuchUsage(usage_key)
 
@@ -205,13 +217,16 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         else:
             block = block_class.parse_xml(xml_node, runtime=self, keys=keys)
 
+        # Store the version request on the block so we can retrieve it when needed for generating handler URLs etc.
+        block._runtime_requested_version = version  # pylint: disable=protected-access
+
         # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
         block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
 
         # We've pre-loaded the fields for this block, so the FieldData shouldn't
         # consider these values "changed" in its sense of "you have to persist
         # these because we've altered the field values from what was stored".
-        self.system.authored_data_store.mark_unchanged(block)
+        self.authored_data_store.mark_unchanged(block)
 
         return block
 
@@ -221,8 +236,15 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         This gets called by block.save() - do not call this directly.
         """
-        if not self.system.authored_data_store.has_changes(block):
+        if not self.authored_data_store.has_changes(block):
             return  # No changes, so no action needed.
+
+        if block._runtime_requested_version != LatestVersion.DRAFT:  # pylint: disable=protected-access
+            # Not sure if this is an important restriction but it seems like overwriting the latest version based on
+            # an old version is likely an accident, so for now we're not going to allow it.
+            raise ValidationError(
+                "Do not make changes to a component starting from the published or past versions. Use the latest draft."
+            )
 
         # Verify that the user has permission to write to authored data in this
         # learning context:
@@ -254,7 +276,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 },
                 created=now,
             )
-        self.system.authored_data_store.mark_unchanged(block)
+        self.authored_data_store.mark_unchanged(block)
 
     def _get_component_from_usage_key(self, usage_key):
         """

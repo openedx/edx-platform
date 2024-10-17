@@ -3,7 +3,7 @@ Discussion notifications sender util.
 """
 import re
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from django.conf import settings
 from django.utils.text import Truncator
 
@@ -380,6 +380,30 @@ def remove_html_tags(text):
     return re.sub(clean, '', text)
 
 
+def strip_empty_tags(soup):
+    """
+    Strip starting and ending empty tags from the soup object
+    """
+    def strip_tag(element, reverse=False):
+        """
+        Checks if element is empty and removes it
+        """
+        if not element.get_text(strip=True):
+            element.extract()
+            return True
+        if isinstance(element, Tag):
+            child_list = element.contents[::-1] if reverse else element.contents
+            for child in child_list:
+                if not strip_tag(child):
+                    break
+        return False
+
+    while soup.contents:
+        if not (strip_tag(soup.contents[0]) or strip_tag(soup.contents[-1], reverse=True)):
+            break
+    return soup
+
+
 def clean_thread_html_body(html_body):
     """
     Get post body with tags removed and limited to 500 characters
@@ -401,6 +425,9 @@ def clean_thread_html_body(html_body):
         for match in html_body.find_all(tag):
             match.unwrap()
 
+    if not html_body.find():
+        return str(html_body)
+
     # Replace tags that are not allowed in email
     tags_to_update = [
         {"source": "button", "target": "span"},
@@ -412,11 +439,15 @@ def clean_thread_html_body(html_body):
     for tag_dict in tags_to_update:
         for source_tag in html_body.find_all(tag_dict['source']):
             target_tag = html_body.new_tag(tag_dict['target'], **source_tag.attrs)
-            if source_tag.string:
-                target_tag.string = source_tag.string
-            source_tag.replace_with(target_tag)
+            if source_tag.contents:
+                for content in list(source_tag.contents):
+                    target_tag.append(content)
+            source_tag.insert_before(target_tag)
+            source_tag.extract()
 
     for tag in html_body.find_all(True):
         tag.attrs = {}
         tag['style'] = 'margin: 0'
+
+    html_body = strip_empty_tags(html_body)
     return str(html_body)

@@ -982,7 +982,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
 
     def test_duplicate_library_content_block(self):  # pylint: disable=too-many-statements
         """
-        Test the LibraryContentBlock's special duplication process.
+        Test the LegacyLibraryContentBlock's special duplication process.
         """
         store = modulestore()
 
