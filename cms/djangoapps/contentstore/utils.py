@@ -98,7 +98,7 @@ from cms.djangoapps.contentstore.toggles import (
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from xmodule.library_tools import LibraryToolsService
+from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1265,7 +1265,7 @@ def load_services_for_studio(runtime, user):
         "settings": SettingsService(),
         "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
         "teams_configuration": TeamsConfigurationService(),
-        "library_tools": LibraryToolsService(modulestore(), user.id)
+        "library_tools": LegacyLibraryToolsService(modulestore(), user.id)
     }
 
     runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
@@ -1671,9 +1671,7 @@ def get_home_context(request, no_course=False):
         ENABLE_GLOBAL_STAFF_OPTIMIZATION,
     )
     from cms.djangoapps.contentstore.views.library import (
-        LIBRARY_AUTHORING_MICROFRONTEND_URL,
         LIBRARIES_ENABLED,
-        should_redirect_to_library_authoring_mfe,
         user_can_view_create_library_button,
     )
 
@@ -1699,12 +1697,9 @@ def get_home_context(request, no_course=False):
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
         'taxonomies_enabled': not is_tagging_feature_disabled(),
-        'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
-        'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         'taxonomy_list_mfe_url': get_taxonomy_list_url(),
         'libraries': libraries,
-        'show_new_library_button': user_can_view_create_library_button(user)
-        and not should_redirect_to_library_authoring_mfe(),
+        'show_new_library_button': user_can_view_create_library_button(user),
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
@@ -2202,7 +2197,7 @@ class StudioPermissionsService:
 
     Deprecated. To be replaced by a more general authorization service.
 
-    Only used by LibraryContentBlock (and library_tools.py).
+    Only used by LegacyLibraryContentBlock (and library_tools.py).
     """
 
     def __init__(self, user):

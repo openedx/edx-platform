@@ -8,29 +8,31 @@ Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 # pylint: disable=unused-import
-
+from enum import Enum
 from datetime import datetime
 import logging
 import threading
 
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component
+from openedx_learning.api.authoring_models import Component, ComponentVersion
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
-from xblock.exceptions import NoSuchViewError
+from xblock.exceptions import NoSuchUsage, NoSuchViewError
 from xblock.plugin import PluginMissingError
 
+from openedx.core.types import User as UserType
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreFieldData,
     LearningCoreXBlockRuntime,
 )
-from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
+from .data import CheckPerm, LatestVersion
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
 from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
@@ -43,46 +45,40 @@ from openedx.core.djangoapps.xblock.learning_context import LearningContext
 log = logging.getLogger(__name__)
 
 
-def get_runtime_system():
+def get_runtime(user: UserType):
     """
-    Return a new XBlockRuntimeSystem.
+    Return a new XBlockRuntime.
 
-    TODO: Refactor to get rid of the XBlockRuntimeSystem entirely and just
-    create the LearningCoreXBlockRuntime and return it. We used to want to keep
-    around a long lived runtime system (a factory that returns runtimes) for
-    caching purposes, and have it dynamically construct a runtime on request.
-    Now we're just re-constructing both the system and the runtime in this call
-    and returning it every time, because:
-
-    1. We no longer have slow, Blockstore-style definitions to cache, so the
-       performance of this is perfectly acceptable.
-    2. Having a singleton increases complexity and the chance of bugs.
-    3. Creating the XBlockRuntimeSystem every time only takes about 10-30 µs.
-
-    Given that, the extra XBlockRuntimeSystem class just adds confusion. But
-    despite that, it's tested, working code, and so I'm putting off refactoring
-    for now.
+    Each XBlockRuntime is bound to one user (and usually one request or one
+    celery task). It is typically used just to load and render a single block,
+    but the API _does_ allow a single runtime instance to load multiple blocks
+    (as long as they're for the same user).
     """
-    params = get_xblock_app_config().get_runtime_system_params()
+    params = get_xblock_app_config().get_runtime_params()
     params.update(
-        runtime_class=LearningCoreXBlockRuntime,
         handler_url=get_handler_url,
         authored_data_store=LearningCoreFieldData(),
     )
-    runtime = _XBlockRuntimeSystem(**params)
+    runtime = LearningCoreXBlockRuntime(user, **params)
 
     return runtime
 
 
-def load_block(usage_key, user):
+def load_block(
+    usage_key: UsageKeyV2,
+    user: UserType,
+    *,
+    check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
+    version: int | LatestVersion = LatestVersion.AUTO,
+):
     """
     Load the specified XBlock for the given user.
 
     Returns an instantiated XBlock.
 
     Exceptions:
-        NotFound - if the XBlock doesn't exist or if the user doesn't have the
-                   necessary permissions
+        NotFound - if the XBlock doesn't exist
+        PermissionDenied - if the user doesn't have the necessary permissions
 
     Args:
         usage_key(OpaqueKey): block identifier
@@ -94,18 +90,32 @@ def load_block(usage_key, user):
 
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
-    if user is not None and not context_impl.can_view_block(user, usage_key):
-        # We do not know if the block was not found or if the user doesn't have
-        # permission, but we want to return the same result in either case:
-        raise NotFound(f"XBlock {usage_key} does not exist, or you don't have permission to view it.")
+    if check_permission and user is not None:
+        if check_permission == CheckPerm.CAN_EDIT:
+            has_perm = context_impl.can_edit_block(user, usage_key)
+        elif check_permission == CheckPerm.CAN_READ_AS_AUTHOR:
+            has_perm = context_impl.can_view_block_for_editing(user, usage_key)
+        elif check_permission == CheckPerm.CAN_LEARN:
+            has_perm = context_impl.can_view_block(user, usage_key)
+        else:
+            has_perm = False
+        if not has_perm:
+            raise PermissionDenied(f"You don't have permission to access the component '{usage_key}'.")
 
     # TODO: load field overrides from the context
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
     # set to 3.
     # field_overrides = context_impl.get_field_overrides(usage_key)
-    runtime = get_runtime_system().get_runtime(user=user)
+    runtime = get_runtime(user=user)
 
-    return runtime.get_block(usage_key)
+    try:
+        return runtime.get_block(usage_key, version=version)
+    except NoSuchUsage as exc:
+        # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
+        raise NotFound(f"The component '{usage_key}' does not exist.") from exc
+    except ComponentVersion.DoesNotExist as exc:
+        # Convert ComponentVersion.DoesNotExist to NotFound so we do the right thing (404 not 500) by default.
+        raise NotFound(f"The requested version of component '{usage_key}' does not exist.") from exc
 
 
 def get_block_metadata(block, includes=()):
@@ -238,7 +248,13 @@ def render_block_view(block, view_name, user):  # pylint: disable=unused-argumen
     return fragment
 
 
-def get_handler_url(usage_key, handler_name, user):
+def get_handler_url(
+    usage_key: UsageKeyV2,
+    handler_name: str,
+    user: UserType | None,
+    *,
+    version: int | LatestVersion = LatestVersion.AUTO,
+):
     """
     A method for getting the URL to any XBlock handler. The URL must be usable
     without any authentication (no cookie, no OAuth/JWT), and may expire. (So
@@ -255,14 +271,19 @@ def get_handler_url(usage_key, handler_name, user):
         usage_key       - Usage Key (Opaque Key object or string)
         handler_name    - Name of the handler or a dummy name like 'any_handler'
         user            - Django User (registered or anonymous)
+        version         - Run the handler against a specific version of the
+                          block (e.g. when viewing an old version of it in
+                          Studio). Some blocks use handlers to load their data
+                          so it's important the handler matches the student_view
+                          etc.
 
     This view does not check/care if the XBlock actually exists.
     """
     usage_key_str = str(usage_key)
     site_root_url = get_xblock_app_config().get_site_root_url()
-    if not user:  # lint-amnesty, pylint: disable=no-else-raise
+    if not user:
         raise TypeError("Cannot get handler URLs without specifying a specific user ID.")
-    elif user.is_authenticated:
+    if user.is_authenticated:
         user_id = user.id
     elif user.is_anonymous:
         user_id = get_xblock_id_for_anonymous_user(user)
@@ -272,12 +293,16 @@ def get_handler_url(usage_key, handler_name, user):
     # and this XBlock:
     secure_token = get_secure_token_for_xblock_handler(user_id, usage_key_str)
     # Now generate the URL to that handler:
-    path = reverse('xblock_api:xblock_handler', kwargs={
+    kwargs = {
         'usage_key_str': usage_key_str,
         'user_id': user_id,
         'secure_token': secure_token,
         'handler_name': handler_name,
-    })
+    }
+    path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
+    if version != LatestVersion.AUTO:
+        path += "?version=" + (str(version) if isinstance(version, int) else version.value)
+
     # We must return an absolute URL. We can't just use
     # rest_framework.reverse.reverse to get the absolute URL because this method
     # can be called by the XBlock from python as well and in that case we don't

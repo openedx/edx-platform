@@ -36,6 +36,7 @@ URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
 URL_LIB_LTI_LAUNCH = URL_LIB_LTI_PREFIX + 'launch/'
 
 URL_BLOCK_RENDER_VIEW = '/api/xblock/v2/xblocks/{block_key}/view/{view_name}/'
+URL_BLOCK_EMBED_VIEW = '/xblocks/v2/{block_key}/embed/{view_name}/'  # Returns HTML not JSON so its URL is different
 URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{handler_name}/'
 URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 URL_BLOCK_FIELDS_URL = '/api/xblock/v2/xblocks/{block_key}/fields/'
@@ -300,6 +301,24 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         url = URL_BLOCK_RENDER_VIEW.format(block_key=block_key, view_name=view_name)
         return self._api('get', url, None, expect_response)
 
+    def _embed_block(
+        self,
+        block_key,
+        *,
+        view_name="student_view",
+        version: str | int | None = None,
+        expect_response=200,
+    ) -> str:
+        """
+        Get an HTML response that displays the given XBlock. Returns HTML.
+        """
+        url = URL_BLOCK_EMBED_VIEW.format(block_key=block_key, view_name=view_name)
+        if version is not None:
+            url += f"?version={version}"
+        response = self.client.get(url)
+        assert response.status_code == expect_response, 'Unexpected response code {}:'.format(response.status_code)
+        return response.content.decode()
+
     def _get_block_handler_url(self, block_key, handler_name):
         """
         Get the URL to call a specific XBlock's handler.
@@ -308,3 +327,12 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """
         url = URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name=handler_name)
         return self._api('get', url, None, expect_response=200)["handler_url"]
+
+    def _get_library_block_fields(self, block_key, expect_response=200):
+        """ Get the fields of a specific block in the library. This API is only used by the MFE editors. """
+        result = self._api('get', URL_BLOCK_FIELDS_URL.format(block_key=block_key), None, expect_response)
+        return result
+
+    def _set_library_block_fields(self, block_key, new_fields, expect_response=200):
+        """ Set the fields of a specific block in the library. This API is only used by the MFE editors. """
+        return self._api('post', URL_BLOCK_FIELDS_URL.format(block_key=block_key), new_fields, expect_response)
