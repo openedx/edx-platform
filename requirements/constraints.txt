@@ -126,6 +126,7 @@ moto<5.0
 # Date: 2024-10-16
 # MyPY 1.12.0 fails on all PRs with the following error:
 # openedx/core/djangoapps/content_libraries/api.py:732: error: INTERNAL ERROR
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35667
 mypy<1.12.0
 
 # Date: 2024-07-16
