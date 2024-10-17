@@ -11,8 +11,9 @@ from attrs import frozen, Factory
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
-from opaque_keys.edx.locator import DefinitionLocator, LocalId
+from opaque_keys.edx.locator import DefinitionLocator, LocalId, LibraryUsageLocatorV2
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import IdGenerator
@@ -267,7 +268,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
     empty, and (2) a summary of changes made to static files in the destination
     course.
     """
-
     from cms.djangoapps.contentstore.views.preview import _load_preview_block
 
     if not content_staging_api:
@@ -428,14 +428,29 @@ def _import_xml_node_to_parent(
                 tags=tags,
             )
 
+    def copy_tags():
+        if copied_from_block and tags:
+            object_tags = tags.get(str(copied_from_block))
+            if object_tags:
+                content_tagging_api.set_all_object_tags(
+                    content_key=new_xblock.location,
+                    object_tags=object_tags,
+                )
+
     # Copy content tags to the new xblock
-    if copied_from_block and tags:
-        object_tags = tags.get(str(copied_from_block))
-        if object_tags:
-            content_tagging_api.set_all_object_tags(
-                content_key=new_xblock.location,
-                object_tags=object_tags,
+    if (new_xblock.upstream):
+        # Verify if the upstream is a library component
+        # Copy the tags from library component upstream as ready only
+        try:
+            LibraryUsageLocatorV2.from_string(new_xblock.upstream)
+            content_tagging_api.copy_tags_as_read_only(
+                new_xblock.upstream,
+                new_xblock.location,
             )
+        except InvalidKeyError:
+            copy_tags()
+    else:
+        copy_tags()
 
     return new_xblock
 
