@@ -5,8 +5,8 @@
  * whether to accept ("sync") or reject ("ignore") the changes.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal',
-    'js/views/utils/xblock_utils'],
-function($, _, gettext, BaseModal, XBlockViewUtils) {
+    'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils'],
+function($, _, gettext, BaseModal, ViewUtils, XBlockViewUtils) {
     'use strict';
 
     var PreviewLibraryChangesModal = BaseModal.extend({
@@ -51,9 +51,9 @@ function($, _, gettext, BaseModal, XBlockViewUtils) {
             this.xblockInfo = XBlockViewUtils.findXBlockInfo(xblockElement, rootXBlockInfo);
             this.courseAuthoringMfeUrl = rootXBlockInfo.attributes.course_authoring_url;
             const headerElement = xblockElement.find('.xblock-header-primary');
+            this.downstreamBlockId = this.xblockInfo.get('id');
             this.upstreamBlockId = headerElement.data('upstream-ref');
             this.upstreamBlockVersionSynced = headerElement.data('version-synced');
-            // this.options.modalType = this.xblockInfo.get('category');
             this.refreshFunction = refreshFunction;
 
             this.render();
@@ -84,13 +84,29 @@ function($, _, gettext, BaseModal, XBlockViewUtils) {
 
         acceptChanges: function(event) {
             event.preventDefault();
+            $.post(`/api/contentstore/v2/downstreams/${this.downstreamBlockId}/sync`).done(() => {
+                this.hide();
+                this.refreshFunction();
+            }); // Note: if this POST request fails, Studio will display an error toast automatically.
         },
 
         ignoreChanges: function(event) {
             event.preventDefault();
-            if (confirm(gettext('Are you sure you want to ignore these changes?'))) {
-                // TODO
-            }
+            ViewUtils.confirmThenRunOperation(
+                gettext('Ignore these changes?'),
+                gettext('Would you like to permanently ignore this updated version? If so, you won\'t be able to update this until a newer version is published (in the library).'),
+                gettext('Ignore'),
+                () => {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: `/api/contentstore/v2/downstreams/${this.downstreamBlockId}/sync`,
+                        data: {},
+                    }).done(() => {
+                        this.hide();
+                        this.refreshFunction();
+                    }); // Note: if this DELETE request fails, Studio will display an error toast automatically.
+                }
+            );
         },
     });
 

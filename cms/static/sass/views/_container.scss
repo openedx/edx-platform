@@ -571,6 +571,7 @@
     & > iframe {
       width: 100%;
       min-height: 350px;
+      background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
     }
   }
 }
