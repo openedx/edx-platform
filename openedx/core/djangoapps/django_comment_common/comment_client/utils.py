@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import requests
 from django.utils.translation import get_language
+from opaque_keys.edx.keys import CourseKey
 
 from .settings import SERVICE_HOST as COMMENTS_SERVICE
 
@@ -167,3 +168,9 @@ def check_forum_heartbeat():
             return 'forum', False, res.get('check', 'Forum heartbeat failed')
     except Exception as fail:
         return 'forum', False, str(fail)
+
+
+def get_course_key(course_id):
+    if course_id and isinstance(course_id, str):
+        course_id = CourseKey.from_string(course_id)
+    return course_id

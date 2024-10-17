@@ -90,3 +90,5 @@
 # django42 support PR merged but new release is pending.
 # https://github.com/openedx/edx-platform/issues/33431
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
+
+git+https://github.com/edly-io/forum.git@master#egg=forum
