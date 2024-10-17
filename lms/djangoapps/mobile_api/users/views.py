@@ -557,7 +557,7 @@ class UserEnrollmentsStatus(views.APIView):
 
         * course_id (str): The course id associated with the user's enrollment.
         * course_name (str): The course name associated with the user's enrollment.
-        * is_active (bool): User's course enrolment status.
+        * recently_active (bool): User's course enrolment status.
 
 
         The HTTP 200 response contains a list of dictionaries that contain info
@@ -570,17 +570,17 @@ class UserEnrollmentsStatus(views.APIView):
             {
                 "course_id": "course-v1:a+a+a",
                 "course_name": "a",
-                "is_active": true
+                "recently_active": true
             },
             {
                 "course_id": "course-v1:b+b+b",
                 "course_name": "b",
-                "is_active": true
+                "recently_active": true
             },
             {
                 "course_id": "course-v1:c+c+c",
                 "course_name": "c",
-                "is_active": false
+                "recently_active": false
             },
             ...
         ]
@@ -625,7 +625,7 @@ class UserEnrollmentsStatus(views.APIView):
                 {
                     'course_id': course_id,
                     'course_name': user_enrollment.course_overview.display_name,
-                    'is_active': bool(
+                    'recently_active': bool(
                         course_id in course_ids
                         or user_enrollment.created > active_status_date
                     )

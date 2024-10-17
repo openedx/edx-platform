@@ -1422,9 +1422,9 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         response = self.api_response(api_version=API_V1)
 
         expected_response = [
-            {'course_id': str(courses[0].course_id), 'course_name': courses[0].display_name, 'is_active': True},
-            {'course_id': str(courses[1].course_id), 'course_name': courses[1].display_name, 'is_active': True},
-            {'course_id': str(courses[2].course_id), 'course_name': courses[2].display_name, 'is_active': True},
+            {'course_id': str(courses[0].course_id), 'course_name': courses[0].display_name, 'recently_active': True},
+            {'course_id': str(courses[1].course_id), 'course_name': courses[1].display_name, 'recently_active': True},
+            {'course_id': str(courses[2].course_id), 'course_name': courses[2].display_name, 'recently_active': True},
         ]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -1444,10 +1444,10 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         response = self.api_response(api_version=API_V1)
 
         expected_response = [
-            {'course_id': str(courses[0].course_id), 'course_name': courses[0].display_name, 'is_active': True},
-            {'course_id': str(courses[1].course_id), 'course_name': courses[1].display_name, 'is_active': True},
-            {'course_id': str(courses[2].course_id), 'course_name': courses[2].display_name, 'is_active': True},
-            {'course_id': str(old_course.course_id), 'course_name': old_course.display_name, 'is_active': False}
+            {'course_id': str(courses[0].course_id), 'course_name': courses[0].display_name, 'recently_active': True},
+            {'course_id': str(courses[1].course_id), 'course_name': courses[1].display_name, 'recently_active': True},
+            {'course_id': str(courses[2].course_id), 'course_name': courses[2].display_name, 'recently_active': True},
+            {'course_id': str(old_course.course_id), 'course_name': old_course.display_name, 'recently_active': False}
         ]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -1461,7 +1461,7 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         (32, False),
     )
     @ddt.unpack
-    def test_different_enrollment_dates(self, enrolled_days_ago: int, is_active_status: bool) -> None:
+    def test_different_enrollment_dates(self, enrolled_days_ago: int, recently_active_status: bool) -> None:
         self.login()
         course = CourseFactory.create(org="edx", mobile_available=True, run='1001')
         self.enroll(course.id)
@@ -1472,7 +1472,11 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         response = self.api_response(api_version=API_V1)
 
         expected_response = [
-            {'course_id': str(course.course_id), 'course_name': course.display_name, 'is_active': is_active_status}
+            {
+                'course_id': str(course.course_id),
+                'course_name': course.display_name,
+                'recently_active': recently_active_status
+            }
         ]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -1486,7 +1490,7 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         (32, False),
     )
     @ddt.unpack
-    def test_different_completion_dates(self, completed_days_ago: int, is_active_status: bool) -> None:
+    def test_different_completion_dates(self, completed_days_ago: int, recently_active_status: bool) -> None:
         self.login()
         course = CourseFactory.create(org="edx", mobile_available=True, run='1010')
         section = BlockFactory.create(
@@ -1511,7 +1515,11 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         response = self.api_response(api_version=API_V1)
 
         expected_response = [
-            {'course_id': str(course.course_id), 'course_name': course.display_name, 'is_active': is_active_status}
+            {
+                'course_id': str(course.course_id),
+                'course_name': course.display_name,
+                'recently_active': recently_active_status
+            }
         ]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
