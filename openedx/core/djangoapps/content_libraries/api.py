@@ -917,6 +917,8 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
     Create a new library block and populate it with staged content from clipboard
 
     Returns the newly created library block
+
+    TODO: Handle static assets.
     """
     from openedx.core.djangoapps.content_staging import api as content_staging_api
     if not content_staging_api:
