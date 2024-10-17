@@ -48,6 +48,8 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream.data = "<html><body>Upstream content V2</body></html>"
         upstream.save()
 
+        libs.publish_changes(self.library.key, self.user.id)
+
     def test_sync_bad_downstream(self):
         """
         Syncing into an unsupported downstream (such as a another Content Library block) raises BadDownstream, but
@@ -133,6 +135,16 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream.data = "<html><body>Upstream content V3</body></html>"
         upstream.save()
 
+        # Assert that un-published updates are not yet pulled into downstream
+        sync_from_upstream(downstream, self.user)
+        assert downstream.upstream_version == 2  # Library blocks start at version 2 (v1 is the empty new block)
+        assert downstream.upstream_display_name == "Upstream Title V2"
+        assert downstream.display_name == "Upstream Title V2"
+        assert downstream.data == "<html><body>Upstream content V2</body></html>"
+
+        # Publish changes
+        libs.publish_changes(self.library.key, self.user.id)
+
         # Follow-up sync. Assert that updates are pulled into downstream.
         sync_from_upstream(downstream, self.user)
         assert downstream.upstream_version == 3
@@ -157,6 +169,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream.display_name = "Upstream Title V3"
         upstream.data = "<html><body>Upstream content V3</body></html>"
         upstream.save()
+        libs.publish_changes(self.library.key, self.user.id)
 
         # Downstream modifications
         downstream.display_name = "Downstream Title Override"  # "safe" customization
@@ -277,10 +290,18 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert link.version_available == 2
         assert link.ready_to_sync is False
 
-        # Upstream updated to V3
+        # Upstream updated to V3, but not yet published
         upstream = xblock.load_block(self.upstream_key, self.user)
         upstream.data = "<html><body>Upstream content V3</body></html>"
         upstream.save()
+        link = UpstreamLink.get_for_block(downstream)
+        assert link.version_synced == 2
+        assert link.version_declined is None
+        assert link.version_available == 2
+        assert link.ready_to_sync is False
+
+        # Publish changes
+        libs.publish_changes(self.library.key, self.user.id)
         link = UpstreamLink.get_for_block(downstream)
         assert link.version_synced == 2
         assert link.version_declined is None
@@ -299,6 +320,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream = xblock.load_block(self.upstream_key, self.user)
         upstream.data = "<html><body>Upstream content V4</body></html>"
         upstream.save()
+        libs.publish_changes(self.library.key, self.user.id)
         link = UpstreamLink.get_for_block(downstream)
         assert link.version_synced == 2
         assert link.version_declined == 3
