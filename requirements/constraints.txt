@@ -136,13 +136,6 @@ mypy<1.12.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35126
 numpy<2.0.0
 
-# Date: 2024-01-26
-# optimizely-sdk 5.0.0 is breaking following test with segmentation fault
-# common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest::test_secure_key_configuration
-# needs to be fixed in the follow up issue
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/34103
-optimizely-sdk<5.0
-
 # Date: 2023-09-18
 # pinning this version to avoid updates while the library is being developed
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35269
