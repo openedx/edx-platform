@@ -227,7 +227,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.15
+django==4.2.16
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -712,7 +712,6 @@ imagesize==1.4.1
     # via sphinx
 importlib-metadata==6.11.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   markdown
     #   sphinx

@@ -26,15 +26,6 @@ elasticsearch<7.14.0
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
 
-# opentelemetry requires version 6.x at the moment:
-# https://github.com/open-telemetry/opentelemetry-python/issues/3570
-# Normally this could be added as a constraint in edx-django-utils, where we're
-# adding the opentelemetry dependency. However, when we compile pip-tools.txt,
-# that uses version 7.x, and then there's no undoing that when compiling base.txt.
-# So we need to pin it globally, for now.
-# Ticket for unpinning: https://github.com/openedx/edx-lint/issues/407
-importlib-metadata<7
-
 # Cause: https://github.com/openedx/event-tracking/pull/290
 # event-tracking 2.4.1 upgrades to pymongo 4.4.0 which is not supported on edx-platform.
 # We will pin event-tracking to do not break existing installations
