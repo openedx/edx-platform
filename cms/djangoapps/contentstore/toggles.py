@@ -596,10 +596,26 @@ def default_enable_flexible_peer_openassessments(course_key):
     return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)
 
 
+# .. toggle_name: FEATURES['ENABLE_CONTENT_LIBRARIES']
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: True
+# .. toggle_description: Enables use of the legacy and v2 libraries waffle flags.
+#    Note that legacy content libraries are only supported in courses using split mongo.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2015-03-06
+# .. toggle_target_removal_date: 2025-04-09
+# .. toggle_warning: This flag is deprecated in Sumac, and will be removed in favor of the disable_legacy_libraries and
+#    disable_new_libraries waffle flags.
+ENABLE_CONTENT_LIBRARIES = SettingDictToggle(
+    "FEATURES", "ENABLE_CONTENT_LIBRARIES", default=True, module_name=__name__
+)
+
 # .. toggle_name: contentstore.new_studio_mfe.disable_legacy_libraries
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Hides legacy (v1) Libraries tab in Authoring MFE.
+#    This toggle interacts with ENABLE_CONTENT_LIBRARIES toggle: if this is disabled, then legacy libraries are also
+#    disabled.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2024-10-02
 # .. toggle_target_removal_date: 2025-04-09
@@ -616,13 +632,18 @@ def libraries_v1_enabled():
     """
     Returns a boolean if Libraries V2 is enabled in the new Studio Home.
     """
-    return not DISABLE_LEGACY_LIBRARIES.is_enabled()
+    return (
+        ENABLE_CONTENT_LIBRARIES.is_enabled() and
+        not DISABLE_LEGACY_LIBRARIES.is_enabled()
+    )
 
 
 # .. toggle_name: contentstore.new_studio_mfe.disable_new_libraries
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Hides new Libraries v2 tab in Authoring MFE.
+#    This toggle interacts with settings.MEILISEARCH_ENABLED and ENABLE_CONTENT_LIBRARIES toggle: if these flags are
+#    False, then v2 libraries are also disabled.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2024-10-02
 # .. toggle_target_removal_date: 2025-04-09
@@ -638,6 +659,11 @@ DISABLE_NEW_LIBRARIES = WaffleFlag(
 def libraries_v2_enabled():
     """
     Returns a boolean if Libraries V2 is enabled in the new Studio Home.
+
+    Requires the ENABLE_CONTENT_LIBRARIES feature flag to be enabled, plus Meilisearch.
     """
-    # We use Meilisearch to index Libraries V2 content for display on new Studio Home.
-    return search_api.is_meilisearch_enabled() and not DISABLE_NEW_LIBRARIES.is_enabled()
+    return (
+        ENABLE_CONTENT_LIBRARIES.is_enabled() and
+        search_api.is_meilisearch_enabled() and
+        not DISABLE_NEW_LIBRARIES.is_enabled()
+    )
