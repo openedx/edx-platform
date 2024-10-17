@@ -50,7 +50,7 @@ mdurl==0.1.2
     # via markdown-it-py
 packaging==24.1
     # via semgrep
-peewee==3.17.6
+peewee==3.17.7
     # via semgrep
 pygments==2.18.0
     # via rich

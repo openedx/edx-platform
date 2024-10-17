@@ -123,6 +123,10 @@ markdown<3.4.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35270
 moto<5.0
 
+# Date: 2024-10-17
+# testing job
+mypy==1.11.2
+
 # Date: 2024-07-16
 # We need to upgrade the version of elasticsearch to atleast 7.15 before we can upgrade to Numpy 2.0.0
 # Otherwise we see a failure while running the following command:
