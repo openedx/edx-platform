@@ -102,7 +102,7 @@ class UpstreamLink:
             usage_key = LibraryUsageLocatorV2.from_string(self.upstream_ref)
         except InvalidKeyError:
             return None
-        return _get_library_authoring_url(usage_key.lib_key)
+        return _get_library_xblock_url(usage_key)
 
     def to_json(self) -> dict[str, t.Any]:
         """
@@ -364,14 +364,15 @@ def sever_upstream_link(downstream: XBlock) -> None:
         setattr(downstream, fetched_upstream_field, None)  # Null out upstream_display_name, et al.
 
 
-def _get_library_authoring_url(library_key: str):
+def _get_library_xblock_url(usage_key: LibraryUsageLocatorV2):
     """
     Gets authoring url for given library_key.
     """
     library_url = None
     mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
     if mfe_base_url:
-        library_url = f'{mfe_base_url}/library/{library_key}'
+        library_key = usage_key.lib_key
+        library_url = f'{mfe_base_url}/library/{library_key}/components?usageKey={usage_key}'
     return library_url
 
 
