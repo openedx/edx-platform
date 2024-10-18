@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
-from opaque_keys.edx.locator import DefinitionLocator, LibraryUsageLocatorV2, LocalId
+from opaque_keys.edx.locator import DefinitionLocator, LocalId
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import IdGenerator
@@ -303,41 +303,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
         static_files=static_files,
     )
     return new_xblock, notices
-
-
-def import_from_library_content(parent_key: UsageKey, content_key: LibraryUsageLocatorV2, request) -> XBlock:
-    """
-    Import a block (along with its children) from a library content block.
-
-    Does not deal with permissions or REST stuff - do that before calling this.
-    """
-
-    from cms.djangoapps.contentstore.views.preview import _load_preview_block
-    from openedx.core.djangoapps.content_libraries import api as library_api
-    from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx
-    import openedx.core.djangoapps.xblock.api as xblock_api
-
-    library_component = library_api.get_library_block(content_key)
-    xblock = xblock_api.load_block(content_key, user=request.user)
-
-    xblock_data = serialize_xblock_to_olx(xblock)
-    node = etree.fromstring(xblock_data.olx_str)
-    store = modulestore()
-    with store.bulk_operations(parent_key.course_key):
-        parent_descriptor = store.get_item(parent_key)
-        # Some blocks like drag-and-drop only work here with the full XBlock runtime loaded:
-        parent_xblock = _load_preview_block(request, parent_descriptor)
-        new_xblock = _import_xml_node_to_parent(
-            node,
-            parent_xblock,
-            store,
-            user=request.user,
-            slug_hint=content_key.block_id,
-            copied_from_block=str(content_key),
-            copied_from_version_num=library_component.published_version_num,
-            tags=xblock_data.tags,
-        )
-    return new_xblock
 
 
 def _import_xml_node_to_parent(

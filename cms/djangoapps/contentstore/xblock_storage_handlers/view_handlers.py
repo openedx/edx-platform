@@ -27,7 +27,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from opaque_keys.edx.locator import LibraryUsageLocator, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
@@ -77,7 +77,6 @@ from ..utils import (
 from .create_xblock import create_xblock
 from .xblock_helpers import usage_key_with_run
 from ..helpers import (
-    import_from_library_content,
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
     is_unit,

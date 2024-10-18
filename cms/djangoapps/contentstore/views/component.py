@@ -464,12 +464,6 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     if advanced_component_templates['templates']:
         component_templates.insert(0, advanced_component_templates)
 
-    # component_templates.append({
-    #     "type": "abc",
-    #     "templates": "abc",
-    #     "display_name": "ABC",
-    #     "support_legend": create_support_legend_dict()
-    # })
     return component_templates
 
 
