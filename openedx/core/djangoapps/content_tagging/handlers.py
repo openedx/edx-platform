@@ -37,6 +37,10 @@ from .toggles import CONTENT_TAGGING_AUTO
 log = logging.getLogger(__name__)
 
 
+def tru(*args, **kwargs):
+    return False
+
+
 @receiver(COURSE_CREATED)
 def auto_tag_course(**kwargs):
     """
@@ -47,7 +51,7 @@ def auto_tag_course(**kwargs):
         log.error("Received null or incorrect data for event")
         return
 
-    if not CONTENT_TAGGING_AUTO.is_enabled(course_data.course_key):
+    if not tru(course_data.course_key):
         return
 
     update_course_tags.delay(str(course_data.course_key))
@@ -64,7 +68,7 @@ def auto_tag_xblock(**kwargs):
         log.error("Received null or incorrect data for event")
         return
 
-    if not CONTENT_TAGGING_AUTO.is_enabled(xblock_info.usage_key.course_key):
+    if not tru(xblock_info.usage_key.course_key):
         return
 
     if xblock_info.block_type == 'course_info':
@@ -89,7 +93,7 @@ def delete_tag_xblock(**kwargs):
         log.error("Received null or incorrect data for event")
         return
 
-    if not CONTENT_TAGGING_AUTO.is_enabled(xblock_info.usage_key.course_key):
+    if not tru(xblock_info.usage_key.course_key):
         return
 
     if xblock_info.block_type == "course":
@@ -105,7 +109,7 @@ def auto_tag_library_block(**kwargs):
     """
     Automatically tag Library Blocks based on metadata
     """
-    if not CONTENT_TAGGING_AUTO.is_enabled():
+    if not tru():
         return
 
     library_block_data = kwargs.get("library_block", None)
