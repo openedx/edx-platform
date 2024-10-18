@@ -109,6 +109,7 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.grades.api import constants as grades_constants
 from completion import handlers
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from jwcrypto import jwt, jwk
 
 
 log = logging.getLogger("edx.student")
@@ -1598,3 +1599,16 @@ def extras_update_lti_grades(request):
 
 
     return JsonResponse({"Status" : "Success", "message" : "Grades updated successfully"})
+
+@csrf_exempt
+@login_required
+def cyberstruct_sso(request):
+    with open("/openedx/edx-platform/idp/saml2_config/{0}/private_key.pem".format(configuration_helpers.get_value("course_org_filter")), "rb") as pemfile: 
+        key = jwk.JWK.from_pem(pemfile.read())
+
+    payload = { "name": request.user.first_name, "email": request.user.email, "iss": "https://cyberstruct.us.auth0.com/", "aud": "5v8UTnNByIQhTuLaGLaJiu5ZTegZCG5w", "iat": datetime.datetime.now(datetime.timezone.utc).timestamp(),  "exp": (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=100)).timestamp(), "sub": "oidc|talentsprint|{0}".format(request.user.username), }
+    jwt_header = {"type": "JWT", "alg": "RS256", "kid": key.thumbprint()}
+    jwt_object = jwt.JWT(header=jwt_header, claims=payload)
+    jwt_object.make_signed_token(key)
+    token = jwt_object.serialize()
+    return redirect(f"https://app.cyberstruct.io/api/login?organization=org_46qMyHyZqajmxIIZ&id_token={token}")
