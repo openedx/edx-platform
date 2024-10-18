@@ -299,9 +299,9 @@ def get_handler_url(
         'secure_token': secure_token,
         'handler_name': handler_name,
     }
-    path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
     if version != LatestVersion.AUTO:
-        path += "?version=" + (str(version) if isinstance(version, int) else version.value)
+        kwargs["version"] = str(version) if isinstance(version, int) else version.value
+    path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
 
     # We must return an absolute URL. We can't just use
     # rest_framework.reverse.reverse to get the absolute URL because this method

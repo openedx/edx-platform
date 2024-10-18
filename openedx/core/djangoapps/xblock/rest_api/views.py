@@ -58,7 +58,7 @@ def parse_version_request(version_str: str | None) -> LatestVersion | int:
         return int(version_str)
     except ValueError:
         raise serializers.ValidationError(  # pylint: disable=raise-missing-from
-            "Invalid version specifier '{version_str}'. Expected 'draft', 'published', or an integer."
+            f"Invalid version specifier '{version_str}'. Expected 'draft', 'published', or an integer."
         )
 
 
@@ -184,7 +184,7 @@ def get_handler_url(request, usage_key_str, handler_name):
 # and https://github.com/openedx/XBlock/pull/383 for context.
 @csrf_exempt
 @xframe_options_exempt
-def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix=None):
+def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix=None, version=None):
     """
     Run an XBlock's handler and return the result
 
@@ -232,7 +232,7 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
 
     request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
 
-    block = load_block(usage_key, user, version=parse_version_request(request.GET.get("version")))
+    block = load_block(usage_key, user, version=parse_version_request(version))
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)
