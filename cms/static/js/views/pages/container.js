@@ -8,14 +8,15 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-    'js/views/utils/tagging_drawer_utils', 'js/utils/module',
+    'js/views/utils/tagging_drawer_utils', 'js/utils/module', 'js/views/modals/preview_v2_library_changes'
 ],
 function($, _, Backbone, gettext, BasePage,
     ViewUtils, ContainerView, XBlockView,
     AddXBlockComponent, EditXBlockModal, MoveXBlockModal,
     XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils,
-    NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils) {
+    NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils,
+    PreviewLibraryChangesModal) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -28,6 +29,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .copy-button': 'copyXBlock',
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
+            'click .library-sync-button': 'showXBlockLibraryChangesPreview',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .save-button': 'saveSelectedLibraryComponents',
@@ -417,6 +419,18 @@ function($, _, Backbone, gettext, BasePage,
                 refresh: function() {
                     self.refreshXBlock(xblockElement, false);
                 }
+            });
+        },
+
+        showXBlockLibraryChangesPreview: function(event, options) {
+            event.preventDefault();
+
+            var xblockElement = this.findXBlockElement(event.target),
+                self = this,
+                modal = new PreviewLibraryChangesModal(options);
+
+            modal.showPreviewFor(xblockElement, this.model, function() {
+                self.refreshXBlock(xblockElement, false);
             });
         },
 
