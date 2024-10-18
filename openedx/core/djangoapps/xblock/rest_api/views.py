@@ -71,10 +71,7 @@ def block_metadata(request, usage_key, version=None):
     * "include": a comma-separated list of keys to include.
       Valid keys are "index_dictionary" and "student_view_data".
     """
-    if version:
-        raise NotImplementedError()
-
-    block = load_block(usage_key, request.user)
+    block = load_block(usage_key, request.user, version=parse_version_request(version))
     includes = request.GET.get("include", "").split(",")
     metadata_dict = get_block_metadata(block, includes=includes)
     if 'children' in metadata_dict:
@@ -91,11 +88,8 @@ def render_block_view(request, usage_key, view_name, version=None):
     """
     Get the HTML, JS, and CSS needed to render the given XBlock.
     """
-    if version:
-        raise NotImplementedError()
-
     try:
-        block = load_block(usage_key, request.user)
+        block = load_block(usage_key, request.user, version=parse_version_request(version))
     except NoSuchUsage as exc:
         raise NotFound(f"{usage_key} not found") from exc
 
@@ -157,10 +151,7 @@ def get_handler_url(request, usage_key, handler_name, version=None):
 
     The URL will expire but is guaranteed to be valid for a minimum of 2 days.
     """
-    if version:
-        raise NotImplementedError()
-
-    handler_url = _get_handler_url(usage_key, handler_name, request.user)
+    handler_url = _get_handler_url(usage_key, handler_name, request.user, version=parse_version_request(version))
     return Response({"handler_url": handler_url})
 
 
@@ -246,13 +237,18 @@ class BlockFieldsView(APIView):
     """
 
     @atomic
-    def get(self, request, usage_key):
+    def get(self, request, usage_key, version=None):
         """
         retrieves the xblock, returning display_name, data, and metadata
         """
 
         # The "fields" view requires "read as author" permissions because the fields can contain answers, etc.
-        block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_READ_AS_AUTHOR)
+        block = load_block(
+            usage_key,
+            request.user,
+            check_permission=CheckPerm.CAN_READ_AS_AUTHOR,
+            version=parse_version_request(version),
+        )
         # It would make more sense if this just had a "fields" dict with all the content+settings fields, but
         # for backwards compatibility we call the settings metadata and split it up like this, ignoring all content
         # fields except "data".
@@ -265,10 +261,12 @@ class BlockFieldsView(APIView):
         return Response(block_dict)
 
     @atomic
-    def post(self, request, usage_key):
+    def post(self, request, usage_key, version=None):
         """
         edits the xblock, saving changes to data and metadata only (display_name included in metadata)
         """
+        if version:
+            raise serializers.ValidationError("Cannot specify a version when saving changes")
         user = request.user
         block = load_block(usage_key, user, check_permission=CheckPerm.CAN_EDIT)
         data = request.data.get("data")
