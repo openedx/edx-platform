@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from ....utils import get_home_context, get_course_context, get_library_context
-from ..serializers import CourseHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
+from ..serializers import StudioHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
 
 
 @view_auth_classes(is_authenticated=True)
@@ -24,7 +24,7 @@ class HomePageView(APIView):
                 description="Query param to filter by course org",
             )],
         responses={
-            200: CourseHomeSerializer,
+            200: StudioHomeSerializer,
             401: "The requester is not authenticated.",
         },
     )
@@ -59,6 +59,9 @@ class HomePageView(APIView):
             "in_process_course_actions": [],
             "libraries": [],
             "libraries_enabled": true,
+            "libraries_v1_enabled": true,
+            "libraries_v2_enabled": true,
+            "library_authoring_mfe_url": "//localhost:3001/course/course-v1:edX+P315+2T2023",
             "optimization_enabled": true,
             "request_course_creator_url": "/request_course_creator",
             "rerun_creator_status": true,
@@ -84,7 +87,7 @@ class HomePageView(APIView):
             'platform_name': settings.PLATFORM_NAME,
             'user_is_active': request.user.is_active,
         })
-        serializer = CourseHomeSerializer(home_context)
+        serializer = StudioHomeSerializer(home_context)
         return Response(serializer.data)
 
 
