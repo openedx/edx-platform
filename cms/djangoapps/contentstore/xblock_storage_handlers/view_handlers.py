@@ -560,30 +560,6 @@ def _create_block(request):
             "static_file_notices": asdict(notices),
         })
 
-    if request.json.get("library_content_key"):
-        # Add library content into 'usage_key':
-        try:
-            content_key = LibraryUsageLocatorV2.from_string(
-                request.json["library_content_key"]
-            )
-            created_xblock = import_from_library_content(
-                parent_key=usage_key,
-                content_key=content_key,
-                request=request,
-            )
-        except Exception:  # pylint: disable=broad-except
-            log.exception(
-                "Could not add library component into location {}".format(usage_key)
-            )
-            return JsonResponse(
-                {"error": _("There was a problem adding your component.")}, status=400
-            )
-
-        return JsonResponse({
-            "locator": str(created_xblock.location),
-            "courseKey": str(created_xblock.location.course_key),
-        })
-
     category = request.json["category"]
     if isinstance(usage_key, LibraryUsageLocator):
         # Only these categories are supported at this time.

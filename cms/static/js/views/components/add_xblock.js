@@ -71,7 +71,19 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Add
 
             if (saveData.type === 'library_v2') {
                 var modal = new AddLibraryContent();
-                modal.showComponentPicker(this.options.libraryContentPickerUrl, null);
+                modal.showComponentPicker(
+                    this.options.libraryContentPickerUrl,
+                    function(data) {
+                        ViewUtils.runOperationShowingMessage(
+                            gettext('Adding'),
+                            _.bind(this.options.pickLibraryComponent, this, data, $element),
+                        ).always(function() {
+                            // Restore the scroll position of the buttons so that the new
+                            // component appears above them.
+                            ViewUtils.setScrollOffset(self.$el, oldOffset);
+                        });
+                    }.bind(this)
+                );
             } else {
                 ViewUtils.runOperationShowingMessage(
                     gettext('Adding'),
