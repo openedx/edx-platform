@@ -26,16 +26,22 @@ from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xbl
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.helpers import is_unit
 from cms.djangoapps.contentstore.toggles import use_new_problem_editor, use_new_unit_page
-from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import load_services_for_studio
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
+    create_xblock_info,
+    load_services_for_studio,
+)
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_tagging.api import get_object_tags
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from django.views.decorators.clickjacking import xframe_options_exempt
+from openedx.core.lib.xblock_utils import wrap_xblock_aside, request_token
 
 __all__ = [
     'container_handler',
-    'component_handler'
+    'component_handler',
+    'asides_handler'
 ]
 
 log = logging.getLogger(__name__)
@@ -98,6 +104,70 @@ def _load_mixed_class(category):
     component_class = XBlock.load_class(category)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
+
+
+@xframe_options_exempt
+@require_GET
+@login_required
+def asides_handler(request, usage_key_string):
+    """
+    The restful handler for asides xblock requests.
+
+    GET
+        html: returns the HTML page for editing a xblock's aside
+        json: not currently supported
+    """
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+        with modulestore().bulk_operations(usage_key.course_key):
+            try:
+                course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+            except ItemNotFoundError:
+                return HttpResponseBadRequest()
+            component_templates = get_component_templates(course)
+
+            action = request.GET.get('action', 'view')
+
+            is_unit_page = is_unit(xblock)
+
+            # Fetch the XBlock info for use by the container page. Note that it includes information
+            # about the block's ancestors and siblings for use by the Unit Outline.
+            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
+
+            # Get the asides
+            asides = xblock.runtime.get_asides(xblock)
+            asides_fragments = [
+                (aside, aside.studio_view_aside(xblock))
+                for aside in asides if getattr(type(aside), "studio_view_aside", None)
+            ]
+            context = {}
+            asides_contents = [
+                wrap_xblock_aside(runtime_class="StudioRuntime",
+                                  aside=aside,
+                                  view="studio_view",
+                                  frag=fragment, context=context,
+                                  usage_id_serializer=str,
+                                  request_token=request_token(request)).content
+                for aside, fragment in asides_fragments
+            ]
+
+            return render_to_response('asides.html', {
+                'html_contents': asides_contents,
+                'language_code': request.LANGUAGE_CODE,
+                'context_course': course,  # Needed only for display of menus at top of page.
+                'action': action,
+                'xblock': xblock,
+                'xblock_locator': xblock.location,
+                'component_templates': component_templates,
+                'xblock_info': xblock_info,
+                'templates': CONTAINER_TEMPLATES,
+            })
+    else:
+        return HttpResponseBadRequest("Only supports HTML requests")
 
 
 @require_GET
