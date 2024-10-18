@@ -25,6 +25,7 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx_filters.course_authoring.filters import LMSPageURLRequested
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -714,7 +715,15 @@ def get_asset_json(display_name, content_type, date, location, thumbnail_locatio
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
-    external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+
+    ## .. filter_implemented_name: LMSPageURLRequested
+    ## .. filter_type: org.openedx.course_authoring.lms.page.url.requested.v1
+    lms_root, _ = LMSPageURLRequested.run_filter(
+        url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        org=location.org,
+    )
+
+    external_url = urljoin(lms_root, asset_url)
     portable_url = StaticContent.get_static_path_from_location(location)
     usage_locations = [] if usage is None else usage
     return {
