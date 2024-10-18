@@ -248,14 +248,21 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             component_version
             .componentversioncontent_set
             .filter(content__has_file=True)
+            .select_related('content')
             .order_by('key')
         )
 
+        # TODO: We're returning both the URL and the data here because this is
+        # invoked from the XBlockSerializer for both saving a new version of a
+        # block, as well as for saving into the clipboard. The clipboard needs
+        # the actual static asset data to be dumped in here, but saving a new
+        # block version doesn't. We should clean this up later so we're not
+        # doing the unnecessary read() calls for saving new versions.
         return [
             StaticFile(
                 name=cvc.key,
                 url=self._absolute_url_for_asset(component_version, cvc.key),
-                data=None,
+                data=cvc.content.read_file().read(),
             )
             for cvc in cvc_list
         ]

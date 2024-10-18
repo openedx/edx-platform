@@ -731,7 +731,7 @@ class LibraryBlockOlxView(APIView):
         serializer.is_valid(raise_exception=True)
         new_olx_str = serializer.validated_data["olx"]
         try:
-            version_num = api.set_library_block_olx(key, new_olx_str)
+            version_num = api.set_library_block_olx(key, new_olx_str).version_num
         except ValueError as err:
             raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str, "version_num": version_num}).data)
