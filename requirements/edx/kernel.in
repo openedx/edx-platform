@@ -159,4 +159,5 @@ user-util                           # Functionality for retiring users (GDPR com
 webob
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock[django]                      # Courseware component architecture
+xblocks-contrib
 xss-utils                           # https://github.com/openedx/edx-platform/pull/20633 Fix XSS via Translations

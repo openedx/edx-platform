@@ -1579,6 +1579,8 @@ xblock-utils==4.0.0
     #   -r requirements/edx/base.txt
     #   edx-sga
     #   xblock-poll
+xblocks-contrib==0.1.0
+    # via -r requirements/edx/base.txt
 xmlsec==1.3.13
     # via
     #   -c requirements/edx/../constraints.txt
