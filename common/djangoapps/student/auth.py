@@ -73,7 +73,7 @@ def user_has_role(user, role):
     return False
 
 
-def get_user_permissions(user, course_key, org=None):
+def get_user_permissions(user, course_key, org=None, service_variant=None):
     """
     Get the bitmask of permissions that this user has in the given course context.
     Can also set course_key=None and pass in an org to get the user's
@@ -103,7 +103,7 @@ def get_user_permissions(user, course_key, org=None):
     #  the LMS and Studio permissions will be separated as a part of this project. Once this is done (and this code is
     #  not removed during its implementation), we can replace the Limited Staff permissions with more granular ones.
     if course_key and user_has_role(user, CourseLimitedStaffRole(course_key)):
-        if settings.SERVICE_VARIANT == 'lms':
+        if (service_variant or settings.SERVICE_VARIANT) == 'lms':
             return STUDIO_EDIT_CONTENT
         else:
             return STUDIO_NO_PERMISSIONS
@@ -119,7 +119,7 @@ def get_user_permissions(user, course_key, org=None):
     return STUDIO_NO_PERMISSIONS
 
 
-def has_studio_write_access(user, course_key):
+def has_studio_write_access(user, course_key, service_variant=None):
     """
     Return True if user has studio write access to the given course.
     Note that the CMS permissions model is with respect to courses.
@@ -131,15 +131,17 @@ def has_studio_write_access(user, course_key):
 
     :param user:
     :param course_key: a CourseKey
+    :param service_variant: the variant of the service (lms or cms). Permissions may differ between the two,
+        see the comment in get_user_permissions for more details.
     """
-    return bool(STUDIO_EDIT_CONTENT & get_user_permissions(user, course_key))
+    return bool(STUDIO_EDIT_CONTENT & get_user_permissions(user, course_key, service_variant=service_variant))
 
 
-def has_course_author_access(user, course_key):
+def has_course_author_access(user, course_key, service_variant=None):
     """
     Old name for has_studio_write_access
     """
-    return has_studio_write_access(user, course_key)
+    return has_studio_write_access(user, course_key, service_variant)
 
 
 def has_studio_advanced_settings_access(user):
