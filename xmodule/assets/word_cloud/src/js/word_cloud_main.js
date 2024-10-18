@@ -37,7 +37,7 @@ function generateUniqueId(wordCloudId, counter) {
 export default class WordCloudMain {
     constructor(el) {
         // eslint-disable-next-line no-undef
-        this.wordCloudEl = $(el).find('.word_cloud');
+        this.wordCloudEl = $(el).find('.word_cloud_deprecated');
 
         // Get the URL to which we will post the users words.
         this.ajax_url = this.wordCloudEl.data('ajax-url');
