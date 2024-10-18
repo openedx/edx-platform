@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [18, 20]
+        node-version: [20]
         python-version:
           - "3.11"
 
@@ -28,7 +28,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Setup npm
-        run: npm i -g npm@10.5.x
+        run: npm i -g npm@10.7.x
 
       - name: Install Firefox 123.0
         run: |
