@@ -292,12 +292,14 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         data = {"block_id": block_id}
         return self._api('post', url, data, expect_response)
 
-    def _render_block_view(self, block_key, view_name, expect_response=200):
+    def _render_block_view(self, block_key, view_name, version=None, expect_response=200):
         """
         Render an XBlock's view in the active application's runtime.
         Note that this endpoint has different behavior in Studio (draft mode)
         vs. the LMS (published version only).
         """
+        if version is not None:
+            block_key += f"@{version}"
         url = URL_BLOCK_RENDER_VIEW.format(block_key=block_key, view_name=view_name)
         return self._api('get', url, None, expect_response)
 
@@ -328,8 +330,17 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         url = URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name=handler_name)
         return self._api('get', url, None, expect_response=200)["handler_url"]
 
-    def _get_library_block_fields(self, block_key, expect_response=200):
+    def _get_basic_xblock_metadata(self, block_key, version=None, expect_response=200):
+        """ Get basic metadata about a specific block in the library. """
+        if version is not None:
+            block_key += f"@{version}"
+        result = self._api('get', URL_BLOCK_METADATA_URL.format(block_key=block_key), None, expect_response)
+        return result
+
+    def _get_library_block_fields(self, block_key, version=None, expect_response=200):
         """ Get the fields of a specific block in the library. This API is only used by the MFE editors. """
+        if version is not None:
+            block_key += f"@{version}"
         result = self._api('get', URL_BLOCK_FIELDS_URL.format(block_key=block_key), None, expect_response)
         return result
 
