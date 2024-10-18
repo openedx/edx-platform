@@ -8,7 +8,6 @@ from corsheaders.signals import check_request_enabled
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
-from django.http import Http404
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -22,8 +21,6 @@ from xblock.django.request import DjangoWebobRequest, webob_to_django_response
 from xblock.exceptions import NoSuchUsage
 from xblock.fields import Scope
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -65,7 +62,7 @@ def parse_version_request(version_str: str | None) -> LatestVersion | int:
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
-def block_metadata(request, usage_key_str):
+def block_metadata(request, usage_key, version=None):
     """
     Get metadata about the specified block.
 
@@ -74,10 +71,8 @@ def block_metadata(request, usage_key_str):
     * "include": a comma-separated list of keys to include.
       Valid keys are "index_dictionary" and "student_view_data".
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+    if version:
+        raise NotImplementedError()
 
     block = load_block(usage_key, request.user)
     includes = request.GET.get("include", "").split(",")
@@ -92,14 +87,12 @@ def block_metadata(request, usage_key_str):
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
-def render_block_view(request, usage_key_str, view_name):
+def render_block_view(request, usage_key, view_name, version=None):
     """
     Get the HTML, JS, and CSS needed to render the given XBlock.
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+    if version:
+        raise NotImplementedError()
 
     try:
         block = load_block(usage_key, request.user)
@@ -116,17 +109,12 @@ def render_block_view(request, usage_key_str, view_name):
 @view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
 @xframe_options_exempt
-def embed_block_view(request, usage_key_str, view_name):
+def embed_block_view(request, usage_key, view_name):
     """
     Render the given XBlock in an <iframe>
 
     Unstable - may change after Sumac
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
-
     # Check if a specific version has been requested
     version = parse_version_request(request.GET.get("version"))
 
@@ -162,17 +150,15 @@ def embed_block_view(request, usage_key_str, view_name):
 
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=False)
-def get_handler_url(request, usage_key_str, handler_name):
+def get_handler_url(request, usage_key, handler_name, version=None):
     """
     Get an absolute URL which can be used (without any authentication) to call
     the given XBlock handler.
 
     The URL will expire but is guaranteed to be valid for a minimum of 2 days.
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+    if version:
+        raise NotImplementedError()
 
     handler_url = _get_handler_url(usage_key, handler_name, request.user)
     return Response({"handler_url": handler_url})
@@ -184,7 +170,7 @@ def get_handler_url(request, usage_key_str, handler_name):
 # and https://github.com/openedx/XBlock/pull/383 for context.
 @csrf_exempt
 @xframe_options_exempt
-def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix=None, version=None):
+def xblock_handler(request, user_id, secure_token, usage_key, handler_name, suffix=None, version=None):
     """
     Run an XBlock's handler and return the result
 
@@ -192,16 +178,11 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     auth token included in the URL (see below). As a result it can be exempt
     from CSRF, session auth, and JWT/OAuth.
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise Http404 from e
-
     # To support sandboxed XBlocks, custom frontends, and other use cases, we
     # authenticate requests using a secure token in the URL. see
     # openedx.core.djangoapps.xblock.utils.get_secure_hash_for_xblock_handler
     # for details and rationale.
-    if not validate_secure_token_for_xblock_handler(user_id, usage_key_str, secure_token):
+    if not validate_secure_token_for_xblock_handler(user_id, str(usage_key), secure_token):
         raise PermissionDenied("Invalid/expired auth token.")
     if request.user.is_authenticated:
         # The user authenticated twice, e.g. with session auth and the token.
@@ -265,14 +246,10 @@ class BlockFieldsView(APIView):
     """
 
     @atomic
-    def get(self, request, usage_key_str):
+    def get(self, request, usage_key):
         """
         retrieves the xblock, returning display_name, data, and metadata
         """
-        try:
-            usage_key = UsageKey.from_string(usage_key_str)
-        except InvalidKeyError as e:
-            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
         # The "fields" view requires "read as author" permissions because the fields can contain answers, etc.
         block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_READ_AS_AUTHOR)
@@ -288,15 +265,10 @@ class BlockFieldsView(APIView):
         return Response(block_dict)
 
     @atomic
-    def post(self, request, usage_key_str):
+    def post(self, request, usage_key):
         """
         edits the xblock, saving changes to data and metadata only (display_name included in metadata)
         """
-        try:
-            usage_key = UsageKey.from_string(usage_key_str)
-        except InvalidKeyError as e:
-            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
-
         user = request.user
         block = load_block(usage_key, user, check_permission=CheckPerm.CAN_EDIT)
         data = request.data.get("data")
