@@ -56,6 +56,7 @@ from datetime import datetime, timezone
 import base64
 import hashlib
 import logging
+import mimetypes
 
 import attr
 import requests
@@ -68,6 +69,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from edx_rest_api_client.client import OAuthAPIClient
+from django.urls import reverse
 from lxml import etree
 from opaque_keys.edx.keys import BlockTypeKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import (
@@ -96,7 +98,11 @@ from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key, xblock_type_display_name
+from openedx.core.djangoapps.xblock.api import (
+    get_component_from_usage_key,
+    get_xblock_app_config,
+    xblock_type_display_name,
+)
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from xmodule.modulestore.django import modulestore
 
@@ -219,6 +225,8 @@ class LibraryXBlockMetadata:
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
     created = attr.ib(type=datetime)
     modified = attr.ib(type=datetime)
+    draft_version_num = attr.ib(type=int)
+    published_version_num = attr.ib(default=None, type=int)
     display_name = attr.ib("")
     last_published = attr.ib(default=None, type=datetime)
     last_draft_created = attr.ib(default=None, type=datetime)
@@ -240,6 +248,7 @@ class LibraryXBlockMetadata:
             published_by = last_publish_log.published_by.username
 
         draft = component.versioning.draft
+        published = component.versioning.published
         last_draft_created = draft.created if draft else None
         last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
 
@@ -248,9 +257,11 @@ class LibraryXBlockMetadata:
                 library_key,
                 component,
             ),
-            display_name=component.versioning.draft.title,
+            display_name=draft.title,
             created=component.created,
-            modified=component.versioning.draft.created,
+            modified=draft.created,
+            draft_version_num=draft.version_num,
+            published_version_num=published.version_num if published else None,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
             published_by=published_by,
             last_draft_created=last_draft_created,
@@ -737,13 +748,15 @@ def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMeta
     return xblock_metadata
 
 
-def set_library_block_olx(usage_key, new_olx_str):
+def set_library_block_olx(usage_key, new_olx_str) -> int:
     """
     Replace the OLX source of the given XBlock.
 
     This is only meant for use by developers or API client applications, as
     very little validation is done and this can easily result in a broken XBlock
     that won't load.
+
+    Returns the version number of the newly created ComponentVersion.
     """
     # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
     assert isinstance(usage_key, LibraryUsageLocatorV2)
@@ -780,7 +793,7 @@ def set_library_block_olx(usage_key, new_olx_str):
             text=new_olx_str,
             created=now,
         )
-        authoring_api.create_next_version(
+        new_component_version = authoring_api.create_next_component_version(
             component.pk,
             title=new_title,
             content_to_replace={
@@ -795,6 +808,8 @@ def set_library_block_olx(usage_key, new_olx_str):
             usage_key=usage_key
         )
     )
+
+    return new_component_version.version_num
 
 
 def library_component_usage_key(
@@ -1018,18 +1033,48 @@ def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticF
 
     Returns a list of LibraryXBlockStaticFile objects, sorted by path.
 
-    TODO: This is not yet implemented for Learning Core backed libraries.
     TODO: Should this be in the general XBlock API rather than the libraries API?
     """
-    return []
+    component = get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+
+    # If there is no Draft version, then this was soft-deleted
+    if component_version is None:
+        return []
+
+    # cvc = the ComponentVersionContent through table
+    cvc_set = (
+        component_version
+        .componentversioncontent_set
+        .filter(content__has_file=True)
+        .order_by('key')
+        .select_related('content')
+    )
+
+    site_root_url = get_xblock_app_config().get_site_root_url()
+
+    return [
+        LibraryXBlockStaticFile(
+            path=cvc.key,
+            size=cvc.content.size,
+            url=site_root_url + reverse(
+                'content_libraries:library-assets',
+                kwargs={
+                    'component_version_uuid': component_version.uuid,
+                    'asset_path': cvc.key,
+                }
+            ),
+        )
+        for cvc in cvc_set
+    ]
 
 
-def add_library_block_static_asset_file(usage_key, file_name, file_content) -> LibraryXBlockStaticFile:
+def add_library_block_static_asset_file(usage_key, file_path, file_content, user=None) -> LibraryXBlockStaticFile:
     """
     Upload a static asset file into the library, to be associated with the
     specified XBlock. Will silently overwrite an existing file of the same name.
 
-    file_name should be a name like "doc.pdf". It may optionally contain slashes
+    file_path should be a name like "doc.pdf". It may optionally contain slashes
         like 'en/doc.pdf'
     file_content should be a binary string.
 
@@ -1041,10 +1086,67 @@ def add_library_block_static_asset_file(usage_key, file_name, file_content) -> L
         video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
         add_library_block_static_asset_file(video_block, "subtitles-en.srt", subtitles.encode('utf-8'))
     """
-    raise NotImplementedError("Static assets not yet implemented for Learning Core")
+    # File path validations copied over from v1 library logic. This can't really
+    # hurt us inside our system because we never use these paths in an actual
+    # file system–they're just string keys that point to hash-named data files
+    # in a common library (learning package) level directory. But it might
+    # become a security issue during import/export serialization.
+    if file_path != file_path.strip().strip('/'):
+        raise InvalidNameError("file_path cannot start/end with / or whitespace.")
+    if '//' in file_path or '..' in file_path:
+        raise InvalidNameError("Invalid sequence (// or ..) in file_path.")
+
+    component = get_component_from_usage_key(usage_key)
+
+    media_type_str, _encoding = mimetypes.guess_type(file_path)
+    # We use "application/octet-stream" as a generic fallback media type, per
+    # RFC 2046: https://datatracker.ietf.org/doc/html/rfc2046
+    # TODO: This probably makes sense to push down to openedx-learning?
+    media_type_str = media_type_str or "application/octet-stream"
+
+    now = datetime.now(tz=timezone.utc)
+
+    with transaction.atomic():
+        media_type = authoring_api.get_or_create_media_type(media_type_str)
+        content = authoring_api.get_or_create_file_content(
+            component.publishable_entity.learning_package.id,
+            media_type.id,
+            data=file_content,
+            created=now,
+        )
+        component_version = authoring_api.create_next_component_version(
+            component.pk,
+            content_to_replace={file_path: content.id},
+            created=now,
+            created_by=user.id if user else None,
+        )
+        transaction.on_commit(
+            lambda: LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(
+                    library_key=usage_key.context_key,
+                    usage_key=usage_key,
+                )
+            )
+        )
+
+    # Now figure out the URL for the newly created asset...
+    site_root_url = get_xblock_app_config().get_site_root_url()
+    local_path = reverse(
+        'content_libraries:library-assets',
+        kwargs={
+            'component_version_uuid': component_version.uuid,
+            'asset_path': file_path,
+        }
+    )
+
+    return LibraryXBlockStaticFile(
+        path=file_path,
+        url=site_root_url + local_path,
+        size=content.size,
+    )
 
 
-def delete_library_block_static_asset_file(usage_key, file_name):
+def delete_library_block_static_asset_file(usage_key, file_path, user=None):
     """
     Delete a static asset file from the library.
 
@@ -1054,7 +1156,24 @@ def delete_library_block_static_asset_file(usage_key, file_name):
         video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
         delete_library_block_static_asset_file(video_block, "subtitles-en.srt")
     """
-    raise NotImplementedError("Static assets not yet implemented for Learning Core")
+    component = get_component_from_usage_key(usage_key)
+    now = datetime.now(tz=timezone.utc)
+
+    with transaction.atomic():
+        component_version = authoring_api.create_next_component_version(
+            component.pk,
+            content_to_replace={file_path: None},
+            created=now,
+            created_by=user.id if user else None,
+        )
+        transaction.on_commit(
+            lambda: LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(
+                    library_key=usage_key.context_key,
+                    usage_key=usage_key,
+                )
+            )
+        )
 
 
 def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
