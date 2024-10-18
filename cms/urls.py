@@ -222,7 +222,7 @@ urlpatterns += [
     path('openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
 
-if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
+if toggles.ENABLE_CONTENT_LIBRARIES:
     urlpatterns += [
         re_path(fr'^library/{LIBRARY_KEY_PATTERN}?$',
                 contentstore_views.library_handler, name='library_handler'),
