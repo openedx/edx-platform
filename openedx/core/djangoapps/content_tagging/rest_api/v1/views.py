@@ -31,7 +31,12 @@ from ...api import (
 )
 from ...rules import get_admin_orgs
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
-from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
+from .serializers import (
+    ObjectTagCopiedMinimalSerializer,
+    TaxonomyOrgListQueryParamsSerializer,
+    TaxonomyOrgSerializer,
+    TaxonomyUpdateOrgBodySerializer,
+)
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -148,6 +153,7 @@ class ObjectTagOrgView(ObjectTagView):
 
     Refer to ObjectTagView docstring for usage details.
     """
+    minimal_serializer_class = ObjectTagCopiedMinimalSerializer
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
 
     def update(self, request, *args, **kwargs) -> Response:

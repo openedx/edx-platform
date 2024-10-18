@@ -184,7 +184,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
 
         tagging_api.set_taxonomy_orgs(taxonomy_all_org, all_orgs=True)
         for tag_value in ('tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5', 'tag_6', 'tag_7'):
-            Tag.objects.create(taxonomy=taxonomy_all_org, value=tag_value)
+            tagging_api.add_tag_to_taxonomy(taxonomy_all_org, tag_value)
         tagging_api.tag_object(
             object_id=str(unit_key),
             taxonomy=taxonomy_all_org,
@@ -444,6 +444,18 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
 
         self.course = CourseFactory.create(display_name='Course')
 
+        taxonomy_all_org = tagging_api.create_taxonomy(
+            "test_taxonomy",
+            "Test Taxonomy",
+            export_id="ALL_ORGS",
+        )
+        tagging_api.set_taxonomy_orgs(taxonomy_all_org, all_orgs=True)
+        for tag_value in ('tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5', 'tag_6', 'tag_7'):
+            tagging_api.add_tag_to_taxonomy(taxonomy_all_org, tag_value)
+
+        self.lib_block_tags = ['tag_1', 'tag_5']
+        tagging_api.tag_object(str(self.lib_block_key), taxonomy_all_org, self.lib_block_tags)
+
     def test_paste_from_library_creates_link(self):
         """
         When we copy a v2 lib block into a course, the dest block should be linked up to the lib block.
@@ -463,6 +475,28 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         assert new_block.upstream_version == 3
         assert new_block.upstream_display_name == "MCQ-draft"
         assert new_block.upstream_max_attempts == 5
+
+    def test_paste_from_library_read_only_tags(self):
+        """
+        When we copy a v2 lib block into a course, the dest block should have read-only copied tags.
+        """
+
+        copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(self.lib_block_key)}, format="json")
+        assert copy_response.status_code == 200
+
+        paste_response = self.client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(self.course.usage_key),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+
+        new_block_key = paste_response.json()["locator"]
+
+        object_tags = tagging_api.get_object_tags(new_block_key)
+        assert len(object_tags) == len(self.lib_block_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in self.lib_block_tags
+            assert object_tag.is_copied
 
 
 class ClipboardPasteFromV1LibraryTestCase(ModuleStoreTestCase):

@@ -440,3 +440,4 @@ delete_object_tags = oel_tagging.delete_object_tags
 resync_object_tags = oel_tagging.resync_object_tags
 get_object_tags = oel_tagging.get_object_tags
 add_tag_to_taxonomy = oel_tagging.add_tag_to_taxonomy
+copy_tags_as_read_only = oel_tagging.copy_tags
