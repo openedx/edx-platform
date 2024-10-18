@@ -17,7 +17,7 @@ function($, _, gettext, BaseModal, ViewUtils, XBlockViewUtils) {
 
         options: $.extend({}, BaseModal.prototype.options, {
             modalName: 'preview-lib-changes',
-            modalSize: 'med',
+            modalSize: 'lg',
             view: 'studio_view',
             viewSpecificClasses: 'modal-lib-preview confirm',
             // Translators: "title" is the name of the current component being edited.
