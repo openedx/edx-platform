@@ -131,11 +131,13 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         # Note that, if this fails and we raise a 4XX, then we will not call modulstore().update_item,
         # thus preserving the former value of `downstream.upstream`.
         downstream.upstream = new_upstream_ref
-        sync_param = request.data.get("sync", "false").lower()
-        if sync_param not in ["true", "false"]:
+        sync_param = request.data.get("sync", "false")
+        if isinstance(sync_param, str):
+            sync_param = sync_param.lower()
+        if sync_param not in ["true", "false", True, False]:
             raise ValidationError({"sync": "must be 'true' or 'false'"})
         try:
-            if sync_param == "true":
+            if sync_param == "true" or sync_param is True:
                 sync_from_upstream(downstream=downstream, user=request.user)
             else:
                 # Even if we're not syncing (i.e., updating the downstream's values with the upstream's), we still need

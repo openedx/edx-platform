@@ -19,6 +19,13 @@ function($, _, gettext, BaseModal) {
 
         initialize: function() {
             BaseModal.prototype.initialize.call(this);
+            // Add event listen to close picker when the iframe tells us to
+            window.addEventListener("message", function (event) {
+                if (event.data?.type === 'pickerComponentSelected') {
+                    this.refreshFunction(event.data);
+                    this.hide();
+                }
+            }.bind(this), { once: true }, false);
         },
 
         /**
@@ -42,12 +49,6 @@ function($, _, gettext, BaseModal) {
         },
 
         getContentHtml: function() {
-            // Add event listen to close picker when the iframe tells us to
-            window.addEventListener("message", function (event) {
-                if (event.data === 'closeComponentPicker') {
-                    this.hide();
-                }
-            }.bind(this));
             return `<iframe src="${this.contentPickerUrl}" onload="this.contentWindow.focus()" frameborder="0" style="width: 100%; height: 100%;"/>`;
         },
     });
