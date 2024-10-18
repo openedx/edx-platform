@@ -1,51 +1,56 @@
 /**
  * Provides utilities to open and close the library content picker.
- * 
- * To use this picker you need to add the following code into your template:
- * 
- * ```
- * <div id="library-content-picker" class="picker"></div>
- * <div class="picker-cover"></div>
- * ```
+ *
  */
-define(['jquery'],
-function($) {
+define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
+function($, _, gettext, BaseModal) {
     'use strict';
 
-    const closePicker = (picker, pickerCover) => {
-        $(pickerCover).css('display', 'none');
-        $(picker).empty();
-        $(picker).css('display', 'none');
-        $('body').removeClass('picker-open');
-    };
+    var AddLibraryContent = BaseModal.extend({
+        options: $.extend({}, BaseModal.prototype.options, {
+            modalName: 'add-component-from-library',
+            modalSize: 'lg',
+            view: 'studio_view',
+            viewSpecificClasses: 'modal-add-component-picker confirm',
+            // Translators: "title" is the name of the current component being edited.
+            titleFormat: gettext('Add library content'),
+            addPrimaryActionButton: false,
+        }),
 
-    const openPicker = (contentPickerUrl, picker, pickerCover) => {
-        // Add event listen to close picker when the iframe tells us to
-        window.addEventListener("message", function (event) {
-            if (event.data === 'closeComponentPicker') {
-                closePicker(picker, pickerCover);
-            }
-        }.bind(this));
+        initialize: function() {
+            BaseModal.prototype.initialize.call(this);
+        },
 
-        $(pickerCover).css('display', 'block');
-        // xss-lint: disable=javascript-jquery-html
-        $(picker).html(
-            `<iframe src="${contentPickerUrl}" onload="this.contentWindow.focus()" frameborder="0" style="width: 100%; height: 100%;"></iframe>`
-        );
-        $(picker).css('display', 'block');
+        /**
+         * Adds the action buttons to the modal.
+         */
+        addActionButtons: function() {
+            this.addActionButton('cancel', gettext('Cancel'));
+        },
 
-        // Prevent background from being scrollable when picker is open
-        $('body').addClass('picker-open');
-    };
+        /**
+         * Show a component picker modal from library.
+         * @param contentPickerUrl Url for component picker
+         * @param refreshFunction A function to refresh the block after it has been updated
+         */
+        showComponentPicker: function(contentPickerUrl, refreshFunction) {
+            this.contentPickerUrl = contentPickerUrl;
+            this.refreshFunction = refreshFunction;
 
-    const createComponent = (contentPickerUrl) => {
-      const picker = document.querySelector("#library-content-picker");
-      const pickerCover = document.querySelector(".picker-cover");
+            this.render();
+            this.show();
+        },
 
-      return openPicker(contentPickerUrl, picker, pickerCover);
-    };
+        getContentHtml: function() {
+            // Add event listen to close picker when the iframe tells us to
+            window.addEventListener("message", function (event) {
+                if (event.data === 'closeComponentPicker') {
+                    this.hide();
+                }
+            }.bind(this));
+            return `<iframe src="${this.contentPickerUrl}" onload="this.contentWindow.focus()" frameborder="0" style="width: 100%; height: 100%;"/>`;
+        },
+    });
 
-    return {
-        createComponent: createComponent,
-    };
+    return AddLibraryContent;
 });
