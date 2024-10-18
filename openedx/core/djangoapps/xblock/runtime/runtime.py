@@ -1,9 +1,8 @@
 """
 Common base classes for all new XBlock runtimes.
 """
-from __future__ import annotations
 import logging
-from typing import Callable, Optional
+from typing import Callable, Protocol
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
@@ -15,7 +14,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from eventtracking import tracker
-from opaque_keys.edx.keys import UsageKey, LearningContextKey
+from opaque_keys.edx.keys import UsageKeyV2, LearningContextKey
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
@@ -38,7 +37,7 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.types import User as UserType
 from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-from openedx.core.djangoapps.xblock.data import StudentDataMode
+from openedx.core.djangoapps.xblock.data import AuthoredDataMode, StudentDataMode, LatestVersion
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
@@ -61,6 +60,19 @@ def make_track_function():
     def function(event_type, event):
         return track_views.server_track(current_request, event_type, event, page='x_module')
     return function
+
+
+class GetHandlerFunction(Protocol):
+    """ Type definition for our "get handler" callback """
+    def __call__(
+        self,
+        usage_key: UsageKeyV2,
+        handler_name: str,
+        user: UserType | None,
+        *,
+        version: int | LatestVersion = LatestVersion.AUTO,
+    ) -> str:
+        ...
 
 
 class XBlockRuntime(RuntimeShim, Runtime):
@@ -94,19 +106,35 @@ class XBlockRuntime(RuntimeShim, Runtime):
     # keep track of view name (student_view, studio_view, etc)
     # currently only used to track if we're in the studio_view (see below under service())
     view_name: str | None
+    # backing store for authored field data (mostly content+settings scopes)
+    authored_data_store: FieldData
 
-    def __init__(self, system: XBlockRuntimeSystem, user: UserType | None):
+    def __init__(
+        self,
+        user: UserType | None,
+        *,
+        handler_url: GetHandlerFunction,
+        student_data_mode: StudentDataMode,
+        authored_data_mode: AuthoredDataMode,
+        authored_data_store: FieldData,
+        id_reader: IdReader | None = None,
+    ):
         super().__init__(
-            id_reader=system.id_reader,
+            id_reader=id_reader or OpaqueKeyReader(),
             mixins=(
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
                 XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
             ),
             default_class=None,
             select=None,
-            id_generator=system.id_generator,
+            id_generator=MemoryIdManager(),  # We don't really use id_generator until we need to support asides
         )
-        self.system = system
+        assert student_data_mode in (StudentDataMode.Ephemeral, StudentDataMode.Persisted)
+        self.authored_data_mode = authored_data_mode
+        self.authored_data_store = authored_data_store
+        self.children_data_store = None
+        self.student_data_mode = student_data_mode
+        self.handler_url_fn = handler_url
         self.user = user
         # self.user_id must be set as a separate attribute since base class sets it:
         if self.user is None:
@@ -126,7 +154,10 @@ class XBlockRuntime(RuntimeShim, Runtime):
         if thirdparty:
             log.warning("thirdparty handlers are not supported by this runtime for XBlock %s.", type(block))
 
-        url = self.system.handler_url(block.scope_ids.usage_id, handler_name, self.user)
+        # Note: it's important that we call handlers based on the same version of the block
+        # (draft block -> draft data available to handler; published block -> published data available to handler)
+        kwargs = {"version": block._runtime_requested_version} if hasattr(block, "_runtime_requested_version") else {}  # pylint: disable=protected-access
+        url = self.handler_url_fn(block.usage_key, handler_name, self.user, **kwargs)
         if suffix:
             if not url.endswith('/'):
                 url += '/'
@@ -275,7 +306,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             # the preview engine, and 'main' otherwise.
             # For backwards compatibility, we check the student_data_mode (Ephemeral indicates CMS) and the
             # view_name for 'studio_view.' self.view_name is set by render() below.
-            if self.system.student_data_mode == StudentDataMode.Ephemeral and self.view_name != 'studio_view':
+            if self.student_data_mode == StudentDataMode.Ephemeral and self.view_name != 'studio_view':
                 return MakoService(namespace_prefix='lms.')
             return MakoService()
         elif service_name == "i18n":
@@ -301,14 +332,12 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return EventPublishingService(self.user, context_key, make_track_function())
         elif service_name == 'enrollments':
             return EnrollmentsService()
+        elif service_name == 'error_tracker':
+            return make_error_tracker()
 
-        # Check if the XBlockRuntimeSystem wants to handle this:
-        service = self.system.get_service(block, service_name)
         # Otherwise, fall back to the base implementation which loads services
         # defined in the constructor:
-        if service is None:
-            service = super().service(block, service_name)
-        return service
+        return super().service(block, service_name)
 
     def _init_field_data_for_block(self, block: XBlock) -> FieldData:
         """
@@ -322,7 +351,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             assert isinstance(self.user_id, str) and self.user_id.startswith("anon")
             kvs = EphemeralKeyValueStore()
             student_data_store = KvsFieldData(kvs)
-        elif self.system.student_data_mode == StudentDataMode.Ephemeral:
+        elif self.student_data_mode == StudentDataMode.Ephemeral:
             # We're in an environment like Studio where we want to let the
             # author test blocks out but not permanently save their state.
             kvs = EphemeralKeyValueStore()
@@ -341,10 +370,10 @@ class XBlockRuntime(RuntimeShim, Runtime):
             student_data_store = KvsFieldData(kvs=DjangoKeyValueStore(field_data_cache))
 
         return SplitFieldData({
-            Scope.content: self.system.authored_data_store,
-            Scope.settings: self.system.authored_data_store,
-            Scope.parent: self.system.authored_data_store,
-            Scope.children: self.system.children_data_store,
+            Scope.content: self.authored_data_store,
+            Scope.settings: self.authored_data_store,
+            Scope.parent: self.authored_data_store,
+            Scope.children: self.children_data_store,
             Scope.user_state_summary: student_data_store,
             Scope.user_state: student_data_store,
             Scope.user_info: student_data_store,
@@ -407,62 +436,3 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         # Subclasses should override this
         return None
-
-
-class XBlockRuntimeSystem:
-    """
-    This class is essentially a factory for XBlockRuntimes. This is a
-    long-lived object which provides the behavior specific to the application
-    that wants to use XBlocks. Unlike XBlockRuntime, a single instance of this
-    class can be used with many different XBlocks, whereas each XBlock gets its
-    own instance of XBlockRuntime.
-    """
-    def __init__(
-        self,
-        handler_url: Callable[[UsageKey, str, UserType | None], str],
-        student_data_mode: StudentDataMode,
-        runtime_class: type[XBlockRuntime],
-        id_reader: Optional[IdReader] = None,
-        authored_data_store: Optional[FieldData] = None,
-    ):
-        """
-        args:
-            handler_url: A method to get URLs to call XBlock handlers. It must
-                implement this signature:
-                handler_url(
-                    usage_key: UsageKey,
-                    handler_name: str,
-                    user: User | AnonymousUser | None
-                ) -> str
-            student_data_mode: Specifies whether student data should be kept
-                in a temporary in-memory store (e.g. Studio) or persisted
-                forever in the database.
-            runtime_class: What runtime to use, e.g. LearningCoreXBlockRuntime
-        """
-        self.handler_url = handler_url
-        self.id_reader = id_reader or OpaqueKeyReader()
-        self.id_generator = MemoryIdManager()  # We don't really use id_generator until we need to support asides
-        self.runtime_class = runtime_class
-        self.authored_data_store = authored_data_store
-        self.children_data_store = None
-        assert student_data_mode in (StudentDataMode.Ephemeral, StudentDataMode.Persisted)
-        self.student_data_mode = student_data_mode
-
-    def get_runtime(self, user: UserType | None) -> XBlockRuntime:
-        """
-        Get the XBlock runtime for the specified Django user. The user can be
-        a regular user, an AnonymousUser, or None.
-        """
-        return self.runtime_class(self, user)
-
-    def get_service(self, block, service_name: str):
-        """
-        Get a runtime service
-
-        Runtime services may come from this XBlockRuntimeSystem,
-        or if this method returns None, they may come from the
-        XBlockRuntime.
-        """
-        if service_name == 'error_tracker':
-            return make_error_tracker()
-        return None  # None means see if XBlockRuntime offers this service

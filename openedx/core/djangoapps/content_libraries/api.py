@@ -56,6 +56,7 @@ from datetime import datetime, timezone
 import base64
 import hashlib
 import logging
+import mimetypes
 
 import attr
 import requests
@@ -68,15 +69,20 @@ from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 from edx_rest_api_client.client import OAuthAPIClient
+from django.urls import reverse
 from lxml import etree
-from opaque_keys.edx.keys import UsageKey, UsageKeyV2
+from opaque_keys.edx.keys import BlockTypeKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import (
     LibraryLocatorV2,
     LibraryUsageLocatorV2,
-    LibraryLocator as LibraryLocatorV1
+    LibraryLocator as LibraryLocatorV1,
+    LibraryCollectionLocator,
 )
-from opaque_keys import InvalidKeyError
-from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    LibraryBlockData,
+    LibraryCollectionData,
+)
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
@@ -84,19 +90,21 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, MediaType
+from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key, xblock_type_display_name
+from openedx.core.djangoapps.xblock.api import (
+    get_component_from_usage_key,
+    get_xblock_app_config,
+    xblock_type_display_name,
+)
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
-from xmodule.library_root_xblock import LibraryRoot as LibraryRootV1
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import permissions, tasks
 from .constants import ALL_RIGHTS_RESERVED, COMPLEX
@@ -111,6 +119,8 @@ log = logging.getLogger(__name__)
 
 ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
+ContentLibraryCollectionNotFound = Collection.DoesNotExist
+
 
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """
@@ -118,6 +128,10 @@ class ContentLibraryBlockNotFound(XBlockNotFoundError):
 
 class LibraryAlreadyExists(KeyError):
     """ A library with the specified slug already exists """
+
+
+class LibraryCollectionAlreadyExists(IntegrityError):
+    """ A Collection with that key already exists in the library """
 
 
 class LibraryBlockAlreadyExists(KeyError):
@@ -150,6 +164,7 @@ class ContentLibraryMetadata:
     Class that represents the metadata about a content library.
     """
     key = attr.ib(type=LibraryLocatorV2)
+    learning_package = attr.ib(type=LearningPackage)
     title = attr.ib("")
     description = attr.ib("")
     num_blocks = attr.ib(0)
@@ -194,6 +209,15 @@ class ContentLibraryPermissionEntry:
 
 
 @attr.s
+class CollectionMetadata:
+    """
+    Class to represent collection metadata in a content library.
+    """
+    key = attr.ib(type=str)
+    title = attr.ib(type=str)
+
+
+@attr.s
 class LibraryXBlockMetadata:
     """
     Class that represents the metadata about an XBlock in a content library.
@@ -201,29 +225,49 @@ class LibraryXBlockMetadata:
     usage_key = attr.ib(type=LibraryUsageLocatorV2)
     created = attr.ib(type=datetime)
     modified = attr.ib(type=datetime)
+    draft_version_num = attr.ib(type=int)
+    published_version_num = attr.ib(default=None, type=int)
     display_name = attr.ib("")
     last_published = attr.ib(default=None, type=datetime)
+    last_draft_created = attr.ib(default=None, type=datetime)
+    last_draft_created_by = attr.ib("")
+    published_by = attr.ib("")
     has_unpublished_changes = attr.ib(False)
-    tags_count = attr.ib(0)
+    created = attr.ib(default=None, type=datetime)
+    collections = attr.ib(type=list[CollectionMetadata], factory=list)
 
     @classmethod
-    def from_component(cls, library_key, component):
+    def from_component(cls, library_key, component, associated_collections=None):
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
         last_publish_log = component.versioning.last_publish_log
 
+        published_by = None
+        if last_publish_log and last_publish_log.published_by:
+            published_by = last_publish_log.published_by.username
+
+        draft = component.versioning.draft
+        published = component.versioning.published
+        last_draft_created = draft.created if draft else None
+        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
+
         return cls(
-            usage_key=LibraryUsageLocatorV2(
+            usage_key=library_component_usage_key(
                 library_key,
-                component.component_type.name,
-                component.local_key,
+                component,
             ),
-            display_name=component.versioning.draft.title,
+            display_name=draft.title,
             created=component.created,
-            modified=component.versioning.draft.created,
+            modified=draft.created,
+            draft_version_num=draft.version_num,
+            published_version_num=published.version_num if published else None,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
-            has_unpublished_changes=component.versioning.has_unpublished_changes
+            published_by=published_by,
+            last_draft_created=last_draft_created,
+            last_draft_created_by=last_draft_created_by,
+            has_unpublished_changes=component.versioning.has_unpublished_changes,
+            collections=associated_collections or [],
         )
 
 
@@ -323,13 +367,14 @@ def get_metadata(queryset, text_search=None):
             has_unpublished_changes=False,
             has_unpublished_deletes=False,
             license=lib.license,
+            learning_package=lib.learning_package,
         )
         for lib in queryset
     ]
     return libraries
 
 
-def require_permission_for_library_key(library_key, user, permission):
+def require_permission_for_library_key(library_key, user, permission) -> ContentLibrary:
     """
     Given any of the content library permission strings defined in
     openedx.core.djangoapps.content_libraries.permissions,
@@ -339,9 +384,11 @@ def require_permission_for_library_key(library_key, user, permission):
     Raises django.core.exceptions.PermissionDenied if the user doesn't have
     permission.
     """
-    library_obj = ContentLibrary.objects.get_by_key(library_key)
+    library_obj = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     if not user.has_perm(permission, obj=library_obj):
         raise PermissionDenied
+
+    return library_obj
 
 
 def get_library(library_key):
@@ -381,8 +428,8 @@ def get_library(library_key):
     # updated version of content that a course could pull in. But more recently,
     # we've decided to do those version references at the level of the
     # individual blocks being used, since a Learning Core backed library is
-    # intended to be used for many LibraryContentBlocks and not 1:1 like v1
-    # libraries. The top level version stays for now because LibraryContentBlock
+    # intended to be referenced in multiple course locations and not 1:1 like v1
+    # libraries. The top level version stays for now because LegacyLibraryContentBlock
     # uses it, but that should hopefully change before the Redwood release.
     version = 0 if last_publish_log is None else last_publish_log.pk
     published_by = None
@@ -408,6 +455,7 @@ def get_library(library_key):
         license=ref.license,
         created=learning_package.created,
         updated=learning_package.updated,
+        learning_package=learning_package
     )
 
 
@@ -479,6 +527,7 @@ def create_library(
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         license=library_license,
+        learning_package=ref.learning_package
     )
 
 
@@ -661,7 +710,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
     return components
 
 
-def get_library_block(usage_key) -> LibraryXBlockMetadata:
+def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMetadata:
     """
     Get metadata about (the draft version of) one specific XBlock in a library.
 
@@ -684,20 +733,30 @@ def get_library_block(usage_key) -> LibraryXBlockMetadata:
     if not draft_version:
         raise ContentLibraryBlockNotFound(usage_key)
 
+    if include_collections:
+        associated_collections = authoring_api.get_entity_collections(
+            component.learning_package_id,
+            component.key,
+        ).values('key', 'title')
+    else:
+        associated_collections = None
     xblock_metadata = LibraryXBlockMetadata.from_component(
         library_key=usage_key.context_key,
         component=component,
+        associated_collections=associated_collections,
     )
     return xblock_metadata
 
 
-def set_library_block_olx(usage_key, new_olx_str):
+def set_library_block_olx(usage_key, new_olx_str) -> int:
     """
     Replace the OLX source of the given XBlock.
 
     This is only meant for use by developers or API client applications, as
     very little validation is done and this can easily result in a broken XBlock
     that won't load.
+
+    Returns the version number of the newly created ComponentVersion.
     """
     # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
     assert isinstance(usage_key, LibraryUsageLocatorV2)
@@ -734,7 +793,7 @@ def set_library_block_olx(usage_key, new_olx_str):
             text=new_olx_str,
             created=now,
         )
-        authoring_api.create_next_version(
+        new_component_version = authoring_api.create_next_component_version(
             component.pk,
             title=new_title,
             content_to_replace={
@@ -748,6 +807,22 @@ def set_library_block_olx(usage_key, new_olx_str):
             library_key=usage_key.context_key,
             usage_key=usage_key
         )
+    )
+
+    return new_component_version.version_num
+
+
+def library_component_usage_key(
+    library_key: LibraryLocatorV2,
+    component: Component,
+) -> LibraryUsageLocatorV2:
+    """
+    Returns a LibraryUsageLocatorV2 for the given library + component.
+    """
+    return LibraryUsageLocatorV2(  # type: ignore[abstract]
+        library_key,
+        block_type=component.component_type.name,
+        usage_id=component.local_key,
     )
 
 
@@ -958,18 +1033,48 @@ def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticF
 
     Returns a list of LibraryXBlockStaticFile objects, sorted by path.
 
-    TODO: This is not yet implemented for Learning Core backed libraries.
     TODO: Should this be in the general XBlock API rather than the libraries API?
     """
-    return []
+    component = get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+
+    # If there is no Draft version, then this was soft-deleted
+    if component_version is None:
+        return []
+
+    # cvc = the ComponentVersionContent through table
+    cvc_set = (
+        component_version
+        .componentversioncontent_set
+        .filter(content__has_file=True)
+        .order_by('key')
+        .select_related('content')
+    )
+
+    site_root_url = get_xblock_app_config().get_site_root_url()
+
+    return [
+        LibraryXBlockStaticFile(
+            path=cvc.key,
+            size=cvc.content.size,
+            url=site_root_url + reverse(
+                'content_libraries:library-assets',
+                kwargs={
+                    'component_version_uuid': component_version.uuid,
+                    'asset_path': cvc.key,
+                }
+            ),
+        )
+        for cvc in cvc_set
+    ]
 
 
-def add_library_block_static_asset_file(usage_key, file_name, file_content) -> LibraryXBlockStaticFile:
+def add_library_block_static_asset_file(usage_key, file_path, file_content, user=None) -> LibraryXBlockStaticFile:
     """
     Upload a static asset file into the library, to be associated with the
     specified XBlock. Will silently overwrite an existing file of the same name.
 
-    file_name should be a name like "doc.pdf". It may optionally contain slashes
+    file_path should be a name like "doc.pdf". It may optionally contain slashes
         like 'en/doc.pdf'
     file_content should be a binary string.
 
@@ -981,10 +1086,67 @@ def add_library_block_static_asset_file(usage_key, file_name, file_content) -> L
         video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
         add_library_block_static_asset_file(video_block, "subtitles-en.srt", subtitles.encode('utf-8'))
     """
-    raise NotImplementedError("Static assets not yet implemented for Learning Core")
+    # File path validations copied over from v1 library logic. This can't really
+    # hurt us inside our system because we never use these paths in an actual
+    # file system–they're just string keys that point to hash-named data files
+    # in a common library (learning package) level directory. But it might
+    # become a security issue during import/export serialization.
+    if file_path != file_path.strip().strip('/'):
+        raise InvalidNameError("file_path cannot start/end with / or whitespace.")
+    if '//' in file_path or '..' in file_path:
+        raise InvalidNameError("Invalid sequence (// or ..) in file_path.")
+
+    component = get_component_from_usage_key(usage_key)
+
+    media_type_str, _encoding = mimetypes.guess_type(file_path)
+    # We use "application/octet-stream" as a generic fallback media type, per
+    # RFC 2046: https://datatracker.ietf.org/doc/html/rfc2046
+    # TODO: This probably makes sense to push down to openedx-learning?
+    media_type_str = media_type_str or "application/octet-stream"
+
+    now = datetime.now(tz=timezone.utc)
+
+    with transaction.atomic():
+        media_type = authoring_api.get_or_create_media_type(media_type_str)
+        content = authoring_api.get_or_create_file_content(
+            component.publishable_entity.learning_package.id,
+            media_type.id,
+            data=file_content,
+            created=now,
+        )
+        component_version = authoring_api.create_next_component_version(
+            component.pk,
+            content_to_replace={file_path: content.id},
+            created=now,
+            created_by=user.id if user else None,
+        )
+        transaction.on_commit(
+            lambda: LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(
+                    library_key=usage_key.context_key,
+                    usage_key=usage_key,
+                )
+            )
+        )
+
+    # Now figure out the URL for the newly created asset...
+    site_root_url = get_xblock_app_config().get_site_root_url()
+    local_path = reverse(
+        'content_libraries:library-assets',
+        kwargs={
+            'component_version_uuid': component_version.uuid,
+            'asset_path': file_path,
+        }
+    )
+
+    return LibraryXBlockStaticFile(
+        path=file_path,
+        url=site_root_url + local_path,
+        size=content.size,
+    )
 
 
-def delete_library_block_static_asset_file(usage_key, file_name):
+def delete_library_block_static_asset_file(usage_key, file_path, user=None):
     """
     Delete a static asset file from the library.
 
@@ -994,7 +1156,24 @@ def delete_library_block_static_asset_file(usage_key, file_name):
         video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
         delete_library_block_static_asset_file(video_block, "subtitles-en.srt")
     """
-    raise NotImplementedError("Static assets not yet implemented for Learning Core")
+    component = get_component_from_usage_key(usage_key)
+    now = datetime.now(tz=timezone.utc)
+
+    with transaction.atomic():
+        component_version = authoring_api.create_next_component_version(
+            component.pk,
+            content_to_replace={file_path: None},
+            created=now,
+            created_by=user.id if user else None,
+        )
+        transaction.on_commit(
+            lambda: LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(
+                    library_key=usage_key.context_key,
+                    usage_key=usage_key,
+                )
+            )
+        )
 
 
 def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
@@ -1056,75 +1235,224 @@ def revert_changes(library_key):
     )
 
 
-# V1/V2 Compatibility Helpers
-# (Should be removed as part of
-#  https://github.com/openedx/edx-platform/issues/32457)
-# ======================================================
-
-def get_v1_or_v2_library(
-    library_id: str | LibraryLocatorV1 | LibraryLocatorV2,
-    version: str | int | None,
-) -> LibraryRootV1 | ContentLibraryMetadata | None:
+def create_library_collection(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    title: str,
+    *,
+    description: str = "",
+    created_by: int | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
     """
-    Fetch either a V1 or V2 content library from a V1/V2 key (or key string) and version.
+    Creates a Collection in the given ContentLibrary.
 
-    V1 library versions are Mongo ObjectID strings.
-    V2 library versions can be positive ints, or strings of positive ints.
-    Passing version=None will return the latest version the library.
-
-    Returns None if not found.
-    If key is invalid, raises InvalidKeyError.
-    For V1, if key has a version, it is ignored in favor of `version`.
-    For V2, if version is provided but it isn't an int or parseable to one, we raise a ValueError.
-
-    Examples:
-    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", None)       -> <LibraryRootV1>
-    * get_v1_or_v2_library("library-v1:ProblemX+PR0B", "65ff...")  -> <LibraryRootV1>
-    * get_v1_or_v2_library("lib:RG:rg-1", None)                    -> <ContentLibraryMetadata>
-    * get_v1_or_v2_library("lib:RG:rg-1", "36")                    -> <ContentLibraryMetadata>
-    * get_v1_or_v2_library("lib:RG:rg-1", "xyz")                   -> <ValueError>
-    * get_v1_or_v2_library("notakey", "xyz")                       -> <InvalidKeyError>
-
-    If you just want to get a V2 library, use `get_library` instead.
+    If you've already fetched a ContentLibrary for the given library_key, pass it in here to avoid refetching.
     """
-    library_key: LibraryLocatorV1 | LibraryLocatorV2
-    if isinstance(library_id, str):
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    try:
+        collection = authoring_api.create_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+            created_by=created_by,
+        )
+    except IntegrityError as err:
+        raise LibraryCollectionAlreadyExists from err
+
+    return collection
+
+
+def update_library_collection(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    *,
+    title: str | None = None,
+    description: str | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Updates a Collection in the given ContentLibrary.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    try:
+        collection = authoring_api.update_collection(
+            learning_package_id=content_library.learning_package_id,
+            key=collection_key,
+            title=title,
+            description=description,
+        )
+    except Collection.DoesNotExist as exc:
+        raise ContentLibraryCollectionNotFound from exc
+
+    return collection
+
+
+def update_library_collection_components(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+    *,
+    usage_keys: list[UsageKeyV2],
+    created_by: int | None = None,
+    remove=False,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Collection:
+    """
+    Associates the Collection with Components for the given UsageKeys.
+
+    By default the Components are added to the Collection.
+    If remove=True, the Components are removed from the Collection.
+
+    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
+
+    Raises:
+    * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
+    * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
+
+    Returns the updated Collection.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    # Fetch the Component.key values for the provided UsageKeys.
+    component_keys = []
+    for usage_key in usage_keys:
+        # Parse the block_family from the key to use as namespace.
+        block_type = BlockTypeKey.from_string(str(usage_key))
+
         try:
-            library_key = LibraryLocatorV1.from_string(library_id)
-        except InvalidKeyError:
-            library_key = LibraryLocatorV2.from_string(library_id)
+            component = authoring_api.get_component_by_key(
+                content_library.learning_package_id,
+                namespace=block_type.block_family,
+                type_name=usage_key.block_type,
+                local_key=usage_key.block_id,
+            )
+        except Component.DoesNotExist as exc:
+            raise ContentLibraryBlockNotFound(usage_key) from exc
+
+        component_keys.append(component.key)
+
+    # Note: Component.key matches its PublishableEntity.key
+    entities_qset = PublishableEntity.objects.filter(
+        key__in=component_keys,
+    )
+
+    if remove:
+        collection = authoring_api.remove_from_collection(
+            content_library.learning_package_id,
+            collection_key,
+            entities_qset,
+        )
     else:
-        library_key = library_id
-    if isinstance(library_key, LibraryLocatorV2):
-        v2_version: int | None
-        if version:
-            v2_version = int(version)
-        else:
-            v2_version = None
-        try:
-            library = get_library(library_key)
-            if v2_version is not None and library.version != v2_version:
-                raise NotImplementedError(
-                    f"Tried to load version {v2_version} of learning_core-based library {library_key}. "
-                    f"Currently, only the latest version ({library.version}) may be loaded. "
-                    "This is a known issue. "
-                    "It will be fixed before the production release of learning_core-based (V2) content libraries. "
-                )
-            return library
-        except ContentLibrary.DoesNotExist:
-            return None
-    elif isinstance(library_key, LibraryLocatorV1):
-        v1_version: str | None
-        if version:
-            v1_version = str(version)
-        else:
-            v1_version = None
-        store = modulestore()
-        library_key = library_key.for_branch(ModuleStoreEnum.BranchName.library).for_version(v1_version)
-        try:
-            return store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
-        except ItemNotFoundError:
-            return None
+        collection = authoring_api.add_to_collection(
+            content_library.learning_package_id,
+            collection_key,
+            entities_qset,
+            created_by=created_by,
+        )
+
+    return collection
+
+
+def set_library_component_collections(
+    library_key: LibraryLocatorV2,
+    component: Component,
+    *,
+    collection_keys: list[str],
+    created_by: int | None = None,
+    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
+    content_library: ContentLibrary | None = None,
+) -> Component:
+    """
+    It Associates the component with collections for the given collection keys.
+
+    Only collections in queryset are associated with component, all previous component-collections
+    associations are removed.
+
+    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
+
+    Raises:
+    * ContentLibraryCollectionNotFound if any of the given collection_keys don't match Collections in the given library.
+
+    Returns the updated Component.
+    """
+    if not content_library:
+        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library
+    assert content_library.learning_package_id
+    assert content_library.library_key == library_key
+
+    # Note: Component.key matches its PublishableEntity.key
+    collection_qs = authoring_api.get_collections(content_library.learning_package_id).filter(
+        key__in=collection_keys
+    )
+
+    affected_collections = authoring_api.set_collections(
+        content_library.learning_package_id,
+        component,
+        collection_qs,
+        created_by=created_by,
+    )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                background=True,
+            )
+        )
+
+    return component
+
+
+def get_library_collection_usage_key(
+    library_key: LibraryLocatorV2,
+    collection_key: str,
+) -> LibraryCollectionLocator:
+    """
+    Returns the LibraryCollectionLocator associated to a collection
+    """
+
+    return LibraryCollectionLocator(library_key, collection_key)
+
+
+def get_library_collection_from_usage_key(
+    collection_usage_key: LibraryCollectionLocator,
+) -> Collection:
+    """
+    Return a Collection using the LibraryCollectionLocator
+    """
+
+    library_key = collection_usage_key.library_key
+    collection_key = collection_usage_key.collection_id
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    try:
+        return authoring_api.get_collection(
+            content_library.learning_package_id,
+            collection_key,
+        )
+    except Collection.DoesNotExist as exc:
+        raise ContentLibraryCollectionNotFound from exc
 
 
 # Import from Courseware

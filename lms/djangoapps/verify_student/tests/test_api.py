@@ -69,7 +69,8 @@ class CreateVerificationAttempt(TestCase):
         )
         self.attempt.save()
 
-    def test_create_verification_attempt(self):
+    @patch('lms.djangoapps.verify_student.api.emit_idv_attempt_created_event')
+    def test_create_verification_attempt(self, mock_created_event):
         expected_id = 2
         self.assertEqual(
             create_verification_attempt(
@@ -86,6 +87,13 @@ class CreateVerificationAttempt(TestCase):
         self.assertEqual(verification_attempt.name, 'Tester McTest')
         self.assertEqual(verification_attempt.status, VerificationAttemptStatus.CREATED)
         self.assertEqual(verification_attempt.expiration_datetime, datetime(2024, 12, 31, tzinfo=timezone.utc))
+        mock_created_event.assert_called_with(
+            attempt_id=verification_attempt.id,
+            user=self.user,
+            status=VerificationAttemptStatus.CREATED,
+            name='Tester McTest',
+            expiration_date=datetime(2024, 12, 31, tzinfo=timezone.utc),
+        )
 
     def test_create_verification_attempt_no_expiration_datetime(self):
         expected_id = 2
@@ -129,7 +137,18 @@ class UpdateVerificationAttempt(TestCase):
         ('Tester McTest3', VerificationAttemptStatus.DENIED, datetime(2026, 12, 31, tzinfo=timezone.utc)),
     )
     @ddt.unpack
-    def test_update_verification_attempt(self, name, status, expiration_datetime):
+    @patch('lms.djangoapps.verify_student.api.emit_idv_attempt_pending_event')
+    @patch('lms.djangoapps.verify_student.api.emit_idv_attempt_approved_event')
+    @patch('lms.djangoapps.verify_student.api.emit_idv_attempt_denied_event')
+    def test_update_verification_attempt(
+        self,
+        name,
+        status,
+        expiration_datetime,
+        mock_denied_event,
+        mock_approved_event,
+        mock_pending_event,
+    ):
         update_verification_attempt(
             attempt_id=self.attempt.id,
             name=name,
@@ -144,6 +163,31 @@ class UpdateVerificationAttempt(TestCase):
         self.assertEqual(verification_attempt.name, name)
         self.assertEqual(verification_attempt.status, status)
         self.assertEqual(verification_attempt.expiration_datetime, expiration_datetime)
+
+        if status == VerificationAttemptStatus.PENDING:
+            mock_pending_event.assert_called_with(
+                attempt_id=verification_attempt.id,
+                user=self.user,
+                status=status,
+                name=name,
+                expiration_date=expiration_datetime,
+            )
+        elif status == VerificationAttemptStatus.APPROVED:
+            mock_approved_event.assert_called_with(
+                attempt_id=verification_attempt.id,
+                user=self.user,
+                status=status,
+                name=name,
+                expiration_date=expiration_datetime,
+            )
+        elif status == VerificationAttemptStatus.DENIED:
+            mock_denied_event.assert_called_with(
+                attempt_id=verification_attempt.id,
+                user=self.user,
+                status=status,
+                name=name,
+                expiration_date=expiration_datetime,
+            )
 
     def test_update_verification_attempt_none_values(self):
         update_verification_attempt(
@@ -166,6 +210,7 @@ class UpdateVerificationAttempt(TestCase):
             VerificationAttempt.DoesNotExist,
             update_verification_attempt,
             attempt_id=999999,
+            name=None,
             status=VerificationAttemptStatus.APPROVED,
         )
 

@@ -37,19 +37,32 @@ class XBlockSerializer:
         # Search the OLX for references to files stored in the course's
         # "Files & Uploads" (contentstore):
         self.olx_str = utils.rewrite_absolute_static_urls(self.olx_str, course_key)
-        for asset in utils.collect_assets_from_text(self.olx_str, course_key):
-            path = asset['path']
-            if path not in [sf.name for sf in self.static_files]:
-                self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
 
-        if block.scope_ids.usage_id.block_type in ['problem', 'vertical']:
-            py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)
-            if py_lib_zip_file:
-                self.static_files.append(py_lib_zip_file)
+        runtime_supports_explicit_assets = hasattr(block.runtime, 'get_block_assets')
+        if runtime_supports_explicit_assets:
+            # If a block supports explicitly tracked assets, things are simple.
+            # Learning Core backed content supports this, which currently means
+            # v2 Content Libraries.
+            self.static_files.extend(
+                block.runtime.get_block_assets(block)
+            )
+        else:
+            # Otherwise, we have to scan the content to extract associated asset
+            # by inference. This is what we have to do for Modulestore-backed
+            # courses, which store files a course-global "Files and Uploads".
+            for asset in utils.collect_assets_from_text(self.olx_str, course_key):
+                path = asset['path']
+                if path not in [sf.name for sf in self.static_files]:
+                    self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
 
-            js_input_files = utils.get_js_input_files_if_using(self.olx_str, course_key)
-            for js_input_file in js_input_files:
-                self.static_files.append(js_input_file)
+            if block.scope_ids.usage_id.block_type in ['problem', 'vertical']:
+                py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)
+                if py_lib_zip_file:
+                    self.static_files.append(py_lib_zip_file)
+
+                js_input_files = utils.get_js_input_files_if_using(self.olx_str, course_key)
+                for js_input_file in js_input_files:
+                    self.static_files.append(js_input_file)
 
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
@@ -133,7 +146,7 @@ class XBlockSerializer:
 
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")
-        olx_node.text = etree.CDATA("\n" + escaped_block_data + "\n")
+        olx_node.text = etree.CDATA(escaped_block_data)
         return olx_node
 
 

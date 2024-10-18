@@ -21,7 +21,7 @@ XBLOCKS = [
     "html = xmodule.html_block:HtmlBlock",
     "image = xmodule.template_block:TranslateCustomTagBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
-    "library_content = xmodule.library_content_block:LibraryContentBlock",
+    "library_content = xmodule.library_content_block:LegacyLibraryContentBlock",
     "lti = xmodule.lti_block:LTIBlock",
     "poll_question = xmodule.poll_block:PollBlock",
     "problem = xmodule.capa_block:ProblemBlock",
@@ -129,7 +129,8 @@ setup(
             'discussions_link = openedx.core.djangoapps.discussions.transformers:DiscussionsTopicLinkTransformer',
         ],
         "openedx.ace.policy": [
-            "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
+            "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout",
+            "course_push_notification_optout = openedx.core.djangoapps.notifications.policies:CoursePushNotificationOptout",  # lint-amnesty, pylint: disable=line-too-long
         ],
         "openedx.call_to_action": [
             "personalized_learner_schedules = openedx.features.personalized_learner_schedules.call_to_action:PersonalizedLearnerScheduleCallToAction"  # lint-amnesty, pylint: disable=line-too-long
