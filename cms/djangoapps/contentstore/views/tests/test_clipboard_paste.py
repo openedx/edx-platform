@@ -490,9 +490,8 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         }, format="json")
         assert paste_response.status_code == 200
 
-
         new_block_key = paste_response.json()["locator"]
-        
+
         object_tags = tagging_api.get_object_tags(new_block_key)
         assert len(object_tags) == len(self.lib_block_tags)
         for object_tag in object_tags:

@@ -28,6 +28,7 @@ from xblock.core import XBlockMixin, XBlock
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -298,7 +299,7 @@ def _update_tags(*, upstream: XBlock, downstream: XBlock) -> None:
         )
     else:
         copy_object_tags(upstream.location, downstream.location)
-    
+
 
 def _get_synchronizable_fields(upstream: XBlock, downstream: XBlock) -> set[str]:
     """

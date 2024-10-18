@@ -324,6 +324,8 @@ def _import_xml_node_to_parent(
     Given an XML node representing a serialized XBlock (OLX), import it into modulestore 'store' as a child of the
     specified parent block. Recursively copy children as needed.
     """
+    # pylint: disable=too-many-statements
+
     runtime = parent_xblock.runtime
     parent_key = parent_xblock.scope_ids.usage_id
     block_type = node.tag

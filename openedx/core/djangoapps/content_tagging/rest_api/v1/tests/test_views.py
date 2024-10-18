@@ -1857,7 +1857,7 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         object_id_2 = str(self.courseB)
         tagging_api.tag_object(object_id=object_id_1, taxonomy=self.t1, tags=["android"])
         tagging_api.tag_object(object_id=object_id_2, taxonomy=self.t1, tags=["anvil"])
-        tagging_api.copy_tags(object_id_1, object_id_2)
+        tagging_api.copy_tags_as_read_only(object_id_1, object_id_2)
 
         expected_tags = [{
             'name': self.t1.name,
