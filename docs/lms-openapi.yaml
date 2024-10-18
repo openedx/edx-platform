@@ -9548,7 +9548,7 @@ paths:
       tags:
       - user
       security:
-      - CSRF: []
+      - csrf: []
     parameters:
     - name: api_version
       in: path
