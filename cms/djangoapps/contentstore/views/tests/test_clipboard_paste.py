@@ -454,7 +454,7 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
             tagging_api.add_tag_to_taxonomy(taxonomy_all_org, tag_value)
 
         self.lib_block_tags = ['tag_1', 'tag_5']
-        tagging_api.tag_object(str(self.lib_block_key), taxonomy_all_org, ['tag_1', 'tag_5'])
+        tagging_api.tag_object(str(self.lib_block_key), taxonomy_all_org, self.lib_block_tags)
 
     def test_paste_from_library_creates_link(self):
         """
@@ -495,9 +495,7 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         
         object_tags = tagging_api.get_object_tags(new_block_key)
         assert len(object_tags) == len(self.lib_block_tags)
-        print(object_tags)
         for object_tag in object_tags:
-            print(object_tag)
             assert object_tag.value in self.lib_block_tags
             assert object_tag.is_copied
 

@@ -438,7 +438,7 @@ def _import_xml_node_to_parent(
                 )
 
     # Copy content tags to the new xblock
-    if (new_xblock.upstream):
+    if new_xblock.upstream:
         # Verify if the upstream is a library component
         # Copy the tags from library component upstream as ready only
         try:

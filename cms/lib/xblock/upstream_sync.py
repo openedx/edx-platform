@@ -28,7 +28,6 @@ from xblock.core import XBlockMixin, XBlock
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -187,6 +186,7 @@ def sync_from_upstream(downstream: XBlock, user: User) -> None:
     link, upstream = _load_upstream_link_and_block(downstream, user)
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=False)
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
+    _update_tags(upstream=upstream, downstream=downstream)
     downstream.upstream_version = link.version_available
 
 
@@ -283,6 +283,22 @@ def _update_non_customizable_fields(*, upstream: XBlock, downstream: XBlock) -> 
         new_upstream_value = getattr(upstream, field_name)
         setattr(downstream, field_name, new_upstream_value)
 
+
+def _update_tags(*, upstream: XBlock, downstream: XBlock) -> None:
+    """
+    Update tags from `upstream` to `downstream`
+    """
+    from openedx.core.djangoapps.content_tagging.api import copy_object_tags, copy_tags_as_read_only
+    if isinstance(upstream.location, LibraryUsageLocatorV2):
+        # If is a library component, then update the tags as read_only
+        # This keeps tags added locally.
+        copy_tags_as_read_only(
+            str(upstream.location),
+            str(downstream.location),
+        )
+    else:
+        copy_object_tags(upstream.location, downstream.location)
+    
 
 def _get_synchronizable_fields(upstream: XBlock, downstream: XBlock) -> set[str]:
     """
