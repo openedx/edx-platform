@@ -580,3 +580,18 @@
     width:100%;
     height:100%
 }
+
+// Modal for adding components from libary using component picker
+// cms/static/js/views/components/add_library_content_with_picker.js
+.modal-add-component-picker {
+  top: 10%;
+  .modal-content {
+    padding: 0 !important;
+
+    & > iframe {
+      width: 100%;
+      min-height: 80vh;
+      background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
+    }
+  }
+}

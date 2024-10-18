@@ -70,7 +70,8 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Add
             this.closeNewComponent(event);
 
             if (saveData.type === 'library_v2') {
-                AddLibraryContent.createComponent(this.options.libraryContentPickerUrl);
+                var modal = new AddLibraryContent();
+                modal.showComponentPicker(this.options.libraryContentPickerUrl, null);
             } else {
                 ViewUtils.runOperationShowingMessage(
                     gettext('Adding'),
