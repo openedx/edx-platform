@@ -713,29 +713,35 @@ login_user_schema = openapi.Schema(
     },
 )
 
-login_user_return_success_schema = openapi.Schema(
+login_user_return_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         "success": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+        "value": openapi.Schema(type=openapi.TYPE_STRING),
+        "error_code":  openapi.Schema(type=openapi.TYPE_STRING),
     },
 )
 
+
 class LoginSessionView(APIView):
-    """HTTP end-points for logging in users. """
+    """HTTP end-points for logging in users."""
 
     # This end-point is available to anonymous users,
     # so do not require authentication.
     authentication_classes = []
 
-    # TODO also add:
-    #
-    #    HttpResponse: 400 if the request failed.
-    #        Ex. {'success': false, 'value': '{'success': false, 'value: 'Email or password is incorrect.'}
-    #    HttpResponse: 403 if successful authentication with a third party provider but does not have a linked account.
-    #        Ex. {'success': false, 'error_code': 'third-party-auth-with-no-linked-account'}
     login_user_responses = {
-        status.HTTP_200_OK: login_user_return_success_schema,
+        status.HTTP_200_OK: login_user_return_schema,
+        status.HTTP_400_BAD_REQUEST: login_user_return_schema,
+        status.HTTP_403_FORBIDDEN: login_user_return_schema,
     }
+
+    csrf_header_param = openapi.Parameter(
+        "X-CSRFToken",
+        openapi.IN_HEADER,
+        description="CSRF Token",
+        type=openapi.TYPE_STRING,
+    )
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
@@ -744,10 +750,16 @@ class LoginSessionView(APIView):
     @swagger_auto_schema(
         request_body=login_user_schema,
         responses=login_user_responses,
+        security=[{'CSRF':[]},],
+#        manual_parameters=[csrf_header_param],
     )
     @method_decorator(csrf_protect)
     def post(self, request, api_version):
-        """Log in a user."""
+        """
+        POST /user/{api_version}/account/login_session/
+
+        Returns 200 on success, and a detailed error message otherwise.
+        """
         return login_user(request, api_version)
 
     @method_decorator(sensitive_post_parameters("password"))
