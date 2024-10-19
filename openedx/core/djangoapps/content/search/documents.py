@@ -161,12 +161,12 @@ def _get_description_from_block_content(block_type, block_content) -> str:
     Generate description from block content
     """
     result = None
-    
+
     if block_type == 'html' and 'html_content' in block_content:
         result = block_content['html_content']
     elif block_type == 'problem' and 'capa_content' in block_content:
         result = block_content['capa_content']
-    
+
     return result
 
 
@@ -210,7 +210,7 @@ def _fields_from_block(block) -> dict:
                 parent_data,
             )
     try:
-        content_data = _get_content_from_block(block) 
+        content_data = _get_content_from_block(block)
         block_data[Fields.content] = content_data
 
         # Generate description from the content
@@ -345,7 +345,7 @@ def _published_data_from_block(block_published) -> dict:
     }
 
     try:
-        content_data =  _get_content_from_block(block_published)
+        content_data = _get_content_from_block(block_published)
 
         description = _get_description_from_block_content(
             block_published.scope_ids.block_type,
@@ -371,7 +371,7 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     """
     library_name = lib_api.get_library(xblock_metadata.usage_key.context_key).title
     block = xblock_api.load_block(xblock_metadata.usage_key, user=None)
-    
+
     try:
         block_published = xblock_api.load_block(xblock_metadata.usage_key, user=None, version=LatestVersion.PUBLISHED)
     except NotFound:
@@ -388,7 +388,7 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     })
 
     doc.update(_fields_from_block(block))
-    
+
     if block_published:
         doc.update(_published_data_from_block(block_published))
 
