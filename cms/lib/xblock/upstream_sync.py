@@ -290,16 +290,13 @@ def _update_tags(*, upstream: XBlock, downstream: XBlock) -> None:
     """
     Update tags from `upstream` to `downstream`
     """
-    from openedx.core.djangoapps.content_tagging.api import copy_object_tags, copy_tags_as_read_only
-    if isinstance(upstream.location, LibraryUsageLocatorV2):
-        # If is a library component, then update the tags as read_only
-        # This keeps tags added locally.
-        copy_tags_as_read_only(
-            str(upstream.location),
-            str(downstream.location),
-        )
-    else:
-        copy_object_tags(upstream.location, downstream.location)
+    from openedx.core.djangoapps.content_tagging.api import copy_tags_as_read_only
+    # For any block synced with an upstream, copy the tags as read_only
+    # This keeps tags added locally.
+    copy_tags_as_read_only(
+        str(upstream.location),
+        str(downstream.location),
+    )
 
 
 def _get_synchronizable_fields(upstream: XBlock, downstream: XBlock) -> set[str]:

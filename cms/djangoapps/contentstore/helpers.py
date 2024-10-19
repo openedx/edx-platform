@@ -430,29 +430,21 @@ def _import_xml_node_to_parent(
                 tags=tags,
             )
 
-    def copy_tags():
-        if copied_from_block and tags:
-            object_tags = tags.get(str(copied_from_block))
-            if object_tags:
-                content_tagging_api.set_all_object_tags(
-                    content_key=new_xblock.location,
-                    object_tags=object_tags,
-                )
-
     # Copy content tags to the new xblock
     if new_xblock.upstream:
-        # Verify if the upstream is a library component
-        # Copy the tags from library component upstream as ready only
-        try:
-            LibraryUsageLocatorV2.from_string(new_xblock.upstream)
-            content_tagging_api.copy_tags_as_read_only(
-                new_xblock.upstream,
-                new_xblock.location,
+        # If this block is synced from an upstream (e.g. library content),
+        # copy the tags from the upstream as ready-only
+        content_tagging_api.copy_tags_as_read_only(
+            new_xblock.upstream,
+            new_xblock.location,
+        )
+    elif copied_from_block and tags:
+        object_tags = tags.get(str(copied_from_block))
+        if object_tags:
+            content_tagging_api.set_all_object_tags(
+                content_key=new_xblock.location,
+                object_tags=object_tags,
             )
-        except InvalidKeyError:
-            copy_tags()
-    else:
-        copy_tags()
 
     return new_xblock
 
