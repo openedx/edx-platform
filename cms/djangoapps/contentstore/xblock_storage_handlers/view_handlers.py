@@ -36,6 +36,7 @@ from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.toggles import ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
+from cms.lib.xblock.upstream_sync import BadUpstream, BadDownstream, sync_from_upstream
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
@@ -585,6 +586,20 @@ def _create_block(request):
         display_name=request.json.get("display_name"),
         boilerplate=request.json.get("boilerplate"),
     )
+
+    # If it contains library_content_key, the block is being imported from a v2 library
+    # so it needs to be synced with upstream block.
+    if upstream_ref := request.json.get("library_content_key"):
+        try:
+            # Set `created_block.upstream` so that we can try to sync and/or fetch.
+            # Note that, if this fails and we raise a 4XX, then we will not call modulstore().update_item,
+            # thus preserving the former value of `created_block.upstream`.
+            created_block.upstream = upstream_ref
+            sync_from_upstream(downstream=created_block, user=request.user)
+        except BadUpstream:
+            _delete_item(created_block.location, request.user)
+            return JsonResponse({"error": _("Invalid library xblock reference.")}, status=400)
+        modulestore().update_item(created_block, request.user.id)
 
     return JsonResponse(
         {

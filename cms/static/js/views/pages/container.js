@@ -216,7 +216,6 @@ function($, _, Backbone, gettext, BasePage,
                         createComponent: _.bind(self.createComponent, self),
                         collection: self.options.templates,
                         libraryContentPickerUrl: self.options.libraryContentPickerUrl,
-                        pickLibraryComponent: _.bind(self.pickLibraryComponent, self),
                     });
                     component.render();
                 });
@@ -636,45 +635,6 @@ function($, _, Backbone, gettext, BasePage,
                 .fail(function() {
                     // Remove the placeholder if the update failed
                     placeholderElement.remove();
-            });
-        },
-
-        pickLibraryComponent: function(template, target) {
-            // A placeholder element is created in the correct location for the new xblock
-            // and then onNewXBlock will replace it with a rendering of the xblock. Note that
-            // for xblocks that can't be replaced inline, the entire parent will be refreshed.
-            var parentElement = this.findXBlockElement(target),
-                parentLocator = parentElement.data('locator'),
-                buttonPanel = target.closest('.add-xblock-component'),
-                listPanel = buttonPanel.prev(),
-                scrollOffset = ViewUtils.getScrollOffset(buttonPanel),
-                $placeholderEl = $(this.createPlaceholderElement()),
-                requestData = _.extend(template, {
-                    parent_locator: parentLocator
-                }),
-                placeholderElement;
-            placeholderElement = $placeholderEl.appendTo(listPanel);
-            // Create an blank xblock with the same category as the upstream library xblock
-            return $.postJSON(
-                this.getURLRoot() + '/',
-                requestData,
-                function(data) {
-                    // Link with upstream library xblock and sync
-                    $.ajax({
-                        url: `/api/contentstore/v2/downstreams/${data.locator}`,
-                        type: 'PUT',
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            upstream_ref: requestData.usageKey,
-                            sync: true,
-                        }),
-                        success: _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false, data),
-                    });
-                }.bind(this)
-            ).fail(function() {
-                // Remove the placeholder if the update failed
-                placeholderElement.remove();
             });
         },
 

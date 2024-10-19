@@ -22,7 +22,11 @@ function($, _, gettext, BaseModal) {
             // Add event listen to close picker when the iframe tells us to
             window.addEventListener("message", function (event) {
                 if (event.data?.type === 'pickerComponentSelected') {
-                    this.refreshFunction(event.data);
+                    var requestData = {
+                        library_content_key: event.data.usageKey,
+                        category: event.data.category,
+                    }
+                    this.refreshFunction(requestData);
                     this.hide();
                 }
             }.bind(this), { once: true }, false);

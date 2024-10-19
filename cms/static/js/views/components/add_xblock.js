@@ -76,7 +76,7 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Add
                     function(data) {
                         ViewUtils.runOperationShowingMessage(
                             gettext('Adding'),
-                            _.bind(this.options.pickLibraryComponent, this, data, $element),
+                            _.bind(this.options.createComponent, this, data, $element),
                         ).always(function() {
                             // Restore the scroll position of the buttons so that the new
                             // component appears above them.
