@@ -299,7 +299,7 @@ def get_handler_url(
         'handler_name': handler_name,
     }
     if version != LatestVersion.AUTO:
-        kwargs["version"] = str(version) if isinstance(version, int) else version.value
+        kwargs["version"] = version
     path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
 
     # We must return an absolute URL. We can't just use

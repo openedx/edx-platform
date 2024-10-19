@@ -2,7 +2,7 @@
 URL configuration for the new XBlock API
 """
 from django.urls import include, path, re_path, register_converter
-from .url_converters import UsageKeyV2Converter
+from . import url_converters
 from . import views
 
 # Note that the exact same API URLs are used in Studio and the LMS, but the API
@@ -11,7 +11,8 @@ from . import views
 # urls_studio and urls_lms, and/or the views could be likewise duplicated.
 app_name = 'openedx.core.djangoapps.xblock.rest_api'
 
-register_converter(UsageKeyV2Converter, "usage_v2")
+register_converter(url_converters.UsageKeyV2Converter, "usage_v2")
+register_converter(url_converters.VersionConverter, "block_version")
 
 block_endpoints = [
     # get metadata about an XBlock:
@@ -34,7 +35,7 @@ block_endpoints = [
 urlpatterns = [
     path('api/xblock/v2/', include([
         path(r'xblocks/<usage_v2:usage_key>/', include(block_endpoints)),
-        path(r'xblocks/<usage_v2:usage_key>@<str:version>/', include(block_endpoints)),
+        path(r'xblocks/<usage_v2:usage_key>@<block_version:version>/', include(block_endpoints)),
     ])),
     # Non-API views (these return HTML, not JSON):
     path('xblocks/v2/<usage_v2:usage_key>/', include([
