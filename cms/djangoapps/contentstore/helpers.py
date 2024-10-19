@@ -11,9 +11,8 @@ from attrs import frozen, Factory
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
-from opaque_keys.edx.locator import DefinitionLocator, LocalId, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import DefinitionLocator, LocalId
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import IdGenerator
