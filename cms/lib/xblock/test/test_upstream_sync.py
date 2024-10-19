@@ -392,6 +392,8 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream_lib_block.data = "<html>another lib block</html>"
         upstream_lib_block.save()
 
+        libs.publish_changes(self.library.key, self.user.id)
+
         expected_tags = self.upstream_tags
         tagging_api.tag_object(str(upstream_lib_block_key), self.taxonomy_all_org, expected_tags)
 
