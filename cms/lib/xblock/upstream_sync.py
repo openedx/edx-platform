@@ -165,11 +165,7 @@ class UpstreamLink:
         return cls(
             upstream_ref=downstream.upstream,
             version_synced=downstream.upstream_version,
-            version_available=(lib_meta.draft_version_num if lib_meta else None),
-            # TODO: Previous line is wrong. It should use the published version instead, but the
-            # LearningCoreXBlockRuntime APIs do not yet support published content yet.
-            # Will be fixed in a follow-up task: https://github.com/openedx/edx-platform/issues/35582
-            # version_available=(lib_meta.published_version_num if lib_meta else None),
+            version_available=(lib_meta.published_version_num if lib_meta else None),
             version_declined=downstream.upstream_version_declined,
             error_message=None,
         )
@@ -214,9 +210,14 @@ def _load_upstream_link_and_block(downstream: XBlock, user: User) -> tuple[Upstr
     """
     link = UpstreamLink.get_for_block(downstream)  # can raise UpstreamLinkException
     # We import load_block here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
-    from openedx.core.djangoapps.xblock.api import load_block  # pylint: disable=wrong-import-order
+    from openedx.core.djangoapps.xblock.api import load_block, CheckPerm, LatestVersion  # pylint: disable=wrong-import-order
     try:
-        lib_block: XBlock = load_block(LibraryUsageLocatorV2.from_string(downstream.upstream), user)
+        lib_block: XBlock = load_block(
+            LibraryUsageLocatorV2.from_string(downstream.upstream),
+            user,
+            check_permission=CheckPerm.CAN_READ_AS_AUTHOR,
+            version=LatestVersion.PUBLISHED,
+        )
     except (NotFound, PermissionDenied) as exc:
         raise BadUpstream(_("Linked library item could not be loaded: {}").format(downstream.upstream)) from exc
     return link, lib_block

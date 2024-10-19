@@ -89,6 +89,10 @@ upstream_info = UpstreamLink.try_get_for_block(xblock)
     authoring_MFE_base_url = ${get_editor_page_base_url(xblock.location.course_key)}
     data-block-type = ${xblock.scope_ids.block_type}
     data-usage-id = ${xblock.scope_ids.usage_id}
+    % if upstream_info.upstream_ref:
+        data-upstream-ref = ${upstream_info.upstream_ref}
+        data-version-synced = ${upstream_info.version_synced}
+    %endif
     >
         <div class="header-details">
             % if show_inline:
@@ -137,7 +141,6 @@ upstream_info = UpstreamLink.try_get_for_block(xblock)
                                 <button
                                     class="btn-default library-sync-button action-button"
                                     data-tooltip="${_("Update available - click to sync")}"
-                                    onclick="$.post('/api/contentstore/v2/downstreams/${xblock.usage_key}/sync').done(() => { location.reload(); })"
                                 >
                                     <span class="icon fa fa-refresh" aria-hidden="true"></span>
                                     <span>${_("Update available")}</span>
