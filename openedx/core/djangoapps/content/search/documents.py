@@ -190,7 +190,6 @@ def _fields_from_block(block) -> dict:
         Fields.org: str(block.usage_key.context_key.org),
         Fields.access_id: _meili_access_id_from_context_key(block.usage_key.context_key),
         Fields.breadcrumbs: [],
-        Fields.description: None,
     }
     # Get the breadcrumbs (course, section, subsection, etc.):
     if block.usage_key.context_key.is_course:  # Getting parent is not yet implemented in Learning Core (for libraries).
@@ -347,10 +346,14 @@ def _published_data_from_block(block_published) -> dict:
 
     try:
         content_data =  _get_content_from_block(block_published)
-        result[Fields.published][Fields.published_description] = _get_description_from_block_content(
+
+        description = _get_description_from_block_content(
             block_published.scope_ids.block_type,
             content_data,
         )
+
+        if description:
+            result[Fields.published][Fields.published_description] = description
     except Exception as err:  # pylint: disable=broad-except
         log.exception(f"Failed to process index_dictionary for {block_published.usage_key}: {err}")
 
