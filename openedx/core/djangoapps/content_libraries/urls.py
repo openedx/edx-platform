@@ -66,7 +66,8 @@ urlpatterns = [
             # CRUD for static asset files associated with a block in the library:
             path('assets/', views.LibraryBlockAssetListView.as_view()),
             path('assets/<path:file_path>', views.LibraryBlockAssetView.as_view()),
-            # Future: publish/discard changes for just this one block
+            path('publish/', views.LibraryBlockPublishView.as_view()),
+            # Future: discard changes for just this one block
             # Future: set a block's tags (tags are stored in a Tag bundle and linked in)
         ])),
         re_path(r'^lti/1.3/', include([

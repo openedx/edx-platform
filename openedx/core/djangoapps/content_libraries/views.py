@@ -824,6 +824,20 @@ class LibraryBlockAssetView(APIView):
 
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
+class LibraryBlockPublishView(APIView):
+    """
+    Commit/publish all of the draft changes made to the component.
+    """
+
+    @convert_exceptions
+    def post(self, request, usage_key_str):
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.publish_component_changes(key, request.user)
+        return Response({})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
 class LibraryImportTaskViewSet(GenericViewSet):
     """
     Import blocks from Courseware through modulestore.

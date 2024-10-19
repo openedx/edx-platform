@@ -27,6 +27,7 @@ URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user'
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
 URL_LIB_PASTE_CLIPBOARD = URL_LIB_DETAIL + 'paste_clipboard/'  # Paste user clipboard (POST) containing Xblock data
 URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'  # Get data about a block, or delete it
+URL_LIB_BLOCK_PUBLISH = URL_LIB_BLOCK + 'publish/'  # Publish changes from a specified XBlock
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
@@ -285,6 +286,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Delete a static asset file. """
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         return self._api('delete', url, None, expect_response)
+
+    def _publish_library_block(self, block_key, expect_response=200):
+        """ Publish changes from a specified XBlock """
+        return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
 
     def _paste_clipboard_content_in_library(self, lib_key, block_id, expect_response=200):
         """ Paste's the users clipboard content into Library """
