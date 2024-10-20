@@ -22,15 +22,19 @@ class XBlockSerializer:
     static_files: list[StaticFile]
     tags: TagValuesByObjectIdDict
 
-    def __init__(self, block):
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False, normalize_asset_refs=False):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
+        self.normalize_asset_refs = normalize_asset_refs
+        self.write_url_name = write_url_name
+
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
         self.tags = {}
         olx_node = self._serialize_block(block)
+
         self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
 
         course_key = self.orig_block_key.course_key
@@ -44,7 +48,7 @@ class XBlockSerializer:
             # Learning Core backed content supports this, which currently means
             # v2 Content Libraries.
             self.static_files.extend(
-                block.runtime.get_block_assets(block)
+                block.runtime.get_block_assets(block, fetch_asset_data)
             )
         else:
             # Otherwise, we have to scan the content to extract associated asset
@@ -70,6 +74,12 @@ class XBlockSerializer:
             olx = self._serialize_html_block(block)
         else:
             olx = self._serialize_normal_block(block)
+
+        # The url_name attribute can come either because it was already in the
+        # block's field data, or because this class adds it in the calls above.
+        # However it gets set though, we can remove it here:
+        if not self.write_url_name:
+            olx.attrib.pop("url_name", None)
 
         # Store the block's tags
         block_key = block.scope_ids.usage_id
@@ -161,12 +171,12 @@ class XBlockSerializerForLearningCore(XBlockSerializer):
         (3) a list of any static files required by the XBlock and their URL
     """
 
-    def __init__(self, block):
+    def __init__(self, block, *args, **kwargs):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
-        super().__init__(block)
+        super().__init__(block, *args, **kwargs)
         self.def_id = utils.learning_core_def_key_from_modulestore_usage_key(self.orig_block_key)
 
     def _serialize_block(self, block) -> etree.Element:

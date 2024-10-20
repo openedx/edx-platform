@@ -10,6 +10,9 @@ def serialize_xblock_to_olx(block):
     This class will serialize an XBlock, producing:
         (1) an XML string defining the XBlock and all of its children (inline)
         (2) a list of any static files required by the XBlock and their URL
+
+    This calls XBlockSerializer with all default options. To actually tweak the
+    output, instantiate XBlockSerializer directly.
     """
     return XBlockSerializer(block)
 
