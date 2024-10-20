@@ -1648,6 +1648,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'openedx.core.djangoapps.cors_csrf',
 
+    # Provides the 'django_markup' template library so we can use 'interpolate_html' in django templates
+    'xss_utils',
+
     # History tables
     'simple_history',
 

@@ -1,0 +1,46 @@
+{% load i18n %}
+{% load django_markup %}
+<div style="padding: 1em">
+    {% if block_count > 0 %}
+        {% if max_count == -1 %}
+            <p>
+                {% filter force_escape %}
+                {% blocktrans count num_selected=block_count %}
+                Learners will see the selected component:
+                {% plural %}
+                Learners will see all of the {{ num_selected }} selected components, in random order:
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+        {% else %}
+            <p>
+                {% filter force_escape %}
+                {% blocktrans with max_count=max_count count num_selected=block_count %}
+                Learners will see the selected component:
+                {% plural %}
+                Learners will see {{ max_count }} of the {{ num_selected }} selected components:
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+        {% endif %}
+        <ol style="list-style: decimal; margin-left: 2em;">
+            {% for block in blocks %}
+                <li>{{ block.display_name }}</li>
+            {% endfor %}
+        </ol>
+        <p style="color: var(--gray);">
+            {% blocktrans trimmed asvar view_msg %}
+            Press {link_start}View{link_end} to preview, sync/update, and/or remove the selected components.
+            {% endblocktrans %}
+            {% interpolate_html view_msg link_start=view_link|safe link_end='</a>'|safe %}
+        </p>
+        <p style="color: var(--gray);">
+            {% blocktrans trimmed asvar edit_msg %}
+            Press {link_start}Edit{link_end} to configure how many will be shown and other settings.
+            {% endblocktrans %}
+            {% interpolate_html edit_msg link_start='<a role="button" href="#" class="edit-button action-button">'|safe link_end='</a>'|safe %}
+        </p>
+    {% else %}
+        <p>{% trans "You have not selected any components yet." as tmsg %}{{tmsg|force_escape}}</p>
+    {% endif %}
+</div>

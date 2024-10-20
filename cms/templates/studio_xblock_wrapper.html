@@ -197,8 +197,7 @@ upstream_info = UpstreamLink.try_get_for_block(xblock)
                                             </li>
                                         % endif
                                     % endif
-                                    % if can_add:
-                                        <!-- If we can add, we can delete. -->
+                                    % if can_delete:
                                         <li class="nav-item">
                                             <a class="delete-button" href="#" role="button">${_("Delete")}</a>
                                         </li>
