@@ -1248,10 +1248,7 @@ def component_draft_asset(request, usage_key_str, asset_path):
     """
     try:
         key = UsageKeyV2.from_string(usage_key_str)
-        learning_package = authoring.get_learning_package_by_key(key.lib_key)
-        component = api.get_component_from_usage_key(key)
-        publishable_entity = authoring.get_publishable_entity_by_key(learning_package.id, component.key)
-        component_version_uuid = authoring.get_draft_version(publishable_entity.id).uuid
+        component_version_uuid = api.get_component_from_usage_key(key).versioning.draft.uuid
     except InvalidKeyError as exc:
         return HttpResponseBadRequest()
     except ObjectDoesNotExist as exc:
