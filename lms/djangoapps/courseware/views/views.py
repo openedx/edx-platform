@@ -47,6 +47,7 @@ from rest_framework.throttling import UserRateThrottle
 from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -437,6 +438,7 @@ def jump_to(request, course_id, location):
             usage_key=usage_key,
             request=request,
         )
+        print(redirect_url)
     except (ItemNotFoundError, NoPathToItem):
         # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
         # hits a no-longer-valid URL (for example, "resume" buttons that link to no-longer-existing block IDs if the
@@ -1559,8 +1561,15 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         )
 
     staff_access = has_access(request.user, 'staff', course_key)
+    is_preview = request.GET.get('preview') == '1'
 
-    with modulestore().bulk_operations(course_key):
+    store = modulestore()
+    branchType = ModuleStoreEnum.Branch.draft_preferred if is_preview else ModuleStoreEnum.Branch.published_only
+
+    if is_preview and not staff_access:
+        return HttpResponseBadRequest("You do not have access to preview this xblock")
+
+    with store.branch_setting(branchType, course_key):
         # verify the user has access to the course, including enrollment check
         try:
             course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)

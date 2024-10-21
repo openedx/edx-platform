@@ -402,6 +402,7 @@ class CoursewareIndex(View):
         """
 
         course_url = default_course_url(self.course.id)
+        print(course_url, self.chapter, self.section)
         show_search = (
             settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
             (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)

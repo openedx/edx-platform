@@ -466,6 +466,7 @@ def _get_item_in_course(request, usage_key):
     item = modulestore().get_item(usage_key, depth=1)
     lms_link = get_lms_link_for_item(item.location)
     preview_lms_link = get_lms_link_for_item(item.location, preview=True)
+    print(preview_lms_link)
 
     return course, item, lms_link, preview_lms_link
 

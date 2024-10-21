@@ -120,12 +120,14 @@ def _get_new_courseware_url(
         course_key=course_key,
         sequence_key=sequence_key,
         unit_key=unit_key,
+        preview=request.GET.get('preview') if request and request.GET else False,
         params=request.GET if request and request.GET else None,
     )
 
 
 def make_learning_mfe_courseware_url(
         course_key: CourseKey,
+        preview: bool,
         sequence_key: Optional[UsageKey] = None,
         unit_key: Optional[UsageKey] = None,
         params: Optional[QueryDict] = None,
@@ -160,6 +162,9 @@ def make_learning_mfe_courseware_url(
     `params` is an optional QueryDict object (e.g. request.GET)
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+   
+    if preview:
+        mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/preview/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -168,7 +173,9 @@ def make_learning_mfe_courseware_url(
             mfe_link += f'/{unit_key}'
 
     if params:
-        mfe_link += f'?{params.urlencode()}'
+        get_params = params.copy()
+        del get_params['preview']
+        mfe_link += f'?{get_params.urlencode()}'
 
     return mfe_link
 
