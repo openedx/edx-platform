@@ -307,6 +307,9 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             usage_key=new_xblock.scope_ids.usage_id,
         )
 
+        # Rewrite the OLX's static asset references to point to the new
+        # locations for those assets. See _import_files_into_course for more
+        # info on why this is necessary.
         if hasattr(new_xblock, 'data') and substitutions:
             data_with_substitutions = new_xblock.data
             for old_static_ref, new_static_ref in substitutions.items():
@@ -314,9 +317,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
                     old_static_ref,
                     new_static_ref,
                 )
-
-            print(f"data_with_substitutions: {data_with_substitutions}")
-
             new_xblock.data = data_with_substitutions
             store.update_item(new_xblock, request.user.id)
 
@@ -476,9 +476,18 @@ def _import_files_into_course(
     usage_key: UsageKey,
 ) -> (StaticFileNotices, dict[str, str]):
     """
-    For the given staged static asset files (which are in "Staged Content" such as the user's clipbaord, but which
-    need to end up in the course's Files & Uploads page), import them into the destination course, unless they already
+    For the given staged static asset files (which are in "Staged Content" such
+    as the user's clipbaord, but which need to end up in the course's Files &
+    Uploads page), import them into the destination course, unless they already
     exist.
+
+    This function returns a tuple of StaticFileNotices (assets added, errors,
+    conflicts), and static asset path substitutions that should be made in the
+    OLX in order to paste this content into this course. The latter is for the
+    case in which we're brining content in from a v2 library, which stores
+    static assets locally to a Component and needs to go into a subdirectory
+    when pasting into a course to avoid overwriting commonly named things, e.g.
+    "figure1.png".
     """
     # List of files that were newly added to the destination course
     new_files = []
@@ -494,12 +503,6 @@ def _import_files_into_course(
     # nested directory structure.
     substitutions = {}
     for file_data_obj in static_files:
-#        if not isinstance(file_data_obj.source_key, AssetKey):
-            # This static asset was managed by the XBlock and instead of being added to "Files & Uploads", it is stored
-            # using some other system. We could make it available via runtime.resources_fs during XML parsing, but it's
-            # not needed here.
-#            continue
-
         # At this point, we know this is a "Files & Uploads" asset that we may need to copy into the course:
         try:
             result, substitution_for_file = _import_file_into_course(
@@ -539,21 +542,24 @@ def _import_file_into_course(
     Returns True if it was imported, False if there's a conflict, or None if
     the file already existed (no action needed).
     """
-    # If this came from a library (need to adjust this condition later)
     clipboard_file_path = file_data_obj.filename
+
+    # We need to generate an AssetKey to add an asset to a course. The mapping
+    # of directories '/' -> '_' is a long-existing contentstore convention that
+    # we're not going to attempt to change.
     if clipboard_file_path.startswith('static/'):
+        # If it's in this form, it came from a library and assumes component-local assets
         file_path = clipboard_file_path.lstrip('static/')
         import_path = f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
         filename = pathlib.Path(file_path).name
         new_key = course_key.make_asset_key("asset", import_path.replace("/", "_"))
     else:
+        # Otherwise it came from a course...
         file_path = clipboard_file_path
         import_path = None
         filename = pathlib.Path(file_path).name
         new_key = course_key.make_asset_key("asset", file_path.replace("/", "_"))
 
-    # Yeah, I'd prefer a different delimiter, but this is what we already do
-    # during file import.
     try:
         current_file = contentstore().find(new_key)
     except NotFoundError:
