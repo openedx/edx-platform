@@ -267,7 +267,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
     empty, and (2) a summary of changes made to static files in the destination
     course.
     """
-
     from cms.djangoapps.contentstore.views.preview import _load_preview_block
 
     if not content_staging_api:
@@ -324,6 +323,8 @@ def _import_xml_node_to_parent(
     Given an XML node representing a serialized XBlock (OLX), import it into modulestore 'store' as a child of the
     specified parent block. Recursively copy children as needed.
     """
+    # pylint: disable=too-many-statements
+
     runtime = parent_xblock.runtime
     parent_key = parent_xblock.scope_ids.usage_id
     block_type = node.tag
@@ -429,7 +430,14 @@ def _import_xml_node_to_parent(
             )
 
     # Copy content tags to the new xblock
-    if copied_from_block and tags:
+    if new_xblock.upstream:
+        # If this block is synced from an upstream (e.g. library content),
+        # copy the tags from the upstream as ready-only
+        content_tagging_api.copy_tags_as_read_only(
+            new_xblock.upstream,
+            new_xblock.location,
+        )
+    elif copied_from_block and tags:
         object_tags = tags.get(str(copied_from_block))
         if object_tags:
             content_tagging_api.set_all_object_tags(
