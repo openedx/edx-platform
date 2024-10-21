@@ -83,7 +83,7 @@ urlpatterns = [
             name='library-assets',
         ),
         path(
-            'blocks/<str:usage_key_str>/<path:asset_path>',
+            'blocks/<usage_v2:usage_key>/<path:asset_path>',
             views.component_draft_asset,
             name='library-draft-assets',
         ),
