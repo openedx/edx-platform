@@ -770,9 +770,7 @@ multidict==6.1.0
 mysqlclient==2.2.4
     # via -r requirements/edx/kernel.in
 newrelic==10.2.0
-    # via
-    #   -r requirements/edx/bundled.in
-    #   edx-django-utils
+    # via edx-django-utils
 nh3==0.2.18
     # via -r requirements/edx/kernel.in
 nltk==3.9.1
