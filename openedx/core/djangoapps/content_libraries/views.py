@@ -1237,3 +1237,18 @@ def component_version_asset(request, component_version_uuid, asset_path):
         content.read_file().chunks(),
         headers=redirect_response.headers,
     )
+
+
+@require_safe
+def component_draft_asset(request, usage_key_str, asset_path):
+    """
+    Serves the draft version of static assets associated with a Library Component.
+
+    See `component_version_asset` for more details
+    """
+    key = LibraryUsageLocatorV2.from_string(usage_key_str)
+    learning_package = authoring.get_learning_package_by_key(key.lib_key)
+    component = api.get_component_from_usage_key(key)
+    publishable_entity = authoring.get_publishable_entity_by_key(learning_package.id, component.key)
+    component_version_uuid = authoring.get_draft_version(publishable_entity.id).uuid
+    return component_version_asset(request, component_version_uuid, asset_path)
