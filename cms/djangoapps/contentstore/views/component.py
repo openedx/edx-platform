@@ -26,7 +26,7 @@ from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.helpers import is_unit
-from cms.djangoapps.contentstore.toggles import use_new_problem_editor, use_new_unit_page
+from cms.djangoapps.contentstore.toggles import libraries_v2_enabled, use_new_problem_editor, use_new_unit_page
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import load_services_for_studio
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 COMPONENT_TYPES = [
     'discussion',
     'library',
-    'library_v2',
+    'library_v2',  # Not an XBlock
     'html',
     'openassessment',
     'problem',
@@ -486,6 +486,8 @@ def _filter_disabled_blocks(all_blocks):
     Filter out disabled xblocks from the provided list of xblock names.
     """
     disabled_block_names = [block.name for block in disabled_xblocks()]
+    if not libraries_v2_enabled():
+        disabled_block_names.append('library_v2')
     return [block_name for block_name in all_blocks if block_name not in disabled_block_names]
 
 
