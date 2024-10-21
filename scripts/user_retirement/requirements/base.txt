@@ -10,9 +10,9 @@ attrs==24.2.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.35.40
+boto3==1.35.42
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.35.40
+botocore==1.35.42
     # via
     #   boto3
     #   s3transfer
@@ -46,7 +46,7 @@ django-crum==0.7.9
     # via edx-django-utils
 django-waffle==4.1.0
     # via edx-django-utils
-edx-django-utils==6.0.0
+edx-django-utils==6.1.0
     # via edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.in
@@ -83,7 +83,7 @@ lxml==4.9.4
     #   zeep
 more-itertools==10.5.0
     # via simple-salesforce
-newrelic==10.1.0
+newrelic==10.2.0
     # via edx-django-utils
 pbr==6.1.0
     # via stevedore
@@ -158,10 +158,9 @@ unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.in
 uritemplate==4.1.1
     # via google-api-python-client
-urllib3==1.26.20
+urllib3==2.2.3
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   botocore
     #   requests
-zeep==4.3.0
+zeep==4.3.1
     # via simple-salesforce

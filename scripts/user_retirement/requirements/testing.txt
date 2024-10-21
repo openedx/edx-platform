@@ -14,11 +14,11 @@ attrs==24.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.35.40
+boto3==1.35.42
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.35.40
+botocore==1.35.42
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -66,7 +66,7 @@ django-waffle==4.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-edx-django-utils==6.0.0
+edx-django-utils==6.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
@@ -132,7 +132,7 @@ more-itertools==10.5.0
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==10.1.0
+newrelic==10.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -266,7 +266,7 @@ uritemplate==4.1.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-urllib3==1.26.20
+urllib3==2.2.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   botocore
@@ -274,9 +274,9 @@ urllib3==1.26.20
     #   responses
 werkzeug==3.0.4
     # via moto
-xmltodict==0.14.1
+xmltodict==0.14.2
     # via moto
-zeep==4.3.0
+zeep==4.3.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce

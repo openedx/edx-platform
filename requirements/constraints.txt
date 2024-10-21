@@ -188,11 +188,9 @@ pymongo<4.4.1
 # Issue for unpinning: https://github.com/edx/edx-arch-experiments/issues/760
 social-auth-app-django<=5.4.1
 
-# Date: 2023-11-05
-# urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
-# which require urllib3<2 for now.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
-urllib3<2.0.0
+# # Date: 2024-10-14
+# # The edx-enterprise is currently using edx-rest-api-client==5.7.1, which needs to be updated first.
+# edx-rest-api-client==5.7.1
 
 # Date: 2024-04-24
 # xmlsec==1.3.14 breaking tests or all builds, can be removed once a fix is available
