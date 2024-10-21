@@ -26,7 +26,7 @@ from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.helpers import is_unit
-from cms.djangoapps.contentstore.toggles import use_new_problem_editor, use_new_unit_page
+from cms.djangoapps.contentstore.toggles import libraries_v2_enabled, use_new_problem_editor, use_new_unit_page
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import load_services_for_studio
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
@@ -43,7 +43,16 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video', 'drag-and-drop-v2']
+COMPONENT_TYPES = [
+    'discussion',
+    'library',
+    'library_v2',  # Not an XBlock
+    'html',
+    'openassessment',
+    'problem',
+    'video',
+    'drag-and-drop-v2',
+]
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
@@ -97,6 +106,10 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
+    # Libraries v2 content doesn't have an XBlock.
+    if category == 'library_v2':
+        return None
+
     component_class = XBlock.load_class(category)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
@@ -247,7 +260,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'problem': _("Problem"),
         'video': _("Video"),
         'openassessment': _("Open Response"),
-        'library': _("Library Content"),
+        'library': _("Legacy Library"),
+        'library_v2': _("Library Content"),
         'drag-and-drop-v2': _("Drag and Drop"),
     }
 
@@ -277,7 +291,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         templates_for_category = []
         component_class = _load_mixed_class(category)
 
-        if support_level_without_template and category != 'library':
+        if support_level_without_template and category not in ['library']:
             # add the default template with localized display name
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
@@ -472,6 +486,8 @@ def _filter_disabled_blocks(all_blocks):
     Filter out disabled xblocks from the provided list of xblock names.
     """
     disabled_block_names = [block.name for block in disabled_xblocks()]
+    if not libraries_v2_enabled():
+        disabled_block_names.append('library_v2')
     return [block_name for block_name in all_blocks if block_name not in disabled_block_names]
 
 

@@ -179,6 +179,7 @@ def get_user_clipboard_json(user_id: int, request: HttpRequest | None = None):
     except _UserClipboard.DoesNotExist:
         # This user does not have any content on their clipboard.
         return {"content": None, "source_usage_key": "", "source_context_title": "", "source_edit_url": ""}
+
     serializer = _UserClipboardSerializer(
         _user_clipboard_model_to_data(clipboard),
         context={'request': request},

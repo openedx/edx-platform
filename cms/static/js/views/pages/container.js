@@ -214,7 +214,8 @@ function($, _, Backbone, gettext, BasePage,
                     var component = new AddXBlockComponent({
                         el: element,
                         createComponent: _.bind(self.createComponent, self),
-                        collection: self.options.templates
+                        collection: self.options.templates,
+                        libraryContentPickerUrl: self.options.libraryContentPickerUrl,
                     });
                     component.render();
                 });
@@ -224,7 +225,7 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         initializePasteButton() {
-            if (this.options.canEdit && !self.options.isIframeEmbed) {
+            if (this.options.canEdit && !this.options.isIframeEmbed) {
                 // We should have the user's clipboard status.
                 const data = this.options.clipboardData;
                 this.refreshPasteButton(data);
@@ -241,7 +242,7 @@ function($, _, Backbone, gettext, BasePage,
         refreshPasteButton(data) {
             // Do not perform any changes on paste button since they are not
             // rendered on Library or LibraryContent pages
-            if (!this.isLibraryPage && !this.isLibraryContentPage && !self.options.isIframeEmbed) {
+            if (!this.isLibraryPage && !this.isLibraryContentPage && !this.options.isIframeEmbed) {
                 // 'data' is the same data returned by the "get clipboard status" API endpoint
                 // i.e. /api/content-staging/v1/clipboard/
                 if (this.options.canEdit && data.content) {
