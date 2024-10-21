@@ -591,9 +591,7 @@ def _create_block(request):
     # so it needs to be synced with upstream block.
     if upstream_ref := request.json.get("library_content_key"):
         try:
-            # Set `created_block.upstream` so that we can try to sync and/or fetch.
-            # Note that, if this fails and we raise a 4XX, then we will not call modulstore().update_item,
-            # thus preserving the former value of `created_block.upstream`.
+            # Set `created_block.upstream` and then sync this with the upstream (library) version.
             created_block.upstream = upstream_ref
             sync_from_upstream(downstream=created_block, user=request.user)
         except BadUpstream:
