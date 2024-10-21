@@ -78,12 +78,12 @@ urlpatterns = [
     ])),
     path('library_assets/', include([
         path(
-            '<uuid:component_version_uuid>/<path:asset_path>',
+            'component_versions/<uuid:component_version_uuid>/<path:asset_path>',
             views.component_version_asset,
             name='library-assets',
         ),
         path(
-            '<str:usage_key_str>/<path:asset_path>',
+            'blocks/<str:usage_key_str>/<path:asset_path>',
             views.component_draft_asset,
             name='library-draft-assets',
         ),
