@@ -22,12 +22,11 @@ class XBlockSerializer:
     static_files: list[StaticFile]
     tags: TagValuesByObjectIdDict
 
-    def __init__(self, block, write_url_name=True, fetch_asset_data=False, normalize_asset_refs=False):
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
-        self.normalize_asset_refs = normalize_asset_refs
         self.write_url_name = write_url_name
 
         self.orig_block_key = block.scope_ids.usage_id

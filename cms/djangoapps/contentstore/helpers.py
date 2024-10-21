@@ -309,9 +309,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
 
         if hasattr(new_xblock, 'data') and substitutions:
             data_with_substitutions = new_xblock.data
-
-            print(f"Substitutions: {substitutions}")
-
             for old_static_ref, new_static_ref in substitutions.items():
                 data_with_substitutions = data_with_substitutions.replace(
                     old_static_ref,
