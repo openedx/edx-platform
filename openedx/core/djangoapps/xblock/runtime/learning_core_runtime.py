@@ -377,7 +377,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         then this method will be called with asset_path="test.png" and should
         return a URL like:
 
-          http://studio.local.openedx.io:8001/library_assets/cd31871e-a342-4c3f-ba2f-a661bf630996/static/test.png
+          http://studio.local.openedx.io:8001/library_assets/component_versions/cd31871e-a342-4c3f-ba2f-a661bf630996/static/test.png
 
         If the asset file is not recognized, return None
 
