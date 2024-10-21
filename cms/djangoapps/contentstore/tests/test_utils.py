@@ -960,4 +960,17 @@ class CourseUpdateNotificationTests(ModuleStoreTestCase):
         send_course_update_notification(self.course.id, content, self.user)
         assert Notification.objects.all().count() == 1
         notification = Notification.objects.first()
-        assert notification.content == "<p><strong><p>content</p></strong></p>"
+        assert notification.content == "<p><strong>content</strong></p>"
+
+    def test_if_content_is_plain_text(self):
+        """
+        Test that the course_update notification is sent.
+        """
+        user = UserFactory()
+        CourseEnrollment.enroll(user=user, course_key=self.course.id)
+        assert Notification.objects.all().count() == 0
+        content = "<p>content<p>Sub content</p><h1>heading</h1></p><img src='' />"
+        send_course_update_notification(self.course.id, content, self.user)
+        assert Notification.objects.all().count() == 1
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong>content Sub content heading</strong></p>"

@@ -34,7 +34,11 @@ from milestones import api as milestones_api
 from pytz import UTC
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
+from cms.djangoapps.contentstore.toggles import (
+    exam_setting_view_enabled,
+    libraries_v1_enabled,
+    libraries_v2_enabled,
+)
 from common.djangoapps.course_action_state.models import CourseRerunUIStateManager, CourseRerunState
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_modes.models import CourseMode
@@ -1536,11 +1540,10 @@ def get_library_context(request, request_is_json=False):
         _format_library_for_view,
     )
     from cms.djangoapps.contentstore.views.library import (
-        LIBRARIES_ENABLED,
         user_can_view_create_library_button,
     )
 
-    libraries = _accessible_libraries_iter(request.user) if LIBRARIES_ENABLED else []
+    libraries = _accessible_libraries_iter(request.user) if libraries_v1_enabled() else []
     data = {
         'libraries': [_format_library_for_view(lib, request) for lib in libraries],
     }
@@ -1550,7 +1553,7 @@ def get_library_context(request, request_is_json=False):
             **data,
             'in_process_course_actions': [],
             'courses': [],
-            'libraries_enabled': LIBRARIES_ENABLED,
+            'libraries_enabled': libraries_v1_enabled(),
             'show_new_library_button': user_can_view_create_library_button(request.user) and request.user.is_active,
             'user': request.user,
             'request_course_creator_url': reverse('request_course_creator'),
@@ -1671,7 +1674,6 @@ def get_home_context(request, no_course=False):
         ENABLE_GLOBAL_STAFF_OPTIMIZATION,
     )
     from cms.djangoapps.contentstore.views.library import (
-        LIBRARIES_ENABLED,
         user_can_view_create_library_button,
     )
 
@@ -1687,7 +1689,7 @@ def get_home_context(request, no_course=False):
     if not no_course:
         active_courses, archived_courses, in_process_course_actions = get_course_context(request)
 
-    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED and not no_course:
+    if not split_library_view_on_dashboard() and libraries_v1_enabled() and not no_course:
         libraries = get_library_context(request, True)['libraries']
 
     home_context = {
@@ -1695,7 +1697,9 @@ def get_home_context(request, no_course=False):
         'split_studio_home': split_library_view_on_dashboard(),
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
-        'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries_enabled': libraries_v1_enabled(),
+        'libraries_v1_enabled': libraries_v1_enabled(),
+        'libraries_v2_enabled': libraries_v2_enabled(),
         'taxonomies_enabled': not is_tagging_feature_disabled(),
         'taxonomy_list_mfe_url': get_taxonomy_list_url(),
         'libraries': libraries,
@@ -2244,22 +2248,9 @@ def clean_html_body(html_body):
     Get html body, remove tags and limit to 500 characters
     """
     html_body = BeautifulSoup(Truncator(html_body).chars(500, html=True), 'html.parser')
-
-    tags_to_remove = [
-        "a", "link",  # Link Tags
-        "img", "picture", "source",  # Image Tags
-        "video", "track",  # Video Tags
-        "audio",  # Audio Tags
-        "embed", "object", "iframe",  # Embedded Content
-        "script"
-    ]
-
-    # Remove the specified tags while keeping their content
-    for tag in tags_to_remove:
-        for match in html_body.find_all(tag):
-            match.unwrap()
-
-    return str(html_body)
+    text_content = html_body.get_text(separator=" ").strip()
+    text_content = text_content.replace('\n', '').replace('\r', '')
+    return text_content
 
 
 def send_course_update_notification(course_key, content, user):

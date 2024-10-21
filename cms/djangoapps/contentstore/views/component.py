@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
@@ -35,7 +36,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 __all__ = [
     'container_handler',
-    'component_handler'
+    'component_handler',
+    'container_embed_handler',
 ]
 
 log = logging.getLogger(__name__)
@@ -139,6 +141,36 @@ def container_handler(request, usage_key_string):  # pylint: disable=too-many-st
             return render_to_response('container.html', container_handler_context)
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
+
+
+@require_GET
+@login_required
+@xframe_options_exempt
+def container_embed_handler(request, usage_key_string):  # pylint: disable=too-many-statements
+    """
+    Returns an HttpResponse with HTML content for the container XBlock.
+    The returned HTML is a chromeless rendering of the XBlock.
+
+    GET
+        html: returns the HTML page for editing a container
+        json: not currently supported
+    """
+
+    # Avoiding a circular dependency
+    from ..utils import get_container_handler_context
+
+    try:
+        usage_key = UsageKey.from_string(usage_key_string)
+    except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
+        return HttpResponseBadRequest()
+    with modulestore().bulk_operations(usage_key.course_key):
+        try:
+            course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+        except ItemNotFoundError:
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+
+        container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
+        return render_to_response('container_chromeless.html', container_handler_context)
 
 
 def get_component_templates(courselike, library=False):  # lint-amnesty, pylint: disable=too-many-statements
