@@ -2244,22 +2244,9 @@ def clean_html_body(html_body):
     Get html body, remove tags and limit to 500 characters
     """
     html_body = BeautifulSoup(Truncator(html_body).chars(500, html=True), 'html.parser')
-
-    tags_to_remove = [
-        "a", "link",  # Link Tags
-        "img", "picture", "source",  # Image Tags
-        "video", "track",  # Video Tags
-        "audio",  # Audio Tags
-        "embed", "object", "iframe",  # Embedded Content
-        "script"
-    ]
-
-    # Remove the specified tags while keeping their content
-    for tag in tags_to_remove:
-        for match in html_body.find_all(tag):
-            match.unwrap()
-
-    return str(html_body)
+    text_content = html_body.get_text(separator=" ").strip()
+    text_content = text_content.replace('\n', '').replace('\r', '')
+    return text_content
 
 
 def send_course_update_notification(course_key, content, user):
