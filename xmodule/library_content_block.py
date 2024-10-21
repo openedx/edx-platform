@@ -301,8 +301,6 @@ class LegacyLibraryContentBlock(ItemBankMixin, XBlock):
         Validates the state of this Library Content Block Instance. This
         is the override of the general XBlock method, and it will also ask
         its superclass to validate.
-
-        @@TODO put back what was here before.
         """
         validation = super().validate()
         if not isinstance(validation, StudioValidation):
@@ -410,7 +408,7 @@ class LegacyLibraryContentBlock(ItemBankMixin, XBlock):
             orig_key, orig_version = self.runtime.modulestore.get_block_original_usage(usage_key)
             return {
                 "usage_key": str(usage_key),
-                "original_usage_key": str(orig_key) if orig_key else None,
+                "original_usage_key": str(orig_key.replace(version=None, branch=None)) if orig_key else None,
                 "original_usage_version": str(orig_version) if orig_version else None,
             }
 
@@ -423,7 +421,6 @@ class LegacyLibraryContentBlock(ItemBankMixin, XBlock):
                 block = self.runtime.modulestore.get_item(key, depth=None)  # Load the item and all descendants
                 children = list(getattr(block, "children", []))
                 while children:
-                    # @@TODO why is there branch info here now for us to clear??
                     child_key = children.pop().replace(version=None, branch=None)
                     child = self.runtime.modulestore.get_item(child_key)
                     info['descendants'].append(summarize_block(child_key))

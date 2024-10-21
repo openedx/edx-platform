@@ -39,7 +39,8 @@ logger = logging.getLogger(__name__)
 @XBlock.needs('mako')
 @XBlock.wants('user')
 class ItemBankMixin(
-    # @@TODO do we really need all these mixins?
+    # TODO: Whittle down list of mixins if possible.
+    # https://github.com/openedx/edx-platform/issues/35686
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
@@ -263,9 +264,6 @@ class ItemBankMixin(
         descendants of the top level blocks, if any.
 
         Must be implemented in child class.
-
-        @@TODO: Do we actually want to share this format between ItemBankBlocks and LegacyLibraryContentBlocks?
-                Or should we define a fresh format for ItemBankBlocks?
         """
         raise NotImplementedError
 
@@ -385,7 +383,7 @@ class ItemBankMixin(
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
-        @@TODO docstring
+        Parse an itembank.
         """
         children = []
 
@@ -435,8 +433,6 @@ class ItemBankBlock(ItemBankMixin, XBlock):
     def validate(self):
         """
         Validates the state of this ItemBankBlock Instance.
-
-        @@TODO implement
         """
         validation = super().validate()
         if not isinstance(validation, StudioValidation):
@@ -494,7 +490,14 @@ class ItemBankBlock(ItemBankMixin, XBlock):
     def format_block_keys_for_analytics(self, block_keys: list[tuple[str, str]]) -> list[dict]:
         """
         Implement format_block_keys_for_analytics using the `upstream` link system.
-
-        @@TODO this doesn't include original_usage_key, original_usage_version, or descendends!
         """
-        return [{"usage_key": str(self.context_key.make_usage_key(*block_key))} for block_key in block_keys]
+        return [
+            {
+                "usage_key": str(self.context_key.make_usage_key(*block_key)),
+                # TODO: Need to implement these fields. Will probably need to make `UpstreamMixin` available in the
+                #       LMS. See https://github.com/openedx/edx-platform/issues/35685.
+                # "original_usage_key": ...,
+                # "original_usage_version": ...,
+                # "descendents": ...,
+            } for block_key in block_keys
+        ]

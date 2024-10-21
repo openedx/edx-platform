@@ -58,7 +58,8 @@ class ItemBankTestBase(MixedSplitTestCase):
         """
         Bind a block (part of self.course) so we can access student-specific data.
 
-        @@TODO is this necessary?
+        (Not clear if this is necessary since XModules are all removed now. It's possible that this
+         could be removed without breaking tests.)
         """
         prepare_block_runtime(block.runtime, course_id=block.location.course_key)
 
@@ -89,7 +90,7 @@ class ItemBankTestBase(MixedSplitTestCase):
 @skip_unless_cms
 class TestItemBankForCms(ItemBankTestBase):
     """
-    Export and import tests for ItemBankBlock
+    Test Studio ItemBank behaviors -- export/import, validation, author-facing views.
     """
     def test_xml_export_import_cycle(self):
         """
@@ -174,8 +175,6 @@ class TestItemBankForCms(ItemBankTestBase):
         """
         Test that the validation method of LibraryContent blocks can warn
         the user about problems with other settings (max_count and capa_type).
-
-        @@TODO
         """
         # Ensure we're starting wtih clean validation
         assert self.item_bank.validate()
@@ -196,6 +195,8 @@ class TestItemBankForCms(ItemBankTestBase):
         self.item_bank.max_count = -1
         assert self.item_bank.validate()
         assert len(self.item_bank.selected_children()) == len(self.item_bank.children)
+
+        assert "@@TODO make more assertions about the validation messages"
 
     @patch(
         'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render',
@@ -237,7 +238,7 @@ class TestItemBankForCms(ItemBankTestBase):
 @ddt.ddt
 class TestItemBankForLms(ItemBankTestBase):
     """
-    @@TODO
+    Test LMS ItemBank features: selection, analytics, resetting problems.
     """
 
     def _assert_event_was_published(self, event_type):
@@ -398,7 +399,7 @@ class TestItemBankForLms(ItemBankTestBase):
         * Delete both assigned blocks (C, D)
         * Final condition:  1 child, 1 asigned:        [A]  _   _   _
 
-        @@TODO - This is flaky!! Seems to be dependent on the random seed. Need to remove or delete.
+        @@TODO - This is flaky!! Seems to be dependent on the random seed. Need to fix. Should pin a specific seed, too.
         """
         self.maxDiff = None
 
