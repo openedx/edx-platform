@@ -123,6 +123,7 @@ class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
         block = self._add_block_to_library(library["id"], "html", "html1")
         self._set_library_block_asset(block["id"], "static/test.svg", SVG_DATA)
         usage_key = UsageKey.from_string(block["id"])
+        self.usage_key = usage_key
         self.component = get_component_from_usage_key(usage_key)
         self.draft_component_version = self.component.versioning.draft
 
@@ -184,3 +185,17 @@ class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
             f"/library_assets/{self.draft_component_version.uuid}/static/test.svg"
         )
         assert get_response.status_code == 403
+
+    def test_draft_version(self):
+        """Get draft version of asset"""
+        get_response = self.client.get(
+            f"/library_assets/{self.usage_key}/static/test.svg"
+        )
+        assert get_response.status_code == 200
+        content = b''.join(chunk for chunk in get_response.streaming_content)
+        assert content == SVG_DATA
+
+        good_head_response = self.client.head(
+            f"/library_assets/{self.usage_key}/static/test.svg"
+        )
+        assert good_head_response.headers == get_response.headers
