@@ -1253,7 +1253,7 @@ def component_draft_asset(request, usage_key_str, asset_path):
         publishable_entity = authoring.get_publishable_entity_by_key(learning_package.id, component.key)
         component_version_uuid = authoring.get_draft_version(publishable_entity.id).uuid
     except InvalidKeyError as exc:
-        raise Http404() from exc
+        return HttpResponseBadRequest()
     except ObjectDoesNotExist as exc:
         raise Http404() from exc
 
