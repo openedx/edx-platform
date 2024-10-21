@@ -69,6 +69,11 @@ class StagedContent(models.Model):
     # Tags applied to the original source block(s) will be copied to the new block(s) on paste.
     tags = models.JSONField(null=True, help_text=_("Content tags applied to these blocks"))
 
+    # Static assets.
+    #
+    # File paths start with "static/", references
+    # has_normalized_asset_refs = models.BooleanField(default=False)
+
     @property
     def olx_filename(self) -> str:
         """ Get a filename that can be used for the OLX content of this staged content """
