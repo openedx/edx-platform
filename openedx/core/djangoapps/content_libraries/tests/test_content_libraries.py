@@ -257,7 +257,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
     # General Content Library XBlock tests:
 
-    def test_library_blocks(self):
+    def test_library_blocks(self):  # pylint: disable=too-many-statements
         """
         Test the happy path of creating and working with XBlocks in a content
         library.
