@@ -15,6 +15,7 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import EmptyDataRawMixin
+from xmodule.toggles import USE_EXTRACTED_WORD_CLOUD_BLOCK
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
@@ -23,6 +24,7 @@ from xmodule.x_module import (
     XModuleMixin,
     XModuleToXBlockMixin,
 )
+from xblocks_contrib.word_cloud import WordCloudBlock as _ExtractedWordCloudBlock
 log = logging.getLogger(__name__)
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -41,7 +43,7 @@ def pretty_bool(value):
 
 
 @XBlock.needs('mako')
-class WordCloudBlock(  # pylint: disable=abstract-method
+class _BuiltInWordCloudBlock(  # pylint: disable=abstract-method
     EmptyDataRawMixin,
     XmlMixin,
     EditingMixin,
@@ -52,6 +54,8 @@ class WordCloudBlock(  # pylint: disable=abstract-method
     """
     Word Cloud XBlock.
     """
+
+    is_extracted = False
 
     display_name = String(
         display_name=_("Display Name"),
@@ -308,3 +312,9 @@ class WordCloudBlock(  # pylint: disable=abstract-method
         xblock_body["content_type"] = "Word Cloud"
 
         return xblock_body
+
+
+WordCloudBlock = (
+    _ExtractedWordCloudBlock if USE_EXTRACTED_WORD_CLOUD_BLOCK.is_enabled()
+    else _BuiltInWordCloudBlock
+)
