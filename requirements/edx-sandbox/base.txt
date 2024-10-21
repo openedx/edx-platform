@@ -57,7 +57,7 @@ openedx-calc==3.1.2
     # via -r requirements/edx-sandbox/base.in
 packaging==24.1
     # via matplotlib
-pillow==10.4.0
+pillow==11.0.0
     # via matplotlib
 pycparser==2.22
     # via cffi
