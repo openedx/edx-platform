@@ -356,6 +356,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             Fields.tags + "." + Fields.tags_level3,
             Fields.collections + "." + Fields.collections_display_name,
             Fields.collections + "." + Fields.collections_key,
+            Fields.published + "." + Fields.display_name,
+            Fields.published + "." + Fields.published_description,
         ])
         # Mark which attributes can be used for sorting search results:
         client.index(temp_index_name).update_sortable_attributes([
