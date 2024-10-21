@@ -20,7 +20,7 @@ function($, _, gettext, BaseModal) {
         initialize: function() {
             BaseModal.prototype.initialize.call(this);
             // Add event listen to close picker when the iframe tells us to
-            window.addEventListener("message", function (event) {
+            const handleMessage = (event) => {
                 if (event.data?.type === 'pickerComponentSelected') {
                     var requestData = {
                         library_content_key: event.data.usageKey,
@@ -29,7 +29,14 @@ function($, _, gettext, BaseModal) {
                     this.refreshFunction(requestData);
                     this.hide();
                 }
-            }.bind(this), { once: true }, false);
+            };
+            this.messageListener = window.addEventListener("message", handleMessage);
+            this.cleanupListener = () => { window.removeEventListener("message", handleMessage) };
+        },
+
+        hide: function() {
+            BaseModal.prototype.hide.call(this);
+            this.cleanupListener();
         },
 
         /**
