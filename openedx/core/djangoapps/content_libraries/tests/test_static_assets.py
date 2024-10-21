@@ -189,7 +189,7 @@ class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
     def test_draft_version(self):
         """Get draft version of asset"""
         get_response = self.client.get(
-            f"/library_assets/component_versions/{self.usage_key}/static/test.svg"
+            f"/library_assets/blocks/{self.usage_key}/static/test.svg"
         )
         assert get_response.status_code == 200
         content = b''.join(chunk for chunk in get_response.streaming_content)
@@ -199,3 +199,15 @@ class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
             f"/library_assets/blocks/{self.usage_key}/static/test.svg"
         )
         assert good_head_response.headers == get_response.headers
+
+    def test_draft_version_404(self):
+        """Get draft version of asset"""
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}@/static/test.svg"
+        )
+        assert get_response.status_code == 404
+
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}/static/test2.svg"
+        )
+        assert get_response.status_code == 404

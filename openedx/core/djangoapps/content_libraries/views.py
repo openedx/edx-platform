@@ -87,7 +87,7 @@ from pylti1p3.exception import LtiException, OIDCException
 
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2, UsageKeyV2
 from openedx_learning.api import authoring
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
@@ -1246,9 +1246,15 @@ def component_draft_asset(request, usage_key_str, asset_path):
 
     See `component_version_asset` for more details
     """
-    key = LibraryUsageLocatorV2.from_string(usage_key_str)
-    learning_package = authoring.get_learning_package_by_key(key.lib_key)
-    component = api.get_component_from_usage_key(key)
-    publishable_entity = authoring.get_publishable_entity_by_key(learning_package.id, component.key)
-    component_version_uuid = authoring.get_draft_version(publishable_entity.id).uuid
+    try:
+        key = UsageKeyV2.from_string(usage_key_str)
+        learning_package = authoring.get_learning_package_by_key(key.lib_key)
+        component = api.get_component_from_usage_key(key)
+        publishable_entity = authoring.get_publishable_entity_by_key(learning_package.id, component.key)
+        component_version_uuid = authoring.get_draft_version(publishable_entity.id).uuid
+    except InvalidKeyError as exc:
+        raise Http404() from exc
+    except ObjectDoesNotExist as exc:
+        raise Http404() from exc
+
     return component_version_asset(request, component_version_uuid, asset_path)
