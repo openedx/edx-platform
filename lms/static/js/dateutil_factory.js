@@ -71,7 +71,8 @@
           hour: "2-digit",
           minute: "2-digit",
           hour12: false, // 24-hour format (set to `true` for 12-hour format)
-          timeZone: timeZone, // Specify the desired timezone (e.g., CST)
+          timeZone:
+            timeZone !== "None" || null || undefined ? timeZone : Intl.DateTimeFormat().resolvedOptions().timeZone, // Specify the desired timezone (e.g., CST)
           timeZoneName: "short", // Include the short timezone abbreviation (CST, PDT, etc.)
         };
 
