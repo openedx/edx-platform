@@ -14,7 +14,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
-from xmodule.library_content_block import LibraryContentBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.library_content_block import LegacyLibraryContentBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_student_module_as_dict
@@ -47,7 +47,6 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         Collects any information that's necessary to execute this
         transformer's transform method.
         """
-        block_structure.request_xblock_fields('mode')
         block_structure.request_xblock_fields('max_count')
         block_structure.request_xblock_fields('category')
         store = modulestore()
@@ -83,7 +82,6 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             if library_children:
                 all_library_children.update(library_children)
                 selected = []
-                mode = block_structure.get_xblock_field(block_key, 'mode')
                 max_count = block_structure.get_xblock_field(block_key, 'max_count')
                 if max_count < 0:
                     max_count = len(library_children)
@@ -100,7 +98,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
                 # Update selected
                 previous_count = len(selected)
-                block_keys = LibraryContentBlock.make_selection(selected, library_children, max_count, mode)
+                block_keys = LegacyLibraryContentBlock.make_selection(selected, library_children, max_count)
                 selected = block_keys['selected']
 
                 # Save back any changes
@@ -176,7 +174,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             with tracker.get_tracker().context(full_event_name, context):
                 tracker.emit(full_event_name, event_data)
 
-        LibraryContentBlock.publish_selected_children_events(
+        LegacyLibraryContentBlock.publish_selected_children_events(
             block_keys,
             format_block_keys,
             publish_event,

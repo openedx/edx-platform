@@ -7,8 +7,9 @@ import logging
 from collections import defaultdict
 from datetime import datetime, timezone
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.transaction import atomic
+from django.urls import reverse
 
 from openedx_learning.api import authoring as authoring_api
 
@@ -19,7 +20,10 @@ from xblock.exceptions import NoSuchUsage
 from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import FieldData
 
+from openedx.core.djangoapps.xblock.api import get_xblock_app_config
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
+from openedx.core.lib.xblock_serializer.data import StaticFile
+from ..data import AuthoredDataMode, LatestVersion
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
 
@@ -161,7 +165,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
     (eventually) asset storage.
     """
 
-    def get_block(self, usage_key, for_parent=None):
+    def get_block(self, usage_key, for_parent=None, *, version: int | LatestVersion = LatestVersion.AUTO):
         """
         Fetch an XBlock from Learning Core data models.
 
@@ -173,10 +177,21 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # We can do this more efficiently in a single query later, but for now
         # just get it the easy way.
         component = self._get_component_from_usage_key(usage_key)
-        # TODO: For now, this runtime will only be used in CMS, so it's fine to just return the Draft version.
-        #       However, we will need the runtime to return the Published version for LMS (and Draft for LMS-Preview).
-        #       We should base this Draft vs Published decision on a runtime initialization parameter.
-        component_version = component.versioning.draft
+
+        if version == LatestVersion.AUTO:
+            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
+                version = LatestVersion.DRAFT
+            else:
+                version = LatestVersion.PUBLISHED
+        if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
+            raise ValidationError("This runtime only allows accessing the published version of components")
+        if version == LatestVersion.DRAFT:
+            component_version = component.versioning.draft
+        elif version == LatestVersion.PUBLISHED:
+            component_version = component.versioning.published
+        else:
+            assert isinstance(version, int)
+            component_version = component.versioning.version_num(version)
         if component_version is None:
             raise NoSuchUsage(usage_key)
 
@@ -205,15 +220,45 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         else:
             block = block_class.parse_xml(xml_node, runtime=self, keys=keys)
 
+        # Store the version request on the block so we can retrieve it when needed for generating handler URLs etc.
+        block._runtime_requested_version = version  # pylint: disable=protected-access
+
         # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
         block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
 
         # We've pre-loaded the fields for this block, so the FieldData shouldn't
         # consider these values "changed" in its sense of "you have to persist
         # these because we've altered the field values from what was stored".
-        self.system.authored_data_store.mark_unchanged(block)
+        self.authored_data_store.mark_unchanged(block)
 
         return block
+
+    def get_block_assets(self, block):
+        """
+        Return a list of StaticFile entries.
+
+        TODO: When we want to copy a whole Section at a time, doing these
+        lookups one by one is going to get slow. At some point we're going to
+        want something to look up a bunch of blocks at once.
+        """
+        component_version = self._get_component_version_from_block(block)
+
+        # cvc = the ComponentVersionContent through-table
+        cvc_list = (
+            component_version
+            .componentversioncontent_set
+            .filter(content__has_file=True)
+            .order_by('key')
+        )
+
+        return [
+            StaticFile(
+                name=cvc.key,
+                url=self._absolute_url_for_asset(component_version, cvc.key),
+                data=None,
+            )
+            for cvc in cvc_list
+        ]
 
     def save_block(self, block):
         """
@@ -221,8 +266,15 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         This gets called by block.save() - do not call this directly.
         """
-        if not self.system.authored_data_store.has_changes(block):
+        if not self.authored_data_store.has_changes(block):
             return  # No changes, so no action needed.
+
+        if block._runtime_requested_version != LatestVersion.DRAFT:  # pylint: disable=protected-access
+            # Not sure if this is an important restriction but it seems like overwriting the latest version based on
+            # an old version is likely an accident, so for now we're not going to allow it.
+            raise ValidationError(
+                "Do not make changes to a component starting from the published or past versions. Use the latest draft."
+            )
 
         # Verify that the user has permission to write to authored data in this
         # learning context:
@@ -254,7 +306,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 },
                 created=now,
             )
-        self.system.authored_data_store.mark_unchanged(block)
+        self.authored_data_store.mark_unchanged(block)
 
     def _get_component_from_usage_key(self, usage_key):
         """
@@ -278,19 +330,120 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         return component
 
-    def _lookup_asset_url(self, block: XBlock, asset_path: str) -> str | None:  # pylint: disable=unused-argument
+    def _get_component_version_from_block(self, block):
+        """
+        Given an XBlock instance, return the Learning Core ComponentVersion.
+
+        This relies on our runtime setting the _runtime_requested_version
+        attribute on blocks that it fetches.
+        """
+        usage_key = block.usage_key
+        component = self._get_component_from_usage_key(usage_key)
+
+        block_version = block._runtime_requested_version  # pylint: disable=protected-access
+        if block_version == LatestVersion.DRAFT:
+            component_version = component.versioning.draft
+        elif block_version == LatestVersion.PUBLISHED:
+            component_version = component.versioning.published
+        else:
+            component_version = component.versioning.version_num(block_version)
+
+        return component_version
+
+    def _absolute_url_for_asset(self, component_version, asset_path):
+        """
+        The full URL for a specific library asset in a ComponentVersion.
+
+        This does not check for whether the path actually exists–it just returns
+        where it would be if it did exist.
+        """
+        # This function should return absolute URLs, so we need the site root.
+        site_root_url = get_xblock_app_config().get_site_root_url()
+
+        return site_root_url + reverse(
+            'content_libraries:library-assets',
+            kwargs={
+                'component_version_uuid': component_version.uuid,
+                'asset_path': f"static/{asset_path}",
+            }
+        )
+
+    def _lookup_asset_url(self, block: XBlock, asset_path: str) -> str | None:
         """
         Return an absolute URL for the specified static asset file that may
         belong to this XBlock.
 
-        e.g. if the XBlock settings have a field value like "/static/foo.png"
-        then this method will be called with asset_path="foo.png" and should
-        return a URL like https://cdn.none/xblock/f843u89789/static/foo.png
+        e.g. if the XBlock settings have a field value like "/static/test.png"
+        then this method will be called with asset_path="test.png" and should
+        return a URL like:
+
+          http://studio.local.openedx.io:8001/library_assets/cd31871e-a342-4c3f-ba2f-a661bf630996/static/test.png
 
         If the asset file is not recognized, return None
 
         This is called by the XBlockRuntime superclass in the .runtime module.
 
-        TODO: Implement as part of larger static asset effort.
+        Implementation Details
+        ----------------------
+        The standard XBlock "static/{asset_path}" substitution strips out the
+        leading "static/" part because it assumes that all files will exist in a
+        shared, flat namespace (i.e. a course's Files and Uploads).
+
+        Learning Core treats assets differently. Each Component has its own,
+        isolated namespace for asset storage. Furthermore, that namespace
+        contains content that are not meant to be downloadable, like the
+        block.xml (the OLX of the Component). There may one day be other files
+        that are not meant to be externally downloadable there as well, like
+        Markdown or LaTeX source files or grader code.
+
+        By convention, the static assets that we store in Learning Core and are
+        meant for download sit inside a static/ directory that is local to each
+        Component (and actually separate for each Component Version).
+
+        So the transformation looks like this:
+
+        1. The Learning Core ComponentVersion has an asset stored as
+           ``static/test.png`` in the database.
+        2. The original OLX content we store references ``/static/test.png``,
+           per OLX convention. Note the leading "/".
+        3. The ReplaceURLService XBlock runtime service invokes
+           ``static_replace`` and strips out ``/static/``.
+        4. The method we're in now is invoked with a ``static_path`` of just
+           ``test.png``, because that's the transformation that works for
+           ModuleStore-based courses, where everything is stored in the root of
+           a shared Files and Uploads space.
+        5. This method then builds a URL that re-adds the "static/" prefix, and
+           then points to the ComponentVersion-specific location for that asset.
+
+        Note: This means that the URL for a static asset will change with every
+        new version of the Component that is created, i.e. with every edit
+        that's saved–even if the asset itself doesn't change. This was the
+        tradeoff we made in order to put each version's assets in an isolated
+        space, and to make sure that we don't break things like relative links.
+        On the backend, we only store the asset once.
+
+        Performance Note
+        ----------------
+        This can theoretically get very expensive if there are many, many static
+        asset references in a Component. It's also very cacheable–we could put
+        it in a RequestCache with a key of (usage_key, version_num), and have
+        the value be the component_version.uuid and the full list of assets. I'm
+        not doing this yet in order to keep the code simpler, but I'm leaving
+        this note here in case someone needs to optimize this later.
         """
-        return None
+        component_version = self._get_component_version_from_block(block)
+
+        try:
+            content = (
+                component_version
+                .componentversioncontent_set
+                .filter(content__has_file=True)
+                .get(key=f"static/{asset_path}")
+            )
+        except ObjectDoesNotExist:
+            # This means we see a path that _looks_ like it should be a static
+            # asset for this Component, but that static asset doesn't really
+            # exist.
+            return None
+
+        return self._absolute_url_for_asset(component_version, asset_path)

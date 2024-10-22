@@ -53,13 +53,15 @@ class SAMLProviderConfigForm(forms.ModelForm):
 class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLProviderConfig """
     form = SAMLProviderConfigForm
+    search_fields = ['display_name']
 
     def get_queryset(self, request):
         """
-        Filter the queryset to exclude the archived records.
+        Filter the queryset to exclude the archived records unless it's the /change/ view.
         """
-        queryset = super().get_queryset(request).exclude(archived=True)
-        return queryset
+        if request.path.endswith('/change/'):
+            return self.model.objects.all()
+        return super().get_queryset(request).exclude(archived=True)
 
     def archive_provider_configuration(self, request, queryset):
         """
@@ -99,7 +101,15 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         Record name with link for the change view.
         """
         if not instance.is_active:
-            return instance.name
+            update_url = reverse(
+                f'admin:{self.model._meta.app_label}_{self.model._meta.model_name}_change',
+                args=[instance.pk]
+            )
+            return format_html(
+                '<a href="{}" style="color: #999999;">{}</a>',
+                update_url,
+                f'{instance.name}'
+            )
 
         update_url = reverse(f'admin:{self.model._meta.app_label}_{self.model._meta.model_name}_add')
         update_url += f'?source={instance.pk}'
@@ -167,11 +177,11 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         # Always redirect back to the SAMLProviderConfig listing page
         return HttpResponseRedirect(reverse('admin:third_party_auth_samlproviderconfig_changelist'))
 
-    def change_view(self, request, object_slug, form_url='', extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         """ Extend the change view to include CSV upload. """
         extra_context = extra_context or {}
         extra_context['show_csv_upload'] = True
-        return super().change_view(request, object_slug, form_url, extra_context)
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def csv_uuid_update_button(self, obj):
         """ Add CSV upload button to the form. """

@@ -210,29 +210,6 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         }
 
     @ddt.data(
-        (False, timedelta(days=2), False, True),
-        (False, -timedelta(days=2), True, None),
-        (True, timedelta(days=2), True, None),
-    )
-    @ddt.unpack
-    @patch.dict(settings.FEATURES, {"CERTIFICATES_HTML_VIEW": True})
-    @patch.dict(settings.FEATURES, {"ENABLE_V2_CERT_DISPLAY_SETTINGS": False})
-    def test_cert_api_return_v1(self, self_paced, cert_avail_delta, cert_downloadable_status, earned_but_not_available):
-        """
-        Test 'downloadable status'
-        """
-        cert_avail_date = datetime.now(pytz.UTC) + cert_avail_delta
-        self.course.self_paced = self_paced
-        self.course.certificate_available_date = cert_avail_date
-        self.course.save()
-
-        self._setup_course_certificate()
-
-        downloadable_status = certificate_downloadable_status(self.student, self.course.id)
-        assert downloadable_status["is_downloadable"] == cert_downloadable_status
-        assert downloadable_status.get("earned_but_not_available") == earned_but_not_available
-
-    @ddt.data(
         (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
         (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
         (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
@@ -243,8 +220,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {"CERTIFICATES_HTML_VIEW": True})
-    @patch.dict(settings.FEATURES, {"ENABLE_V2_CERT_DISPLAY_SETTINGS": True})
-    def test_cert_api_return_v2(
+    def test_cert_api_return(
         self,
         self_paced,
         cert_avail_delta,

@@ -4,7 +4,6 @@
 import datetime
 import json
 
-import ddt
 import freezegun
 from django.conf import settings
 from django.test import TestCase
@@ -258,51 +257,3 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             },
         ]
         assert json.loads(response.content.decode('utf-8')) == expected
-
-
-@override_settings(VERIFY_STUDENT=VERIFY_STUDENT)
-@ddt.ddt
-class VerificationSupportViewTests(VerificationViewTestsMixinBase, TestCase):
-    """
-    Tests for the verification_for_support view
-    """
-    @property
-    def path(self):
-        return reverse('verification_for_support', kwargs={'attempt_id': self.photo_verification.id})
-
-    def get_expected_response(self, *args, **kwargs):
-        return {
-            'type': 'Software Secure',
-            'status': self.photo_verification.status,
-            'expiration_datetime': '{}Z'.format(kwargs.get('expected_expires').isoformat()),
-            'message': kwargs.get('error_msg'),
-            'updated_at': f'{self.CREATED_AT.isoformat()}Z',
-            'receipt_id': self.photo_verification.receipt_id,
-        }
-
-    @ddt.data(
-        ('accepted', ''),
-        ('denied', '[{"generalReasons": ["Name mismatch"]}]'),
-        ('submitted', ''),
-        ('must_retry', ''),
-    )
-    @ddt.unpack
-    def test_get_details(self, status, error_message):
-        self.photo_verification.status = status
-        self.photo_verification.error_msg = error_message
-        self.photo_verification.save()
-        self.client.login(username=self.staff.username, password=self.PASSWORD)
-        response = self.assert_verification_returned()
-        expected_expires = self.CREATED_AT + datetime.timedelta(settings.VERIFY_STUDENT['DAYS_GOOD_FOR'])
-        expected = self.get_expected_response(expected_expires=expected_expires, error_msg=error_message)
-        assert json.loads(response.content.decode('utf-8')) == expected
-
-    @ddt.data(
-        0,
-        234324,
-        'not_a_number',
-    )
-    def test_not_found(self, attempt_id):
-        not_found_path = self.path.replace(str(self.photo_verification.id), str(attempt_id))
-        response = self.client.get(not_found_path)
-        assert response.status_code == 404

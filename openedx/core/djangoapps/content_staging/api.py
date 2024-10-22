@@ -34,7 +34,7 @@ from .tasks import delete_expired_clipboards
 log = logging.getLogger(__name__)
 
 
-def save_xblock_to_user_clipboard(block: XBlock, user_id: int) -> UserClipboardData:
+def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int | None = None) -> UserClipboardData:
     """
     Copy an XBlock's OLX to the user's clipboard.
     """
@@ -64,6 +64,7 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int) -> UserClipboardD
             display_name=block_metadata_utils.display_name_with_default(block),
             suggested_url_name=usage_key.block_id,
             tags=block_data.tags,
+            version_num=(version_num or 0),
         )
         (clipboard, _created) = _UserClipboard.objects.update_or_create(user_id=user_id, defaults={
             "content": staged_content,
@@ -178,6 +179,7 @@ def get_user_clipboard_json(user_id: int, request: HttpRequest | None = None):
     except _UserClipboard.DoesNotExist:
         # This user does not have any content on their clipboard.
         return {"content": None, "source_usage_key": "", "source_context_title": "", "source_edit_url": ""}
+
     serializer = _UserClipboardSerializer(
         _user_clipboard_model_to_data(clipboard),
         context={'request': request},
@@ -205,6 +207,7 @@ def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardDat
             block_type=content.block_type,
             display_name=content.display_name,
             tags=content.tags,
+            version_num=content.version_num,
         ),
         source_usage_key=clipboard.source_usage_key,
         source_context_title=clipboard.get_source_context_title(),

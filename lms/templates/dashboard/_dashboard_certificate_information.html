@@ -44,14 +44,11 @@ else:
     <div class="message message-status ${status_css_class} is-shown">
       <p class="message-copy">
         <%
-          if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
-            certificate_available_date_string = ""
-            if course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE and course_overview.certificate_available_date:
-              certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
-            elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END and course_overview.end:
-              certificate_available_date_string = course_overview.end.strftime('%Y-%m-%dT%H:%M:%S%z')
-          else:
+          certificate_available_date_string = ""
+          if course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE and course_overview.certificate_available_date:
             certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+          elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END and course_overview.end:
+            certificate_available_date_string = course_overview.end.strftime('%Y-%m-%dT%H:%M:%S%z')
           container_string = _("Your grade and certificate will be ready after {date}.")
           format = 'shortDate'
         %>

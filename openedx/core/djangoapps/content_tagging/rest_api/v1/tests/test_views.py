@@ -1850,6 +1850,31 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert status.is_success(response3.status_code)
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
+    def test_get_copied_tags(self):
+        self.client.force_authenticate(user=self.staffB)
+
+        object_id_1 = str(self.courseA)
+        object_id_2 = str(self.courseB)
+        tagging_api.tag_object(object_id=object_id_1, taxonomy=self.t1, tags=["android"])
+        tagging_api.tag_object(object_id=object_id_2, taxonomy=self.t1, tags=["anvil"])
+        tagging_api.copy_tags_as_read_only(object_id_1, object_id_2)
+
+        expected_tags = [{
+            'name': self.t1.name,
+            'taxonomy_id': self.t1.pk,
+            'can_tag_object': True,
+            'export_id': self.t1.export_id,
+            'tags': [
+                {'value': 'android', 'lineage': ['ALPHABET', 'android'], 'can_delete_objecttag': False},
+                {'value': 'anvil', 'lineage': ['ALPHABET', 'anvil'], 'can_delete_objecttag': True}
+            ]
+        }]
+
+        get_url = OBJECT_TAGS_URL.format(object_id=self.courseB)
+        response = self.client.get(get_url, format="json")
+        assert status.is_success(response.status_code)
+        assert response.data[str(object_id_2)]["taxonomies"] == expected_tags
+
     @ddt.data(
         ('staff', 'courseA', 8),
         ('staff', 'libraryA', 8),
