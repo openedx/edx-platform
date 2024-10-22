@@ -124,6 +124,12 @@ function($, _, Backbone, gettext, BasePage,
 
             }
 
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'refreshXBlock') {
+                    this.render();
+                }
+            });
+
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
         },
 
@@ -222,6 +228,7 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         initializePasteButton() {
+          var self = this;
             if (this.options.canEdit && !self.options.isIframeEmbed) {
                 // We should have the user's clipboard status.
                 const data = this.options.clipboardData;
@@ -237,6 +244,7 @@ function($, _, Backbone, gettext, BasePage,
          * Given the latest information about the user's clipboard, hide or show the Paste button as appropriate.
          */
         refreshPasteButton(data) {
+            var self = this;
             // Do not perform any changes on paste button since they are not
             // rendered on Library or LibraryContent pages
             if (!this.isLibraryPage && !this.isLibraryContentPage && !self.options.isIframeEmbed) {
@@ -554,26 +562,40 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         showMoveXBlockModal: function(event) {
+            var xblockElement = this.findXBlockElement(event.target),
+                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
+                sourceXBlockInfo = XBlockUtils.findXBlockInfo(xblockElement, this.model),
+                sourceParentXBlockInfo = XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
+                modal = new MoveXBlockModal({
+                    sourceXBlockInfo: sourceXBlockInfo,
+                    sourceParentXBlockInfo: sourceParentXBlockInfo,
+                    XBlockURLRoot: this.getURLRoot(),
+                    outlineURL: this.options.outlineURL
+                });
+
             try {
                 if (this.options.isIframeEmbed) {
                     window.parent.postMessage(
                         {
                             type: 'showMoveXBlockModal',
-                            payload: {}
+                            payload: {
+                                sourceXBlockInfo: {
+                                  id: sourceXBlockInfo.attributes.id,
+                                  displayName: sourceXBlockInfo.attributes.display_name,
+                                },
+                                sourceParentXBlockInfo: {
+                                  id: sourceParentXBlockInfo.attributes.id,
+                                  category: sourceParentXBlockInfo.attributes.category,
+                                  hasChildren: sourceParentXBlockInfo.attributes.has_children,
+                                },
+                            },
                         }, document.referrer
                     );
+                    return true;
                 }
             } catch (e) {
                 console.error(e);
             }
-            var xblockElement = this.findXBlockElement(event.target),
-                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
-                modal = new MoveXBlockModal({
-                    sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
-                    sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
-                    XBlockURLRoot: this.getURLRoot(),
-                    outlineURL: this.options.outlineURL
-                });
 
             event.preventDefault();
             modal.show();
