@@ -15,7 +15,11 @@ from .. import downstreams as downstreams_views
 
 MOCK_LIB_KEY = "lib:OpenedX:CSPROB3"
 MOCK_UPSTREAM_REF = "lb:OpenedX:CSPROB3:html:843b4c73-1e2d-4ced-a0ff-24e503cdb3e4"
-MOCK_UPSTREAM_LINK = settings.COURSE_AUTHORING_MICROFRONTEND_URL + '/library/' + MOCK_LIB_KEY
+MOCK_UPSTREAM_LINK = "{mfe_url}/library/{lib_key}/components?usageKey={usage_key}".format(
+    mfe_url=settings.COURSE_AUTHORING_MICROFRONTEND_URL,
+    lib_key=MOCK_LIB_KEY,
+    usage_key=MOCK_UPSTREAM_REF,
+)
 MOCK_UPSTREAM_ERROR = "your LibraryGPT subscription has expired"
 
 
