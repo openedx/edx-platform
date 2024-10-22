@@ -126,6 +126,12 @@ function($, _, Backbone, gettext, BasePage,
 
             }
 
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'refreshXBlock') {
+                    this.render();
+                }
+            });
+
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
         },
 
@@ -380,11 +386,14 @@ function($, _, Backbone, gettext, BasePage,
         editXBlock: function(event, options) {
             event.preventDefault();
             try {
-                if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
+                if (this.options.isIframeEmbed && event.currentTarget.className === 'access-button') {
+                    return window.parent.postMessage(
                         {
-                            type: 'editXBlock',
-                            payload: {}
+                            type: 'manageXBlockAccess',
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator'),
+                                targetElementClassName: event.currentTarget.className,
+                            }
                         }, document.referrer
                     );
                 }
@@ -404,7 +413,23 @@ function($, _, Backbone, gettext, BasePage,
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
-                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
+                    var pathToNewXBlockEditor = `/${blockType}/${encodeURI(primaryHeader.attr('data-usage-id'))}`;
+                    var destinationUrl = `${primaryHeader.attr('authoring_MFE_base_url')}${pathToNewXBlockEditor}`;
+
+                    try {
+                        if (this.options.isIframeEmbed) {
+                            return window.parent.postMessage(
+                                {
+                                    type: 'newXBlockEditor',
+                                    payload: {
+                                        url: pathToNewXBlockEditor,
+                                    }
+                                }, document.referrer
+                            );
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
                     window.location.href = destinationUrl;
                     return;
                 }
@@ -497,10 +522,12 @@ function($, _, Backbone, gettext, BasePage,
             event.preventDefault();
             try {
                 if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
+                    return window.parent.postMessage(
                         {
                             type: 'copyXBlock',
-                            payload: {}
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator')
+                            }
                         }, document.referrer
                     );
                 }
@@ -554,10 +581,12 @@ function($, _, Backbone, gettext, BasePage,
             event.preventDefault();
             try {
                 if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
+                    return window.parent.postMessage(
                         {
                             type: 'duplicateXBlock',
-                            payload: {}
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator')
+                            }
                         }, document.referrer
                     );
                 }
@@ -597,10 +626,12 @@ function($, _, Backbone, gettext, BasePage,
             event.preventDefault();
             try {
                 if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
+                    return window.parent.postMessage(
                         {
                             type: 'deleteXBlock',
-                            payload: {}
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator')
+                            }
                         }, document.referrer
                     );
                 }
