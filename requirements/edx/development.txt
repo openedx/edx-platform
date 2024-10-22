@@ -2099,7 +2099,7 @@ tomlkit==0.13.2
     #   -r requirements/edx/testing.txt
     #   pylint
     #   snowflake-connector-python
-tox==4.23.0
+tox==4.23.1
     # via -r requirements/edx/testing.txt
 tqdm==4.66.5
     # via
