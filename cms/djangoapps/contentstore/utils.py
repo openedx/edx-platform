@@ -204,7 +204,7 @@ def get_lms_link_for_item(location, preview=False):
 
     if preview:
         # checks LMS_BASE value in site configuration for the given course_org_filter(org)
-    # if not found returns settings.LMS_BASE
+        # if not found returns settings.LMS_BASE
         params = '?preview=1'
 
     return "//{lms_base}/courses/{course_key}/jump_to/{location}{params}".format(

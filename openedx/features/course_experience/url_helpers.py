@@ -162,7 +162,7 @@ def make_learning_mfe_courseware_url(
     `params` is an optional QueryDict object (e.g. request.GET)
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
-   
+
     if preview:
         mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/preview/course/{course_key}'
 
