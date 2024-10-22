@@ -76,7 +76,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         createWarningToast: function(upstreamLink) {
-            this.$('.modal-window-alerts').html(this.loadTemplate('edit-upstream-alert')({
+            this.$('.modal-header').before(this.loadTemplate('edit-upstream-alert')({
                 upstreamLink: upstreamLink,
             }));
         },

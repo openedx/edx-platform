@@ -5,8 +5,6 @@
     <div class="modal-window <%- viewSpecificClasses %> modal-<%- size %> modal-type-<%- type %>" tabindex="-1" aria-labelledby="modal-window-title">
         <div class="<%- name %>-modal">
             <div class="modal-header">
-                <div class="modal-window-alerts">
-                </div>
                 <h2 id="modal-window-title" class="title modal-window-title">
                     <%- title %>
                     <% if (modalSRTitle) { %>
