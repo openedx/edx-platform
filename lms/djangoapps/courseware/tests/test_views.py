@@ -467,7 +467,11 @@ class BaseViewsTestCase(ModuleStoreTestCase, MasqueradeMixin):
             self.course_key,
             self.section2.location
         )
-        preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + lms_url
+        preview_url = '{}/preview/course/{}/{}?foo=b%24r'.format(
+            settings.LEARNING_MICROFRONTEND_URL,
+            self.course_key,
+            self.section2.location
+        )
 
         return lms_url, mfe_url, preview_url
 

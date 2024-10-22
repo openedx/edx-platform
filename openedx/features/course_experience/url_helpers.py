@@ -127,7 +127,7 @@ def _get_new_courseware_url(
 
 def make_learning_mfe_courseware_url(
         course_key: CourseKey,
-        preview: bool,
+        preview: bool = None,
         sequence_key: Optional[UsageKey] = None,
         unit_key: Optional[UsageKey] = None,
         params: Optional[QueryDict] = None,
