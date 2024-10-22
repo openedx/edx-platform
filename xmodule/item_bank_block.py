@@ -303,12 +303,11 @@ class ItemBankMixin(
 
         for child in self._get_selected_child_blocks():
             if child is None:
-                # TODO: Fix the underlying issue in TNL-7424
-                # This shouldn't be happening, but does for an as-of-now
-                # unknown reason. Until we address the underlying issue,
-                # let's at least log the error explicitly, ignore the
-                # exception, and prevent the page from resulting in a
-                # 500-response.
+                # TODO: This shouldn't be happening, but at least as of July 2020, it was happening on edx.org for
+                # unknown reasons. We should reach out to 2U and ask if they are still seeing these log items, and if
+                # they are, fix the underlying bug.
+                # * PR that added this logging: https://github.com/openedx/edx-platform/pull/24572
+                # * Private 2U Jira ticket: https://2u-internal.atlassian.net/browse/TNL-7424
                 logger.error('Skipping display for child block that is None')
                 continue
 
