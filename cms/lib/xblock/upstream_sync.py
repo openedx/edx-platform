@@ -92,11 +92,11 @@ class UpstreamLink:
         )
 
     @property
-    def upstream_link(self) -> str:
+    def upstream_link(self) -> str | None:
         """
         Link to edit/view upstream block in library.
         """
-        if self.version_available is None:
+        if self.version_available is None or self.upstream_ref is None:
             return None
         try:
             usage_key = LibraryUsageLocatorV2.from_string(self.upstream_ref)
@@ -369,8 +369,7 @@ def _get_library_xblock_url(usage_key: LibraryUsageLocatorV2):
     Gets authoring url for given library_key.
     """
     library_url = None
-    mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
-    if mfe_base_url:
+    if mfe_base_url := settings.COURSE_AUTHORING_MICROFRONTEND_URL:  # type: ignore
         library_key = usage_key.lib_key
         library_url = f'{mfe_base_url}/library/{library_key}/components?usageKey={usage_key}'
     return library_url
