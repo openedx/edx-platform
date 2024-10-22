@@ -40,7 +40,6 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
     """
     block_data = XBlockSerializer(
         block,
-        write_url_name=False,
         fetch_asset_data=True,
     )
     usage_key = block.usage_key
