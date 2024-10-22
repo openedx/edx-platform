@@ -114,10 +114,16 @@ class ItemBankMixin(
         Returns:
             A dict containing the following keys:
 
-            'selected' (set) of (block_type, block_id) tuples assigned to this student
-            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
-            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
-            'added' (set) of newly added (block_type, block_id) tuples
+            'selected' (list) of (block_type, block_id) tuples assigned to this student.
+                       Order is RANDOM BUT ALSO SIGNIFICANT, because we want each student's order to remain stable as
+                       long as their set of assigned children hasn't changed.
+
+            'invalid' (list) of dropped (block_type, block_id) tuples that are no longer valid
+            'overlimit' (list) of dropped (block_type, block_id) tuples that were previously selected
+            'added' (list) of newly added (block_type, block_id) tuples
+
+            Order of invalid/overlimit/added is ALPHABETICAL, by type then id. This is arbitrary, but it makes the
+            events more consistent and easier to test.
         """
         rand = random.Random()
 
@@ -155,9 +161,9 @@ class ItemBankMixin(
 
         return {
             'selected': selected,
-            'invalid': invalid_block_keys,
-            'overlimit': overlimit_block_keys,
-            'added': added_block_keys,
+            'invalid': sorted(invalid_block_keys),
+            'overlimit': sorted(overlimit_block_keys),
+            'added': sorted(added_block_keys),
         }
 
     def _publish_event(self, event_name, result, **kwargs):
@@ -344,9 +350,9 @@ class ItemBankMixin(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        # Note: The LibraryContentBlockEditor Webpack bundle just contains JS to help us render a vertical layout of
-        # children blocks. It's not clear if we need to include this bundle for ItemBankBlock, but it's working now.
-        # TODO: Try dropping this JS from ItemBankBlocks.
+        # TODO: It's not clear whether or why we need to add this JS bundle, but we're leaving it in for the Libraries
+        #       Relaunch Beta because studio_view is currently working fine.. As future cleanup, try to remove it from
+        #       the studio_view of ItemBankBlock and/or LegacyLibraryContentBlock.
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -428,7 +434,8 @@ class ItemBankMixin(
         """
         Get a string prefix which will be prepended (plus a dot) to events raised when `self.selected` changes.
 
-        Example: if this returned `edx.myblock.content`, new selected children will raise `edx.myblock.content.assigned`.
+        Example: if this returned `edx.myblock.content`, new selected children will
+                 raise `edx.myblock.content.assigned`.
         """
         raise NotImplementedError
 
@@ -459,7 +466,7 @@ class ItemBankBlock(ItemBankMixin, XBlock):
         elif self.max_count < -1 or self.max_count == 0:
             validation.set_summary(
                 StudioValidationMessage(
-                    StudioValidationMessage.WARNING,
+                    StudioValidationMessage.ERROR,
                     _(
                         "The problem bank has been configured to show {count} problems. "
                         "Please specify a positive number of problems, or specify -1 to show all problems."

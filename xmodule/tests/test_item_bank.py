@@ -1,10 +1,8 @@
 """
 Unit tests for ItemBankBlock.
-
-@TODO - work in progress
 """
-
 from unittest.mock import MagicMock, Mock, patch
+from random import Random
 
 import ddt
 from fs.memoryfs import MemoryFS
@@ -138,32 +136,36 @@ class TestItemBankForCms(ItemBankTestBase):
         assert imported_item_bank.max_count == self.item_bank.max_count
         assert len(imported_item_bank.children) == len(self.item_bank.children)
 
-    def test_validation_of_matching_blocks(self):
+    def test_max_count_validation(self):
         """
-        Test that the validation method of LibraryContent blocks can warn
-        the user about problems with settings (max_count).
+        Test that the validation method of ItemBankBlocks can warn the user about problems with settings (max_count).
         """
         # Ensure we're starting with clean validation
         assert self.item_bank.validate()
 
-        # Set max_count to higher value than exists in library
+        # Ensure that setting the max_count too high (> than # of children) raises a validation warning.
         self.item_bank.max_count = 50
-        result = self.item_bank.validate()
-        assert not result
-        self._assert_has_only_N_matching_problems(result, 4)
         assert len(self.item_bank.selected_children()) == 4
+        assert not (result := self.item_bank.validate())
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert 'configured to show 50 problems, but only 4 have been selected' in result.summary.text
 
-        # Add some capa problems so we can check problem type validation messages
-        self.item_bank.max_count = 1
+        # Now set max_count to valid value (<= than # of children), and ensure the validation error goes away.
+        self.item_bank.max_count = 3
+        assert len(self.item_bank.selected_children()) == 3
         assert self.item_bank.validate()
-        assert len(self.item_bank.selected_children()) == 1
 
-        # -1 selects all blocks from the library.
+        # Ensure that setting max_count to 0 raises a validation error.
+        self.item_bank.max_count = 0
+        assert len(self.item_bank.selected_children()) == 0
+        assert not (result := self.item_bank.validate())
+        assert StudioValidationMessage.ERROR == result.summary.type
+        assert 'configured to show 0 problems. Please specify' in result.summary.text
+
+        # Finally, set max_count to -1, and ensure the validation error goes away.
         self.item_bank.max_count = -1
+        assert len(self.item_bank.selected_children()) == 4
         assert self.item_bank.validate()
-        assert len(self.item_bank.selected_children()) == len(self.item_bank.children)
-
-        assert "@@TODO make more assertions about the validation messages"
 
     @patch(
         'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render',
@@ -194,11 +196,6 @@ class TestItemBankForCms(ItemBankTestBase):
         # content should be empty
         assert 'LibraryContentAuthorView' == rendered.js_init_fn
         # but some js initialization should happen
-
-    def _assert_has_only_N_matching_problems(self, result, n):
-        assert result.summary
-        assert StudioValidationMessage.WARNING == result.summary.type
-        assert f'only {n} have been selected' in result.summary.text
 
 
 @skip_unless_lms
@@ -354,36 +351,62 @@ class TestItemBankForLms(ItemBankTestBase):
         assert event_data['result'] == []
         assert event_data['reason'] == 'overlimit'
 
-    def test_removed_invalid(self):
+    @ddt.data(
+        (
+            [("problem", "My_Item_1"), ("problem", "My_Item_2")],
+            ("problem", "My_Item_1"),
+            [("problem", "My_Item_2"), ("problem", "My_Item_3")],
+        ),
+        (
+            [("problem", "My_Item_1"), ("problem", "My_Item_2")],
+            ("problem", "My_Item_2"),
+            [("problem", "My_Item_1"), ("problem", "My_Item_3")],
+        ),
+        (
+            [("problem", "My_Item_3"), ("problem", "My_Item_0")],
+            ("problem", "My_Item_3"),
+            [("problem", "My_Item_2"), ("problem", "My_Item_3")],
+        ),
+        (
+            [("problem", "My_Item_3"), ("problem", "My_Item_0")],
+            ("problem", "My_Item_0"),
+            [("problem", "My_Item_3"), ("problem", "My_Item_2")],
+        ),
+    )
+    @ddt.unpack
+    def test_removed_invalid(self, to_select_initial, to_drop, to_select_new):
         """
         Test the "removed" event emitted when we un-assign blocks previously assigned to a student.
 
-        In this test, we keep `.max_count==2`, but do a series of two removals from `.children`:
+        In this test, we keep `.max_count==2`, but do a series of two removals from `.children`.
 
-        * Starting condition: 4 children, 2 assigned:   A  [B] [C]  D
-        * Delete the first assigned block (B)
-        * New condition: 3 children, 2 assigned:        A   _  [C] [D]
-        * Delete both assigned blocks (C, D)
-        * Final condition:  1 child, 1 asigned:        [A]  _   _   _
+        * Initial condition: 4 children, 2 assigned.                       0  [1] [2]  3
+        * First deletion: one of the assigned blocks, e.g. block 1.
+        * New condition: 3 children, 2 assigned.                           0   _  [2] [3]
+        * Selecond deletion: the other two assigned blocks (2 and 3).
+        * Final condition:  1 child, 1 assigned.                          [0]  _   _   _
 
-        @@TODO - This is flaky!! Seems to be dependent on the random seed. Need to fix. Should pin a specific seed, too.
+        The grid on the right shows how the test should go for our first ddt case.
         """
+        # pylint: disable=too-many-statements
+
         # Start by assigning two blocks to the student:
         self.item_bank.max_count = 2
         self.store.update_item(self.item_bank, self.user_id)
 
-        # Sanity check
+        # Initial selection
         assert len(self.item_bank.children) == 4
         children_initial = [(child.block_type, child.block_id) for child in self.item_bank.children]
-        selected_initial: list[tuple[str, str]] = self.item_bank.selected_children()
+        with patch.object(Random, "sample", _make_mock_sample(children_initial, to_select_initial)):
+            with patch.object(Random, "shuffle", _make_mock_shuffle(to_select_initial)):
+                selected_initial = self.item_bank.selected_children()
         assert len(selected_initial) == 2
         self.publisher.reset_mock()  # Clear the "assigned" event that was just published.
 
         # Now make sure that one of the assigned blocks will have to be un-assigned.
         # To cause an "invalid" event, we delete exactly one of the currently-assigned children:
-        to_keep: tuple[str, str] = selected_initial[0]
+        (to_keep,) = set(selected_initial) - set([to_drop])
         to_keep_usage_key = self.course.context_key.make_usage_key(*to_keep)
-        to_drop: tuple[str, str] = selected_initial[1]
         to_drop_usage_key = self.course.context_key.make_usage_key(*to_drop)
         self.store.delete_item(to_drop_usage_key, self.user_id)
         self._reload_item_bank()
@@ -392,7 +415,12 @@ class TestItemBankForLms(ItemBankTestBase):
         # Because there are 3 available children and max_count==2, when we reselect children for assignment,
         # we should get 2. To maximize stability from the student's perspective, we expect that one of those children
         # was the one that was previously assigned (to_keep).
-        selected_new = self.item_bank.selected_children()
+        remaining_selectable = set(children_initial) - {to_keep, to_drop}
+        to_add = set(to_select_new) & remaining_selectable
+        assert len(to_add) == 1  # sanity check
+        with patch.object(Random, "sample", _make_mock_sample(remaining_selectable, to_add)):
+            with patch.object(Random, "shuffle", _make_mock_shuffle(to_select_new)):
+                selected_new = self.item_bank.selected_children()
         assert len(selected_new) == 2
         assert to_keep in selected_new
         assert to_drop not in selected_new
@@ -449,7 +477,7 @@ class TestItemBankForLms(ItemBankTestBase):
             "result": [{"usage_key": str(final_usage_key)}],
             "previous_count": 2,
             "max_count": 2,
-            "removed": [{"usage_key": str(uk)} for uk in selected_new_usage_keys],
+            "removed": [{"usage_key": str(uk)} for uk in sorted(selected_new_usage_keys)],
             "reason": "invalid",
         }
         _, assigned_event_name, assigned_event_data = self.publisher.call_args_list[1][0]
@@ -461,3 +489,33 @@ class TestItemBankForLms(ItemBankTestBase):
             "max_count": 2,
             "added": [{"usage_key": str(final_usage_key)}],
         }
+
+
+def _make_mock_sample(expected_pool, mock_sample):
+    """
+    A replacement for Random.sample that confirms that the pool and sample size are as expected.
+    """
+    def sample(_self, pool, desired_sample_size):
+        """
+        The mock implementation.
+        """
+        assert set(pool) == set(expected_pool)
+        assert len(mock_sample) == desired_sample_size
+        return mock_sample
+
+    return sample
+
+
+def _make_mock_shuffle(mock_result):
+    """
+    A replacement for Random.shuffle which confirms that the provided mock_result has the same set of items as
+    the selection we're shuffling.
+    """
+    def shuffle(_self, selection):
+        """
+        The mock implementation.
+        """
+        assert set(selection) == set(mock_result)
+        return mock_result
+
+    return shuffle

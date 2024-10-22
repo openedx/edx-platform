@@ -430,6 +430,16 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
             result_json.append(info)
         return result_json
 
+    @classmethod
+    def get_selected_event_prefix(cls) -> str:
+        """
+        Prefix for events on `self.selected`.
+
+        We use librarycontent rather than legacylibrarycontent for backwards compatibility (this wasn't always the
+        "legacy" library content block :)
+        """
+        return "edx.librarycontentblock.content"
+
 
 class LegacyLibrarySummary:
     """
@@ -465,13 +475,3 @@ class LegacyLibrarySummary:
         Always returns the raw 'library' field from the key.
         """
         return self.location.library_key.library
-
-    @classmethod
-    def get_selected_event_prefix(cls) -> str:
-        """
-        Prefix for events on `self.selected`.
-
-        We use librarycontent rather than legacylibrarycontent for backwards compatibility (this wasn't always the
-        "legacy" library content block :)
-        """
-        return "edx.librarycontent.content"
