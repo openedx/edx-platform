@@ -26,7 +26,7 @@ from xmodule.capa.responsetypes import registry
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.item_bank_block import ItemBankMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
-
+from xmodule.x_module import XModuleToXBlockMixin
 
 _ = lambda text: text
 
@@ -64,7 +64,7 @@ class LibraryToolsUnavailable(ValueError):
 
 @XBlock.wants('library_tools')
 @XBlock.wants('studio_user_permissions')  # Only available in CMS.
-class LegacyLibraryContentBlock(ItemBankMixin, XBlock):
+class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
     """
     An XBlock whose children are chosen dynamically from a legacy (v1) content library.
     Can be used to create randomized assessments among other things.
@@ -465,3 +465,13 @@ class LegacyLibrarySummary:
         Always returns the raw 'library' field from the key.
         """
         return self.location.library_key.library
+
+    @classmethod
+    def get_selected_event_prefix(cls) -> str:
+        """
+        Prefix for events on `self.selected`.
+
+        We use librarycontent rather than legacylibrarycontent for backwards compatibility (this wasn't always the
+        "legacy" library content block :)
+        """
+        return "edx.librarycontent.content"

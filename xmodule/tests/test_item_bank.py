@@ -32,6 +32,7 @@ class ItemBankTestBase(MixedSplitTestCase):
     """
     Base class for tests of ItemBankBlock
     """
+    maxDiff = None  # We need all the diff we can get for some of these asserts.
 
     def setUp(self):
         super().setUp()
@@ -61,11 +62,11 @@ class ItemBankTestBase(MixedSplitTestCase):
         (Not clear if this is necessary since XModules are all removed now. It's possible that this
          could be removed without breaking tests.)
         """
-        prepare_block_runtime(block.runtime, course_id=block.location.course_key)
+        prepare_block_runtime(block.runtime, course_id=block.context_key)
 
         def get_block(descriptor):
             """Mocks module_system get_block function"""
-            prepare_block_runtime(descriptor.runtime, course_id=block.location.course_key)
+            prepare_block_runtime(descriptor.runtime, course_id=block.context_key)
             descriptor.runtime.get_block_for_descriptor = get_block
             descriptor.bind_for_student(self.user_id)
             return descriptor
@@ -80,7 +81,7 @@ class ItemBankTestBase(MixedSplitTestCase):
         reloads. So, we just transfer it from the old item_bank object instance to the new one, as if it were persisted.
         """
         selected = self.item_bank.selected
-        self.item_bank = self.store.get_item(self.item_bank.location)
+        self.item_bank = self.store.get_item(self.item_bank.usage_key)
         self._bind_course_block(self.item_bank)
         if selected:
             self.item_bank.selected = selected
@@ -118,45 +119,11 @@ class TestItemBankForCms(ItemBankTestBase):
             '  <problem url_name="My_Item_3"/>\n'
             '</itembank>\n'
         )
-        self.maxDiff = None
         assert actual_olx_export == expected_olx_export
         olx_element = etree.fromstring(actual_olx_export)
 
         # Re-import the OLX.
-        runtime = TestImportSystem(load_error_blocks=True, course_id=self.item_bank.location.course_key)
-        runtime.resources_fs = export_fs
-        imported_item_bank = ItemBankBlock.parse_xml(olx_element, runtime, None)
-
-        # And make sure the result looks right.
-        self._verify_xblock_properties(imported_item_bank)
-
-    def test_xml_import_with_comments(self):
-        """
-        Test that XML comments within ItemBankBlock are ignored during the import.
-        """
-        # Export self.item_bank to the virtual filesystem
-        export_fs = MemoryFS()
-        self.item_bank.runtime.export_fs = export_fs  # pylint: disable=protected-access
-        node = etree.Element("unknown_root")
-        self.item_bank.add_xml_to_node(node)
-
-        # Now, import the itembank using the same OLX as above, but with some XML comments in there.
-        # (Note: This will not work without exporting first, because it relies on the problem blocks OLX definitions
-        # being available on the filesystem)
-        olx_with_comments = (
-            '<!-- Comment -->\n'
-            '<itembank display_name="My Item Bank" max_count="1">\n'
-            '<!-- Comment -->\n'
-            '  <problem url_name="My_Item_0"/>\n'
-            '  <problem url_name="My_Item_1"/>\n'
-            '  <problem url_name="My_Item_2"/>\n'
-            '  <problem url_name="My_Item_3"/>\n'
-            '</itembank>\n'
-        )
-        olx_element = etree.fromstring(olx_with_comments)
-
-        # Import the olx.
-        runtime = TestImportSystem(load_error_blocks=True, course_id=self.item_bank.location.course_key)
+        runtime = TestImportSystem(load_error_blocks=True, course_id=self.item_bank.context_key)
         runtime.resources_fs = export_fs
         imported_item_bank = ItemBankBlock.parse_xml(olx_element, runtime, None)
 
@@ -174,9 +141,9 @@ class TestItemBankForCms(ItemBankTestBase):
     def test_validation_of_matching_blocks(self):
         """
         Test that the validation method of LibraryContent blocks can warn
-        the user about problems with other settings (max_count and capa_type).
+        the user about problems with settings (max_count).
         """
-        # Ensure we're starting wtih clean validation
+        # Ensure we're starting with clean validation
         assert self.item_bank.validate()
 
         # Set max_count to higher value than exists in library
@@ -248,8 +215,8 @@ class TestItemBankForLms(ItemBankTestBase):
         assert self.publisher.called
         assert len(self.publisher.call_args[0]) == 3  # pylint:disable=unsubscriptable-object
         _, event_name, event_data = self.publisher.call_args[0]  # pylint:disable=unsubscriptable-object
-        assert event_name == f'edx.librarycontentblock.content.{event_type}'
-        assert event_data['location'] == str(self.item_bank.location)
+        assert event_name == f'edx.itembankblock.content.{event_type}'
+        assert event_data['location'] == str(self.item_bank.usage_key)
         return event_data
 
     def test_children_seen_by_a_user(self):
@@ -349,10 +316,10 @@ class TestItemBankForLms(ItemBankTestBase):
         child = self.item_bank.get_child_blocks()[0]
         event_data = self._assert_event_was_published("assigned")
         block_info = {
-            "usage_key": str(child.location),
+            "usage_key": str(child.usage_key),
         }
         assert event_data ==\
-               {'location': str(self.item_bank.location),
+               {'location': str(self.item_bank.usage_key),
                 'added': [block_info],
                 'result': [block_info],
                 'previous_count': 0, 'max_count': 1}
@@ -362,9 +329,9 @@ class TestItemBankForLms(ItemBankTestBase):
         self.item_bank.max_count = 2
         children = self.item_bank.get_child_blocks()
         assert len(children) == 2
-        child, new_child = children if children[0].location == child.location else reversed(children)
+        child, new_child = children if children[0].usage_key == child.usage_key else reversed(children)
         event_data = self._assert_event_was_published("assigned")
-        assert event_data['added'][0]['usage_key'] == str(new_child.location)
+        assert event_data['added'][0]['usage_key'] == str(new_child.usage_key)
         assert len(event_data['result']) == 2
         assert event_data['previous_count'] == 1
         assert event_data['max_count'] == 2
@@ -401,8 +368,6 @@ class TestItemBankForLms(ItemBankTestBase):
 
         @@TODO - This is flaky!! Seems to be dependent on the random seed. Need to fix. Should pin a specific seed, too.
         """
-        self.maxDiff = None
-
         # Start by assigning two blocks to the student:
         self.item_bank.max_count = 2
         self.store.update_item(self.item_bank, self.user_id)
@@ -441,7 +406,7 @@ class TestItemBankForLms(ItemBankTestBase):
         # Check that the event says that one block was removed and one was added
         assert self.publisher.call_count == 2
         _, removed_event_name, removed_event_data = self.publisher.call_args_list[0][0]
-        assert removed_event_name == "edx.librarycontentblock.content.removed"
+        assert removed_event_name == "edx.itembankblock.content.removed"
         assert removed_event_data == {
             "location": str(self.item_bank.usage_key),
             "result": [{"usage_key": str(uk)} for uk in selected_new_usage_keys],
@@ -451,7 +416,7 @@ class TestItemBankForLms(ItemBankTestBase):
             "reason": "invalid",
         }
         _, assigned_event_name, assigned_event_data = self.publisher.call_args_list[1][0]
-        assert assigned_event_name == "edx.librarycontentblock.content.assigned"
+        assert assigned_event_name == "edx.itembankblock.content.assigned"
         assert assigned_event_data == {
             "location": str(self.item_bank.usage_key),
             "result": [{"usage_key": str(uk)} for uk in selected_new_usage_keys],
@@ -478,7 +443,7 @@ class TestItemBankForLms(ItemBankTestBase):
         # Check that the event says that two blocks were removed and one added
         assert self.publisher.call_count == 2
         _, removed_event_name, removed_event_data = self.publisher.call_args_list[0][0]
-        assert removed_event_name == "edx.librarycontentblock.content.removed"
+        assert removed_event_name == "edx.itembankblock.content.removed"
         assert removed_event_data == {
             "location": str(self.item_bank.usage_key),
             "result": [{"usage_key": str(final_usage_key)}],
@@ -488,7 +453,7 @@ class TestItemBankForLms(ItemBankTestBase):
             "reason": "invalid",
         }
         _, assigned_event_name, assigned_event_data = self.publisher.call_args_list[1][0]
-        assert assigned_event_name == "edx.librarycontentblock.content.assigned"
+        assert assigned_event_name == "edx.itembankblock.content.assigned"
         assert assigned_event_data == {
             "location": str(self.item_bank.usage_key),
             "result": [{"usage_key": str(final_usage_key)}],

@@ -26,7 +26,6 @@ from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     ResourceTemplates,
     XModuleMixin,
-    XModuleToXBlockMixin,
     shim_xmodule_js,
     STUDENT_VIEW,
 )
@@ -43,7 +42,6 @@ class ItemBankMixin(
     # https://github.com/openedx/edx-platform/issues/35686
     MakoTemplateBlockBase,
     XmlMixin,
-    XModuleToXBlockMixin,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -101,9 +99,17 @@ class ItemBankMixin(
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
 
         Arguments:
-            selected - list of (block_type, block_id) tuples assigned to this student
+            selected - list of (block_type, block_id) pairs assigned to this student
             children - children of this block
             max_count - number of components to display to each student
+
+        NOTE/TODO:
+            We like to treat `self.selected` as a list of 2-tuples, but when we load a block from persistence, all
+            tuples are quietly converted to lists, so `self.selected` actually ends up being a list of 2-element lists.
+            So, we need to carefully convert the items in `self.selected` to tuples whenever we work with it. As a
+            future refactoring, it would be much better to just accept that `self.selected` always has 2-element lists,
+            and then define some @properties that intentionally convert them to BlockKeys (named 2-tuples) plus type
+            annotations to enforce it all.
 
         Returns:
             A dict containing the following keys:
@@ -135,7 +141,7 @@ class ItemBankMixin(
         # Do we have enough blocks now?
         num_to_add = max_count - len(selected_keys)
 
-        added_block_keys = None
+        added_block_keys = set()
         if num_to_add > 0:
             # We need to select [more] blocks to display to this user:
             pool = valid_block_keys - selected_keys
@@ -159,13 +165,13 @@ class ItemBankMixin(
         Helper method to publish an event for analytics purposes
         """
         event_data = {
-            "location": str(self.location),
+            "location": str(self.usage_key),
             "result": result,
             "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
             "max_count": self.max_count,
         }
         event_data.update(kwargs)
-        self.runtime.publish(self, f"edx.librarycontentblock.content.{event_name}", event_data)
+        self.runtime.publish(self, f"{self.get_selected_event_prefix()}.{event_name}", event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
@@ -280,7 +286,7 @@ class ItemBankMixin(
                             status=status.HTTP_400_BAD_REQUEST)
 
         for block_type, block_id in self.selected_children():
-            block = self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
+            block = self.runtime.get_block(self.context_key.make_usage_key(block_type, block_id))
             if hasattr(block, 'reset_problem'):
                 block.reset_problem(None)
                 block.save()
@@ -314,7 +320,7 @@ class ItemBankMixin(
             rendered_child = child.render(STUDENT_VIEW, child_context)
             fragment.add_fragment_resources(rendered_child)
             contents.append({
-                'id': str(child.location),
+                'id': str(child.usage_key),
                 'content': rendered_child.content,
             })
 
@@ -338,6 +344,9 @@ class ItemBankMixin(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
+        # Note: The LibraryContentBlockEditor Webpack bundle just contains JS to help us render a vertical layout of
+        # children blocks. It's not clear if we need to include this bundle for ItemBankBlock, but it's working now.
+        # TODO: Try dropping this JS from ItemBankBlocks.
         add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -414,6 +423,15 @@ class ItemBankMixin(
                 xml_object.set(field_name, str(field.read_from(self)))
         return xml_object
 
+    @classmethod
+    def get_selected_event_prefix(cls) -> str:
+        """
+        Get a string prefix which will be prepended (plus a dot) to events raised when `self.selected` changes.
+
+        Example: if this returned `edx.myblock.content`, new selected children will raise `edx.myblock.content.assigned`.
+        """
+        raise NotImplementedError
+
 
 class ItemBankBlock(ItemBankMixin, XBlock):
     """
@@ -438,13 +456,16 @@ class ItemBankBlock(ItemBankMixin, XBlock):
             validation = StudioValidation.copy(validation)
         if not validation.empty:
             pass  # If there's already a validation error, leave it there.
-        elif not self.children:
+        elif self.max_count < -1 or self.max_count == 0:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    (_('No problems have been selected.')),
+                    _(
+                        "The problem bank has been configured to show {count} problems. "
+                        "Please specify a positive number of problems, or specify -1 to show all problems."
+                    ).format(count=self.max_count),
                     action_class='edit-button',
-                    action_label=_("Select problems to randomize.")
+                    action_label=_("Edit the problem bank configuration."),
                 )
             )
         elif len(self.children) < self.max_count:
@@ -469,7 +490,7 @@ class ItemBankBlock(ItemBankMixin, XBlock):
         """
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
-        is_root = root_xblock and root_xblock.location == self.location
+        is_root = root_xblock and root_xblock.usage_key == self.usage_key
         # User has clicked the "View" link. Show a preview of all possible children:
         if is_root and self.children:  # pylint: disable=no-member
             fragment.add_content(self.runtime.service(self, 'mako').render_cms_template(
@@ -500,3 +521,13 @@ class ItemBankBlock(ItemBankMixin, XBlock):
                 # "descendents": ...,
             } for block_key in block_keys
         ]
+
+    @classmethod
+    def get_selected_event_prefix(cls) -> str:
+        """
+        Prefix for events on `self.selected`.
+
+        TODO: Ensure that this is the prefix we want to stick with
+        https://github.com/openedx/edx-platform/issues/35685
+        """
+        return "edx.itembankblock.content"
