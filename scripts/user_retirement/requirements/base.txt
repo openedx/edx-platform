@@ -158,8 +158,9 @@ unicodecsv==0.14.1
     # via -r scripts/user_retirement/requirements/base.in
 uritemplate==4.1.1
     # via google-api-python-client
-urllib3==2.2.3
+urllib3==1.26.20
     # via
+    #   -r scripts/user_retirement/requirements/base.in
     #   botocore
     #   requests
 zeep==4.3.1
