@@ -1612,3 +1612,18 @@ def cyberstruct_sso(request):
     jwt_object.make_signed_token(key)
     token = jwt_object.serialize()
     return redirect(f"https://app.cyberstruct.io/api/login?organization=org_46qMyHyZqajmxIIZ&id_token={token}")
+
+
+@csrf_exempt
+@login_required
+def join_lens_meeting(request):
+    try:
+        meeting_id = request.GET["meeting_id"]
+        data = {"email" : request.user.email, "username" : request.user.username, "first_name" : request.user.first_name, "last_name" : request.user.last_name} 
+
+        r_data = get_zoom_link(meeting_id, "0", data, True)
+        log.error(r_data)
+        return redirect(r_data["join_url"])
+    except Exception as err:
+        log.error("ZOOM Error: " + str(err))
+        return HttpResponse("Please contact support")
