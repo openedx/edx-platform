@@ -76,6 +76,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         createWarningToast: function(upstreamLink) {
+            // xss-lint: disable=javascript-jquery-insertion
             this.$('.modal-header').before(this.loadTemplate('edit-upstream-alert')({
                 upstreamLink: upstreamLink,
             }));
