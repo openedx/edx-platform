@@ -1125,7 +1125,7 @@ def _get_zoom_auth_token():
 
 def get_zoom_link(meeting_id, webinar_id, data, useLens = False):
     user = User.objects.get(email = data["email"]) 
-    session_key = str(meeting_id) + "-" + str(user.id) + "Lens" if useLens else "Zoom"
+    session_key = str(meeting_id) + "-" + str(user.id) + ("Lens" if useLens else "Zoom")
     MEMCACHE_TIMEOUT = 28800
     join_url = cache.get(session_key, None)
     space_unicode = u'\u0020'
