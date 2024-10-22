@@ -36,6 +36,8 @@ urlpatterns = [
 
     re_path(r'^activate/(?P<key>[^/]*)$', views.activate_account, name="activate"),
 
+    re_path(r'^extras/join_lens_meeting$', views.join_lens_meeting, name = "join_lens_meeting"),
+
     path('accounts/disable_account_ajax', views.disable_account_ajax, name="disable_account_ajax"),
     path('accounts/manage_user_standing', views.manage_user_standing, name='manage_user_standing'),
 
