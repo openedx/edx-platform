@@ -4,8 +4,6 @@
 #
 #    make upgrade
 #
--e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
-    # via -r requirements/edx/github.in
 acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.4.3
@@ -506,6 +504,8 @@ edx-proctoring==4.18.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring-proctortrack
+edx-proctoring-proctortrack @ git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2
+    # via -r requirements/edx/github.in
 edx-rbac==1.10.0
     # via edx-enterprise
 edx-rest-api-client==6.0.0
