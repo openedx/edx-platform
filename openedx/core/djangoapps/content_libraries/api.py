@@ -791,7 +791,7 @@ def set_library_block_olx(usage_key, new_olx_str) -> int:
     # clipboard right now.
     if "url_name" in node.attrib:
         del node.attrib["url_name"]
-        new_olx_str = etree.tostring(node, encoding='unicode', pretty_print=True)
+        new_olx_str = etree.tostring(node, encoding='unicode')
 
     now = datetime.now(tz=timezone.utc)
 
