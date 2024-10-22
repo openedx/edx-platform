@@ -1237,3 +1237,18 @@ def component_version_asset(request, component_version_uuid, asset_path):
         content.read_file().chunks(),
         headers=redirect_response.headers,
     )
+
+
+@require_safe
+def component_draft_asset(request, usage_key, asset_path):
+    """
+    Serves the draft version of static assets associated with a Library Component.
+
+    See `component_version_asset` for more details
+    """
+    try:
+        component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
+    except ObjectDoesNotExist as exc:
+        raise Http404() from exc
+
+    return component_version_asset(request, component_version_uuid, asset_path)

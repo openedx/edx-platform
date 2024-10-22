@@ -76,9 +76,17 @@ urlpatterns = [
             path('pub/jwks/', views.LtiToolJwksView.as_view(), name='lti-pub-jwks'),
         ])),
     ])),
-    path(
-        'library_assets/<uuid:component_version_uuid>/<path:asset_path>',
-        views.component_version_asset,
-        name='library-assets',
+    path('library_assets/', include([
+        path(
+            'component_versions/<uuid:component_version_uuid>/<path:asset_path>',
+            views.component_version_asset,
+            name='library-assets',
+        ),
+        path(
+            'blocks/<usage_v2:usage_key>/<path:asset_path>',
+            views.component_draft_asset,
+            name='library-draft-assets',
+        ),
+    ])
     ),
 ]
