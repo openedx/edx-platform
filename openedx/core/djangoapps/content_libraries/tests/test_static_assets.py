@@ -205,7 +205,7 @@ class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
         get_response = self.client.get(
             f"/library_assets/blocks/{self.usage_key}@/static/test.svg"
         )
-        assert get_response.status_code == 400
+        assert get_response.status_code == 404
 
         get_response = self.client.get(
             f"/library_assets/blocks/{self.usage_key}/static/test2.svg"

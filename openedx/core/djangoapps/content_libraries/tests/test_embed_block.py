@@ -219,7 +219,7 @@ class LibrariesEmbedViewTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestM
         # show up.
         html = self._embed_block(block_id, version='published')
         # This is the pattern we're looking for:
-        #   <img src="https://localhost:18010/library_assets/component_versions/.../static/deer.jpg"/>
+        #   <img src="https://{host}/library_assets/component_versions/.../static/deer.jpg"/>
         assert re.search(r'/library_assets/component_versions/[0-9a-f-]*/static/deer.jpg', html)
 
         # Now grab the draft version (4), which is going to once again not have

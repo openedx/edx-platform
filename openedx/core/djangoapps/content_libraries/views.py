@@ -87,7 +87,7 @@ from pylti1p3.exception import LtiException, OIDCException
 
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2, UsageKeyV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_learning.api import authoring
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
