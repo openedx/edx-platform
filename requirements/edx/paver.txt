@@ -22,7 +22,7 @@ libsass==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.in
-markupsafe==3.0.1
+markupsafe==3.0.2
     # via -r requirements/edx/paver.in
 mock==5.1.0
     # via -r requirements/edx/paver.in
@@ -34,7 +34,7 @@ paver==1.3.4
     # via -r requirements/edx/paver.in
 pbr==6.1.0
     # via stevedore
-psutil==6.0.0
+psutil==6.1.0
     # via -r requirements/edx/paver.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.in
