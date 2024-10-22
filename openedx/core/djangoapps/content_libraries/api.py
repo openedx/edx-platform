@@ -761,8 +761,12 @@ def set_library_block_olx(usage_key, new_olx_str) -> int:
     # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
     assert isinstance(usage_key, LibraryUsageLocatorV2)
 
+    # HTMLBlock uses CDATA to preserve HTML inside the XML, so make sure we
+    # don't strip that out.
+    parser = etree.XMLParser(strip_cdata=False)
+
     # Verify that the OLX parses, at least as generic XML, and the root tag is correct:
-    node = etree.fromstring(new_olx_str)
+    node = etree.fromstring(new_olx_str, parser=parser)
     if node.tag != usage_key.block_type:
         raise ValueError(
             f"Tried to set the OLX of a {usage_key.block_type} block to a <{node.tag}> node. "
@@ -780,6 +784,14 @@ def set_library_block_olx(usage_key, new_olx_str) -> int:
         "display_name",
         xblock_type_display_name(usage_key.block_type),
     )
+
+    # Libraries don't use the url_name attribute, because they encode that into
+    # the Component key. Normally this is stripped out by the XBlockSerializer,
+    # but we're not actually creating the XBlock when it's coming from the
+    # clipboard right now.
+    if "url_name" in node.attrib:
+        del node.attrib["url_name"]
+        new_olx_str = etree.tostring(node, encoding='unicode', pretty_print=True)
 
     now = datetime.now(tz=timezone.utc)
 
