@@ -128,6 +128,14 @@ function($, _, Backbone, gettext, BasePage,
 
             }
 
+            if (this.options.isIframeEmbed) {
+                window.addEventListener('message', (event) => {
+                  if (event.data && event.data.type === 'refreshXBlock') {
+                      this.render();
+                  }
+               });
+            }
+
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
         },
 
@@ -625,26 +633,40 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         showMoveXBlockModal: function(event) {
+            var xblockElement = this.findXBlockElement(event.target),
+                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
+                sourceXBlockInfo = XBlockUtils.findXBlockInfo(xblockElement, this.model),
+                sourceParentXBlockInfo = XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
+                modal = new MoveXBlockModal({
+                    sourceXBlockInfo: sourceXBlockInfo,
+                    sourceParentXBlockInfo: sourceParentXBlockInfo,
+                    XBlockURLRoot: this.getURLRoot(),
+                    outlineURL: this.options.outlineURL
+                });
+
             try {
                 if (this.options.isIframeEmbed) {
                     window.parent.postMessage(
                         {
                             type: 'showMoveXBlockModal',
-                            payload: {}
+                            payload: {
+                                sourceXBlockInfo: {
+                                  id: sourceXBlockInfo.attributes.id,
+                                  displayName: sourceXBlockInfo.attributes.display_name,
+                                },
+                                sourceParentXBlockInfo: {
+                                  id: sourceParentXBlockInfo.attributes.id,
+                                  category: sourceParentXBlockInfo.attributes.category,
+                                  hasChildren: sourceParentXBlockInfo.attributes.has_children,
+                                },
+                            },
                         }, document.referrer
                     );
+                    return true;
                 }
             } catch (e) {
                 console.error(e);
             }
-            var xblockElement = this.findXBlockElement(event.target),
-                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
-                modal = new MoveXBlockModal({
-                    sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
-                    sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
-                    XBlockURLRoot: this.getURLRoot(),
-                    outlineURL: this.options.outlineURL
-                });
 
             event.preventDefault();
             modal.show();
