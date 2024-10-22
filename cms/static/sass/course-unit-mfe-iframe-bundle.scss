@@ -52,6 +52,7 @@
       &:hover {
         background-color: $primary;
         border-color: $transparent;
+        color: $white;
       }
 
       &:focus {
@@ -648,4 +649,8 @@ select {
 
 .wrapper-comp-setting.metadata-list-enum .action.setting-clear.active {
   margin-top: 0;
+}
+
+.wrapper-xblock .xblock-header-primary .header-actions .wrapper-nav-sub {
+  z-index: 15;
 }

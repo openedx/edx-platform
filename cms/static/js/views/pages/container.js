@@ -63,6 +63,13 @@ function($, _, Backbone, gettext, BasePage,
                 el: this.$('.wrapper-xblock-field'),
                 model: this.model
             });
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'refreshXBlock') {
+                    console.log('Received refreshXBlock message:', event.data.text);
+                    // Call the render function to refresh the XBlock
+                    this.render();
+                }
+            });
             this.nameEditor.render();
             if (!this.isLibraryPage) {
                 this.accessEditor = new XBlockAccessEditor({
@@ -381,10 +388,12 @@ function($, _, Backbone, gettext, BasePage,
             event.preventDefault();
             try {
                 if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
+                    return window.parent.postMessage(
                         {
                             type: 'editXBlock',
-                            payload: {}
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator'),
+                            }
                         }, document.referrer
                     );
                 }
@@ -597,10 +606,12 @@ function($, _, Backbone, gettext, BasePage,
             event.preventDefault();
             try {
                 if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
+                    return window.parent.postMessage(
                         {
                             type: 'deleteXBlock',
-                            payload: {}
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator')
+                            }
                         }, document.referrer
                     );
                 }
