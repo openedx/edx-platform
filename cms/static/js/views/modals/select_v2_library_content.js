@@ -1,6 +1,9 @@
 /**
  * Provides utilities to open and close the library content picker.
+ * This is for adding multiple components to a Problem Bank (for randomization).
  *
+ * Compare cms/static/js/views/components/add_library_content.js which uses
+ * a single-select modal to add one component to a course (non-randomized).
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
 function($, _, gettext, BaseModal) {
@@ -8,26 +11,31 @@ function($, _, gettext, BaseModal) {
 
     var SelectV2LibraryContent = BaseModal.extend({
         options: $.extend({}, BaseModal.prototype.options, {
-            modalName: 'add-component-from-library',
+            modalName: 'add-components-from-library',
             modalSize: 'lg',
             view: 'studio_view',
             viewSpecificClasses: 'modal-add-component-picker confirm',
-            // Translators: "title" is the name of the current component being edited.
             titleFormat: gettext('Add library content'),
             addPrimaryActionButton: false,
         }),
 
+        events: {
+            'click .action-add': 'addSelectedComponents',
+            'click .action-cancel': 'cancel',
+        },
+
         initialize: function() {
             BaseModal.prototype.initialize.call(this);
+            this.selections = [];
             // Add event listen to close picker when the iframe tells us to
             const handleMessage = (event) => {
-                if (event.data?.type === 'pickerComponentSelected') {
-                    var requestData = {
-                        library_content_key: event.data.usageKey,
-                        category: event.data.category,
+                if (event.data?.type === 'pickerSelectionChanged') {
+                    this.selections = event.data.selections;
+                    if (this.selections.length > 0) {
+                        this.enableActionButton('add');
+                    } else {
+                        this.disableActionButton('add');
                     }
-                    this.callback(requestData);
-                    this.hide();
                 }
             };
             this.messageListener = window.addEventListener("message", handleMessage);
@@ -43,7 +51,19 @@ function($, _, gettext, BaseModal) {
          * Adds the action buttons to the modal.
          */
         addActionButtons: function() {
+            this.addActionButton('add', gettext('Add selected components'), true);
             this.addActionButton('cancel', gettext('Cancel'));
+            this.disableActionButton('add');
+        },
+
+        /** Handler when the user clicks the "Add Selected Components" primary button */
+        addSelectedComponents: function(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation(); // Make sure parent modals don't see the click
+            }
+            this.hide();
+            this.callback(this.selections);
         },
 
         /**
