@@ -536,7 +536,7 @@ def _import_file_into_course(
     staged_content_id: int,
     file_data_obj: content_staging_api.StagedContentFileData,
     usage_key: UsageKey,
-) -> (bool | None, dict):
+) -> tuple[bool | None, dict]:
     """
     Import a single staged static asset file into the course, unless it already exists.
     Returns True if it was imported, False if there's a conflict, or None if
