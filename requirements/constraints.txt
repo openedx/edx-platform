@@ -153,9 +153,6 @@ path<16.12.0
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
 
-# Date: 2021-07-12
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/33560
-pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
 astroid<2.14.0
 
 # Date: 2021-08-25

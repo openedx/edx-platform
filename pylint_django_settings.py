@@ -1,5 +1,4 @@
-from pylint_django.checkers import ForeignKeyStringsChecker
-from pylint_plugin_utils import get_checker
+import sys
 
 
 class ArgumentCompatibilityError(Exception):
@@ -47,6 +46,5 @@ def load_configuration(linter):
     """
     Configures the Django settings module based on the command-line arguments passed to pylint.
     """
-    name_checker = get_checker(linter, ForeignKeyStringsChecker)
-    arguments = linter.cmdline_parser.parse_args()[1]
-    name_checker.config.django_settings_module = _get_django_settings_module(arguments)
+    arguments = sys.argv[1:]
+    linter.config.django_settings_module = _get_django_settings_module(arguments)

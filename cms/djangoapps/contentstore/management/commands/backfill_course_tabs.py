@@ -71,6 +71,5 @@ class Command(BaseCommand):
 
         if error_keys:
             msg = 'The following courses encountered errors and were not updated:\n'
-            for error_key in error_keys:
-                msg += f' - {error_key}\n'
+            msg += ''.join([f' - {error_key}\n' for error_key in error_keys])
             logger.info(msg)

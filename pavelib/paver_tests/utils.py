@@ -93,5 +93,3 @@ def unexpected_fail_on_npm_install(*args, **kwargs):  # pylint: disable=unused-a
     """
     if ["npm", "install", "--verbose"] == args[0]:  # lint-amnesty, pylint: disable=no-else-raise
         raise BuildFailure('Subprocess return code: 50')
-    else:
-        return

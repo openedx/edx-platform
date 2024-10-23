@@ -265,8 +265,7 @@ class LazySequence(Sequence):
 
     def __iter__(self):
         # Yield all the known data first
-        for item in self._data:
-            yield item
+        yield from self._data
 
         # Capture and yield data from the underlying iterator
         # until it is exhausted
