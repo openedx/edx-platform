@@ -405,7 +405,13 @@ function($, _, Backbone, gettext, BasePage,
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
-                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
+                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url')
+                        + '/' + blockType
+                        + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
+                    var upstreamRef = primaryHeader.attr('data-upstream-ref');
+                    if(upstreamRef) {
+                        destinationUrl += '?upstreamLibRef=' + upstreamRef;
+                    }
                     window.location.href = destinationUrl;
                     return;
                 }
