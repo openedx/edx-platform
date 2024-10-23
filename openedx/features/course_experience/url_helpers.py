@@ -127,10 +127,10 @@ def _get_new_courseware_url(
 
 def make_learning_mfe_courseware_url(
         course_key: CourseKey,
-        preview: bool = None,
         sequence_key: Optional[UsageKey] = None,
         unit_key: Optional[UsageKey] = None,
         params: Optional[QueryDict] = None,
+        preview: bool = None,
 ) -> str:
     """
     Return a str with the URL for the specified courseware content in the Learning MFE.
@@ -162,9 +162,16 @@ def make_learning_mfe_courseware_url(
     `params` is an optional QueryDict object (e.g. request.GET)
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    get_params = params.copy() if params else None
 
     if preview:
-        mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/preview/course/{course_key}'
+        if len(get_params.keys()) > 1:
+            del get_params['preview']
+        else:
+            get_params = None
+        
+        if (unit_key or sequence_key):
+            mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/preview/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -172,10 +179,10 @@ def make_learning_mfe_courseware_url(
         if unit_key:
             mfe_link += f'/{unit_key}'
 
-    if params:
-        get_params = params.copy()
-        del get_params['preview']
+    if get_params:
         mfe_link += f'?{get_params.urlencode()}'
+
+    print(mfe_link)
 
     return mfe_link
 

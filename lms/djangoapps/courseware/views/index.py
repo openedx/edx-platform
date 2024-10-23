@@ -27,6 +27,7 @@ from web_fragments.fragment import Fragment
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.student.models import CourseEnrollment
@@ -188,11 +189,13 @@ class CoursewareIndex(View):
                 unit_key = None
         except InvalidKeyError:
             unit_key = None
+        is_preview = settings.FEATURES.get('PREVIEW_LMS_BASE') == get_current_request_hostname()
         url = make_learning_mfe_courseware_url(
             self.course_key,
             self.section.location if self.section else None,
             unit_key,
             params=self.request.GET,
+            preview=is_preview,
         )
         return url
 
@@ -402,7 +405,6 @@ class CoursewareIndex(View):
         """
 
         course_url = default_course_url(self.course.id)
-        print(course_url, self.chapter, self.section)
         show_search = (
             settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
             (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
