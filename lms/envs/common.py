@@ -3397,6 +3397,8 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
+    # alternative swagger generator for CMS API
+    'drf_spectacular',
 ]
 
 
@@ -5552,3 +5554,8 @@ SURVEY_REPORT_EXTRA_DATA = {}
 # .. for now it wil impact country listing in auth flow and user profile.
 # .. eg ['US', 'CA']
 DISABLED_COUNTRIES = []
+
+################### Authoring API ######################
+
+# This affects the Authoring API swagger docs but not the legacy swagger docs under /api-docs/.
+REST_FRAMEWORK['DEFAULT_SCHEMA_CLASS'] = 'drf_spectacular.openapi.AutoSchema'
