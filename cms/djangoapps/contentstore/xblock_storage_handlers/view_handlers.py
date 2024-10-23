@@ -594,9 +594,13 @@ def _create_block(request):
             # Set `created_block.upstream` and then sync this with the upstream (library) version.
             created_block.upstream = upstream_ref
             sync_from_upstream(downstream=created_block, user=request.user)
-        except BadUpstream:
+        except BadUpstream as exc:
             _delete_item(created_block.location, request.user)
-            return JsonResponse({"error": _("Invalid library xblock reference.")}, status=400)
+            log.exception(
+                f"Could not sync to new block at '{created_block.usage_key}' "
+                f"using provided library_content_key='{upstream_ref}'"
+            )
+            return JsonResponse({"error": str(exc)}, status=400)
         modulestore().update_item(created_block, request.user.id)
 
     return JsonResponse(
