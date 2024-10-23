@@ -154,7 +154,7 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
             </div>
           </li>
 
-	  %if "talentsprint.com" in user.email:	
+	  %if "talentsprint.com" in user.email or "ts.com" in user.email:	
           <li class="nav-item nav-course-settings">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
 
