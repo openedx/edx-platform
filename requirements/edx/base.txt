@@ -70,13 +70,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.35.45
+boto3==1.35.46
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.45
+botocore==1.35.46
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -513,7 +513,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.0.0
+edx-search==4.1.0
     # via -r requirements/edx/kernel.in
 edx-sga==0.25.0
     # via -r requirements/edx/bundled.in
@@ -564,7 +564,7 @@ filelock==3.16.1
     # via snowflake-connector-python
 firebase-admin==6.5.0
     # via edx-ace
-frozenlist==1.4.1
+frozenlist==1.5.0
     # via
     #   aiohttp
     #   aiosignal
@@ -748,7 +748,9 @@ markupsafe==3.0.2
 maxminddb==2.6.2
     # via geoip2
 meilisearch==0.31.5
-    # via -r requirements/edx/kernel.in
+    # via
+    #   -r requirements/edx/kernel.in
+    #   edx-search
 mock==5.1.0
     # via -r requirements/edx/paver.txt
 mongoengine==0.29.1
@@ -881,11 +883,11 @@ prompt-toolkit==3.0.48
     # via click-repl
 propcache==0.2.0
     # via yarl
-proto-plus==1.24.0
+proto-plus==1.25.0
     # via
     #   google-api-core
     #   google-cloud-firestore
-protobuf==5.28.2
+protobuf==5.28.3
     # via
     #   google-api-core
     #   google-cloud-firestore

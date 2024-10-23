@@ -102,13 +102,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.35.45
+boto3==1.35.46
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.45
+botocore==1.35.46
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -620,7 +620,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.0.0
+edx-search==4.1.0
     # via -r requirements/edx/base.txt
 edx-sga==0.25.0
     # via -r requirements/edx/base.txt
@@ -676,7 +676,7 @@ factory-boy==3.3.1
     # via -r requirements/edx/testing.in
 faker==30.8.0
     # via factory-boy
-fastapi==0.115.2
+fastapi==0.115.3
     # via pact-python
 fastavro==1.9.7
     # via
@@ -694,7 +694,7 @@ firebase-admin==6.5.0
     #   edx-ace
 freezegun==1.5.1
     # via -r requirements/edx/testing.in
-frozenlist==1.4.1
+frozenlist==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -945,7 +945,9 @@ maxminddb==2.6.2
 mccabe==0.7.0
     # via pylint
 meilisearch==0.31.5
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-search
 mock==5.1.0
     # via -r requirements/edx/base.txt
 mongoengine==0.29.1
@@ -1123,12 +1125,12 @@ propcache==0.2.0
     # via
     #   -r requirements/edx/base.txt
     #   yarl
-proto-plus==1.24.0
+proto-plus==1.25.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   google-cloud-firestore
-protobuf==5.28.2
+protobuf==5.28.3
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -1520,7 +1522,7 @@ sqlparse==0.5.1
     #   django
 staff-graded-xblock==2.3.0
     # via -r requirements/edx/base.txt
-starlette==0.40.0
+starlette==0.41.0
     # via fastapi
 stevedore==5.3.0
     # via
@@ -1556,7 +1558,7 @@ tomlkit==0.13.2
     #   -r requirements/edx/base.txt
     #   pylint
     #   snowflake-connector-python
-tox==4.23.1
+tox==4.23.2
     # via -r requirements/edx/testing.in
 tqdm==4.66.5
     # via
