@@ -3,6 +3,7 @@ Helper methods for Studio views.
 """
 from __future__ import annotations
 import logging
+import pathlib
 import urllib
 from lxml import etree
 from mimetypes import guess_type
@@ -11,7 +12,7 @@ from attrs import frozen, Factory
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
-from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
@@ -192,6 +193,8 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Problem')
     elif category == 'library_v2':
         return _('Library Content')
+    elif category == 'itembank':
+        return _('Problem Bank')
     component_class = XBlock.load_class(category)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
         return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string
@@ -278,7 +281,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
         # Clipboard is empty or expired/error/loading
         return None, StaticFileNotices()
     olx_str = content_staging_api.get_staged_content_olx(user_clipboard.content.id)
-    static_files = content_staging_api.get_staged_content_static_files(user_clipboard.content.id)
     node = etree.fromstring(olx_str)
     store = modulestore()
     with store.bulk_operations(parent_key.course_key):
@@ -295,12 +297,29 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             copied_from_version_num=user_clipboard.content.version_num,
             tags=user_clipboard.content.tags,
         )
-    # Now handle static files that need to go into Files & Uploads:
-    notices = _import_files_into_course(
-        course_key=parent_key.context_key,
-        staged_content_id=user_clipboard.content.id,
-        static_files=static_files,
-    )
+
+        # Now handle static files that need to go into Files & Uploads.
+        static_files = content_staging_api.get_staged_content_static_files(user_clipboard.content.id)
+        notices, substitutions = _import_files_into_course(
+            course_key=parent_key.context_key,
+            staged_content_id=user_clipboard.content.id,
+            static_files=static_files,
+            usage_key=new_xblock.scope_ids.usage_id,
+        )
+
+        # Rewrite the OLX's static asset references to point to the new
+        # locations for those assets. See _import_files_into_course for more
+        # info on why this is necessary.
+        if hasattr(new_xblock, 'data') and substitutions:
+            data_with_substitutions = new_xblock.data
+            for old_static_ref, new_static_ref in substitutions.items():
+                data_with_substitutions = data_with_substitutions.replace(
+                    old_static_ref,
+                    new_static_ref,
+                )
+            new_xblock.data = data_with_substitutions
+            store.update_item(new_xblock, request.user.id)
+
     return new_xblock, notices
 
 
@@ -454,11 +473,21 @@ def _import_files_into_course(
     course_key: CourseKey,
     staged_content_id: int,
     static_files: list[content_staging_api.StagedContentFileData],
-) -> StaticFileNotices:
+    usage_key: UsageKey,
+) -> tuple[StaticFileNotices, dict[str, str]]:
     """
-    For the given staged static asset files (which are in "Staged Content" such as the user's clipbaord, but which
-    need to end up in the course's Files & Uploads page), import them into the destination course, unless they already
+    For the given staged static asset files (which are in "Staged Content" such
+    as the user's clipbaord, but which need to end up in the course's Files &
+    Uploads page), import them into the destination course, unless they already
     exist.
+
+    This function returns a tuple of StaticFileNotices (assets added, errors,
+    conflicts), and static asset path substitutions that should be made in the
+    OLX in order to paste this content into this course. The latter is for the
+    case in which we're brining content in from a v2 library, which stores
+    static assets locally to a Component and needs to go into a subdirectory
+    when pasting into a course to avoid overwriting commonly named things, e.g.
+    "figure1.png".
     """
     # List of files that were newly added to the destination course
     new_files = []
@@ -466,17 +495,25 @@ def _import_files_into_course(
     conflicting_files = []
     # List of files that had an error (shouldn't happen unless we have some kind of bug)
     error_files = []
+
+    # Store a mapping of asset URLs that need to be modified for the destination
+    # assets. This is necessary when you take something from a library and paste
+    # it into a course, because we need to translate Component-local static
+    # assets and shove them into the Course's global Files & Uploads space in a
+    # nested directory structure.
+    substitutions = {}
     for file_data_obj in static_files:
-        if not isinstance(file_data_obj.source_key, AssetKey):
-            # This static asset was managed by the XBlock and instead of being added to "Files & Uploads", it is stored
-            # using some other system. We could make it available via runtime.resources_fs during XML parsing, but it's
-            # not needed here.
-            continue
         # At this point, we know this is a "Files & Uploads" asset that we may need to copy into the course:
         try:
-            result = _import_file_into_course(course_key, staged_content_id, file_data_obj)
+            result, substitution_for_file = _import_file_into_course(
+                course_key,
+                staged_content_id,
+                file_data_obj,
+                usage_key,
+            )
             if result is True:
                 new_files.append(file_data_obj.filename)
+                substitutions.update(substitution_for_file)
             elif result is None:
                 pass  # This file already exists; no action needed.
             else:
@@ -484,25 +521,45 @@ def _import_files_into_course(
         except Exception:  # lint-amnesty, pylint: disable=broad-except
             error_files.append(file_data_obj.filename)
             log.exception(f"Failed to import Files & Uploads file {file_data_obj.filename}")
-    return StaticFileNotices(
+
+    notices = StaticFileNotices(
         new_files=new_files,
         conflicting_files=conflicting_files,
         error_files=error_files,
     )
+
+    return notices, substitutions
 
 
 def _import_file_into_course(
     course_key: CourseKey,
     staged_content_id: int,
     file_data_obj: content_staging_api.StagedContentFileData,
-) -> bool | None:
+    usage_key: UsageKey,
+) -> tuple[bool | None, dict]:
     """
     Import a single staged static asset file into the course, unless it already exists.
     Returns True if it was imported, False if there's a conflict, or None if
     the file already existed (no action needed).
     """
-    filename = file_data_obj.filename
-    new_key = course_key.make_asset_key("asset", filename)
+    clipboard_file_path = file_data_obj.filename
+
+    # We need to generate an AssetKey to add an asset to a course. The mapping
+    # of directories '/' -> '_' is a long-existing contentstore convention that
+    # we're not going to attempt to change.
+    if clipboard_file_path.startswith('static/'):
+        # If it's in this form, it came from a library and assumes component-local assets
+        file_path = clipboard_file_path.lstrip('static/')
+        import_path = f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
+        filename = pathlib.Path(file_path).name
+        new_key = course_key.make_asset_key("asset", import_path.replace("/", "_"))
+    else:
+        # Otherwise it came from a course...
+        file_path = clipboard_file_path
+        import_path = None
+        filename = pathlib.Path(file_path).name
+        new_key = course_key.make_asset_key("asset", file_path.replace("/", "_"))
+
     try:
         current_file = contentstore().find(new_key)
     except NotFoundError:
@@ -510,22 +567,28 @@ def _import_file_into_course(
     if not current_file:
         # This static asset should be imported into the new course:
         content_type = guess_type(filename)[0]
-        data = content_staging_api.get_staged_content_static_file_data(staged_content_id, filename)
+        data = content_staging_api.get_staged_content_static_file_data(staged_content_id, clipboard_file_path)
         if data is None:
             raise NotFoundError(file_data_obj.source_key)
-        content = StaticContent(new_key, name=filename, content_type=content_type, data=data)
+        content = StaticContent(
+            new_key,
+            name=filename,
+            content_type=content_type,
+            data=data,
+            import_path=import_path
+        )
         # If it's an image file, also generate the thumbnail:
         thumbnail_content, thumbnail_location = contentstore().generate_thumbnail(content)
         if thumbnail_content is not None:
             content.thumbnail_location = thumbnail_location
         contentstore().save(content)
-        return True
+        return True, {clipboard_file_path: f"static/{import_path}"}
     elif current_file.content_digest == file_data_obj.md5_hash:
         # The file already exists and matches exactly, so no action is needed
-        return None
+        return None, {}
     else:
         # There is a conflict with some other file that has the same name.
-        return False
+        return False, {}
 
 
 def is_item_in_course_tree(item):

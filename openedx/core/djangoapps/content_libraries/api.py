@@ -93,7 +93,14 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
+from openedx_learning.api.authoring_models import (
+    Collection,
+    Component,
+    ComponentVersion,
+    MediaType,
+    LearningPackage,
+    PublishableEntity,
+)
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -748,7 +755,7 @@ def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMeta
     return xblock_metadata
 
 
-def set_library_block_olx(usage_key, new_olx_str) -> int:
+def set_library_block_olx(usage_key, new_olx_str) -> ComponentVersion:
     """
     Replace the OLX source of the given XBlock.
 
@@ -761,11 +768,12 @@ def set_library_block_olx(usage_key, new_olx_str) -> int:
     # because this old pylint can't understand attr.ib() objects, pylint: disable=no-member
     assert isinstance(usage_key, LibraryUsageLocatorV2)
 
-    # Make sure the block exists:
-    _block_metadata = get_library_block(usage_key)
+    # HTMLBlock uses CDATA to preserve HTML inside the XML, so make sure we
+    # don't strip that out.
+    parser = etree.XMLParser(strip_cdata=False)
 
     # Verify that the OLX parses, at least as generic XML, and the root tag is correct:
-    node = etree.fromstring(new_olx_str)
+    node = etree.fromstring(new_olx_str, parser=parser)
     if node.tag != usage_key.block_type:
         raise ValueError(
             f"Tried to set the OLX of a {usage_key.block_type} block to a <{node.tag}> node. "
@@ -783,6 +791,14 @@ def set_library_block_olx(usage_key, new_olx_str) -> int:
         "display_name",
         xblock_type_display_name(usage_key.block_type),
     )
+
+    # Libraries don't use the url_name attribute, because they encode that into
+    # the Component key. Normally this is stripped out by the XBlockSerializer,
+    # but we're not actually creating the XBlock when it's coming from the
+    # clipboard right now.
+    if "url_name" in node.attrib:
+        del node.attrib["url_name"]
+        new_olx_str = etree.tostring(node, encoding='unicode')
 
     now = datetime.now(tz=timezone.utc)
 
@@ -809,7 +825,7 @@ def set_library_block_olx(usage_key, new_olx_str) -> int:
         )
     )
 
-    return new_component_version.version_num
+    return new_component_version
 
 
 def library_component_usage_key(
@@ -926,9 +942,9 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
     if not user_clipboard:
         return None
 
-    olx_str = content_staging_api.get_staged_content_olx(user_clipboard.content.id)
-
-    # TODO: Handle importing over static assets
+    staged_content_id = user_clipboard.content.id
+    olx_str = content_staging_api.get_staged_content_olx(staged_content_id)
+    staged_content_files = content_staging_api.get_staged_content_static_files(staged_content_id)
 
     content_library, usage_key = validate_can_add_block_to_library(
         library_key,
@@ -936,9 +952,91 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
         block_id
     )
 
+    # content_library.learning_package is technically a nullable field because
+    # it was added in a later migration, but we can't actually make a Library
+    # without one at the moment. TODO: fix this at the model level.
+    learning_package: LearningPackage = content_library.learning_package  # type: ignore
+
+    now = datetime.now(tz=timezone.utc)
+
     # Create component for block then populate it with clipboard data
-    _create_component_for_block(content_library, usage_key, user.id)
-    set_library_block_olx(usage_key, olx_str)
+    with transaction.atomic():
+        # First create the Component, but do not initialize it to anything (i.e.
+        # no ComponentVersion).
+        component_type = authoring_api.get_or_create_component_type(
+            "xblock.v1", usage_key.block_type
+        )
+        component = authoring_api.create_component(
+            learning_package.id,
+            component_type=component_type,
+            local_key=usage_key.block_id,
+            created=now,
+            created_by=user.id,
+        )
+
+        # This will create the first component version and set the OLX/title
+        # appropriately. It will not publish. Once we get the newly created
+        # ComponentVersion back from this, we can attach all our files to it.
+        component_version = set_library_block_olx(usage_key, olx_str)
+
+        for staged_content_file_data in staged_content_files:
+            # The ``data`` attribute is going to be None because the clipboard
+            # is optimized to not do redundant file copying when copying/pasting
+            # within the same course (where all the Files and Uploads are
+            # shared). Learning Core backed content Components will always store
+            # a Component-local "copy" of the data, and rely on lower-level
+            # deduplication to happen in the ``contents`` app.
+            filename = staged_content_file_data.filename
+
+            # Grab our byte data for the file...
+            file_data = content_staging_api.get_staged_content_static_file_data(
+                staged_content_id,
+                filename,
+            )
+            if not file_data:
+                log.error(
+                    f"Staged content {staged_content_id} included referenced "
+                    f"file {filename}, but no file data was found."
+                )
+                continue
+
+            # Courses don't support having assets that are local to a specific
+            # component, and instead store all their content together in a
+            # shared Files and Uploads namespace. If we're pasting that into a
+            # Learning Core backed data model (v2 Libraries), then we want to
+            # prepend "static/" to the filename. This will need to get updated
+            # when we start moving courses over to Learning Core, or if we start
+            # storing course component assets in sub-directories of Files and
+            # Uploads.
+            #
+            # The reason we don't just search for a "static/" prefix is that
+            # Learning Core components can store other kinds of files if they
+            # wish (though none currently do).
+            source_assumes_global_assets = not isinstance(
+                user_clipboard.source_context_key, LibraryLocatorV2
+            )
+            if source_assumes_global_assets:
+                filename = f"static/{filename}"
+
+            # Now construct the Learning Core data models for it...
+            # TODO: more of this logic should be pushed down to openedx-learning
+            media_type_str, _encoding = mimetypes.guess_type(filename)
+            if not media_type_str:
+                media_type_str = "application/octet-stream"
+
+            media_type = authoring_api.get_or_create_media_type(media_type_str)
+            content = authoring_api.get_or_create_file_content(
+                learning_package.id,
+                media_type.id,
+                data=file_data,
+                created=now,
+            )
+            authoring_api.create_component_version_content(
+                component_version.pk,
+                content.id,
+                key=filename,
+                learner_downloadable=True,
+            )
 
     # Emit library block created event
     LIBRARY_BLOCK_CREATED.send_event(
@@ -966,7 +1064,7 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
 
 def _create_component_for_block(content_lib, usage_key, user_id=None):
     """
-    Create a Component for an XBlock type, and initialize it.
+    Create a Component for an XBlock type, initialize it, and return the ComponentVersion.
 
     This will create a Component, along with its first ComponentVersion. The tag
     in the OLX will have no attributes, e.g. `<problem />`. This first version
@@ -1009,6 +1107,8 @@ def _create_component_for_block(content_lib, usage_key, user_id=None):
             key="block.xml",
             learner_downloadable=False
         )
+
+        return component_version
 
 
 def delete_library_block(usage_key, remove_from_parent=True):

@@ -233,9 +233,16 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         return block
 
-    def get_block_assets(self, block):
+    def get_block_assets(self, block, fetch_asset_data):
         """
         Return a list of StaticFile entries.
+
+        If ``fetch_data`` is True, we will read the actual asset file data from
+        storage and return it as part of the ``StaticFiles``. This is expensive,
+        and not necessary for something like writing a new version of the OLX in
+        response to a "Save" in the editor. But it is necessary for something
+        like serializing to the clipboard, where we make full copies of the
+        assets.
 
         TODO: When we want to copy a whole Section at a time, doing these
         lookups one by one is going to get slow. At some point we're going to
@@ -248,6 +255,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             component_version
             .componentversioncontent_set
             .filter(content__has_file=True)
+            .select_related('content')
             .order_by('key')
         )
 
@@ -255,7 +263,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             StaticFile(
                 name=cvc.key,
                 url=self._absolute_url_for_asset(component_version, cvc.key),
-                data=None,
+                data=cvc.content.read_file().read() if fetch_asset_data else None,
             )
             for cvc in cvc_list
         ]

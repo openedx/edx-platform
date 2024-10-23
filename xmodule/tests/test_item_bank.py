@@ -192,10 +192,11 @@ class TestItemBankForCms(ItemBankTestBase):
         """ Test author view rendering """
         self._bind_course_block(self.item_bank)
         rendered = self.item_bank.render(AUTHOR_VIEW, {})
-        assert '' == rendered.content
-        # content should be empty
-        assert 'LibraryContentAuthorView' == rendered.js_init_fn
-        # but some js initialization should happen
+        assert 'Learners will see 1 of the 4 selected components' in rendered.content
+        assert '<li>My Item 0</li>' in rendered.content
+        assert '<li>My Item 1</li>' in rendered.content
+        assert '<li>My Item 2</li>' in rendered.content
+        assert '<li>My Item 3</li>' in rendered.content
 
 
 @skip_unless_lms
