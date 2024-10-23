@@ -70,6 +70,11 @@ complexity of Open edX configuration and deployment into their own hands.
 System Dependencies
 -------------------
 
+OS:
+* Ubuntu 20.04
+
+* Ubuntu 22.04
+
 Interperters/Tools:
 
 * Python 3.11
