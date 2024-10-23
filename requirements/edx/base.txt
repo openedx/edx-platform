@@ -1285,10 +1285,8 @@ xblock-utils==4.0.0
     # via
     #   edx-sga
     #   xblock-poll
-xmlsec==1.3.13
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   python3-saml
+xmlsec==1.3.14
+    # via python3-saml
 xss-utils==0.6.0
     # via -r requirements/edx/kernel.in
 yarl==1.17.0

@@ -191,8 +191,3 @@ social-auth-app-django<=5.4.1
 # # Date: 2024-10-14
 # # The edx-enterprise is currently using edx-rest-api-client==5.7.1, which needs to be updated first.
 # edx-rest-api-client==5.7.1
-
-# Date: 2024-04-24
-# xmlsec==1.3.14 breaking tests or all builds, can be removed once a fix is available
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35264
-xmlsec<1.3.14
