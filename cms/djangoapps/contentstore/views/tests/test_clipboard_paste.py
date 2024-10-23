@@ -502,7 +502,6 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         """
         Assets from a library component copied into a subdir of Files & Uploads.
         """
-        return
         # This is the binary for a real, 1px webp file – we need actual image
         # data because contentstore will try to make a thumbnail and grab
         # metadata.
