@@ -120,8 +120,6 @@ def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function
             log.info('Sending forum comment notification with context %s', message_context)
             ace.send(message, limit_to_channels=[ChannelType.PUSH])
             _track_notification_sent(message, context)
-    else:
-        return
 
 
 @shared_task(base=LoggedTask)
