@@ -595,3 +595,38 @@
     }
   }
 }
+
+.modal-alert {
+    display: flex;
+    align-items: center;
+    padding: $baseline;
+    margin-bottom: $baseline;
+
+    &.warning {
+        background-color: $state-warning-bg;
+
+        .fa-warning {
+            color: $orange;
+            margin-right: $baseline;
+        }
+    }
+
+    .action-btn {
+        text-wrap: nowrap;
+        background-color: $black;
+        color: $white;
+        margin-left: auto;
+        padding: ($baseline/2);
+
+        .fa {
+            margin-left: ($baseline/4);
+            color: $white
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            background-color: lighten($black, 20%);
+        }
+    }
+}

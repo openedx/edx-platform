@@ -2,6 +2,7 @@
 Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 """
 from unittest.mock import patch
+from django.conf import settings
 
 from cms.lib.xblock.upstream_sync import UpstreamLink, BadUpstream
 from common.djangoapps.student.tests.factories import UserFactory
@@ -12,7 +13,13 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from .. import downstreams as downstreams_views
 
 
-MOCK_UPSTREAM_REF = "mock-upstream-ref"
+MOCK_LIB_KEY = "lib:OpenedX:CSPROB3"
+MOCK_UPSTREAM_REF = "lb:OpenedX:CSPROB3:html:843b4c73-1e2d-4ced-a0ff-24e503cdb3e4"
+MOCK_UPSTREAM_LINK = "{mfe_url}/library/{lib_key}/components?usageKey={usage_key}".format(
+    mfe_url=settings.COURSE_AUTHORING_MICROFRONTEND_URL,
+    lib_key=MOCK_LIB_KEY,
+    usage_key=MOCK_UPSTREAM_REF,
+)
 MOCK_UPSTREAM_ERROR = "your LibraryGPT subscription has expired"
 
 
@@ -92,6 +99,7 @@ class GetDownstreamViewTest(_DownstreamViewTestMixin, SharedModuleStoreTestCase)
         assert response.data['upstream_ref'] == MOCK_UPSTREAM_REF
         assert response.data['error_message'] is None
         assert response.data['ready_to_sync'] is True
+        assert response.data['upstream_link'] == MOCK_UPSTREAM_LINK
 
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_bad)
     def test_200_bad_upstream(self):
@@ -104,6 +112,7 @@ class GetDownstreamViewTest(_DownstreamViewTestMixin, SharedModuleStoreTestCase)
         assert response.data['upstream_ref'] == MOCK_UPSTREAM_REF
         assert response.data['error_message'] == MOCK_UPSTREAM_ERROR
         assert response.data['ready_to_sync'] is False
+        assert response.data['upstream_link'] is None
 
     def test_200_no_upstream(self):
         """
@@ -115,6 +124,7 @@ class GetDownstreamViewTest(_DownstreamViewTestMixin, SharedModuleStoreTestCase)
         assert response.data['upstream_ref'] is None
         assert "is not linked" in response.data['error_message']
         assert response.data['ready_to_sync'] is False
+        assert response.data['upstream_link'] is None
 
 
 class PutDownstreamViewTest(_DownstreamViewTestMixin, SharedModuleStoreTestCase):
