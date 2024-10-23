@@ -15,7 +15,7 @@ concurrency:
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os-version }}
     strategy:
       matrix:
         python-version:
@@ -43,22 +43,27 @@ jobs:
           - "xmodule-with-cms"
         mongo-version:
           - "7.0"
+        os-version:
+          - ubuntu-24.04
 
-        # We only need to test older versions of Mongo with modules that directly interface with Mongo (that is: xmodule.modulestore)
-        # This code is left here as an example for future refernce in case we need to reduce the number of shards we're
-        # testing but still have good confidence with older versions of mongo.  We use Mongo 4.4 in the example.
+        # It's useful to run some subset of the tests on the older version of Ubuntu
+        # so that we don't spend too many resources on this but can find major issues quickly
+        # while we're in a situation where we support two versions.  This section may be commented
+        # out when not in use to easily add/drop future support for any given major dependency.
         #
-        # exclude:
-        #   - mongo-version: "4.4"
-        # include:
-        #   - shard_name: "xmodule-with-cms"
-        #     python-version: "3.11"
-        #     django-version: "pinned"
-        #     mongo-version: "4.4"
-        #   - shard_name: "xmodule-with-lms"
-        #     python-version: "3.11"
-        #     django-version: "pinned"
-        #     mongo-version: "4.4"
+        # We're testing the older version of Ubuntu and running the xmodule tests since those rely on many
+        # dependent complex libraries and will hopefully catch most issues quickly.
+        include:
+          - shard_name: "xmodule-with-cms"
+            python-version: "3.11"
+            django-version: "pinned"
+            mongo-version: "7.0"
+            os-version: "ubuntu-22.04"
+          - shard_name: "xmodule-with-lms"
+            python-version: "3.11"
+            django-version: "pinned"
+            mongo-version: "7.0"
+            os-version: "ubuntu-22.04"
 
     steps:
       - name: checkout repo
