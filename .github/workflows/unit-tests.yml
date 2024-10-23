@@ -90,19 +90,10 @@ jobs:
           activate = 1
           EOF
 
-      - name: install mongo version
-        run: |
-          if [[ "${{ matrix.mongo-version }}" != "4.4" ]]; then
-            wget -qO - https://www.mongodb.org/static/pgp/server-${{ matrix.mongo-version }}.asc | sudo apt-key add -
-            echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${{ matrix.mongo-version }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ matrix.mongo-version }}.list
-            sudo apt-get update && sudo apt-get install -y mongodb-org="${{ matrix.mongo-version }}.*"
-          fi
-
-      - name: start mongod server for tests
-        run: |
-          sudo mkdir -p /data/db
-          sudo chmod -R a+rw /data/db
-          mongod &
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-version: ${{ matrix.mongo-version }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
