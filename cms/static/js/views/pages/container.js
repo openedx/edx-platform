@@ -762,9 +762,10 @@ function($, _, Backbone, gettext, BasePage,
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
-            if((useNewTextEditor === 'True' && blockType.includes('html'))
+            // open mfe editors for new blocks only and not for content imported from libraries
+            if(!data.hasOwnProperty('upstreamRef') && ((useNewTextEditor === 'True' && blockType.includes('html'))
                     || (useNewVideoEditor === 'True' && blockType.includes('video'))
-                    || (useNewProblemEditor === 'True' && blockType.includes('problem'))
+                    || (useNewProblemEditor === 'True' && blockType.includes('problem')))
             ){
                 var destinationUrl;
                 if (useVideoGalleryFlow === "True" && blockType.includes("video")) {

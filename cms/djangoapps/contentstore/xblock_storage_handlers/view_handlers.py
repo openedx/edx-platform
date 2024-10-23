@@ -587,6 +587,10 @@ def _create_block(request):
         boilerplate=request.json.get("boilerplate"),
     )
 
+    response = {
+        "locator": str(created_block.location),
+        "courseKey": str(created_block.location.course_key),
+    }
     # If it contains library_content_key, the block is being imported from a v2 library
     # so it needs to be synced with upstream block.
     if upstream_ref := request.json.get("library_content_key"):
@@ -598,13 +602,9 @@ def _create_block(request):
             _delete_item(created_block.location, request.user)
             return JsonResponse({"error": _("Invalid library xblock reference.")}, status=400)
         modulestore().update_item(created_block, request.user.id)
+        response['upstreamRef'] = upstream_ref
 
-    return JsonResponse(
-        {
-            "locator": str(created_block.location),
-            "courseKey": str(created_block.location.course_key),
-        }
-    )
+    return JsonResponse(response)
 
 
 def _get_source_index(source_usage_key, source_parent):
