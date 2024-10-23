@@ -93,7 +93,14 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Collection, Component, MediaType, LearningPackage, PublishableEntity
+from openedx_learning.api.authoring_models import (
+    Collection,
+    Component,
+    ComponentVersion,
+    MediaType,
+    LearningPackage,
+    PublishableEntity,
+)
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -748,7 +755,7 @@ def get_library_block(usage_key, include_collections=False) -> LibraryXBlockMeta
     return xblock_metadata
 
 
-def set_library_block_olx(usage_key, new_olx_str) -> int:
+def set_library_block_olx(usage_key, new_olx_str) -> ComponentVersion:
     """
     Replace the OLX source of the given XBlock.
 
@@ -945,6 +952,11 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
         block_id
     )
 
+    # content_library.learning_package is technically a nullable field because
+    # it was added in a later migration, but we can't actually make a Library
+    # without one at the moment. TODO: fix this at the model level.
+    learning_package: LearningPackage = content_library.learning_package  # type: ignore
+
     now = datetime.now(tz=timezone.utc)
 
     # Create component for block then populate it with clipboard data
@@ -955,7 +967,7 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
             "xblock.v1", usage_key.block_type
         )
         component = authoring_api.create_component(
-            content_library.learning_package.id,
+            learning_package.id,
             component_type=component_type,
             local_key=usage_key.block_id,
             created=now,
@@ -981,6 +993,12 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
                 staged_content_id,
                 filename,
             )
+            if not file_data:
+                log.error(
+                    f"Staged content {staged_content_id} included referenced "
+                    f" file {filename}, but no file data was found."
+                )
+                continue
 
             # Courses don't support having assets that are local to a specific
             # component, and instead store all their content together in a
@@ -1001,10 +1019,14 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
                 filename = f"static/{filename}"
 
             # Now construct the Learning Core data models for it...
+            # TODO: more of this logic should be pushed down to openedx-learning
             media_type_str, _encoding = mimetypes.guess_type(filename)
+            if not media_type_str:
+                media_type_str = "application/octet-stream"
+
             media_type = authoring_api.get_or_create_media_type(media_type_str)
             content = authoring_api.get_or_create_file_content(
-                content_library.learning_package_id,
+                learning_package.id,
                 media_type.id,
                 data=file_data,
                 created=now,
@@ -1015,7 +1037,6 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
                 key=filename,
                 learner_downloadable=True,
             )
-
 
     # Emit library block created event
     LIBRARY_BLOCK_CREATED.send_event(
