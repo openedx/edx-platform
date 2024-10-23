@@ -108,7 +108,7 @@ def _load_mixed_class(category):
     Load an XBlock by category name, and apply all defined mixins
     """
     # Libraries v2 content doesn't have an XBlock.
-    if category in ('library_v2', 'itembank'):
+    if category == 'library_v2':
         return None
 
     component_class = XBlock.load_class(category)
