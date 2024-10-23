@@ -1090,6 +1090,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_id="problem1"
             )
 
+            # Add an asset to the block before copying
+            self._set_library_block_asset(usage_key, "static/hello.txt", b"Hello World!")
+
             # Get the XBlock created in the previous step
             block = xblock_api.load_block(usage_key, user=author)
 
@@ -1099,6 +1102,17 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             # Paste the content of the clipboard into the library
             pasted_block_id = str(uuid4())
             paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
+            pasted_usage_key = LibraryUsageLocatorV2(
+                lib_key=library_key,
+                block_type="problem",
+                usage_id=pasted_block_id
+            )
+            self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
+
+            # Compare the two text files
+            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").content
+            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").content
+            assert src_data == dest_data
 
             # Check that the new block was created after the paste and it's content matches
             # the the block in the clipboard
