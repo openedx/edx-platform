@@ -474,7 +474,7 @@ def _import_files_into_course(
     staged_content_id: int,
     static_files: list[content_staging_api.StagedContentFileData],
     usage_key: UsageKey,
-) -> (StaticFileNotices, dict[str, str]):
+) -> tuple[StaticFileNotices, dict[str, str]]:
     """
     For the given staged static asset files (which are in "Staged Content" such
     as the user's clipbaord, but which need to end up in the course's Files &
