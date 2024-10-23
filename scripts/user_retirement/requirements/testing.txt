@@ -14,11 +14,11 @@ attrs==24.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.35.45
+boto3==1.35.46
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.35.45
+botocore==1.35.46
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -148,11 +148,11 @@ platformdirs==4.3.6
     #   zeep
 pluggy==1.5.0
     # via pytest
-proto-plus==1.24.0
+proto-plus==1.25.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==5.28.2
+protobuf==5.28.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core

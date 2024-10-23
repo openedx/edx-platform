@@ -102,13 +102,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.35.45
+boto3==1.35.46
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.45
+botocore==1.35.46
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -594,7 +594,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.0.0
+edx-search==4.1.0
     # via -r requirements/edx/base.txt
 edx-sga==0.25.0
     # via -r requirements/edx/base.txt
@@ -656,7 +656,7 @@ firebase-admin==6.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
-frozenlist==1.4.1
+frozenlist==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -892,7 +892,9 @@ maxminddb==2.6.2
     #   -r requirements/edx/base.txt
     #   geoip2
 meilisearch==0.31.5
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-search
 mistune==3.0.2
     # via sphinx-mdinclude
 mock==5.1.0
@@ -1002,7 +1004,6 @@ packaging==24.1
     #   drf-yasg
     #   gunicorn
     #   py2neo
-    #   pydata-sphinx-theme
     #   snowflake-connector-python
     #   sphinx
 pansi==2020.7.3
@@ -1061,12 +1062,12 @@ propcache==0.2.0
     # via
     #   -r requirements/edx/base.txt
     #   yarl
-proto-plus==1.24.0
+proto-plus==1.25.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   google-cloud-firestore
-protobuf==5.28.2
+protobuf==5.28.3
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -1112,7 +1113,7 @@ pydantic-core==2.23.4
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
-pydata-sphinx-theme==0.15.4
+pydata-sphinx-theme==0.16.0
     # via sphinx-book-theme
 pygments==2.18.0
     # via
