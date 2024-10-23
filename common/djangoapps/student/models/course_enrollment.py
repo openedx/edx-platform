@@ -717,6 +717,8 @@ class CourseEnrollment(models.Model):
         Also emits relevant events for analytics purposes.
         """
         try:
+            # .. filter_implemented_name: CourseEnrollmentStarted
+            # .. filter_type: org.openedx.learning.course.enrollment.started.v1
             user, course_key, mode = CourseEnrollmentStarted.run_filter(
                 user=user, course_key=course_key, mode=mode,
             )
