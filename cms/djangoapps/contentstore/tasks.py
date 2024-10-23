@@ -1066,3 +1066,42 @@ def undo_all_library_source_blocks_ids_for_course(course_key_string, v1_to_v2_li
             store.update_item(draft_library_source_block, None)
     # return success
     return
+
+
+class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
+    """
+    Base class for course link check tasks.
+    """
+
+    @staticmethod
+    def calculate_total_steps(arguments_dict):
+        """
+        Get the number of in-progress steps in the export process, as shown in the UI.
+
+        For reference, these are:
+
+        1. Checking links
+        2. Saving???
+        """
+        return 2
+
+    @classmethod
+    def generate_name(cls, arguments_dict):
+        """
+        Create a name for this particular task instance.
+
+        Arguments:
+            arguments_dict (dict): The arguments given to the task function
+
+        Returns:
+            str: The generated name
+        """
+        key = arguments_dict['course_key_string']
+        return f'Link check of {key}'
+
+
+def check_broken_links(self, user_id, course_key_string):
+    """
+    Checks for broken links in a course. Store the results.
+    """
+    return f'link_check {user_id} {course_key_string}'
