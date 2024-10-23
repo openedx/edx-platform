@@ -996,7 +996,7 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
             if not file_data:
                 log.error(
                     f"Staged content {staged_content_id} included referenced "
-                    f" file {filename}, but no file data was found."
+                    f"file {filename}, but no file data was found."
                 )
                 continue
 
