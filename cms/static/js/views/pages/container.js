@@ -426,6 +426,7 @@ function($, _, Backbone, gettext, BasePage,
             });
         },
 
+        /** Show the modal for previewing changes before syncing a library-sourced XBlock. */
         showXBlockLibraryChangesPreview: function(event, options) {
             event.preventDefault();
 
@@ -438,6 +439,7 @@ function($, _, Backbone, gettext, BasePage,
             });
         },
 
+        /** Show the multi-select library content picker, for adding to a Problem Bank (itembank) Component */
         showSelectV2LibraryContent: function(event, options) {
             event.preventDefault();
 
@@ -445,32 +447,40 @@ function($, _, Backbone, gettext, BasePage,
             const modal = new SelectV2LibraryContent(options);
             const courseAuthoringMfeUrl = this.model.attributes.course_authoring_url;
             const itemBankBlockId = xblockElement.data("locator");
-            const pickerUrl = courseAuthoringMfeUrl + '/component-picker?variant=published';
+            const pickerUrl = courseAuthoringMfeUrl + '/component-picker/multiple?variant=published';
 
-            modal.showComponentPicker(pickerUrl, (selectedBlockData) => {
-                const createData = {
-                    parent_locator: itemBankBlockId,
-                    // The user wants to add this block from the library to the Problem Bank:
-                    library_content_key: selectedBlockData.library_content_key,
-                    category: selectedBlockData.category,
-                };
-                let doneAddingBlock = () => { this.refreshXBlock(xblockElement, false); };
+            modal.showComponentPicker(pickerUrl, (selectedBlocks) => {
+                // selectedBlocks has type: {usageKey: string, blockType: string}[]
+                let doneAddingAllBlocks = () => { this.refreshXBlock(xblockElement, false); };
+                let doneAddingBlock = () => {};
                 if (this.model.id === itemBankBlockId) {
                     // We're on the detailed view, showing all the components inside the problem bank.
                     // Create a placeholder that will become the new block(s)
-                    const $placeholderEl = $(this.createPlaceholderElement());
                     const $insertSpot = xblockElement.find('.insert-new-lib-blocks-here');
-                    const placeholderElement = $placeholderEl.insertBefore($insertSpot);
-                    const scrollOffset = ViewUtils.getScrollOffset($placeholderEl);
                     doneAddingBlock = (addResult) => {
-                        ViewUtils.setScrollOffset(placeholderElement, scrollOffset);
+                        const $placeholderEl = $(this.createPlaceholderElement());
+                        const placeholderElement = $placeholderEl.insertBefore($insertSpot);
                         placeholderElement.data('locator', addResult.locator);
                         return this.refreshXBlock(placeholderElement, true);
                     };
+                    doneAddingAllBlocks = () => {};
+                }
+                // Note: adding all the XBlocks in parallel will cause a race condition 😢 so we have to add
+                // them one at a time:
+                let lastAdded = $.when();
+                for (const { usageKey, blockType } of selectedBlocks) {
+                    const addData = {
+                        library_content_key: usageKey,
+                        category: blockType,
+                        parent_locator: itemBankBlockId,
+                    };
+                    lastAdded = lastAdded.then(() => (
+                        $.postJSON(this.getURLRoot() + '/', addData, doneAddingBlock)
+                    ));
                 }
                 // Now we actually add the block:
                 ViewUtils.runOperationShowingMessage(gettext('Adding'), () => {
-                    return $.postJSON(this.getURLRoot() + '/', createData, doneAddingBlock);
+                    return lastAdded.done(() => { doneAddingAllBlocks() });
                 });
             });
         },

@@ -1,6 +1,13 @@
 /**
  * Provides utilities to open and close the library content picker.
+ * This is for adding a single, selected, non-randomized component (XBlock)
+ * from the library into the course. It achieves the same effect as copy-pasting
+ * the block from a library into the course. The block will remain synced with
+ * the "upstream" library version.
  *
+ * Compare cms/static/js/views/modals/select_v2_library_content.js which uses
+ * a multi-select modal to add component(s) to a Problem Bank (for
+ * randomization).
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
 function($, _, gettext, BaseModal) {
