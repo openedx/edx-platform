@@ -436,7 +436,7 @@ def get_library_content_picker_url(course_locator) -> str:
     content_picker_url = None
     if libraries_v2_enabled():
         mfe_base_url = get_course_authoring_url(course_locator)
-        content_picker_url = f'{mfe_base_url}/component-picker'
+        content_picker_url = f'{mfe_base_url}/component-picker?variant=published'
 
     return content_picker_url
 
