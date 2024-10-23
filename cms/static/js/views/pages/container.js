@@ -8,7 +8,8 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
     'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
     'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-    'js/views/utils/tagging_drawer_utils', 'js/utils/module', 'js/views/modals/preview_v2_library_changes'
+    'js/views/utils/tagging_drawer_utils', 'js/utils/module', 'js/views/modals/preview_v2_library_changes',
+    'js/views/modals/select_v2_library_content'
 ],
 function($, _, Backbone, gettext, BasePage,
     ViewUtils, ContainerView, XBlockView,
@@ -16,7 +17,7 @@ function($, _, Backbone, gettext, BasePage,
     XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils,
     NotificationView, PromptView, TaggingDrawerUtils, ModuleUtils,
-    PreviewLibraryChangesModal) {
+    PreviewLibraryChangesModal, SelectV2LibraryContent) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -30,6 +31,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
             'click .library-sync-button': 'showXBlockLibraryChangesPreview',
+            'click .problem-bank-v2-add-button': 'showSelectV2LibraryContent',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons',
             'click .save-button': 'saveSelectedLibraryComponents',
@@ -255,6 +257,7 @@ function($, _, Backbone, gettext, BasePage,
                     } else {
                         // The thing in the clipboard can be pasted into this unit:
                         const detailsPopupEl = this.$(".clipboard-details-popup")[0];
+                        if (!detailsPopupEl) return; // This happens on the Problem Bank container page - no paste button is there anyways
                         detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
                         detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
                         detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
@@ -423,6 +426,7 @@ function($, _, Backbone, gettext, BasePage,
             });
         },
 
+        /** Show the modal for previewing changes before syncing a library-sourced XBlock. */
         showXBlockLibraryChangesPreview: function(event, options) {
             event.preventDefault();
 
@@ -432,6 +436,52 @@ function($, _, Backbone, gettext, BasePage,
 
             modal.showPreviewFor(xblockElement, this.model, function() {
                 self.refreshXBlock(xblockElement, false);
+            });
+        },
+
+        /** Show the multi-select library content picker, for adding to a Problem Bank (itembank) Component */
+        showSelectV2LibraryContent: function(event, options) {
+            event.preventDefault();
+
+            const xblockElement = this.findXBlockElement(event.target);
+            const modal = new SelectV2LibraryContent(options);
+            const courseAuthoringMfeUrl = this.model.attributes.course_authoring_url;
+            const itemBankBlockId = xblockElement.data("locator");
+            const pickerUrl = courseAuthoringMfeUrl + '/component-picker/multiple?variant=published';
+
+            modal.showComponentPicker(pickerUrl, (selectedBlocks) => {
+                // selectedBlocks has type: {usageKey: string, blockType: string}[]
+                let doneAddingAllBlocks = () => { this.refreshXBlock(xblockElement, false); };
+                let doneAddingBlock = () => {};
+                if (this.model.id === itemBankBlockId) {
+                    // We're on the detailed view, showing all the components inside the problem bank.
+                    // Create a placeholder that will become the new block(s)
+                    const $insertSpot = xblockElement.find('.insert-new-lib-blocks-here');
+                    doneAddingBlock = (addResult) => {
+                        const $placeholderEl = $(this.createPlaceholderElement());
+                        const placeholderElement = $placeholderEl.insertBefore($insertSpot);
+                        placeholderElement.data('locator', addResult.locator);
+                        return this.refreshXBlock(placeholderElement, true);
+                    };
+                    doneAddingAllBlocks = () => {};
+                }
+                // Note: adding all the XBlocks in parallel will cause a race condition 😢 so we have to add
+                // them one at a time:
+                let lastAdded = $.when();
+                for (const { usageKey, blockType } of selectedBlocks) {
+                    const addData = {
+                        library_content_key: usageKey,
+                        category: blockType,
+                        parent_locator: itemBankBlockId,
+                    };
+                    lastAdded = lastAdded.then(() => (
+                        $.postJSON(this.getURLRoot() + '/', addData, doneAddingBlock)
+                    ));
+                }
+                // Now we actually add the block:
+                ViewUtils.runOperationShowingMessage(gettext('Adding'), () => {
+                    return lastAdded.done(() => { doneAddingAllBlocks() });
+                });
             });
         },
 

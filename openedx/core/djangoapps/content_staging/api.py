@@ -13,7 +13,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, UsageKey
 from xblock.core import XBlock
 
-from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx, StaticFile
+from openedx.core.lib.xblock_serializer.api import StaticFile, XBlockSerializer
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from xmodule import block_metadata_utils
 from xmodule.contentstore.content import StaticContent
@@ -38,7 +38,10 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
     """
     Copy an XBlock's OLX to the user's clipboard.
     """
-    block_data = serialize_xblock_to_olx(block)
+    block_data = XBlockSerializer(
+        block,
+        fetch_asset_data=True,
+    )
     usage_key = block.usage_key
 
     expired_ids = []

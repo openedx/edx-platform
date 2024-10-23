@@ -47,6 +47,7 @@ COMPONENT_TYPES = [
     'discussion',
     'library',
     'library_v2',  # Not an XBlock
+    'itembank',
     'html',
     'openassessment',
     'problem',
@@ -262,6 +263,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'openassessment': _("Open Response"),
         'library': _("Legacy Library"),
         'library_v2': _("Library Content"),
+        'itembank': _("Problem Bank"),
         'drag-and-drop-v2': _("Drag and Drop"),
     }
 
@@ -488,6 +490,7 @@ def _filter_disabled_blocks(all_blocks):
     disabled_block_names = [block.name for block in disabled_xblocks()]
     if not libraries_v2_enabled():
         disabled_block_names.append('library_v2')
+        disabled_block_names.append('itembank')
     return [block_name for block_name in all_blocks if block_name not in disabled_block_names]
 
 
