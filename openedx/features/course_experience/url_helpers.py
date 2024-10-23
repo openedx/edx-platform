@@ -170,7 +170,7 @@ def make_learning_mfe_courseware_url(
             del get_params['preview']
         else:
             get_params = None
-        
+
         if (unit_key or sequence_key):
             mfe_link = f'/preview/course/{course_key}'
 
@@ -183,13 +183,10 @@ def make_learning_mfe_courseware_url(
     if get_params:
         query_string = get_params.urlencode()
 
-    # url_parts = ['', , mfe_link, '', query_string, '']
-    # url = urlunparse(url_parts)
-    # print(url)
-
     url_parts = list(urlparse(settings.LEARNING_MICROFRONTEND_URL))
-    url_parts[2]= mfe_link
+    url_parts[2] = mfe_link
     url_parts[4] = query_string
+
     return urlunparse(url_parts)
 
 

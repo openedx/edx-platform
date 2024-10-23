@@ -143,12 +143,15 @@ class TestJumpTo(ModuleStoreTestCase):
             course = CourseFactory.create()
             location = course.id.make_usage_key(None, 'NoSuchPlace')
 
-        expected_redirect_url =  f'http://learning-mfe/course/{course.id}'
-        jumpto_url = f'/courses/{course.id}/jump_to/{location}?preview=1' if preview_mode else f'/courses/{course.id}/jump_to/{location}'
+        expected_redirect_url = f'http://learning-mfe/course/{course.id}'
+        jumpto_url = (
+            f'/courses/{course.id}/jump_to/{location}?preview=1'
+        ) if preview_mode else (
+            f'/courses/{course.id}/jump_to/{location}'
+        )
 
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        
         with set_preview_mode(False):
             response = self.client.get(jumpto_url)
         assert response.status_code == 302
@@ -267,7 +270,11 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jump_to_id_invalid_location(self, preview_mode, store_type):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-        jumpto_url = f'/courses/{course.id}/jump_to/NoSuchPlace?preview=1' if preview_mode else f'/courses/{course.id}/jump_to/NoSuchPlace'
+        jumpto_url = (
+            f'/courses/{course.id}/jump_to/NoSuchPlace?preview=1'
+        ) if preview_mode else (
+            f'/courses/{course.id}/jump_to/NoSuchPlace'
+        )
         with set_preview_mode(False):
             response = self.client.get(jumpto_url)
         assert response.status_code == 404

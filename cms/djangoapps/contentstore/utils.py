@@ -209,7 +209,7 @@ def get_lms_link_for_item(location, preview=False):
         query_string = urlencode(params)
 
     url_parts = list(urlparse(lms_base))
-    url_parts[2]= '/courses/{course_key}/jump_to/{location}'.format(
+    url_parts[2] = '/courses/{course_key}/jump_to/{location}'.format(
         course_key=str(location.course_key),
         location=str(location),
     )
