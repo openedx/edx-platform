@@ -106,7 +106,7 @@ class BlockStructureManager:
             BlockStructureTransformers.verify_versions(block_structure)
 
         except (BlockStructureNotFound, TransformerDataIncompatible):
-            if user:
+            if user and getattr(user, "known", True):
                 # This bypasses the runtime access checks. When we are populating the course blocks cache,
                 # we do not want to perform access checks. Access checks result in inconsistent blocks where
                 # inaccessible blocks are missing from the cache. Cached course blocks are then used for all the users.
