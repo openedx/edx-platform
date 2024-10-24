@@ -11,8 +11,6 @@ from opaque_keys import InvalidKeyError
 
 from openedx_learning.api.authoring_models import Collection
 from openedx.core.djangoapps.content_libraries.constants import (
-    LIBRARY_TYPES,
-    COMPLEX,
     ALL_RIGHTS_RESERVED,
     LICENSE_OPTIONS,
 )
@@ -37,10 +35,8 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     # begins with 'lib:'. (The numeric ID of the ContentLibrary object in MySQL
     # is not exposed via this API.)
     id = serializers.CharField(source="key", read_only=True)
-    type = serializers.ChoiceField(choices=LIBRARY_TYPES, default=COMPLEX)
     org = serializers.SlugField(source="key.org")
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
-    bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     num_blocks = serializers.IntegerField(read_only=True)
@@ -86,7 +82,6 @@ class ContentLibraryUpdateSerializer(serializers.Serializer):
     description = serializers.CharField()
     allow_public_learning = serializers.BooleanField()
     allow_public_read = serializers.BooleanField()
-    type = serializers.ChoiceField(choices=LIBRARY_TYPES)
     license = serializers.ChoiceField(choices=LICENSE_OPTIONS)
 
 
@@ -131,7 +126,6 @@ class ContentLibraryFilterSerializer(BaseFilterSerializer):
     """
     Serializer for filtering library listings.
     """
-    type = serializers.ChoiceField(choices=LIBRARY_TYPES, default=None, required=False)
 
 
 class CollectionMetadataSerializer(serializers.Serializer):

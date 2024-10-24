@@ -25,7 +25,7 @@ from organizations.models import Organization
 from rest_framework.test import APITestCase
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content_libraries.constants import CC_4_BY, COMPLEX, PROBLEM, VIDEO
+from openedx.core.djangoapps.content_libraries.constants import CC_4_BY
 from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
@@ -100,7 +100,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             "title": "A Tést Lꜟطrary",
             "description": "Just Téstꜟng",
             "version": 0,
-            "type": COMPLEX,
             "license": CC_4_BY,
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
@@ -199,13 +198,13 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         Test the filters in the list libraries API
         """
         self._create_library(
-            slug="test-lib-filter-1", title="Fob", description="Bar", library_type=VIDEO,
+            slug="test-lib-filter-1", title="Fob", description="Bar",
         )
         self._create_library(
             slug="test-lib-filter-2", title="Library-Title-2", description="Bar-2",
         )
         self._create_library(
-            slug="l3", title="Library-Title-3", description="Description", library_type=VIDEO,
+            slug="l3", title="Library-Title-3", description="Description",
         )
 
         Organization.objects.get_or_create(
@@ -215,7 +214,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         self._create_library(
             slug="l4", title="Library-Title-4",
             description="Library-Description", org='org-test',
-            library_type=VIDEO,
         )
         self._create_library(
             slug="l5", title="Library-Title-5", description="Library-Description",
@@ -225,14 +223,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert len(self._list_libraries()) == 5
         assert len(self._list_libraries({'org': 'org-test'})) == 2
         assert len(self._list_libraries({'text_search': 'test-lib-filter'})) == 2
-        assert len(self._list_libraries({'text_search': 'test-lib-filter', 'type': VIDEO})) == 1
         assert len(self._list_libraries({'text_search': 'library-title'})) == 4
-        assert len(self._list_libraries({'text_search': 'library-title', 'type': VIDEO})) == 2
         assert len(self._list_libraries({'text_search': 'bar'})) == 2
         assert len(self._list_libraries({'text_search': 'org-test'})) == 2
         assert len(self._list_libraries({'org': 'org-test',
                                          'text_search': 'library-title-4'})) == 1
-        assert len(self._list_libraries({'type': VIDEO})) == 3
 
         self.assertOrderEqual(
             self._list_libraries({'order': 'title'}),
@@ -496,27 +491,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})['results']) == 3
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})['results']) == 0
 
-    @ddt.data(
-        ('video-problem', VIDEO, 'problem', 400),
-        ('video-video', VIDEO, 'video', 200),
-        ('problem-problem', PROBLEM, 'problem', 200),
-        ('problem-video', PROBLEM, 'video', 400),
-        ('complex-video', COMPLEX, 'video', 200),
-        ('complex-problem', COMPLEX, 'problem', 200),
-    )
-    @ddt.unpack
-    def test_library_blocks_type_constrained(self, slug, library_type, block_type, expect_response):
-        """
-        Test that type-constrained libraries enforce their constraint when adding an XBlock.
-        """
-        lib = self._create_library(
-            slug=slug, title="A Test Library", description="Testing XBlocks", library_type=library_type,
-        )
-        lib_id = lib["id"]
-
-        # Add a 'problem' XBlock to the library:
-        self._add_block_to_library(lib_id, block_type, 'test-block', expect_response=expect_response)
-
     def test_library_not_found(self):
         """Test that requests fail with 404 when the library does not exist"""
         valid_not_found_key = 'lb:valid:key:video:1'
@@ -754,24 +728,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._add_block_to_library(lib_id, "unit", "unit1")
             # Second block should throw error
             self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
-
-    @ddt.data(
-        ('complex-types', COMPLEX, False),
-        ('video-types', VIDEO, True),
-        ('problem-types', PROBLEM, True),
-    )
-    @ddt.unpack
-    def test_block_types(self, slug, library_type, constrained):
-        """
-        Test that the permitted block types listing for a library change based on type.
-        """
-        lib = self._create_library(slug=slug, title='Test Block Types', library_type=library_type)
-        types = self._get_library_block_types(lib['id'])
-        if constrained:
-            assert len(types) == 1
-            assert types[0]['block_type'] == library_type
-        else:
-            assert len(types) > 1
 
     def test_content_library_create_event(self):
         """

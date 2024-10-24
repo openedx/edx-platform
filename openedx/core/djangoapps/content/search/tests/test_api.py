@@ -115,7 +115,6 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Create a content library:
         self.library = library_api.create_library(
-            library_type=library_api.COMPLEX,
             org=OrganizationFactory.create(short_name="org1"),
             slug="lib",
             title="Library",

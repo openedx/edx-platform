@@ -2,16 +2,6 @@
 from django.utils.translation import gettext_lazy as _
 
 
-VIDEO = 'video'
-COMPLEX = 'complex'
-PROBLEM = 'problem'
-
-LIBRARY_TYPES = (
-    (VIDEO, _('Video')),
-    (COMPLEX, _('Complex')),
-    (PROBLEM, _('Problem')),
-)
-
 # These are all the licenses we support so far.
 ALL_RIGHTS_RESERVED = ''
 CC_4_BY = 'CC:4.0:BY'
