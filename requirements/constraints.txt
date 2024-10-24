@@ -105,13 +105,6 @@ event-tracking==3.0.0
 # https://github.com/openedx/edx-platform/issues/31616
 libsass==0.10.0
 
-# Date: 2024-04-30
-# lxml>=5.0 introduced breaking changes related to system dependencies
-# lxml==5.2.1 introduced new extra so we'll nee to rename lxml --> lxml[html-clean]
-# This constraint can be removed once we upgrade to Python 3.11
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35272
-lxml<5.0
-
 # Date: 2018-12-14
 # markdown>=3.4.0 has failures due to internal refactorings which causes the tests to fail
 # pinning the version untill the issue gets resolved in the package itself
