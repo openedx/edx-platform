@@ -7,6 +7,7 @@ import pathlib
 import urllib
 from lxml import etree
 from mimetypes import guess_type
+import re
 
 from attrs import frozen, Factory
 from django.conf import settings
@@ -397,6 +398,10 @@ def _import_xml_node_to_parent(
         temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys)
         child_nodes = list(node)
 
+    if issubclass(xblock_class, XmlMixin) and "x-is-pointer-node" in getattr(temp_xblock, "data", ""):
+        # Undo the "pointer node" hack if needed (e.g. for capa problems)
+        temp_xblock.data = re.sub(r'([^>]+) x-is-pointer-node="no"', r'\1', temp_xblock.data, count=1)
+
     # Restore the original id_generator
     runtime.id_generator = original_id_generator
 
@@ -436,7 +441,7 @@ def _import_xml_node_to_parent(
         # Allow an XBlock to do anything fancy it may need to when pasted from the clipboard.
         # These blocks may handle their own children or parenting if needed. Let them return booleans to
         # let us know if we need to handle these or not.
-        children_handed = new_xblock.studio_post_paste(store, node)
+        children_handled = new_xblock.studio_post_paste(store, node)
 
     if not children_handled:
         for child_node in child_nodes:
