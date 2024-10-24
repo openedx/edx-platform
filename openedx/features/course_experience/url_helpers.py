@@ -167,7 +167,7 @@ def make_learning_mfe_courseware_url(
 
     if preview:
         if len(get_params.keys()) > 1:
-            del get_params['preview']
+            get_params.pop('preview')
         else:
             get_params = None
 
