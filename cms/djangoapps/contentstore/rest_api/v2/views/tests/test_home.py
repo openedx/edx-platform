@@ -164,7 +164,11 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             ("display_name", self.archived_course.display_name),
             (
                 "lms_link",
-                f'{settings.LMS_ROOT_URL}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}',
+                '{url_root}/courses/{course_id}/jump_to/{location}'.format(
+                    url_root=settings.LMS_ROOT_URL,
+                    course_id=str(self.archived_course.id),
+                    location=self.archived_course.location
+                ),
             ),
             ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}'),
             ("number", self.archived_course.number),
@@ -190,7 +194,11 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             ("display_name", self.archived_course.display_name),
             (
                 "lms_link",
-                f'{settings.LMS_ROOT_URL}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}',
+                '{url_root}/courses/{course_id}/jump_to/{location}'.format(
+                    url_root=settings.LMS_ROOT_URL,
+                    course_id=str(self.archived_course.id),
+                    location=self.archived_course.location
+                ),
             ),
             ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}'),
             ("number", self.archived_course.number),
