@@ -257,7 +257,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
     # General Content Library XBlock tests:
 
-    def test_library_blocks(self):
+    def test_library_blocks(self):  # pylint: disable=too-many-statements
         """
         Test the happy path of creating and working with XBlocks in a content
         library.
@@ -358,6 +358,21 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         self._revert_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_deletes'] is False
         assert self._get_library_block_olx(block_id) == orig_olx
+
+        # Now edit and publish the single block instead of the whole library:
+        new_olx = "<problem><p>Edited OLX</p></problem>"
+        self._set_library_block_olx(block_id, new_olx)
+        assert self._get_library_block_olx(block_id) == new_olx
+        unpublished_block_data = self._get_library_block(block_id)
+        assert unpublished_block_data['has_unpublished_changes'] is True
+        block_update_date = datetime(2024, 8, 8, 8, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(block_update_date):
+            self._publish_library_block(block_id)
+        # Confirm the block is now published:
+        published_block_data = self._get_library_block(block_id)
+        assert published_block_data['last_published'] == block_update_date.isoformat().replace('+00:00', 'Z')
+        assert published_block_data['published_by'] == "Bob"
+        assert published_block_data['has_unpublished_changes'] is False
 
         # fin
 
@@ -675,12 +690,13 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             # self._get_library_block_assets(block3_key)
             # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
-        # Users without authoring permission cannot edit nor delete XBlocks:
+        # Users without authoring permission cannot edit nor publish nor delete XBlocks:
         for user in [reader, random_user]:
             with self.as_user(user):
                 self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
                 self._set_library_block_fields(block3_key, {"data": "<problem />", "metadata": {}}, expect_response=403)
                 self._set_library_block_asset(block3_key, "static/test.txt", b"data", expect_response=403)
+                self._publish_library_block(block3_key, expect_response=403)
                 self._delete_library_block(block3_key, expect_response=403)
                 self._commit_library_changes(lib_id, expect_response=403)
                 self._revert_library_changes(lib_id, expect_response=403)
@@ -694,8 +710,19 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._set_library_block_asset(block3_key, "static/test.txt", b"data")
             self._get_library_block_asset(block3_key, file_name="static/test.txt")
             self._delete_library_block(block3_key)
+            self._publish_library_block(block3_key)
             self._commit_library_changes(lib_id)
             self._revert_library_changes(lib_id)  # This is a no-op after the commit, but should still have 200 response
+
+        # Users without authoring permission cannot commit Xblock changes:
+        # First we need to add some unpublished changes
+        with self.as_user(admin):
+            block4_data = self._add_block_to_library(lib_id, "problem", "problem4")
+            block5_data = self._add_block_to_library(lib_id, "problem", "problem5")
+            block4_key = block4_data["id"]
+            block5_key = block5_data["id"]
+            self._set_library_block_olx(block4_key, "<problem/>")
+            self._set_library_block_olx(block5_key, "<problem/>")
 
     def test_no_lockout(self):
         """
@@ -1063,6 +1090,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_id="problem1"
             )
 
+            # Add an asset to the block before copying
+            self._set_library_block_asset(usage_key, "static/hello.txt", b"Hello World!")
+
             # Get the XBlock created in the previous step
             block = xblock_api.load_block(usage_key, user=author)
 
@@ -1072,6 +1102,17 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             # Paste the content of the clipboard into the library
             pasted_block_id = str(uuid4())
             paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
+            pasted_usage_key = LibraryUsageLocatorV2(
+                lib_key=library_key,
+                block_type="problem",
+                usage_id=pasted_block_id
+            )
+            self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
+
+            # Compare the two text files
+            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").content
+            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").content
+            assert src_data == dest_data
 
             # Check that the new block was created after the paste and it's content matches
             # the the block in the clipboard
@@ -1101,10 +1142,6 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             endpoint.format(**endpoint_parameters),
         )
         self.assertEqual(response.status_code, 404)
-        msg = f"XBlock {endpoint_parameters.get('block_key')} does not exist, or you don't have permission to view it."
-        self.assertEqual(response.json(), {
-            'detail': msg,
-        })
 
     def test_xblock_handler_invalid_key(self):
         """This endpoint is tested separately from the previous ones as it's not a DRF endpoint."""

@@ -36,6 +36,7 @@ from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.toggles import ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
+from cms.lib.xblock.upstream_sync import BadUpstream, sync_from_upstream
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
@@ -586,12 +587,28 @@ def _create_block(request):
         boilerplate=request.json.get("boilerplate"),
     )
 
-    return JsonResponse(
-        {
-            "locator": str(created_block.location),
-            "courseKey": str(created_block.location.course_key),
-        }
-    )
+    response = {
+        "locator": str(created_block.location),
+        "courseKey": str(created_block.location.course_key),
+    }
+    # If it contains library_content_key, the block is being imported from a v2 library
+    # so it needs to be synced with upstream block.
+    if upstream_ref := request.json.get("library_content_key"):
+        try:
+            # Set `created_block.upstream` and then sync this with the upstream (library) version.
+            created_block.upstream = upstream_ref
+            sync_from_upstream(downstream=created_block, user=request.user)
+        except BadUpstream as exc:
+            _delete_item(created_block.location, request.user)
+            log.exception(
+                f"Could not sync to new block at '{created_block.usage_key}' "
+                f"using provided library_content_key='{upstream_ref}'"
+            )
+            return JsonResponse({"error": str(exc)}, status=400)
+        modulestore().update_item(created_block, request.user.id)
+        response['upstreamRef'] = upstream_ref
+
+    return JsonResponse(response)
 
 
 def _get_source_index(source_usage_key, source_parent):

@@ -66,7 +66,8 @@ urlpatterns = [
             # CRUD for static asset files associated with a block in the library:
             path('assets/', views.LibraryBlockAssetListView.as_view()),
             path('assets/<path:file_path>', views.LibraryBlockAssetView.as_view()),
-            # Future: publish/discard changes for just this one block
+            path('publish/', views.LibraryBlockPublishView.as_view()),
+            # Future: discard changes for just this one block
             # Future: set a block's tags (tags are stored in a Tag bundle and linked in)
         ])),
         re_path(r'^lti/1.3/', include([
@@ -75,9 +76,17 @@ urlpatterns = [
             path('pub/jwks/', views.LtiToolJwksView.as_view(), name='lti-pub-jwks'),
         ])),
     ])),
-    path(
-        'library_assets/<uuid:component_version_uuid>/<path:asset_path>',
-        views.component_version_asset,
-        name='library-assets',
+    path('library_assets/', include([
+        path(
+            'component_versions/<uuid:component_version_uuid>/<path:asset_path>',
+            views.component_version_asset,
+            name='library-assets',
+        ),
+        path(
+            'blocks/<usage_v2:usage_key>/<path:asset_path>',
+            views.component_draft_asset,
+            name='library-draft-assets',
+        ),
+    ])
     ),
 ]

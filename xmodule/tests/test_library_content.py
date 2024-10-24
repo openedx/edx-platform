@@ -414,6 +414,7 @@ class LegacyLibraryContentBlockTestMixin:
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
+        assert LegacyLibraryContentBlock.source_library_version in non_editable_metadata_fields
         assert LegacyLibraryContentBlock.display_name not in non_editable_metadata_fields
 
     def test_overlimit_blocks_chosen_randomly(self):

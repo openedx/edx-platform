@@ -13,6 +13,7 @@ from cms.lib.xblock.upstream_sync import (
 )
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as libs
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
@@ -47,6 +48,20 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream.display_name = "Upstream Title V2"
         upstream.data = "<html><body>Upstream content V2</body></html>"
         upstream.save()
+
+        libs.publish_changes(self.library.key, self.user.id)
+
+        self.taxonomy_all_org = tagging_api.create_taxonomy(
+            "test_taxonomy",
+            "Test Taxonomy",
+            export_id="ALL_ORGS",
+        )
+        tagging_api.set_taxonomy_orgs(self.taxonomy_all_org, all_orgs=True)
+        for tag_value in ('tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5', 'tag_6', 'tag_7'):
+            tagging_api.add_tag_to_taxonomy(self.taxonomy_all_org, tag_value)
+
+        self.upstream_tags = ['tag_1', 'tag_5']
+        tagging_api.tag_object(str(self.upstream_key), self.taxonomy_all_org, self.upstream_tags)
 
     def test_sync_bad_downstream(self):
         """
@@ -127,11 +142,29 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert downstream.display_name == "Upstream Title V2"
         assert downstream.data == "<html><body>Upstream content V2</body></html>"
 
+        # Verify tags
+        object_tags = tagging_api.get_object_tags(str(downstream.location))
+        assert len(object_tags) == len(self.upstream_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in self.upstream_tags
+
         # Upstream updates
         upstream = xblock.load_block(self.upstream_key, self.user)
         upstream.display_name = "Upstream Title V3"
         upstream.data = "<html><body>Upstream content V3</body></html>"
         upstream.save()
+        new_upstream_tags = self.upstream_tags + ['tag_2', 'tag_3']
+        tagging_api.tag_object(str(self.upstream_key), self.taxonomy_all_org, new_upstream_tags)
+
+        # Assert that un-published updates are not yet pulled into downstream
+        sync_from_upstream(downstream, self.user)
+        assert downstream.upstream_version == 2  # Library blocks start at version 2 (v1 is the empty new block)
+        assert downstream.upstream_display_name == "Upstream Title V2"
+        assert downstream.display_name == "Upstream Title V2"
+        assert downstream.data == "<html><body>Upstream content V2</body></html>"
+
+        # Publish changes
+        libs.publish_changes(self.library.key, self.user.id)
 
         # Follow-up sync. Assert that updates are pulled into downstream.
         sync_from_upstream(downstream, self.user)
@@ -139,6 +172,12 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert downstream.upstream_display_name == "Upstream Title V3"
         assert downstream.display_name == "Upstream Title V3"
         assert downstream.data == "<html><body>Upstream content V3</body></html>"
+
+        # Verify tags
+        object_tags = tagging_api.get_object_tags(str(downstream.location))
+        assert len(object_tags) == len(new_upstream_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in new_upstream_tags
 
     def test_sync_updates_to_modified_content(self):
         """
@@ -157,6 +196,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream.display_name = "Upstream Title V3"
         upstream.data = "<html><body>Upstream content V3</body></html>"
         upstream.save()
+        libs.publish_changes(self.library.key, self.user.id)
 
         # Downstream modifications
         downstream.display_name = "Downstream Title Override"  # "safe" customization
@@ -277,10 +317,18 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert link.version_available == 2
         assert link.ready_to_sync is False
 
-        # Upstream updated to V3
+        # Upstream updated to V3, but not yet published
         upstream = xblock.load_block(self.upstream_key, self.user)
         upstream.data = "<html><body>Upstream content V3</body></html>"
         upstream.save()
+        link = UpstreamLink.get_for_block(downstream)
+        assert link.version_synced == 2
+        assert link.version_declined is None
+        assert link.version_available == 2
+        assert link.ready_to_sync is False
+
+        # Publish changes
+        libs.publish_changes(self.library.key, self.user.id)
         link = UpstreamLink.get_for_block(downstream)
         assert link.version_synced == 2
         assert link.version_declined is None
@@ -299,6 +347,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         upstream = xblock.load_block(self.upstream_key, self.user)
         upstream.data = "<html><body>Upstream content V4</body></html>"
         upstream.save()
+        libs.publish_changes(self.library.key, self.user.id)
         link = UpstreamLink.get_for_block(downstream)
         assert link.version_synced == 2
         assert link.version_declined == 3
@@ -335,3 +384,42 @@ class UpstreamTestCase(ModuleStoreTestCase):
 
         # AND, we have recorded the old upstream as our copied_from_block.
         assert downstream.copied_from_block == str(self.upstream_key)
+
+    def test_sync_library_block_tags(self):
+        upstream_lib_block_key = libs.create_library_block(self.library.key, "html", "upstream").usage_key
+        upstream_lib_block = xblock.load_block(upstream_lib_block_key, self.user)
+        upstream_lib_block.display_name = "Another lib block"
+        upstream_lib_block.data = "<html>another lib block</html>"
+        upstream_lib_block.save()
+
+        libs.publish_changes(self.library.key, self.user.id)
+
+        expected_tags = self.upstream_tags
+        tagging_api.tag_object(str(upstream_lib_block_key), self.taxonomy_all_org, expected_tags)
+
+        downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(upstream_lib_block_key))
+
+        # Initial sync
+        sync_from_upstream(downstream, self.user)
+
+        # Verify tags
+        object_tags = tagging_api.get_object_tags(str(downstream.location))
+        assert len(object_tags) == len(expected_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in expected_tags
+
+        # Upstream updates
+        upstream_lib_block.display_name = "Upstream Title V3"
+        upstream_lib_block.data = "<html><body>Upstream content V3</body></html>"
+        upstream_lib_block.save()
+        new_upstream_tags = self.upstream_tags + ['tag_2', 'tag_3']
+        tagging_api.tag_object(str(upstream_lib_block_key), self.taxonomy_all_org, new_upstream_tags)
+
+        # Follow-up sync.
+        sync_from_upstream(downstream, self.user)
+
+        #Verify tags
+        object_tags = tagging_api.get_object_tags(str(downstream.location))
+        assert len(object_tags) == len(new_upstream_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in new_upstream_tags
