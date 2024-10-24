@@ -136,7 +136,7 @@ class PollBlock(
             'configuration_json': self.dump_poll(),
         }
         fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('poll.html', params))
-        add_css_to_fragment(fragment, 'PollBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'PollBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'PollBlockDisplay')
         shim_xmodule_js(fragment, 'Poll')
         return fragment
