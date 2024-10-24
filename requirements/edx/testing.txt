@@ -221,7 +221,6 @@ cryptography==43.0.3
     #   django-fernet-fields-v2
     #   edx-enterprise
     #   jwcrypto
-    #   optimizely-sdk
     #   paramiko
     #   pgpy
     #   pyjwt
@@ -1043,10 +1042,8 @@ openedx-learning==0.16.1
     #   -r requirements/edx/base.txt
 openedx-mongodbproxy==0.2.2
     # via -r requirements/edx/base.txt
-optimizely-sdk==4.1.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+optimizely-sdk==5.0.1
+    # via -r requirements/edx/base.txt
 ora2==6.12.2
     # via -r requirements/edx/base.txt
 packaging==24.1
@@ -1252,7 +1249,6 @@ pynliner==0.8.0
 pyopenssl==24.2.1
     # via
     #   -r requirements/edx/base.txt
-    #   optimizely-sdk
     #   snowflake-connector-python
 pyparsing==3.2.0
     # via
@@ -1476,7 +1472,6 @@ six==1.16.0
     #   html5lib
     #   interchange
     #   libsass
-    #   optimizely-sdk
     #   pact-python
     #   pansi
     #   paver
