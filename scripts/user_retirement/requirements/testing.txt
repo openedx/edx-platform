@@ -116,7 +116,7 @@ jmespath==1.0.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   botocore
-lxml==4.9.4
+lxml==5.3.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
