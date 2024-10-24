@@ -1183,14 +1183,14 @@ lti-consumer-xblock==9.11.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-lxml==4.9.4
+lxml[html-clean]==5.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools
     #   edxval
     #   lti-consumer-xblock
+    #   lxml-html-clean
     #   olxcleaner
     #   openedx-calc
     #   ora2
@@ -1198,6 +1198,11 @@ lxml==4.9.4
     #   python3-saml
     #   xblock
     #   xmlsec
+lxml-html-clean==0.3.1
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   lxml
 mailsnake==1.6.4
     # via
     #   -r requirements/edx/doc.txt
