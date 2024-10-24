@@ -544,6 +544,9 @@ class UserEnrollmentsStatus(views.APIView):
         less than 30 days ago or has progressed in the course in the last 30 days.
         Otherwise, the registration is considered inactive.
 
+        USER_ENROLLMENTS_LIMIT - adds users enrollments query limit to
+        safe API from possible DDOS attacks.
+
     **Example Request**
 
         GET /api/mobile/{api_version}/users/<user_name>/enrollments_status/
@@ -586,6 +589,9 @@ class UserEnrollmentsStatus(views.APIView):
         ]
         ```
     """
+
+    USER_ENROLLMENTS_LIMIT = 500
+
     def get(self, request, *args, **kwargs) -> Response:
         """
         Gets user's enrollments status.
@@ -613,7 +619,12 @@ class UserEnrollmentsStatus(views.APIView):
         Builds list with dictionaries with user's enrolments statuses.
         """
         user = get_object_or_404(User, username=username)
-        user_enrollments = CourseEnrollment.enrollments_for_user(user).select_related('course')
+        user_enrollments = (
+            CourseEnrollment
+            .enrollments_for_user(user)
+            .select_related('course')
+            [:self.USER_ENROLLMENTS_LIMIT]
+        )
         mobile_available = [
             enrollment for enrollment in user_enrollments
             if is_mobile_available_for_user(user, enrollment.course_overview)
