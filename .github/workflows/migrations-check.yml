@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         python-version:
           - "3.11"
         # 'pinned' is used to install the latest patch version of Django
@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: Setup mongodb user
         run: |
-          mongosh edxapp --eval '
+          docker exec ${{ job.services.mongo.id }} mongosh edxapp --eval '
             db.createUser(
               {
                 user: "edxapp",
@@ -67,7 +67,7 @@ jobs:
       - name: Verify mongo and mysql db credentials
         run: |
           mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
-          mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
+          docker exec ${{ job.services.mongo.id }} mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -126,7 +126,7 @@ jobs:
     if: always()
     needs:
       - check_migrations
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1

@@ -11,18 +11,18 @@ click==8.1.6
     #   click-log
 click-log==0.4.0
     # via -r scripts/structures_pruning/requirements/base.in
-dnspython==2.6.1
+dnspython==2.7.0
     # via pymongo
-edx-opaque-keys==2.10.0
+edx-opaque-keys==2.11.0
     # via -r scripts/structures_pruning/requirements/base.in
-pbr==6.0.0
+pbr==6.1.0
     # via stevedore
 pymongo==4.4.0
     # via
     #   -c scripts/structures_pruning/requirements/../../../requirements/constraints.txt
     #   -r scripts/structures_pruning/requirements/base.in
     #   edx-opaque-keys
-stevedore==5.2.0
+stevedore==5.3.0
     # via edx-opaque-keys
 typing-extensions==4.12.2
     # via edx-opaque-keys

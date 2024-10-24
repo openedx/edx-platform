@@ -8,17 +8,20 @@ import copy
 import html
 import logging
 import os
+import pathlib
 import re
 from functools import wraps
 
 import requests
 import simplejson as json
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -1039,27 +1042,29 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
 
 def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
     """
-    Get video transcript from Learning Core.
+    Get video transcript from Learning Core (used for Content Libraries)
 
-    HISTORIC INFORMATION FROM WHEN THIS FUNCTION WAS `get_transcript_from_blockstore`:
+    Limitation: This is only going to grab from the Draft version.
 
-      Blockstore expects video transcripts to be placed into the 'static/'
-      subfolder of the XBlock's folder in a Blockstore bundle. For example, if the
-      video XBlock's definition is in the standard location of
-          video/video1/definition.xml
-      Then the .srt files should be placed at e.g.
-          video/video1/static/video1-en.srt
-      This is the same place where other public static files are placed for other
-      XBlocks, such as image files used by HTML blocks.
+    Learning Core models a VideoBlock's data in a more generic thing it calls a
+    Component. Each Component has its own virtual space for file-like data. The
+    OLX for the VideoBlock itself is stored at the root of that space, as
+    ``block.xml``. Static assets that are meant to be user-downloadable are
+    placed in a `static/` directory for that Component, and this is where we
+    expect to store transcript files.
 
-      Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
-      JSON dictionary listing the filename of the transcript for each language:
-          <video
-              youtube_id_1_0="3_yD_cEKoCk"
-              transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
-              display_name="Welcome Video with Transcript"
-              download_track="true"
-          />
+    So if there is a ``video1-en.srt`` file for a particular VideoBlock, we
+    expect that to be stored as ``static/video1-en.srt`` in the Component. Any
+    other downloadable files would be here as well, such as thumbnails.
+
+    Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
+    JSON dictionary listing the filename of the transcript for each language:
+        <video
+            youtube_id_1_0="3_yD_cEKoCk"
+            transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
+            display_name="Welcome Video with Transcript"
+            download_track="true"
+        />
 
       This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
 
@@ -1072,9 +1077,71 @@ def get_transcript_from_learning_core(video_block, language, output_format, tran
     Returns:
         tuple containing content, filename, mimetype
     """
-    # TODO: Update to use Learning Core data models once static assets support
-    # has been added.
-    raise NotImplementedError("Transcripts not supported.")
+    usage_key = video_block.usage_key
+
+    # Validate that the format is something we even support...
+    if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
+        raise NotFoundError(f'Invalid transcript format `{output_format}`')
+
+    # See if the requested language exists.
+    transcripts = transcripts_info['transcripts']
+    if language not in transcripts:
+        raise NotFoundError(
+            f"Video {usage_key} does not have a transcript file defined for the "
+            f"'{language}' language in its OLX."
+        )
+
+    # Grab the underlying Component. There's no version parameter to this call,
+    # so we're just going to grab the file associated with the latest draft
+    # version for now.
+    component = get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+    if not component_version:
+        raise NotFoundError(
+            f"No transcript for {usage_key} because Component {component.uuid} "
+            "was soft-deleted."
+        )
+
+    file_path = pathlib.Path(f"static/{transcripts[language]}")
+    if file_path.suffix != '.srt':
+        # We want to standardize on .srt
+        raise NotFoundError(
+            "Video XBlocks in Content Libraries only support storing .srt "
+            f"transcript files, but we tried to look up {file_path} for {usage_key}"
+        )
+
+    # TODO: There should be a Learning Core API call for this:
+    try:
+        content = (
+            component_version
+            .componentversioncontent_set
+            .filter(content__has_file=True)
+            .select_related('content')
+            .get(key=file_path)
+            .content
+        )
+        data = content.read_file().read()
+    except ObjectDoesNotExist as exc:
+        raise NotFoundError(
+            f"No file {file_path} found for {usage_key} "
+            f"(ComponentVersion {component_version.uuid})"
+        ) from exc
+
+    # Now convert the transcript data to the requested format:
+    output_filename = f'{file_path.stem}.{output_format}'
+    output_transcript = Transcript.convert(
+        data.decode('utf-8'),
+        input_format=Transcript.SRT,
+        output_format=output_format,
+    )
+    if not output_transcript.strip():
+        raise NotFoundError(
+            f"Transcript file {file_path} found for {usage_key} "
+            f"(ComponentVersion {component_version.uuid}), but it has no "
+            "content or is malformed."
+        )
+
+    return output_transcript, output_filename, Transcript.mime_types[output_format]
 
 
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):

@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}You have been enrolled in {{ course_name }} at {{ site_name }}. This course will now appear on your {{ site_name }} dashboard.{% endblocktrans %}
+{% endautoescape %}

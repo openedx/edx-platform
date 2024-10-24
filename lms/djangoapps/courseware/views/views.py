@@ -46,7 +46,11 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
-from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.course_block import (
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -288,7 +292,10 @@ def courses(request):
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     set_default_filter = ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER.is_enabled()
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
+        courses_list = get_courses(
+            request.user,
+            filter_={"catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+        )
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
@@ -825,9 +832,13 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
                 single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
 
             if single_paid_mode and single_paid_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(
+                    single_paid_mode.sku, course_run_keys=[course_id]
+                )
             if single_paid_mode and single_paid_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(
+                    single_paid_mode.bulk_sku, course_run_keys=[course_id]
+                )
 
         registration_price, course_price = get_course_prices(course)  # lint-amnesty, pylint: disable=unused-variable
 

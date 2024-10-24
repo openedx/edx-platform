@@ -30,9 +30,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
         this.industryPathways = options.industryPathways;
         this.creditPathways = options.creditPathways;
         this.programModel = options.model;
-        this.subscriptionModel = options.subscriptionModel;
         this.programTabViewEnabled = options.programTabViewEnabled;
-        this.isSubscriptionEligible = options.isSubscriptionEligible;
         this.urls = options.urls;
         this.render();
     }
@@ -42,14 +40,12 @@ class ProgramDetailsSidebarView extends Backbone.View {
         const data = $.extend(
             {},
             this.model.toJSON(),
-            this.subscriptionModel.toJSON(),
             {
                 programCertificate: this.programCertificate
                     ? this.programCertificate.toJSON() : {},
                 industryPathways: this.industryPathways,
                 creditPathways: this.creditPathways,
                 programTabViewEnabled: this.programTabViewEnabled,
-                isSubscriptionEligible: this.isSubscriptionEligible,
                 arrowUprightIcon,
                 ...this.urls,
             },

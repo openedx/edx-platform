@@ -7,6 +7,7 @@ from django.urls import include, path, re_path
 from rest_framework import routers
 
 from . import views
+from . import views_collections
 
 
 # Django application name.
@@ -17,6 +18,11 @@ app_name = 'openedx.core.djangoapps.content_libraries'
 
 import_blocks_router = routers.DefaultRouter()
 import_blocks_router.register(r'tasks', views.LibraryImportTaskViewSet, basename='import-block-task')
+
+library_collections_router = routers.DefaultRouter()
+library_collections_router.register(
+    r'collections', views_collections.LibraryCollectionsView, basename="library-collections"
+)
 
 # These URLs are only used in Studio. The LMS already provides all the
 # API endpoints needed to serve XBlocks from content libraries using the
@@ -43,10 +49,16 @@ urlpatterns = [
             path('team/group/<str:group_name>/', views.LibraryTeamGroupView.as_view()),
             # Import blocks into this library.
             path('import_blocks/', include(import_blocks_router.urls)),
+            # Paste contents of clipboard into library
+            path('paste_clipboard/', views.LibraryPasteClipboardView.as_view()),
+            # Library Collections
+            path('', include(library_collections_router.urls)),
         ])),
         path('blocks/<str:usage_key_str>/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:
             path('', views.LibraryBlockView.as_view()),
+            # Update collections for a given component
+            path('collections/', views.LibraryBlockCollectionsView.as_view(), name='update-collections'),
             # Get the LTI URL of a specific XBlock
             path('lti/', views.LibraryBlockLtiUrlView.as_view(), name='lti-url'),
             # Get the OLX source code of the specified block:
@@ -54,7 +66,8 @@ urlpatterns = [
             # CRUD for static asset files associated with a block in the library:
             path('assets/', views.LibraryBlockAssetListView.as_view()),
             path('assets/<path:file_path>', views.LibraryBlockAssetView.as_view()),
-            # Future: publish/discard changes for just this one block
+            path('publish/', views.LibraryBlockPublishView.as_view()),
+            # Future: discard changes for just this one block
             # Future: set a block's tags (tags are stored in a Tag bundle and linked in)
         ])),
         re_path(r'^lti/1.3/', include([
@@ -63,4 +76,17 @@ urlpatterns = [
             path('pub/jwks/', views.LtiToolJwksView.as_view(), name='lti-pub-jwks'),
         ])),
     ])),
+    path('library_assets/', include([
+        path(
+            'component_versions/<uuid:component_version_uuid>/<path:asset_path>',
+            views.component_version_asset,
+            name='library-assets',
+        ),
+        path(
+            'blocks/<usage_v2:usage_key>/<path:asset_path>',
+            views.component_draft_asset,
+            name='library-draft-assets',
+        ),
+    ])
+    ),
 ]

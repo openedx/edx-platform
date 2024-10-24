@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
@@ -40,7 +39,7 @@ from .serializers import (
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateSerializer,
 )
-from .utils import get_show_notifications_tray
+from .utils import get_show_notifications_tray, get_is_new_notification_view_enabled
 
 
 @allow_any_authenticated_user()
@@ -292,7 +291,7 @@ class NotificationListAPIView(generics.ListAPIView):
 
         if app_name:
             params['app_name'] = app_name
-        return Notification.objects.filter(**params).order_by('-id')
+        return Notification.objects.filter(**params).order_by('-created')
 
 
 @allow_any_authenticated_user()
@@ -330,6 +329,7 @@ class NotificationCountView(APIView):
         )
         count_total = 0
         show_notifications_tray = get_show_notifications_tray(self.request.user)
+        is_new_notification_view_enabled = get_is_new_notification_view_enabled()
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
@@ -345,7 +345,8 @@ class NotificationCountView(APIView):
             "show_notifications_tray": show_notifications_tray,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
-            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY
+            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY,
+            "is_new_notification_view_enabled": is_new_notification_view_enabled
         })
 
 
@@ -442,4 +443,4 @@ def preference_update_from_encrypted_username_view(request, username, patch):
     username and patch must be string
     """
     update_user_preferences_from_patch(username, patch)
-    return HttpResponse("<!DOCTYPE html><html><body>Success</body></html>", status=status.HTTP_200_OK)
+    return Response({"result": "success"}, status=status.HTTP_200_OK)

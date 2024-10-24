@@ -5,7 +5,7 @@
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
 
-
+import logging
 import mimetypes
 
 from django.conf import settings
@@ -22,6 +22,8 @@ from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_st
 from common.djangoapps.util.cache import cache_if_anonymous
 from common.djangoapps.util.views import fix_crum_request
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+log = logging.getLogger(__name__)
 
 valid_templates = []
 
@@ -122,4 +124,21 @@ def render_429(request, exception=None):  # lint-amnesty, pylint: disable=unused
 
 @fix_crum_request
 def render_500(request):
-    return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}, request=request))
+    """
+    Render the generic error page when we have an uncaught error.
+    """
+    try:
+        return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}, request=request))
+    except BaseException as e:
+        # If we can't render the error page, ensure we don't raise another
+        # exception -- because if we do, we'll probably just end up back
+        # at the same rendering error.
+        #
+        # This is an attempt at working around the recursive error handling issues
+        # observed in <https://github.com/openedx/edx-platform/issues/35151>, which
+        # were triggered by Mako and translation errors.
+
+        log.error("Encountered error while rendering error page.", exc_info=True)
+        # This message is intentionally hardcoded and does not involve
+        # any translation, templating, etc. Do not translate.
+        return HttpResponseServerError("Encountered error while rendering error page.")

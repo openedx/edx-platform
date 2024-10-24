@@ -31,11 +31,8 @@ from openedx.core.djangolib.js_utils import (
 ProgramListFactory({
     marketingUrl: '${marketing_url | n, js_escaped_string}',
     programsData: ${programs | n, dump_js_escaped_json},
-    programsSubscriptionData: ${programs_subscription_data | n, dump_js_escaped_json},
-    subscriptionUpsellData: ${subscription_upsell_data | n, dump_js_escaped_json},
     userProgress: ${progress | n, dump_js_escaped_json},
     userPreferences: ${user_preferences | n, dump_js_escaped_json},
-    isUserB2CSubscriptionsEnabled: ${is_user_b2c_subscriptions_enabled | n, dump_js_escaped_json},
     mobileOnly: ${mobile_only | n, dump_js_escaped_json}
 });
 </%static:webpack>
