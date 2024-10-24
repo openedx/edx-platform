@@ -12,7 +12,7 @@ from django.http import HttpRequest
 from django.http.request import QueryDict
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six.moves.urllib.parse import urlencode, urlparse
+from six.moves.urllib.parse import urlencode, urlparse, urlunparse
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -120,6 +120,7 @@ def _get_new_courseware_url(
         course_key=course_key,
         sequence_key=sequence_key,
         unit_key=unit_key,
+        preview=request.GET.get('preview') if request and request.GET else False,
         params=request.GET if request and request.GET else None,
     )
 
@@ -129,6 +130,7 @@ def make_learning_mfe_courseware_url(
         sequence_key: Optional[UsageKey] = None,
         unit_key: Optional[UsageKey] = None,
         params: Optional[QueryDict] = None,
+        preview: bool = None,
 ) -> str:
     """
     Return a str with the URL for the specified courseware content in the Learning MFE.
@@ -159,7 +161,18 @@ def make_learning_mfe_courseware_url(
     strings. They're only ever used to concatenate a URL string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
-    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    mfe_link = f'/course/{course_key}'
+    get_params = params.copy() if params else None
+    query_string = ''
+
+    if preview:
+        if len(get_params.keys()) > 1:
+            get_params.pop('preview')
+        else:
+            get_params = None
+
+        if (unit_key or sequence_key):
+            mfe_link = f'/preview/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -167,10 +180,14 @@ def make_learning_mfe_courseware_url(
         if unit_key:
             mfe_link += f'/{unit_key}'
 
-    if params:
-        mfe_link += f'?{params.urlencode()}'
+    if get_params:
+        query_string = get_params.urlencode()
 
-    return mfe_link
+    url_parts = list(urlparse(settings.LEARNING_MICROFRONTEND_URL))
+    url_parts[2] = mfe_link
+    url_parts[4] = query_string
+
+    return urlunparse(url_parts)
 
 
 def get_learning_mfe_home_url(
