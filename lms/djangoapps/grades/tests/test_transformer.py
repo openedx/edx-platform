@@ -13,6 +13,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls_range
 
+import openedx.core.djangoapps.content.block_structure.api as bs_api
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
@@ -462,6 +463,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
             )
         with self.store.default_store(store_type):
             blocks = self.build_course(course)
+        bs_api.update_course_in_cache(blocks['course'].id)
         clear_course_from_cache(blocks['course'].id)
         with check_mongo_calls_range(max_mongo_calls, min_mongo_calls):
             get_course_blocks(self.student, blocks['course'].location, self.transformers)
