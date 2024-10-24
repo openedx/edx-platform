@@ -180,7 +180,7 @@ class AnnotatableBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.get_html())
-        add_css_to_fragment(fragment, 'AnnotatableBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'AnnotatableBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockDisplay')
         shim_xmodule_js(fragment, 'Annotatable')
 
@@ -193,7 +193,7 @@ class AnnotatableBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_css_to_fragment(fragment, 'AnnotatableBlockEditor.scss')
+        add_css_to_fragment(fragment, 'AnnotatableBlockEditor.css')
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
