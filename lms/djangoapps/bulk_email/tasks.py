@@ -537,6 +537,11 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             email_context['course_id'] = str(course_email.course_id)
             email_context['unsubscribe_link'] = get_unsubscribed_link(current_recipient['username'],
                                                                       str(course_email.course_id))
+            email_context['unsubscribe_text'] = 'Unsubscribe from course updates for this course'
+            email_context['disclaimer'] = (
+                f"You are receiving this email because you are enrolled in the "
+                f"{email_context['platform_name']} course {email_context['course_title']}"
+            )
 
             if is_bulk_email_edx_ace_enabled():
                 message = ACEEmail(site, email_context)
