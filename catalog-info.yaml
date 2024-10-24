@@ -11,7 +11,7 @@ metadata:
       title: "Documentation"
       icon: "Web"
   annotations:
-    openedx.org/release: "2u/release"    
+    openedx.org/release: "master"
 spec:
   owner: group:wg-maintenance-edx-platform
   type: 'service'
