@@ -3,6 +3,7 @@ Common utility functions useful throughout the contentstore
 """
 from __future__ import annotations
 import configparser
+import html
 import logging
 import re
 from collections import defaultdict
@@ -2258,6 +2259,7 @@ def clean_html_body(html_body):
     """
     Get html body, remove tags and limit to 500 characters
     """
+    html_body = html.unescape(html_body).strip()
     html_body = BeautifulSoup(Truncator(html_body).chars(500, html=True), 'html.parser')
     text_content = html_body.get_text(separator=" ").strip()
     text_content = text_content.replace('\n', '').replace('\r', '')
