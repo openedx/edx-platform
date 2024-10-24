@@ -23,7 +23,7 @@ from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
 from xmodule.util.misc import escape_html_characters
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
@@ -90,7 +90,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return a fragment that contains the html for the student view
         """
         fragment = Fragment(self.get_html())
-        add_sass_to_fragment(fragment, 'HtmlBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'HtmlBlockDisplay.scss')
         add_webpack_js_to_fragment(fragment, 'HtmlBlockDisplay')
         shim_xmodule_js(fragment, 'HTMLModule')
         return fragment
@@ -136,7 +136,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_sass_to_fragment(fragment, 'HtmlBlockEditor.scss')
+        add_css_to_fragment(fragment, 'HtmlBlockEditor.scss')
         add_webpack_js_to_fragment(fragment, 'HtmlBlockEditor')
         shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
         return fragment

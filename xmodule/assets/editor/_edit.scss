@@ -18,7 +18,7 @@
     @include linear-gradient(top, #d4dee8, #c9d5e2);
 
     position: relative;
-    padding: ($baseline/4);
+    padding: calc(var(--baseline)/4);
     border-bottom-color: #a5aaaf;
 
     button {
@@ -26,7 +26,7 @@
 
       @include float(left);
 
-      padding: 3px ($baseline/2) 5px;
+      padding: 3px calc(var(--baseline)/2) 5px;
       margin-left: 7px;
       border: 0;
       border-radius: 2px;
@@ -53,7 +53,7 @@
 
     li {
       @include float(left);
-      @include margin-right($baseline/4);
+      @include margin-right(calc(var(--baseline)/4));
 
       &:last-child {
         @include margin-right(0);
@@ -67,7 +67,7 @@
       border: 1px solid #a5aaaf;
       border-radius: 3px 3px 0 0;
 
-      @include linear-gradient(top, $transparent 87%, rgba(0, 0, 0, .06));
+      @include linear-gradient(top, var(--transparent) 87%, rgba(0, 0, 0, .06));
 
       background-color: #e5ecf3;
       font-size: 13px;
@@ -75,8 +75,8 @@
       box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
 
       &.current {
-        background: $white;
-        border-bottom-color: $white;
+        background: var(--white);
+        border-bottom-color: var(--white);
       }
     }
   }
