@@ -9,7 +9,7 @@ from organizations.models import Organization
 from rest_framework.test import APITransactionTestCase, APIClient
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
+from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 # Define the URLs here - don't use reverse() because we want to detect
@@ -124,7 +124,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         self.client = old_client  # pylint: disable=attribute-defined-outside-init
 
     def _create_library(
-        self, slug, title, description="", org=None, library_type=COMPLEX,
+        self, slug, title, description="", org=None,
         license_type=ALL_RIGHTS_RESERVED, expect_response=200,
     ):
         """ Create a library """
@@ -135,7 +135,6 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             "slug": slug,
             "title": title,
             "description": description,
-            "type": library_type,
             "license": license_type,
         }, expect_response)
 

@@ -408,7 +408,6 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         self.store = modulestore()
 
         self.library = library_api.create_library(
-            library_type=library_api.COMPLEX,
             org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
             slug="lib",
             title="Library",
