@@ -3,7 +3,9 @@
 
 import logging
 
-from .utils import CommentClientRequestError, extract, perform_request
+from .utils import CommentClientRequestError, extract, perform_request, get_course_key
+from forum import api as forum_api
+from lms.djangoapps.discussion.toggles import is_forum_v2_enabled
 
 log = logging.getLogger(__name__)
 
@@ -69,14 +71,25 @@ class Model:
         return self
 
     def _retrieve(self, *args, **kwargs):
-        url = self.url(action='get', params=self.attributes)
-        response = perform_request(
-            'get',
-            url,
-            self.default_retrieve_params,
-            metric_tags=self._metric_tags,
-            metric_action='model.retrieve'
-        )
+        course_id = self.attributes.get("course_id") or kwargs.get("course_id")
+        if not course_id:
+            course_id = forum_api.get_course_id_by_comment(self.id)
+        course_key = get_course_key(course_id)
+        response = None
+        if is_forum_v2_enabled(course_key):
+            if self.type == "comment":
+                response = forum_api.get_parent_comment(comment_id=self.attributes["id"], course_id=str(course_key))
+            if response is None:
+                raise CommentClientRequestError("Forum v2 API call is missing")
+        else:
+            url = self.url(action='get', params=self.attributes)
+            response = perform_request(
+                'get',
+                url,
+                self.default_retrieve_params,
+                metric_tags=self._metric_tags,
+                metric_action='model.retrieve'
+            )
         self._update_from_response(response)
 
     @property
@@ -151,33 +164,27 @@ class Model:
         """
         self.before_save(self)
         if self.id:   # if we have id already, treat this as an update
-            request_params = self.updatable_attributes()
-            if params:
-                request_params.update(params)
-            url = self.url(action='put', params=self.attributes)
-            response = perform_request(
-                'put',
-                url,
-                request_params,
-                metric_tags=self._metric_tags,
-                metric_action='model.update'
-            )
-        else:   # otherwise, treat this as an insert
-            url = self.url(action='post', params=self.attributes)
-            response = perform_request(
-                'post',
-                url,
-                self.initializable_attributes(),
-                metric_tags=self._metric_tags,
-                metric_action='model.insert'
-            )
+            response = self.handle_update(params)
+        else:  # otherwise, treat this as an insert
+            response = self.handle_create(params)
+
         self.retrieved = True
         self._update_from_response(response)
         self.after_save(self)
 
     def delete(self):
-        url = self.url(action='delete', params=self.attributes)
-        response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
+        course_key = get_course_key(self.attributes.get("course_id"))
+        if is_forum_v2_enabled(course_key):
+            response = None
+            if self.type == "comment":
+                response = forum_api.delete_comment(comment_id=self.attributes["id"], course_id=str(course_key))
+            elif self.type == "thread":
+                response = forum_api.delete_thread(thread_id=self.attributes["id"], course_id=str(course_key))
+            if response is None:
+                raise CommentClientRequestError("Forum v2 API call is missing")
+        else:
+            url = self.url(action='delete', params=self.attributes)
+            response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
         self.retrieved = True
         self._update_from_response(response)
 
@@ -208,3 +215,157 @@ class Model:
                 raise CommentClientRequestError(f"Cannot perform action {action} without id")  # lint-amnesty, pylint: disable=raise-missing-from
         else:   # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()
+
+    def handle_update(self, params=None):
+        request_params = self.updatable_attributes()
+        if params:
+            request_params.update(params)
+        course_id = self.attributes.get("course_id") or request_params.get("course_id")
+        course_key = get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
+            response = None
+            if self.type == "comment":
+                response = self.handle_update_comment(request_params, str(course_key))
+            elif self.type == "thread":
+                response = self.handle_update_thread(request_params, str(course_key))
+            elif self.type == "user":
+                response = self.handle_update_user(request_params, str(course_key))
+            if response is None:
+                raise CommentClientRequestError("Forum v2 API call is missing")
+        else:
+            response = self.perform_http_put_request(request_params)
+        return response
+
+    def handle_update_user(self, request_params, course_id):
+        try:
+            username = request_params["username"]
+            external_id = str(request_params["external_id"])
+        except KeyError as e:
+            raise e
+        response = forum_api.update_user(
+            external_id,
+            username,
+            course_id,
+        )
+        return response
+
+    def handle_update_comment(self, request_params, course_id):
+        request_data = {
+            "comment_id": self.attributes["id"],
+            "body": request_params.get("body"),
+            "course_id": request_params.get("course_id"),
+            "user_id": request_params.get("user_id"),
+            "anonymous": request_params.get("anonymous"),
+            "anonymous_to_peers": request_params.get("anonymous_to_peers"),
+            "endorsed": request_params.get("endorsed"),
+            "closed": request_params.get("closed"),
+            "editing_user_id": request_params.get("editing_user_id"),
+            "edit_reason_code": request_params.get("edit_reason_code"),
+            "endorsement_user_id": request_params.get("endorsement_user_id"),
+            "course_key": course_id
+        }
+        request_data = {k: v for k, v in request_data.items() if v is not None}
+        response = forum_api.update_comment(**request_data)
+        return response
+
+    def handle_update_thread(self, request_params, course_id):
+        request_data = {
+            "thread_id": self.attributes["id"],
+            "title": request_params.get("title"),
+            "body": request_params.get("body"),
+            "course_id": request_params.get("course_id"),
+            "anonymous": request_params.get("anonymous"),
+            "anonymous_to_peers": request_params.get("anonymous_to_peers"),
+            "closed": request_params.get("closed"),
+            "commentable_id": request_params.get("commentable_id"),
+            "user_id": request_params.get("user_id"),
+            "editing_user_id": request_params.get("editing_user_id"),
+            "pinned": request_params.get("pinned"),
+            "thread_type": request_params.get("thread_type"),
+            "edit_reason_code": request_params.get("edit_reason_code"),
+            "close_reason_code": request_params.get("close_reason_code"),
+            "closing_user_id": request_params.get("closing_user_id"),
+            "endorsed": request_params.get("endorsed"),
+            "course_key": course_id
+        }
+        request_data = {k: v for k, v in request_data.items() if v is not None}
+        response = forum_api.update_thread(**request_data)
+        return response
+
+    def perform_http_put_request(self, request_params):
+        url = self.url(action="put", params=self.attributes)
+        response = perform_request(
+            "put",
+            url,
+            request_params,
+            metric_tags=self._metric_tags,
+            metric_action="model.update",
+        )
+        return response
+
+    def perform_http_post_request(self):
+        url = self.url(action="post", params=self.attributes)
+        response = perform_request(
+            "post",
+            url,
+            self.initializable_attributes(),
+            metric_tags=self._metric_tags,
+            metric_action="model.insert",
+        )
+        return response
+
+    def handle_create(self, params=None):
+        course_id = self.attributes.get("course_id") or params.get("course_id")
+        course_key = get_course_key(course_id)
+        if is_forum_v2_enabled(course_key):
+            response = None
+            if self.type == "comment":
+                response = self.handle_create_comment(str(course_key))
+            elif self.type == "thread":
+                response = self.handle_create_thread(str(course_key))
+            if response is None:
+                raise CommentClientRequestError("Forum v2 API call is missing")
+        else:
+            response = self.perform_http_post_request()
+        return response
+
+    def handle_create_comment(self, course_id):
+        request_data = self.initializable_attributes()
+        body = request_data["body"]
+        user_id = request_data["user_id"]
+        course_id = course_id or str(request_data["course_id"])
+        if parent_id := self.attributes.get("parent_id"):
+            response = forum_api.create_child_comment(
+                parent_id,
+                body,
+                user_id,
+                course_id,
+                request_data.get("anonymous", False),
+                request_data.get("anonymous_to_peers", False),
+            )
+        else:
+            response = forum_api.create_parent_comment(
+                self.attributes["thread_id"],
+                body,
+                user_id,
+                course_id,
+                request_data.get("anonymous", False),
+                request_data.get("anonymous_to_peers", False),
+            )
+        return response
+
+    def handle_create_thread(self, course_id):
+        request_data = self.initializable_attributes()
+        response = forum_api.create_thread(
+            title=request_data["title"],
+            body=request_data["body"],
+            course_id=course_id or str(request_data["course_id"]),
+            user_id=str(request_data["user_id"]),
+            anonymous=request_data.get("anonymous", False),
+            anonymous_to_peers=request_data.get("anonymous_to_peers", False),
+            commentable_id=request_data.get("commentable_id", "course"),
+            thread_type=request_data.get("thread_type", "discussion"),
+            group_id=request_data.get("group_id", None),
+            context=request_data.get("context", None),
+        )
+        return response
