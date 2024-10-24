@@ -104,7 +104,7 @@ from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryBlockImportTaskCreateSerializer,
     ContentLibraryBlockImportTaskSerializer,
-    ContentLibraryFilterSerializer,
+    BaseFilterSerializer,
     ContentLibraryMetadataSerializer,
     ContentLibraryPermissionLevelSerializer,
     ContentLibraryPermissionSerializer,
@@ -224,7 +224,7 @@ class LibraryRootView(GenericAPIView):
         """
         Return a list of all content libraries that the user has permission to view.
         """
-        serializer = ContentLibraryFilterSerializer(data=request.query_params)
+        serializer = BaseFilterSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         org = serializer.validated_data['org']
         text_search = serializer.validated_data['text_search']

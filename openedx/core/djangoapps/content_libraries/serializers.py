@@ -122,12 +122,6 @@ class BaseFilterSerializer(serializers.Serializer):
     order = serializers.CharField(default=None, required=False)
 
 
-class ContentLibraryFilterSerializer(BaseFilterSerializer):
-    """
-    Serializer for filtering library listings.
-    """
-
-
 class CollectionMetadataSerializer(serializers.Serializer):
     """
     Serializer for CollectionMetadata
