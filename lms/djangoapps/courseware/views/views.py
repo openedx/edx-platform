@@ -1566,7 +1566,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             f"Rendering of the xblock view '{nh3.clean(requested_view)}' is not supported."
         )
 
-    staff_access = has_access(request.user, 'staff', course_key)
+    staff_access = bool(has_access(request.user, 'staff', course_key))
     is_preview = request.GET.get('preview') == '1'
 
     store = modulestore()

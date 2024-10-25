@@ -179,7 +179,7 @@ class VideoBlock(
                 track_url = self.track
             elif sub or other_lang:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
-
+        print('GETTING THE TRANSCRIPT DEFAULT LANGUAGW',dest_lang)
         transcript_language = self.get_default_transcript_language(transcripts, dest_lang)
         native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
         languages = {

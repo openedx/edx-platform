@@ -14,7 +14,9 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode, urlparse, urlunparse
 
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -99,7 +101,15 @@ def _get_new_courseware_url(
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
-    path = path_to_location(modulestore(), usage_key, request, full_path=True)
+    preview = request.GET.get('preview') if request and request.GET else False
+    staff_access = bool(has_access(request.user, 'staff', course_key))
+    
+    branch_type = (
+        ModuleStoreEnum.Branch.draft_preferred
+    ) if preview and staff_access else ModuleStoreEnum.Branch.published_only
+
+    path = path_to_location(modulestore(), usage_key, request, full_path=True, branch_type=branch_type)
+
     if len(path) <= 1:
         # Course-run-level block:
         # We have no Sequence or Unit to return.
@@ -120,7 +130,7 @@ def _get_new_courseware_url(
         course_key=course_key,
         sequence_key=sequence_key,
         unit_key=unit_key,
-        preview=request.GET.get('preview') if request and request.GET else False,
+        preview=preview,
         params=request.GET if request and request.GET else None,
     )
 
