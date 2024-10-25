@@ -41,6 +41,16 @@ define(
                     type: 'VideoID',
                     value: 'basic tab video id'
                 },
+                transcriptDownloadRoleEntry = {
+                    default_value: ['*', 'All'],
+                    display_name: 'Transcript Download Role',
+                    explicitly_set: true,
+                    field_name: 'transcript_download_role',
+                    help: 'Select the transcript download role.',
+                    options: [],
+                    type: MetadataModel.LIST_TYPE,
+                    value: ['*']
+                },
                 models = [DisplayNameEntry, VideoListEntry, VideoIDEntry],
                 testData = {
                     display_name: DisplayNameEntry,
@@ -265,7 +275,8 @@ define(
                             subEntry,
                             html5SourcesEntry,
                             youtubeEntry,
-                            videoIDEntry
+                            videoIDEntry,
+                            transcriptDownloadRoleEntry
                         ]
                     );
 
