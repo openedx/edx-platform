@@ -30,7 +30,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ROLE
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
@@ -300,7 +300,8 @@ class VideoBlock(
         # based on user locale.  This exists to support cases where
         # we leverage a geography specific CDN, like China.
         default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
-        user_location = self.runtime.service(self, 'user').get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
+        loggedin_user = self.runtime.service(self, 'user').get_current_user()
+        user_location = loggedin_user.opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
 
         # If we have an edx_video_id, we prefer its values over what we store
@@ -485,7 +486,8 @@ class VideoBlock(
             'poster': json.dumps(get_poster(self)),
             'track': track_url,
             'transcript_download_format': transcript_download_format,
-            'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
+            'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object,
+            'showTranscriptDownload' : (loggedin_user.opt_attrs[ATTR_KEY_USER_ROLE] == getattr(self, 'transcript_download_role', True)) or getattr(self, 'transcript_download_role', True) == "*"
         }
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
