@@ -57,7 +57,7 @@ import base64
 import hashlib
 import logging
 import mimetypes
-import sys
+
 
 import attr
 import requests
@@ -1206,7 +1206,7 @@ def add_library_block_static_asset_file(usage_key, file_path, file_content, user
     return LibraryXBlockStaticFile(
         path=file_path,
         url=site_root_url + local_path,
-        size=sys.getsizeof(file_content),
+        size=len(file_content),
     )
 
 
