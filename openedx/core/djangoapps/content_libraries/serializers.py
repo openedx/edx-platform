@@ -113,7 +113,7 @@ class ContentLibraryPermissionSerializer(ContentLibraryPermissionLevelSerializer
     group_name = serializers.CharField(source="group.name", allow_null=True, allow_blank=False, default=None)
 
 
-class BaseFilterSerializer(serializers.Serializer):
+class ContentLibraryFilterSerializer(serializers.Serializer):
     """
     Base serializer for filtering listings on the content library APIs.
     """
