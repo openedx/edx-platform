@@ -27,7 +27,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
@@ -936,7 +935,6 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         for app_name, app_prefs in config.items():
             for type_prefs in app_prefs['notification_types'].values():
                 assert type_prefs['email'] is False
-                assert type_prefs['email_cadence'] == EmailCadence.NEVER
 
     def test_if_config_version_is_updated(self):
         """
