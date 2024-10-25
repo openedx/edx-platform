@@ -204,6 +204,13 @@ class VideoFields:
         scope=Scope.settings,
         default="",
     )
+    transcript_download_role = String(
+        display_name=_("Transcript Download Role"),
+        help=_('Choose a role to be able to download transcripts.'),
+        default="*",
+        values=["ALL", "staff", "instructor"],
+        scope=Scope.settings,
+    )
     bumper_last_view_date = DateTime(
         display_name=_("Date of the last view of the bumper"),
         scope=Scope.preferences,
@@ -227,10 +234,4 @@ class VideoFields:
         scope=Scope.settings,
         default="",
     )
-    transcript_download_role = String(
-        display_name=_("Transcript Download Role"),
-        help=_('Choose a role to be able to download transcripts.'),
-        default="*",
-        values=["ALL", "staff", "instructor"],
-        scope=Scope.settings,
-    )
+    
