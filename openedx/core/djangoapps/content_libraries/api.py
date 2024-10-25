@@ -114,7 +114,7 @@ from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_f
 from xmodule.modulestore.django import modulestore
 
 from . import permissions, tasks
-from .constants import ALL_RIGHTS_RESERVED, COMPLEX
+from .constants import ALL_RIGHTS_RESERVED
 from .models import ContentLibrary, ContentLibraryPermission, ContentLibraryBlockImportTask
 
 log = logging.getLogger(__name__)
@@ -176,7 +176,6 @@ class ContentLibraryMetadata:
     description = attr.ib("")
     num_blocks = attr.ib(0)
     version = attr.ib(0)
-    type = attr.ib(default=COMPLEX)
     last_published = attr.ib(default=None, type=datetime)
     last_draft_created = attr.ib(default=None, type=datetime)
     last_draft_created_by = attr.ib(default=None, type=datetime)
@@ -306,15 +305,13 @@ class LibraryXBlockType:
 # ============
 
 
-def get_libraries_for_user(user, org=None, library_type=None, text_search=None, order=None):
+def get_libraries_for_user(user, org=None, text_search=None, order=None):
     """
     Return content libraries that the user has permission to view.
     """
     filter_kwargs = {}
     if org:
         filter_kwargs['org__short_name'] = org
-    if library_type:
-        filter_kwargs['type'] = library_type
     qs = ContentLibrary.objects.filter(**filter_kwargs) \
                                .select_related('learning_package', 'org') \
                                .order_by('org__short_name', 'slug')
@@ -361,7 +358,6 @@ def get_metadata(queryset, text_search=None):
         ContentLibraryMetadata(
             key=lib.library_key,
             title=lib.learning_package.title if lib.learning_package else "",
-            type=lib.type,
             description="",
             version=0,
             allow_public_learning=lib.allow_public_learning,
@@ -446,7 +442,6 @@ def get_library(library_key):
     return ContentLibraryMetadata(
         key=library_key,
         title=learning_package.title,
-        type=ref.type,
         description=ref.learning_package.description,
         num_blocks=num_blocks,
         version=version,
@@ -474,7 +469,6 @@ def create_library(
         allow_public_learning=False,
         allow_public_read=False,
         library_license=ALL_RIGHTS_RESERVED,
-        library_type=COMPLEX,
 ):
     """
     Create a new content library.
@@ -491,8 +485,6 @@ def create_library(
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
 
-    library_type: Deprecated parameter, not really used. Set to COMPLEX.
-
     Returns a ContentLibraryMetadata instance.
     """
     assert isinstance(org, Organization)
@@ -502,7 +494,6 @@ def create_library(
             ref = ContentLibrary.objects.create(
                 org=org,
                 slug=slug,
-                type=library_type,
                 allow_public_learning=allow_public_learning,
                 allow_public_read=allow_public_read,
                 license=library_license,
@@ -526,7 +517,6 @@ def create_library(
     return ContentLibraryMetadata(
         key=ref.library_key,
         title=title,
-        type=library_type,
         description=description,
         num_blocks=0,
         version=0,
@@ -611,7 +601,6 @@ def update_library(
         description=None,
         allow_public_learning=None,
         allow_public_read=None,
-        library_type=None,
         library_license=None,
 ):
     """
@@ -621,7 +610,7 @@ def update_library(
     A value of None means "don't change".
     """
     lib_obj_fields = [
-        allow_public_learning, allow_public_read, library_type, library_license
+        allow_public_learning, allow_public_read, library_license
     ]
     lib_obj_changed = any(field is not None for field in lib_obj_fields)
     learning_pkg_changed = any(field is not None for field in [title, description])
@@ -640,10 +629,6 @@ def update_library(
                 content_lib.allow_public_learning = allow_public_learning
             if allow_public_read is not None:
                 content_lib.allow_public_read = allow_public_read
-            if library_type is not None:
-                # TODO: Get rid of this field entirely, and remove library_type
-                # from any functions that take it as an argument.
-                content_lib.library_type = library_type
             if library_license is not None:
                 content_lib.library_license = library_license
             content_lib.save()
@@ -856,13 +841,6 @@ def validate_can_add_block_to_library(
     """
     assert isinstance(library_key, LibraryLocatorV2)
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    if content_library.type != COMPLEX:
-        if block_type != content_library.type:
-            raise IncompatibleTypesError(
-                _('Block type "{block_type}" is not compatible with library type "{library_type}".').format(
-                    block_type=block_type, library_type=content_library.type,
-                )
-            )
 
     # If adding a component would take us over our max, return an error.
     component_count = authoring_api.get_all_drafts(content_library.learning_package.id).count()
@@ -1288,10 +1266,7 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     # TODO: return support status and template options
     # See cms/djangoapps/contentstore/views/component.py
     block_types = sorted(name for name, class_ in XBlock.load_classes())
-    lib = get_library(library_key)
-    if lib.type != COMPLEX:
-        # Problem and Video libraries only permit XBlocks of the same name.
-        block_types = (name for name in block_types if name == lib.type)
+
     info = []
     for block_type in block_types:
         # TODO: unify the contentstore helper with the xblock.api version of
