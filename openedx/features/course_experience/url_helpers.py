@@ -14,7 +14,6 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode, urlparse, urlunparse
 
-from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -26,6 +25,7 @@ User = get_user_model()
 def get_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        is_staff: bool = False,
 ) -> str:
     """
     Return the URL to the canonical learning experience for a given block.
@@ -46,12 +46,13 @@ def get_courseware_url(
         get_url_fn = _get_new_courseware_url
     else:
         get_url_fn = _get_legacy_courseware_url
-    return get_url_fn(usage_key=usage_key, request=request)
+    return get_url_fn(usage_key=usage_key, request=request, is_staff=is_staff)
 
 
 def _get_legacy_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        is_staff: bool = None
 ) -> str:
     """
     Return the URL to Legacy (LMS-rendered) courseware content.
@@ -92,6 +93,7 @@ def _get_legacy_courseware_url(
 def _get_new_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        is_staff: bool = None,
 ) -> str:
     """
     Return the URL to the "new" (Learning Micro-Frontend) experience for a given block.
@@ -102,11 +104,9 @@ def _get_new_courseware_url(
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
     preview = request.GET.get('preview') if request and request.GET else False
-    staff_access = bool(has_access(request.user, 'staff', course_key))
-    
     branch_type = (
         ModuleStoreEnum.Branch.draft_preferred
-    ) if preview and staff_access else ModuleStoreEnum.Branch.published_only
+    ) if preview and is_staff else ModuleStoreEnum.Branch.published_only
 
     path = path_to_location(modulestore(), usage_key, request, full_path=True, branch_type=branch_type)
 

@@ -83,8 +83,7 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False, bran
             queue.append((parent, newpath))
 
     with modulestore.bulk_operations(usage_key.course_key):
-        branch_setting = branch_type if branch_type else ModuleStoreEnum.Branch.published_only 
-        with modulestore.branch_setting(branch_setting, usage_key.course_key):
+        with modulestore.branch_setting(branch_type, usage_key.course_key):
             if not modulestore.has_item(usage_key):
                 raise ItemNotFoundError(usage_key)
 
