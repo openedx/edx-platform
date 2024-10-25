@@ -27,17 +27,27 @@ define(["jquery", "backbone", "underscore"], function($, Backbone) {
                     minLength: 2,
                     scroll: true,
                     autoFocus: true,
+                    delay: 0,
                     select: function(event, ui) {
                     if(ui.item.domain == "cdn.exec.talentsprint.com" || ui.item.domain == "cdn.chn.talentsprint.com" || ui.item.domain == "cdn-intl.talentsprint.com") {
                             ui.item.value = "https://" + ui.item.domain + "/content/" + ui.item.value;
                         }else {
                             ui.item.value = "https://" + ui.item.domain + "/content/" + Crypto.MD5(ui.item.value + "dingdong") + "/" + ui.item.value;
                         }
-                        $(this).val(ui.item.value);
-                        $(this).trigger("input");
+                        $(this).val(ui.item.value).trigger('change');
+                        return false;
+                    },
+                    focus: function(event, ui) {
                         event.preventDefault();
                     }
                 });
+                $('.list-input.settings-list li:nth-child(4) .wrapper-comp-setting input')
+                    .on('input', function() {
+                        $(this).data('manuallyEdited', true);
+                    })
+                    .on('keyup', function() {
+                        $(this).autocomplete("search");
+                    });
             };
 
         return {
