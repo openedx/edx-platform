@@ -57,6 +57,7 @@ import base64
 import hashlib
 import logging
 import mimetypes
+import sys
 
 import attr
 import requests
@@ -1176,26 +1177,11 @@ def add_library_block_static_asset_file(usage_key, file_path, file_content, user
 
     component = get_component_from_usage_key(usage_key)
 
-    media_type_str, _encoding = mimetypes.guess_type(file_path)
-    # We use "application/octet-stream" as a generic fallback media type, per
-    # RFC 2046: https://datatracker.ietf.org/doc/html/rfc2046
-    # TODO: This probably makes sense to push down to openedx-learning?
-    media_type_str = media_type_str or "application/octet-stream"
-
-    now = datetime.now(tz=timezone.utc)
-
     with transaction.atomic():
-        media_type = authoring_api.get_or_create_media_type(media_type_str)
-        content = authoring_api.get_or_create_file_content(
-            component.publishable_entity.learning_package.id,
-            media_type.id,
-            data=file_content,
-            created=now,
-        )
         component_version = authoring_api.create_next_component_version(
             component.pk,
-            content_to_replace={file_path: content.id},
-            created=now,
+            content_to_replace={file_path: file_content},
+            created=datetime.now(tz=timezone.utc),
             created_by=user.id if user else None,
         )
         transaction.on_commit(
@@ -1220,7 +1206,7 @@ def add_library_block_static_asset_file(usage_key, file_path, file_content, user
     return LibraryXBlockStaticFile(
         path=file_path,
         url=site_root_url + local_path,
-        size=content.size,
+        size=sys.getsizeof(file_content),
     )
 
 
