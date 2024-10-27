@@ -23,7 +23,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
-from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from openedx.features.course_experience import ENABLE_COURSE_GOALS, ENABLE_SES_FOR_GOALREMINDER
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 
 log = logging.getLogger(__name__)
@@ -86,13 +86,24 @@ def send_ace_message(goal):
         'programs_url': getattr(settings, 'ACE_EMAIL_PROGRAMS_URL', None),
     })
 
+    options = {'transactional': True}
+
+    is_ses_enabled = ENABLE_SES_FOR_GOALREMINDER.is_enabled(goal.course_key)
+
+    if is_ses_enabled:
+        options = {
+            'transactional': True,
+            'from_address': settings.LMS_COMM_DEFAULT_FROM_EMAIL,
+            'override_default_channel': 'django_email',
+        }
+
     msg = Message(
         name="goalreminder",
         app_label="course_goals",
         recipient=Recipient(user.id, user.email),
         language=language,
         context=message_context,
-        options={'transactional': True},
+        options=options,
     )
 
     with emulate_http_request(site, user):

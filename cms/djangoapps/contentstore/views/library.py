@@ -41,8 +41,8 @@ from common.djangoapps.student.roles import (
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 
-from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
 from ..utils import add_instructor, reverse_library_url
+from ..toggles import libraries_v1_enabled
 from .component import CONTAINER_TEMPLATES, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import create_xblock_info
 from .user import user_with_role
@@ -51,28 +51,11 @@ __all__ = ['library_handler', 'manage_library_users']
 
 log = logging.getLogger(__name__)
 
-LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
-ENABLE_LIBRARY_AUTHORING_MICROFRONTEND = settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND', False)
-LIBRARY_AUTHORING_MICROFRONTEND_URL = settings.LIBRARY_AUTHORING_MICROFRONTEND_URL
-
-
-def should_redirect_to_library_authoring_mfe():
-    """
-    Boolean helper method, returns whether or not to redirect to the Library
-    Authoring MFE based on settings and flags.
-    """
-
-    return (
-        ENABLE_LIBRARY_AUTHORING_MICROFRONTEND and
-        LIBRARY_AUTHORING_MICROFRONTEND_URL and
-        REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND.is_enabled()
-    )
-
 
 def _user_can_create_library_for_org(user, org=None):
     """
     Helper method for returning the library creation status for a particular user,
-    taking into account the value LIBRARIES_ENABLED.
+    taking into account the libraries_v1_enabled toggle.
 
     if the ENABLE_CREATOR_GROUP value is False, then any user can create a library (in any org),
     if library creation is enabled.
@@ -85,7 +68,7 @@ def _user_can_create_library_for_org(user, org=None):
     Course Staff: Can make libraries in the organization which has courses of which they are staff.
     Course Admin: Can make libraries in the organization which has courses of which they are Admin.
     """
-    if not LIBRARIES_ENABLED:
+    if not libraries_v1_enabled():
         return False
     elif user.is_staff:
         return True
@@ -141,7 +124,7 @@ def library_handler(request, library_key_string=None):
     """
     RESTful interface to most content library related functionality.
     """
-    if not LIBRARIES_ENABLED:
+    if not libraries_v1_enabled():
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
 

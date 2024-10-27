@@ -3455,6 +3455,15 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         })
         assert response.status_code == 400
 
+    def test_skip_entrance_exam_student_with_invalid_student(self):
+        """ Test skip entrance exam api for non existing user. """
+        # create a re-score entrance exam task
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'unique_student_identifier': 'test',
+        })
+        assert response.status_code == 400
+
     def test_skip_entrance_exam_student(self):
         """ Test skip entrance exam api for student. """
         # create a re-score entrance exam task

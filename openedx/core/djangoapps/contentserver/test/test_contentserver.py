@@ -1,5 +1,5 @@
 """
-Tests for StaticContentServer
+Tests for content server.
 """
 
 
@@ -27,7 +27,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..views import HTTP_DATE_FORMAT, StaticContentServer, parse_range_header
+from .. import views
 
 log = logging.getLogger(__name__)
 
@@ -246,7 +246,6 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
-        # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 
@@ -356,8 +355,8 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         assert 'private, no-cache, no-store' == resp['Cache-Control']
 
     def test_get_expiration_value(self):
-        start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", HTTP_DATE_FORMAT)
-        near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
+        start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", views.HTTP_DATE_FORMAT)
+        near_expire_dt = views.get_expiration_value(start_dt, 55)
         assert 'Thu, 01 Dec 1983 20:00:55 GMT' == near_expire_dt
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -371,7 +370,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Chrome 1234')
 
-        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        is_from_cdn = views.is_cdn_request(browser_request)
         assert is_from_cdn is False
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -385,7 +384,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
-        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        is_from_cdn = views.is_cdn_request(browser_request)
         assert is_from_cdn is True
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -400,7 +399,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
-        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        is_from_cdn = views.is_cdn_request(browser_request)
         assert is_from_cdn is True
 
 
@@ -415,7 +414,7 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
         self.content_length = 10000
 
     def test_bytes_unit(self):
-        unit, __ = parse_range_header('bytes=100-', self.content_length)
+        unit, __ = views.parse_range_header('bytes=100-', self.content_length)
         assert unit == 'bytes'
 
     @ddt.data(
@@ -428,7 +427,7 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     )
     @ddt.unpack
     def test_valid_syntax(self, header_value, excepted_ranges_length, expected_ranges):
-        __, ranges = parse_range_header(header_value, self.content_length)
+        __, ranges = views.parse_range_header(header_value, self.content_length)
         assert len(ranges) == excepted_ranges_length
         assert ranges == expected_ranges
 
@@ -446,5 +445,5 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     @ddt.unpack
     def test_invalid_syntax(self, header_value, exception_class, exception_message_regex):
         self.assertRaisesRegex(
-            exception_class, exception_message_regex, parse_range_header, header_value, self.content_length
+            exception_class, exception_message_regex, views.parse_range_header, header_value, self.content_length
         )

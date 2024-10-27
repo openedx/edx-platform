@@ -144,7 +144,8 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized_learning_core = api.serialize_modulestore_block_for_learning_core(html_block)
         self.assertXmlEqual(
             serialized_learning_core.olx_str,
-            # For learning core, OLX should never contain "url_name" as that ID is specified by the filename:
+            # For learning core, OLX should never contain "url_name" as that ID
+            # is specified by the Component key:
             """
             <html display_name="Text"><![CDATA[
                 <img src="/static/foo_bar.jpg" />
@@ -154,8 +155,6 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         self.assertIn("CDATA", serialized.olx_str)
         # Static files should be identical:
         self.assertEqual(serialized.static_files, serialized_learning_core.static_files)
-        # This is the only other difference - an extra field with the learning-core-specific definition ID:
-        self.assertEqual(serialized_learning_core.def_id, "html/just_img")
 
     def test_html_with_fields(self):
         """ Test an HTML Block with non-default fields like editor='raw' """
@@ -192,28 +191,6 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         serialized = api.serialize_xblock_to_olx(sequential)
 
         self.assertXmlEqual(serialized.olx_str, EXPECTED_SEQUENTIAL_OLX)
-
-    def test_export_sequential_learning_core(self):
-        """
-        Export a sequential from the toy course, formatted for learning core.
-        """
-        sequential_id = self.course.id.make_usage_key('sequential', 'Toy_Videos')  # see sample_courses.py
-        sequential = modulestore().get_item(sequential_id)
-        serialized = api.serialize_modulestore_block_for_learning_core(sequential)
-
-        self.assertXmlEqual(serialized.olx_str, """
-            <sequential display_name="Toy Videos" format="Lecture Sequence">
-                <xblock-include definition="html/secret:toylab"/>
-                <xblock-include definition="html/toyjumpto"/>
-                <xblock-include definition="html/toyhtml"/>
-                <xblock-include definition="html/nonportable"/>
-                <xblock-include definition="html/nonportable_link"/>
-                <xblock-include definition="html/badlink"/>
-                <xblock-include definition="html/with_styling"/>
-                <xblock-include definition="html/just_img"/>
-                <xblock-include definition="video/Video_Resources"/>
-            </sequential>
-        """)
 
     def test_capa_python_lib(self):
         """ Test capa problem blocks with and without python_lib.zip """

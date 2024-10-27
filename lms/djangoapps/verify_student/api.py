@@ -54,7 +54,13 @@ def send_approval_email(attempt):
         send_verification_approved_email(context=email_context)
 
 
-def create_verification_attempt(user: User, name: str, status: str, expiration_datetime: Optional[datetime] = None):
+def create_verification_attempt(
+    user: User,
+    name: str,
+    status: str,
+    expiration_datetime: Optional[datetime] = None,
+    hide_status_from_user: Optional[bool] = False,
+):
     """
     Create a verification attempt.
 
@@ -74,6 +80,7 @@ def create_verification_attempt(user: User, name: str, status: str, expiration_d
         name=name,
         status=status,
         expiration_datetime=expiration_datetime,
+        hide_status_from_user=hide_status_from_user,
     )
 
     emit_idv_attempt_created_event(
@@ -129,7 +136,7 @@ def update_verification_attempt(
                 'Status must be one of: %(status_list)s',
                 {
                     'status': status,
-                    'status_list': VerificationAttempt.STATUS_CHOICES,
+                    'status_list': VerificationAttempt.STATUS,
                 },
             )
             raise VerificationAttemptInvalidStatus

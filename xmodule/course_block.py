@@ -1115,9 +1115,6 @@ class CourseBlock(
         except InvalidTabsException as err:
             raise type(err)(f'{str(err)} For course: {str(self.id)}')  # lint-amnesty, pylint: disable=line-too-long
 
-        if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
-            self.set_default_certificate_available_date()
-
     def set_grading_policy(self, course_policy):
         """
         The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
