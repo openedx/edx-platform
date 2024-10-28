@@ -25,7 +25,7 @@ from organizations.models import Organization
 from rest_framework.test import APITestCase
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content_libraries.constants import CC_4_BY, COMPLEX, PROBLEM, VIDEO
+from openedx.core.djangoapps.content_libraries.constants import CC_4_BY
 from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
@@ -100,7 +100,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             "title": "A Tést Lꜟطrary",
             "description": "Just Téstꜟng",
             "version": 0,
-            "type": COMPLEX,
             "license": CC_4_BY,
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
@@ -199,13 +198,13 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         Test the filters in the list libraries API
         """
         self._create_library(
-            slug="test-lib-filter-1", title="Fob", description="Bar", library_type=VIDEO,
+            slug="test-lib-filter-1", title="Fob", description="Bar",
         )
         self._create_library(
             slug="test-lib-filter-2", title="Library-Title-2", description="Bar-2",
         )
         self._create_library(
-            slug="l3", title="Library-Title-3", description="Description", library_type=VIDEO,
+            slug="l3", title="Library-Title-3", description="Description",
         )
 
         Organization.objects.get_or_create(
@@ -215,7 +214,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         self._create_library(
             slug="l4", title="Library-Title-4",
             description="Library-Description", org='org-test',
-            library_type=VIDEO,
         )
         self._create_library(
             slug="l5", title="Library-Title-5", description="Library-Description",
@@ -225,14 +223,11 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert len(self._list_libraries()) == 5
         assert len(self._list_libraries({'org': 'org-test'})) == 2
         assert len(self._list_libraries({'text_search': 'test-lib-filter'})) == 2
-        assert len(self._list_libraries({'text_search': 'test-lib-filter', 'type': VIDEO})) == 1
         assert len(self._list_libraries({'text_search': 'library-title'})) == 4
-        assert len(self._list_libraries({'text_search': 'library-title', 'type': VIDEO})) == 2
         assert len(self._list_libraries({'text_search': 'bar'})) == 2
         assert len(self._list_libraries({'text_search': 'org-test'})) == 2
         assert len(self._list_libraries({'org': 'org-test',
                                          'text_search': 'library-title-4'})) == 1
-        assert len(self._list_libraries({'type': VIDEO})) == 3
 
         self.assertOrderEqual(
             self._list_libraries({'order': 'title'}),
@@ -257,7 +252,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
     # General Content Library XBlock tests:
 
-    def test_library_blocks(self):
+    def test_library_blocks(self):  # pylint: disable=too-many-statements
         """
         Test the happy path of creating and working with XBlocks in a content
         library.
@@ -358,6 +353,21 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         self._revert_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_deletes'] is False
         assert self._get_library_block_olx(block_id) == orig_olx
+
+        # Now edit and publish the single block instead of the whole library:
+        new_olx = "<problem><p>Edited OLX</p></problem>"
+        self._set_library_block_olx(block_id, new_olx)
+        assert self._get_library_block_olx(block_id) == new_olx
+        unpublished_block_data = self._get_library_block(block_id)
+        assert unpublished_block_data['has_unpublished_changes'] is True
+        block_update_date = datetime(2024, 8, 8, 8, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(block_update_date):
+            self._publish_library_block(block_id)
+        # Confirm the block is now published:
+        published_block_data = self._get_library_block(block_id)
+        assert published_block_data['last_published'] == block_update_date.isoformat().replace('+00:00', 'Z')
+        assert published_block_data['published_by'] == "Bob"
+        assert published_block_data['has_unpublished_changes'] is False
 
         # fin
 
@@ -480,27 +490,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})['results']) == 1
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})['results']) == 3
         assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})['results']) == 0
-
-    @ddt.data(
-        ('video-problem', VIDEO, 'problem', 400),
-        ('video-video', VIDEO, 'video', 200),
-        ('problem-problem', PROBLEM, 'problem', 200),
-        ('problem-video', PROBLEM, 'video', 400),
-        ('complex-video', COMPLEX, 'video', 200),
-        ('complex-problem', COMPLEX, 'problem', 200),
-    )
-    @ddt.unpack
-    def test_library_blocks_type_constrained(self, slug, library_type, block_type, expect_response):
-        """
-        Test that type-constrained libraries enforce their constraint when adding an XBlock.
-        """
-        lib = self._create_library(
-            slug=slug, title="A Test Library", description="Testing XBlocks", library_type=library_type,
-        )
-        lib_id = lib["id"]
-
-        # Add a 'problem' XBlock to the library:
-        self._add_block_to_library(lib_id, block_type, 'test-block', expect_response=expect_response)
 
     def test_library_not_found(self):
         """Test that requests fail with 404 when the library does not exist"""
@@ -661,13 +650,13 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._get_library_block_olx(block3_key, expect_response=403)
             self._get_library_block_fields(block3_key, expect_response=403)
             self._get_library_block_assets(block3_key, expect_response=403)
-            self._get_library_block_asset(block3_key, file_name="whatever.png", expect_response=403)
+            self._get_library_block_asset(block3_key, file_name="static/whatever.png", expect_response=403)
             # Nor can they preview the block:
             self._render_block_view(block3_key, view_name="student_view", expect_response=403)
         # But if we grant allow_public_read, then they can:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
-            # self._set_library_block_asset(block3_key, "whatever.png", b"data")
+            self._set_library_block_asset(block3_key, "static/whatever.png", b"data")
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key)
             self._render_block_view(block3_key, view_name="student_view")
@@ -675,12 +664,13 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             # self._get_library_block_assets(block3_key)
             # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
-        # Users without authoring permission cannot edit nor delete XBlocks:
+        # Users without authoring permission cannot edit nor publish nor delete XBlocks:
         for user in [reader, random_user]:
             with self.as_user(user):
                 self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
                 self._set_library_block_fields(block3_key, {"data": "<problem />", "metadata": {}}, expect_response=403)
-                # self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
+                self._set_library_block_asset(block3_key, "static/test.txt", b"data", expect_response=403)
+                self._publish_library_block(block3_key, expect_response=403)
                 self._delete_library_block(block3_key, expect_response=403)
                 self._commit_library_changes(lib_id, expect_response=403)
                 self._revert_library_changes(lib_id, expect_response=403)
@@ -690,12 +680,23 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             olx = self._get_library_block_olx(block3_key)
             self._set_library_block_olx(block3_key, olx)
             self._set_library_block_fields(block3_key, {"data": olx, "metadata": {}})
-            # self._get_library_block_assets(block3_key)
-            # self._set_library_block_asset(block3_key, "test.txt", b"data")
-            # self._get_library_block_asset(block3_key, file_name="test.txt")
+            self._get_library_block_assets(block3_key)
+            self._set_library_block_asset(block3_key, "static/test.txt", b"data")
+            self._get_library_block_asset(block3_key, file_name="static/test.txt")
             self._delete_library_block(block3_key)
+            self._publish_library_block(block3_key)
             self._commit_library_changes(lib_id)
             self._revert_library_changes(lib_id)  # This is a no-op after the commit, but should still have 200 response
+
+        # Users without authoring permission cannot commit Xblock changes:
+        # First we need to add some unpublished changes
+        with self.as_user(admin):
+            block4_data = self._add_block_to_library(lib_id, "problem", "problem4")
+            block5_data = self._add_block_to_library(lib_id, "problem", "problem5")
+            block4_key = block4_data["id"]
+            block5_key = block5_data["id"]
+            self._set_library_block_olx(block4_key, "<problem/>")
+            self._set_library_block_olx(block5_key, "<problem/>")
 
     def test_no_lockout(self):
         """
@@ -727,24 +728,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._add_block_to_library(lib_id, "unit", "unit1")
             # Second block should throw error
             self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
-
-    @ddt.data(
-        ('complex-types', COMPLEX, False),
-        ('video-types', VIDEO, True),
-        ('problem-types', PROBLEM, True),
-    )
-    @ddt.unpack
-    def test_block_types(self, slug, library_type, constrained):
-        """
-        Test that the permitted block types listing for a library change based on type.
-        """
-        lib = self._create_library(slug=slug, title='Test Block Types', library_type=library_type)
-        types = self._get_library_block_types(lib['id'])
-        if constrained:
-            assert len(types) == 1
-            assert types[0]['block_type'] == library_type
-        else:
-            assert len(types) > 1
 
     def test_content_library_create_event(self):
         """
@@ -915,7 +898,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             event_receiver.call_args.kwargs
         )
 
-    @skip("We still need to re-implement static asset handling.")
     def test_library_block_add_asset_update_event(self):
         """
         Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
@@ -934,7 +916,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         block = self._add_block_to_library(lib_id, "unit", "u1")
         block_id = block["id"]
-        self._set_library_block_asset(block_id, "test.txt", b"data")
+        self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
@@ -955,7 +937,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             event_receiver.call_args.kwargs
         )
 
-    @skip("We still need to re-implement static asset handling.")
     def test_library_block_del_asset_update_event(self):
         """
         Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
@@ -974,9 +955,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         block = self._add_block_to_library(lib_id, "unit", "u1")
         block_id = block["id"]
-        self._set_library_block_asset(block_id, "test.txt", b"data")
+        self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
-        self._delete_library_block_asset(block_id, 'text.txt')
+        self._delete_library_block_asset(block_id, 'static/text.txt')
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
@@ -1065,6 +1046,9 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 usage_id="problem1"
             )
 
+            # Add an asset to the block before copying
+            self._set_library_block_asset(usage_key, "static/hello.txt", b"Hello World!")
+
             # Get the XBlock created in the previous step
             block = xblock_api.load_block(usage_key, user=author)
 
@@ -1074,6 +1058,17 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             # Paste the content of the clipboard into the library
             pasted_block_id = str(uuid4())
             paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
+            pasted_usage_key = LibraryUsageLocatorV2(
+                lib_key=library_key,
+                block_type="problem",
+                usage_id=pasted_block_id
+            )
+            self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
+
+            # Compare the two text files
+            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").content
+            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").content
+            assert src_data == dest_data
 
             # Check that the new block was created after the paste and it's content matches
             # the the block in the clipboard
@@ -1103,10 +1098,6 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             endpoint.format(**endpoint_parameters),
         )
         self.assertEqual(response.status_code, 404)
-        msg = f"XBlock {endpoint_parameters.get('block_key')} does not exist, or you don't have permission to view it."
-        self.assertEqual(response.json(), {
-            'detail': msg,
-        })
 
     def test_xblock_handler_invalid_key(self):
         """This endpoint is tested separately from the previous ones as it's not a DRF endpoint."""

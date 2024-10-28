@@ -48,7 +48,7 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
@@ -242,7 +242,7 @@ class VideoBlock(
         Return the student view.
         """
         fragment = Fragment(self.get_html(context=context))
-        add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
@@ -260,7 +260,7 @@ class VideoBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_sass_to_fragment(fragment, 'VideoBlockEditor.scss')
+        add_css_to_fragment(fragment, 'VideoBlockEditor.css')
         add_webpack_js_to_fragment(fragment, 'VideoBlockEditor')
         shim_xmodule_js(fragment, 'TabsEditingDescriptor')
         return fragment
@@ -276,7 +276,7 @@ class VideoBlock(
             return self.student_view(context)
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
-        add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment

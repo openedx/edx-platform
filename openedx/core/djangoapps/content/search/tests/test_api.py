@@ -115,7 +115,6 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Create a content library:
         self.library = library_api.create_library(
-            library_type=library_api.COMPLEX,
             org=OrganizationFactory.create(short_name="org1"),
             slug="lib",
             title="Library",
@@ -219,10 +218,10 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_vertical["tags"] = {}
         doc_problem1 = copy.deepcopy(self.doc_problem1)
         doc_problem1["tags"] = {}
-        doc_problem1["collections"] = {}
+        doc_problem1["collections"] = {'display_name': [], 'key': []}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
-        doc_problem2["collections"] = {}
+        doc_problem2["collections"] = {'display_name': [], 'key': []}
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
 
@@ -263,7 +262,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_vertical["tags"] = {}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
-        doc_problem2["collections"] = {}
+        doc_problem2["collections"] = {'display_name': [], 'key': []}
 
         orig_from_component = library_api.LibraryXBlockMetadata.from_component
 
@@ -662,7 +661,7 @@ class TestSearchApi(ModuleStoreTestCase):
 
         doc_problem_without_collection = {
             "id": self.doc_problem1["id"],
-            "collections": {},
+            "collections": {'display_name': [], 'key': []},
         }
 
         # Should delete the collection document

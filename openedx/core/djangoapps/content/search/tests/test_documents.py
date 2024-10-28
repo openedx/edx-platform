@@ -154,6 +154,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "org": "edX",
             "access_id": self.toy_course_access_id,
             "display_name": "Test Problem",
+            "description": "What is a test?",
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
@@ -202,6 +203,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "org": "edX",
             "access_id": self.toy_course_access_id,
             "display_name": "Text",
+            "description": "This is a link to another page and some Chinese 四節比分和七年前 Some "
+                         "more Chinese 四節比分和七年前 ",
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
@@ -294,6 +297,128 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "tags": {
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"],
+            },
+        }
+
+    def test_html_published_library_block(self):
+        library_api.publish_changes(self.library.key)
+
+        doc = searchable_doc_for_library_block(self.library_block)
+        doc.update(searchable_doc_tags(self.library_block.usage_key))
+        doc.update(searchable_doc_collections(self.library_block.usage_key))
+
+        assert doc == {
+            "id": "lbedx2012_fallhtmltext2-4bb47d67",
+            "type": "library_block",
+            "block_type": "html",
+            "usage_key": "lb:edX:2012_Fall:html:text2",
+            "block_id": "text2",
+            "context_key": "lib:edX:2012_Fall",
+            "org": "edX",
+            "access_id": self.library_access_id,
+            "display_name": "Text",
+            "breadcrumbs": [
+                {
+                    "display_name": "some content_library",
+                },
+            ],
+            "last_published": None,
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            "content": {
+                "html_content": "",
+            },
+            "collections": {
+                "key": ["TOY_COLLECTION"],
+                "display_name": ["Toy Collection"],
+            },
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"],
+            },
+            'published': {'display_name': 'Text'},
+        }
+
+        # Update library block to create a draft
+        olx_str = '<html display_name="Text 2"><![CDATA[<p>This is a Test</p>]]></html>'
+        library_api.set_library_block_olx(self.library_block.usage_key, olx_str)
+
+        doc = searchable_doc_for_library_block(self.library_block)
+        doc.update(searchable_doc_tags(self.library_block.usage_key))
+        doc.update(searchable_doc_collections(self.library_block.usage_key))
+
+        assert doc == {
+            "id": "lbedx2012_fallhtmltext2-4bb47d67",
+            "type": "library_block",
+            "block_type": "html",
+            "usage_key": "lb:edX:2012_Fall:html:text2",
+            "block_id": "text2",
+            "context_key": "lib:edX:2012_Fall",
+            "org": "edX",
+            "access_id": self.library_access_id,
+            "display_name": "Text 2",
+            "description": "This is a Test",
+            "breadcrumbs": [
+                {
+                    "display_name": "some content_library",
+                },
+            ],
+            "last_published": None,
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            "content": {
+                "html_content": "This is a Test",
+            },
+            "collections": {
+                "key": ["TOY_COLLECTION"],
+                "display_name": ["Toy Collection"],
+            },
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"],
+            },
+            "published": {"display_name": "Text"},
+        }
+
+        # Publish new changes
+        library_api.publish_changes(self.library.key)
+        doc = searchable_doc_for_library_block(self.library_block)
+        doc.update(searchable_doc_tags(self.library_block.usage_key))
+        doc.update(searchable_doc_collections(self.library_block.usage_key))
+
+        assert doc == {
+            "id": "lbedx2012_fallhtmltext2-4bb47d67",
+            "type": "library_block",
+            "block_type": "html",
+            "usage_key": "lb:edX:2012_Fall:html:text2",
+            "block_id": "text2",
+            "context_key": "lib:edX:2012_Fall",
+            "org": "edX",
+            "access_id": self.library_access_id,
+            "display_name": "Text 2",
+            "description": "This is a Test",
+            "breadcrumbs": [
+                {
+                    "display_name": "some content_library",
+                },
+            ],
+            "last_published": None,
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            "content": {
+                "html_content": "This is a Test",
+            },
+            "collections": {
+                "key": ["TOY_COLLECTION"],
+                "display_name": ["Toy Collection"],
+            },
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"],
+            },
+            "published": {
+                "display_name": "Text 2",
+                "description": "This is a Test",
             },
         }
 

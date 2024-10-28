@@ -179,15 +179,23 @@ class TestCleanThreadHtmlBody(unittest.TestCase):
         """
         Tests that the clean_thread_html_body function replaces the button tag with span tag
         """
-        # Tests for button replacement tag with text
         html_body = '<button class="abc">Button</button>'
         expected_output = '<span style="margin: 0">Button</span>'
         result = clean_thread_html_body(html_body)
         self.assertEqual(result, expected_output)
 
-        # Tests button tag replacement without text
+        html_body = '<p><p>abc</p><button class="abc"></button><p>abc</p></p>'
+        expected_output = '<p style="margin: 0"><p style="margin: 0">abc</p>'\
+                          '<span style="margin: 0"></span><p style="margin: 0">abc</p></p>'
+        result = clean_thread_html_body(html_body)
+        self.assertEqual(result, expected_output)
+
+    def test_button_tag_removal(self):
+        """
+        Tests button tag with no text is removed if at start or end
+        """
         html_body = '<button class="abc"></button>'
-        expected_output = '<span style="margin: 0"></span>'
+        expected_output = ''
         result = clean_thread_html_body(html_body)
         self.assertEqual(result, expected_output)
 
@@ -196,3 +204,11 @@ class TestCleanThreadHtmlBody(unittest.TestCase):
         html_body = '<p class="abc" style="color:red" aria-disabled=true>Paragraph</p>'
         result = clean_thread_html_body(html_body)
         self.assertEqual(result, '<p style="margin: 0">Paragraph</p>')
+
+    def test_strip_empty_tags(self):
+        """
+        Tests if the clean_thread_html_body function removes starting and ending empty tags
+        """
+        html_body = '<div><p></p><p>content</p><p></p></div>'
+        result = clean_thread_html_body(html_body)
+        self.assertEqual(result, '<p style="margin: 0"><p style="margin: 0">content</p></p>')
