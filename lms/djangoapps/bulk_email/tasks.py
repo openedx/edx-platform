@@ -539,7 +539,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                                                                       str(course_email.course_id))
             email_context['unsubscribe_text'] = 'Unsubscribe from course updates for this course'
             email_context['disclaimer'] = (
-                f"You are receiving this email because you are enrolled in the "
+                "You are receiving this email because you are enrolled in the "
                 f"{email_context['platform_name']} course {email_context['course_title']}"
             )
 
