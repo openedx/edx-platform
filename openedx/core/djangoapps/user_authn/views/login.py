@@ -102,9 +102,7 @@ def _do_third_party_auth(request):
             register_label_strong=HTML("<strong>{register_text}</strong>").format(register_text=_("Register")),
         )
 
-        raise AuthFailedError(
-            message, error_code="third-party-auth-with-no-linked-account"
-        )  # lint-amnesty, pylint: disable=raise-missing-from
+        raise AuthFailedError(message, error_code="third-party-auth-with-no-linked-account")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _get_user_by_email(email):
@@ -213,9 +211,7 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         send_password_reset_email_for_user(user, request)
 
         # Prevent the login attempt.
-        raise AuthFailedError(
-            HTML(str(e)), error_code=e.__class__.__name__
-        )  # lint-amnesty, pylint: disable=raise-missing-from
+        raise AuthFailedError(HTML(str(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
@@ -745,9 +741,7 @@ class LoginSessionView(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
-        return HttpResponse(
-            get_login_session_form(request).to_json(), content_type="application/json"
-        )  # lint-amnesty, pylint: disable=http-response-with-content-type-json
+        return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
     @swagger_auto_schema(
         request_body=login_user_schema,
