@@ -133,6 +133,38 @@ class TestJumpTo(ModuleStoreTestCase):
     Check the jumpto link for a course.
     """
     @ddt.data(
+        (True, False),  # preview -> Legacy experience
+        (False, True),  # no preview -> MFE experience
+    )
+    @ddt.unpack
+    def test_jump_to_legacy_vs_mfe(self, preview_mode, expect_mfe):
+        """
+        Test that jump_to and jump_to_id correctly choose which courseware frontend to redirect to.
+
+        Can be removed when the MFE supports a preview mode.
+        """
+        course = CourseFactory.create()
+        chapter = BlockFactory.create(category='chapter', parent_location=course.location)
+        if expect_mfe:
+            expected_url = f'http://learning-mfe/course/{course.id}/{chapter.location}'
+        else:
+            expected_url = f'/courses/{course.id}/courseware/{chapter.url_name}/'
+
+        jumpto_url = f'/courses/{course.id}/jump_to/{chapter.location}'
+        with set_preview_mode(preview_mode):
+            response = self.client.get(jumpto_url)
+        assert response.status_code == 302
+        # Check the response URL, but chop off the querystring; we don't care here.
+        assert response.url.split('?')[0] == expected_url
+
+        jumpto_id_url = f'/courses/{course.id}/jump_to_id/{chapter.url_name}'
+        with set_preview_mode(preview_mode):
+            response = self.client.get(jumpto_id_url)
+        assert response.status_code == 302
+        # Check the response URL, but chop off the querystring; we don't care here.
+        assert response.url.split('?')[0] == expected_url
+
+    @ddt.data(
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -142,34 +174,32 @@ class TestJumpTo(ModuleStoreTestCase):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             location = course.id.make_usage_key(None, 'NoSuchPlace')
-
-        expected_redirect_url = f'http://learning-mfe/course/{course.id}'
-        jumpto_url = (
-            f'/courses/{course.id}/jump_to/{location}?preview=1'
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware?' + urlencode({'activate_block_id': str(course.location)})
         ) if preview_mode else (
-            f'/courses/{course.id}/jump_to/{location}'
+            f'http://learning-mfe/course/{course.id}'
         )
-
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        with set_preview_mode(False):
+        jumpto_url = f'/courses/{course.id}/jump_to/{location}'
+        with set_preview_mode(preview_mode):
             response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(False)
-    def test_jump_to_preview_from_sequence(self):
+    @set_preview_mode(True)
+    def test_jump_to_legacy_from_sequence(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
             sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
-        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}?preview=1'
+        activate_block_id = urlencode({'activate_block_id': str(sequence.location)})
         expected_redirect_url = (
-            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}'
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/?{activate_block_id}'
         )
+        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
         response = self.client.get(jumpto_url)
-        assert response.status_code == 302
-        assert response.url == expected_redirect_url
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @set_preview_mode(False)
     def test_jump_to_mfe_from_sequence(self):
@@ -184,8 +214,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(False)
-    def test_jump_to_preview_from_block(self):
+    @set_preview_mode(True)
+    def test_jump_to_legacy_from_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -195,21 +225,21 @@ class TestJumpTo(ModuleStoreTestCase):
             block1 = BlockFactory.create(category='html', parent_location=vertical1.location)
             block2 = BlockFactory.create(category='html', parent_location=vertical2.location)
 
-        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}?preview=1'
+        activate_block_id = urlencode({'activate_block_id': str(block1.location)})
         expected_redirect_url = (
-            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}/{vertical1.location}'
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
+        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}'
         response = self.client.get(jumpto_url)
-        assert response.status_code == 302
-        assert response.url == expected_redirect_url
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
-        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}?preview=1'
+        activate_block_id = urlencode({'activate_block_id': str(block2.location)})
         expected_redirect_url = (
-            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}/{vertical2.location}'
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/2?{activate_block_id}'
         )
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
-        assert response.status_code == 302
-        assert response.url == expected_redirect_url
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @set_preview_mode(False)
     def test_jump_to_mfe_from_block(self):
@@ -270,12 +300,8 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jump_to_id_invalid_location(self, preview_mode, store_type):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-        jumpto_url = (
-            f'/courses/{course.id}/jump_to/NoSuchPlace?preview=1'
-        ) if preview_mode else (
-            f'/courses/{course.id}/jump_to/NoSuchPlace'
-        )
-        with set_preview_mode(False):
+        jumpto_url = f'/courses/{course.id}/jump_to/NoSuchPlace'
+        with set_preview_mode(preview_mode):
             response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
@@ -3333,7 +3359,7 @@ class PreviewTests(BaseViewsTestCase):
     def test_preview_no_redirect(self):
         __, __, preview_url = self._get_urls()
         with set_preview_mode(True):
-            # Previews server from PREVIEW_LMS_BASE will not redirect to the mfe
+            # Previews will not redirect to the mfe
             course_staff = UserFactory.create(is_staff=False)
             CourseStaffRole(self.course_key).add_users(course_staff)
             self.client.login(username=course_staff.username, password=TEST_PASSWORD)
