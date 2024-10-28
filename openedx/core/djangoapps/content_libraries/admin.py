@@ -2,7 +2,9 @@
 Admin site for content libraries
 """
 from django.contrib import admin
-from .models import ContentLibrary, ContentLibraryPermission
+from .models import (
+    ContentLibrary, ContentLibraryPermission, ContentLibraryMigration, ContentLibraryBlockMigration
+)
 
 
 class ContentLibraryPermissionInline(admin.TabularInline):
@@ -39,3 +41,20 @@ class ContentLibraryAdmin(admin.ModelAdmin):
             return ["library_key", "org", "slug"]
         else:
             return ["library_key", ]
+
+
+class ContentLibraryBlockMigrationInline(admin.TabularInline):
+    """
+    Django admin UI for content library block migrations
+    """
+    model = ContentLibraryBlockMigration
+    list_display = ("library_migration", "block_type", "source_block_id", "target_block_id")
+
+
+@admin.register(ContentLibraryMigration)
+class ContentLibraryMigrationAdmin(admin.ModelAdmin):
+    """
+    Django admin UI for content library migrations
+    """
+    list_display = ("source_key", "target", "target_collection")
+    inlines = (ContentLibraryBlockMigrationInline,)
