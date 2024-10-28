@@ -11,3 +11,4 @@ Concepts and Guides
     frontend/bootstrap
     frontend/static_assets
     rest_apis
+    hooks/index
