@@ -100,6 +100,17 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 this.render();
                 this.resize();
                 $(window).resize(_.bind(this.resize, this));
+                // console.log('this.resize ==================>', this.resize);
+                try {
+                    window.parent.postMessage(
+                        {
+                            type: 'showXBlockEditorModal',
+                            payload: {}
+                        }, document.referrer
+                    );
+                } catch (e) {
+                    console.error(e);
+                }
 
                 // child may want to have its own focus management
                 if (focusModalWindow) {
@@ -112,6 +123,17 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 // Completely remove the modal from the DOM
                 this.undelegateEvents();
                 this.$el.html('');
+
+                try {
+                    window.parent.postMessage(
+                        {
+                            type: 'hideXBlockEditorModal',
+                            payload: {}
+                        }, document.referrer
+                    );
+                } catch (e) {
+                    console.error(e);
+                }
             },
 
             cancel: function(event) {
@@ -175,24 +197,37 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
             },
 
             resize: function() {
-                var top, left, modalWindow, modalWidth, modalHeight,
-                    availableWidth, availableHeight, maxWidth, maxHeight;
+                // var top, left, modalWindow, modalWidth, modalHeight,
+                //     availableWidth, availableHeight, maxWidth, maxHeight;
+                var left, maxWidth, modalWidth;
 
-                modalWindow = this.$el.find(this.options.modalWindowClass);
+                var modalWindow = this.$el.find(this.options.modalWindowClass);
                 availableWidth = $(window).width();
-                availableHeight = $(window).height();
+                // availableHeight = $(window).height();
                 maxWidth = availableWidth * 0.98;
-                maxHeight = availableHeight * 0.98;
+                // maxHeight = availableHeight * 0.98;
                 modalWidth = Math.min(modalWindow.outerWidth(), maxWidth);
-                modalHeight = Math.min(modalWindow.outerHeight(), maxHeight);
+                // modalHeight = Math.min(modalWindow.outerHeight(), maxHeight);
 
                 left = (availableWidth - modalWidth) / 2;
-                top = (availableHeight - modalHeight) / 2;
+                // top = (availableHeight - modalHeight) / 2;
 
-                modalWindow.css({
-                    top: top + $(window).scrollTop(),
-                    left: left + $(window).scrollLeft()
+                window.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'controlEditModalPosition') {
+                        console.log('============ controlEditModalPosition ============', {
+                            top: event.data.payload.height,
+                            left: left + $(window).scrollLeft()
+                        });
+                        modalWindow.css({
+                            top: `${event.data.payload.height}px`,
+                            left: left + $(window).scrollLeft()
+                        });
+                    }
                 });
+                // modalWindow.css({
+                //     top: 0,
+                //     // left: left + $(window).scrollLeft()
+                // });
             }
         });
 
