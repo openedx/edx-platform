@@ -83,33 +83,33 @@ Differences between Events and Filters
 Here are some key differences between Open edX Events and Filters:
 
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
-|                	| Events                                                             	| Filters                                                 	|
+|                    | Events                                                                 | Filters                                                     |
 +====================+========================================================================+=============================================================+
-| **Purpose**    	| Notify when an action occurs in a specific part of the             	| Alter the application flow control.                     	|
-|                	| application.                                                       	|                                                         	|
+| **Purpose**        | Notify when an action occurs in a specific part of the                 | Alter the application flow control.                         |
+|                    | application.                                                           |                                                             |
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
-|  **Usage**     	| Used to **extend** functionality via signal handlers when an event is  |  Used to intercept and **modify** the data used within a	|
-|                	| triggered.                                                         	|  component without directly modifying the application   	|
-|                	|                                                                    	|  itself.                                                	|
+|  **Usage**         | Used to **extend** functionality via signal handlers when an event is  |  Used to intercept and **modify** the data used within a    |
+|                    | triggered.                                                             |  component without directly modifying the application       |
+|                    |                                                                        |  itself.                                                    |
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
-|  **Definition**	|  Defined using the `OpenEdxPublicSignal` class, which              	|  Defined using the ``OpenEdxPublicFilter`` class,       	|
-|                	|  provides a structured way to define the data and                  	|  which provides a way to define the filter function     	|
-|                	|  metadata associated with the event.                               	|  and the parameters it should receive.                  	|
+|  **Definition**    |  Defined using the `OpenEdxPublicSignal` class, which                  |  Defined using the ``OpenEdxPublicFilter`` class,           |
+|                    |  provides a structured way to define the data and                      |  which provides a way to define the filter function         |
+|                    |  metadata associated with the event.                                   |  and the parameters it should receive.                      |
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
-| **Implementation** |  Implemented using Django signals, which allow                     	|  Implemented using an accumulative pipeline mechanism which |
-|                	|  developers to send and receive notifications that an action happened  |  takes a set of arguments and returns a modified set    	|
-|                	|  within a Django application.                                      	|  to the caller or raises exceptions during              	|
-|                	|                                                                    	|  processing.                                            	|
+| **Implementation** |  Implemented using Django signals, which allow                         |  Implemented using an accumulative pipeline mechanism which |
+|                    |  developers to send and receive notifications that an action happened  |  takes a set of arguments and returns a modified set        |
+|                    |  within a Django application.                                          |  to the caller or raises exceptions during                  |
+|                    |                                                                        |  processing.                                                |
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
-| **Use cases**  	|  Send an email notification when a user enrolls in a course.       	|  Include additional information in an API endpoint response.|
-|                	|  an email notification.                                            	|                                                         	|
+| **Use cases**      |  Send an email notification when a user enrolls in a course.           |  Include additional information in an API endpoint response.|
+|                    |  an email notification.                                                |                                                             |
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
 
 How to know when to use an Event or a Filter?
-=============================================
+----------------------------------------------
 
 When to use an Open edX Event?
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use an Open edX Event when you need to:
 
@@ -127,7 +127,7 @@ You can review the `Open edX Events`_ documentation for more information on `how
 .. _how to implement custom event handlers: https://docs.openedx.org/projects/openedx-events/en/latest/how-tos/using-events.html#receiving-events
 
 When to use an Open edX Filter?
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use an Open edX Filter when:
 
