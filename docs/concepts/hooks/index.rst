@@ -105,8 +105,11 @@ Here are some key differences between Open edX Events and Filters:
 |                	|  an email notification.                                            	|                                                         	|
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
 
+How to know when to use an Event or a Filter?
+=============================================
+
 When to use an Open edX Event?
-------------------------------
+-------------------------------
 
 Use an Open edX Event when you need to:
 
