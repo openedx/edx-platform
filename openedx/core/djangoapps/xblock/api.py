@@ -279,7 +279,6 @@ def get_handler_url(
 
     This view does not check/care if the XBlock actually exists.
     """
-    usage_key_str = str(usage_key)
     site_root_url = get_xblock_app_config().get_site_root_url()
     if not user:
         raise TypeError("Cannot get handler URLs without specifying a specific user ID.")
@@ -291,17 +290,17 @@ def get_handler_url(
         raise ValueError("Invalid user value")
     # Now generate a token-secured URL for this handler, specific to this user
     # and this XBlock:
-    secure_token = get_secure_token_for_xblock_handler(user_id, usage_key_str)
+    secure_token = get_secure_token_for_xblock_handler(user_id, str(usage_key))
     # Now generate the URL to that handler:
     kwargs = {
-        'usage_key_str': usage_key_str,
+        'usage_key': usage_key,
         'user_id': user_id,
         'secure_token': secure_token,
         'handler_name': handler_name,
     }
-    path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
     if version != LatestVersion.AUTO:
-        path += "?version=" + (str(version) if isinstance(version, int) else version.value)
+        kwargs["version"] = version
+    path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
 
     # We must return an absolute URL. We can't just use
     # rest_framework.reverse.reverse to get the absolute URL because this method

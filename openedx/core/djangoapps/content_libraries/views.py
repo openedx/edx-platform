@@ -227,14 +227,12 @@ class LibraryRootView(GenericAPIView):
         serializer = ContentLibraryFilterSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         org = serializer.validated_data['org']
-        library_type = serializer.validated_data['type']
         text_search = serializer.validated_data['text_search']
         order = serializer.validated_data['order']
 
         queryset = api.get_libraries_for_user(
             request.user,
             org=org,
-            library_type=library_type,
             text_search=text_search,
             order=order,
         )
@@ -259,7 +257,6 @@ class LibraryRootView(GenericAPIView):
         data = dict(serializer.validated_data)
         # Converting this over because using the reserved names 'type' and 'license' would shadow the built-in
         # definitions elsewhere.
-        data['library_type'] = data.pop('type')
         data['library_license'] = data.pop('license')
         key_data = data.pop("key")
         # Move "slug" out of the "key.slug" pseudo-field that the serializer added:
@@ -313,8 +310,6 @@ class LibraryDetailsView(APIView):
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         # Prevent ourselves from shadowing global names.
-        if 'type' in data:
-            data['library_type'] = data.pop('type')
         if 'license' in data:
             data['library_license'] = data.pop('license')
         try:
@@ -617,7 +612,13 @@ class LibraryBlockView(APIView):
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
-        Get metadata about an existing XBlock in the content library
+        Get metadata about an existing XBlock in the content library.
+
+        This API doesn't support versioning; most of the information it returns
+        is related to the latest draft version, or to all versions of the block.
+        If you need to get the display name of a previous version, use the
+        similar "metadata" API from djangoapps.xblock, which does support
+        versioning.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
@@ -731,7 +732,7 @@ class LibraryBlockOlxView(APIView):
         serializer.is_valid(raise_exception=True)
         new_olx_str = serializer.validated_data["olx"]
         try:
-            version_num = api.set_library_block_olx(key, new_olx_str)
+            version_num = api.set_library_block_olx(key, new_olx_str).version_num
         except ValueError as err:
             raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str, "version_num": version_num}).data)
@@ -814,6 +815,20 @@ class LibraryBlockAssetView(APIView):
         except ValueError:
             raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryBlockPublishView(APIView):
+    """
+    Commit/publish all of the draft changes made to the component.
+    """
+
+    @convert_exceptions
+    def post(self, request, usage_key_str):
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.publish_component_changes(key, request.user)
+        return Response({})
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -1217,3 +1232,18 @@ def component_version_asset(request, component_version_uuid, asset_path):
         content.read_file().chunks(),
         headers=redirect_response.headers,
     )
+
+
+@require_safe
+def component_draft_asset(request, usage_key, asset_path):
+    """
+    Serves the draft version of static assets associated with a Library Component.
+
+    See `component_version_asset` for more details
+    """
+    try:
+        component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
+    except ObjectDoesNotExist as exc:
+        raise Http404() from exc
+
+    return component_version_asset(request, component_version_uuid, asset_path)

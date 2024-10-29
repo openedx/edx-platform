@@ -88,6 +88,19 @@ class TestNewCommentGrouper(unittest.TestCase):
         self.assertEqual(len(updated_context['replier_name_list']), 3)
         self.assertEqual(updated_context['grouped_count'], 3)
 
+    def test_group_email_content(self):
+        """
+        Tests email_content in content_context when grouping notification
+        """
+        self.old_notification.content_context['email_content'] = 'old content'
+        self.new_notification.content_context = {
+            'email_content': 'new content',
+            'replier_name': 'user_2',
+        }
+        content_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
+        self.assertIn('email_content', content_context)
+        self.assertEqual(content_context['email_content'], 'new content')
+
 
 class TestGroupUserNotifications(unittest.TestCase):
     """

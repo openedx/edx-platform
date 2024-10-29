@@ -63,6 +63,8 @@ class StagedContent(models.Model):
     # A _suggested_ URL name to use for this content. Since this suggestion may already be in use, it's fine to generate
     # a new url_name instead.
     suggested_url_name = models.CharField(max_length=1024)
+    # If applicable, an int >=1 indicating the version of copied content. If not applicable, zero (default).
+    version_num = models.PositiveIntegerField(default=0)
 
     # Tags applied to the original source block(s) will be copied to the new block(s) on paste.
     tags = models.JSONField(null=True, help_text=_("Content tags applied to these blocks"))

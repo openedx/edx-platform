@@ -19,6 +19,7 @@ XBLOCKS = [
     "error = xmodule.error_block:ErrorBlock",
     "hidden = xmodule.hidden_block:HiddenBlock",
     "html = xmodule.html_block:HtmlBlock",
+    "itembank = xmodule.item_bank_block:ItemBankBlock",
     "image = xmodule.template_block:TranslateCustomTagBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
     "library_content = xmodule.library_content_block:LegacyLibraryContentBlock",

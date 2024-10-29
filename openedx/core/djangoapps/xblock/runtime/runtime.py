@@ -156,7 +156,14 @@ class XBlockRuntime(RuntimeShim, Runtime):
 
         # Note: it's important that we call handlers based on the same version of the block
         # (draft block -> draft data available to handler; published block -> published data available to handler)
-        kwargs = {"version": block._runtime_requested_version} if hasattr(block, "_runtime_requested_version") else {}  # pylint: disable=protected-access
+        kwargs = {}
+        if hasattr(block, "_runtime_requested_version"):  # pylint: disable=protected-access
+            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
+                default_version = LatestVersion.DRAFT
+            else:
+                default_version = LatestVersion.PUBLISHED
+            if block._runtime_requested_version != default_version:  # pylint: disable=protected-access
+                kwargs["version"] = block._runtime_requested_version  # pylint: disable=protected-access
         url = self.handler_url_fn(block.usage_key, handler_name, self.user, **kwargs)
         if suffix:
             if not url.endswith('/'):

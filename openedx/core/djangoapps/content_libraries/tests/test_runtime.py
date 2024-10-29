@@ -21,7 +21,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_FIELDS_URL,
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
+from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
@@ -50,7 +50,6 @@ class ContentLibraryContentTestMixin:
         _, slug = self.id().rsplit('.', 1)
         with transaction.atomic():
             self.library = library_api.create_library(
-                library_type=COMPLEX,
                 org=self.organization,
                 slug=slugify(slug),
                 title=(f"{slug} Test Lib"),
