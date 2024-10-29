@@ -119,7 +119,7 @@ Use an Open edX Event when you need to:
 
 In summary, events can be used to integrate application components with each other or with external services, allowing them to communicate, synchronize, and perform additional actions when specific triggers occur.
 
-You can review the `Open edX Events`_ documentation for more information on `how to use events`_ in your project. This documentation includes a `list of available events`` and `how to implement event handlers`.
+You can review the `Open edX Events`_ documentation for more information on `how to use events`_ in your project. This documentation includes a `list of available events`_ and `how to implement event handlers`_.
 
 .. _Open edX Events: https://docs.openedx.org/projects/openedx-events/en/latest/
 .. _how to use events: https://docs.openedx.org/projects/openedx-events/en/latest/how-tos/using-events.html
@@ -137,7 +137,7 @@ Use an Open edX Filter when:
 
 In summary, filters can be used when implementing application flow control that modifies the application's behavior, navigation, or user interaction flow during runtime.
 
-You can review the `Open edX Filters`_ documentation for more information on `how to use filters`_ in your project or `create new`. This documentation includes a `list of available filters` and `how to implement filters`.
+You can review the `Open edX Filters`_ documentation for more information on `how to use filters`_ in your project or `create new`_. This documentation includes a `list of available filters`_ and `how to implement filters`_.
 
 .. _Open edX Filters: https://docs.openedx.org/projects/openedx-filters/en/latest/
 .. _how to use filters: https://docs.openedx.org/projects/openedx-filters/en/latest/how-tos/using-filters.html
