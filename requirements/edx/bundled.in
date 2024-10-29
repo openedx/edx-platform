@@ -34,7 +34,6 @@ algoliasearch                       # Algolia’s API client for indexed searchi
 django-ses                          # Django email backend for Amazon’s Simple Email Service
 edx-braze-client                    # a customer engagement platform used for edx.org
 mailsnake                           # MailChimp API; used for two management commands in the "mailing" djangoapp
-newrelic                            # New Relic agent for performance monitoring
 optimizely-sdk                      # Optimizely provides A/B testing and other features, used by edx.org
 
 

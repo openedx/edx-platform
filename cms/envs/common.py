@@ -127,6 +127,7 @@ from django.urls import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
+from cms.lib.xblock.upstream_sync import UpstreamSyncMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
@@ -434,18 +435,6 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
 
-    # .. toggle_name: FEATURES['ENABLE_LIBRARY_AUTHORING_MICROFRONTEND']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable the Library Authoring MFE
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2020-06-20
-    # .. toggle_target_removal_date: 2020-12-31
-    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4106944527/Libraries+Relaunch+Proposal+For+Product+Review
-    # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
-    #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
-    'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
-
     # .. toggle_name: FEATURES['DISABLE_COURSE_CREATION']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -601,7 +590,6 @@ IDA_LOGOUT_URI_LIST = []
 COURSE_AUTHORING_MICROFRONTEND_URL = None
 DISCUSSIONS_MICROFRONTEND_URL = None
 DISCUSSIONS_MFE_FEEDBACK_URL = None
-LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -676,6 +664,7 @@ CMS_ROOT = REPO_ROOT / "cms"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
+XMODULE_ROOT = REPO_ROOT / "xmodule"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
@@ -1008,6 +997,7 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,
+    UpstreamSyncMixin,
 )
 
 # .. setting_name: XBLOCK_EXTRA_MIXINS
@@ -1281,6 +1271,10 @@ STATIC_ROOT = os.environ.get('STATIC_ROOT_CMS', ENV_ROOT / 'staticfiles' / 'stud
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    # Temporarily adding the following static path as we are migrating the built-in blocks' Sass to vanilla CSS.
+    # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
+    # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
+    XMODULE_ROOT / "static",
 ]
 
 # Locale/Internationalization
@@ -1417,6 +1411,12 @@ PIPELINE['STYLESHEETS'] = {
             'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
+    },
+    'course-unit-mfe-iframe-bundle': {
+        'source_filenames': [
+            'css/course-unit-mfe-iframe-bundle.css',
+        ],
+        'output_filename': 'css/course-unit-mfe-iframe-bundle.css',
     },
 }
 
@@ -1652,6 +1652,9 @@ INSTALLED_APPS = [
     # CORS and cross-domain CSRF
     'corsheaders',
     'openedx.core.djangoapps.cors_csrf',
+
+    # Provides the 'django_markup' template library so we can use 'interpolate_html' in django templates
+    'xss_utils',
 
     # History tables
     'simple_history',
@@ -2779,6 +2782,7 @@ WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runni
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
 ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#configuring-course-level-open-response-assessment-settings"
+# pylint: enable=line-too-long
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
@@ -2810,6 +2814,7 @@ DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 # Learn More link in upgraded discussion notification alert
 # pylint: disable=line-too-long
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_discussions/discussions.html"
+# pylint: enable=line-too-long
 
 #### django-simple-history##
 # disable indexing on date field its coming django-simple-history.

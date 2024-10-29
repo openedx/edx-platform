@@ -140,12 +140,13 @@
         position: relative;
         display: inline-block;
         width: ($baseline*6.25);
-        height: ($baseline*5);
+        height: ($baseline*7);
         margin-bottom: ($baseline/2);
         box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, 0.4) inset;
         border-radius: ($baseline/4);
         padding: 0;
         text-align: center;
+        vertical-align: top;
 
         @extend %btn-primary-green;
 
@@ -153,6 +154,21 @@
           box-sizing: border-box;
           display: block;
           color: $white;
+        }
+
+        .beta {
+          margin-top: 3px;
+          margin-bottom: -20px;
+          padding: 4px;
+          display: inline-block;
+
+          color: $uxpl-green-base;
+          background-color: theme-color("inverse");
+          border-color: theme-color("inverse");
+          border-radius: 3px;
+
+          font-size: 90%;
+          line-height: 90%;
         }
       }
     }

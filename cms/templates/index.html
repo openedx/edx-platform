@@ -348,9 +348,6 @@ from openedx.core.djangolib.js_utils import (
         % endif
 
         % if libraries_enabled:
-            % if redirect_to_library_authoring_mfe:
-            <li><a href="${library_authoring_mfe_url}">${_("Libraries")}</a></li>
-            %else:
              <li class="libraries-tab ${ 'active' if active_tab == 'libraries' else ''}">
                 % if split_studio_home:
                   <a href="${reverse('home_library')}">${_("Libraries")}</a>
@@ -358,7 +355,6 @@ from openedx.core.djangolib.js_utils import (
                   <a href="#" >${_("Libraries")}</a>
                 % endif
              </li>
-            % endif
         % endif
         % if taxonomies_enabled:
             <li><a href="${taxonomy_list_mfe_url}">${_("Taxonomies")}</li>

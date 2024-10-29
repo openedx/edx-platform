@@ -46,7 +46,11 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
-from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.course_block import (
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -288,7 +292,10 @@ def courses(request):
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     set_default_filter = ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER.is_enabled()
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
+        courses_list = get_courses(
+            request.user,
+            filter_={"catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+        )
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):

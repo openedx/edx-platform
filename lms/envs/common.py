@@ -1932,6 +1932,10 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     NODE_MODULES_ROOT / "@edx",
+    # Temporarily adding the following static path as we are migrating the built-in blocks' Sass to vanilla CSS.
+    # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
+    # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
+    XMODULE_ROOT / "static",
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
@@ -4304,13 +4308,6 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
-# E-Commerce Commerce Coordinator Configuration
-COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8140'
-COMMERCE_COORDINATOR_REFUND_PATH = '/lms/refund/'
-COMMERCE_COORDINATOR_REFUND_SOURCE_SYSTEMS = ('SET-ME-PLEASE',)
-COMMERCE_COORDINATOR_SERVICE_WORKER_USERNAME = 'commerce_coordinator_worker'
-COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/payment_page_redirect/'
-
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
@@ -5541,3 +5538,6 @@ SURVEY_REPORT_EXTRA_DATA = {}
 # .. for now it wil impact country listing in auth flow and user profile.
 # .. eg ['US', 'CA']
 DISABLED_COUNTRIES = []
+
+
+LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
