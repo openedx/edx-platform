@@ -259,6 +259,15 @@ COURSE_NOTIFICATION_APPS = {
         'core_email_cadence': EmailCadence.DAILY,
         'non_editable': []
     },
+    # 'mobile': {
+    #     'enabled': True,
+    #     'core_info': _('Notifications for mobile users.'),
+    #     'core_web': True,
+    #     'core_email': True,
+    #     'core_push': True,
+    #     'core_email_cadence': EmailCadence.DAILY,
+    #     'non_editable': []
+    # },
 }
 
 

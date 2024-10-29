@@ -10,10 +10,12 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
+from oauthlib.uri_validate import segment
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.utils import get_braze_client
 from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
@@ -198,8 +200,32 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     if notifications_generated:
         notification_generated_event(
             generated_notification_audience, app_name, notification_type, course_key, content_url,
-            notification_content, sender_id=sender_id
+                notification_content, sender_id=sender_id
         )
+        send_mobile_notifications(notification_content, generated_notification_audience, notification_type, content_url)
+
+def send_mobile_notifications(notification_content, generated_notification_audience, notification_type, content_url):
+    android_content = notification_content.copy()
+    android_content['android_str'] = 'This notification for android device'
+    ios_content = notification_content.copy()
+    ios_content['ios_str'] = 'This notification is for ios device'
+    post_data = {
+        'notification_type': notification_type,
+        'content_url': content_url,
+        "external_user_ids": generated_notification_audience,
+        "campaign_id": "a08cc81b-eb91-467f-8b61-8a9fd2677ec5",
+        "messages": {
+            "android_push": android_content,
+            "apple_push": ios_content,
+        }
+    }
+
+    try:
+        braze_client = get_braze_client()
+        if braze_client:
+            braze_client._make_request(data=post_data, endpoint='/messages/send', method='post')
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.error(f'Unable to send notification request with Braze ')
 
 
 def is_notification_valid(notification_type, context):
