@@ -14,11 +14,11 @@ attrs==24.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.35.46
+boto3==1.35.50
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.35.46
+botocore==1.35.50
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -72,7 +72,7 @@ edx-django-utils==7.0.0
     #   edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-api-core==2.21.0
+google-api-core==2.22.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
@@ -272,7 +272,7 @@ urllib3==1.26.20
     #   botocore
     #   requests
     #   responses
-werkzeug==3.0.4
+werkzeug==3.0.6
     # via moto
 xmltodict==0.14.2
     # via moto
