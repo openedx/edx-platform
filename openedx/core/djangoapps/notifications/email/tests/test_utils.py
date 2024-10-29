@@ -148,8 +148,18 @@ class TestContextFunctions(ModuleStoreTestCase):
             {'title': 'Updates', 'count': 1},
         ]
         expected_email_content = [
-            {'title': 'Discussion', 'help_text': '', 'help_text_url': '', 'notifications': [discussion_notification]},
-            {'title': 'Updates', 'help_text': '', 'help_text_url': '', 'notifications': [update_notification]}
+            {
+                'title': 'Discussion', 'help_text': '', 'help_text_url': '',
+                'notifications': [discussion_notification],
+                'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
+                'url': 'http://learner-home-mfe/?showNotifications=true&app=discussion'
+            },
+            {
+                'title': 'Updates', 'help_text': '', 'help_text_url': '',
+                'notifications': [update_notification],
+                'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
+                'url': 'http://learner-home-mfe/?showNotifications=true&app=updates'
+            }
         ]
         assert context['start_date'] == expected_start_date
         assert context['end_date'] == 'Sunday, Mar 24'
