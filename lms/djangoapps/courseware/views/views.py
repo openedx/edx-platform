@@ -2317,6 +2317,13 @@ def courseware_mfe_search_enabled(request, course_id=None):
     else:
         enabled = True
 
+    inclusion_date = settings.FEATURES.get('COURSEWARE_SEARCH_INCLUSION_DATE')
+    start_date = CourseOverview.get_from_id(course_key).start
+
+    # only include courses that have a start date later than the setting-defined inclusion date
+    if inclusion_date:
+        enabled = enabled and (start_date and start_date.strftime('%Y-%m-%d') > inclusion_date)
+
     payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
     return JsonResponse(payload)
 
