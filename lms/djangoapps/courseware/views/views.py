@@ -1570,16 +1570,13 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
         )
 
     staff_access = bool(has_access(request.user, 'staff', course_key))
-    is_preview = request.GET.get('preview') == '1'
+    is_preview = request.GET.get('preview', '0') == '1'
 
     store = modulestore()
-    branchType = ModuleStoreEnum.Branch.draft_preferred if is_preview else ModuleStoreEnum.Branch.published_only
-
-    if is_preview and not staff_access:
-        return HttpResponseBadRequest("You do not have access to preview this xblock")
+    branch_type = ModuleStoreEnum.Branch.draft_preferred if is_preview and staff_access else ModuleStoreEnum.Branch.published_only
 
     with store.bulk_operations(course_key):
-        with store.branch_setting(branchType, course_key):
+        with store.branch_setting(branch_type, course_key):
             # verify the user has access to the course, including enrollment check
             try:
                 course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
