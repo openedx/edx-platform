@@ -54,8 +54,7 @@ from pylti1p3.grade import Grade
 
 from opaque_keys.edx.django.models import UsageKeyField
 from openedx.core.djangoapps.content_libraries.constants import (
-    LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
-    ALL_RIGHTS_RESERVED,
+    LICENSE_OPTIONS, ALL_RIGHTS_RESERVED,
 )
 from openedx_learning.api.authoring_models import LearningPackage
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
@@ -100,18 +99,6 @@ class ContentLibrary(models.Model):
     # e.g. "lib:org:slug" is the opaque key for a library.
     org = models.ForeignKey(Organization, on_delete=models.PROTECT, null=False)
     slug = models.SlugField(allow_unicode=True)
-
-    # We no longer use the ``bundle_uuid`` and ``type`` fields, but we'll leave
-    # them in the model until after the Redwood release, just in case someone
-    # out there was using v2 libraries. We don't expect this, since it wasn't in
-    # a usable state, but there's always a chance someone managed to do it and
-    # is still using it. By keeping the schema backwards compatible, the thought
-    # is that they would update to the latest version, notice their libraries
-    # aren't working correctly, and still have the ability to recover their data
-    # if the code was rolled back.
-    # TODO: Remove these fields after the Redwood release is cut.
-    bundle_uuid = models.UUIDField(unique=True, null=True, default=None)
-    type = models.CharField(max_length=25, default=COMPLEX, choices=LIBRARY_TYPES)
 
     license = models.CharField(max_length=25, default=ALL_RIGHTS_RESERVED, choices=LICENSE_OPTIONS)
     learning_package = models.OneToOneField(

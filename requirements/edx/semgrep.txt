@@ -116,7 +116,7 @@ ruamel-yaml==0.17.40
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.92.0
+semgrep==1.93.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep

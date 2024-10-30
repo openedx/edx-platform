@@ -10,9 +10,9 @@ attrs==24.2.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.35.46
+boto3==1.35.50
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.35.46
+botocore==1.35.50
     # via
     #   boto3
     #   s3transfer
@@ -50,7 +50,7 @@ edx-django-utils==7.0.0
     # via edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.21.0
+google-api-core==2.22.0
     # via google-api-python-client
 google-api-python-client==2.149.0
     # via -r scripts/user_retirement/requirements/base.in

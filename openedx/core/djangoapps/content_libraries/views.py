@@ -227,14 +227,12 @@ class LibraryRootView(GenericAPIView):
         serializer = ContentLibraryFilterSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         org = serializer.validated_data['org']
-        library_type = serializer.validated_data['type']
         text_search = serializer.validated_data['text_search']
         order = serializer.validated_data['order']
 
         queryset = api.get_libraries_for_user(
             request.user,
             org=org,
-            library_type=library_type,
             text_search=text_search,
             order=order,
         )
@@ -259,7 +257,6 @@ class LibraryRootView(GenericAPIView):
         data = dict(serializer.validated_data)
         # Converting this over because using the reserved names 'type' and 'license' would shadow the built-in
         # definitions elsewhere.
-        data['library_type'] = data.pop('type')
         data['library_license'] = data.pop('license')
         key_data = data.pop("key")
         # Move "slug" out of the "key.slug" pseudo-field that the serializer added:
@@ -313,8 +310,6 @@ class LibraryDetailsView(APIView):
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         # Prevent ourselves from shadowing global names.
-        if 'type' in data:
-            data['library_type'] = data.pop('type')
         if 'license' in data:
             data['library_license'] = data.pop('license')
         try:

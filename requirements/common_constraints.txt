@@ -32,3 +32,7 @@ elasticsearch<7.14.0
 # This can be unpinned once https://github.com/openedx/edx-platform/issues/34586
 # has been resolved and edx-platform is running with pymongo>=4.4.0
 
+
+# Cause: https://github.com/openedx/edx-lint/issues/458
+# This can be unpinned once https://github.com/openedx/edx-lint/issues/459 has been resolved.
+pip<24.3
