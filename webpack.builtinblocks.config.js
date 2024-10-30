@@ -38,6 +38,10 @@ module.exports = {
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/html/edit.js'
         ],
+        LibraryContentBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/vertical/edit.js'
+        ],
         LTIBlockDisplay: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/lti/lti.js'
@@ -45,11 +49,6 @@ module.exports = {
         LTIBlockEditor: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/raw/edit/metadata-only.js'
-        ],
-        LibraryContentBlockDisplay: './xmodule/js/src/xmodule.js',
-        LibraryContentBlockEditor: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/vertical/edit.js'
         ],
         PollBlockDisplay: [
             './xmodule/js/src/xmodule.js',

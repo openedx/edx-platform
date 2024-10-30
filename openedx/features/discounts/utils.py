@@ -8,6 +8,7 @@ import pytz
 from django.conf import settings
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
+from edx_django_utils.plugins import pluggable_override
 
 from common.djangoapps.course_modes.models import format_course_price, get_course_prices
 from lms.djangoapps.experiments.models import ExperimentData
@@ -73,6 +74,7 @@ def _get_discount_prices(user, course, assume_discount=False):
         return format_course_price(base_price), None, None
 
 
+@pluggable_override("OVERRIDE_GENERATE_OFFER_DATA")
 def generate_offer_data(user, course):
     """
     Create a dictionary of information about the current discount offer.

@@ -649,6 +649,9 @@ def _get_item(request, data):
     Returns the item.
     """
     usage_key = UsageKey.from_string(data.get('locator'))
+    if not usage_key.context_key.is_course:
+        # TODO: implement transcript support for learning core / content libraries.
+        raise TranscriptsRequestValidationException(_('Transcripts are not yet supported in content libraries.'))
     # This is placed before has_course_author_access() to validate the location,
     # because has_course_author_access() raises  r if location is invalid.
     item = modulestore().get_item(usage_key)

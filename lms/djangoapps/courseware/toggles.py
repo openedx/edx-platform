@@ -148,7 +148,6 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 # .. toggle_creation_date: 2019-05-16
 # .. toggle_expiration_date: None
 # .. toggle_tickets: https://github.com/mitodl/edx-platform/issues/123
-# .. toggle_status: unsupported
 COURSES_INVITE_ONLY = SettingToggle('COURSES_INVITE_ONLY', default=False)
 
 

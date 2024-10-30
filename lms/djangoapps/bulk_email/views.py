@@ -64,6 +64,7 @@ def opt_out_email_updates(request, token, course_id):
     event_name = 'edx.bulk_email.opt_out'
     event_data = {
         "username": user.username,
+        "user_email": user.email,
         "user_id": user.id,
         "course_id": course_id,
     }

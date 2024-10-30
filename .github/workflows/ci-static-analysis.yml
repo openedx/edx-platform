@@ -10,7 +10,7 @@ jobs:
       matrix:
         python-version:
           - "3.11"
-        os: ["ubuntu-20.04"]
+        os: ["ubuntu-22.04"]
 
     steps:
       - uses: actions/checkout@v4

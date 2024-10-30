@@ -8,7 +8,7 @@ from .course_rerun import CourseRerunSerializer
 from .course_team import CourseTeamSerializer
 from .grading import CourseGradingModelSerializer, CourseGradingSerializer
 from .group_configurations import CourseGroupConfigurationsSerializer
-from .home import CourseHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
+from .home import StudioHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
 from .proctoring import (
     LimitedProctoredExamSettingsSerializer,
     ProctoredExamConfigurationSerializer,

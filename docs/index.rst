@@ -32,6 +32,8 @@ locations.
     how-tos/index
     references/index
     concepts/index
+    hooks/index
+    extensions/tinymce_plugins
 
 .. grid:: 1 2 2 2
    :gutter: 3
@@ -70,6 +72,18 @@ locations.
       * :doc:`concepts/frontend/javascript`
       +++
       .. button-ref:: concepts/index
+         :color: primary
+         :outline:
+         :expand:
+
+   .. grid-item-card:: Hooks and Extensions
+      :class-card: sd-shadow-md sd-p-2
+      :class-footer: sd-border-0
+
+      * :doc:`hooks/index`
+      * :doc:`extensions/tinymce_plugins`
+      +++
+      .. button-ref:: hooks/index
          :color: primary
          :outline:
          :expand:

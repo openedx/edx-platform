@@ -76,14 +76,18 @@ from django.urls import reverse
                 ${_("This course run is using an upgraded version of edx discussion forum. In order to display the discussions sidebar, discussions xBlocks will no longer be visible to learners.")}
             </div>
             <div style="margin-left:auto; width:fit-content;">
+              %if settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL:
                 <span>
                     <a href="${settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL}" target="_blank" rel="noreferrer noopener">${_(" Learn more")}</a>
                     <i class="fa fa-share-square-o" aria-hidden="true"></i>
                 </span>
+              %endif
+              %if settings.DISCUSSIONS_INCONTEXT_FEEDBACK_URL:
                 <span style="margin-left: 1rem">
                     <a href="${settings.DISCUSSIONS_INCONTEXT_FEEDBACK_URL}" target="_blank" rel="noreferrer noopener">${_("Share feedback")}</a>
                     <i class="fa fa-share-square-o" aria-hidden="true"></i>
                 </span>
+              %endif
             </div>
         </div>
       </div>
@@ -162,7 +166,7 @@ from django.urls import reverse
             % if mfe_proctored_exam_settings_url:
               <% url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='') %>
               ${Text(_("To update these settings go to the {link_start}Proctored Exam Settings page{link_end}.")).format(
-                link_start=HTML('<a href="${mfe_proctored_exam_settings_url}">').format(
+                link_start=HTML('<a href="{mfe_proctored_exam_settings_url}">').format(
                         mfe_proctored_exam_settings_url=mfe_proctored_exam_settings_url
                 ),
                 link_end=HTML("</a>")

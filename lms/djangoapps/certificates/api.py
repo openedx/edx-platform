@@ -10,7 +10,6 @@ certificates models or any other certificates modules.
 import logging
 from datetime import datetime
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -286,12 +285,9 @@ def certificate_downloadable_status(student, course_key):
 
     course_overview = get_course_overview_or_none(course_key)
 
-    if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
-        display_behavior_is_valid = (
-            course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
-        )
-    else:
-        display_behavior_is_valid = True
+    display_behavior_is_valid = (
+        course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
+    )
 
     if (
         not certificates_viewable_for_course(course_overview)
@@ -837,10 +833,7 @@ def can_show_certificate_message(course, student, course_grade, certificates_ena
 
 def _course_uses_available_date(course):
     """Returns if the course has an certificate_available_date set and that it should be used"""
-    if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
-        display_behavior_is_valid = course.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
-    else:
-        display_behavior_is_valid = True
+    display_behavior_is_valid = course.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
 
     return (
         can_show_certificate_available_date_field(course)

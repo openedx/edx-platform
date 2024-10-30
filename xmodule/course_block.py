@@ -228,7 +228,7 @@ class ProctoringProvider(String):
     and default that pulls from edx platform settings.
     """
 
-    def from_json(self, value):
+    def from_json(self, value, validate_providers=False):
         """
         Return ProctoringProvider as full featured Python type. Perform validation on the provider
         and include any inherited values from the platform default.
@@ -237,7 +237,8 @@ class ProctoringProvider(String):
         if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
             # Only validate the provider value if ProctoredExams are enabled on the environment
             # Otherwise, the passed in provider does not matter. We should always return default
-            self._validate_proctoring_provider(value)
+            if validate_providers:
+                self._validate_proctoring_provider(value)
             value = self._get_proctoring_value(value)
             return value
         else:
@@ -1113,9 +1114,6 @@ class CourseBlock(
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
             raise type(err)(f'{str(err)} For course: {str(self.id)}')  # lint-amnesty, pylint: disable=line-too-long
-
-        if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
-            self.set_default_certificate_available_date()
 
     def set_grading_policy(self, course_policy):
         """

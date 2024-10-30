@@ -23,7 +23,7 @@ from lms.djangoapps.certificates.generation_handler import (
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.signals import (
     _listen_for_enrollment_mode_change,
-    _listen_for_id_verification_status_changed,
+    _handle_id_verification_approved,
     listen_for_passing_grade
 )
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory
@@ -272,7 +272,7 @@ class CertificateFiltersTest(SharedModuleStoreTestCase):
         mock.Mock(return_value={"status": "approved"})
     )
     @mock.patch("lms.djangoapps.certificates.api.auto_certificate_generation_enabled", mock.Mock(return_value=True))
-    def test_listen_for_id_verification_status_changed(self):
+    def test_handle_id_verification_approved(self):
         """
         Test stop certificate generation process after the verification status changed by raising a filters exception.
 
@@ -280,7 +280,7 @@ class CertificateFiltersTest(SharedModuleStoreTestCase):
             - CertificateCreationRequested is triggered and executes TestStopCertificateGenerationStep.
             - The certificate is not generated.
         """
-        _listen_for_id_verification_status_changed(None, self.user)
+        _handle_id_verification_approved(self.user)
 
         self.assertFalse(
             GeneratedCertificate.objects.filter(

@@ -73,7 +73,7 @@
     "style-loader": "0.18.2",
     "svg-inline-loader": "0.8.2",
     "uglify-js": "2.7.0",
-    "underscore": "1.12.1",
+    "underscore": "1.13.1",
     "underscore.string": "3.3.6",
     "webpack": "^5.90.3",
     "webpack-bundle-tracker": "0.4.3",

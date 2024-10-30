@@ -505,8 +505,8 @@ class CCXListView(GenericAPIView):
                 course_id=ccx_course_key,
                 student_email=coach.email,
                 auto_enroll=True,
-                email_students=True,
-                email_params=email_params,
+                message_students=True,
+                message_params=email_params,
             )
             # assign staff role for the coach to the newly created ccx
             assign_staff_role_to_ccx(ccx_course_key, coach, master_course_object.id)
@@ -768,8 +768,8 @@ class CCXDetailView(GenericAPIView):
                     course_id=ccx_course_key,
                     student_email=coach.email,
                     auto_enroll=True,
-                    email_students=True,
-                    email_params=email_params,
+                    message_students=True,
+                    message_params=email_params,
                 )
                 # make the new coach staff on the CCX
                 assign_staff_role_to_ccx(ccx_course_key, coach, master_course_object.id)

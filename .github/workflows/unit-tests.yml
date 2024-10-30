@@ -15,7 +15,7 @@ concurrency:
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python-version:
@@ -66,7 +66,29 @@ jobs:
 
       - name: install system requirements
         run: |
-          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx openssl
+
+      # This is needed until the ENABLE_BLAKE2B_HASHING can be removed and we
+      # can stop using MD4 by default.
+      - name: enable md4 hashing in libssl
+        run: |
+          cat <<EOF | sudo tee /etc/ssl/openssl.cnf
+          # Use this in order to automatically load providers.
+          openssl_conf = openssl_init
+
+          [openssl_init]
+          providers = provider_sect
+
+          [provider_sect]
+          default = default_sect
+          legacy = legacy_sect
+
+          [default_sect]
+          activate = 1
+
+          [legacy_sect]
+          activate = 1
+          EOF
 
       - name: install mongo version
         run: |
@@ -142,7 +164,7 @@ jobs:
           overwrite: true
 
   collect-and-verify:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -207,7 +229,7 @@ jobs:
   # https://github.com/orgs/community/discussions/33579
   success:
     name: Unit tests successful
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: always()
     needs: [run-tests]
     steps:
@@ -218,7 +240,7 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
   compile-warnings-report:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [run-tests]
     steps:
       - uses: actions/checkout@v4
@@ -246,7 +268,7 @@ jobs:
           overwrite: true
 
   merge-artifacts:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [compile-warnings-report]
     steps:
       - name: Merge Pytest Warnings JSON Artifacts
@@ -266,7 +288,7 @@ jobs:
   # Combine and upload coverage reports.
   coverage:
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [run-tests]
     strategy:
       matrix:

@@ -4,7 +4,7 @@ waffle switches for the contentstore app.
 """
 
 
-from edx_toggles.toggles import WaffleFlag, WaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -24,20 +24,6 @@ ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(  # lint-amnesty, pylint: disable=t
 
 SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     f'{WAFFLE_NAMESPACE}.show_review_rules', __name__, LOG_PREFIX
-)
-
-# Waffle flag to redirect to the library authoring MFE.
-# .. toggle_name: contentstore.library_authoring_mfe
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Toggles the new micro-frontend-based implementation of the library authoring experience.
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2020-08-03
-# .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and ENABLE_LIBRARY_AUTHORING_MICROFRONTEND.
-# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4106944527/Libraries+Relaunch+Proposal+For+Product+Review
-REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
-    f'{WAFFLE_NAMESPACE}.library_authoring_mfe', __name__, LOG_PREFIX
 )
 
 

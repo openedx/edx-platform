@@ -65,6 +65,7 @@ from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions
 )
+
 ENABLE_AUTO_GENERATED_USERNAME = settings.FEATURES.copy()
 ENABLE_AUTO_GENERATED_USERNAME['ENABLE_AUTO_GENERATED_USERNAME'] = True
 
@@ -1556,7 +1557,7 @@ class RegistrationViewTestV1(
         assert len(mail.outbox) == 1
         sent_email = mail.outbox[0]
         assert sent_email.to == [self.EMAIL]
-        assert sent_email.subject ==\
+        assert sent_email.subject == \
                f'Action Required: Activate your {settings.PLATFORM_NAME} account'
         assert f'high-quality {settings.PLATFORM_NAME} courses' in sent_email.body
 
@@ -2468,6 +2469,31 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             })
         assert response.status_code == 400
 
+    @override_settings(DISABLED_COUNTRIES=['KP'])
+    def test_register_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is disabled for a country
+        """
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+            "country": "KP",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {'country':
+                [
+                    {
+                        'user_message': 'Registration from this country is not allowed due to restrictions.'
+                    }
+                ], 'error_code': 'validation-error'}
+        )
+
 
 @httpretty.activate
 @ddt.ddt
@@ -2574,6 +2600,24 @@ class ThirdPartyRegistrationTestMixin(
         assert response.status_code == 200
 
         self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
+
+    @override_settings(DISABLED_COUNTRIES=['US'])
+    def test_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is disabled for a country
+        """
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+        self._setup_provider_response(success=True)
+        response = self.client.post(self.url, self.data())
+        assert response.status_code == 400
+        assert response.json() == {
+            'country': [
+                {
+                    'user_message': 'Registration from this country is not allowed due to restrictions.'
+                }
+            ], 'error_code': 'validation-error'
+        }
+        self._verify_user_existence(user_exists=False, social_link_exists=False, user_is_active=False)
 
     def test_unlinked_active_user(self):
         user = UserFactory()

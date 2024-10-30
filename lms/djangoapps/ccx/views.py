@@ -223,8 +223,8 @@ def create_ccx(request, course, ccx=None):
         course_id=ccx_id,
         student_email=request.user.email,
         auto_enroll=True,
-        email_students=True,
-        email_params=email_params,
+        message_students=True,
+        message_params=email_params,
     )
 
     assign_staff_role_to_ccx(ccx_id, request.user, course.id)

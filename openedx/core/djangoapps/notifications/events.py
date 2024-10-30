@@ -167,6 +167,5 @@ def notification_preference_unsubscribe_event(user):
         'username': user.username,
         'event_type': 'email_digest_unsubscribe'
     }
-    with tracker.get_tracker().context(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data):
-        tracker.emit(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
-        segment.track(user.id, NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
+    tracker.emit(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
+    segment.track(user.id, NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)

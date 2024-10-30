@@ -1538,6 +1538,20 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             problem = self.build_problem(answer=given_answer)
             self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
+    def test_percentage(self):
+        """
+        Test percentage
+        """
+        problem_setup = [
+            # [given_answer, [list of correct responses], [list of incorrect responses]]
+            ["1%", ["1%", "1.0%", "1.00%", "0.01"], [""]],
+            ["2.0%", ["2%", "2.0%", "2.00%", "0.02"], [""]],
+            ["4.00%", ["4%", "4.0%", "4.00%", "0.04"], [""]],
+        ]
+        for given_answer, correct_responses, incorrect_responses in problem_setup:
+            problem = self.build_problem(answer=given_answer)
+            self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
     def test_grade_with_script(self):
         script_text = "computed_response = math.sqrt(4)"
         problem = self.build_problem(answer="$computed_response", script=script_text)

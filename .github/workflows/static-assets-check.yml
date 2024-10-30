@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         python-version:
           - "3.11"
         node-version: [18, 20]
@@ -71,9 +71,6 @@ jobs:
       - name: Install Limited Python Deps for Build
         run: |
           pip install -r requirements/edx/assets.txt
-
-      - name: Initiate Mongo DB Service
-        run: sudo systemctl start mongod
 
       - name: Add node_modules bin to $Path
         run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH

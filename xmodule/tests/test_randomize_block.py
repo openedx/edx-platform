@@ -16,7 +16,7 @@ from .test_course_block import DummySystem as TestImportSystem
 
 class RandomizeBlockTest(MixedSplitTestCase):
     """
-    Base class for tests of LibraryContentBlock (library_content_block.py)
+    Base class for tests of RandomizeBlock (randomize_block.py)
     """
     maxDiff = None
 

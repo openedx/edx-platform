@@ -144,10 +144,12 @@ ${HTML(fragment.foot_html())}
                 // to stay in relatively the same position so viewing of the video
                 // is not disrupted.
                 if ($(this).attr('class') === 'transcript-start'||$(this).attr('class') === 'transcript-end') {
+                  var target = $(targetId)[0];
                   event.preventDefault();
-                  $(targetId)[0].scrollIntoView({
+                  target.scrollIntoView({
                     block: 'nearest',
                   });
+                  target.focus();
                 } else {
                   var targetName = $(this).attr('href').slice(1);
                   // Checks if the target uses an id or name.
@@ -159,6 +161,7 @@ ${HTML(fragment.foot_html())}
                     target.scrollIntoView({
                       block: 'start',
                     });
+                    target.focus();
                   }
                 }
               }

@@ -55,7 +55,6 @@ class CourseSettingsViewTest(CourseTestCase, PermissionAccessMixin):
             "show_min_grade_warning": False,
             "upgrade_deadline": None,
             "licensing_enabled": False,
-            "use_v2_cert_display_settings": False,
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
