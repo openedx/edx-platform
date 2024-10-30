@@ -111,7 +111,6 @@ from lms.djangoapps.grades.api import constants as grades_constants
 from completion import handlers
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from jwcrypto import jwt, jwk
-from django.http import JsonResponse
 from common.djangoapps.student.models import CourseEnrollment, SocialLink
 from django.db.models import Prefetch
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
@@ -1676,7 +1675,6 @@ def extras_get_peer_profiles(request):
                 "has_profile_image": has_image, "profile_image_urls": profile_image_urls
             })
 
-        #return JsonResponse(profiles, safe=False)
         return render(request, 'peerProfile.html', {'profiles': profiles})
     except Exception as e:
-        return JsonResponse({'Failed to fetch peer profiles details': str(e)}, status=500)
+        return HttpResponse('Failed to fetch peer profiles')
