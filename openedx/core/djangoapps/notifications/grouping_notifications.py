@@ -80,6 +80,7 @@ class NewCommentGrouper(BaseNotificationGrouper):
             context['grouped'] = True
         context['replier_name_list'].append(new_notification.content_context['replier_name'])
         context['grouped_count'] += 1
+        context['email_content'] = new_notification.content_context.get('email_content', '')
         return context
 
 

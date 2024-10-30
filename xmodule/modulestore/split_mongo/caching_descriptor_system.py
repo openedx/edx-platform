@@ -13,7 +13,7 @@ from xblock.runtime import KeyValueStore, KvsFieldData
 
 from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
-from xmodule.library_tools import LibraryToolsService
+from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
@@ -78,7 +78,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
 
         user = get_current_user()
         user_id = user.id if user else None
-        self._services['library_tools'] = LibraryToolsService(modulestore, user_id=user_id)
+        self._services['library_tools'] = LegacyLibraryToolsService(modulestore, user_id=user_id)
 
         # Cache of block field datas, keyed by the XBlock instance (since the ScopeId changes!)
         self.block_field_datas = weakref.WeakKeyDictionary()
