@@ -6,7 +6,7 @@ Views for user API
 import datetime
 import logging
 from functools import cached_property
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 import pytz
 from completion.exceptions import UnavailableCompletionData
@@ -20,6 +20,7 @@ from django.utils import dateparse
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import CourseLocator
 from rest_framework import generics, views
 from rest_framework.decorators import api_view
 from rest_framework.permissions import SAFE_METHODS
@@ -613,7 +614,7 @@ class UserEnrollmentsStatus(views.APIView):
         self,
         username: str,
         active_status_date: datetime,
-        course_ids: List[str],
+        course_ids: Set[CourseLocator],
     ) -> List[Dict[str, bool]]:
         """
         Builds list with dictionaries with user's enrolments statuses.
@@ -631,10 +632,10 @@ class UserEnrollmentsStatus(views.APIView):
         ]
         enrollments_status = []
         for user_enrollment in mobile_available:
-            course_id = str(user_enrollment.course_overview.id)
+            course_id = user_enrollment.course_overview.id
             enrollments_status.append(
                 {
-                    'course_id': course_id,
+                    'course_id': str(course_id),
                     'course_name': user_enrollment.course_overview.display_name,
                     'recently_active': bool(
                         course_id in course_ids
@@ -648,16 +649,16 @@ class UserEnrollmentsStatus(views.APIView):
     def _get_course_ids_where_user_has_completions(
         username: str,
         active_status_date: datetime,
-    ) -> List[str]:
+    ) -> Set[CourseLocator]:
         """
-        Gets course ids where user has completions.
+        Gets course keys where user has completions.
         """
         context_keys = BlockCompletion.objects.filter(
             user__username=username,
             created__gte=active_status_date
         ).values_list('context_key', flat=True).distinct()
 
-        return [str(context_key) for context_key in context_keys]
+        return set(context_keys)
 
 
 class UserCourseEnrollmentsV4Pagination(DefaultPagination):
