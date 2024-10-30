@@ -1573,7 +1573,11 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     is_preview = request.GET.get('preview', '0') == '1'
 
     store = modulestore()
-    branch_type = ModuleStoreEnum.Branch.draft_preferred if is_preview and staff_access else ModuleStoreEnum.Branch.published_only
+    branch_type = (
+        ModuleStoreEnum.Branch.draft_preferred
+    ) if is_preview and staff_access else (
+        ModuleStoreEnum.Branch.published_only
+    )
 
     with store.bulk_operations(course_key):
         with store.branch_setting(branch_type, course_key):

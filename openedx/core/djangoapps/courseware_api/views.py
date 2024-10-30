@@ -595,7 +595,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError as exc:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.") from exc
-        
+
         staff_access = has_access(request.user, 'staff', usage_key.course_key)
         is_preview = request.GET.get('preview', '0') == '1'
         _, request.user = setup_masquerade(
@@ -605,7 +605,11 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             reset_masquerade_data=True,
         )
 
-        branch_type = ModuleStoreEnum.Branch.draft_preferred if is_preview and has_access else ModuleStoreEnum.Branch.published_only
+        branch_type = (
+            ModuleStoreEnum.Branch.draft_preferred
+        ) if is_preview and staff_access else (
+            ModuleStoreEnum.Branch.published_only
+        )
 
         with modulestore().branch_setting(branch_type, usage_key.course_key):
             sequence, _ = get_block_by_usage_id(
