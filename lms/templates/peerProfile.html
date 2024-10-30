@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peer Profile</title>
+
+  <meta name="author" content="Codeconvey" />
+  <link rel="stylesheet" href="https://cdn.exec.talentsprint.com/static/vlsi/VLSIC2/Peers/css/swap.css" />
+  <link rel="stylesheet" href="https://cdn.exec.talentsprint.com/static/vlsi/VLSIC2/Peers/css/bootstrap.css" />
+  <link rel="stylesheet" href="https://cdn.exec.talentsprint.com/static/vlsi/VLSIC2/Peers/css/demo.css" />
+  <link rel="stylesheet" href="https://cdn.exec.talentsprint.com/static/vlsi/VLSIC2/Peers/css/style.css" />
+
+  <style>
+    body {
+      font-family: "Metropolis", sans-serif;
+      /* Use the Metropolis font */
+      background: linear-gradient(to bottom right, #d0ecfa, #ffffff, #caecfd);
+      position: relative;
+      /* background-image: url('/static/imagesimages/bg1.svg') */
+    }
+
+    .container .card {
+      width: 312px;
+      /* height: 350px; */
+    }
+
+    .card-header.bg-transparent.text-center {
+      border-bottom: none;
+    }
+
+    .profile-img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 7px solid rgb(207, 234, 245);
+    }
+
+    .colElement {
+      border-radius: 1.25rem;
+      width: 420px;
+    }
+
+    .gap {
+      gap: 1rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+
+      width: 100%;
+      height: 100vh;
+      overflow: auto;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    /* Modal content */
+    .modal-content {
+      background-color: #fefefe;
+      /* margin: auto;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 75%;
+      border-radius: 40px;
+    }
+
+    /* Close button */
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .social-media-icons {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      margin: 0 15px;
+    }
+
+    .gradient-border {
+      background: linear-gradient(90deg, #d0f1ff, #fff1e4);
+      padding: 15px;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      width: fit-content;
+    }
+
+    .content {
+      background-color: white;
+      /* padding: 20px; */
+      border-radius: inherit;
+    }
+
+    p#name {
+      word-break: break-all;
+    }
+
+    @media (max-width: 991.98px) {
+      .profile-img-modal {
+        width: 115px;
+        height: 115px;
+      }
+      .modal-content-container {
+        padding: 45px;
+        margin-bottom: 0px;
+      }
+      .peer-about {
+        word-break: break-all;
+        white-space: break-spaces;
+        font-size: 20px;
+      }
+      .peer-name-modal{
+        font-size: 26px;
+        line-height: 1;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .profile-img-modal {
+        width: 200px;
+        height: 200px;
+      }
+      .modal-content-container {
+        padding: 75px;
+        margin-bottom: 60px;
+      }
+      .peer-name-modal {
+        font-size: 35px;
+        line-height: 1;
+      }
+    }
+  </style>
+</head>
+
+<body class="position-relative" style="height: 100vh;">
+  <img class="position-fixed" style="top: 0; right: 0px;"
+    src="https://static.talentsprint.com/lms_maple/images/topRight.svg" alt="">
+
+  <nav class="top-0 z-3">
+    <img src="https://static.talentsprint.com/lms_maple/images/logo.png" class="my-2"
+      style="height: 62px; margin-left: 70px; width: 250px" />
+  </nav>
+  <header class="mb-5" style="margin-top: 40px">
+    <div class="text-center">
+      <h1>Know Your Peers</h1>
+      <h5>Build Connections Beyond Boundaries</h5>
+    </div>
+  </header>
+
+  <section>
+    <div class="student-profile py-4">
+      <div class="" style="padding: 0 6rem">
+        <div class="row gap" id="row">
+          {% for profile in profiles %}
+           {% if not profile.is_superuser or not profile.is_staff %}
+          <div class="bg-white p-3 colElement" style="cursor: pointer; position: relative; z-index: 10;">
+            <div class="profile-section d-flex flex-column flex-lg-row align-items-center flex-wrap flex-lg-nowrap text-center text-lg-left">
+              <img class="profile-img" id="profile_image" src="{{ profile.profile_image_urls.full }}" alt="">
+              <p class="ml-lg-4 font-weight-bold" id="name" style="font-size: 24px;">
+                {{ profile.first_name }} {{ profile.last_name }}
+              </p>
+            </div>
+            <div class="ed-section mt-3">
+              <p style="height:50px;color: rgba(0,0,0,0.5);font-size: 17px; overflow: hidden;display: -webkit-box;
+-webkit-line-clamp: 2;  
+-webkit-box-orient: vertical;" id="level_of_education">{{ profile.level_of_education }}</p>
+              </p>
+              <p id="bio" style="display: none;">{{ profile.bio }}</p>
+              <div id="social-links" style="display: none;">
+                {% for link in profile.social_links %}
+                <div>{{ link.platform }} :
+                  <a id="{{ link.platform }}" href="{{ link.url }}" target="_blank">
+                    {{ link.url }}
+                  </a>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            <img src="https://static.talentsprint.com/lms_maple/images/arrow.png" style="height: 35px; width: 35px">
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: unset; justify-content: center" role="document">
+        <div class="modal-content" id="modal-content"></div>
+      </div>
+    </div>
+  </section>
+  <img class="position-fixed" style="bottom: 0px; left: 0;z-index: 0;"
+    src="https://static.talentsprint.com/lms_maple/imagesimages/bottomLeft.svg" alt="">
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const courseElement = document.querySelector('.pgn__card-wrapper-image-cap');
+      if (courseElement && courseElement.hasAttribute('href')) {
+        const courseName = courseElement.getAttribute('href');
+        console.log(courseName);
+      } else {
+        console.log('Element not found');
+      }
+    });
+    const modal = document.getElementById("myModal");
+    const colElements = document.querySelector(".colElement");
+    const colElementss = document.getElementsByClassName("colElement");
+
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto"; // Enable background scrolling
+      }
+    };
+    for (let item of colElementss) {
+      let peerDetails = {
+        name: item.querySelector("#name")?.innerHTML || "",
+        level_of_education: item.querySelector("#level_of_education")?.innerHTML || "",
+        bio: item.querySelector("#bio")?.innerHTML || "",
+        // social_links: item.querySelector("#social-links")?.innerHTML,
+        social_links: {
+          twitter: item.querySelector("#twitter")?.href || "",
+          facebook: item.querySelector("#facebook")?.href || "",
+          linkedin: item.querySelector("#linkedin")?.href || "",
+        },
+        profile_image_urls: item.querySelector("#profile_image")?.src || "",
+      }
+      item.onclick = function () {
+        modal.style.display = "block";
+        document.body.style.overflow = "hidden";
+        renderModal(peerDetails);
+      };
+    }
+
+    function renderModal(peer) {
+      const modalContent = document.getElementById("modal-content");
+      const existingContent = modalContent.innerHTML;
+      console.log(peer);
+      modalContent.innerHTML = `
+<span class="close text-right" style="font-size: 33px;
+position: absolute;
+right: 38px;
+">X</span>
+<div class="d-flex flex-column flex-lg-row align-content-center modal-content-container">
+<div class="peer-img d-fex flex-column align-items-center" style="max-width: 235px;">
+<div class="gradient-border"> 
+<img class="content profile-img-modal"  src="${peer?.profile_image_urls}" style="border-radius: 50%;" alt="${peer?.name}" />
+</div>
+  <div class="social-media d-flex justify-content-center mt-3">
+  ${peer?.social_links?.linkedin ? `<a href=${peer?.social_links?.linkedin} target="_blank"> 
+  <img src="https://static.talentsprint.com/lms_maple/images/linkedin.svg" alt="LinkedIn" class="social-media-icons" />   
+  </a>` : ""}
+
+  ${peer?.social_links?.twitter ? `<a href=${peer?.social_links?.twitter} target="_blank"> 
+  <img src="https://static.talentsprint.com/lms_maple/images/twitter.svg" alt="Twitter" class="social-media-icons" />   
+  </a>` : ""}
+
+  ${peer?.social_links?.facebook ? `<a href=${peer?.social_links?.facebook} target="_blank"> 
+  <img src="https://static.talentsprint.com/lms_maple/images/facebook.svg" alt="LinkedIn" class="social-media-icons" />   
+  </a>` : ""}
+   
+  </div>
+</div>
+<div class="info-section ml-lg-5 text-center text-lg-left">
+<div class="peer-name">
+<p class="peer-name-modal">${peer?.name || ""}</p>       
+<p class="peer-level-modal" style= "font-size: 18px;color: rgba(0,0,0,0.5);">${peer?.level_of_education || ""
+        }</p>
+</div>
+<div class="my-3" style="height: 1px; background-color: rgba(0,0,0,0.1)"> </div>
+  <div class="peer-about" style="font-size: 22px; color: rgba(0,0,0,0.5); line-height: 2rem;">
+    <p>${peer?.bio || ""}</p>
+  </div>
+</div>
+</div>
+
+`;
+      const span = document.getElementsByClassName("close")[0];
+      if (span) {
+        span.onclick = function () {
+          modal.style.display = "none";
+          document.body.style.overflow = "auto"; // Enable background scrolling
+        };
+      }
+    }
+
+
+
+  </script>
+</body>
+
+</html>
