@@ -14,10 +14,13 @@ from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.locator import CourseLocator
+from rest_framework.authentication import SessionAuthentication
 
 from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.django_comment_common.models import assign_role
+from openedx.core.djangoapps.user_authn.permissions import IsE2eTestUser
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from openedx.features.course_experience import course_home_url
 from common.djangoapps.student.helpers import (
@@ -35,6 +38,7 @@ from common.djangoapps.student.models import (
     create_comments_service_user
 )
 from common.djangoapps.util.json_request import JsonResponse
+from openedx.core.lib.api.authentication import BearerAuthentication
 
 from edx_django_utils.user import generate_password  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -61,6 +65,8 @@ def auto_auth(request):  # pylint: disable=too-many-statements
     If username, email, or password are not provided, use
     randomly generated credentials.
     """
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
+    permission_classes = (IsE2eTestUser,)
 
     # Generate a unique name to use if none provided
     generated_username = uuid.uuid4().hex[0:30]
