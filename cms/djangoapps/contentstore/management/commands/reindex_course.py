@@ -11,6 +11,7 @@ from elasticsearch import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from search.meilisearch import create_indexes, MeilisearchEngine, INDEX_FILTERABLES
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.courseware_index import CourseAboutSearchIndexer, CoursewareSearchIndexer
@@ -97,14 +98,21 @@ class Command(BaseCommand):
                         logging.exception('Search Engine error - %s', exc)
                         return
 
-                    index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
+                    # Meilisearch engine
+                    if isinstance(searcher, MeilisearchEngine) and index_name in INDEX_FILTERABLES:
+                        logging.info(f"Creating meilisearch index for {index_name}")
+                        create_indexes({index_name: INDEX_FILTERABLES[index_name]})
 
-                    index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
-                        index=index_name,
-                    ) if index_exists else {}
+                    # Legacy Elasticsearch engine
+                    else:
+                        index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
 
-                    if index_exists and index_mapping:
-                        return
+                        index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
+                            index=index_name,
+                        ) if index_exists else {}
+
+                        if index_exists and index_mapping:
+                            return
 
             # if reindexing is done during devstack setup step, don't prompt the user
             if setup_option or query_yes_no(self.CONFIRMATION_PROMPT, default="no"):
