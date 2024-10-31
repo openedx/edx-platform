@@ -4,9 +4,9 @@ Hooks Extension Framework
 What is the Hooks Extension Framework?
 ---------------------------------------
 
-Based on the `open-closed principle`_, this framework aims to extend the platform in a maintainable way without modifying its core. The main goal is to leverage the existing extension capabilities provided by the plugin architecture, allowing developers to implement new features to fit customer needs while reducing the need for core modifications and minimizing maintenance efforts.
+Based on the `open-closed principle`_, this framework aims to extend the Open edX platform in a maintainable way without modifying its core. The main goal is to leverage the existing extension capabilities provided by the plugin architecture, allowing developers to implement new features to fit customer needs while reducing the need for core modifications and minimizing maintenance efforts.
 
-Hooks are a list of places in the Open edX platform where externally defined functions can take place. These functions may alter what the user sees or experiences on the platform, while in other cases, they are purely informative. All hooks are designed to be extended through Open edX plugins and configurations.
+Hooks are a list of places in the Open edX platform where externally defined functions can take place. These functions may alter what the user sees or experiences on the platform, while in other cases, they act as notifications. All hooks are designed to be extended through Open edX plugins and configurations.
 
 Hooks can be of two types: events and filters. Events are signals sent in specific places whose receivers can extend functionality, while filters are functions that can modify the application's behavior.
 
@@ -27,34 +27,33 @@ A longer description of the framework and its history can be found in `OEP 50`_.
 Why adopt the Hooks Extension Framework?
 ----------------------------------------
 
-#. Stable and Maintainable Extensions
+1. Stable and Maintainable Extensions
 
 The Hooks Extension Framework allows developers to extend the platform's functionality in a stable, maintainable, and decoupled way ensuring easier upgrades and long-term stability by removing the need to modify the core in an significant way.
 
-#. Contained Solution Implementation
+2. Contained Solution Implementation
 
 By avoiding core modifications, the framework promotes self-contained solutions, eliminating the need  for custom code to coexist with core logic which lowers maintenance costs for extension developers.
 
-#. Leveraging the Open edX Plugin Extension Mechanism
+3. Leveraging the Open edX Plugin Extension Mechanism
 
 The framework allows developers to implement custom business logic and integrations directly in plugins. This keeps core modifications minimal, focusing maintenance and development efforts on plugins, where solutions can be built and maintained independently of the core platform.
 
-#. Standardization
+4. Standardization
 
-Both filters and events implementations implement an approach for adding additional features, such as communication between components or services, or backend flow control. With these standards in place, it’s easy to identify when and how to use the framework as a solution, ensuring a consistent and predictable approach to extending the platform.
+Both filters and events implementations implement an approach for adding additional features, such as communication between services or backend flow control. With these standards in place, it’s easy to identify when and how to use the framework as a solution, ensuring a consistent and predictable approach to extending the platform.
 
-#. Reduce Fork Modifications
+5. Reduce Fork Modifications
 
 The need to modify logic in forks is minimized, as most extensions can now be implementing using the framework, keeping forks closer to the core and easier to manage.
 
-#. Community Compatibility
+6. Community Compatibility
 
 The framework allows for shorter and more agile contribution cycles. By adding standardized extension points, contributors avoid creating customer-specific logic, making development more community-friendly.
 
-#. Backward Compatibility
+7. Backward Compatibility
 
 Hooks are designed to be backward compatible, guaranteeing stability across releases and making it easier to upgrade without breaking existing functionality.
-
 
 Open edX Events and Filters
 ============================
@@ -96,7 +95,7 @@ Here are some key differences between Open edX Events and Filters:
 |                    |  provides a structured way to define the data and                      |  which provides a way to define the filter function         |
 |                    |  metadata associated with the event.                                   |  and the parameters it should receive.                      |
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
-| **Implementation** |  Implemented using Django signals, which allow                         |  Implemented using an accumulative pipeline mechanism which |
+| **Implementation** |  Implemented using `Django signals`_, which allow                      |  Implemented using an accumulative pipeline mechanism which |
 |                    |  developers to send and receive notifications that an action happened  |  takes a set of arguments and returns a modified set        |
 |                    |  within a Django application.                                          |  to the caller or raises exceptions during                  |
 |                    |                                                                        |  processing.                                                |
@@ -104,6 +103,8 @@ Here are some key differences between Open edX Events and Filters:
 | **Use cases**      |  Send an email notification when a user enrolls in a course.           |  Include additional information in an API endpoint response.|
 |                    |  an email notification.                                                |                                                             |
 +--------------------+------------------------------------------------------------------------+-------------------------------------------------------------+
+
+.. _Django signals: https://docs.djangoproject.com/en/4.2/topics/signals/
 
 How to know when to use an Event or a Filter?
 ----------------------------------------------
