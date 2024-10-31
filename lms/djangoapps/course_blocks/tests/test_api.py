@@ -55,7 +55,6 @@ def get_block_side_effect_for_unknown_user(self, *args, **kwargs):
     return get_block_side_effect(self, False)
 
 
-
 @ddt.ddt
 class TestGetCourseBlocks(UserPartitionTestMixin, CourseStructureTestCase):
     """
