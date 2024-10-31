@@ -230,6 +230,7 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         initializePasteButton() {
+            var self = this;
             if (this.options.canEdit && !self.options.isIframeEmbed) {
                 // We should have the user's clipboard status.
                 const data = this.options.clipboardData;
@@ -496,12 +497,15 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         openManageTags: function(event) {
+            const contentId = this.findXBlockElement(event.target).data('locator');
             try {
                 if (this.options.isIframeEmbed) {
                     window.parent.postMessage(
                         {
                             type: 'openManageTags',
-                            payload: {}
+                            payload: {
+                                contentId,
+                            }
                         }, document.referrer
                     );
                 }
@@ -509,7 +513,6 @@ function($, _, Backbone, gettext, BasePage,
                 console.error(e);
             }
             const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
-            const contentId = this.findXBlockElement(event.target).data('locator');
 
             TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },
