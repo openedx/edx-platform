@@ -6,12 +6,12 @@ from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import ddt
-from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_switch
 from rest_framework import status
+from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -303,7 +303,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             display_name="Course (Demo)",
             id=archived_course_key,
             org=archived_course_key.org,
-            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=Zoneinfo("UTC")),
         )
         active_course_key = self.store.make_course_key("foo-org", "foo-number", "foo-run")
         CourseOverviewFactory.create(

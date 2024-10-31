@@ -12,9 +12,9 @@ from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
 from django_countries import countries
 from zoneinfo import available_timezones
-from pytz import country_timezones
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
+from openedx.core.constants import country_timezones
 from common.djangoapps.student.models import User, UserProfile
 from common.djangoapps.track import segment
 

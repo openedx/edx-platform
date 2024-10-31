@@ -108,8 +108,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     ALLOW_ACCESS_TO_UNRELEASED_COURSE = True
     ALLOW_ACCESS_TO_MILESTONE_COURSE = True
     ALLOW_ACCESS_TO_NON_VISIBLE_COURSE = True
-    NEXT_WEEK = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=7)
-    LAST_WEEK = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=7)
+    NEXT_WEEK = datetime.datetime.now(ZoneInfo('UTC')) + datetime.timedelta(days=7)
+    LAST_WEEK = datetime.datetime.now(ZoneInfo('UTC')) - datetime.timedelta(days=7)
     THREE_YEARS_AGO = now() - datetime.timedelta(days=(365 * 3))
     ADVERTISED_START = "Spring 2016"
     ENABLED_SIGNALS = ['course_published']
@@ -1438,7 +1438,7 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         old_course = CourseFactory.create(org="edx", mobile_available=True)
         self.enroll(old_course.id)
         old_enrollment = CourseEnrollment.objects.filter(user=self.user, course=old_course.course_id).first()
-        old_enrollment.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=31)
+        old_enrollment.created = datetime.datetime.now(ZoneInfo('UTC')) - datetime.timedelta(days=31)
         old_enrollment.save()
 
         response = self.api_response(api_version=API_V1)
@@ -1466,7 +1466,7 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         course = CourseFactory.create(org="edx", mobile_available=True, run='1001')
         self.enroll(course.id)
         enrollment = CourseEnrollment.objects.filter(user=self.user, course=course.course_id).first()
-        enrollment.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=enrolled_days_ago)
+        enrollment.created = datetime.datetime.now(ZoneInfo('UTC')) - datetime.timedelta(days=enrolled_days_ago)
         enrollment.save()
 
         response = self.api_response(api_version=API_V1)
@@ -1500,7 +1500,7 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
         self.enroll(course.id)
         enrollment = CourseEnrollment.objects.filter(user=self.user, course=course.course_id).first()
         # make enrollment older 30 days ago
-        enrollment.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=50)
+        enrollment.created = datetime.datetime.now(ZoneInfo('UTC')) - datetime.timedelta(days=50)
         enrollment.save()
         completion = BlockCompletion.objects.create(
             user=self.user,
@@ -1509,7 +1509,7 @@ class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
             block_key=section.location,
             completion=0.5,
         )
-        completion.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=completed_days_ago)
+        completion.created = datetime.datetime.now(ZoneInfo('UTC')) - datetime.timedelta(days=completed_days_ago)
         completion.save()
 
         response = self.api_response(api_version=API_V1)
