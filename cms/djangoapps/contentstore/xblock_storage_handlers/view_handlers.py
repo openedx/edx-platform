@@ -558,6 +558,7 @@ def _create_block(request):
             "locator": str(created_xblock.location),
             "courseKey": str(created_xblock.location.course_key),
             "static_file_notices": asdict(notices),
+            "upstreamRef": str(created_xblock.upstream),
         })
 
     category = request.json["category"]

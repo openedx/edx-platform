@@ -70,13 +70,13 @@ bleach[css]==6.1.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.35.46
+boto3==1.35.50
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.46
+botocore==1.35.50
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -144,7 +144,7 @@ code-annotations==1.8.0
     #   edx-toggles
 codejail-includes==1.0.0
     # via -r requirements/edx/kernel.in
-crowdsourcehinter-xblock==0.7
+crowdsourcehinter-xblock==0.8
     # via -r requirements/edx/bundled.in
 cryptography==43.0.3
     # via
@@ -455,7 +455,7 @@ edx-django-utils==7.0.0
     #   openedx-events
     #   ora2
     #   super-csv
-edx-drf-extensions==10.4.0
+edx-drf-extensions==10.5.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-completion
@@ -467,11 +467,11 @@ edx-drf-extensions==10.4.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.29.0
+edx-enterprise==4.30.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-edx-event-bus-kafka==5.8.1
+edx-event-bus-kafka==6.0.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.5.1
     # via -r requirements/edx/kernel.in
@@ -584,7 +584,7 @@ geoip2==4.8.0
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
-google-api-core[grpc]==2.21.0
+google-api-core[grpc]==2.22.0
     # via
     #   firebase-admin
     #   google-api-python-client
@@ -747,7 +747,7 @@ markupsafe==3.0.2
     #   xblock
 maxminddb==2.6.2
     # via geoip2
-meilisearch==0.31.5
+meilisearch==0.31.6
     # via
     #   -r requirements/edx/kernel.in
     #   edx-search
@@ -1038,9 +1038,9 @@ pyyaml==6.0.2
     #   xblock
 random2==1.0.2
     # via -r requirements/edx/kernel.in
-recommender-xblock==2.2.1
+recommender-xblock==3.0.0
     # via -r requirements/edx/bundled.in
-redis==5.1.1
+redis==5.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1144,7 +1144,7 @@ slumber==0.7.1
     #   -r requirements/edx/kernel.in
     #   edx-bulk-grades
     #   edx-enterprise
-snowflake-connector-python==3.12.2
+snowflake-connector-python==3.12.3
     # via edx-enterprise
 social-auth-app-django==5.4.1
     # via
@@ -1191,7 +1191,7 @@ tinycss2==1.2.1
     # via bleach
 tomlkit==0.13.2
     # via snowflake-connector-python
-tqdm==4.66.5
+tqdm==4.66.6
     # via
     #   nltk
     #   openai
@@ -1254,7 +1254,7 @@ webencodings==0.5.1
     #   bleach
     #   html5lib
     #   tinycss2
-webob==1.8.8
+webob==1.8.9
     # via
     #   -r requirements/edx/kernel.in
     #   xblock
@@ -1291,7 +1291,7 @@ xmlsec==1.3.13
     #   python3-saml
 xss-utils==0.6.0
     # via -r requirements/edx/kernel.in
-yarl==1.16.0
+yarl==1.17.0
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata
