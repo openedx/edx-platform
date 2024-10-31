@@ -1,11 +1,10 @@
-# pylint: disable=attribute-defined-outside-init
 """
 Tests for manager.py
 """
 
+import pytest
 import ddt
 import pytest
-from django.core.cache import cache
 from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_switch
 
