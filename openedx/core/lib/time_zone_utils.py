@@ -4,7 +4,8 @@ Utilities related to timezones
 
 from datetime import datetime
 
-from zoneinfo import ZoneInfo, available_timezones
+from pytz import common_timezones
+from zoneinfo import ZoneInfo
 
 
 def _format_time_zone_string(time_zone, date_time, format_string):
@@ -49,6 +50,6 @@ def get_display_time_zone(time_zone_name):
 
 
 TIME_ZONE_CHOICES = sorted(
-    [(tz, get_display_time_zone(tz)) for tz in available_timezones()],
+    [(tz, get_display_time_zone(tz)) for tz in common_timezones],
     key=lambda tz_tuple: tz_tuple[1]
 )

@@ -505,7 +505,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self._test_delete_course_from_search_index_after_course_deletion(self.store)
 
     def test_empty_course(self):
-        empty_course = CourseFactory.create(modulestore=self.store, start=datetime(2015, 3, 1, tzinfo=UTC))
+        empty_course = CourseFactory.create(modulestore=self.store, start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")))
         added_to_index = CoursewareSearchIndexer.do_course_reindex(self.store, empty_course.id)
         assert added_to_index == 0
 
