@@ -11,7 +11,7 @@ from elasticsearch import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from search.meilisearch import create_indexes, MeilisearchEngine, INDEX_FILTERABLES
+from meilisearch.errors import MeilisearchError
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.courseware_index import CourseAboutSearchIndexer, CoursewareSearchIndexer
@@ -94,17 +94,12 @@ class Command(BaseCommand):
                 for index_name in index_names:
                     try:
                         searcher = SearchEngine.get_search_engine(index_name)
-                    except exceptions.ElasticsearchException as exc:
+                    except (exceptions.ElasticsearchException, MeilisearchError) as exc:
                         logging.exception('Search Engine error - %s', exc)
                         return
 
-                    # Meilisearch engine
-                    if isinstance(searcher, MeilisearchEngine) and index_name in INDEX_FILTERABLES:
-                        logging.info(f"Creating meilisearch index for {index_name}")
-                        create_indexes({index_name: INDEX_FILTERABLES[index_name]})
-
                     # Legacy Elasticsearch engine
-                    else:
+                    if hasattr(searcher, '_es'):  # pylint: disable=protected-access
                         index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
 
                         index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
