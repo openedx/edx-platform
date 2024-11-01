@@ -11,7 +11,6 @@ from elasticsearch import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from meilisearch.errors import MeilisearchError
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.courseware_index import CourseAboutSearchIndexer, CoursewareSearchIndexer
@@ -94,7 +93,7 @@ class Command(BaseCommand):
                 for index_name in index_names:
                     try:
                         searcher = SearchEngine.get_search_engine(index_name)
-                    except (exceptions.ElasticsearchException, MeilisearchError) as exc:
+                    except exceptions.ElasticsearchException as exc:
                         logging.exception('Search Engine error - %s', exc)
                         return
 
