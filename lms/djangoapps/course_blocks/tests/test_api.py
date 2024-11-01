@@ -84,7 +84,7 @@ class TestGetCourseBlocks(UserPartitionTestMixin, CourseStructureTestCase):
         #                      course
         #                    /          \
         #                   /            \
-        #        A[0, 1, 2, 3]            B
+        #                 A[0]            B
         #                                 |
         #                                 |
         #                                 O
