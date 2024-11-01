@@ -116,6 +116,8 @@ class TestGetCourseBlocks(UserPartitionTestMixin, CourseStructureTestCase):
     @ddt.data(
         (1, ('course', 'B', 'O'), True),
         (1, ('course', 'A', 'B', 'O'), False),
+        (None, ('course', 'B', 'O'), True),
+        (None, ('course', 'A', 'B', 'O'), False),
     )
     @ddt.unpack
     def test_get_course_blocks(self, group_id, expected_blocks, user_known):
