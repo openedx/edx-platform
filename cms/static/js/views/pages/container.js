@@ -248,7 +248,7 @@ function($, _, Backbone, gettext, BasePage,
         refreshPasteButton(data) {
             // Do not perform any changes on paste button since they are not
             // rendered on Library or LibraryContent pages
-            if (!this.isLibraryPage && !this.isLibraryContentPage && !self.options.isIframeEmbed) {
+            if (!this.isLibraryPage && !this.isLibraryContentPage && !(self.options && self.options.isIframeEmbed)) {
                 // 'data' is the same data returned by the "get clipboard status" API endpoint
                 // i.e. /api/content-staging/v1/clipboard/
                 if (this.options.canEdit && data.content) {
@@ -504,7 +504,7 @@ function($, _, Backbone, gettext, BasePage,
                         {
                             type: 'openManageTags',
                             payload: {
-                                contentId,
+                                id: contentId,
                             }
                         }, document.referrer
                     );
