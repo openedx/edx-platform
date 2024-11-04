@@ -2,13 +2,24 @@
 
 
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations, models, connection
 import django.db.models.deletion
 import simple_history.models
 
 
-class Migration(migrations.Migration):
+def get_compatible_columns():
+    columns = [
+        ('grade',
+         models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING,
+                           related_name='+', to='grades.PersistentSubsectionGrade')),
+    ]
+    if connection.vendor == 'postgresql':
+        columns = [('grade_id', models.IntegerField()), ] + columns
 
+    return columns
+
+
+class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('grades', '0014_persistentsubsectiongradeoverridehistory'),
@@ -18,21 +29,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='HistoricalPersistentSubsectionGradeOverride',
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('created', models.DateTimeField(blank=True, db_index=True, editable=False)),
-                ('modified', models.DateTimeField(blank=True, db_index=True, editable=False)),
-                ('earned_all_override', models.FloatField(blank=True, null=True)),
-                ('possible_all_override', models.FloatField(blank=True, null=True)),
-                ('earned_graded_override', models.FloatField(blank=True, null=True)),
-                ('possible_graded_override', models.FloatField(blank=True, null=True)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('grade_id', models.IntegerField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('grade', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='grades.PersistentSubsectionGrade')),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-            ],
+                       ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
+                       ('created', models.DateTimeField(blank=True, db_index=True, editable=False)),
+                       ('modified', models.DateTimeField(blank=True, db_index=True, editable=False)),
+                       ('earned_all_override', models.FloatField(blank=True, null=True)),
+                       ('possible_all_override', models.FloatField(blank=True, null=True)),
+                       ('earned_graded_override', models.FloatField(blank=True, null=True)),
+                       ('possible_graded_override', models.FloatField(blank=True, null=True)),
+                       ('history_id', models.AutoField(primary_key=True, serialize=False)),
+                       ('history_date', models.DateTimeField()),
+                       ('history_change_reason', models.CharField(max_length=100, null=True)),
+                       ('history_type',
+                        models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
+                       ('history_user',
+                        models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+',
+                                          to=settings.AUTH_USER_MODEL)),
+                   ] + get_compatible_columns(),
             options={
                 'ordering': ('-history_date', '-history_id'),
                 'get_latest_by': 'history_date',
