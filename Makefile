@@ -50,7 +50,7 @@ pull_xblock_translations:  ## pull xblock translations via atlas
 
 clean_translations: ## Remove existing translations to prepare for a fresh pull
 	# Removes core edx-platform translations but keeps config files and Esperanto (eo) test translations
-	find conf/locale -mindepth 1 -maxdepth 1 -type d -a ! -name eo -exec rm -rf {} +
+	find conf/locale/ -type f \! -path '*/eo/*' \( -name '*.mo' -o -name '*.po' \) -delete
 	# Removes the xblocks/plugins and js-compiled translations
 	rm -rf conf/plugins-locale cms/static/js/i18n/ lms/static/js/i18n/ cms/static/js/xblock.v1-i18n/ lms/static/js/xblock.v1-i18n/
 
@@ -136,6 +136,8 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	sed '/^django-simple-history==/d' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	sed 's/Django<4.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+	sed 's/event-tracking<2.4.1//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt

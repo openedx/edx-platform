@@ -10,19 +10,17 @@ from django.utils.html import strip_tags
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
-from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
-from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
-from xmodule.modulestore.django import SignalHandler, modulestore
-
 from lms.djangoapps.discussion import tasks
+from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
 from lms.djangoapps.discussion.rest_api.tasks import (
+    send_response_endorsed_notifications,
     send_response_notifications,
-    send_thread_created_notification,
-    send_response_endorsed_notifications
+    send_thread_created_notification
 )
 from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 log = logging.getLogger(__name__)
 
@@ -101,8 +99,6 @@ def send_reported_content_notification(sender, user, post, **kwargs):
     Sends notification for reported content.
     """
     course_key = CourseKey.from_string(post.course_id)
-    if not ENABLE_REPORTED_CONTENT_NOTIFICATIONS.is_enabled(course_key):
-        return
     course = modulestore().get_course(course_key)
     DiscussionNotificationSender(post, course, user).send_reported_content_notification()
 
@@ -113,8 +109,10 @@ def create_message_context(comment, site):
         'course_id': str(thread.course_id),
         'comment_id': comment.id,
         'comment_body': comment.body,
+        'comment_body_text': comment.body_text,
         'comment_author_id': comment.user_id,
         'comment_created_at': comment.created_at,  # comment_client models dates are already serialized
+        'comment_parent_id': comment.parent_id,
         'thread_id': thread.id,
         'thread_title': thread.title,
         'thread_author_id': thread.user_id,
@@ -180,8 +178,9 @@ def create_comment_created_notification(*args, **kwargs):
     comment = kwargs['post']
     thread_id = comment.attributes['thread_id']
     parent_id = comment.attributes['parent_id']
+    comment_id = comment.attributes['id']
     course_key_str = comment.attributes['course_id']
-    send_response_notifications.apply_async(args=[thread_id, course_key_str, user.id, parent_id])
+    send_response_notifications.apply_async(args=[thread_id, course_key_str, user.id, comment_id, parent_id])
 
 
 @receiver(signals.comment_endorsed)

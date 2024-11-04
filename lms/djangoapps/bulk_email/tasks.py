@@ -26,6 +26,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import override as override_language
 from edx_django_utils.monitoring import set_code_owner_attribute
+from eventtracking import tracker
 from markupsafe import escape
 
 from common.djangoapps.util.date_utils import get_default_time_display
@@ -456,7 +457,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     log.info(
         f"BulkEmail ==> Task: {parent_task_id}, SubTask: {task_id}, EmailId: {email_id}, "
-        f"TotalRecipients: {total_recipients}"
+        f"TotalRecipients: {total_recipients}, ace_enabled: {is_bulk_email_edx_ace_enabled()}"
     )
 
     try:
@@ -467,7 +468,15 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             "send."
         )
         raise exc
-
+    tracker.emit(
+        'edx.bulk_email.created',
+        {
+            'course_id': str(course_email.course_id),
+            'to_list': [user_obj.get('email', '') for user_obj in to_list],
+            'total_recipients': total_recipients,
+            'ace_enabled_for_bulk_email': is_bulk_email_edx_ace_enabled(),
+        }
+    )
     # Exclude optouts (if not a retry):
     # Note that we don't have to do the optout logic at all if this is a retry,
     # because we have presumably already performed the optout logic on the first
@@ -525,9 +534,14 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             email_context['email'] = email
             email_context['name'] = profile_name
             email_context['user_id'] = user_id
-            email_context['course_id'] = course_email.course_id
+            email_context['course_id'] = str(course_email.course_id)
             email_context['unsubscribe_link'] = get_unsubscribed_link(current_recipient['username'],
                                                                       str(course_email.course_id))
+            email_context['unsubscribe_text'] = 'Unsubscribe from course updates for this course'
+            email_context['disclaimer'] = (
+                "You are receiving this email because you are enrolled in the "
+                f"{email_context['platform_name']} course {email_context['course_title']}"
+            )
 
             if is_bulk_email_edx_ace_enabled():
                 message = ACEEmail(site, email_context)

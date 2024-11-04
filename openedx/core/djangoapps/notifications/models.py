@@ -23,7 +23,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 10
+COURSE_NOTIFICATION_CONFIG_VERSION = 12
 
 
 def get_course_notification_preference_config():
@@ -109,6 +109,7 @@ class Notification(TimeStampedModel):
     email = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
+    group_by_id = models.CharField(max_length=42, db_index=True, null=False, default="")
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'

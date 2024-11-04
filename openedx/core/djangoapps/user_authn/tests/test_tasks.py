@@ -19,6 +19,7 @@ class SendActivationEmailTestCase(TestCase):
     """
     Test for send activation email to user
     """
+
     def setUp(self):
         """ Setup components used by each test."""
         super().setUp()
@@ -44,6 +45,7 @@ class SendActivationEmailTestCase(TestCase):
         assert self.msg.context['routed_profile_name'] == ''
         assert self.msg.context['registration_flow'] is False
         assert self.msg.context['is_enterprise_learner'] is False
+        assert self.msg.context['is_first_purchase_discount_overridden'] is False
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
     @mock.patch('openedx.core.djangoapps.user_authn.tasks.log')

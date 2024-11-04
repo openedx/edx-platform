@@ -90,6 +90,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     # For closed thread:
     # no edits, except 'abuse_flagged' and 'read' are allowed for thread
     # no edits, except 'abuse_flagged' is allowed for comment
+
     is_thread = cc_content["type"] == "thread"
     is_comment = cc_content["type"] == "comment"
     has_moderation_privilege = context["has_moderation_privilege"]
@@ -120,7 +121,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
 
     is_author = _is_author(cc_content, context)
     editable_fields.update({
-        "voted": True,
+        "voted": has_moderation_privilege or not is_author or is_staff_or_admin,
         "raw_body": has_moderation_privilege or is_author,
         "edit_reason_code": has_moderation_privilege and not is_author,
         "following": is_thread,

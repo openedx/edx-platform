@@ -33,8 +33,10 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.toggles import ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
+from cms.lib.xblock.upstream_sync import BadUpstream, sync_from_upstream
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
@@ -184,6 +186,11 @@ def handle_xblock(request, usage_key_string=None):
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = get_block_info(get_xblock(usage_key, request.user))
+                    # TODO: remove after beta testing for the new problem editor parser
+                    if response["category"] == "problem":
+                        response["metadata"]["default_to_advanced"] = (
+                            ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG.is_enabled()
+                        )
                     if "customReadToken" in fields:
                         parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
                         response.update(parent_children)
@@ -305,13 +312,10 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
         old_metadata = own_metadata(xblock)
     if old_content is None:
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
-    if hasattr(xblock, "editor_saved"):
-        load_services_for_studio(xblock.runtime, user)
-        xblock.editor_saved(user, old_metadata, old_content)
+    load_services_for_studio(xblock.runtime, user)
+    xblock.editor_saved(user, old_metadata, old_content)
     xblock_updated = modulestore().update_item(xblock, user.id)
-    if hasattr(xblock_updated, "post_editor_saved"):
-        load_services_for_studio(xblock_updated.runtime, user)
-        xblock_updated.post_editor_saved(user, old_metadata, old_content)
+    xblock_updated.post_editor_saved(user, old_metadata, old_content)
     return xblock_updated
 
 
@@ -536,7 +540,8 @@ def _create_block(request):
         # Paste from the user's clipboard (content_staging app clipboard, not browser clipboard) into 'usage_key':
         try:
             created_xblock, notices = import_staged_content_from_user_clipboard(
-                parent_key=usage_key, request=request
+                parent_key=usage_key,
+                request=request,
             )
         except Exception:  # pylint: disable=broad-except
             log.exception(
@@ -553,6 +558,7 @@ def _create_block(request):
             "locator": str(created_xblock.location),
             "courseKey": str(created_xblock.location.course_key),
             "static_file_notices": asdict(notices),
+            "upstreamRef": str(created_xblock.upstream),
         })
 
     category = request.json["category"]
@@ -582,12 +588,28 @@ def _create_block(request):
         boilerplate=request.json.get("boilerplate"),
     )
 
-    return JsonResponse(
-        {
-            "locator": str(created_block.location),
-            "courseKey": str(created_block.location.course_key),
-        }
-    )
+    response = {
+        "locator": str(created_block.location),
+        "courseKey": str(created_block.location.course_key),
+    }
+    # If it contains library_content_key, the block is being imported from a v2 library
+    # so it needs to be synced with upstream block.
+    if upstream_ref := request.json.get("library_content_key"):
+        try:
+            # Set `created_block.upstream` and then sync this with the upstream (library) version.
+            created_block.upstream = upstream_ref
+            sync_from_upstream(downstream=created_block, user=request.user)
+        except BadUpstream as exc:
+            _delete_item(created_block.location, request.user)
+            log.exception(
+                f"Could not sync to new block at '{created_block.usage_key}' "
+                f"using provided library_content_key='{upstream_ref}'"
+            )
+            return JsonResponse({"error": str(exc)}, status=400)
+        modulestore().update_item(created_block, request.user.id)
+        response['upstreamRef'] = upstream_ref
+
+    return JsonResponse(response)
 
 
 def _get_source_index(source_usage_key, source_parent):
@@ -1156,12 +1178,19 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                     supports_onboarding = False
 
                 proctoring_exam_configuration_link = None
-                if xblock.is_proctored_exam:
-                    proctoring_exam_configuration_link = (
-                        get_exam_configuration_dashboard_url(
-                            course.id, xblock_info["id"]
+
+                # only call get_exam_configuration_dashboard_url if not using an LTI proctoring provider
+                if xblock.is_proctored_exam and (course.proctoring_provider != 'lti_external'):
+                    try:
+                        proctoring_exam_configuration_link = (
+                            get_exam_configuration_dashboard_url(
+                                course.id, xblock_info["id"]
+                            )
                         )
-                    )
+                    except Exception as e:  # pylint: disable=broad-except
+                        log.error(
+                            f"Error while getting proctoring exam configuration link: {e}"
+                        )
 
                 if course.proctoring_provider == "proctortrack":
                     show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(

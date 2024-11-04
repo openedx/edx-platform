@@ -3,7 +3,7 @@ Serializers for Learner Home
 """
 
 from datetime import date, timedelta
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
 from django.urls import reverse
@@ -15,6 +15,7 @@ from openedx_filters.learning.filters import CourseEnrollmentAPIRenderStarted, C
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
 from xmodule.data import CertificatesDisplayBehaviors
+from lms.djangoapps.learner_home.utils import course_progress_url
 
 
 class LiteralField(serializers.Field):
@@ -116,7 +117,7 @@ class CourseRunSerializer(serializers.Serializer):
         return course_home_url(instance.course_id)
 
     def get_progressUrl(self, instance):
-        return reverse("progress", kwargs={"course_id": instance.course_id})
+        return course_progress_url(instance.course_id)
 
     def get_unenrollUrl(self, instance):
         return reverse("course_run_refund_status", args=[instance.course_id])
@@ -131,7 +132,13 @@ class CourseRunSerializer(serializers.Serializer):
         )
 
         if ecommerce_payment_page and verified_sku:
-            return f"{ecommerce_payment_page}?sku={verified_sku}"
+            query_params = {
+                'sku': verified_sku,
+                'course_run_key': str(instance.course_id)
+            }
+            encoded_params = urlencode(query_params)
+            upgrade_url = f"{ecommerce_payment_page}?{encoded_params}"
+            return upgrade_url
 
     def get_resumeUrl(self, instance):
         return self.context.get("resume_course_urls", {}).get(instance.course_id)
@@ -292,23 +299,20 @@ class CertificateSerializer(serializers.Serializer):
     def get_availableDate(self, enrollment):
         """Available date changes based off of Certificate display behavior"""
         course_overview = enrollment.course_overview
-        available_date = course_overview.certificate_available_date
+        available_date = None
 
-        if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
-            if (
-                course_overview.certificates_display_behavior
-                == CertificatesDisplayBehaviors.END_WITH_DATE
-                and course_overview.certificate_available_date
-            ):
-                available_date = course_overview.certificate_available_date
-            elif (
-                course_overview.certificates_display_behavior
-                == CertificatesDisplayBehaviors.END
-                and course_overview.end
-            ):
-                available_date = course_overview.end
-        else:
+        if (
+            course_overview.certificates_display_behavior
+            == CertificatesDisplayBehaviors.END_WITH_DATE
+            and course_overview.certificate_available_date
+        ):
             available_date = course_overview.certificate_available_date
+        elif (
+            course_overview.certificates_display_behavior
+            == CertificatesDisplayBehaviors.END
+            and course_overview.end
+        ):
+            available_date = course_overview.end
 
         return serializers.DateTimeField().to_representation(available_date)
 

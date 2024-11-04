@@ -123,6 +123,8 @@ urlpatterns = oauth2_urlpatterns + [
             name='course_rerun_handler'),
     re_path(fr'^container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.container_handler,
             name='container_handler'),
+    re_path(fr'^container_embed/{settings.USAGE_KEY_PATTERN}$', contentstore_views.container_embed_handler,
+            name='container_embed_handler'),
     re_path(fr'^orphan/{settings.COURSE_KEY_PATTERN}$', contentstore_views.orphan_handler,
             name='orphan_handler'),
     re_path(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
@@ -194,6 +196,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
+    re_path(fr'api/youtube/courses/{COURSELIKE_KEY_PATTERN}/edx-video-ids$',
+            contentstore_views.get_course_youtube_edx_videos_ids, name='youtube_edx_video_ids'),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
@@ -218,7 +222,7 @@ urlpatterns += [
     path('openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
 
-if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
+if toggles.ENABLE_CONTENT_LIBRARIES:
     urlpatterns += [
         re_path(fr'^library/{LIBRARY_KEY_PATTERN}?$',
                 contentstore_views.library_handler, name='library_handler'),

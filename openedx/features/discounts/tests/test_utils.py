@@ -5,7 +5,7 @@ from unittest.mock import patch, Mock
 
 import ddt
 from django.contrib.auth.models import AnonymousUser
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.translation import override as override_lang
 from edx_toggles.toggles.testutils import override_waffle_flag
 
@@ -14,7 +14,11 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG, get_discount_expiration_date
+from openedx.features.discounts.applicability import (
+    DISCOUNT_APPLICABILITY_FLAG,
+    FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG,
+    get_discount_expiration_date
+)
 
 from .. import utils
 
@@ -83,6 +87,14 @@ class TestOfferData(TestCase):
     def test_spanish_code(self):
         with override_lang('es-419'):
             assert utils.generate_offer_data(self.user, self.overview)['code'] == 'BIENVENIDOAEDX'
+
+    def test_override(self):
+        with override_settings(FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE='NOTEDXWELCOME'):
+            with override_settings(FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE=30):
+                with override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True):
+                    with override_waffle_flag(FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG, active=True):
+                        assert utils.generate_offer_data(self.user, self.overview)['code'] == 'NOTEDXWELCOME'
+                        assert utils.generate_offer_data(self.user, self.overview)['percentage'] == 30
 
     def test_anonymous(self):
         assert utils.generate_offer_data(AnonymousUser(), self.overview) is None

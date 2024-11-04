@@ -3,6 +3,8 @@ User Auth Views Utils
 """
 import logging
 import re
+from typing import Dict
+
 from django.conf import settings
 from django.contrib import messages
 from django.utils.translation import gettext as _
@@ -128,16 +130,25 @@ def _get_username_prefix(data):
     - str: Name initials or None.
     """
     username_regex_partial = settings.USERNAME_REGEX_PARTIAL
+    valid_username_regex = r'^[A-Za-z0-9_\-]+$'
     full_name = ''
-    if data.get('first_name', '').strip() and data.get('last_name', '').strip():
-        full_name = f"{unidecode(data.get('first_name', ''))} {unidecode(data.get('last_name', ''))}"
-    elif data.get('name', '').strip():
-        full_name = unidecode(data['name'])
+    try:
+        if data.get('first_name', '').strip() and data.get('last_name', '').strip():
+            full_name = f"{unidecode(data.get('first_name', ''))} {unidecode(data.get('last_name', ''))}"
+        elif data.get('name', '').strip():
+            full_name = unidecode(data['name'])
 
-    if full_name.strip():
-        full_name = re.findall(username_regex_partial, full_name)[0]
-        name_initials = "".join([name_part[0] for name_part in full_name.split()[:2]])
-        return name_initials.upper() if name_initials else None
+        if full_name.strip():
+            matched_name = re.findall(username_regex_partial, full_name)
+            if matched_name:
+                full_name = " ".join(matched_name)
+                name_initials = "".join([name_part[0] for name_part in full_name.split()[:2]])
+                if re.match(valid_username_regex, name_initials):
+                    return name_initials.upper() if name_initials else None
+
+    except Exception as e:  # pylint: disable=broad-except
+        logging.info(f"Error in _get_username_prefix: {e}")
+        return None
 
     return None
 
@@ -168,3 +179,18 @@ def get_auto_generated_username(data):
     # We generate the username regardless of whether the name is empty or invalid. We do this
     # because the name validations occur later, ensuring that users cannot create an account without a valid name.
     return f"{username_prefix}_{username_suffix}" if username_prefix else username_suffix
+
+
+def remove_disabled_country_from_list(countries: Dict) -> Dict:
+    """
+    Remove disabled countries from the list of countries.
+
+    Args:
+    - countries (dict): List of countries.
+
+    Returns:
+    - dict: Dict of countries with disabled countries removed.
+    """
+    for country_code in settings.DISABLED_COUNTRIES:
+        del countries[country_code]
+    return countries
