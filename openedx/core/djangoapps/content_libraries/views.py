@@ -1163,8 +1163,7 @@ class LtiToolJwksView(LtiToolView):
         return JsonResponse(self.lti_tool_config.get_jwks(), safe=False)
 
 
-@require_safe
-def component_version_asset(request, component_version_uuid, asset_path):
+def get_component_version_asset(request, component_version_uuid, asset_path):
     """
     Serves static assets associated with particular Component versions.
 
@@ -1234,16 +1233,25 @@ def component_version_asset(request, component_version_uuid, asset_path):
     )
 
 
-@require_safe
-def component_draft_asset(request, usage_key, asset_path):
-    """
-    Serves the draft version of static assets associated with a Library Component.
+@view_auth_classes()
+class LibraryComponentAssetView(APIView):
+    @convert_exceptions
+    def get(self, request, component_version_uuid, asset_path):
+        return get_component_version_asset(request, component_version_uuid, asset_path)
 
-    See `component_version_asset` for more details
-    """
-    try:
-        component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
-    except ObjectDoesNotExist as exc:
-        raise Http404() from exc
 
-    return component_version_asset(request, component_version_uuid, asset_path)
+@view_auth_classes()
+class LibraryComponentDraftAssetView(APIView):
+    @convert_exceptions
+    def get(self, request, usage_key, asset_path):
+        """
+        Serves the draft version of static assets associated with a Library Component.
+
+        See `component_version_asset` for more details
+        """
+        try:
+            component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
+        except ObjectDoesNotExist as exc:
+            raise Http404() from exc
+
+        return get_component_version_asset(request, component_version_uuid, asset_path)
