@@ -52,13 +52,12 @@
           <nav class="navbar legal-nav navbar-expand-sm" aria-label="${_('Legal')}">
             <ul class="navbar-nav">
               % for item_num, link in enumerate(footer['legal_links'], start=1):
-                <li class="nav-item">
-                  <a class="nav-link" href="${link['url']}">${link['title']}</a>
-                </li>
+                % if link['title'] != 'Contact':
+                  <li class="nav-item">
+                    <a class="nav-link" href="${link['url']}">${link['title']}</a>
+                  </li>
+                % endif
               % endfor
-              <li class="nav-item">
-                <a class="nav-link" href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a>
-              </li>
             </ul>
           </nav>
         </div>
