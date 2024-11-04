@@ -207,6 +207,9 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
 
     <div class="marketing-hero"><%block name="marketing_hero"></%block></div>
 
+    <head>
+      <link rel="stylesheet" href="https://static.talentsprint.com/edx_styles/contact_styles.css">
+    </head>
     <div class="content-wrapper main-container" id="content" dir="${static.dir_rtl()}">
       ${next.body()}
       <%block name="bodyextra"/>
