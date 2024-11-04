@@ -11,7 +11,7 @@ import opaque_keys.edx.django.models
 from django.conf import settings
 from django.db import connection
 
-def run_before_migrate(apps, migrations):
+def run_before_migrate(migrations):
     if connection.vendor == 'mysql':
         # MySQL: utf8_bin collation
         return [migrations.RunSQL('ALTER TABLE learning_sequences_learningcontext MODIFY context_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;',reverse_sql=migrations.RunSQL.noop,),
@@ -117,4 +117,4 @@ class Migration(migrations.Migration):
             name='coursesection',
             index_together={('learning_context', 'ordering')},
         ),
-    ]+run_before_migrate(migrations)
+    ] + run_before_migrate(migrations)
