@@ -11,17 +11,17 @@ import opaque_keys.edx.django.models
 from django.conf import settings
 from django.db import connection
 
-def run_before_migrate(apps, schema_editor):
+def run_before_migrate(apps, migrations):
     if connection.vendor == 'mysql':
         # MySQL: utf8_bin collation
-        schema_editor.execute('ALTER TABLE learning_sequences_learningcontext MODIFY context_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;')
-        schema_editor.execute('ALTER TABLE learning_sequences_coursesection MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;')
-        schema_editor.execute('ALTER TABLE learning_sequences_learningsequence MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;')
+        return [migrations.RunSQL('ALTER TABLE learning_sequences_learningcontext MODIFY context_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;',reverse_sql=migrations.RunSQL.noop,),
+        migrations.RunSQL('ALTER TABLE learning_sequences_coursesection MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;',reverse_sql=migrations.RunSQL.noop,),
+        migrations.RunSQL('ALTER TABLE learning_sequences_learningsequence MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;',reverse_sql=migrations.RunSQL.noop,)]
     elif connection.vendor == 'postgresql':
         # PostgreSQL: Use binary collation
-        schema_editor.execute('ALTER TABLE learning_sequences_learningcontext ALTER COLUMN context_key TYPE VARCHAR(255) COLLATE "C";')
-        schema_editor.execute('ALTER TABLE learning_sequences_coursesection ALTER COLUMN usage_key TYPE VARCHAR(255) COLLATE "C";')
-        schema_editor.execute('ALTER TABLE learning_sequences_learningsequence ALTER COLUMN usage_key TYPE VARCHAR(255) COLLATE "C";')
+        return [migrations.RunSQL('ALTER TABLE learning_sequences_learningcontext ALTER COLUMN context_key TYPE VARCHAR(255) COLLATE "C";',reverse_sql=migrations.RunSQL.noop,),
+        migrations.RunSQL('ALTER TABLE learning_sequences_coursesection ALTER COLUMN usage_key TYPE VARCHAR(255) COLLATE "C";',reverse_sql=migrations.RunSQL.noop,),
+        migrations.RunSQL('ALTER TABLE learning_sequences_learningsequence ALTER COLUMN usage_key TYPE VARCHAR(255) COLLATE "C";',reverse_sql=migrations.RunSQL.noop,)]
 class Migration(migrations.Migration):
 
     initial = True
@@ -117,7 +117,4 @@ class Migration(migrations.Migration):
             name='coursesection',
             index_together={('learning_context', 'ordering')},
         ),
-
-        # Custom code: Convert columns to utf8_bin for MySQL or the equivalent for PostgreSQL
-        migrations.RunPython(run_before_migrate),
-    ]
+    ]+run_before_migrate(migrations)
