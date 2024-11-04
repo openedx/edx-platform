@@ -84,6 +84,19 @@ class NewCommentGrouper(BaseNotificationGrouper):
         return context
 
 
+@NotificationRegistry.register('new_discussion_post')
+class NewPostGrouper(BaseNotificationGrouper):
+    """
+    Groups new post notifications based on the author name.
+    """
+
+    def group(self, new_notification, old_notification):
+        """
+        Groups new post notifications based on the author name.
+        """
+        return {**old_notification.content_context, "grouped": True}
+
+
 def group_user_notifications(new_notification: Notification, old_notification: Notification):
     """
     Groups user notification based on notification type and group_id
