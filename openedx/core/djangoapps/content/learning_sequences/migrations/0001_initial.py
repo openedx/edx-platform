@@ -8,8 +8,20 @@ import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
 import opaque_keys.edx.django.models
+from django.conf import settings
+from django.db import connection
 
-
+def run_before_migrate(apps, schema_editor):
+    if connection.vendor == 'mysql':
+        # MySQL: utf8_bin collation
+        schema_editor.execute('ALTER TABLE learning_sequences_learningcontext MODIFY context_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;')
+        schema_editor.execute('ALTER TABLE learning_sequences_coursesection MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;')
+        schema_editor.execute('ALTER TABLE learning_sequences_learningsequence MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;')
+    elif connection.vendor == 'postgresql':
+        # PostgreSQL: Use binary collation
+        schema_editor.execute('ALTER TABLE learning_sequences_learningcontext ALTER COLUMN context_key TYPE VARCHAR(255) COLLATE "C";')
+        schema_editor.execute('ALTER TABLE learning_sequences_coursesection ALTER COLUMN usage_key TYPE VARCHAR(255) COLLATE "C";')
+        schema_editor.execute('ALTER TABLE learning_sequences_learningsequence ALTER COLUMN usage_key TYPE VARCHAR(255) COLLATE "C";')
 class Migration(migrations.Migration):
 
     initial = True
@@ -106,19 +118,6 @@ class Migration(migrations.Migration):
             index_together={('learning_context', 'ordering')},
         ),
 
-        # Custom code: Convert columns to utf8_bin because we want to allow
-        # case-sensitive comparisons for things like UsageKeys, CourseKeys, and
-        # slugs.
-        migrations.RunSQL(
-            'ALTER TABLE learning_sequences_learningcontext MODIFY context_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;',
-            reverse_sql=migrations.RunSQL.noop,
-        ),
-        migrations.RunSQL(
-            'ALTER TABLE learning_sequences_coursesection MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;',
-            reverse_sql=migrations.RunSQL.noop,
-        ),
-        migrations.RunSQL(
-            'ALTER TABLE learning_sequences_learningsequence MODIFY usage_key VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin;',
-            reverse_sql=migrations.RunSQL.noop,
-        ),
+        # Custom code: Convert columns to utf8_bin for MySQL or the equivalent for PostgreSQL
+        migrations.RunPython(run_before_migrate),
     ]
