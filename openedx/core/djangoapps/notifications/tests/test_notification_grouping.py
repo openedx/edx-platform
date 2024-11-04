@@ -120,6 +120,7 @@ class TestNewPostGrouper(unittest.TestCase):
         updated_context = NewPostGrouper().group(new_notification, old_notification)
 
         self.assertTrue(updated_context['grouped'])
+        self.assertEqual(updated_context['replier_name'], new_notification.content_context['replier_name'])
 
 
 class TestGroupUserNotifications(unittest.TestCase):

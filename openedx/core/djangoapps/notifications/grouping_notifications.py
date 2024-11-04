@@ -94,7 +94,11 @@ class NewPostGrouper(BaseNotificationGrouper):
         """
         Groups new post notifications based on the author name.
         """
-        return {**old_notification.content_context, "grouped": True}
+        return {
+            **old_notification.content_context,
+            "grouped": True,
+            "replier_name": new_notification.content_context["replier_name"]
+        }
 
 
 def group_user_notifications(new_notification: Notification, old_notification: Notification):
