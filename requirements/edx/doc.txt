@@ -547,7 +547,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.30.1
+edx-enterprise==4.31.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -594,7 +594,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.1.0
+edx-search==4.1.1
     # via -r requirements/edx/base.txt
 edx-sga==0.25.0
     # via -r requirements/edx/base.txt
