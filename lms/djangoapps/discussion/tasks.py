@@ -25,6 +25,7 @@ from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.track import segment
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.discussion.django_comment_client.utils import (
     permalink,
     get_users_with_moderator_roles,
@@ -77,20 +78,23 @@ class ReportedContentNotification(BaseMessageType):
 @set_code_owner_attribute
 def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function-docstring
     context['course_id'] = CourseKey.from_string(context['course_id'])
+    enrolled_users_ids = CourseEnrollment.objects.filter(course_id=context['course_id']).values_list("user", flat=True)
 
-    if _should_send_message(context):
-        context['site'] = Site.objects.get(id=context['site_id'])
-        thread_author = User.objects.get(id=context['thread_author_id'])
-        with emulate_http_request(site=context['site'], user=thread_author):
-            message_context = _build_message_context(context)
-            message = ResponseNotification().personalize(
-                Recipient(thread_author.id, thread_author.email),
-                _get_course_language(context['course_id']),
-                message_context
-            )
-            log.info('Sending forum comment email notification with context %s', message_context)
-            ace.send(message)
-            _track_notification_sent(message, context)
+    for user_id in enrolled_users_ids:
+        context["thread_author_id"] = user_id
+        if _should_send_message(context):
+            context['site'] = Site.objects.get(id=context['site_id'])
+            thread_author = User.objects.get(id=context['thread_author_id'])
+            with emulate_http_request(site=context['site'], user=thread_author):
+                message_context = _build_message_context(context)
+                message = ResponseNotification().personalize(
+                    Recipient(thread_author.id, thread_author.email),
+                    _get_course_language(context['course_id']),
+                    message_context
+                )
+                log.info('Sending forum comment email notification with context %s', message_context)
+                ace.send(message)
+                _track_notification_sent(message, context)
 
 
 @shared_task(base=LoggedTask)
@@ -149,11 +153,12 @@ def _track_notification_sent(message, context):
 
 def _should_send_message(context):
     cc_thread_author = cc.User(id=context['thread_author_id'], course_id=context['course_id'])
-    return (
-        _is_user_subscribed_to_thread(cc_thread_author, context['thread_id']) and
-        _is_not_subcomment(context['comment_id']) and
-        _is_first_comment(context['comment_id'], context['thread_id'])
-    )
+    return (_is_user_subscribed_to_thread(cc_thread_author, context['thread_id']) and
+            not _comment_author_is_thread_author(context))
+
+def _comment_author_is_thread_author(context):
+    return context.get('comment_author_id', '') == context['thread_author_id']
+
 
 
 def _is_content_still_reported(context):
