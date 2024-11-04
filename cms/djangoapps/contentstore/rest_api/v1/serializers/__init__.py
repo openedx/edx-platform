@@ -6,6 +6,7 @@ from .course_details import CourseDetailsSerializer
 from .course_index import CourseIndexSerializer
 from .course_rerun import CourseRerunSerializer
 from .course_team import CourseTeamSerializer
+from .course_waffle_flags import CourseWaffleFlagsSerializer
 from .grading import CourseGradingModelSerializer, CourseGradingSerializer
 from .group_configurations import CourseGroupConfigurationsSerializer
 from .home import StudioHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
