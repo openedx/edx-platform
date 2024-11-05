@@ -40,7 +40,7 @@ deprecated==1.2.14
     #   opentelemetry-exporter-otlp-proto-http
 exceptiongroup==1.2.2
     # via semgrep
-face==22.0.0
+face==24.0.0
     # via glom
 glom==22.1.0
     # via semgrep
@@ -108,7 +108,7 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.20.0
+rpds-py==0.20.1
     # via
     #   jsonschema
     #   referencing
@@ -116,7 +116,7 @@ ruamel-yaml==0.17.40
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.93.0
+semgrep==1.95.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
