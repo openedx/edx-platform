@@ -162,7 +162,6 @@
                     `);
                     textArea.value = data.summary;
                     textArea.style.height = `${textArea.scrollHeight}px`;
-                    textAreaWrapper.querySelector(".annotator-resize").remove();
 
                     if (annotatorForm.offsetHeight > editorTop){
                         textArea.style.maxHeight = `${editorTop - controlsHeight - tagFieldHeight}px`;
