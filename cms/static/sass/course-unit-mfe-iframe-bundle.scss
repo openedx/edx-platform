@@ -432,7 +432,7 @@ body {
   @extend %button-styles;
 
   position: relative;
-  top: 7px;
+  top: -7px;
 
   .fa-pencil {
     display: none;
@@ -547,7 +547,7 @@ body {
   @extend %primary-button;
 }
 
-.wrapper-comp-settings {
+div.wrapper-comp-settings {
   .list-input.settings-list {
     .metadata-list-enum .create-setting {
       @extend %modal-actions-button;
