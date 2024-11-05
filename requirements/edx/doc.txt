@@ -1084,6 +1084,8 @@ psutil==7.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
+psycopg2-binary==2.9.10
+    # via -r requirements/edx/base.txt
 py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
     # via
     #   -c requirements/edx/../constraints.txt
