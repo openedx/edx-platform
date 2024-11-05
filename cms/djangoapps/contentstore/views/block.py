@@ -306,26 +306,24 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
 
 @xframe_options_exempt
-@require_http_methods("GET")
+@require_http_methods(["GET"])
 @login_required
-def xblock_actions_view(request, usage_key_string, action_name):
+def xblock_edit_view(request, usage_key_string):
     """
-    Return rendered xblock action view.
-    The action name should be provided as an argument.
-    Valid options for action names are edit and move.
+    Return rendered xblock edit view.
+
+    Allows editing of an XBlock specified by the usage key.
     """
     usage_key = usage_key_with_run(usage_key_string)
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
-    if action_name not in ['edit', 'move']:
-        return HttpResponse(status=404)
 
     store = modulestore()
 
     with store.bulk_operations(usage_key.course_key):
         course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
         container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
-        container_handler_context.update({'action_name': action_name})
+        container_handler_context.update({'action_name': 'edit'})
         return render_to_response('container_editor.html', container_handler_context)
 
 
