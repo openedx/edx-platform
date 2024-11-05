@@ -14,6 +14,20 @@
                 // Overrides of annotatorjs HTML/CSS to add summarize button.
                 const style = document.createElement('style');
                 style.innerHTML = `
+                    form.annotator-widget {
+                        width: fit-content;
+                    }
+
+                    .annotator-invert-x .annotator-widget {
+                        left: -18px;
+                    }
+
+                    @media (max-width: 768px) {
+                        .annotator-widget textarea{
+                            max-height: 380px;
+                        }
+                    }
+
                     .annotator-adder::before {
                         content: '';
                         width: 10px;
@@ -106,6 +120,8 @@
                     loaderWrapper.classList.toggle('d-none');
                     saveButton.disabled = !saveButton.disabled;
                 }
+
+                const container = document.querySelector('.edx-notes-wrapper-content')
                 const textAreaWrapper = editor.fields[0].element;
                 const request = new Request('/pearson-core/llm-assistance/api/v0/summarize-text', {
                     method: 'POST',
@@ -122,27 +138,54 @@
                 editor.fields[1].element.children[0].value = 'ai_summary';
                 toggleLoader(editor);
                 fetch(request)
-                    .then((response) => {
-                        toggleLoader();
-                        if (response.ok) return response.json();
-                        throw new Error(gettext('There was an error while summarizing the content.'));
-                    })
-                    .then((data) => {
-                        textAreaWrapper.children[0].value = data.summary;
-                    })
-                    .catch((error) => {
-                        alert(error.message);
-                        editor.hide();
-                    });
+                .then((response) => {
+                    toggleLoader();
+                    if (response.ok) return response.json();
+                    throw new Error(gettext('There was an error while summarizing the content.'));
+                })
+                .then((data) => {
+                    const annotatorEditor = editor.element[0];
+                    const annotatorForm = annotatorEditor.children[0];
+                    const controlsHeight = annotatorForm.children[1].offsetHeight;
+                    const editorTop = parseInt(annotatorEditor.style.getPropertyValue('top'));
+                    const tagFieldHeight = editor.fields[1].element.offsetHeight;
+                    const textArea = textAreaWrapper.children[0];
+
+                    annotatorEditor.style.left = '0px'
+                    textArea.setAttribute('style', `
+                        background-color: #f7f7f7 !important;
+                        border-radius: 5px;
+                        font-size: 12px !important;
+                        width: ${container.offsetWidth}px !important;
+                        height: auto;
+                        overflow-y: auto;
+                    `);
+                    textArea.value = data.summary;
+                    textArea.style.height = `${textArea.scrollHeight}px`;
+                    textAreaWrapper.querySelector(".annotator-resize").remove();
+
+                    if (annotatorForm.offsetHeight > editorTop){
+                        textArea.style.maxHeight = `${editorTop - controlsHeight - tagFieldHeight}px`;
+                    }
+
+                    annotatorForm.setAttribute('tabindex', '-1');
+                    annotatorForm.scrollIntoView({behavior: 'smooth', block: 'start'});
+                })
+                .catch((error) => {
+                    alert(error.message);
+                    editor.hide();
+                });
             },
             cleanupSummarize: function(editor) {
                 const textAreaWrapper = editor.fields[0].element;
+                const textArea = textAreaWrapper.children[0]
                 const loaderWrapper = document.querySelector('.summarize-loader-wrapper');
 
-                textAreaWrapper.children[0].value = '';
+                textArea.value = '';
                 textAreaWrapper.children[1].value = '';
                 editor.options.isSummarizing = false;
                 loaderWrapper.classList.add('d-none');
+                textArea.removeAttribute('style');
             },
             modifyDom: function(annotator) {
                 const textAreaWrapper = annotator.editor.fields[0].element;
