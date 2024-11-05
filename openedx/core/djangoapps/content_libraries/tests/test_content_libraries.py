@@ -1066,8 +1066,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
 
             # Compare the two text files
-            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").content
-            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").content
+            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").getvalue()
+            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").getvalue()
             assert src_data == dest_data
 
             # Check that the new block was created after the paste and it's content matches

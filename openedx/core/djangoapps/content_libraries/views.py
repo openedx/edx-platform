@@ -80,7 +80,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_safe
 from django.views.generic.base import TemplateResponseMixin, View
 from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
 from pylti1p3.exception import LtiException, OIDCException
@@ -1235,19 +1234,28 @@ def get_component_version_asset(request, component_version_uuid, asset_path):
 
 @view_auth_classes()
 class LibraryComponentAssetView(APIView):
+    """
+    Serves static assets associated with particular Component versions.
+    """
     @convert_exceptions
     def get(self, request, component_version_uuid, asset_path):
+        """
+        GET API for fetching static asset for given component_version_uuid.
+        """
         return get_component_version_asset(request, component_version_uuid, asset_path)
 
 
 @view_auth_classes()
 class LibraryComponentDraftAssetView(APIView):
+    """
+    Serves the draft version of static assets associated with a Library Component.
+
+    See `get_component_version_asset` for more details
+    """
     @convert_exceptions
     def get(self, request, usage_key, asset_path):
         """
-        Serves the draft version of static assets associated with a Library Component.
-
-        See `component_version_asset` for more details
+        Fetches component_version_uuid for given usage_key and returns component asset.
         """
         try:
             component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
