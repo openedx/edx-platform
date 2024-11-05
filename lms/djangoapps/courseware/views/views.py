@@ -51,6 +51,7 @@ from xmodule.course_block import (
     COURSE_VISIBILITY_PUBLIC_OUTLINE,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
 )
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -439,10 +440,12 @@ def jump_to(request, course_id, location):
     except InvalidKeyError as exc:
         raise Http404("Invalid course_key or usage_key") from exc
 
+    staff_access = has_access(request.user, 'staff', course_key)
     try:
         redirect_url = get_courseware_url(
             usage_key=usage_key,
             request=request,
+            is_staff=staff_access,
         )
     except (ItemNotFoundError, NoPathToItem):
         # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
@@ -452,6 +455,7 @@ def jump_to(request, course_id, location):
         redirect_url = get_courseware_url(
             usage_key=course_location_from_key(course_key),
             request=request,
+            is_staff=staff_access,
         )
 
     return redirect(redirect_url)
@@ -1565,142 +1569,151 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
             f"Rendering of the xblock view '{nh3.clean(requested_view)}' is not supported."
         )
 
-    staff_access = has_access(request.user, 'staff', course_key)
+    staff_access = bool(has_access(request.user, 'staff', course_key))
+    is_preview = request.GET.get('preview', '0') == '1'
 
-    with modulestore().bulk_operations(course_key):
-        # verify the user has access to the course, including enrollment check
-        try:
-            course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
-        except CourseAccessRedirect:
-            raise Http404("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
+    store = modulestore()
+    branch_type = (
+        ModuleStoreEnum.Branch.draft_preferred
+    ) if is_preview and staff_access else (
+        ModuleStoreEnum.Branch.published_only
+    )
 
-        # with course access now verified:
-        # assume masquerading role, if applicable.
-        # (if we did this *before* the course access check, then course staff
-        #  masquerading as learners would often be denied access, since course
-        #  staff are generally not enrolled, and viewing a course generally
-        #  requires enrollment.)
-        _course_masquerade, request.user = setup_masquerade(
-            request,
-            course_key,
-            staff_access,
-        )
+    with store.bulk_operations(course_key):
+        with store.branch_setting(branch_type, course_key):
+            # verify the user has access to the course, including enrollment check
+            try:
+                course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
+            except CourseAccessRedirect:
+                raise Http404("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
 
-        # Record user activity for tracking progress towards a user's course goals (for mobile app)
-        UserActivity.record_user_activity(
-            request.user, usage_key.course_key, request=request, only_if_mobile_app=True
-        )
-
-        # get the block, which verifies whether the user has access to the block.
-        recheck_access = request.GET.get('recheck_access') == '1'
-        block, _ = get_block_by_usage_id(
-            request,
-            str(course_key),
-            str(usage_key),
-            disable_staff_debug_info=disable_staff_debug_info,
-            course=course,
-            will_recheck_access=recheck_access,
-        )
-
-        student_view_context = request.GET.dict()
-        student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
-        student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
-
-        is_learning_mfe = is_request_from_learning_mfe(request)
-        # Right now, we only care about this in regards to the Learning MFE because it results
-        # in a bad UX if we display blocks with access errors (repeated upgrade messaging).
-        # If other use cases appear, consider removing the is_learning_mfe check or switching this
-        # to be its own query parameter that can toggle the behavior.
-        student_view_context['hide_access_error_blocks'] = is_learning_mfe and recheck_access
-        is_mobile_app = is_request_from_mobile_app(request)
-        student_view_context['is_mobile_app'] = is_mobile_app
-
-        enable_completion_on_view_service = False
-        completion_service = block.runtime.service(block, 'completion')
-        if completion_service and completion_service.completion_tracking_enabled():
-            if completion_service.blocks_to_mark_complete_on_view({block}):
-                enable_completion_on_view_service = True
-                student_view_context['wrap_xblock_data'] = {
-                    'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
-                }
-
-        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
-
-        # Some content gating happens only at the Sequence level (e.g. "has this
-        # timed exam started?").
-        ancestor_sequence_block = enclosing_sequence_for_gating_checks(block)
-        if ancestor_sequence_block:
-            context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, course_key)}
-            # If the SequenceModule feels that gating is necessary, redirect
-            # there so we can have some kind of error message at any rate.
-            if ancestor_sequence_block.descendants_are_gated(context):
-                return redirect(
-                    reverse(
-                        'render_xblock',
-                        kwargs={'usage_key_string': str(ancestor_sequence_block.location)}
-                    )
-                )
-
-        # For courses using an LTI provider managed by edx-exams:
-        # Access to exam content is determined by edx-exams and passed to the LMS using a
-        # JWT url param. There is no longer a need for exam gating or logic inside the
-        # sequence block or its render call. descendants_are_gated shoule not return true
-        # for these timed exams. Instead, sequences are assumed gated by default and we look for
-        # an access token on the request to allow rendering to continue.
-        if course.proctoring_provider == 'lti_external':
-            seq_block = ancestor_sequence_block if ancestor_sequence_block else block
-            if getattr(seq_block, 'is_time_limited', None):
-                if not _check_sequence_exam_access(request, seq_block.location):
-                    return HttpResponseForbidden("Access to exam content is restricted")
-
-        context = {
-            'course': course,
-            'block': block,
-            'disable_accordion': True,
-            'allow_iframing': True,
-            'disable_header': True,
-            'disable_footer': True,
-            'disable_window_wrap': True,
-            'enable_completion_on_view_service': enable_completion_on_view_service,
-            'edx_notes_enabled': is_feature_enabled(course, request.user),
-            'staff_access': staff_access,
-            'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
-            'missed_deadlines': missed_deadlines,
-            'missed_gated_content': missed_gated_content,
-            'has_ended': course.has_ended(),
-            'web_app_course_url': get_learning_mfe_home_url(course_key=course.id, url_fragment='home'),
-            'on_courseware_page': True,
-            'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-            'is_learning_mfe': is_learning_mfe,
-            'is_mobile_app': is_mobile_app,
-            'render_course_wide_assets': True,
-        }
-
-        try:
-            # .. filter_implemented_name: RenderXBlockStarted
-            # .. filter_type: org.openedx.learning.xblock.render.started.v1
-            context, student_view_context = RenderXBlockStarted.run_filter(
-                context=context, student_view_context=student_view_context
+            # with course access now verified:
+            # assume masquerading role, if applicable.
+            # (if we did this *before* the course access check, then course staff
+            #  masquerading as learners would often be denied access, since course
+            #  staff are generally not enrolled, and viewing a course generally
+            #  requires enrollment.)
+            _course_masquerade, request.user = setup_masquerade(
+                request,
+                course_key,
+                staff_access,
             )
-        except RenderXBlockStarted.PreventXBlockBlockRender as exc:
-            log.info("Halted rendering block %s. Reason: %s", usage_key_string, exc.message)
-            return render_500(request)
-        except RenderXBlockStarted.RenderCustomResponse as exc:
-            log.info("Rendering custom exception for block %s. Reason: %s", usage_key_string, exc.message)
+
+            # Record user activity for tracking progress towards a user's course goals (for mobile app)
+            UserActivity.record_user_activity(
+                request.user, usage_key.course_key, request=request, only_if_mobile_app=True
+            )
+
+            # get the block, which verifies whether the user has access to the block.
+            recheck_access = request.GET.get('recheck_access') == '1'
+            block, _ = get_block_by_usage_id(
+                request,
+                str(course_key),
+                str(usage_key),
+                disable_staff_debug_info=disable_staff_debug_info,
+                course=course,
+                will_recheck_access=recheck_access,
+            )
+
+            student_view_context = request.GET.dict()
+            student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
+            student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
+
+            is_learning_mfe = is_request_from_learning_mfe(request)
+            # Right now, we only care about this in regards to the Learning MFE because it results
+            # in a bad UX if we display blocks with access errors (repeated upgrade messaging).
+            # If other use cases appear, consider removing the is_learning_mfe check or switching this
+            # to be its own query parameter that can toggle the behavior.
+            student_view_context['hide_access_error_blocks'] = is_learning_mfe and recheck_access
+            is_mobile_app = is_request_from_mobile_app(request)
+            student_view_context['is_mobile_app'] = is_mobile_app
+
+            enable_completion_on_view_service = False
+            completion_service = block.runtime.service(block, 'completion')
+            if completion_service and completion_service.completion_tracking_enabled():
+                if completion_service.blocks_to_mark_complete_on_view({block}):
+                    enable_completion_on_view_service = True
+                    student_view_context['wrap_xblock_data'] = {
+                        'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
+                    }
+
+            missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
+
+            # Some content gating happens only at the Sequence level (e.g. "has this
+            # timed exam started?").
+            ancestor_sequence_block = enclosing_sequence_for_gating_checks(block)
+            if ancestor_sequence_block:
+                context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, course_key)}
+                # If the SequenceModule feels that gating is necessary, redirect
+                # there so we can have some kind of error message at any rate.
+                if ancestor_sequence_block.descendants_are_gated(context):
+                    return redirect(
+                        reverse(
+                            'render_xblock',
+                            kwargs={'usage_key_string': str(ancestor_sequence_block.location)}
+                        )
+                    )
+
+            # For courses using an LTI provider managed by edx-exams:
+            # Access to exam content is determined by edx-exams and passed to the LMS using a
+            # JWT url param. There is no longer a need for exam gating or logic inside the
+            # sequence block or its render call. descendants_are_gated shoule not return true
+            # for these timed exams. Instead, sequences are assumed gated by default and we look for
+            # an access token on the request to allow rendering to continue.
+            if course.proctoring_provider == 'lti_external':
+                seq_block = ancestor_sequence_block if ancestor_sequence_block else block
+                if getattr(seq_block, 'is_time_limited', None):
+                    if not _check_sequence_exam_access(request, seq_block.location):
+                        return HttpResponseForbidden("Access to exam content is restricted")
+
+            context = {
+                'course': course,
+                'block': block,
+                'disable_accordion': True,
+                'allow_iframing': True,
+                'disable_header': True,
+                'disable_footer': True,
+                'disable_window_wrap': True,
+                'enable_completion_on_view_service': enable_completion_on_view_service,
+                'edx_notes_enabled': is_feature_enabled(course, request.user),
+                'staff_access': staff_access,
+                'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
+                'missed_deadlines': missed_deadlines,
+                'missed_gated_content': missed_gated_content,
+                'has_ended': course.has_ended(),
+                'web_app_course_url': get_learning_mfe_home_url(course_key=course.id, url_fragment='home'),
+                'on_courseware_page': True,
+                'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
+                'is_learning_mfe': is_learning_mfe,
+                'is_mobile_app': is_mobile_app,
+                'render_course_wide_assets': True,
+            }
+
+            try:
+                # .. filter_implemented_name: RenderXBlockStarted
+                # .. filter_type: org.openedx.learning.xblock.render.started.v1
+                context, student_view_context = RenderXBlockStarted.run_filter(
+                    context=context, student_view_context=student_view_context
+                )
+            except RenderXBlockStarted.PreventXBlockBlockRender as exc:
+                log.info("Halted rendering block %s. Reason: %s", usage_key_string, exc.message)
+                return render_500(request)
+            except RenderXBlockStarted.RenderCustomResponse as exc:
+                log.info("Rendering custom exception for block %s. Reason: %s", usage_key_string, exc.message)
+                context.update({
+                    'fragment': Fragment(exc.response)
+                })
+                return render_to_response('courseware/courseware-chromeless.html', context, request=request)
+
+            fragment = block.render(requested_view, context=student_view_context)
+            optimization_flags = get_optimization_flags_for_content(block, fragment)
+
             context.update({
-                'fragment': Fragment(exc.response)
+                'fragment': fragment,
+                **optimization_flags,
             })
+
             return render_to_response('courseware/courseware-chromeless.html', context, request=request)
-
-        fragment = block.render(requested_view, context=student_view_context)
-        optimization_flags = get_optimization_flags_for_content(block, fragment)
-
-        context.update({
-            'fragment': fragment,
-            **optimization_flags,
-        })
-
-        return render_to_response('courseware/courseware-chromeless.html', context, request=request)
 
 
 def get_optimization_flags_for_content(block, fragment):
