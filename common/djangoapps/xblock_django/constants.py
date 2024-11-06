@@ -16,6 +16,7 @@ ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'
 # The username.
 ATTR_KEY_USERNAME = 'edx-platform.username'
+ATTR_KEY_EMAIL = 'edx-platform.email'
 # Whether the user is enrolled in the course as a Beta Tester.
 ATTR_KEY_USER_IS_BETA_TESTER = 'edx-platform.user_is_beta_tester'
 # Whether the user has staff access to the platform.
