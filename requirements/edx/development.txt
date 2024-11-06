@@ -790,7 +790,7 @@ edx-organizations==6.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-proctoring==4.18.2
+edx-proctoring==4.18.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
