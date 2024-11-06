@@ -1199,7 +1199,6 @@ def get_component_version_asset(request, component_version_uuid, asset_path):
         component_version_uuid,
         asset_path,
         public=False,
-        learner_downloadable_only=False,
     )
 
     # If there was any error, we return that response because it will have the
