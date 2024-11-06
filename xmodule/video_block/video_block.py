@@ -30,7 +30,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ROLE
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ROLE, ATTR_KEY_EMAIL
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
