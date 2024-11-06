@@ -53,7 +53,8 @@ def send_ace_message(goal, session_id):
             {
                 'uuid': session_id,
                 'timestamp': datetime.now(),
-                'reason': 'course key not found',
+                'reason': 'course not found',
+                'course_key': goal.course_key,
             }
         )
         return False
@@ -127,7 +128,7 @@ def send_ace_message(goal, session_id):
                     'uuid': session_id,
                     'timestamp': datetime.now(),
                     'reason': 'ace error',
-                    'error': exc,
+                    'error': str(exc),
                 }
             )
             return False
@@ -151,13 +152,14 @@ class Command(BaseCommand):
 
         try:
             self._handle_all_goals()
-        except BaseException:  # pylint: disable=broad-except
+        except BaseException as exc:  # pylint: disable=broad-except
             log.exception("Error while sending course goals emails: ")
             tracker.emit(
                 'edx.course.goal.email.failed',
                 {
                     'timestamp': datetime.now(),
                     'reason': 'base exception',
+                    'error': str(exc),
                 }
             )
             for h in log.handlers:
