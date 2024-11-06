@@ -39,6 +39,7 @@ function($, _, Backbone, gettext, BasePage,
             'click .manage-tags-button': 'openManageTags',
             'change .header-library-checkbox': 'toggleLibraryComponent',
             'click .collapse-button': 'collapseXBlock',
+            'click .xblock-view-action-button': 'viewXBlockContent',
         },
 
         options: {
@@ -717,10 +718,6 @@ function($, _, Backbone, gettext, BasePage,
             this.deleteComponent(this.findXBlockElement(event.target));
         },
 
-        createPlaceholderElement: function() {
-            return $('<div/>', {class: 'studio-xblock-wrapper'});
-        },
-
         createComponent: function(template, target) {
             // A placeholder element is created in the correct location for the new xblock
             // and then onNewXBlock will replace it with a rendering of the xblock. Note that
@@ -812,6 +809,26 @@ function($, _, Backbone, gettext, BasePage,
                 this.storedSelectedLibraryComponents.push(componentId);
                 this.toggleSaveButton();
             }
+        },
+
+        viewXBlockContent: function(event) {
+          try {
+            if (this.options.isIframeEmbed) {
+              event.preventDefault();
+              var usageId = event.currentTarget.href.split('/').pop() || '';
+              window.parent.postMessage(
+                {
+                  type: 'handleViewXBlockContent',
+                  payload: {
+                    usageId: usageId,
+                  },
+                }, document.referrer
+              );
+              return true;
+            }
+          } catch (e) {
+            console.error(e);
+          }
         },
 
         toggleSaveButton: function() {
