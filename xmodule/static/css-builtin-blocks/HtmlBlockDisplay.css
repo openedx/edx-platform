@@ -222,6 +222,7 @@
 .xmodule_display.xmodule_HtmlBlock img,
 .xmodule_display.xmodule_StaticTabBlock img {
     max-width: 100%;
+    height: auto;
 }
 
 .xmodule_display.xmodule_AboutBlock pre,
