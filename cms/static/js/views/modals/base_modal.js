@@ -96,19 +96,6 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
             },
 
             show: function(focusModal) {
-                try {
-                    this.resize();
-                    return window.parent.postMessage(
-                        {
-                            type: 'showXBlockEditorModal',
-                            message: 'Sends a message when the modal window is shown',
-                            payload: {}
-                        }, document.referrer
-                    );
-                } catch (e) {
-                    console.error(e);
-                }
-
                 var focusModalWindow = focusModal === undefined;
                 this.render();
                 this.resize();
@@ -123,7 +110,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
 
             hide: function() {
                 try {
-                    return window.parent.postMessage(
+                    window.parent.postMessage(
                         {
                             type: 'hideXBlockEditorModal',
                             message: 'Sends a message when the modal window is hided',
