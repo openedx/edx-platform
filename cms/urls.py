@@ -24,7 +24,7 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
 
-from common.djangoapps.student.views.management import extras_course_enroll_user, extras_update_user_details
+from common.djangoapps.student.views.management import extras_course_enroll_user, extras_update_user_details, extras_sync_moodle_attendance
 from cms.djangoapps.contentstore.views.course import extras_create_course
 from cms.djangoapps.contentstore.views.course import extras_get_moodle_login_url
 
@@ -111,6 +111,7 @@ urlpatterns = oauth2_urlpatterns + [
             name='course_search_index_handler'
             ),
     re_path(fr'^course/{settings.COURSE_KEY_PATTERN}?$', contentstore_views.course_handler, name='course_handler'),
+    re_path(r'^extras/sync_moodle_attendance$', views.extras_sync_moodle_attendance, name='extras_sync_moodle_attendance'),
 
     re_path(fr'^checklists/{settings.COURSE_KEY_PATTERN}?$',
             contentstore_views.checklists_handler,
