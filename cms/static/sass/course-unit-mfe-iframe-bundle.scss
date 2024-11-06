@@ -1,14 +1,22 @@
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
+body {
+    min-width: 800px;
+}
+
 .wrapper {
+  .inner-wrapper {
+      max-width: 100%;
+  }
+
   .wrapper-xblock {
     background-color: $transparent;
     border-radius: 6px;
     border: none;
 
     &:hover {
-      border-color: none;
+      border-color: transparent;
     }
 
     .xblock-header-primary {
@@ -20,6 +28,21 @@
         line-height: 28px;
         font-weight: 700;
         color: $black;
+      }
+    }
+
+    &.level-page .xblock-message {
+      font-size: 16px;
+      line-height: 22px;
+      color: $text-color;
+      border-radius: 4px;
+      padding: ($baseline * 1.2);
+      margin-bottom: ($baseline * 1.4);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
+
+      &.information {
+        background-color: $xblock-message-info-bg;
+        border-color: $xblock-message-info-border-color;
       }
     }
 
@@ -40,26 +63,32 @@
       border-bottom-right-radius: 6px;
     }
 
-    .wrapper-xblock .header-actions .actions-list .action-item .action-button {
-      @extend %button-styles;
-
-      color: $black;
-
-      .fa-ellipsis-v {
-        font-size: $base-font-size;
+    .wrapper-xblock .header-actions .actions-list {
+      .action-actions-menu:last-of-type .nav-sub {
+        right: 120px;
       }
 
-      &:hover {
-        background-color: $primary;
-        border-color: $transparent;
-      }
+      .action-item .action-button {
+        @extend %button-styles;
 
-      &:focus {
-        outline: 2px $transparent;
-        background-color: $transparent;
-        box-shadow: inset 0 0 0 2px $primary;
-        color: $primary;
-        border-color: $transparent;
+        color: $black;
+
+        .fa-ellipsis-v {
+            font-size: $base-font-size;
+        }
+
+        &:hover {
+            background-color: $primary;
+            border-color: $transparent;
+        }
+
+        &:focus {
+            outline: 2px $transparent;
+            background-color: $transparent;
+            box-shadow: inset 0 0 0 2px $primary;
+            color: $primary;
+            border-color: $transparent;
+        }
       }
     }
 
