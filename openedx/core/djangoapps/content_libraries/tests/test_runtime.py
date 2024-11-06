@@ -5,7 +5,7 @@ import json
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections, transaction
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.text import slugify
 import django.utils.translation
 from organizations.models import Organization
@@ -243,6 +243,16 @@ class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
         assert block_saved.display_name == 'New Display Name'
 
 
+# EphemeralKeyValueStore requires a working cache, and the default test cache is a dummy cache.
+@override_settings(
+    XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE='default',
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'edx_loc_mem_cache',
+        },
+    },
+)
 # We can remove the line below to enable this in Studio once we implement a session-backed
 # field data store which we can use for both studio users and anonymous users
 @skip_unless_lms
