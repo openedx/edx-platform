@@ -114,6 +114,7 @@ from jwcrypto import jwt, jwk
 from common.djangoapps.student.models import CourseEnrollment, SocialLink
 from django.db.models import Prefetch
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from completion.models import BlockCompletion
 
 
 log = logging.getLogger("edx.student")
@@ -1697,3 +1698,22 @@ def extras_transcript(request):
         return JsonResponse(json.loads(r.text))
     except Exception as err:
         return ""
+
+@csrf_exempt
+def extras_sync_moodle_attendance(request):
+    usage_id = request.POST.get("unit_id")
+    user_email = request.POST.get("user_email")
+    attendance = request.POST.get("attendance")
+    user = User.objects.get(email = user_email)
+    block_key = UsageKey.from_string(usage_id)
+    completion = 1
+    if attendance == "Absent":
+        completion = 0
+    
+    BlockCompletion.objects.submit_completion(
+            user=user,
+            block_key=block_key,
+            completion=completion,
+        )
+
+    return JsonResponse({"Status" : "Success", "Response" : "Completion updated Successfully."})
