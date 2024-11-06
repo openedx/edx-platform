@@ -55,7 +55,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from eventtracking import tracker
 # Note that this lives in LMS, so this dependency should be refactored.
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
