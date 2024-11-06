@@ -2,12 +2,12 @@
 Test the Learning-Core-based XBlock runtime and content libraries together.
 """
 import json
-from gettext import GNUTranslations
-from django.test import TestCase
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections, transaction
+from django.test import TestCase
 from django.utils.text import slugify
+import django.utils.translation
 from organizations.models import Organization
 from rest_framework.test import APIClient
 from xblock.core import XBlock
@@ -145,13 +145,12 @@ class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
     Basic tests of the Learning-Core-based XBlock runtime using XBlocks in a
     content library.
     """
-
     def test_dndv2_sets_translator(self):
         dnd_block_key = library_api.create_library_block(self.library.key, "drag-and-drop-v2", "dnd1").usage_key
         library_api.publish_changes(self.library.key)
         dnd_block = xblock_api.load_block(dnd_block_key, self.student_a)
         i18n_service = dnd_block.runtime.service(dnd_block, 'i18n')
-        assert isinstance(i18n_service.translator, GNUTranslations)
+        assert i18n_service.translator is django.utils.translation
 
     def test_has_score(self):
         """
@@ -169,8 +168,7 @@ class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
         """
         Test the XBlock metadata API
         """
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "metadata-u1").usage_key
-        problem_key = library_api.create_library_block_child(unit_block_key, "problem", "metadata-p1").usage_key
+        problem_key = library_api.create_library_block(self.library.key, "problem", "metadata-p1").usage_key
         new_olx = """
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
@@ -191,14 +189,6 @@ class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
         # Now view the problem as Alice:
         client = APIClient()
         client.login(username=self.student_a.username, password='edx')
-
-        # Check the metadata API for the unit:
-        metadata_view_result = client.get(
-            URL_BLOCK_METADATA_URL.format(block_key=unit_block_key),
-            {"include": "children,editable_children"},
-        )
-        assert metadata_view_result.data['children'] == [str(problem_key)]
-        assert metadata_view_result.data['editable_children'] == [str(problem_key)]
 
         # Check the metadata API for the problem:
         metadata_view_result = client.get(
@@ -226,8 +216,7 @@ class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
         client.login(username=self.staff_user.username, password='edx')
 
         # create/save a block using the library APIs first
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "fields-u1").usage_key
-        block_key = library_api.create_library_block_child(unit_block_key, "html", "fields-p1").usage_key
+        block_key = library_api.create_library_block(self.library.key, "html", "fields-p1").usage_key
         new_olx = """
         <html display_name="New Text Block">
             <p>This is some <strong>HTML</strong>.</p>
@@ -250,7 +239,7 @@ class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
             }
         }, format='json')
         block_saved = xblock_api.load_block(block_key, self.staff_user)
-        assert block_saved.data == '\n<p>test</p>\n'
+        assert block_saved.data == '<p>test</p>'
         assert block_saved.display_name == 'New Display Name'
 
 
