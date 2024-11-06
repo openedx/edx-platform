@@ -300,8 +300,9 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)  # lint-amnesty, pylint: disable=line-too-long
         course = modulestore().get_course(xblock.location.course_key)
         can_edit = context.get('can_edit', True)
+        can_add = context.get('can_add', True)
         # Is this a course or a library?
-        is_course = xblock.scope_ids.usage_id.context_key.is_course
+        is_course = xblock.context_key.is_course
         tags_count_map = context.get('tags_count_map')
         tags_count = 0
         if tags_count_map:
@@ -320,7 +321,10 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_selected': context.get('is_selected', False),
             'selectable': context.get('selectable', False),
             'selected_groups_label': selected_groups_label,
-            'can_add': context.get('can_add', True),
+            'can_add': can_add,
+            # Generally speaking, "if you can add, you can delete". One exception is itembank (Problem Bank)
+            # which has its own separate "add" workflow but uses the normal delete workflow for its child blocks.
+            'can_delete': can_add or (root_xblock and root_xblock.scope_ids.block_type == "itembank" and can_edit),
             'can_move': context.get('can_move', is_course),
             'language': getattr(course, 'language', None),
             'is_course': is_course,

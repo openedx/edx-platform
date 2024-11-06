@@ -71,14 +71,16 @@ import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.transaction import atomic, non_atomic_requests
-from django.http import Http404, HttpResponseBadRequest, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_safe
 from django.views.generic.base import TemplateResponseMixin, View
 from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
 from pylti1p3.exception import LtiException, OIDCException
@@ -86,6 +88,7 @@ from pylti1p3.exception import LtiException, OIDCException
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_learning.api import authoring
 from organizations.api import ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
@@ -224,14 +227,12 @@ class LibraryRootView(GenericAPIView):
         serializer = ContentLibraryFilterSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         org = serializer.validated_data['org']
-        library_type = serializer.validated_data['type']
         text_search = serializer.validated_data['text_search']
         order = serializer.validated_data['order']
 
         queryset = api.get_libraries_for_user(
             request.user,
             org=org,
-            library_type=library_type,
             text_search=text_search,
             order=order,
         )
@@ -256,7 +257,6 @@ class LibraryRootView(GenericAPIView):
         data = dict(serializer.validated_data)
         # Converting this over because using the reserved names 'type' and 'license' would shadow the built-in
         # definitions elsewhere.
-        data['library_type'] = data.pop('type')
         data['library_license'] = data.pop('license')
         key_data = data.pop("key")
         # Move "slug" out of the "key.slug" pseudo-field that the serializer added:
@@ -310,8 +310,6 @@ class LibraryDetailsView(APIView):
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         # Prevent ourselves from shadowing global names.
-        if 'type' in data:
-            data['library_type'] = data.pop('type')
         if 'license' in data:
             data['library_license'] = data.pop('license')
         try:
@@ -614,7 +612,13 @@ class LibraryBlockView(APIView):
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
-        Get metadata about an existing XBlock in the content library
+        Get metadata about an existing XBlock in the content library.
+
+        This API doesn't support versioning; most of the information it returns
+        is related to the latest draft version, or to all versions of the block.
+        If you need to get the display name of a previous version, use the
+        similar "metadata" API from djangoapps.xblock, which does support
+        versioning.
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
@@ -728,10 +732,10 @@ class LibraryBlockOlxView(APIView):
         serializer.is_valid(raise_exception=True)
         new_olx_str = serializer.validated_data["olx"]
         try:
-            api.set_library_block_olx(key, new_olx_str)
+            version_num = api.set_library_block_olx(key, new_olx_str).version_num
         except ValueError as err:
             raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
-        return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str}).data)
+        return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str, "version_num": version_num}).data)
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -792,7 +796,7 @@ class LibraryBlockAssetView(APIView):
             raise ValidationError("File too big")
         file_content = file_wrapper.read()
         try:
-            result = api.add_library_block_static_asset_file(usage_key, file_path, file_content)
+            result = api.add_library_block_static_asset_file(usage_key, file_path, file_content, request.user)
         except ValueError:
             raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(LibraryXBlockStaticFileSerializer(result).data)
@@ -807,10 +811,24 @@ class LibraryBlockAssetView(APIView):
             usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
         try:
-            api.delete_library_block_static_asset_file(usage_key, file_path)
+            api.delete_library_block_static_asset_file(usage_key, file_path, request.user)
         except ValueError:
             raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryBlockPublishView(APIView):
+    """
+    Commit/publish all of the draft changes made to the component.
+    """
+
+    @convert_exceptions
+    def post(self, request, usage_key_str):
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.publish_component_changes(key, request.user)
+        return Response({})
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -1143,3 +1161,89 @@ class LtiToolJwksView(LtiToolView):
         Return the JWKS.
         """
         return JsonResponse(self.lti_tool_config.get_jwks(), safe=False)
+
+
+@require_safe
+def component_version_asset(request, component_version_uuid, asset_path):
+    """
+    Serves static assets associated with particular Component versions.
+
+    Important notes:
+    * This is meant for Studio/authoring use ONLY. It requires read access to
+      the content library.
+    * It uses the UUID because that's easier to parse than the key field (which
+      could be part of an OpaqueKey, but could also be almost anything else).
+    * This is not very performant, and we still want to use the X-Accel-Redirect
+      method for serving LMS traffic in the longer term (and probably Studio
+      eventually).
+    """
+    try:
+        component_version = authoring.get_component_version_by_uuid(
+            component_version_uuid
+        )
+    except ObjectDoesNotExist as exc:
+        raise Http404() from exc
+
+    # Permissions check...
+    learning_package = component_version.component.learning_package
+    library_key = LibraryLocatorV2.from_string(learning_package.key)
+    api.require_permission_for_library_key(
+        library_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+    )
+
+    # We already have logic for getting the correct content and generating the
+    # proper headers in Learning Core, but the response generated here is an
+    # X-Accel-Redirect and lacks the actual content. We eventually want to use
+    # this response in conjunction with a media reverse proxy (Caddy or Nginx),
+    # but in the short term we're just going to remove the redirect and stream
+    # the content directly.
+    redirect_response = authoring.get_redirect_response_for_component_asset(
+        component_version_uuid,
+        asset_path,
+        public=False,
+        learner_downloadable_only=False,
+    )
+
+    # If there was any error, we return that response because it will have the
+    # correct headers set and won't have any X-Accel-Redirect header set.
+    if redirect_response.status_code != 200:
+        return redirect_response
+
+    # If we got here, we know that the asset exists and it's okay to download.
+    cv_content = component_version.componentversioncontent_set.get(key=asset_path)
+    content = cv_content.content
+
+    # Delete the re-direct part of the response headers. We'll copy the rest.
+    headers = redirect_response.headers
+    headers.pop('X-Accel-Redirect')
+
+    # We need to set the content size header manually because this is a
+    # streaming response. It's not included in the redirect headers because it's
+    # not needed there (the reverse-proxy would have direct access to the file).
+    headers['Content-Length'] = content.size
+
+    if request.method == "HEAD":
+        return HttpResponse(headers=headers)
+
+    # Otherwise it's going to be a GET response. We don't support response
+    # offsets or anything fancy, because we don't expect to run this view at
+    # LMS-scale.
+    return StreamingHttpResponse(
+        content.read_file().chunks(),
+        headers=redirect_response.headers,
+    )
+
+
+@require_safe
+def component_draft_asset(request, usage_key, asset_path):
+    """
+    Serves the draft version of static assets associated with a Library Component.
+
+    See `component_version_asset` for more details
+    """
+    try:
+        component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
+    except ObjectDoesNotExist as exc:
+        raise Http404() from exc
+
+    return component_version_asset(request, component_version_uuid, asset_path)
