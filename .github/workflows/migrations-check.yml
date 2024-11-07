@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-24.04]
         python-version:
           - "3.11"
         # 'pinned' is used to install the latest patch version of Django
@@ -126,7 +126,7 @@ jobs:
     if: always()
     needs:
       - check_migrations
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1
