@@ -171,9 +171,8 @@ def make_learning_mfe_courseware_url(
     strings. They're only ever used to concatenate a URL string.
     `params` is an optional QueryDict object (e.g. request.GET)
     """
-    mfe_link = f'/course/{course_key}'
+    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
     get_params = params.copy() if params else None
-    query_string = ''
 
     if preview:
         if len(get_params.keys()) > 1:
@@ -182,7 +181,7 @@ def make_learning_mfe_courseware_url(
             get_params = None
 
         if (unit_key or sequence_key):
-            mfe_link = f'/preview/course/{course_key}'
+            mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/preview/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -191,13 +190,9 @@ def make_learning_mfe_courseware_url(
             mfe_link += f'/{unit_key}'
 
     if get_params:
-        query_string = get_params.urlencode()
+        mfe_link += get_params.urlencode()
 
-    url_parts = list(urlparse(settings.LEARNING_MICROFRONTEND_URL))
-    url_parts[2] = mfe_link
-    url_parts[4] = query_string
-
-    return urlunparse(url_parts)
+    return mfe_link
 
 
 def get_learning_mfe_home_url(
