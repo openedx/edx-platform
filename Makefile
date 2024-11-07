@@ -30,6 +30,9 @@ SWAGGER = docs/lms-openapi.yaml
 docs: swagger guides technical-docs ## build the documentation for this repository
 	$(MAKE) -C docs html
 
+docs-lint: swagger guides technical-docs ## build the documentation for this repository
+	$(MAKE) -C docs lint
+
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
 

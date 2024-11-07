@@ -1484,6 +1484,7 @@ polib==1.2.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools
+    #   sphinx-lint
 prompt-toolkit==3.0.48
     # via
     #   -r requirements/edx/doc.txt
@@ -1820,6 +1821,7 @@ regex==2024.9.11
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   nltk
+    #   sphinx-lint
 requests==2.32.3
     # via
     #   -r requirements/edx/doc.txt
@@ -2004,6 +2006,8 @@ sphinx==8.1.3
 sphinx-book-theme==1.1.3
     # via -r requirements/edx/doc.txt
 sphinx-design==0.6.1
+    # via -r requirements/edx/doc.txt
+sphinx-lint==1.0.0
     # via -r requirements/edx/doc.txt
 sphinx-mdinclude==0.6.2
     # via
