@@ -32,7 +32,7 @@
     "backbone": "1.6.0",
     "backbone-associations": "0.6.2",
     "backbone.paginator": "2.0.8",
-    "bootstrap": "5.0.0",
+    "bootstrap": "5.3.3",
     "camelize": "1.0.1",
     "classnames": "2.3.1",
     "css-loader": "0.28.8",
