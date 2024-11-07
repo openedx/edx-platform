@@ -3,6 +3,7 @@
 import json
 from unittest.mock import Mock
 
+import pytest
 from django.test import TestCase
 from fs.memoryfs import MemoryFS
 from lxml import etree
@@ -14,6 +15,7 @@ from xmodule.word_cloud_block import WordCloudBlock
 from . import get_test_descriptor_system, get_test_system
 
 
+@pytest.mark.django_db
 class WordCloudBlockTest(TestCase):
     """
     Logic tests for Word Cloud Block.
