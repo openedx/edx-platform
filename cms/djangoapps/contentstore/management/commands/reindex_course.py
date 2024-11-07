@@ -97,14 +97,16 @@ class Command(BaseCommand):
                         logging.exception('Search Engine error - %s', exc)
                         return
 
-                    index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
+                    # Legacy Elasticsearch engine
+                    if hasattr(searcher, '_es'):  # pylint: disable=protected-access
+                        index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
 
-                    index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
-                        index=index_name,
-                    ) if index_exists else {}
+                        index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
+                            index=index_name,
+                        ) if index_exists else {}
 
-                    if index_exists and index_mapping:
-                        return
+                        if index_exists and index_mapping:
+                            return
 
             # if reindexing is done during devstack setup step, don't prompt the user
             if setup_option or query_yes_no(self.CONFIRMATION_PROMPT, default="no"):

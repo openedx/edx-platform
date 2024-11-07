@@ -264,12 +264,12 @@ class CustomPagesCourseApp(CourseApp):
 
 class ORASettingsApp(CourseApp):
     """
-    Course App config for ORA app.
+    Course App config for Flexible Peer Grading ORA app.
     """
 
     app_id = "ora_settings"
-    name = _("Open Response Assessment Settings")
-    description = _("Course level settings for Open Response Assessment.")
+    name = _("Flexible Peer Grading for ORAs")
+    description = _("Course level settings for Flexible Peer Grading Open Response Assessments.")
     documentation_links = {
         "learn_more_configuration": settings.ORA_SETTINGS_HELP_URL,
     }
@@ -287,14 +287,15 @@ class ORASettingsApp(CourseApp):
         """
         Get open response enabled status from course overview model.
         """
-        return True
+        course = get_course_by_id(course_key)
+        return course.force_on_flexible_peer_openassessments
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
         """
         Update open response enabled status in modulestore. Always enable to avoid confusion that user can disable ora.
         """
-        return True
+        raise ValueError("Flexible Peer Grading cannot be enabled/disabled via this API.")
 
     @classmethod
     def get_allowed_operations(cls, course_key: CourseKey, user: Optional[User] = None) -> Dict[str, bool]:

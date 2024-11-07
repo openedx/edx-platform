@@ -7,10 +7,9 @@ from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-from .notification_content import get_notification_type_content_function
+from .notification_content import get_notification_type_context_function
 
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
-
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
@@ -32,6 +31,8 @@ COURSE_NOTIFICATION_TYPES = {
         'is_core': True,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
+                                      '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'author_name': 'author name',
@@ -206,6 +207,26 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
         'visible_to': [CourseStaffRole.ROLE, CourseInstructorRole.ROLE]
+    },
+    'ora_grade_assigned': {
+        'notification_app': 'grading',
+        'name': 'ora_grade_assigned',
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': True,
+        'push': False,
+        'email_cadence': EmailCadence.DAILY,
+        'non_editable': [],
+        'content_template': _('<{p}>You have received {points_earned} out of {points_possible} on your assessment: '
+                              '<{strong}>{ora_name}</{strong}></{p}>'),
+        'content_context': {
+            'ora_name': 'Name of ORA in course',
+            'points_earned': 'Points earned',
+            'points_possible': 'Points possible',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
     },
 }
 
@@ -461,21 +482,46 @@ class NotificationAppManager:
 def get_notification_content(notification_type, context):
     """
     Returns notification content for the given notification type with provided context.
+
+    Args:
+    notification_type (str): The type of notification (e.g., 'course_update').
+    context (dict): The context data to be used in the notification template.
+
+    Returns:
+    str: Rendered notification content based on the template and context.
     """
-    html_tags_context = {
+    context.update({
         'strong': 'strong',
         'p': 'p',
-    }
-    content_function = get_notification_type_content_function(notification_type)
+    })
+
+    # Retrieve the function associated with the notification type.
+    context_function = get_notification_type_context_function(notification_type)
+
+    # Fix a specific case where 'course_update' needs to be renamed to 'course_updates'.
     if notification_type == 'course_update':
         notification_type = 'course_updates'
+
+    # Retrieve the notification type object from NotificationTypeManager.
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
+
     if notification_type:
-        if content_function:
-            return content_function(notification_type, context)
-        notification_type_content_template = notification_type.get('content_template', None)
-        if notification_type_content_template:
-            return notification_type_content_template.format(**context, **html_tags_context)
+        # Check if the notification is grouped.
+        is_grouped = context.get('grouped', False)
+
+        # Determine the correct template key based on whether it's grouped or not.
+        template_key = "grouped_content_template" if is_grouped else "content_template"
+
+        # Get the corresponding template from the notification type.
+        template = notification_type.get(template_key, None)
+
+        # Apply the context function to transform or modify the context.
+        context = context_function(context)
+
+        if template:
+            # Handle grouped templates differently by modifying the context using a different function.
+            return template.format(**context)
+
     return ''
 
 
