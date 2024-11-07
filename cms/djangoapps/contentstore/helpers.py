@@ -323,8 +323,8 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
     return new_xblock, notices
 
 
-def fetch_and_set_upstream_link(
-    copied_from_block: str | None,
+def _fetch_and_set_upstream_link(
+    copied_from_block: str,
     copied_from_version_num: int,
     temp_xblock: XBlock,
     user: User
@@ -336,8 +336,6 @@ def fetch_and_set_upstream_link(
     * the xblock is copied from a course where the source block was imported from a library; the original libary block
       is set as upstream.
     """
-    if copied_from_block is None:
-        return
     # Try to link the pasted block (downstream) to the copied block (upstream).
     temp_xblock.upstream = copied_from_block
     try:
@@ -351,7 +349,7 @@ def fetch_and_set_upstream_link(
         # and set the same upstream link for the new block.
         source_descriptor = modulestore().get_item(UsageKey.from_string(copied_from_block))
         if source_descriptor.upstream:
-            fetch_and_set_upstream_link(
+            _fetch_and_set_upstream_link(
                 source_descriptor.upstream,
                 source_descriptor.upstream_version,
                 temp_xblock,
@@ -455,7 +453,8 @@ def _import_xml_node_to_parent(
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
     temp_xblock.parent = parent_key
-    fetch_and_set_upstream_link(copied_from_block, copied_from_version_num, temp_xblock, user)
+    if copied_from_block:
+        _fetch_and_set_upstream_link(copied_from_block, copied_from_version_num, temp_xblock, user)
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
     new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)
