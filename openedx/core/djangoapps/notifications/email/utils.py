@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from pytz import utc
-from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
+from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding.api import get_logo_url_for_email
@@ -28,7 +28,6 @@ from openedx.core.djangoapps.notifications.models import (
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
-
 
 User = get_user_model()
 
@@ -357,14 +356,6 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
         """
         return True if param_name is None else name == param_name
 
-    def is_editable(app_name, notification_type, channel):
-        """
-        Returns if notification type channel is editable
-        """
-        if notification_type == 'core':
-            return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
-        return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
-
     def get_default_cadence_value(app_name, notification_type):
         """
         Returns default email cadence value
@@ -404,7 +395,7 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
                 for channel in ['web', 'email', 'push']:
                     if not is_name_match(channel, channel_value):
                         continue
-                    if is_editable(app_name, noti_type, channel):
+                    if is_notification_type_channel_editable(app_name, noti_type, channel):
                         type_prefs[channel] = pref_value
                         if channel == 'email':
                             cadence_value = get_default_cadence_value(app_name, noti_type)\
@@ -412,3 +403,12 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
                             type_prefs['email_cadence'] = cadence_value
         preference.save()
     notification_preference_unsubscribe_event(user)
+
+
+def is_notification_type_channel_editable(app_name, notification_type, channel):
+    """
+    Returns if notification type channel is editable
+    """
+    if notification_type == 'core':
+        return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
+    return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
