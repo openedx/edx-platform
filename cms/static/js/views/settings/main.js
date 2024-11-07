@@ -388,11 +388,11 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                     Hides and clears the certificate available date field if a display behavior that doesn't use it is
                     chosen. Because we are clearing it, toggling back to "end_with_date" will require re-entering the date
                     */
-            if (!this.useV2CertDisplaySettings) {
-                return;
-            }
+            // eslint-disable-next-line prefer-const
             let showDatepicker = this.model.get('certificates_display_behavior') == 'end_with_date';
+            // eslint-disable-next-line prefer-const
             let datepicker = this.$el.find('#certificate-available-date');
+            // eslint-disable-next-line prefer-const
             let certificateAvailableDateField = this.$el.find('#field-certificate-available-date');
 
             if (showDatepicker) {
@@ -451,6 +451,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 selector = '',
                 image_key = '',
                 image_path_key = '';
+            // eslint-disable-next-line default-case
             switch (event.currentTarget.id) {
             case 'upload-course-image':
                 title = gettext('Upload your course image.');

@@ -213,7 +213,7 @@ class CourseOutlineData:
     course_visibility: CourseVisibility = attr.ib(validator=attr.validators.in_(CourseVisibility))
 
     # Entrance Exam ID
-    entrance_exam_id = attr.ib(type=str)
+    entrance_exam_id = attr.ib(type=Optional[str])
 
     def __attrs_post_init__(self):
         """Post-init hook that validates and inits the `sequences` field."""
@@ -250,10 +250,16 @@ class CourseOutlineData:
         """
         keys_to_remove = set(usage_keys)
 
-        # If we remove a Section, we also remove all Sequences in that Section.
         for section in self.sections:
+            section_sequences_keys = {seq.usage_key for seq in section.sequences}
+
+            # If we remove a Section, we also remove all Sequences in that Section.
             if section.usage_key in keys_to_remove:
-                keys_to_remove |= {seq.usage_key for seq in section.sequences}
+                keys_to_remove |= section_sequences_keys
+
+            # If a Section is empty or about to be, we remove it.
+            elif section_sequences_keys.issubset(keys_to_remove):
+                keys_to_remove.add(section.usage_key)
 
         return attr.evolve(
             self,

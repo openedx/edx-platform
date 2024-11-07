@@ -15,6 +15,7 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.test import TestCase, override_settings
 from django.test.client import Client
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 from markupsafe import escape
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
@@ -33,6 +34,7 @@ from common.djangoapps.student.models import (
     user_by_anonymous_id
 )
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.toggles import REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT
 from common.djangoapps.student.views import complete_course_mode_info
 from common.djangoapps.util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
 from common.djangoapps.util.testing import EventTestMixin
@@ -278,7 +280,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()
-        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
+        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password=self.TEST_PASSWORD)
         self.client = Client()
         cache.clear()
 
@@ -307,7 +309,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         """
         Test that the certificate verification status for courses is visible on the dashboard.
         """
-        self.client.login(username="jack", password="test")
+        self.client.login(username="jack", password=self.TEST_PASSWORD)
         self._check_verification_status_on('verified', 'You&#39;re enrolled as a verified student')
         self._check_verification_status_on('honor', 'You&#39;re enrolled as an honor code student')
         self._check_verification_status_off('audit', '')
@@ -345,7 +347,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         Test that the certificate verification status for courses is not visible on the dashboard
         if the verified certificates setting is off.
         """
-        self.client.login(username="jack", password="test")
+        self.client.login(username="jack", password=self.TEST_PASSWORD)
         self._check_verification_status_off('verified', 'You\'re enrolled as a verified student')
         self._check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
         self._check_verification_status_off('audit', '')
@@ -371,7 +373,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
     @skip_unless_lms
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):
         # Without linked-in config don't show Add Certificate to LinkedIn button
-        self.client.login(username="jack", password="test")
+        self.client.login(username="jack", password=self.TEST_PASSWORD)
 
         CourseModeFactory.create(
             course_id=self.course.id,
@@ -409,7 +411,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
     def test_linked_in_add_to_profile_btn_with_certificate(self):
         # If user has a certificate with valid linked-in config then Add Certificate to LinkedIn button
         # should be visible. and it has URL value with valid parameters.
-        self.client.login(username="jack", password="test")
+        self.client.login(username="jack", password=self.TEST_PASSWORD)
 
         linkedin_config = LinkedInAddToProfileConfiguration.objects.create(company_identifier='1337', enabled=True)
         CourseModeFactory.create(
@@ -480,7 +482,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         # Create a course and log in the user.
         # Creating a new course will trigger a publish event and the course will be cached
         test_course = CourseFactory.create(emit_signals=True)
-        self.client.login(username="jack", password="test")
+        self.client.login(username="jack", password=self.TEST_PASSWORD)
 
         with check_mongo_calls(0):
             CourseEnrollment.enroll(self.user, test_course.id)
@@ -495,7 +497,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
 
     @skip_unless_lms
     def test_dashboard_header_nav_has_find_courses(self):
-        self.client.login(username="jack", password="test")
+        self.client.login(username="jack", password=self.TEST_PASSWORD)
         response = self.client.get(reverse("dashboard"))
 
         # "Explore courses" is shown in the side panel
@@ -542,7 +544,7 @@ class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
         super().setUp()
         self.org = 'fakeX'
         self.course = CourseFactory.create(org=self.org)
-        self.user = UserFactory.create(username='jack', email='jack@fake.edx.org', password='test')
+        self.user = UserFactory.create(username='jack', email='jack@fake.edx.org', password=self.TEST_PASSWORD)
         CourseModeFactory.create(mode_slug='no-id-professional', course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode='no-id-professional')
         cache.clear()
@@ -564,7 +566,7 @@ class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
             'course_org_filter': self.org
         })
         self.set_up_site(site_domain, site_configuration_values)
-        self.client.login(username='jack', password='test')
+        self.client.login(username='jack', password=self.TEST_PASSWORD)
         response = self.client.get(reverse('dashboard'))
         self.assertContains(response, 'class="course professional"')
 
@@ -585,7 +587,7 @@ class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
             'course_org_filter': self.org
         })
         self.set_up_site(site_domain, site_configuration_values)
-        self.client.login(username='jack', password='test')
+        self.client.login(username='jack', password=self.TEST_PASSWORD)
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, 'class="course professional"')
 
@@ -893,14 +895,15 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
 
 @skip_unless_lms
+@ddt.ddt
 class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     """Tests the student.views.change_enrollment view"""
 
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()
-        self.user = UserFactory.create(password='secret')
-        self.client.login(username=self.user.username, password='secret')
+        self.user = UserFactory.create(password=self.TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.url = reverse('change_enrollment')
 
     def _enroll_through_view(self, course):
@@ -912,6 +915,17 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             }
         )
         return response
+
+    @ddt.data(
+        (True, 'courseware'),
+        (False, None),
+    )
+    @ddt.unpack
+    def test_enrollment_url(self, waffle_flag_enabled, returned_view):
+        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, waffle_flag_enabled):
+            response = self._enroll_through_view(self.course)
+        data = reverse(returned_view, args=[str(self.course.id)]) if returned_view else ''
+        assert response.content.decode('utf8') == data
 
     def test_enroll_as_default(self):
         """Tests that a student can successfully enroll through this view"""
@@ -1056,14 +1070,13 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Tests verifying that related programs appear on the course dashboard."""
     maxDiff = None
-    password = 'test'
     related_programs_preface = 'Related Programs'
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user = UserFactory()
+        cls.user = UserFactory(password=cls.TEST_PASSWORD)
         cls.course = CourseFactory()
         cls.enrollment = CourseEnrollmentFactory(user=cls.user, course_id=cls.course.id)  # pylint: disable=no-member
 
@@ -1073,7 +1086,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.url = reverse('dashboard')
 
         self.create_programs_config()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         course_run = CourseRunFactory(key=str(self.course.id))  # pylint: disable=no-member
         course = CatalogCourseFactory(course_runs=[course_run])

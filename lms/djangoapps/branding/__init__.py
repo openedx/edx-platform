@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
-def get_visible_courses(org=None, filter_=None, active_only=False):
+def get_visible_courses(org=None, filter_=None, active_only=False, course_keys=None):
     """
     Yield the CourseOverviews that should be visible in this branded
     instance.
@@ -25,6 +25,8 @@ def get_visible_courses(org=None, filter_=None, active_only=False):
         filter_ (dict): Optional parameter that allows custom filtering by
             fields on the course.
         active_only (bool): Optional parameter that enables fetching active courses only.
+        course_keys (list[str]): Optional parameter that allows for selecting which
+            courses to fetch the `CourseOverviews` for
     """
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -36,12 +38,16 @@ def get_visible_courses(org=None, filter_=None, active_only=False):
     if org:
         # Check the current site's orgs to make sure the org's courses should be displayed
         if not current_site_orgs or org in current_site_orgs:
-            courses = CourseOverview.get_all_courses(orgs=[org], filter_=filter_, active_only=active_only)
+            courses = CourseOverview.get_all_courses(
+                orgs=[org], filter_=filter_, active_only=active_only, course_keys=course_keys
+            )
     elif current_site_orgs:
         # Only display courses that should be displayed on this site
-        courses = CourseOverview.get_all_courses(orgs=current_site_orgs, filter_=filter_, active_only=active_only)
+        courses = CourseOverview.get_all_courses(
+            orgs=current_site_orgs, filter_=filter_, active_only=active_only, course_keys=course_keys
+        )
     else:
-        courses = CourseOverview.get_all_courses(filter_=filter_, active_only=active_only)
+        courses = CourseOverview.get_all_courses(filter_=filter_, active_only=active_only, course_keys=course_keys)
 
     courses = courses.order_by('id')
 

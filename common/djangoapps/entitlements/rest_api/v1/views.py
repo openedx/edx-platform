@@ -4,6 +4,7 @@ Views for the Entitlements v1 API.
 
 import logging
 
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
@@ -13,7 +14,6 @@ from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status, viewsets
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -32,6 +32,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
+User = get_user_model()
 log = logging.getLogger(__name__)
 
 
@@ -315,7 +316,6 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         - Unenroll
         - Switch Enrollment
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     # TODO: ARCH-91
     # This view is excluded from Swagger doc generation because it
     # does not specify a serializer class.

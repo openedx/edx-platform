@@ -5,24 +5,24 @@ Tests for vertical block.
 # pylint: disable=protected-access
 
 
+import json
 from collections import namedtuple
 from datetime import datetime, timedelta
-import json
 from unittest.mock import Mock, patch
 
-import pytz
 import ddt
-from fs.memoryfs import MemoryFS
+import pytz
 from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
+from fs.memoryfs import MemoryFS
 from openedx_filters import PipelineStep
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 
+from ..x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
 from . import prepare_block_runtime
 from .helpers import StubUserService
 from .xml import XModuleXmlImportTest
 from .xml import factories as xml
-from ..x_module import STUDENT_VIEW, AUTHOR_VIEW, PUBLIC_VIEW
 
 COMPLETION_DELAY = 9876
 
@@ -212,17 +212,17 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test the rendering of the student and public view.
         """
-        self.course.runtime._runtime_services['bookmarks'] = Mock()
+        self.course.runtime._services['bookmarks'] = Mock()
         now = datetime.now(pytz.UTC)
         self.vertical.due = now + timedelta(days=days)
         if view == STUDENT_VIEW:
-            self.course.runtime._runtime_services['user'] = StubUserService(user=Mock(username=self.username))
-            self.course.runtime._runtime_services['completion'] = StubCompletionService(
+            self.course.runtime._services['user'] = StubUserService(user=Mock(username=self.username))
+            self.course.runtime._services['completion'] = StubCompletionService(
                 enabled=True,
                 completion_value=completion_value
             )
         elif view == PUBLIC_VIEW:
-            self.course.runtime._runtime_services['user'] = StubUserService(user=AnonymousUser())
+            self.course.runtime._services['user'] = StubUserService(user=AnonymousUser())
 
         html = self.course.runtime.render(
             self.vertical, view, self.default_context if context is None else context

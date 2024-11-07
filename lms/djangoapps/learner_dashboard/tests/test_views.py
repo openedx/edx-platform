@@ -26,7 +26,6 @@ from openedx.core.djangoapps.programs.models import ProgramDiscussionsConfigurat
 class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMixin):
     """Unit tests for the program details page."""
     program_uuid = str(uuid4())
-    password = 'test'
     url = reverse_lazy('program_discussion', kwargs={'program_uuid': program_uuid})
 
     @classmethod
@@ -41,7 +40,7 @@ class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMix
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
         ProgramEnrollmentFactory.create(
             user=self.user,
@@ -103,7 +102,7 @@ class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMix
         """
         if staff:
             self.user = UserFactory(is_staff=True)
-            self.client.login(username=self.user.username, password=self.password)
+            self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         discussion_config = ProgramDiscussionsConfiguration.objects.create(
             program_uuid=self.program_uuid,
             enabled=True,
@@ -126,7 +125,7 @@ class TestProgramDiscussionIframeView(SharedModuleStoreTestCase, ProgramCacheMix
         Test if API returns default response in case a non staff user has no enrollment in the program
         """
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         default_response = {
             'tab_view_enabled': False,

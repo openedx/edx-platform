@@ -45,8 +45,17 @@ class Command(BaseCommand):
     """
     help = "Rebuild the LMS' cache of program data."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--domain',
+            dest='domain',
+            type=str,
+            help='Help in caching the programs for one site'
+        )
+
     # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
     def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
+        domain = options.get('domain', '')
         failure = False
         logger.info('populate-multitenant-programs switch is ON')
 
@@ -68,7 +77,9 @@ class Command(BaseCommand):
         programs_by_type = {}
         programs_by_type_slug = {}
         organizations = {}
-        for site in Site.objects.all():
+
+        sites = Site.objects.filter(domain=domain) if domain else Site.objects.all()
+        for site in sites:
             site_config = getattr(site, 'configuration', None)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
                 logger.info(f'Skipping site {site.domain}. No configuration.')

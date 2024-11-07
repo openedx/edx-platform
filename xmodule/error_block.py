@@ -18,7 +18,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
@@ -47,7 +46,6 @@ class ErrorFields:
 class ErrorBlock(
     ErrorFields,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):  # pylint: disable=abstract-method
@@ -62,7 +60,7 @@ class ErrorBlock(
         """
         Return a fragment that contains the html for the student view.
         """
-        fragment = Fragment(self.runtime.service(self, 'mako').render_template('module-error.html', {
+        fragment = Fragment(self.runtime.service(self, 'mako').render_lms_template('module-error.html', {
             'staff_access': True,
             'data': self.contents,
             'error': self.error_msg,
@@ -180,13 +178,13 @@ class ErrorBlock(
         return cls._construct(system, xml_data, error_msg, location=id_generator.create_definition('error'))
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):  # lint-amnesty, pylint: disable=unused-argument
+    def parse_xml(cls, node, runtime, keys):  # lint-amnesty, pylint: disable=unused-argument
         """
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         # It'd be great to not reserialize and deserialize the xml
         xml = etree.tostring(node).decode('utf-8')
-        block = cls.from_xml(xml, runtime, id_generator)
+        block = cls.from_xml(xml, runtime, runtime.id_generator)
         return block
 
     def export_to_xml(self, resource_fs):

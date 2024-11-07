@@ -13,6 +13,7 @@ const mapDispatchToProps = dispatch => ({
     (courseId, excludeBlockTypes) => dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
     createProblemResponsesReportTask:
     (problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation) => dispatch(
+        // eslint-disable-next-line max-len
         createProblemResponsesReportTask(problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation),
     ),
 });

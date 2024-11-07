@@ -19,7 +19,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-from lms.djangoapps.discussion.tasks import _should_send_message, _track_notification_sent
+from lms.djangoapps.discussion.tasks import (
+    _is_first_comment,
+    _should_send_message,
+    _track_notification_sent,
+)
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
@@ -126,6 +130,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'parent_id': None,
             'user_id': cls.comment_author.id,
             'username': cls.comment_author.username,
+            'course_id': str(cls.course.id),
         }
         cls.discussion_comment2 = {
             'id': 'discussion-comment2',
@@ -134,7 +139,8 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'thread_id': cls.discussion_thread['id'],
             'parent_id': None,
             'user_id': cls.comment_author.id,
-            'username': cls.comment_author.username
+            'username': cls.comment_author.username,
+            'course_id': str(cls.course.id)
         }
         cls.discussion_subcomment = {
             'id': 'discussion-subcomment',
@@ -144,6 +150,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'parent_id': cls.discussion_comment['id'],
             'user_id': cls.comment_author.id,
             'username': cls.comment_author.username,
+            'course_id': str(cls.course.id),
         }
         cls.discussion_thread['children'] = [cls.discussion_comment, cls.discussion_comment2]
         cls.discussion_comment['child_count'] = 1
@@ -176,6 +183,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'parent_id': None,
             'user_id': cls.comment_author.id,
             'username': cls.comment_author.username,
+            'course_id': str(cls.course.id),
         }
         cls.question_comment2 = {
             'id': 'question-comment2',
@@ -184,7 +192,8 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'thread_id': cls.question_thread['id'],
             'parent_id': None,
             'user_id': cls.comment_author.id,
-            'username': cls.comment_author.username
+            'username': cls.comment_author.username,
+            'course_id': str(cls.course.id),
         }
         cls.question_subcomment = {
             'id': 'question-subcomment',
@@ -194,6 +203,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'parent_id': cls.question_comment['id'],
             'user_id': cls.comment_author.id,
             'username': cls.comment_author.username,
+            'course_id': str(cls.course.id),
         }
         cls.question_thread['endorsed_responses'] = [cls.question_comment]
         cls.question_thread['non_endorsed_responses'] = [cls.question_comment2]
@@ -216,6 +226,8 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
 
         self.ace_send_patcher = mock.patch('edx_ace.ace.send')
         self.mock_ace_send = self.ace_send_patcher.start()
+        self.mock_message_patcher = mock.patch('lms.djangoapps.discussion.tasks.ResponseNotification')
+        self.mock_message = self.mock_message_patcher.start()
 
         thread_permalink = '/courses/discussion/dummy_discussion_id'
         self.permalink_patcher = mock.patch('lms.djangoapps.discussion.tasks.permalink', return_value=thread_permalink)
@@ -225,10 +237,12 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         super().tearDown()
         self.request_patcher.stop()
         self.ace_send_patcher.stop()
+        self.mock_message_patcher.stop()
         self.permalink_patcher.stop()
 
     @ddt.data(True, False)
     def test_send_discussion_email_notification(self, user_subscribed):
+        self.mock_message_patcher.stop()
         if user_subscribed:
             non_matching_id = 'not-a-match'
             # with per_page left with a default value of 1, this ensures
@@ -256,16 +270,19 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             )
             user = mock.Mock()
             comment = cc.Comment.find(id=comment['id']).retrieve()
-            with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
-                comment_created.send(sender=None, user=user, post=comment)
+            with mock.patch('lms.djangoapps.discussion.rest_api.tasks.send_response_notifications.apply_async'):
+                with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
+                    comment_created.send(sender=None, user=user, post=comment)
 
             if user_subscribed:
                 expected_message_context = get_base_template_context(site)
                 expected_message_context.update({
                     'comment_author_id': self.comment_author.id,
                     'comment_body': comment['body'],
+                    'comment_body_text': comment.body_text,
                     'comment_created_at': ONE_HOUR_AGO,
                     'comment_id': comment['id'],
+                    'comment_parent_id': comment['parent_id'],
                     'comment_username': self.comment_author.username,
                     'course_id': self.course.id,
                     'thread_author_id': self.thread_author.id,
@@ -276,7 +293,15 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
                     'thread_commentable_id': thread['commentable_id'],
                     'post_link': f'https://{site.domain}{self.mock_permalink.return_value}',
                     'site': site,
-                    'site_id': site.id
+                    'site_id': site.id,
+                    'push_notification_extra_context': {
+                        'notification_type': 'forum_response',
+                        'topic_id': thread['commentable_id'],
+                        'course_id': comment['course_id'],
+                        'parent_id': str(comment['parent_id']),
+                        'thread_id': thread['id'],
+                        'comment_id': comment['id'],
+                    },
                 })
                 expected_recipient = Recipient(self.thread_author.id, self.thread_author.email)
                 actual_message = self.mock_ace_send.call_args_list[0][0][0]
@@ -310,7 +335,8 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         )
         user = mock.Mock()
         comment = cc.Comment.find(id=comment_dict['id']).retrieve()
-        comment_created.send(sender=None, user=user, post=comment)
+        with mock.patch('lms.djangoapps.discussion.rest_api.tasks.send_response_notifications.apply_async'):
+            comment_created.send(sender=None, user=user, post=comment)
 
         actual_result = _should_send_message({
             'thread_author_id': self.thread_author.id,
@@ -318,7 +344,9 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'comment_id': comment_dict['id'],
             'thread_id': thread['id'],
         })
-        assert actual_result is False
+
+        should_email_send = _is_first_comment(comment_dict['id'], thread['id'])
+        assert not should_email_send
         assert not self.mock_ace_send.called
 
     def test_subcomment_should_not_send_email(self):

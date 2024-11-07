@@ -1,5 +1,5 @@
 <%page args="section_data" expression_filter="h"/>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import gettext as _ %>
 %if section_data['access']['staff'] or section_data['access']['instructor']:
 <div class="action-type-container">
     %if section_data.get('writable_gradebook_url') or section_data.get('is_small_course'):

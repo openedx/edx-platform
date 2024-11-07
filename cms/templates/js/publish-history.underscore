@@ -10,8 +10,3 @@ if (published_on && published_by) {
     copy = gettext("Previously published");
 }
 %>
-
-<div class="wrapper-last-publish">
-    <% // xss-lint: disable=underscore-not-escaped %>
-    <p class="copy"><%= copy %></p>
-</div>

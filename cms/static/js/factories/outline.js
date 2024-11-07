@@ -3,12 +3,13 @@ define([
 ], function(CourseOutlinePage, XBlockOutlineInfo) {
     'use strict';
 
-    return function(XBlockOutlineInfoJson, initialStateJson) {
+    return function(XBlockOutlineInfoJson, initialStateJson, initialUserClipboardJson) {
         var courseXBlock = new XBlockOutlineInfo(XBlockOutlineInfoJson, {parse: true}),
             view = new CourseOutlinePage({
                 el: $('#content'),
                 model: courseXBlock,
-                initialState: initialStateJson
+                initialState: initialStateJson,
+                initialUserClipboard: initialUserClipboardJson,
             });
         view.render();
     };

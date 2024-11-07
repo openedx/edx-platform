@@ -43,9 +43,8 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        password = 'test'
-        self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
-        self.client.login(username=self.student.username, password=password)
+        self.student = UserFactory.create(is_staff=False, username='test_student', password=self.TEST_PASSWORD)
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.student)
         self.course_structure = get_course_blocks(self.student, self.course.location)
@@ -58,8 +57,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         For details on the contents and structure of the file, see
         `common/test/data/scoreable/README`.
         """
-        password = 'test'
-        user = UserFactory.create(is_staff=False, username='test_student', password=password)
+        user = UserFactory.create(is_staff=False, username='test_student', password=cls.TEST_PASSWORD)
 
         course_items = import_course_from_xml(
             cls.store,
@@ -144,7 +142,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         '''
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
-        self.client.login(username=self.request.user.username, password="test")
+        self.client.login(username=self.request.user.username, password=self.TEST_PASSWORD)
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
     def _get_altered_metadata(self, alterations):

@@ -47,6 +47,7 @@
                 children: count > 0 ? (function() {
                     var _i, _results;
                     _results = [];
+                    // eslint-disable-next-line no-multi-assign
                     for (index = _i = 1; count >= 1 ? _i <= count : _i >= count; index = count >= 1 ? ++_i : --_i) {
                         _results.push(createTestResponseJson(index));
                     }

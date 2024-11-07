@@ -23,7 +23,6 @@ from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django_countries import countries
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import WaffleFlag
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from openedx_filters.learning.filters import StudentRegistrationRequested
@@ -64,8 +63,12 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
+from openedx.core.djangoapps.user_authn.views.utils import get_auto_generated_username
 from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
-from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
+from openedx.core.djangoapps.user_authn.toggles import (
+    is_require_third_party_auth_enabled,
+    is_auto_generated_username_enabled
+)
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
@@ -108,15 +111,6 @@ IS_MARKETABLE = 'is_marketable'
 REGISTER_USER = Signal()
 
 
-# .. toggle_name: registration.enable_failure_logging
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Enable verbose logging of registration failure messages
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2020-04-30
-# .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag('registration.enable_failure_logging', __name__)
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
@@ -200,10 +194,9 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         set_custom_attribute('register_user_tpa', pipeline.running(request))
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
     # Can't have terms of service for certain SHIB users, like at Stanford
-    registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     tos_required = (
-        registration_fields.get('terms_of_service') != 'hidden' or
-        registration_fields.get('honor_code') != 'hidden'
+        extra_fields.get('terms_of_service') != 'hidden' or
+        extra_fields.get('honor_code') != 'hidden'
     )
 
     form = AccountCreationForm(
@@ -258,7 +251,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
     else:
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        compose_and_send_activation_email(user, profile, registration, redirect_url)
+        compose_and_send_activation_email(user, profile, registration, redirect_url, True)
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
@@ -299,7 +292,13 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
 def is_new_user(password, user):
     if user is not None:
         AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
-        check_pwned_password_and_send_track_event.delay(user.id, password, user.is_staff, True)
+        check_pwned_password_and_send_track_event.delay(
+            user_id=user.id,
+            password=password,
+            internal_user=user.is_staff,
+            is_new_user=True,
+            request_page='registration'
+        )
 
 
 def _link_user_to_third_party_provider(
@@ -391,8 +390,13 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'is_year_of_birth_selected': bool(profile.year_of_birth),
             'is_education_selected': bool(profile.level_of_education_display),
             'is_goal_set': bool(profile.goals),
-            'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
+            'total_registration_time': round(
+                float(params.get('total_registration_time') or params.get('totalRegistrationTime') or 0)
+            ),
             'activation_key': registration.activation_key if registration else None,
+            'host': params.get('host', ''),
+            'app_name': params.get('app_name', ''),
+            'utm_campaign': params.get('utm_campaign', ''),
         }
         # VAN-738 - added below properties to experiment marketing emails opt in/out events on Braze.
         if params.get('marketing_emails_opt_in') and settings.MARKETING_EMAILS_OPT_IN:
@@ -577,6 +581,9 @@ class RegistrationView(APIView):
         data = request.POST.copy()
         self._handle_terms_of_service(data)
 
+        if is_auto_generated_username_enabled() and 'username' not in data:
+            data['username'] = get_auto_generated_username(data)
+
         try:
             data = StudentRegistrationRequested.run_filter(form_data=data)
         except StudentRegistrationRequested.PreventRegistration as exc:
@@ -599,7 +606,10 @@ class RegistrationView(APIView):
 
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
+        authenticated_user = {'username': user.username, 'full_name': user.profile.name, 'user_id': user.id}
+        response = self._create_response(
+            request, {'authenticated_user': authenticated_user}, status_code=200, redirect_url=redirect_url
+        )
         set_logged_in_cookies(request, response, user)
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
@@ -697,32 +707,12 @@ class RegistrationView(APIView):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
-        else:
-            self._log_validation_errors(request, response_dict, status_code)
         if redirect_url:
             response_dict['redirect_url'] = redirect_url
         if error_code:
             response_dict['error_code'] = error_code
             set_custom_attribute('register_error_code', error_code)
         return JsonResponse(response_dict, status=status_code)
-
-    def _log_validation_errors(self, request, errors, status_code):
-        if not REGISTRATION_FAILURE_LOGGING_FLAG.is_enabled():
-            return
-
-        try:
-            for field_key, errors in errors.items():  # lint-amnesty, pylint: disable=redefined-argument-from-local
-                for error in errors:
-                    log.info(
-                        'message=registration_failed, status_code=%d, agent="%s", field="%s", error="%s"',
-                        status_code,
-                        request.META.get('HTTP_USER_AGENT', ''),
-                        field_key,
-                        error['user_message']
-                    )
-        except:  # pylint: disable=bare-except
-            log.exception("Failed to log registration validation error")
-            pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 # pylint: disable=line-too-long

@@ -6,11 +6,14 @@ import json
 import ddt
 from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.toggles import ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE
 
 
+@override_waffle_flag(ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE, active=True)
 @ddt.ddt
 class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
@@ -81,3 +84,13 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
             assert field in content.keys()
         for field in absent_fields:
             assert field not in content.keys()
+
+    @ddt.data(
+        ("ENABLE_EDXNOTES", "edxnotes"),
+        ("ENABLE_OTHER_COURSE_SETTINGS", "other_course_settings"),
+    )
+    @ddt.unpack
+    def test_disabled_fetch_all_query_param(self, setting, excluded_field):
+        with override_settings(FEATURES={setting: False}):
+            resp = self.client.get(self.url, {"fetch_all": 0})
+            assert excluded_field not in resp.data

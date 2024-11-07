@@ -16,7 +16,7 @@ from .test_course_block import DummySystem as TestImportSystem
 
 class RandomizeBlockTest(MixedSplitTestCase):
     """
-    Base class for tests of LibraryContentBlock (library_content_block.py)
+    Base class for tests of RandomizeBlock (randomize_block.py)
     """
     maxDiff = None
 
@@ -83,8 +83,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
 
         # Now import it.
         olx_element = etree.fromstring(exported_olx)
-        id_generator = Mock()
-        imported_randomize_block = RandomizeBlock.parse_xml(olx_element, runtime, None, id_generator)
+        imported_randomize_block = RandomizeBlock.parse_xml(olx_element, runtime, None)
 
         # Check the new XBlock has the same properties as the old one.
         assert imported_randomize_block.display_name == randomize_block.display_name

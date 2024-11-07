@@ -504,7 +504,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             url = reverse('course_modes_choose', args=[str(self.course.id)])
             response = self.client.get(url)
             # URL-encoded version of 1/1/15, 12:00 AM
-            redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
+            redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00%E2%80%AFAM'
             self.assertRedirects(response, redirect_url)
 
     @ddt.data(

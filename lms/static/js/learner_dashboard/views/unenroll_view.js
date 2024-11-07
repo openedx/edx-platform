@@ -7,6 +7,7 @@ class UnenrollView extends Backbone.View {
         const defaults = {
             el: '.unenroll-modal',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -37,6 +38,7 @@ class UnenrollView extends Backbone.View {
 
     switchToSlideTwo() {
         let reason = this.$(".reasons_survey input[name='reason']:checked").attr('val');
+        // eslint-disable-next-line no-undef
         const courserunKey = $('#unenroll_course_id').val() + $('#unenroll_course_number').val();
         if (reason === 'Other') {
             reason = this.$('.other_text').val();
@@ -69,20 +71,25 @@ class UnenrollView extends Backbone.View {
     unenrollComplete(event, xhr) {
         if (xhr.status === 200) {
             if (!this.isEdx) {
+                // eslint-disable-next-line no-restricted-globals
                 location.href = this.urls.dashboard;
             } else {
                 this.switchToSlideOne();
                 this.$('.reasons_survey:first .submit_reasons').click(this.switchToSlideTwo.bind(this));
             }
         } else if (xhr.status === 400) {
+            // eslint-disable-next-line no-undef
             $('#unenroll_error').text(
                 xhr.responseText,
             ).stop()
                 .css('display', 'block');
         } else if (xhr.status === 403) {
+            // eslint-disable-next-line no-restricted-globals
             location.href = `${this.urls.signInUser}?course_id=${
+                // eslint-disable-next-line no-undef
                 encodeURIComponent($('#unenroll_course_id').val())}&enrollment_action=unenroll`;
         } else {
+            // eslint-disable-next-line no-undef
             $('#unenroll_error').text(
                 gettext('Unable to determine whether we should give you a refund because'
                 + ' of System Error. Please try again later.'),
@@ -101,16 +108,20 @@ class UnenrollView extends Backbone.View {
         this.isEdx = options.isEdx;
 
         this.closeButtonSelector = '.unenroll-modal .close-modal';
+        // eslint-disable-next-line no-undef
         this.$closeButton = $(this.closeButtonSelector);
         this.modalId = `#${this.$el.attr('id')}`;
         this.mainPageSelector = '#dashboard-main';
 
         this.triggerSelector = '.action-unenroll';
+        // eslint-disable-next-line no-undef
         $(this.triggerSelector).each((index, element) => {
+            // eslint-disable-next-line no-undef
             $(element).on('click', view.handleTrigger.bind($(element)));
         });
 
         this.$('.submit .submit-button').on('click', this.startSubmit.bind(this));
+        // eslint-disable-next-line no-undef
         $('#unenroll_form').on('ajax:complete', this.unenrollComplete.bind(this));
     }
 }

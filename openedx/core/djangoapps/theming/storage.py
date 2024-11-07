@@ -192,33 +192,41 @@ class ThemeManifestFilesMixin(ManifestFilesMixin):
             This requires figuring out which files the matched URL resolves
             to and calling the url() method of the storage.
             """
-            matched, url = matchobj.groups()
+            matches = matchobj.groupdict()
+            matched = matches["matched"]
+            url = matches["url"]
 
             # Ignore absolute/protocol-relative and data-uri URLs.
-            if re.match(r'^[a-z]+:', url):
+            if re.match(r"^[a-z]+:", url):
                 return matched
 
             # Ignore absolute URLs that don't point to a static file (dynamic
             # CSS / JS?). Note that STATIC_URL cannot be empty.
-            if url.startswith('/') and not url.startswith(settings.STATIC_URL):
+            if url.startswith("/") and not url.startswith(settings.STATIC_URL):
                 return matched
 
             # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
 
-            if url_path.startswith('/'):
+            # Ignore URLs without a path
+            if not url_path:
+                return matched
+
+            if url_path.startswith("/"):
                 # Otherwise the condition above would have returned prematurely.
                 assert url_path.startswith(settings.STATIC_URL)
                 target_name = url_path[len(settings.STATIC_URL):]
             else:
                 # We're using the posixpath module to mix paths and URLs conveniently.
-                source_name = name if os.sep == '/' else name.replace(os.sep, '/')
+                source_name = name if os.sep == "/" else name.replace(os.sep, "/")
                 target_name = posixpath.join(posixpath.dirname(source_name), url_path)
 
             # Determine the hashed name of the target file with the storage backend.
             hashed_url = self._url(
-                self._stored_name, unquote(target_name),
-                force=True, hashed_files=hashed_files,
+                self._stored_name,
+                unquote(target_name),
+                force=True,
+                hashed_files=hashed_files,
             )
 
             # NOTE:
@@ -228,15 +236,19 @@ class ThemeManifestFilesMixin(ManifestFilesMixin):
             # The line is commented and not removed to make future django upgrade easier and show exactly what is
             # changed in this method override
             #
-            #transformed_url = '/'.join(url_path.split('/')[:-1] + hashed_url.split('/')[-1:])
+            # transformed_url = "/".join(
+            #  url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
+            # )
+
             transformed_url = hashed_url  # This line was added.
 
             # Restore the fragment that was stripped off earlier.
             if fragment:
-                transformed_url += ('?#' if '?#' in url else '#') + fragment
+                transformed_url += ("?#" if "?#" in url else "#") + fragment
 
             # Return the hashed version to the file
-            return template % unquote(transformed_url)
+            matches["url"] = unquote(transformed_url)
+            return template % matches
 
         return converter
 

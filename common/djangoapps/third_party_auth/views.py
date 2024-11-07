@@ -47,7 +47,7 @@ def inactive_user_view(request):
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        if third_party_provider.skip_email_verification and not activated:
+        if third_party_provider and third_party_provider.skip_email_verification and not activated:
             user.is_active = True
             user.save()
             activated = True

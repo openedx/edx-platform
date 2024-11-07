@@ -8,7 +8,8 @@ import logging
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import (CourseEnrollment,
+                                              CourseEnrollmentAllowed)
 
 log = logging.getLogger(__name__)
 
@@ -127,3 +128,16 @@ class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     description = serializers.CharField()
     sku = serializers.CharField()
     bulk_sku = serializers.CharField()
+
+
+class CourseEnrollmentAllowedSerializer(serializers.ModelSerializer):
+    """
+    Serializes CourseEnrollmentAllowed model
+
+    Aggregates all data from the CourseEnrollmentAllowed table, and pulls in the serialization
+    to give a complete representation of course enrollment allowed.
+    """
+    class Meta:
+        model = CourseEnrollmentAllowed
+        exclude = ['id']
+        lookup_field = 'user'

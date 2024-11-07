@@ -1,6 +1,7 @@
 """
 Models for content staging (and clipboard)
 """
+from __future__ import annotations
 import logging
 
 from django.contrib.auth import get_user_model
@@ -9,6 +10,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import UsageKeyField
 from opaque_keys.edx.keys import LearningContextKey
+from openedx_learning.lib.fields import case_insensitive_char_field, MultiCollationTextField
 
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
@@ -17,6 +19,11 @@ from .data import CLIPBOARD_PURPOSE, StagedContentStatus
 log = logging.getLogger(__name__)
 
 User = get_user_model()
+
+CASE_SENSITIVE_COLLATIONS = {
+    "sqlite": "BINARY",
+    "mysql": "utf8mb4_bin",
+}
 
 
 class StagedContent(models.Model):
@@ -50,12 +57,17 @@ class StagedContent(models.Model):
             e.g. "video" if a video is staged, or "vertical" for a unit.
         """),
     )
-    olx = models.TextField(null=False, blank=False)
+    olx = MultiCollationTextField(null=False, blank=False, db_collations=CASE_SENSITIVE_COLLATIONS)
     # The display name of whatever item is staged here, i.e. the root XBlock.
-    display_name = models.CharField(max_length=1024)
+    display_name = case_insensitive_char_field(max_length=768)
     # A _suggested_ URL name to use for this content. Since this suggestion may already be in use, it's fine to generate
     # a new url_name instead.
     suggested_url_name = models.CharField(max_length=1024)
+    # If applicable, an int >=1 indicating the version of copied content. If not applicable, zero (default).
+    version_num = models.PositiveIntegerField(default=0)
+
+    # Tags applied to the original source block(s) will be copied to the new block(s) on paste.
+    tags = models.JSONField(null=True, help_text=_("Content tags applied to these blocks"))
 
     @property
     def olx_filename(self) -> str:
@@ -65,6 +77,25 @@ class StagedContent(models.Model):
     def __str__(self):
         """ String representation of this instance """
         return f'Staged {self.block_type} block "{self.display_name}" ({self.status})'
+
+
+class StagedContentFile(models.Model):
+    """
+    A data file ("Static Asset") associated with some StagedContent.
+
+    These usually come from a course's Files & Uploads page, but can also come
+    from per-xblock file storage (e.g. video transcripts or images used in
+    v2 content libraries).
+    """
+    for_content = models.ForeignKey(StagedContent, on_delete=models.CASCADE, related_name="files")
+    filename = models.CharField(max_length=255, blank=False)
+    # Everything below is optional:
+    data_file = models.FileField(upload_to="staged-content-temp/", blank=True)
+    # If this asset came from Files & Uploads in a course, this is an AssetKey
+    # as a string. If this asset came from an XBlock's filesystem, this is the
+    # UsageKey of the XBlock.
+    source_key_str = models.CharField(max_length=255, blank=True)
+    md5_hash = models.CharField(max_length=32, blank=True)
 
 
 class UserClipboard(models.Model):

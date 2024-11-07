@@ -18,6 +18,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
                 'click .pathway-button': 'trackPathwayClicked',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -29,25 +30,22 @@ class ProgramDetailsSidebarView extends Backbone.View {
         this.industryPathways = options.industryPathways;
         this.creditPathways = options.creditPathways;
         this.programModel = options.model;
-        this.subscriptionModel = options.subscriptionModel;
         this.programTabViewEnabled = options.programTabViewEnabled;
-        this.isSubscriptionEligible = options.isSubscriptionEligible;
         this.urls = options.urls;
         this.render();
     }
 
     render() {
+        // eslint-disable-next-line no-undef
         const data = $.extend(
             {},
             this.model.toJSON(),
-            this.subscriptionModel.toJSON(),
             {
                 programCertificate: this.programCertificate
                     ? this.programCertificate.toJSON() : {},
                 industryPathways: this.industryPathways,
                 creditPathways: this.creditPathways,
                 programTabViewEnabled: this.programTabViewEnabled,
-                isSubscriptionEligible: this.isSubscriptionEligible,
                 arrowUprightIcon,
                 ...this.urls,
             },
@@ -114,7 +112,9 @@ class ProgramDetailsSidebarView extends Backbone.View {
             // Credentials uses the uuid without dashes so we are converting here for consistency
             program_uuid: this.programModel.attributes.uuid.replace(/-/g, ''),
             program_name: this.programModel.attributes.title,
+            // eslint-disable-next-line no-undef
             pathway_link_uuid: $(button).data('pathwayUuid').replace(/-/g, ''),
+            // eslint-disable-next-line no-undef
             pathway_name: $(button).data('pathwayName'),
         });
     }

@@ -126,9 +126,13 @@ class ChooseModeView(View):
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
                 if purchase_workflow == "single" and professional_mode.sku:
-                    redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.sku)
+                    redirect_url = ecommerce_service.get_checkout_page_url(
+                        professional_mode.sku, course_run_keys=[course_id]
+                    )
                 if purchase_workflow == "bulk" and professional_mode.bulk_sku:
-                    redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
+                    redirect_url = ecommerce_service.get_checkout_page_url(
+                        professional_mode.bulk_sku, course_run_keys=[course_id]
+                    )
             return redirect(redirect_url)
         course = modulestore().get_course(course_key)
 
@@ -191,6 +195,7 @@ class ChooseModeView(View):
             "content_gating_enabled": gated_content,
             "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(request.user, course),
             "search_courses_url": urljoin(settings.MKTG_URLS.get('ROOT'), '/search?tab=course'),
+            "course_run_key": course_id,
         }
         context.update(
             get_experiment_user_metadata_context(

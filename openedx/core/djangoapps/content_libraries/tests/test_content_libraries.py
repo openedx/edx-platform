@@ -1,37 +1,47 @@
 """
-Tests for Blockstore-based Content Libraries
+Tests for Learning-Core-based Content Libraries
 """
-from uuid import UUID
-from unittest.mock import patch
+from datetime import datetime, timezone
+from unittest import skip
+from unittest.mock import Mock, patch
+from uuid import uuid4
 
 import ddt
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.test.client import Client
-from django.test.utils import override_settings
+from freezegun import freeze_time
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
+from openedx_events.content_authoring.signals import (
+    CONTENT_LIBRARY_CREATED,
+    CONTENT_LIBRARY_DELETED,
+    CONTENT_LIBRARY_UPDATED,
+    LIBRARY_BLOCK_CREATED,
+    LIBRARY_BLOCK_DELETED,
+    LIBRARY_BLOCK_UPDATED
+)
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from organizations.models import Organization
 from rest_framework.test import APITestCase
 
-from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.constants import CC_4_BY
 from openedx.core.djangoapps.content_libraries.tests.base import (
-    ContentLibrariesRestApiBlockstoreServiceTest,
-    ContentLibrariesRestApiTest,
-    elasticsearch_test,
+    URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
     URL_BLOCK_RENDER_VIEW,
-    URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_XBLOCK_HANDLER,
+    ContentLibrariesRestApiTest
 )
-from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
-from openedx.core.djangolib.blockstore_cache import cache
-from openedx.core.lib import blockstore_api
-from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 
+@skip_unless_cms
 @ddt.ddt
-class ContentLibrariesTestMixin:
+class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
     """
-    General tests for Blockstore-based Content Libraries
+    General tests for Learning-Core-based Content Libraries
 
     These tests use the REST API, which in turn relies on the Python API.
     Some tests may use the python API directly if necessary to provide
@@ -52,37 +62,50 @@ class ContentLibrariesTestMixin:
     library slug and bundle UUID does not because it's assumed to be immutable
     and cached forever.
     """
+    ENABLED_OPENEDX_EVENTS = [
+        CONTENT_LIBRARY_CREATED.event_type,
+        CONTENT_LIBRARY_DELETED.event_type,
+        CONTENT_LIBRARY_UPDATED.event_type,
+        LIBRARY_BLOCK_CREATED.event_type,
+        LIBRARY_BLOCK_DELETED.event_type,
+        LIBRARY_BLOCK_UPDATED.event_type,
+    ]
 
-    def setUp(self):
-        super().setUp()
-        if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
-            ContentLibraryIndexer.remove_all_items()
-            LibraryBlockIndexer.remove_all_items()
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
+              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
+              so we're following a pattern here. But that pattern doesn't really make sense.
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def test_library_crud(self):
         """
         Test Create, Read, Update, and Delete of a Content Library
+
+        Tests with some non-ASCII chars in slug, title, description.
         """
         # Create:
         lib = self._create_library(
-            slug="lib-crud", title="A Test Library", description="Just Testing", license_type=CC_4_BY,
+            slug="téstlꜟط", title="A Tést Lꜟطrary", description="Just Téstꜟng", license_type=CC_4_BY,
         )
         expected_data = {
-            "id": "lib:CL-TEST:lib-crud",
+            "id": "lib:CL-TEST:téstlꜟط",
             "org": "CL-TEST",
-            "slug": "lib-crud",
-            "title": "A Test Library",
-            "description": "Just Testing",
+            "slug": "téstlꜟط",
+            "title": "A Tést Lꜟطrary",
+            "description": "Just Téstꜟng",
             "version": 0,
-            "type": COMPLEX,
             "license": CC_4_BY,
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
         }
-        self.assertDictContainsEntries(lib, expected_data)
-        # Check that bundle_uuid looks like a valid UUID
-        UUID(lib["bundle_uuid"])  # will raise an exception if not valid
 
+        self.assertDictContainsEntries(lib, expected_data)
         # Read:
         lib2 = self._get_library(lib["id"])
         self.assertDictContainsEntries(lib2, expected_data)
@@ -98,214 +121,164 @@ class ContentLibrariesTestMixin:
         self._get_library(lib["id"], expect_response=404)
         self._delete_library(lib["id"], expect_response=404)
 
-    @ddt.data(VIDEO, PROBLEM, COMPLEX)
-    def test_library_alternative_type(self, target_type):
-        """
-        Create a library with a specific type
-        """
-        lib = self._create_library(
-            slug="some-slug", title="Video Library", description="Test Video Library", library_type=target_type,
-        )
-        expected_data = {
-            "id": "lib:CL-TEST:some-slug",
-            "org": "CL-TEST",
-            "slug": "some-slug",
-            "title": "Video Library",
-            "type": target_type,
-            "description": "Test Video Library",
-            "version": 0,
-            "has_unpublished_changes": False,
-            "has_unpublished_deletes": False,
-            "license": ALL_RIGHTS_RESERVED,
-        }
-        self.assertDictContainsEntries(lib, expected_data)
-
-    # Need to use a different slug each time here. Seems to be a race condition on test cleanup that will break things
-    # otherwise.
-    @ddt.data(
-        ('to-video-fail', COMPLEX, VIDEO, (("problem", "problemA"),), 400),
-        ('to-video-empty', COMPLEX, VIDEO, tuple(), 200),
-        ('to-problem', COMPLEX, PROBLEM, (("problem", "problemB"),), 200),
-        ('to-problem-fail', COMPLEX, PROBLEM, (("video", "videoA"),), 400),
-        ('to-problem-empty', COMPLEX, PROBLEM, tuple(), 200),
-        ('to-complex-from-video', VIDEO, COMPLEX, (("video", "videoB"),), 200),
-        ('to-complex-from-problem', PROBLEM, COMPLEX, (("problem", "problemC"),), 200),
-        ('to-complex-from-problem-empty', PROBLEM, COMPLEX, tuple(), 200),
-        ('to-problem-from-video-empty', PROBLEM, VIDEO, tuple(), 200),
-    )
-    @ddt.unpack
-    def test_library_update_type_conversion(self, slug, start_type, target_type, xblock_specs, expect_response):
-        """
-        Test conversion of one library type to another. Restricts options based on type/block matching.
-        """
-        lib = self._create_library(
-            slug=slug, title="A Test Library", description="Just Testing", library_type=start_type,
-        )
-        assert lib['type'] == start_type
-        for block_type, block_slug in xblock_specs:
-            self._add_block_to_library(lib['id'], block_type, block_slug)
-        self._commit_library_changes(lib['id'])
-        result = self._update_library(lib['id'], type=target_type, expect_response=expect_response)
-        if expect_response == 200:
-            assert result['type'] == target_type
-            assert 'type' in result
-        else:
-            lib = self._get_library(lib['id'])
-            assert lib['type'] == start_type
-
-    def test_no_convert_on_unpublished(self):
-        """
-        Verify that you can't change a library's type, even if it would normally be valid,
-        when there are unpublished changes. This is so that a reversion of blocks won't cause an inconsistency.
-        """
-        lib = self._create_library(
-            slug='resolute', title="A complex library", description="Unconvertable", library_type=COMPLEX,
-        )
-        self._add_block_to_library(lib['id'], "video", 'vid-block')
-        result = self._update_library(lib['id'], type=VIDEO, expect_response=400)
-        assert 'type' in result
-
-    def test_no_convert_on_pending_deletes(self):
-        """
-        Verify that you can't change a library's type, even if it would normally be valid,
-        when there are unpublished changes. This is so that a reversion of blocks won't cause an inconsistency.
-        """
-        lib = self._create_library(
-            slug='still-alive', title="A complex library", description="Unconvertable", library_type=COMPLEX,
-        )
-        block = self._add_block_to_library(lib['id'], "video", 'vid-block')
-        self._commit_library_changes(lib['id'])
-        self._delete_library_block(block['id'])
-        result = self._update_library(lib['id'], type=VIDEO, expect_response=400)
-        assert 'type' in result
-
     def test_library_validation(self):
         """
         You can't create a library with the same slug as an existing library,
         or an invalid slug.
         """
-        assert 0 == len(blockstore_api.get_bundles(text_search='some-slug'))
         self._create_library(slug="some-slug", title="Existing Library")
-        assert 1 == len(blockstore_api.get_bundles(text_search='some-slug'))
 
         # Try to create a library+bundle with a duplicate slug
         response = self._create_library(slug="some-slug", title="Duplicate Library", expect_response=400)
         assert response == {
             'slug': 'A library with that ID already exists.',
         }
-        # The second bundle created with that slug is removed when the transaction rolls back.
-        assert 1 == len(blockstore_api.get_bundles(text_search='some-slug'))
 
         response = self._create_library(slug="Invalid Slug!", title="Library with Bad Slug", expect_response=400)
         assert response == {
             'slug': ['Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'],
         }
 
-    @ddt.data(True, False)
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
-    def test_list_library(self, is_indexing_enabled):
+    @skip("This endpoint shouldn't support num_blocks and has_unpublished_*.")
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootView.pagination_class.page_size", new=2)
+    def test_list_library(self):
         """
         Test the /libraries API and its pagination
+
+        TODO: This test will technically pass, but it's not really meaningful
+        because we don't have real data behind num_blocks, last_published,
+        has_published_changes, and has_unpublished_deletes. The has_* in
+        particular are going to be expensive to compute, particularly if we have
+        many large libraries. We also don't use that data for the library list
+        page yet.
+
+        We're looking at re-doing a lot of the UX right now, and so I'm holding
+        off on making deeper changes. We should either make sure we don't need
+        those fields and remove them from the returned results, or else we
+        should figure out how to make them more performant.
+
+        I've marked this as @skip to flag it for future review.
         """
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            lib1 = self._create_library(slug="some-slug-1", title="Existing Library")
-            lib2 = self._create_library(slug="some-slug-2", title="Existing Library")
-            if not is_indexing_enabled:
-                lib1['num_blocks'] = lib2['num_blocks'] = None
-                lib1['last_published'] = lib2['last_published'] = None
-                lib1['has_unpublished_changes'] = lib2['has_unpublished_changes'] = None
-                lib1['has_unpublished_deletes'] = lib2['has_unpublished_deletes'] = None
+        lib1 = self._create_library(slug="some-slug-1", title="Existing Library")
+        lib2 = self._create_library(slug="some-slug-2", title="Existing Library")
+        lib1['num_blocks'] = lib2['num_blocks'] = 0
+        lib1['last_published'] = lib2['last_published'] = None
+        lib1['version'] = lib2['version'] = None
+        lib1['has_unpublished_changes'] = lib2['has_unpublished_changes'] = False
+        lib1['has_unpublished_deletes'] = lib2['has_unpublished_deletes'] = False
 
-            result = self._list_libraries()
-            assert len(result) == 2
-            assert lib1 in result
-            assert lib2 in result
-            result = self._list_libraries({'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert result['next'] is None
+        result = self._list_libraries()
+        assert len(result) == 2
+        assert lib1 in result
+        assert lib2 in result
+        result = self._list_libraries({'pagination': 'true'})
+        assert len(result['results']) == 2
+        assert result['next'] is None
 
-            # Create another library which causes number of libraries to exceed the page size
-            self._create_library(slug="some-slug-3", title="Existing Library")
-            # Verify that if `pagination` param isn't sent, API still honors the max page size.
-            # This is for maintaining compatibility with older non pagination-aware clients.
-            result = self._list_libraries()
-            assert len(result) == 2
+        # Create another library which causes number of libraries to exceed the page size
+        self._create_library(slug="some-slug-3", title="Existing Library")
+        # Verify that if `pagination` param isn't sent, API still honors the max page size.
+        # This is for maintaining compatibility with older non pagination-aware clients.
+        result = self._list_libraries()
+        assert len(result) == 2
 
-            # Pagination enabled:
-            # Verify total elements and valid 'next' in page 1
-            result = self._list_libraries({'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert 'page=2' in result['next']
-            assert 'pagination=true' in result['next']
-            # Verify total elements and null 'next' in page 2
-            result = self._list_libraries({'pagination': 'true', 'page': '2'})
-            assert len(result['results']) == 1
-            assert result['next'] is None
+        # Pagination enabled:
+        # Verify total elements and valid 'next' in page 1
+        result = self._list_libraries({'pagination': 'true'})
+        assert len(result['results']) == 2
+        assert 'page=2' in result['next']
+        assert 'pagination=true' in result['next']
+        # Verify total elements and null 'next' in page 2
+        result = self._list_libraries({'pagination': 'true', 'page': '2'})
+        assert len(result['results']) == 1
+        assert result['next'] is None
 
-    @ddt.data(True, False)
-    def test_library_filters(self, is_indexing_enabled):
+    def test_library_filters(self):
         """
         Test the filters in the list libraries API
         """
-        suffix = str(is_indexing_enabled)
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            self._create_library(
-                slug=f"test-lib-filter-{suffix}-1", title="Fob", description=f"Bar-{suffix}", library_type=VIDEO,
-            )
-            self._create_library(
-                slug=f"test-lib-filter-{suffix}-2", title=f"Library-Title-{suffix}-2", description=f"Bar-{suffix}-2",
-            )
-            self._create_library(
-                slug=f"l3{suffix}", title=f"Library-Title-{suffix}-3", description="Description", library_type=VIDEO,
-            )
+        self._create_library(
+            slug="test-lib-filter-1", title="Fob", description="Bar",
+        )
+        self._create_library(
+            slug="test-lib-filter-2", title="Library-Title-2", description="Bar-2",
+        )
+        self._create_library(
+            slug="l3", title="Library-Title-3", description="Description",
+        )
 
-            Organization.objects.get_or_create(
-                short_name=f"org-test-{suffix}",
-                defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
-            )
-            self._create_library(
-                slug=f"l4-{suffix}", title=f"Library-Title-{suffix}-4",
-                description="Library-Description", org=f'org-test-{suffix}',
-                library_type=VIDEO,
-            )
-            self._create_library(
-                slug="l5", title=f"Library-Title-{suffix}-5", description="Library-Description",
-                org=f'org-test-{suffix}',
-            )
+        Organization.objects.get_or_create(
+            short_name="org-test",
+            defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
+        )
+        self._create_library(
+            slug="l4", title="Library-Title-4",
+            description="Library-Description", org='org-test',
+        )
+        self._create_library(
+            slug="l5", title="Library-Title-5", description="Library-Description",
+            org='org-test',
+        )
 
-            assert len(self._list_libraries()) == 5
-            assert len(self._list_libraries({'org': f'org-test-{suffix}'})) == 2
-            assert len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}'})) == 2
-            assert len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}', 'type': VIDEO})) == 1
-            assert len(self._list_libraries({'text_search': f'library-title-{suffix}'})) == 4
-            assert len(self._list_libraries({'text_search': f'library-title-{suffix}', 'type': VIDEO})) == 2
-            assert len(self._list_libraries({'text_search': f'bar-{suffix}'})) == 2
-            assert len(self._list_libraries({'text_search': f'org-test-{suffix}'})) == 2
-            assert len(self._list_libraries({'org': f'org-test-{suffix}',
-                                             'text_search': f'library-title-{suffix}-4'})) == 1
-            assert len(self._list_libraries({'type': VIDEO})) == 3
+        assert len(self._list_libraries()) == 5
+        assert len(self._list_libraries({'org': 'org-test'})) == 2
+        assert len(self._list_libraries({'text_search': 'test-lib-filter'})) == 2
+        assert len(self._list_libraries({'text_search': 'library-title'})) == 4
+        assert len(self._list_libraries({'text_search': 'bar'})) == 2
+        assert len(self._list_libraries({'text_search': 'org-test'})) == 2
+        assert len(self._list_libraries({'org': 'org-test',
+                                         'text_search': 'library-title-4'})) == 1
+
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'title'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-title'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': 'created'}),
+            ["test-lib-filter-1", "test-lib-filter-2", "l3", "l4", "l5"],
+        )
+        self.assertOrderEqual(
+            self._list_libraries({'order': '-created'}),
+            ["l5", "l4", "l3", "test-lib-filter-2", "test-lib-filter-1"],
+        )
+        # An invalid order doesn't apply any specific ordering to the result, so just
+        # check if successfully returned libraries
+        assert len(self._list_libraries({'order': 'invalid'})) == 5
+        assert len(self._list_libraries({'order': '-invalid'})) == 5
 
     # General Content Library XBlock tests:
 
-    def test_library_blocks(self):
+    def test_library_blocks(self):  # pylint: disable=too-many-statements
         """
         Test the happy path of creating and working with XBlocks in a content
         library.
+
+        Tests with some non-ASCII chars in slugs, titles, descriptions.
         """
-        lib = self._create_library(slug="testlib1", title="A Test Library", description="Testing XBlocks")
+        lib = self._create_library(slug="téstlꜟط", title="A Tést Lꜟطrary", description="Tésting XBlocks")
         lib_id = lib["id"]
         assert lib['has_unpublished_changes'] is False
 
         # A library starts out empty:
-        assert self._get_library_blocks(lib_id) == []
+        assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'problem' XBlock to the library:
-        block_data = self._add_block_to_library(lib_id, "problem", "problem1")
+        create_date = datetime(2024, 6, 6, 6, 6, 6, tzinfo=timezone.utc)
+        with freeze_time(create_date):
+            block_data = self._add_block_to_library(lib_id, "problem", "ࠒröblæm1")
         self.assertDictContainsEntries(block_data, {
-            "id": "lb:CL-TEST:testlib1:problem:problem1",
-            "display_name": "Blank Advanced Problem",
+            "id": "lb:CL-TEST:téstlꜟط:problem:ࠒröblæm1",
+            "display_name": "Blank Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
+            "last_published": None,
+            "published_by": None,
+            "last_draft_created": create_date.isoformat().replace('+00:00', 'Z'),
+            "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
         # Confirm that the result contains a definition key, but don't check its value,
@@ -313,16 +286,20 @@ class ContentLibrariesTestMixin:
         assert 'def_key' in block_data
 
         # now the library should contain one block and have unpublished changes:
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        publish_date = datetime(2024, 7, 7, 7, 7, 7, tzinfo=timezone.utc)
+        with freeze_time(publish_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
         # Now update the block's OLX:
         orig_olx = self._get_library_block_olx(block_id)
@@ -331,7 +308,7 @@ class ContentLibrariesTestMixin:
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -341,19 +318,22 @@ class ContentLibrariesTestMixin:
             </multiplechoiceresponse>
         </problem>
         """.strip()
-        self._set_library_block_olx(block_id, new_olx)
+        update_date = datetime(2024, 8, 8, 8, 8, 8, tzinfo=timezone.utc)
+        with freeze_time(update_date):
+            self._set_library_block_olx(block_id, new_olx)
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
         assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "New Multi Choice Question",
             "has_unpublished_changes": True,
+            "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
 
         # Now view the XBlock's student_view (including draft changes):
         fragment = self._render_block_view(block_id, "student_view")
         assert 'resources' in fragment
-        assert 'Blockstore is designed to store.' in fragment['content']
+        assert 'Learning Core is designed to store.' in fragment['content']
 
         # Also call a handler to make sure that's working:
         handler_url = self._get_block_handler_url(block_id, "xmodule_handler") + "problem_get"
@@ -374,6 +354,21 @@ class ContentLibrariesTestMixin:
         assert self._get_library(lib_id)['has_unpublished_deletes'] is False
         assert self._get_library_block_olx(block_id) == orig_olx
 
+        # Now edit and publish the single block instead of the whole library:
+        new_olx = "<problem><p>Edited OLX</p></problem>"
+        self._set_library_block_olx(block_id, new_olx)
+        assert self._get_library_block_olx(block_id) == new_olx
+        unpublished_block_data = self._get_library_block(block_id)
+        assert unpublished_block_data['has_unpublished_changes'] is True
+        block_update_date = datetime(2024, 8, 8, 8, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(block_update_date):
+            self._publish_library_block(block_id)
+        # Confirm the block is now published:
+        published_block_data = self._get_library_block(block_id)
+        assert published_block_data['last_published'] == block_update_date.isoformat().replace('+00:00', 'Z')
+        assert published_block_data['published_by'] == "Bob"
+        assert published_block_data['has_unpublished_changes'] is False
+
         # fin
 
     def test_library_blocks_studio_view(self):
@@ -385,44 +380,55 @@ class ContentLibrariesTestMixin:
         assert lib['has_unpublished_changes'] is False
 
         # A library starts out empty:
-        assert self._get_library_blocks(lib_id) == []
+        assert self._get_library_blocks(lib_id)['results'] == []
 
         # Add a 'html' XBlock to the library:
-        block_data = self._add_block_to_library(lib_id, "html", "html1")
+        create_date = datetime(2024, 6, 6, 6, 6, 6, tzinfo=timezone.utc)
+        with freeze_time(create_date):
+            block_data = self._add_block_to_library(lib_id, "html", "html1")
         self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:testlib2:html:html1",
             "display_name": "Text",
             "block_type": "html",
             "has_unpublished_changes": True,
+            "last_published": None,
+            "published_by": None,
+            "last_draft_created": create_date.isoformat().replace('+00:00', 'Z'),
+            "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
-        # Confirm that the result contains a definition key, but don't check its value,
-        # which for the purposes of these tests is an implementation detail.
-        assert 'def_key' in block_data
 
         # now the library should contain one block and have unpublished changes:
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
         assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
-        self._commit_library_changes(lib_id)
+        publish_date = datetime(2024, 7, 7, 7, 7, 7, tzinfo=timezone.utc)
+        with freeze_time(publish_date):
+            self._commit_library_changes(lib_id)
         assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
+        block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
+        block_data["published_by"] = "Bob"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
-        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
         # Now update the block's OLX:
         orig_olx = self._get_library_block_olx(block_id)
         assert '<html' in orig_olx
         new_olx = "<html><b>Hello world!</b></html>"
-        self._set_library_block_olx(block_id, new_olx)
+
+        update_date = datetime(2024, 8, 8, 8, 8, 8, tzinfo=timezone.utc)
+        with freeze_time(update_date):
+            self._set_library_block_olx(block_id, new_olx)
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
         assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "Text",
             "has_unpublished_changes": True,
+            "last_draft_created": update_date.isoformat().replace('+00:00', 'Z')
         })
 
         # Now view the XBlock's studio view (including draft changes):
@@ -430,124 +436,84 @@ class ContentLibrariesTestMixin:
         assert 'resources' in fragment
         assert 'Hello world!' in fragment['content']
 
-    @ddt.data(True, False)
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
-    def test_list_library_blocks(self, is_indexing_enabled):
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryBlocksView.pagination_class.page_size", new=2)
+    def test_list_library_blocks(self):
         """
         Test the /libraries/{lib_key_str}/blocks API and its pagination
         """
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            lib = self._create_library(slug="list_blocks-slug" + str(is_indexing_enabled), title="Library 1")
-            block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
-            block2 = self._add_block_to_library(lib["id"], "unit", "unit1")
+        lib = self._create_library(slug="list_blocks-slug", title="Library 1")
+        block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
+        self._add_block_to_library(lib["id"], "unit", "unit1")
 
-            self._add_block_to_library(lib["id"], "problem", "problem2", parent_block=block2["id"])
+        response = self._get_library_blocks(lib["id"])
+        result = response['results']
+        assert len(response['results']) == 2
+        assert block1 in result
+        assert response['next'] is None
 
-            result = self._get_library_blocks(lib["id"])
-            assert len(result) == 2
-            assert block1 in result
+        self._add_block_to_library(lib["id"], "problem", "problem3")
 
-            result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert result['next'] is None
+        # Test pagination
+        result = self._get_library_blocks(lib["id"])
+        assert len(result['results']) == 2
 
-            self._add_block_to_library(lib["id"], "problem", "problem3")
-            # Test pagination
-            result = self._get_library_blocks(lib["id"])
-            assert len(result) == 3
-            result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
-            assert len(result['results']) == 2
-            assert 'page=2' in result['next']
-            assert 'pagination=true' in result['next']
-            result = self._get_library_blocks(lib["id"], {'pagination': 'true', 'page': '2'})
-            assert len(result['results']) == 1
-            assert result['next'] is None
+        assert 'page=2' in result['next']
+        result = self._get_library_blocks(lib["id"], {'page': '2'})
+        assert len(result['results']) == 1
+        assert result['next'] is None
 
-    @ddt.data(True, False)
-    def test_library_blocks_filters(self, is_indexing_enabled):
+    def test_library_blocks_filters(self):
         """
         Test the filters in the list libraries API
         """
-        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            lib = self._create_library(slug="test-lib-blocks" + str(is_indexing_enabled), title="Title")
-            block1 = self._add_block_to_library(lib["id"], "problem", "foo-bar")
-            self._add_block_to_library(lib["id"], "video", "vid-baz")
-            self._add_block_to_library(lib["id"], "html", "html-baz")
-            self._add_block_to_library(lib["id"], "problem", "foo-baz")
-            self._add_block_to_library(lib["id"], "problem", "bar-baz")
+        lib = self._create_library(slug="test-lib-blocks", title="Title")
+        block1 = self._add_block_to_library(lib["id"], "problem", "foo-bar")
+        self._add_block_to_library(lib["id"], "video", "vid-baz")
+        self._add_block_to_library(lib["id"], "html", "html-baz")
+        self._add_block_to_library(lib["id"], "problem", "foo-baz")
+        self._add_block_to_library(lib["id"], "problem", "bar-baz")
 
-            self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
+        self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
 
-            assert len(self._get_library_blocks(lib['id'])) == 5
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo'})) == 2
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Display'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Video'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo', 'block_type': 'video'})) == 0
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': 'video'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': ['video', 'html']})) ==\
-                   2
-            assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})) == 1
-            assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})) == 3
-            assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})) == 0
-
-    @ddt.data(
-        ('video-problem', VIDEO, 'problem', 400),
-        ('video-video', VIDEO, 'video', 200),
-        ('problem-problem', PROBLEM, 'problem', 200),
-        ('problem-video', PROBLEM, 'video', 400),
-        ('complex-video', COMPLEX, 'video', 200),
-        ('complex-problem', COMPLEX, 'problem', 200),
-    )
-    @ddt.unpack
-    def test_library_blocks_type_constrained(self, slug, library_type, block_type, expect_response):
-        """
-        Test that type-constrained libraries enforce their constraint when adding an XBlock.
-        """
-        lib = self._create_library(
-            slug=slug, title="A Test Library", description="Testing XBlocks", library_type=library_type,
+        assert len(self._get_library_blocks(lib['id'])['results']) == 5
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo'})['results']) == 2
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Display'})['results']) == 1
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Video'})['results']) == 1
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo', 'block_type': 'video'})['results']) == 0
+        assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': 'video'})['results']) == 1
+        assert 2 == len(
+            self._get_library_blocks(
+                lib['id'],
+                {'text_search': 'Baz', 'block_type': ['video', 'html']}
+            )['results']
         )
-        lib_id = lib["id"]
+        assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})['results']) == 1
+        assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})['results']) == 3
+        assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})['results']) == 0
 
-        # Add a 'problem' XBlock to the library:
-        self._add_block_to_library(lib_id, block_type, 'test-block', expect_response=expect_response)
+    def test_library_not_found(self):
+        """Test that requests fail with 404 when the library does not exist"""
+        valid_not_found_key = 'lb:valid:key:video:1'
+        response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=valid_not_found_key))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {
+            'detail': "Content Library 'lib:valid:key' does not exist",
+        })
 
-    def test_library_blocks_with_hierarchy(self):
-        """
-        Test library blocks with children
-        """
-        lib = self._create_library(slug="hierarchy_test_lib", title="A Test Library")
-        lib_id = lib["id"]
-
-        # Add a 'unit' XBlock to the library:
-        unit_block = self._add_block_to_library(lib_id, "unit", "unit1")
-        # Add an HTML child block:
-        child1 = self._add_block_to_library(lib_id, "html", "html1", parent_block=unit_block["id"])
-        self._set_library_block_olx(child1["id"], "<html>Hello world</html>")
-        # Add a problem child block:
-        child2 = self._add_block_to_library(lib_id, "problem", "problem1", parent_block=unit_block["id"])
-        self._set_library_block_olx(child2["id"], """
-            <problem><multiplechoiceresponse>
-                    <p>What is an even number?</p>
-                    <choicegroup type="MultipleChoice">
-                        <choice correct="false">3</choice>
-                        <choice correct="true">2</choice>
-                    </choicegroup>
-            </multiplechoiceresponse></problem>
-        """)
-
-        # Check the resulting OLX of the unit:
-        assert self._get_library_block_olx(unit_block['id']) ==\
-               '<unit xblock-family="xblock.v1">\n  <xblock-include definition="html/html1"/>\n' \
-               '  <xblock-include definition="problem/problem1"/>\n</unit>\n'
-
-        # The unit can see and render its children:
-        fragment = self._render_block_view(unit_block["id"], "student_view")
-        assert 'Hello world' in fragment['content']
-        assert 'What is an even number?' in fragment['content']
-
-        # We cannot add a duplicate ID to the library, either at the top level or as a child:
-        self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
-        self._add_block_to_library(lib_id, "problem", "problem1", parent_block=unit_block["id"], expect_response=400)
+    def test_block_not_found(self):
+        """Test that requests fail with 404 when the library exists but the XBlock does not"""
+        lib = self._create_library(
+            slug="test_lib_block_event_delete",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        library_key = LibraryLocatorV2.from_string(lib['id'])
+        non_existent_block_key = LibraryUsageLocatorV2(lib_key=library_key, block_type='video', usage_id='123')
+        response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=non_existent_block_key))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {
+            'detail': f"The component '{non_existent_block_key}' does not exist.",
+        })
 
     # Test that permissions are enforced for content libraries
 
@@ -559,6 +525,10 @@ class ContentLibrariesTestMixin:
 
         This is a single giant test case, because that optimizes for the fastest
         test run time, even though it can make debugging failures harder.
+
+        TODO: The asset permissions part of this test have been commented out
+        for now. These should be re-enabled after we re-implement them over
+        Learning Core data models.
         """
         # Create a few users to use for all of these tests:
         admin = UserFactory.create(username="Admin", email="admin@example.com")
@@ -678,22 +648,29 @@ class ContentLibrariesTestMixin:
         # A random user cannot read OLX nor assets (this library has allow_public_read False):
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key, expect_response=403)
+            self._get_library_block_fields(block3_key, expect_response=403)
             self._get_library_block_assets(block3_key, expect_response=403)
-            self._get_library_block_asset(block3_key, file_name="whatever.png", expect_response=403)
+            self._get_library_block_asset(block3_key, file_name="static/whatever.png", expect_response=403)
+            # Nor can they preview the block:
+            self._render_block_view(block3_key, view_name="student_view", expect_response=403)
         # But if we grant allow_public_read, then they can:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
-            self._set_library_block_asset(block3_key, "whatever.png", b"data")
+            self._set_library_block_asset(block3_key, "static/whatever.png", b"data")
         with self.as_user(random_user):
             self._get_library_block_olx(block3_key)
-            self._get_library_block_assets(block3_key)
-            self._get_library_block_asset(block3_key, file_name="whatever.png")
+            self._render_block_view(block3_key, view_name="student_view")
+            f = self._get_library_block_fields(block3_key)
+            # self._get_library_block_assets(block3_key)
+            # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
-        # Users without authoring permission cannot edit nor delete XBlocks (this library has allow_public_read False):
+        # Users without authoring permission cannot edit nor publish nor delete XBlocks:
         for user in [reader, random_user]:
             with self.as_user(user):
                 self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
-                self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
+                self._set_library_block_fields(block3_key, {"data": "<problem />", "metadata": {}}, expect_response=403)
+                self._set_library_block_asset(block3_key, "static/test.txt", b"data", expect_response=403)
+                self._publish_library_block(block3_key, expect_response=403)
                 self._delete_library_block(block3_key, expect_response=403)
                 self._commit_library_changes(lib_id, expect_response=403)
                 self._revert_library_changes(lib_id, expect_response=403)
@@ -702,12 +679,24 @@ class ContentLibrariesTestMixin:
         with self.as_user(author_group_member):
             olx = self._get_library_block_olx(block3_key)
             self._set_library_block_olx(block3_key, olx)
+            self._set_library_block_fields(block3_key, {"data": olx, "metadata": {}})
             self._get_library_block_assets(block3_key)
-            self._set_library_block_asset(block3_key, "test.txt", b"data")
-            self._get_library_block_asset(block3_key, file_name="test.txt")
+            self._set_library_block_asset(block3_key, "static/test.txt", b"data")
+            self._get_library_block_asset(block3_key, file_name="static/test.txt")
             self._delete_library_block(block3_key)
+            self._publish_library_block(block3_key)
             self._commit_library_changes(lib_id)
             self._revert_library_changes(lib_id)  # This is a no-op after the commit, but should still have 200 response
+
+        # Users without authoring permission cannot commit Xblock changes:
+        # First we need to add some unpublished changes
+        with self.as_user(admin):
+            block4_data = self._add_block_to_library(lib_id, "problem", "problem4")
+            block5_data = self._add_block_to_library(lib_id, "problem", "problem5")
+            block4_key = block4_data["id"]
+            block5_key = block5_data["id"]
+            self._set_library_block_olx(block4_key, "<problem/>")
+            self._set_library_block_olx(block5_key, "<problem/>")
 
     def test_no_lockout(self):
         """
@@ -725,237 +714,377 @@ class ContentLibrariesTestMixin:
             )
             self._remove_user_access(lib_key=lib['id'], username=admin.username)
 
-    def test_library_blocks_with_links(self):
-        """
-        Test that libraries can link to XBlocks in other content libraries
-        """
-        # Create a problem bank:
-        bank_lib = self._create_library(slug="problem_bank", title="Problem Bank")
-        bank_lib_id = bank_lib["id"]
-        # Add problem1 to the problem bank:
-        p1 = self._add_block_to_library(bank_lib_id, "problem", "problem1")
-        self._set_library_block_olx(p1["id"], """
-            <problem><multiplechoiceresponse>
-                    <p>What is an even number?</p>
-                    <choicegroup type="MultipleChoice">
-                        <choice correct="false">3</choice>
-                        <choice correct="true">2</choice>
-                    </choicegroup>
-            </multiplechoiceresponse></problem>
-        """)
-        # Commit the changes, creating version 1:
-        self._commit_library_changes(bank_lib_id)
-        # Now update problem 1 and create a new problem 2:
-        self._set_library_block_olx(p1["id"], """
-            <problem><multiplechoiceresponse>
-                    <p>What is an odd number?</p>
-                    <choicegroup type="MultipleChoice">
-                        <choice correct="true">3</choice>
-                        <choice correct="false">2</choice>
-                    </choicegroup>
-            </multiplechoiceresponse></problem>
-        """)
-        p2 = self._add_block_to_library(bank_lib_id, "problem", "problem2")
-        self._set_library_block_olx(p2["id"], """
-            <problem><multiplechoiceresponse>
-                    <p>What holds this XBlock?</p>
-                    <choicegroup type="MultipleChoice">
-                        <choice correct="false">A course</choice>
-                        <choice correct="true">A problem bank</choice>
-                    </choicegroup>
-            </multiplechoiceresponse></problem>
-        """)
-        # Commit the changes, creating version 2:
-        self._commit_library_changes(bank_lib_id)
-        # At this point, bank_lib contains two problems and has two versions.
-        # In version 1, problem1 is "What is an event number", and in version 2 it's "What is an odd number".
-        # Problem2 exists only in version 2 and asks "What holds this XBlock?"
-
-        lib = self._create_library(slug="links_test_lib", title="Link Test Library")
-        lib_id = lib["id"]
-        # Link to the problem bank:
-        self._link_to_library(lib_id, "problem_bank", bank_lib_id)
-        self._link_to_library(lib_id, "problem_bank_v1", bank_lib_id, version=1)
-
-        # Add a 'unit' XBlock to the library:
-        unit_block = self._add_block_to_library(lib_id, "unit", "unit1")
-        self._set_library_block_olx(unit_block["id"], """
-            <unit>
-                <!-- version 2 link to "What is an odd number?" -->
-                <xblock-include source="problem_bank" definition="problem/problem1"/>
-                <!-- version 1 link to "What is an even number?" -->
-                <xblock-include source="problem_bank_v1" definition="problem/problem1" usage="p1v1" />
-                <!-- link to "What holds this XBlock?" -->
-                <xblock-include source="problem_bank" definition="problem/problem2"/>
-            </unit>
-        """)
-
-        # The unit can see and render its children:
-        fragment = self._render_block_view(unit_block["id"], "student_view")
-        assert 'What is an odd number?' in fragment['content']
-        assert 'What is an even number?' in fragment['content']
-        assert 'What holds this XBlock?' in fragment['content']
-
-        # Also check the API for retrieving links:
-        links_created = self._get_library_links(lib_id)
-        links_created.sort(key=lambda link: link["id"])
-        assert len(links_created) == 2
-
-        assert links_created[0]['id'] == 'problem_bank'
-        assert links_created[0]['bundle_uuid'] == bank_lib['bundle_uuid']
-        assert links_created[0]['version'] == 2
-        assert links_created[0]['latest_version'] == 2
-        assert links_created[0]['opaque_key'] == bank_lib_id
-
-        assert links_created[1]['id'] == 'problem_bank_v1'
-        assert links_created[1]['bundle_uuid'] == bank_lib['bundle_uuid']
-        assert links_created[1]['version'] == 1
-        assert links_created[1]['latest_version'] == 2
-        assert links_created[1]['opaque_key'] == bank_lib_id
-
-    def test_library_blocks_with_deleted_links(self):
-        """
-        Test that libraries can handle deleted links to bundles
-        """
-        # Create a problem bank:
-        bank_lib = self._create_library(slug="problem_bank1X", title="Problem Bank")
-        bank_lib_id = bank_lib["id"]
-        # Add problem1 to the problem bank:
-        p1 = self._add_block_to_library(bank_lib_id, "problem", "problem1X")
-        self._set_library_block_olx(p1["id"], """
-            <problem><multiplechoiceresponse>
-                    <p>What is an even number?</p>
-                    <choicegroup type="MultipleChoice">
-                        <choice correct="false">3</choice>
-                        <choice correct="true">2</choice>
-                    </choicegroup>
-            </multiplechoiceresponse></problem>
-        """)
-        # Commit the changes, creating version 1:
-        self._commit_library_changes(bank_lib_id)
-
-        # Create another problem bank:
-        bank_lib2 = self._create_library(slug="problem_bank2", title="Problem Bank 2")
-        bank_lib2_id = bank_lib2["id"]
-        # Add problem1 to the problem bank:
-        p2 = self._add_block_to_library(bank_lib2_id, "problem", "problem1X")
-        self._set_library_block_olx(p2["id"], """
-            <problem><multiplechoiceresponse>
-                    <p>What is an odd number?</p>
-                    <choicegroup type="MultipleChoice">
-                        <choice correct="true">3</choice>
-                        <choice correct="false">2</choice>
-                    </choicegroup>
-            </multiplechoiceresponse></problem>
-        """)
-        # Commit the changes, creating version 1:
-        self._commit_library_changes(bank_lib2_id)
-
-        lib = self._create_library(slug="problem_bank2X", title="Link Test Library")
-        lib_id = lib["id"]
-        # Link to the other libraries:
-        self._link_to_library(lib_id, "problem_bank", bank_lib_id)
-        self._link_to_library(lib_id, "problem_bank_v1", bank_lib2_id)
-
-        # check the API for retrieving links:
-        links_created = self._get_library_links(lib_id)
-        links_created.sort(key=lambda link: link["id"])
-        assert len(links_created) == 2
-
-        assert links_created[0]['id'] == 'problem_bank'
-        assert links_created[0]['bundle_uuid'] == bank_lib['bundle_uuid']
-        assert links_created[0]['version'] == 1
-        assert links_created[0]['latest_version'] == 1
-        assert links_created[0]['opaque_key'] == bank_lib_id
-
-        assert links_created[1]['id'] == 'problem_bank_v1'
-        assert links_created[1]['bundle_uuid'] == bank_lib2['bundle_uuid']
-        assert links_created[1]['version'] == 1
-        assert links_created[1]['latest_version'] == 1
-        assert links_created[1]['opaque_key'] == bank_lib2_id
-
-        # Delete one of the linked bundles/libraries
-        self._delete_library(bank_lib2_id)
-
-        # update the cache so we're not getting cached links in the next step
-        cache_key = 'bundle_version:{}:'.format(bank_lib['bundle_uuid'])
-        cache.delete(cache_key)
-        cache_key = 'bundle_version:{}:'.format(bank_lib2['bundle_uuid'])
-        cache.delete(cache_key)
-
-        links_created = self._get_library_links(lib_id)
-        links_created.sort(key=lambda link: link["id"])
-        assert len(links_created) == 2
-
-        assert links_created[0]['id'] == 'problem_bank'
-        assert links_created[0]['bundle_uuid'] == bank_lib['bundle_uuid']
-        assert links_created[0]['version'] == 1
-        assert links_created[0]['latest_version'] == 1
-        assert links_created[0]['opaque_key'] == bank_lib_id
-
-        # If a link has been deleted, the latest version will be 0,
-        # and the opaque key will be `None`.
-        assert links_created[1]['id'] == 'problem_bank_v1'
-        assert links_created[1]['bundle_uuid'] == bank_lib2['bundle_uuid']
-        assert links_created[1]['version'] == 1
-        assert links_created[1]['latest_version'] == 0
-        assert links_created[1]['opaque_key'] is None
-
     def test_library_blocks_limit(self):
         """
         Test that libraries don't allow more than specified blocks
         """
         with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1):
-            lib = self._create_library(slug="test_lib_limits", title="Limits Test Library", description="Testing XBlocks limits in a library")  # lint-amnesty, pylint: disable=line-too-long
+            lib = self._create_library(
+                slug="test_lib_limits",
+                title="Limits Test Library",
+                description="Testing XBlocks limits in a library"
+            )
             lib_id = lib["id"]
-            block_data = self._add_block_to_library(lib_id, "unit", "unit1")
+            self._add_block_to_library(lib_id, "unit", "unit1")
             # Second block should throw error
             self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
-            # Also check that limit applies to child blocks too
-            self._add_block_to_library(lib_id, "html", "html1", parent_block=block_data['id'], expect_response=400)
 
-    @ddt.data(
-        ('complex-types', COMPLEX, False),
-        ('video-types', VIDEO, True),
-        ('problem-types', PROBLEM, True),
-    )
-    @ddt.unpack
-    def test_block_types(self, slug, library_type, constrained):
+    def test_content_library_create_event(self):
         """
-        Test that the permitted block types listing for a library change based on type.
+        Check that CONTENT_LIBRARY_CREATED event is sent when a content library is created.
         """
-        lib = self._create_library(slug=slug, title='Test Block Types', library_type=library_type)
-        types = self._get_library_block_types(lib['id'])
-        if constrained:
-            assert len(types) == 1
-            assert types[0]['block_type'] == library_type
-        else:
-            assert len(types) > 1
+        event_receiver = Mock()
+        CONTENT_LIBRARY_CREATED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_event_create",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        library_key = LibraryLocatorV2.from_string(lib['id'])
 
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_LIBRARY_CREATED,
+                "sender": None,
+                "content_library": ContentLibraryData(
+                    library_key=library_key,
+                    update_blocks=False,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
 
-@elasticsearch_test
-class ContentLibrariesBlockstoreServiceTest(
-    ContentLibrariesTestMixin,
-    ContentLibrariesRestApiBlockstoreServiceTest,
-):
-    """
-    General tests for Blockstore-based Content Libraries, using the standalone Blockstore service.
-    """
+    def test_content_library_update_event(self):
+        """
+        Check that CONTENT_LIBRARY_UPDATED event is sent when a content library is updated.
+        """
+        event_receiver = Mock()
+        CONTENT_LIBRARY_UPDATED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_event_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
 
+        lib2 = self._update_library(lib["id"], title="New Title")
+        library_key = LibraryLocatorV2.from_string(lib2['id'])
 
-@elasticsearch_test
-class ContentLibrariesTest(
-    ContentLibrariesTestMixin,
-    ContentLibrariesRestApiTest,
-):
-    """
-    General tests for Blockstore-based Content Libraries, using the installed Blockstore app.
-    """
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_LIBRARY_UPDATED,
+                "sender": None,
+                "content_library": ContentLibraryData(
+                    library_key=library_key,
+                    update_blocks=False,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_content_library_delete_event(self):
+        """
+        Check that CONTENT_LIBRARY_DELETED event is sent when a content library is deleted.
+        """
+        event_receiver = Mock()
+        CONTENT_LIBRARY_DELETED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_event_delete",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        library_key = LibraryLocatorV2.from_string(lib['id'])
+
+        self._delete_library(lib["id"])
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_LIBRARY_DELETED,
+                "sender": None,
+                "content_library": ContentLibraryData(
+                    library_key=library_key,
+                    update_blocks=False,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_create_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when a library block is created.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_CREATED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_block_event_create",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        lib_id = lib["id"]
+        self._add_block_to_library(lib_id, "problem", "problem1")
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="problem",
+            usage_id="problem1"
+        )
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_CREATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_olx_update_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when the OLX source is updated.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_UPDATED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_block_event_olx_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        lib_id = lib["id"]
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "problem", "problem1")
+        block_id = block["id"]
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="problem",
+            usage_id="problem1"
+        )
+
+        new_olx = """
+        <problem display_name="New Multi Choice Question" max_attempts="5">
+            <multiplechoiceresponse>
+                <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
+                <label>Learning Core is designed to store.</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">XBlock metadata only</choice>
+                    <choice correct="true">XBlock data/metadata and associated static asset files</choice>
+                    <choice correct="false">Static asset files for XBlocks and courseware</choice>
+                    <choice correct="false">XModule metadata only</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """.strip()
+
+        self._set_library_block_olx(block_id, new_olx)
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_UPDATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_add_asset_update_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
+        uploaded associated with the XBlock.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_UPDATED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_block_event_add_asset_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        lib_id = lib["id"]
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block_id = block["id"]
+        self._set_library_block_asset(block_id, "static/test.txt", b"data")
+
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="unit",
+            usage_id="u1"
+        )
+
+        event_receiver.assert_called_once()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_UPDATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_del_asset_update_event(self):
+        """
+        Check that LIBRARY_BLOCK_CREATED event is sent when a static asset is
+        removed from XBlock.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_UPDATED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_block_event_del_asset_update",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+        lib_id = lib["id"]
+
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block_id = block["id"]
+        self._set_library_block_asset(block_id, "static/test.txt", b"data")
+
+        self._delete_library_block_asset(block_id, 'static/text.txt')
+
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="unit",
+            usage_id="u1"
+        )
+
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_UPDATED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_block_delete_event(self):
+        """
+        Check that LIBRARY_BLOCK_DELETED event is sent when a content library is deleted.
+        """
+        event_receiver = Mock()
+        LIBRARY_BLOCK_DELETED.connect(event_receiver)
+        lib = self._create_library(
+            slug="test_lib_block_event_delete",
+            title="Event Test Library",
+            description="Testing event in library"
+        )
+
+        lib_id = lib["id"]
+        library_key = LibraryLocatorV2.from_string(lib_id)
+
+        block = self._add_block_to_library(lib_id, "problem", "problem1")
+        block_id = block['id']
+
+        usage_key = LibraryUsageLocatorV2(
+            lib_key=library_key,
+            block_type="problem",
+            usage_id="problem1"
+        )
+
+        self._delete_library_block(block_id)
+
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_BLOCK_DELETED,
+                "sender": None,
+                "library_block": LibraryBlockData(
+                    library_key=library_key,
+                    usage_key=usage_key
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    def test_library_paste_clipboard(self):
+        """
+        Check the a new block is created in the library after pasting from clipboard.
+        The content of the new block should match the content of the block in the clipboard.
+        """
+        # Importing here since this was failing when tests ran in the LMS
+        from openedx.core.djangoapps.content_staging.api import save_xblock_to_user_clipboard
+
+        # Create user to perform tests on
+        author = UserFactory.create(username="Author", email="author@example.com")
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_paste_clipboard",
+                title="Paste Clipboard Test Library",
+                description="Testing pasting clipboard in library"
+            )
+            lib_id = lib["id"]
+
+            # Add a 'problem' XBlock to the library:
+            block_data = self._add_block_to_library(lib_id, "problem", "problem1")
+
+            # Get the usage_key of the created block
+            library_key = LibraryLocatorV2.from_string(lib_id)
+            usage_key = LibraryUsageLocatorV2(
+                lib_key=library_key,
+                block_type="problem",
+                usage_id="problem1"
+            )
+
+            # Add an asset to the block before copying
+            self._set_library_block_asset(usage_key, "static/hello.txt", b"Hello World!")
+
+            # Get the XBlock created in the previous step
+            block = xblock_api.load_block(usage_key, user=author)
+
+            # Copy the block to the user's clipboard
+            save_xblock_to_user_clipboard(block, author.id)
+
+            # Paste the content of the clipboard into the library
+            pasted_block_id = str(uuid4())
+            paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
+            pasted_usage_key = LibraryUsageLocatorV2(
+                lib_key=library_key,
+                block_type="problem",
+                usage_id=pasted_block_id
+            )
+            self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
+
+            # Compare the two text files
+            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").getvalue()
+            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").getvalue()
+            assert src_data == dest_data
+
+            # Check that the new block was created after the paste and it's content matches
+            # the the block in the clipboard
+            self.assertDictContainsEntries(self._get_library_block(paste_data["id"]), {
+                **block_data,
+                "last_draft_created_by": None,
+                "last_draft_created": paste_data["last_draft_created"],
+                "created": paste_data["created"],
+                "modified": paste_data["modified"],
+                "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
+            })
 
 
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
-    """Tests only focused on service validation, no Blockstore needed."""
+    """Tests only focused on service validation, no Learning Core interactions here."""
 
     @ddt.data(
         (URL_BLOCK_METADATA_URL, dict(block_key='totally_invalid_key')),
@@ -969,10 +1098,6 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             endpoint.format(**endpoint_parameters),
         )
         self.assertEqual(response.status_code, 404)
-        msg = f"XBlock {endpoint_parameters.get('block_key')} does not exist, or you don't have permission to view it."
-        self.assertEqual(response.json(), {
-            'detail': msg,
-        })
 
     def test_xblock_handler_invalid_key(self):
         """This endpoint is tested separately from the previous ones as it's not a DRF endpoint."""
@@ -984,12 +1109,3 @@ class ContentLibraryXBlockValidationTest(APITestCase):
             secure_token='random',
         )))
         self.assertEqual(response.status_code, 404)
-
-    def test_not_found_fails_correctly(self):
-        """Test fails with 404 when xblock key is valid but not found."""
-        valid_not_found_key = 'lb:valid:key:video:1'
-        response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=valid_not_found_key))
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {
-            'detail': f"XBlock {valid_not_found_key} does not exist, or you don't have permission to view it.",
-        })

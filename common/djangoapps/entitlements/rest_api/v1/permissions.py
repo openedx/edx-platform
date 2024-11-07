@@ -15,6 +15,7 @@ class IsAdminOrSupportOrAuthenticatedReadOnly(BasePermission):
     in the SAFE_METHODS list.  For example GET requests will not
     require an Admin or Support user.
     """
+
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return request.user.is_authenticated

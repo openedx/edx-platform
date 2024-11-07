@@ -1,6 +1,6 @@
 <%page expression_filter="h"/>
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 <%namespace name='static' file='../static_content.html'/>
@@ -51,7 +51,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                     % if facebook_share_enabled:
                       <button class="action action-share-facebook btn-inverse btn-small icon-only" id="action-share-facebook"
                         ## xss-lint: disable=mako-invalid-html-filter
-                        onclick="FaceBook.share({share_text: '${facebook_share_text | n, js_escaped_string}', share_link: '${share_url | n, js_escaped_string}', picture_link: '${full_course_image_url | n, js_escaped_string}', description: '${_('Click the link to see my certificate.') | n, js_escaped_string}'});">
+                        onclick="FaceBook.share({share_link: '${share_url | n, js_escaped_string}'});">
                           <span class="icon fa fa-facebook-official" aria-hidden="true"></span>
                           <span class="action-label">${_("Post on Facebook")}</span>
                       </button>

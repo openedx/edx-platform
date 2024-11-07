@@ -7,6 +7,8 @@ var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
 var userPartitionInfo = xblockInfo.get('user_partition_info');
 var selectedGroupsLabel = userPartitionInfo['selected_groups_label'];
 var selectedPartitionIndex = userPartitionInfo['selected_partition_index'];
+var xblockId = xblockInfo.get('id')
+var tagsCount = (xblockInfo.get('tag_counts_by_block') || {})[xblockId] || 0;
 
 var statusMessages = [];
 var messageType;
@@ -20,7 +22,13 @@ var addStatusMessage = function (statusType, message) {
         statusIconClass = 'fa-warning';
     } else if (statusType === 'staff-only' || statusType === 'gated') {
         statusIconClass = 'fa-lock';
-    } else if (statusType === 'partition-groups') {
+    } else if(statusType === 'hide-from-toc-chapter') {
+        statusIconClass = 'fa-eye-slash';
+    }
+    else if(statusType === 'hide-from-toc-sequence') {
+        statusIconClass = 'fa-ban';
+    }
+    else if (statusType === 'partition-groups') {
         statusIconClass = 'fa-eye';
     }
 
@@ -46,6 +54,15 @@ if (prereq) {
 if (staffOnlyMessage) {
     messageType = 'staff-only';
     messageText = gettext('Contains staff only content');
+    addStatusMessage(messageType, messageText);
+} else if (hideFromTOCMessage && !xblockInfo.isVertical()){
+    if (xblockInfo.isChapter()) {
+        messageText = gettext('Hidden in the course outline, but sections are accessible for your learners through their separate link.');
+        messageType = 'hide-from-toc-chapter';
+    } else {
+        messageText = gettext('Subsections are not navigable between each other, they can only be accessed through their link.');
+        messageType = 'hide-from-toc-sequence';
+    }
     addStatusMessage(messageType, messageText);
 } else {
     if (visibilityState === 'needs_attention' && xblockInfo.isVertical()) {
@@ -78,8 +95,14 @@ if (staffOnlyMessage) {
 }
 
 var gradingType = gettext('Ungraded');
+var gradingPolicyMismatch = false;
 if (xblockInfo.get('graded')) {
     gradingType = xblockInfo.get('format')
+    if (gradingType) {
+        gradingPolicyMismatch = (
+            xblockInfo.get('course_graders').filter((cg) => cg.toLowerCase() === gradingType.toLowerCase())
+        ).length === 0;
+    }
 }
 
 var is_proctored_exam = xblockInfo.get('is_proctored_exam');
@@ -137,7 +160,7 @@ if (is_proctored_exam) {
         <% } else { %>
             <div class="<%- xblockType %>-header-actions">
         <% } %>
-            <ul class="actions-list">
+            <ul class="actions-list nav-dd ui-right">
                 <% var discussion_settings = course.get('discussions_settings') %>
                 <% if ((xblockInfo.isVertical()) && discussion_settings && (!parentInfo.get('is_time_limited'))) { %>
                     <% if (xblockInfo.get('discussion_enabled') && (discussion_settings.provider_type == "openedx")) { %>
@@ -163,34 +186,84 @@ if (is_proctored_exam) {
                         </a>
                     </li>
                 <% } %>
-                <% if (xblockInfo.isEditableOnCourseOutline()) { %>
-                    <li class="action-item action-configure">
-                        <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
-                            <span class="icon fa fa-gear" aria-hidden="true"></span>
-                            <span class="sr action-button-text"><%- gettext('Configure') %></span>
-                        </a>
-                    </li>
+
+                <% if (!isTaggingFeatureDisabled) { %>
+                    <li class="action-item tag-count" data-locator="<%- xblockId %>"></li>
                 <% } %>
-                <% if (xblockInfo.isDuplicable()) { %>
-                    <li class="action-item action-duplicate">
-                        <a href="#" data-tooltip="<%- gettext('Duplicate') %>" class="duplicate-button action-button">
-                            <span class="icon fa fa-copy" aria-hidden="true"></span>
-                            <span class="sr action-button-text"><%- gettext('Duplicate') %></span>
-                        </a>
+
+                <% if (typeof enableCopyPasteUnits !== "undefined" && enableCopyPasteUnits) { %>
+                    <!--
+                        If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, all these actions (besides "Publish")
+                        appear in a menu. We use .nav-dd on the parent element and .nav-item on this button to get the
+                        same dropdown menu appearance and behavior as in Studio's various other nav bars.
+                    -->
+                    <li class="action-item action-actions-menu nav-item">
+                        <button data-tooltip="<%- gettext('Actions') %>" class="btn-default show-actions-menu-button action-button">
+                            <span class="icon fa fa-ellipsis-v" aria-hidden="true"></span>
+                            <span class="sr"><%- gettext('Actions') %></span>
+                        </button>
+                        <div class="wrapper wrapper-nav-sub" style="right: -10px; top: 45px;">
+                            <div class="nav-sub">
+                                <ul>
+                                    <% if (xblockInfo.isEditableOnCourseOutline()) { %>
+                                        <li class="nav-item">
+                                            <a class="configure-button" href="#" role="button"><%- gettext('Configure') %></a>
+                                        </li>
+                                    <% } %>
+                                    <% if (!isTaggingFeatureDisabled) { %>
+                                        <li class="nav-item">
+                                            <a class="manage-tags-button" href="#" role="button"><%- gettext('Manage Tags') %></a>
+                                        </li>
+                                    <% } %>
+                                    <% if (xblockInfo.isVertical()) { %>
+                                        <li class="nav-item">
+                                            <a class="copy-button" href="#" role="button"><%- gettext('Copy to Clipboard') %></a>
+                                        </li>
+                                    <% } %>
+                                    <% if (xblockInfo.isDuplicable()) { %>
+                                        <li class="nav-item">
+                                            <a class="duplicate-button" href="#" role="button"><%- gettext('Duplicate') %></a>
+                                        </li>
+                                    <% } %>
+                                    <% if (xblockInfo.isDeletable()) { %>
+                                        <li class="nav-item">
+                                            <a class="delete-button" href="#" role="button"><%- gettext('Delete') %></a>
+                                        </li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
                     </li>
-                <% } %>
-                <% if (xblockInfo.isDeletable()) { %>
-                    <li class="action-item action-delete">
-                        <a href="#" data-tooltip="<%- gettext('Delete') %>" class="delete-button action-button">
-                            <span class="icon fa fa-trash-o" aria-hidden="true"></span>
-                            <span class="sr action-button-text"><%- gettext('Delete') %></span>
-                        </a>
-                    </li>
+                <% } else { %>
+                    <% if (xblockInfo.isEditableOnCourseOutline()) { %>
+                        <li class="action-item action-configure">
+                            <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
+                                <span class="icon fa fa-gear" aria-hidden="true"></span>
+                                <span class="sr action-button-text"><%- gettext('Configure') %></span>
+                            </a>
+                        </li>
+                    <% } %>
+                    <% if (xblockInfo.isDuplicable()) { %>
+                        <li class="action-item action-duplicate">
+                            <a href="#" data-tooltip="<%- gettext('Duplicate') %>" class="duplicate-button action-button">
+                                <span class="icon fa fa-copy" aria-hidden="true"></span>
+                                <span class="sr action-button-text"><%- gettext('Duplicate') %></span>
+                            </a>
+                        </li>
+                    <% } %>
+                    <% if (xblockInfo.isDeletable()) { %>
+                        <li class="action-item action-delete">
+                            <a href="#" data-tooltip="<%- gettext('Delete') %>" class="delete-button action-button">
+                                <span class="icon fa fa-trash-o" aria-hidden="true"></span>
+                                <span class="sr action-button-text"><%- gettext('Delete') %></span>
+                            </a>
+                        </li>
+                    <% } %>
                 <% } %>
                 <% if (xblockInfo.isDraggable()) { %>
                 <li class="action-item action-drag">
                     <span data-tooltip="<%- gettext('Drag to reorder') %>"
-                          class="drag-handle <%- xblockType %>-drag-handle action">
+                        class="drag-handle <%- xblockType %>-drag-handle action">
                         <span class="sr"><%- gettext('Drag to reorder') %></span>
                     </span>
                 </li>
@@ -269,7 +342,7 @@ if (is_proctored_exam) {
                                     )
                                 %>
                             </span>
-                        <p>
+                        </p>
                     </div>
                 <% } %>
             <% } else if ((xblockInfo.get('due_date') && !course.get('self_paced')) || xblockInfo.get('graded')) { %>
@@ -299,7 +372,7 @@ if (is_proctored_exam) {
                                     )
                                 %>
                             </span>
-                        <p>
+                        </p>
                     </div>
                 <% } %>
             <% } else if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
@@ -325,7 +398,7 @@ if (is_proctored_exam) {
                                 )
                             %>
                         </span>
-                    <p>
+                    </p>
                 </div>
             <% } %>
             <div class="status-hide-after-due">
@@ -346,10 +419,33 @@ if (is_proctored_exam) {
             <div class="status-messages">
             <% for (var i=0; i<statusMessages.length; i++) { %>
                 <div class="status-message">
-                    <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
-                    <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                    <div>
+                        <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
+                        <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                    </div>
+                    <% if (enableHideFromTOC && xblockInfo.isSequential()) { %>
+                        <button type="button" class="button btn-primary subsection-share-link-button">
+                            <span class="icon fa fa-link icon-share-link"></span><%- gettext('Share') %>
+                        </button>
+                    <% } %>
                 </div>
             <% } %>
+            </div>
+        <% } %>
+        <% if (gradingPolicyMismatch) { %>
+            <div class="status-messages">
+                <div class="container-message wrapper-message">
+                    <div class="message has-warnings">
+                        <p class="warning">
+                            <span class="icon fa fa-warning" aria-hidden="true"></span>
+                            <%- interpolate(
+                                gettext("This subsection is configured as \"%(gradingType)s\", which doesn't exist in the current grading policy."),
+                                { gradingType: gradingType },
+                                true
+                            ) %>
+                        </p>
+                    </div>
+                </div>
             </div>
         <% } %>
     </div>
@@ -388,8 +484,38 @@ if (is_proctored_exam) {
                     >
                         <span class="icon fa fa-plus" aria-hidden="true"></span><%- addChildLabel %>
                     </a>
+
+                    <!--
+                        Technically this isn't pasting a "component" (leaf XBlock), but we re-use most of the same UI
+                        elements and CSS from the Unit page's "paste component" button, so the class names are the same.
+                    -->
+                    <div
+                        class="paste-component"
+                        style="display: none;"
+                        data-category="<%- childCategory %>"
+                        data-parent="<%- xblockInfo.get('id') %>"
+                    >
+                        <button type="button" class="button paste-component-button">
+                            <span class="icon fa fa-paste" aria-hidden="true"></span>
+                            <%- interpolate(
+                                gettext('Paste %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
+                            ) %>
+                        </button>
+                        <div class="paste-component-whats-in-clipboard" tabindex="0">
+                            <!-- These details get filled in by JavaScript code when it makes the paste button visible: -->
+                            <a href="#" class="clipboard-details-popup" onClick="if (this.getAttribute('href') === '#') return false;" target="_blank">
+                                <span class="fa fa-external-link" aria-hidden="true"></span>
+                                <strong class="detail-block-name">Block Name</strong>
+                                <span class="detail-block-type">Type</span>
+                                <%- gettext("From:") %> <span class="detail-course-name">Course Name Goes Here</span>
+                            </a>
+                            <span class="icon fa fa-question-circle" aria-hidden="true"></span>
+                            <%- gettext("What's in my clipboard?") %>
+                        </div>
+                    </div>
+
                 </div>
-                <% } %>
+            <% } %>
             <% } %>
         </div>
     <% } %>

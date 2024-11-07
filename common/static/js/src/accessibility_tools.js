@@ -203,6 +203,7 @@ $(function() {
     var SRAlert;
 
     SRAlert = (function() {
+        // eslint-disable-next-line no-shadow
         function SRAlert() {
             // This initialization sometimes gets done twice, so take to only create a single reader-feedback div.
             var readerFeedbackID = 'reader-feedback',

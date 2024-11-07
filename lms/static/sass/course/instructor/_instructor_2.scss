@@ -162,13 +162,21 @@
     overflow: hidden;
     vertical-align: bottom;
 
+    @include media-breakpoint-up(sm) {
+      margin-right: 6px;
+    }
+
+    @include media-breakpoint-down(xs) {
+      width: 100%;
+    }
+
     .enhanced-input-file {
       @include border-radius(4px 0 0 4px);
       @include padding(23px 6px 5px);
 
       position: relative;
       display: inline-block;
-      width: 265px;
+      width: 100%;
       vertical-align: middle;
       border: 1px solid $lightGrey1;
       background: $white;
@@ -177,8 +185,6 @@
     }
 
     .file-browse {
-      @include margin-left(-5px);
-
       display: inline-block;
       position: absolute;
       bottom: 0;
@@ -191,27 +197,34 @@
 
       .browse {
         @include button(simple, $primary);
-        @include margin-left(268px);
-
+        box-sizing: border-box;
+        height: 30px;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        z-index: 2;
         border-radius: 0 3px 3px 0;
         padding: 6px ($baseline/2);
         font-size: 12px;
       }
 
       .file_field {
-        @include left(-27%);
-
-        position: absolute;
+        box-sizing: border-box;
+        position: relative;
+        left: 0;
+        width: 100%;
+        padding: 3px 12px;
+        height: 30px;
         z-index: 3;
-        height: 24px; // To match bull browse button
-        width: 124%;
         margin: 0;
-        padding: 4px 0 0;
         cursor: pointer;
 
-        // for visual sync, need to make button similar to firefox
-        &::-webkit-file-upload-button {
-          width: 100px;
+        @include media-breakpoint-down(xs) {
+          padding-right: 80px;
+        }
+
+        &::file-selector-button {
+          display: none;
         }
       }
     }

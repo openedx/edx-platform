@@ -12,6 +12,7 @@ import XModule from 'xmodule/js/src/xmodule';
 import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
 
+// eslint-disable-next-line import/no-mutable-exports
 var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
     mockComponentTemplates, installEditTemplates, showEditModal, verifyXBlockRequest;
 
@@ -91,6 +92,7 @@ installEditTemplates = function(append) {
     TemplateHelpers.installTemplate('edit-xblock-modal');
     TemplateHelpers.installTemplate('editor-mode-button');
     TemplateHelpers.installTemplate('edit-title-button');
+    TemplateHelpers.installTemplate('edit-upstream-alert');
 
     // Add templates needed by the settings editor
     TemplateHelpers.installTemplate('metadata-editor');
@@ -116,6 +118,7 @@ verifyXBlockRequest = function(requests, expectedJson) {
     expect(actualJson).toEqual(expectedJson);
 };
 
+// eslint-disable-next-line import/no-mutable-exports
 var editHelpers = $.extend(modal_helpers, {
     installMockXBlock: installMockXBlock,
     uninstallMockXBlock: uninstallMockXBlock,

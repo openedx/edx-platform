@@ -59,7 +59,7 @@ class SplitTestBase(ModuleStoreTestCase):
 
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.client.login(username=self.student.username, password='test')
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
 
         self.included_usage_keys = None
         self.excluded_usage_keys = None
@@ -309,7 +309,7 @@ class SplitTestPosition(SharedModuleStoreTestCase):
 
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.client.login(username=self.student.username, password='test')
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)
 
     def test_changing_position_works(self):
         # Make a mock FieldDataCache for this course, so we can get the course block

@@ -42,6 +42,8 @@ describe('CourseOutlinePage', function() {
             user_partition_info: {},
             highlights_enabled: true,
             highlights_enabled_for_messaging: false,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -68,7 +70,9 @@ describe('CourseOutlinePage', function() {
             show_review_rules: true,
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -93,7 +97,9 @@ describe('CourseOutlinePage', function() {
             group_access: {},
             user_partition_info: {},
             highlights: [],
-            highlights_enabled: true
+            highlights_enabled: true,
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options, {child_info: {children: children}});
     };
 
@@ -123,7 +129,9 @@ describe('CourseOutlinePage', function() {
             },
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true,
         }, options, {child_info: {children: children}});
     };
 
@@ -141,7 +149,9 @@ describe('CourseOutlinePage', function() {
             edited_by: 'MockUser',
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            hide_from_toc: false,
+            enable_hide_from_toc_ui: true
         }, options);
     };
 
@@ -241,6 +251,7 @@ describe('CourseOutlinePage', function() {
         };
 
         it('can be published', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true
             });
@@ -256,6 +267,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should show publish button if it is not published and not changed', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: false,
                 published: false
@@ -264,6 +276,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should show publish button if it is published and changed', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true,
                 published: true
@@ -272,6 +285,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should show publish button if it is not published, but changed', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true,
                 published: false
@@ -280,6 +294,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should hide publish button if it is not changed, but published', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: false,
                 published: true
@@ -308,7 +323,8 @@ describe('CourseOutlinePage', function() {
             'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
-            'course-highlights-enable', 'course-video-sharing-enable'
+            'course-highlights-enable', 'course-video-sharing-enable', 'summary-configuration-editor',
+            'subsection-share-link-modal-tabs', 'full-page-share-link-editor', 'embed-link-share-link-editor',
         ]);
         appendSetFixtures(mockOutlinePage);
         mockCourseJSON = createMockCourseJSON({}, [
@@ -589,6 +605,7 @@ describe('CourseOutlinePage', function() {
             setSelfPaced();
         });
 
+        // eslint-disable-next-line prefer-const
         createCourse = function(sectionOptions, courseOptions) {
             createCourseOutlinePage(this,
                 createMockCourseJSON(courseOptions, [
@@ -597,14 +614,17 @@ describe('CourseOutlinePage', function() {
             );
         };
 
+        // eslint-disable-next-line prefer-const
         createCourseWithHighlights = function(highlights) {
             createCourse({highlights: highlights});
         };
 
+        // eslint-disable-next-line prefer-const
         clickSaveOnModal = function() {
             $('.wrapper-modal-window .action-save').click();
         };
 
+        // eslint-disable-next-line prefer-const
         clickCancelOnModal = function() {
             $('.wrapper-modal-window .action-cancel').click();
         };
@@ -1043,6 +1063,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('can display a publish modal with a list of unpublished subsections and units', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({has_changes: true}, [
                         createMockSubsectionJSON({has_changes: true}, [
@@ -1204,7 +1225,9 @@ describe('CourseOutlinePage', function() {
                 is_practice_exam: false,
                 is_proctored_exam: false,
                 default_time_limit_minutes: 150,
-                hide_after_due: true
+                hide_after_due: true,
+                hide_from_toc: false,
+                enable_hide_from_toc_ui: true,
             }, [
                 createMockVerticalJSON({
                     has_changes: true,
@@ -1319,6 +1342,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('can show correct editors for self_paced course', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({}, [])
@@ -1386,6 +1410,7 @@ describe('CourseOutlinePage', function() {
                     default_time_limit_minutes: 150,
                     hide_after_due: true,
                     is_onboarding_exam: false,
+                    hide_from_toc: null,
                 }
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -2166,6 +2191,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('can display a publish modal with a list of unpublished units', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({has_changes: true}, [
                         createMockSubsectionJSON({has_changes: true}, [
@@ -2193,6 +2219,7 @@ describe('CourseOutlinePage', function() {
 
         describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-shadow
                 var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({}, [
                         createMockSubsectionJSON({}, [])
@@ -2227,6 +2254,8 @@ describe('CourseOutlinePage', function() {
                     is_practice_exam: false,
                     is_proctored_exam: false,
                     default_time_limit_minutes: null,
+                    hide_from_toc: false,
+                    enable_hide_from_toc_ui: true,
                 }, [
                     createMockVerticalJSON({
                         has_changes: true,
@@ -2476,6 +2505,42 @@ describe('CourseOutlinePage', function() {
                 outlinePage.$('.outline-unit .configure-button').click();
                 expect($('.modal-section .edit-discussion')).not.toExist();
             });
+        });
+
+        describe('summary configuration', function() {
+            it('hides summary configuration settings if summary_configuration_enabled is not a boolean', function() {
+                getUnitStatus({summary_configuration_enabled: null});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .summary-configuration')).not.toExist();
+            });
+
+            it('shows summary configuration settings if summary_configuration_enabled is true', function() {
+                getUnitStatus({summary_configuration_enabled: true});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .summary-configuration')).toExist();
+            });
+
+            it('shows summary configuration settings if summary_configuration_enabled is false', function() {
+                getUnitStatus({summary_configuration_enabled: false});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .summary-configuration')).toExist();
+            });
+
+            it('can be updated', function() {
+                getUnitStatus({summary_configuration_enabled: false});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('#summary_configuration_enabled').is(':checked')).toBe(false);
+                $('#summary_configuration_enabled').prop('checked', true).trigger('change');
+                $('.wrapper-modal-window .action-save').click();
+                AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-unit', {
+                    summary_configuration_enabled: true,
+                    publish: 'republish',
+                    metadata: {
+                        visible_to_staff_only: null,
+                        hide_from_toc: null
+                    }
+                });
+            })
         });
 
         verifyTypePublishable('unit', function(options) {

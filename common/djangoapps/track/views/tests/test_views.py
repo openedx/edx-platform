@@ -173,7 +173,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
     def test_user_track_with_middleware_and_processors(self):
         self.recreate_tracker()
 
-        middleware = TrackMiddleware()
+        middleware = TrackMiddleware(get_response=lambda request: None)
         payload = '{"foo": "bar"}'
         user_id = 1
         request = self.request_factory.get('/event', {
@@ -238,7 +238,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
         assert_event_matches(expected_event, actual_event)
 
     def test_server_track_with_middleware(self):
-        middleware = TrackMiddleware()
+        middleware = TrackMiddleware(get_response=lambda request: None)
         request = self.request_factory.get(self.path_with_course)
         middleware.process_request(request)
         # The middleware emits an event, reset the mock to ignore it since we aren't testing that feature.
@@ -279,7 +279,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
         )
 
     def test_server_track_with_middleware_and_google_analytics_cookie(self):
-        middleware = TrackMiddleware()
+        middleware = TrackMiddleware(get_response=lambda request: None)
         request = self.request_factory.get(self.path_with_course)
         request.COOKIES['_ga'] = 'GA1.2.1033501218.1368477899'
         middleware.process_request(request)

@@ -15,6 +15,8 @@ from openedx.core.lib.request_utils import course_id_from_url
 from openedx.features.enterprise_support.api import get_enterprise_consent_url
 from common.djangoapps.student.models import CourseEnrollment
 
+from xmodule.modulestore.django import modulestore
+
 
 class WikiAccessMiddleware(MiddlewareMixin):
     """
@@ -54,6 +56,20 @@ class WikiAccessMiddleware(MiddlewareMixin):
 
         course_id = course_id_from_url(request.path)
         wiki_path = request.path.partition('/wiki/')[2]
+
+        # if no wiki_path, can't get wiki_slug, so no point trying to look up
+        # course_id by wiki_slug
+        if not course_id and wiki_path:
+            # wiki path always starts with wiki_slug
+            wiki_slug = wiki_path.split('/')[0]
+
+            course_ids = modulestore().get_courses_for_wiki(wiki_slug)
+            # the above can return multiple courses, and to avoid ambiguity and
+            # avoid pointing to wrong courses, we only set course_id if we've
+            # got an exact match, i.e. only one course was returned for a
+            # wiki_slug
+            if len(course_ids) == 1:
+                course_id = course_ids[0]
 
         if course_id:
             # This is a /courses/org/name/run/wiki request

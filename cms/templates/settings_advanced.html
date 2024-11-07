@@ -3,7 +3,6 @@
 <%def name="online_help_token()"><% return "advanced" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-  import six
   from six.moves.urllib.parse import quote
   from django.utils.translation import gettext as _
   from cms.djangoapps.contentstore import utils
@@ -43,7 +42,7 @@
           <h2 class="title title-3">${_("This course has proctored exam settings that are incomplete or invalid.")}</h2>
           <p>
             % if mfe_proctored_exam_settings_url:
-              <% url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='') %>
+              <% url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='') %>
               ${Text(_("You will be unable to make changes until the errors are resolved. To update these settings go to the {link_start}Proctored Exam Settings page{link_end}.")).format(
                 link_start=HTML('<a href="{mfe_proctored_exam_settings_url}">').format(
                         mfe_proctored_exam_settings_url=mfe_proctored_exam_settings_url
@@ -136,7 +135,7 @@
       <div class="bit">
       % if context_course:
         <%
-          url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='')
+          url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='')
           details_url = utils.reverse_course_url('settings_handler', context_course.id)
           grading_url = utils.reverse_course_url('grading_handler', context_course.id)
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)

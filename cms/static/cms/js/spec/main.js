@@ -243,7 +243,6 @@
         'js/spec/video/transcripts/message_manager_spec',
         'js/spec/video/transcripts/utils_spec',
         'js/spec/video/transcripts/editor_spec',
-        'js/spec/video/transcripts/videolist_spec',
         'js/spec/video/transcripts/file_uploader_spec',
         'js/spec/models/component_template_spec',
         'js/spec/models/explicit_url_spec',

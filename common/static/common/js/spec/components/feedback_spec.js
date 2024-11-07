@@ -57,6 +57,7 @@
                 this.renderSpy = spyOn(AlertView.Confirmation.prototype, 'render').and.callThrough();
                 this.showSpy = spyOn(AlertView.Confirmation.prototype, 'show').and.callThrough();
                 this.hideSpy = spyOn(AlertView.Confirmation.prototype, 'hide').and.callThrough();
+                // eslint-disable-next-line no-return-assign
                 return this.clock = sinon.useFakeTimers();
             });
             afterEach(function() {
@@ -317,6 +318,7 @@
                 this.showSpy.and.callThrough();
                 this.hideSpy = spyOn(NotificationView.Confirmation.prototype, 'hide');
                 this.hideSpy.and.callThrough();
+                // eslint-disable-next-line no-return-assign
                 return this.clock = sinon.useFakeTimers();
             });
             afterEach(function() {

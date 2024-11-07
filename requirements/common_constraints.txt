@@ -17,20 +17,22 @@
 
 
 # using LTS django version
-Django<4.0
+Django<5.0
 
 # elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
+# See https://github.com/openedx/edx-platform/issues/35126 for more info
 elasticsearch<7.14.0
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
-django-simple-history==3.0.0
 
-# tox>4.0.0 isn't yet compatible with many tox plugins, causing CI failures in almost all repos.
-# Details can be found in this discussion: https://github.com/tox-dev/tox/discussions/1810
-tox<4.0.0
+# Cause: https://github.com/openedx/event-tracking/pull/290
+# event-tracking 2.4.1 upgrades to pymongo 4.4.0 which is not supported on edx-platform.
+# We will pin event-tracking to do not break existing installations
+# This can be unpinned once https://github.com/openedx/edx-platform/issues/34586
+# has been resolved and edx-platform is running with pymongo>=4.4.0
 
-# edx-sphinx-theme is not compatible with latest Sphinx==6.0.0 version 
-# Pinning Sphinx version unless the compatibility issue gets resolved
-# For details, see issue https://github.com/openedx/edx-sphinx-theme/issues/197
-sphinx<6.0.0
+
+# Cause: https://github.com/openedx/edx-lint/issues/458
+# This can be unpinned once https://github.com/openedx/edx-lint/issues/459 has been resolved.
+pip<24.3

@@ -184,6 +184,7 @@
                         isTouch = state.isTouch,
                         video = document.createElement('video');
 
+                    // eslint-disable-next-line no-extra-boolean-cast
                     return !isTouch || (isHtml5 && !Boolean(video.playbackRate));
                 },
 
@@ -327,6 +328,7 @@
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
+                    // eslint-disable-next-line default-case
                     switch (keyCode) {
                     // Open menu and focus on last element of list above it.
                     case KEY.ENTER:
@@ -362,6 +364,7 @@
                         index = parent.index(),
                         speed = parent.data('speed');
 
+                    // eslint-disable-next-line default-case
                     switch (event.keyCode) {
                     // Close menu.
                     case KEY.TAB:

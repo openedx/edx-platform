@@ -1,7 +1,6 @@
 """
 Test file to test the Entitlement API Views.
 """
-
 import json
 import logging
 import uuid
@@ -24,17 +23,22 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import \
+    ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
-    from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail  # lint-amnesty, pylint: disable=line-too-long
+    from common.djangoapps.entitlements.models import (  # lint-amnesty, pylint: disable=line-too-long
+        CourseEntitlement,
+        CourseEntitlementPolicy,
+        CourseEntitlementSupportDetail
+    )
     from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
     from common.djangoapps.entitlements.rest_api.v1.views import set_entitlement_policy
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 
 
 @skip_unless_lms
@@ -671,6 +675,49 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
 
         results = response.data
         assert results.get('expired_at')
+
+    def test_entitlements_filter_on_course_uuid_and_expired_at(self):
+        """
+        Verify that courses filtered properly on list of course_uuids.
+        """
+        entitlements = CourseEntitlementFactory.create_batch(5, user=self.user, expired_at=datetime.now())
+        course_uuids_to_filter_on = {
+            str(entitlement.course_uuid)
+            for entitlement in entitlements[0:3]
+        }
+        # Create a 2nd entitlement for one of the ones to filter on
+        active_entitlement = CourseEntitlementFactory.create(
+            user=self.user,
+            course_uuid=str(entitlements[0].course_uuid),
+            expired_at=None,
+        )
+
+        url = reverse('entitlements_api:v1:entitlements-list')
+        url += f'?user={self.user.username}'
+        url += f'&course_uuid={",".join(course_uuids_to_filter_on)}'
+
+        response = self.client.get(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+
+        results = response.data
+        assert results['count'] == 4
+        actual_course_uuids = {entitlement['course_uuid'] for entitlement in results['results']}
+        assert actual_course_uuids == course_uuids_to_filter_on
+        assert len(actual_course_uuids) == 3
+
+        # Now lets confirm we filter out expired entitlements
+        url += '&expired_at__isnull=True'
+        response = self.client.get(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+        results = response.data
+        assert results['count'] == 1
+        assert results['results'][0]['uuid'] == str(active_entitlement.uuid)
 
     def test_delete_and_revoke_entitlement(self):
         course_entitlement = CourseEntitlementFactory.create()

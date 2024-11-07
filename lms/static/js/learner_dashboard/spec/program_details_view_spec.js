@@ -7,11 +7,6 @@ describe('Program Details View', () => {
     let view = null;
     const options = {
         programData: {
-            subscription_eligible: false,
-            subscription_prices: [{
-                price: '100.00',
-                currency: 'USD',
-            }],
             subtitle: '',
             overview: '',
             weeks_to_complete: null,
@@ -468,24 +463,11 @@ describe('Program Details View', () => {
                 },
             ],
         },
-        subscriptionData: [
-            {
-                trial_end: '1970-01-01T03:25:45Z',
-                next_payment_date: '1970-06-03T07:12:04Z',
-                price: '100.00',
-                currency: 'USD',
-                subscription_state: 'pre',
-            },
-        ],
         urls: {
             program_listing_url: '/dashboard/programs/',
             commerce_api_url: '/api/commerce/v0/baskets/',
             track_selection_url: '/course_modes/choose/',
             program_record_url: 'http://credentials.example.com/records/programs/UUID',
-            buy_subscription_url: '/subscriptions',
-            manage_subscription_url: '/orders',
-            subscriptions_learner_help_center_url: '/learner',
-            orders_and_subscriptions_url: '/orders',
         },
         userPreferences: {
             'pref-lang': 'en',
@@ -513,36 +495,11 @@ describe('Program Details View', () => {
             },
         ],
         programTabViewEnabled: false,
-        isUserB2CSubscriptionsEnabled: false,
     };
     const data = options.programData;
 
-    const testSubscriptionState = (state, heading, body, trial = false) => {
-        const subscriptionData = {
-            ...options.subscriptionData[0],
-            subscription_state: state,
-        };
-        if (trial) {
-            subscriptionData.trial_end = moment().add(3, 'days').utc().format(
-                'YYYY-MM-DDTHH:mm:ss[Z]',
-            );
-        }
-        view = initView({
-            programData: $.extend({}, options.programData, {
-                subscription_eligible: true,
-            }),
-            isUserB2CSubscriptionsEnabled: true,
-            subscriptionData: [subscriptionData],
-        });
-        view.render();
-        expect(view.$('.upgrade-subscription')[0]).toBeInDOM();
-        expect(view.$('.upgrade-subscription .upgrade-button'))
-            .toContainText(heading);
-        expect(view.$('.upgrade-subscription .subscription-info-brief'))
-            .toContainText(body);
-    };
-
     const initView = (updates) => {
+        // eslint-disable-next-line no-undef
         const viewOptions = $.extend({}, options, updates);
 
         return new ProgramDetailsView(viewOptions);
@@ -588,6 +545,7 @@ describe('Program Details View', () => {
     it('should render the program heading congratulations message if all courses completed', () => {
         view = initView({
             // Remove remaining courses so all courses are complete
+            // eslint-disable-next-line no-undef
             courseData: $.extend({}, options.courseData, {
                 in_progress: [],
                 not_started: [],
@@ -614,26 +572,34 @@ describe('Program Details View', () => {
     it('should render the basic course card information', () => {
         view = initView();
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.course-title')[0]).text().trim()).toEqual('Star Trek: The Next Generation');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.enrolled')[0]).text().trim()).toEqual('Enrolled:');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.run-period')[0]).text().trim()).toEqual('Mar 20, 2017 - Mar 31, 2017');
     });
 
     it('should render certificate information', () => {
         view = initView();
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-message .card-msg')).text().trim()).toEqual('Certificate Status:');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-message .price')).text().trim()).toEqual('$10.00');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-button.single-course-run')[0]).text().trim()).toEqual('Upgrade to Verified');
     });
 
     it('should render full program purchase link', () => {
         view = initView({
+            // eslint-disable-next-line no-undef
             programData: $.extend({}, options.programData, {
                 is_learner_eligible_for_one_click_purchase: true,
             }),
         });
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-button.complete-program')).text().trim()
             .replace(/\s+/g, ' '))
             .toEqual(
@@ -643,6 +609,7 @@ describe('Program Details View', () => {
 
     it('should render partial program purchase link', () => {
         view = initView({
+            // eslint-disable-next-line no-undef
             programData: $.extend({}, options.programData, {
                 is_learner_eligible_for_one_click_purchase: true,
                 discount_data: {
@@ -655,6 +622,7 @@ describe('Program Details View', () => {
             }),
         });
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-button.complete-program')).text().trim()
             .replace(/\s+/g, ' '))
             .toEqual(
@@ -666,7 +634,9 @@ describe('Program Details View', () => {
         view = initView();
         view.render();
         expect(view.$('.run-select')[0].options.length).toEqual(2);
+        // eslint-disable-next-line no-undef
         expect($(view.$('.select-choice')[0]).attr('for')).toEqual($(view.$('.run-select')[0]).attr('id'));
+        // eslint-disable-next-line no-undef
         expect($(view.$('.enroll-button button')[0]).text().trim()).toEqual('Enroll Now');
     });
 
@@ -677,50 +647,19 @@ describe('Program Details View', () => {
             uuid: '0ffff5d6-0177-4690-9a48-aa2fecf94610',
         };
         view = initView({
+            // eslint-disable-next-line no-undef
             programData: $.extend({}, options.programData, {
                 is_learner_eligible_for_one_click_purchase: true,
                 variant: 'partial',
             }),
         });
         view.render();
+        // eslint-disable-next-line no-undef
         $('.complete-program').click();
         // Verify that analytics event fires when the purchase button is clicked.
         expect(window.analytics.track).toHaveBeenCalledWith(
             'edx.bi.user.dashboard.program.purchase',
             properties,
-        );
-    });
-
-    it('should render the get subscription link if program is subscription eligible', () => {
-        testSubscriptionState(
-            'pre',
-            'Start 7-day free trial',
-            '$100/month subscription after trial ends. Cancel anytime.',
-        );
-    });
-
-    it('should render appropriate subscription text when subscription is active with trial', () => {
-        testSubscriptionState(
-            'active',
-            'Manage my subscription',
-            'Active trial ends',
-            true,
-        );
-    });
-
-    it('should render appropriate subscription text when subscription is active', () => {
-        testSubscriptionState(
-            'active',
-            'Manage my subscription',
-            'Your next billing date is',
-        );
-    });
-
-    it('should render appropriate subscription text when subscription is inactive', () => {
-        testSubscriptionState(
-            'inactive',
-            'Restart my subscription',
-            'Unlock verified access to all courses for $100/month. Cancel anytime.',
         );
     });
 });

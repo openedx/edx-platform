@@ -328,6 +328,7 @@
                 that.new_queued_items = $(response.html).find('.xqueue');
                 if (that.new_queued_items.length !== that.num_queued_items) {
                     edx.HtmlUtils.setHtml(that.el, edx.HtmlUtils.HTML(response.html)).promise().done(function() {
+                        // eslint-disable-next-line no-void
                         return typeof focusCallback === 'function' ? focusCallback() : void 0;
                     });
                     JavascriptLoader.executeModuleScripts(that.el, function() {
@@ -386,6 +387,7 @@
                     that.bind();
                     that.queueing(focusCallback);
                     that.renderProgressState();
+                    // eslint-disable-next-line no-void
                     return typeof focusCallback === 'function' ? focusCallback() : void 0;
                 });
             } else {
@@ -415,6 +417,7 @@
                     if (setupMethod != null) {
                         results.push(that.inputtypeDisplays[id] = setupMethod(inputtype));
                     } else {
+                        // eslint-disable-next-line no-void
                         results.push(void 0);
                     }
                 }
@@ -726,6 +729,7 @@
                 answers = response.answers;
                 $.each(answers, function(key, value) {
                     var safeKey = key.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
+                    safeKey = safeKey.replace(/\./g, '\\.'); // fix for courses which use url_names with periods. e.g. question1.1
                     var answer;
                     if (!$.isArray(value)) {
                         answer = that.$('#answer_' + safeKey + ', #solution_' + safeKey);
@@ -760,6 +764,7 @@
                         if (showMethod != null) {
                             results.push(showMethod(inputtype, display, answers, response.correct_status_html));
                         } else {
+                            // eslint-disable-next-line no-void
                             results.push(void 0);
                         }
                     }
@@ -962,6 +967,7 @@
                     if (bindMethod != null) {
                         results.push(bindMethod(inputtype));
                     } else {
+                        // eslint-disable-next-line no-void
                         results.push(void 0);
                     }
                 }
@@ -1080,12 +1086,13 @@
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
                 inputId = inputId.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
+                var safeId = inputId.replace(/\./g, '\\.'); // fix for courses which use url_names with periods. e.g. question1.1
                 answer = answers[inputId];
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    $inputLabel = $element.find('#input_' + inputId + '_' + choice + ' + label');
-                    $inputStatus = $element.find('#status_' + inputId);
+                    $inputLabel = $element.find('#input_' + safeId + '_' + choice + ' + label');
+                    $inputStatus = $element.find('#status_' + safeId);
                     // If the correct answer was already Submitted before "Show Answer" was selected,
                     // the status HTML will already be present. Otherwise, inject the status HTML.
 
@@ -1310,6 +1317,7 @@
                 that = this;
             hintContainer = this.$('.problem-hint');
             hintIndex = hintContainer.attr('hint_index');
+            // eslint-disable-next-line no-void
             if (hintIndex === void 0) {
                 nextIndex = 0;
             } else {

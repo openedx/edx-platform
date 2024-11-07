@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
+    MINIMUM_UNUSED_PARTITION_ID,
     Group,
     UserPartition
 )
@@ -78,7 +78,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         """
         # pylint: disable=attribute-defined-outside-init
         self.content_partition = UserPartition(
-            MINIMUM_STATIC_PARTITION_ID,
+            MINIMUM_UNUSED_PARTITION_ID,
             self.CONTENT_GROUPS_TITLE,
             'Contains Groups for Cohorted Courseware',
             content_groups,
@@ -158,14 +158,6 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             [self.STAFF_LOCKED, self.CONTENT_GROUPS_TITLE, self.ENROLLMENT_GROUPS_TITLE]
         )
 
-    def test_html_populated_partition_staff_locked(self):
-        self.create_content_groups(self.pet_groups)
-        self.set_staff_only(self.vertical_location)
-        self.verify_visibility_view_contains(
-            self.video_location,
-            [self.STAFF_LOCKED, self.CONTENT_GROUPS_TITLE, 'Cat Lovers', 'Dog Lovers']
-        )
-
     def test_html_false_content_group(self):
         self.create_content_groups(self.pet_groups)
         self.set_group_access(self.video_location, ['false_group_id'])
@@ -176,20 +168,6 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.verify_visibility_view_does_not_contain(
             self.video_location,
             [self.STAFF_LOCKED]
-        )
-
-    def test_html_false_content_group_staff_locked(self):
-        self.create_content_groups(self.pet_groups)
-        self.set_staff_only(self.vertical_location)
-        self.set_group_access(self.video_location, ['false_group_id'])
-        self.verify_visibility_view_contains(
-            self.video_location,
-            [
-                'Cat Lovers',
-                'Dog Lovers',
-                self.STAFF_LOCKED,
-                self.GROUP_NO_LONGER_EXISTS
-            ]
         )
 
     @override_settings(FEATURES=FEATURES_WITH_ENROLLMENT_TRACK_DISABLED)

@@ -136,7 +136,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         params = {
             'username': 'test_user',
             'email': 'test_user@example.com',
-            'password': 'edx',
+            'password': 'Password1234',
             'name': 'Test User',
             'honor_code': True,
             'terms_of_service': True
@@ -319,7 +319,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
         self.request = self.req_factory.post('unused_url', data={
-            'password': 'test',
+            'password': 'Password1234',
             'new_email': self.new_email
         })
         self.request.user = self.user
@@ -628,7 +628,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self.new_secondary_email = 'new.secondary.email@edx.org'
         self.req_factory = RequestFactory()
         self.request = self.req_factory.post('unused_url', data={
-            'password': 'test',
+            'password': 'Password1234',
             'new_email': self.new_secondary_email
         })
         self.request.user = self.user

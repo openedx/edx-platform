@@ -15,7 +15,7 @@ class CreditConfig(AppConfig):
     name = 'openedx.core.djangoapps.credit'
 
     def ready(self):
-        from . import signals  # lint-amnesty, pylint: disable=unused-import
+        from .signals import handlers  # lint-amnesty, pylint: disable=unused-import
         if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
             from .services import CreditService
             set_runtime_service('credit', CreditService())

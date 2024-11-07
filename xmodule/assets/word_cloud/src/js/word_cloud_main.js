@@ -36,6 +36,7 @@ function generateUniqueId(wordCloudId, counter) {
 */
 export default class WordCloudMain {
     constructor(el) {
+        // eslint-disable-next-line no-undef
         this.wordCloudEl = $(el).find('.word_cloud');
 
         // Get the URL to which we will post the users words.
@@ -50,6 +51,7 @@ export default class WordCloudMain {
 
         // Retriveing response from the server as an AJAX request. Attach a callback that will
         // be fired on server's response.
+        // eslint-disable-next-line no-undef
         $.postWithPrefix(
             `${this.ajax_url}/get_state`,
             null,
@@ -70,6 +72,7 @@ export default class WordCloudMain {
                 }
             });
 
+        // eslint-disable-next-line no-undef
         $(el).find('.save').on('click', () => {
             this.submitAnswer();
         });
@@ -87,13 +90,16 @@ export default class WordCloudMain {
 
         // Populate the data to be sent to the server with user's words.
         this.wordCloudEl.find('input.input-cloud').each((index, value) => {
+            // eslint-disable-next-line no-undef
             data.student_words.push($(value).val());
         });
 
         // Send the data to the server as an AJAX request. Attach a callback that will
         // be fired on server's response.
+        // eslint-disable-next-line no-undef
         $.postWithPrefix(
             `${this.ajax_url}/submit`,
+            // eslint-disable-next-line no-undef
             $.param(data),
             (response) => {
                 if (response.status !== 'success') {
@@ -125,6 +131,7 @@ export default class WordCloudMain {
         this.wordCloudEl.find('.input_cloud_section').hide();
 
         // Find the word with the maximum percentage. I.e. the most popular word.
+        // eslint-disable-next-line no-undef
         $.each(words, (index, word) => {
             if (word.size > maxSize) {
                 maxSize = word.size;
@@ -139,6 +146,7 @@ export default class WordCloudMain {
         //
         // This is a fix for: if the word is very long and/or big, it is discarded by
         // for unknown reason.
+        // eslint-disable-next-line no-undef
         $.each(words, (index, word) => {
             let tempScaleFactor = 1.0;
             const size = ((word.size / maxSize) * maxFontSize);
@@ -216,6 +224,7 @@ export default class WordCloudMain {
             );
         }
 
+        // eslint-disable-next-line no-undef
         $.each(response.student_words, (word, stat) => {
             const percent = (response.display_student_percents) ? ` ${Math.round(100 * (stat / response.total_count))}%` : '';
 
@@ -255,6 +264,7 @@ export default class WordCloudMain {
             ),
         );
 
+        // eslint-disable-next-line no-undef
         $(`${cloudSectionEl.attr('id')} .word_cloud`).empty();
 
         // Actual drawing of word cloud.
@@ -274,6 +284,7 @@ export default class WordCloudMain {
             .attr('aria-describedby', () => HtmlUtils.interpolateHtml(
                 gettext('text_word_{uniqueId} title_word_{uniqueId}'),
                 {
+                    // eslint-disable-next-line no-undef
                     uniqueId: generateUniqueId(cloudSectionEl.attr('id'), $(this).data('id')),
                 },
             ));
@@ -283,12 +294,14 @@ export default class WordCloudMain {
             .attr('id', () => HtmlUtils.interpolateHtml(
                 gettext('title_word_{uniqueId}'),
                 {
+                    // eslint-disable-next-line no-undef
                     uniqueId: generateUniqueId(cloudSectionEl.attr('id'), $(this).parent().data('id')),
                 },
             ))
             .text((d) => {
                 let res = '';
 
+                // eslint-disable-next-line no-undef
                 $.each(response.top_words, (index, value) => {
                     if (value.text === d.text) {
                         res = `${value.percent}%`;
@@ -303,6 +316,7 @@ export default class WordCloudMain {
             .attr('id', () => HtmlUtils.interpolateHtml(
                 gettext('text_word_{uniqueId}'),
                 {
+                    // eslint-disable-next-line no-undef
                     uniqueId: generateUniqueId(cloudSectionEl.attr('id'), $(this).parent().data('id')),
                 },
             ))

@@ -38,9 +38,15 @@ from django.utils.translation import gettext as _
     <a class="btn-learn-more btn" href="${learn_more_url}">
       ${_("Learn more about this course")}
     </a>
-    <a class="btn-enroll btn" href="${enroll_url}">
-      ${_("Enroll in this course")}
-    </a>
+    % if is_enrolled_in_course:
+        <a class="btn-go-to-course btn" href="${go_to_course_url}">
+          ${_("Go to course")}
+        </a>
+    % else:
+        <a class="btn-enroll btn" href="${enroll_url}">
+          ${_("Enroll in this course")}
+        </a>
+    % endif
   </div>
 </nav>
 </%block>

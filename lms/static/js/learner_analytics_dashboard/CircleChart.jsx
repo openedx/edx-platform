@@ -18,6 +18,7 @@ class CircleChart extends React.Component {
     getCenter() {
         const {centerHole, sliceBorder} = this.props;
         if (centerHole) {
+            // eslint-disable-next-line no-shadow
             const size = center / 2;
             return (
                 <circle cx={center} cy={center} r={size} fill={sliceBorder.strokeColor} />
@@ -43,6 +44,7 @@ class CircleChart extends React.Component {
                         cx={center}
                         cy={center}
                         className="slice-1"
+                        // eslint-disable-next-line react/no-array-index-key
                         key={index}
                     />
                 );
@@ -85,6 +87,7 @@ class CircleChart extends React.Component {
                 <path
                     d={d}
                     className={`slice-${sliceIndex}`}
+                    // eslint-disable-next-line react/no-array-index-key
                     key={index}
                     stroke={strokeColor}
                     strokeWidth={strokeWidth}
@@ -115,8 +118,11 @@ CircleChart.defaultProps = {
 };
 
 CircleChart.propTypes = {
+    // eslint-disable-next-line react/forbid-prop-types
     slices: PropTypes.array.isRequired,
+    // eslint-disable-next-line react/require-default-props
     centerHole: PropTypes.bool,
+    // eslint-disable-next-line react/forbid-prop-types
     sliceBorder: PropTypes.object
 };
 

@@ -7,12 +7,11 @@ import os
 import re
 import sys
 
-from paver.easy import cmdopts, needs, task
+from paver.easy import cmdopts, needs, sh, task
 
 from pavelib.utils.envs import Env
 from pavelib.utils.test.suites import JestSnapshotTestSuite, JsTestSuite
 from pavelib.utils.timer import timed
-from paver.easy import cmdopts, needs, sh, task
 
 try:
     from pygments.console import colorize
@@ -26,7 +25,6 @@ __test__ = False  # do not collect
 @needs(
     'pavelib.prereqs.install_node_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
-    'pavelib.assets.process_xmodule_assets',
 )
 @cmdopts([
     ("suite=", "s", "Test suite to run"),

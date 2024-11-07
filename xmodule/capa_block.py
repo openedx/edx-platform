@@ -1,6 +1,7 @@
 """
 Implements the Problem XBlock, which is built on top of the CAPA subsystem.
 """
+from __future__ import annotations
 
 import copy
 import datetime
@@ -13,17 +14,16 @@ import struct
 import sys
 import traceback
 
-from bleach.sanitizer import Cleaner
+import nh3
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_string
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
-from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString, List
 from xblock.scorable import ScorableXBlockMixin, Score
 
 from xmodule.capa import responsetypes
@@ -37,9 +37,8 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
 from xmodule.util.sandboxing import SandboxService
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
@@ -52,15 +51,16 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_ID,
 )
 from openedx.core.djangolib.markup import HTML, Text
+from .capa.xqueue_interface import XQueueService
 
-from .fields import Date, ScoreField, Timedelta
+from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
 
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
-#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+#  `django.utils.translation.gettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 # Generate this many different variants of problems with rerandomize=per_student
@@ -93,6 +93,16 @@ class SHOWANSWER:
     ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"
 
 
+class GRADING_METHOD:
+    """
+    Constants for grading method options.
+    """
+    LAST_SCORE = "last_score"
+    FIRST_SCORE = "first_score"
+    HIGHEST_SCORE = "highest_score"
+    AVERAGE_SCORE = "average_score"
+
+
 class RANDOMIZATION:
     """
     Constants for problem randomization
@@ -123,8 +133,6 @@ class Randomization(String):
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
-# Studio doesn't provide XQueueService, but the LMS does.
-@XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,
@@ -132,7 +140,6 @@ class ProblemBlock(
     XmlMixin,
     EditingMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -166,44 +173,13 @@ class ProblemBlock(
 
     uses_xmodule_styles_setup = True
 
-    preview_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/capa/display.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-            resource_string(__name__, 'js/src/capa/imageinput.js'),
-            resource_string(__name__, 'js/src/capa/schematic.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
-    }
-
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/capa/display.scss'),
-        ],
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/problem/edit.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-            resource_string(__name__, 'css/problem/edit.scss'),
-        ]
-    }
-
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default=_("Blank Advanced Problem")
+        default=_("Blank Problem")
     )
     attempts = Integer(
         help=_("Number of attempts taken by the student on this problem"),
@@ -215,6 +191,21 @@ class ProblemBlock(
         help=_("Defines the number of times a student can try to answer this problem. "
                "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
+    )
+    grading_method = String(
+        display_name=_("Grading Method"),
+        help=_(
+            "Define the grading method for this problem. By default, "
+            "it's the score of the last submission made by the student."
+        ),
+        scope=Scope.settings,
+        default=GRADING_METHOD.LAST_SCORE,
+        values=[
+            {"display_name": _("Last Score"), "value": GRADING_METHOD.LAST_SCORE},
+            {"display_name": _("First Score"), "value": GRADING_METHOD.FIRST_SCORE},
+            {"display_name": _("Highest Score"), "value": GRADING_METHOD.HIGHEST_SCORE},
+            {"display_name": _("Average Score"), "value": GRADING_METHOD.AVERAGE_SCORE},
+        ],
     )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     graceperiod = Timedelta(
@@ -298,11 +289,20 @@ class ProblemBlock(
     )
     correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
                        scope=Scope.user_state, default={})
+    correct_map_history = List(
+        help=_("List of correctness maps for each attempt"), scope=Scope.user_state, default=[]
+    )
     input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
+    student_answers_history = List(
+        help=_("List of student answers for each attempt"), scope=Scope.user_state, default=[]
+    )
 
     # enforce_type is set to False here because this field is saved as a dict in the database.
     score = ScoreField(help=_("Dictionary with the current student score"), scope=Scope.user_state, enforce_type=False)
+    score_history = ListScoreField(
+        help=_("List of scores for each attempt"), scope=Scope.user_state, default=[], enforce_type=False
+    )
     has_saved_answers = Boolean(help=_("Whether or not the answers have been saved since last submit"),
                                 scope=Scope.user_state, default=False)
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state, default=False)
@@ -361,7 +361,8 @@ class ProblemBlock(
         else:
             html = self.get_html()
         fragment = Fragment(html)
-        add_webpack_to_fragment(fragment, 'ProblemBlockPreview')
+        add_sass_to_fragment(fragment, "ProblemBlockDisplay.scss")
+        add_webpack_js_to_fragment(fragment, 'ProblemBlockDisplay')
         shim_xmodule_js(fragment, 'Problem')
         return fragment
 
@@ -390,9 +391,10 @@ class ProblemBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'ProblemBlockStudio')
+        add_sass_to_fragment(fragment, 'ProblemBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
         shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
         return fragment
 
@@ -421,7 +423,7 @@ class ProblemBlock(
             'ungraded_response': self.handle_ungraded_response
         }
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         generic_error_message = _(
             "We're sorry, there was an error with processing your request. "
@@ -489,6 +491,31 @@ class ProblemBlock(
 
         return self.display_name
 
+    def grading_method_display_name(self) -> str | None:
+        """
+        If the `ENABLE_GRADING_METHOD_IN_PROBLEMS` feature flag is enabled,
+        return the grading method, else return None.
+        """
+        _ = self.runtime.service(self, "i18n").gettext
+        display_name = {
+            GRADING_METHOD.LAST_SCORE: _("Last Score"),
+            GRADING_METHOD.FIRST_SCORE: _("First Score"),
+            GRADING_METHOD.HIGHEST_SCORE: _("Highest Score"),
+            GRADING_METHOD.AVERAGE_SCORE: _("Average Score"),
+        }
+        if self.is_grading_method_enabled:
+            return display_name[self.grading_method]
+        return None
+
+    @property
+    def is_grading_method_enabled(self) -> bool:
+        """
+        Returns whether the grading method feature is enabled. If the
+        feature is not enabled, the grading method field will not be shown in
+        Studio settings and the default grading method will be used.
+        """
+        return settings.FEATURES.get('ENABLE_GRADING_METHOD_IN_PROBLEMS', False)
+
     @property
     def debug(self):
         """
@@ -537,7 +564,14 @@ class ProblemBlock(
             ProblemBlock.markdown,
             ProblemBlock.use_latex_compiler,
             ProblemBlock.show_correctness,
+
+            # Temporarily remove the ability to see MATLAB API key in Studio, as
+            # a pre-cursor to removing it altogether.
+            #   https://github.com/openedx/public-engineering/issues/192
+            ProblemBlock.matlab_api_key,
         ])
+        if not self.is_grading_method_enabled:
+            non_editable_fields.append(ProblemBlock.grading_method)
         return non_editable_fields
 
     @property
@@ -582,11 +616,15 @@ class ProblemBlock(
             "",
             capa_content
         )
+        # Strip out all other tags, leaving their content. But we want spaces between adjacent tags, so that
+        # <choice correct="true"><div>Option A</div></choice><choice correct="false"><div>Option B</div></choice>
+        # becomes "Option A Option B" not "Option AOption B" (these will appear in search results)
+        capa_content = re.sub(r"</(\w+)><([^>]+)>", r"</\1> <\2>", capa_content)
         capa_content = re.sub(
             r"(\s|&nbsp;|//)+",
             " ",
-            Cleaner(tags=[], strip=True).clean(capa_content)
-        )
+            nh3.clean(capa_content, tags=set())
+        ).strip()
 
         capa_body = {
             "capa_content": capa_content,
@@ -694,7 +732,7 @@ class ProblemBlock(
             xqueue=None,
             matlab_api_key=None,
         )
-        _ = capa_system.i18n.ugettext
+        _ = capa_system.i18n.gettext
 
         count = 0
         for user_state in user_state_iterator:
@@ -762,11 +800,24 @@ class ProblemBlock(
                 yield (user_state.username, report)
 
     @property
+    def course_end_date(self):
+        """
+        Return the end date of the problem's course
+        """
+
+        try:
+            course_block_key = self.runtime.course_entry.structure['root']
+            return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
+        except (AttributeError, KeyError):
+            return None
+
+    @property
     def close_date(self):
         """
         Return the date submissions should be closed from.
         """
-        due_date = self.due
+
+        due_date = self.due or self.course_end_date
 
         if self.graceperiod is not None and due_date:
             return due_date + self.graceperiod
@@ -827,6 +878,8 @@ class ProblemBlock(
         sandbox_service = self.runtime.service(self, 'sandbox')
         cache_service = self.runtime.service(self, 'cache')
 
+        is_studio = getattr(self.runtime, 'is_author_mode', False)
+
         capa_system = LoncapaSystem(
             ajax_url=self.ajax_url,
             anonymous_student_id=anonymous_student_id,
@@ -838,7 +891,7 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            xqueue=self.runtime.service(self, 'xqueue'),
+            xqueue=None if is_studio else XQueueService(self),
             matlab_api_key=self.matlab_api_key
         )
 
@@ -858,6 +911,7 @@ class ProblemBlock(
         return {
             'done': self.done,
             'correct_map': self.correct_map,
+            'correct_map_history': self.correct_map_history,
             'student_answers': self.student_answers,
             'has_saved_answers': self.has_saved_answers,
             'input_state': self.input_state,
@@ -871,6 +925,7 @@ class ProblemBlock(
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
         self.correct_map = lcp_state['correct_map']
+        self.correct_map_history = lcp_state['correct_map_history']
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.has_saved_answers = lcp_state['has_saved_answers']
@@ -929,7 +984,7 @@ class ProblemBlock(
         """
         curr_score, total_possible = self.get_display_progress()
 
-        return self.runtime.service(self, 'mako').render_template('problem_ajax.html', {
+        return self.runtime.service(self, 'mako').render_lms_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': str(self.location),
             'ajax_url': self.ajax_url,
@@ -959,7 +1014,7 @@ class ProblemBlock(
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
         submit = _('Submit')
 
         return submit
@@ -972,7 +1027,7 @@ class ProblemBlock(
         display the value returned by this function until a response is
         received by the server.
         """
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
         return _('Submitting')
 
     def should_enable_submit_button(self):
@@ -1102,7 +1157,7 @@ class ProblemBlock(
             self.set_state_from_lcp()
             self.set_score(self.score_from_lcp(self.lcp))
             # Prepend a scary warning to the student
-            _ = self.runtime.service(self, "i18n").ugettext
+            _ = self.runtime.service(self, "i18n").gettext
             warning_msg = Text(_("Warning: The problem has been reset to its initial state!"))
             warning = HTML('<div class="capa_reset"> <h2>{}</h2>').format(warning_msg)
 
@@ -1161,7 +1216,7 @@ class ProblemBlock(
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         hint_index = hint_index % len(demand_hints)
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         counter = 0
         total_text = ''
@@ -1226,7 +1281,7 @@ class ProblemBlock(
             html = self.handle_problem_html_error(err)
 
         html = self.remove_tags_from_html(html)
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         # Enable/Disable Submit button if should_enable_submit_button returns True/False.
         submit_button = self.submit_button_name()
@@ -1267,6 +1322,7 @@ class ProblemBlock(
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
+            'grading_method': self.grading_method_display_name(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
             'demand_hint_possible': demand_hint_possible,
@@ -1278,7 +1334,7 @@ class ProblemBlock(
             'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
-        html = self.runtime.service(self, 'mako').render_template('problem.html', context)
+        html = self.runtime.service(self, 'mako').render_lms_template('problem.html', context)
 
         if encapsulate:
             html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
@@ -1323,11 +1379,11 @@ class ProblemBlock(
                         break
 
             # Build the notification message based on the notification type and translate it.
-            ungettext = self.runtime.service(self, "i18n").ungettext
-            _ = self.runtime.service(self, "i18n").ugettext
+            ngettext = self.runtime.service(self, "i18n").ngettext
+            _ = self.runtime.service(self, "i18n").gettext
             if answer_notification_type == 'incorrect':
                 if progress is not None:
-                    answer_notification_message = ungettext(
+                    answer_notification_message = ngettext(
                         "Incorrect ({progress} point)",
                         "Incorrect ({progress} points)",
                         progress.frac()[1]
@@ -1336,7 +1392,7 @@ class ProblemBlock(
                     answer_notification_message = _('Incorrect')
             elif answer_notification_type == 'correct':
                 if progress is not None:
-                    answer_notification_message = ungettext(
+                    answer_notification_message = ngettext(
                         "Correct ({progress} point)",
                         "Correct ({progress} points)",
                         progress.frac()[1]
@@ -1345,7 +1401,7 @@ class ProblemBlock(
                     answer_notification_message = _('Correct')
             elif answer_notification_type == 'partially-correct':
                 if progress is not None:
-                    answer_notification_message = ungettext(
+                    answer_notification_message = ngettext(
                         "Partially correct ({progress} point)",
                         "Partially correct ({progress} points)",
                         progress.frac()[1]
@@ -1579,9 +1635,9 @@ class ProblemBlock(
 
         return {
             'answers': new_answers,
-            'correct_status_html': self.runtime.service(self, 'mako').render_template(
+            'correct_status_html': self.runtime.service(self, 'mako').render_lms_template(
                 'status_span.html',
-                {'status': Status('correct', self.runtime.service(self, "i18n").ugettext)}
+                {'status': Status('correct', self.runtime.service(self, "i18n").gettext)}
             )
         }
 
@@ -1713,6 +1769,7 @@ class ProblemBlock(
         self.lcp.has_saved_answers = False
         answers = self.make_dict_of_responses(data)
         answers_without_files = convert_files_to_filenames(answers)
+        self.student_answers_history.append(answers_without_files)
         event_info['answers'] = answers_without_files
 
         metric_name = 'xmodule.capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
@@ -1721,7 +1778,7 @@ class ProblemBlock(
         if override_time is not False:
             current_time = override_time
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         # Too late. Cannot submit
         if self.closed():
@@ -1749,7 +1806,7 @@ class ProblemBlock(
         if self.lcp.is_queued():
             prev_submit_time = self.lcp.get_recentmost_queuetime()
 
-            xqueue_service = self.runtime.service(self, 'xqueue')
+            xqueue_service = self.lcp.capa_system.xqueue
             waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(
@@ -1779,7 +1836,12 @@ class ProblemBlock(
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
-            self.set_score(self.score_from_lcp(self.lcp))
+
+            current_score = self.score_from_lcp(self.lcp)
+            self.score_history.append(current_score)
+            if self.is_grading_method_enabled:
+                current_score = self.get_score_with_grading_method(current_score)
+            self.set_score(current_score)
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -1853,6 +1915,28 @@ class ProblemBlock(
         }
     # pylint: enable=too-many-statements
 
+    def get_score_with_grading_method(self, current_score: Score) -> Score:
+        """
+        Calculate and return the current score based on the grading method.
+
+        Args:
+            current_score (Score): The current score of the LON-CAPA problem.
+
+        In this method:
+            - The current score is obtained from the LON-CAPA problem.
+            - The score history is updated adding the current score.
+
+        Returns:
+            Score: The score based on the grading method.
+        """
+        grading_method_handler = GradingMethodHandler(
+            current_score,
+            self.grading_method,
+            self.score_history,
+            self.max_score(),
+        )
+        return grading_method_handler.get_score()
+
     def publish_unmasked(self, title, event_info):
         """
         All calls to runtime.publish route through here so that the
@@ -1910,25 +1994,25 @@ class ProblemBlock(
         Returns time duration nicely formated, e.g. "3 minutes 4 seconds"
         """
         # Here _ is the N variant ungettext that does pluralization with a 3-arg call
-        ungettext = self.runtime.service(self, "i18n").ungettext
+        ngettext = self.runtime.service(self, "i18n").ngettext
         hours = num_seconds // 3600
         sub_hour = num_seconds % 3600
         minutes = sub_hour // 60
         seconds = sub_hour % 60
         display = ""
         if hours > 0:
-            display += ungettext("{num_hour} hour", "{num_hour} hours", hours).format(num_hour=hours)
+            display += ngettext("{num_hour} hour", "{num_hour} hours", hours).format(num_hour=hours)
         if minutes > 0:
             if display != "":
                 display += " "
             # translators: "minute" refers to a minute of time
-            display += ungettext("{num_minute} minute", "{num_minute} minutes", minutes).format(num_minute=minutes)
+            display += ngettext("{num_minute} minute", "{num_minute} minutes", minutes).format(num_minute=minutes)
         # Taking care to make "0 seconds" instead of "" for 0 time
         if seconds > 0 or (hours == 0 and minutes == 0):
             if display != "":
                 display += " "
             # translators: "second" refers to a second of time
-            display += ungettext("{num_second} second", "{num_second} seconds", seconds).format(num_second=seconds)
+            display += ngettext("{num_second} second", "{num_second} seconds", seconds).format(num_second=seconds)
         return display
 
     def get_submission_metadata_safe(self, answers, correct_map):
@@ -2027,7 +2111,7 @@ class ProblemBlock(
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         # Too late. Cannot submit
         if self.closed() and not self.max_attempts == 0:
@@ -2084,7 +2168,7 @@ class ProblemBlock(
         event_info = {}
         event_info['old_state'] = self.lcp.get_state()
         event_info['problem_id'] = str(self.location)
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         if self.closed():
             event_info['failure'] = 'closed'
@@ -2150,7 +2234,7 @@ class ProblemBlock(
         """
         event_info = {'state': self.lcp.get_state(), 'problem_id': str(self.location)}
 
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
 
         if not self.lcp.supports_rescoring():
             event_info['failure'] = 'unsupported'
@@ -2170,7 +2254,6 @@ class ProblemBlock(
         event_info['orig_score'] = orig_score.raw_earned
         event_info['orig_total'] = orig_score.raw_possible
         try:
-            self.update_correctness()
             calculated_score = self.calculate_score()
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:  # lint-amnesty, pylint: disable=unused-variable
             log.warning("Input error in capa_block:problem_rescore", exc_info=True)
@@ -2204,6 +2287,28 @@ class ProblemBlock(
         event_info['attempts'] = self.attempts
         self.publish_unmasked('problem_rescore', event_info)
 
+    def get_rescore_with_grading_method(self) -> Score:
+        """
+        Calculate and return the rescored score based on the grading method.
+
+        In this method:
+            - The list with the correctness maps is updated.
+            - The list with the score history is updated based on the correctness maps.
+            - The final score is calculated based on the grading method.
+
+        Returns:
+            Score: The score calculated based on the grading method.
+        """
+        self.update_correctness_list()
+        self.score_history = self.calculate_score_list()
+        grading_method_handler = GradingMethodHandler(
+            self.score,
+            self.grading_method,
+            self.score_history,
+            self.max_score(),
+        )
+        return grading_method_handler.get_score()
+
     def has_submitted_answer(self):
         return self.done
 
@@ -2232,12 +2337,46 @@ class ProblemBlock(
         new_correct_map = self.lcp.get_grade_from_current_answers(None)
         self.lcp.correct_map.update(new_correct_map)
 
+    def update_correctness_list(self):
+        """
+        Updates the `correct_map_history` and the `correct_map` of the LCP.
+
+        Operates by creating a new correctness map based on the current
+        state of the LCP, and updating the old correctness map of the LCP.
+        """
+        # Make sure that the attempt number is always at least 1 for grading purposes,
+        # even if the number of attempts have been reset and this problem is regraded.
+        self.lcp.context['attempt'] = max(self.attempts, 1)
+        new_correct_map_list = []
+        for student_answers, correct_map in zip(self.student_answers_history, self.correct_map_history):
+            new_correct_map = self.lcp.get_grade_from_current_answers(student_answers, correct_map)
+            new_correct_map_list.append(new_correct_map)
+        self.lcp.correct_map_history = new_correct_map_list
+        if new_correct_map_list:
+            self.lcp.correct_map.update(new_correct_map_list[-1])
+
     def calculate_score(self):
         """
         Returns the score calculated from the current problem state.
+
+        If the grading method is enabled, the score is calculated based on the grading method.
         """
+        if self.is_grading_method_enabled:
+            return self.get_rescore_with_grading_method()
+        self.update_correctness()
         new_score = self.lcp.calculate_score()
         return Score(raw_earned=new_score['score'], raw_possible=new_score['total'])
+
+    def calculate_score_list(self):
+        """
+        Returns the score calculated from the current problem state.
+        """
+        new_score_list = []
+
+        for correct_map in self.lcp.correct_map_history:
+            new_score = self.lcp.calculate_score(correct_map)
+            new_score_list.append(Score(raw_earned=new_score['score'], raw_possible=new_score['total']))
+        return new_score_list
 
     def score_from_lcp(self, lcp):
         """
@@ -2246,6 +2385,102 @@ class ProblemBlock(
         """
         lcp_score = lcp.calculate_score()
         return Score(raw_earned=lcp_score['score'], raw_possible=lcp_score['total'])
+
+
+class GradingMethodHandler:
+    """
+    A class for handling grading method and calculating scores.
+
+    This class allows for flexible handling of grading methods, including options
+    such as considering the last score, the first score, the highest score,
+    or the average score.
+
+    Attributes:
+        - score (Score): The current score.
+        - grading_method (str): The chosen grading method.
+        - score_history (list[Score]): A list to store the history of scores.
+        - max_score (int): The maximum possible score.
+        - mapping_method (dict): A dictionary mapping the grading
+            method to the corresponding handler.
+
+    Methods:
+        - get_score(): Retrieves the updated score based on the grading method.
+        - handle_last_score(): Handles the last score method.
+        - handle_first_score(): Handles the first score method.
+        - handle_highest_score(): Handles the highest score method.
+        - handle_average_score(): Handles the average score method.
+    """
+
+    def __init__(
+        self,
+        score: Score,
+        grading_method: str,
+        score_history: list[Score],
+        max_score: int,
+    ):
+        self.score = score
+        self.grading_method = grading_method
+        self.score_history = score_history
+        if not self.score_history:
+            self.score_history.append(score)
+        self.max_score = max_score
+        self.mapping_method = {
+            GRADING_METHOD.LAST_SCORE: self.handle_last_score,
+            GRADING_METHOD.FIRST_SCORE: self.handle_first_score,
+            GRADING_METHOD.HIGHEST_SCORE: self.handle_highest_score,
+            GRADING_METHOD.AVERAGE_SCORE: self.handle_average_score,
+        }
+
+    def get_score(self) -> Score:
+        """
+        Retrieves the updated score based on the grading method.
+
+        Returns:
+            - Score: The updated score based on the chosen grading method.
+        """
+        return self.mapping_method[self.grading_method]()
+
+    def handle_last_score(self) -> Score:
+        """
+        Retrieves the score based on the last score.
+        It is the last score in the score history.
+
+        Returns:
+            - Score: The score based on the last score.
+        """
+        return self.score_history[-1]
+
+    def handle_first_score(self) -> Score:
+        """
+        Retrieves the score based on the first score.
+        It is the first score in the score history.
+
+        Returns:
+            - Score: The score based on the first score.
+        """
+        return self.score_history[0]
+
+    def handle_highest_score(self) -> Score:
+        """
+        Retrieves the score based on the highest score.
+        It is the highest score in the score history.
+
+        Returns:
+            - Score: The score based on the highest score.
+        """
+        return max(self.score_history)
+
+    def handle_average_score(self) -> Score:
+        """
+        Calculates the average score based on all attempts. The average score is
+        the sum of all scores divided by the number of scores.
+
+        Returns:
+            - Score: The average score based on all attempts.
+        """
+        total = sum(score.raw_earned for score in self.score_history)
+        average_score = round(total / len(self.score_history), 2)
+        return Score(raw_earned=average_score, raw_possible=self.max_score)
 
 
 class ComplexEncoder(json.JSONEncoder):

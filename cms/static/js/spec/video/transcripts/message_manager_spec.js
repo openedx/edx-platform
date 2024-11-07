@@ -154,6 +154,7 @@ define(
             describe('processCommand', function() {
                 var action = 'replace',
                     errorMessage = 'errorMessage',
+                    // eslint-disable-next-line no-void
                     videoList = void 0,
                     extraParamas = 'video_id';
 
@@ -175,6 +176,7 @@ define(
                     var defaults = {
                         action: 'replace',
                         errorMessage: 'errorMessage',
+                        // eslint-disable-next-line no-void
                         extraParamas: void 0
                     };
                     var args = $.extend({}, defaults, config);
@@ -201,6 +203,7 @@ define(
                                 action,
                                 view.component_locator,
                                 videoList,
+                                // eslint-disable-next-line no-void
                                 void 0
                             );
                             expect(view.showError).not.toHaveBeenCalled();
@@ -251,6 +254,7 @@ define(
                                 action,
                                 view.component_locator,
                                 videoList,
+                                // eslint-disable-next-line no-void
                                 void 0
                             );
                             expect(view.showError).toHaveBeenCalled();

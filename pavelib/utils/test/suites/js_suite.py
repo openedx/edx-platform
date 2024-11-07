@@ -5,7 +5,6 @@ Javascript test tasks
 
 from paver import tasks
 
-from pavelib import assets
 from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
@@ -38,8 +37,6 @@ class JsTestSuite(TestSuite):
 
         if self.mode == 'run' and not self.run_under_coverage:
             test_utils.clean_dir(self.report_dir)
-
-        assets.process_npm_assets()
 
     @property
     def _default_subsuites(self):

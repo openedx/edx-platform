@@ -4,7 +4,6 @@ Unittests for creating a course in an chosen modulestore
 
 from io import StringIO
 
-import ddt
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -40,27 +39,28 @@ class TestArgParsing(TestCase):
             call_command('create_course', "mongo", "fake@example.com", "org", "course", "run")
 
 
-@ddt.ddt
 class TestCreateCourse(ModuleStoreTestCase):
     """
     Unit tests for creating a course in either old mongo or split mongo via command line
     """
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_all_stores_user_email(self, store):
+    def test_all_stores_user_email(self):
         call_command(
             "create_course",
-            store,
+            ModuleStoreEnum.Type.split,
             str(self.user.email),
             "org", "course", "run", "dummy-course-name"
         )
         new_key = modulestore().make_course_key("org", "course", "run")
         self.assertTrue(
             modulestore().has_course(new_key),
-            f"Could not find course in {store}"
+            f"Could not find course in {ModuleStoreEnum.Type.split}"
         )
         # pylint: disable=protected-access
-        self.assertEqual(store, modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type())
+        self.assertEqual(
+            ModuleStoreEnum.Type.split,
+            modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type()
+        )
 
     def test_duplicate_course(self):
         """
@@ -85,8 +85,7 @@ class TestCreateCourse(ModuleStoreTestCase):
         expected = "Course already exists"
         self.assertIn(out.getvalue().strip(), expected)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_get_course_with_different_case(self, default_store):
+    def test_get_course_with_different_case(self):
         """
         Tests that course can not be accessed with different case.
 
@@ -98,21 +97,20 @@ class TestCreateCourse(ModuleStoreTestCase):
         org = 'org1'
         number = 'course1'
         run = 'run1'
-        with self.store.default_store(default_store):
-            lowercase_course_id = self.store.make_course_key(org, number, run)
-            with self.store.bulk_operations(lowercase_course_id, ignore_case=True):
-                # Create course with lowercase key & Verify that store returns course.
-                self.store.create_course(
-                    lowercase_course_id.org,
-                    lowercase_course_id.course,
-                    lowercase_course_id.run,
-                    self.user.id
-                )
-                course = self.store.get_course(lowercase_course_id)
-                self.assertIsNotNone(course, 'Course not found using lowercase course key.')
-                self.assertEqual(str(course.id), str(lowercase_course_id))
+        lowercase_course_id = self.store.make_course_key(org, number, run)
+        with self.store.bulk_operations(lowercase_course_id, ignore_case=True):
+            # Create course with lowercase key & Verify that store returns course.
+            self.store.create_course(
+                lowercase_course_id.org,
+                lowercase_course_id.course,
+                lowercase_course_id.run,
+                self.user.id
+            )
+            course = self.store.get_course(lowercase_course_id)
+            self.assertIsNotNone(course, 'Course not found using lowercase course key.')
+            self.assertEqual(str(course.id), str(lowercase_course_id))
 
-                # Verify store does not return course with different case.
-                uppercase_course_id = self.store.make_course_key(org.upper(), number.upper(), run.upper())
-                course = self.store.get_course(uppercase_course_id)
-                self.assertIsNone(course, 'Course should not be accessed with uppercase course id.')
+            # Verify store does not return course with different case.
+            uppercase_course_id = self.store.make_course_key(org.upper(), number.upper(), run.upper())
+            course = self.store.get_course(uppercase_course_id)
+            self.assertIsNone(course, 'Course should not be accessed with uppercase course id.')

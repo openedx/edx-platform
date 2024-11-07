@@ -6,7 +6,6 @@ import logging
 import random
 import re
 import string
-from urllib.parse import urlparse  # pylint: disable=import-error
 
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from completion.models import BlockCompletion
@@ -85,11 +84,9 @@ def _get_username_from_social_link(platform_name, new_social_link):
     if not new_social_link:
         return new_social_link
 
-    # Parse the social link as if it were a URL.
-    parse_result = urlparse(new_social_link)
-    url_domain_and_path = parse_result[1] + parse_result[2]
     url_stub = re.escape(settings.SOCIAL_PLATFORMS[platform_name]['url_stub'])
-    username_match = re.search(r'(www\.)?' + url_stub + r'(?P<username>.*?)[/]?$', url_domain_and_path, re.IGNORECASE)
+    username_match = re.search(r'(www\.)?' + url_stub + r'(?P<username>.+?)(?:/)?$', new_social_link, re.IGNORECASE)
+
     if username_match:
         username = username_match.group('username')
     else:
@@ -229,13 +226,18 @@ def username_suffix_generator(suffix_length=4):
     Generates a random, alternating number and letter string for the purpose of
     appending to non-unique usernames. Alternating is less likey to produce
     a significant/meaningful substring like an offensive word.
+    Whether the suffix starts with a letter or number is also randomized.
     """
+    # pick from letters, or numbers
+    choice_collections = [string.ascii_lowercase, string.digits]
+    # randomize which collection to pick from first
+    random.shuffle(choice_collections)
     output = ''
     for i in range(suffix_length):
         if (i % 2) == 0:
-            output += random.choice(string.ascii_lowercase)
+            output += random.choice(choice_collections[0])
         else:
-            output += random.choice(string.digits)
+            output += random.choice(choice_collections[1])
     return output
 
 

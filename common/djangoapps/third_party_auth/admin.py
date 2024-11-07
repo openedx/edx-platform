@@ -1,15 +1,17 @@
 """
 Admin site configuration for third party authentication
 """
-
+import csv
 
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db import transaction
-from django.urls import reverse
+from django.http import Http404, HttpResponseRedirect
+from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import (
     _PSA_OAUTH2_BACKENDS,
@@ -21,7 +23,7 @@ from .models import (
     SAMLProviderConfig,
     SAMLProviderData
 )
-from .tasks import fetch_saml_metadata
+from .tasks import fetch_saml_metadata, update_saml_users_social_auth_uid
 
 
 class OAuth2ProviderConfigForm(forms.ModelForm):
@@ -51,13 +53,15 @@ class SAMLProviderConfigForm(forms.ModelForm):
 class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLProviderConfig """
     form = SAMLProviderConfigForm
+    search_fields = ['display_name']
 
     def get_queryset(self, request):
         """
-        Filter the queryset to exclude the archived records.
+        Filter the queryset to exclude the archived records unless it's the /change/ view.
         """
-        queryset = super().get_queryset(request).exclude(archived=True)
-        return queryset
+        if request.path.endswith('/change/'):
+            return self.model.objects.all()
+        return super().get_queryset(request).exclude(archived=True)
 
     def archive_provider_configuration(self, request, queryset):
         """
@@ -72,7 +76,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """ Don't show every single field in the admin change list """
         return (
             'name_with_update_link', 'enabled', 'site', 'entity_id', 'metadata_source',
-            'has_data', 'mode', 'saml_configuration', 'change_date', 'changed_by',
+            'has_data', 'mode', 'saml_configuration', 'change_date', 'changed_by', 'csv_uuid_update_button',
         )
 
     list_display_links = None
@@ -97,7 +101,15 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         Record name with link for the change view.
         """
         if not instance.is_active:
-            return instance.name
+            update_url = reverse(
+                f'admin:{self.model._meta.app_label}_{self.model._meta.model_name}_change',
+                args=[instance.pk]
+            )
+            return format_html(
+                '<a href="{}" style="color: #999999;">{}</a>',
+                update_url,
+                f'{instance.name}'
+            )
 
         update_url = reverse(f'admin:{self.model._meta.app_label}_{self.model._meta.model_name}_add')
         update_url += f'?source={instance.pk}'
@@ -134,6 +146,65 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """
         super().save_model(request, obj, form, change)
         fetch_saml_metadata.apply_async((), countdown=2)
+
+    def get_urls(self):
+        """ Extend the admin URLs to include the custom CSV upload URL. """
+        urls = super().get_urls()
+        custom_urls = [
+            path('<slug:slug>/upload-csv/', self.admin_site.admin_view(self.upload_csv), name='upload_csv'),
+
+        ]
+        return custom_urls + urls
+
+    @csrf_exempt
+    def upload_csv(self, request, slug):
+        """ Handle CSV upload and update UserSocialAuth model. """
+        if not request.user.is_staff:
+            raise Http404
+        if request.method == 'POST':
+            csv_file = request.FILES.get('csv_file')
+            if not csv_file or not csv_file.name.endswith('.csv'):
+                self.message_user(request, "Please upload a valid CSV file.", level=messages.ERROR)
+            else:
+                try:
+                    decoded_file = csv_file.read().decode('utf-8').splitlines()
+                    reader = csv.DictReader(decoded_file)
+                    update_saml_users_social_auth_uid(reader, slug)
+                    self.message_user(request, "CSV file has been processed successfully.")
+                except Exception as e:  # pylint: disable=broad-except
+                    self.message_user(request, f"Failed to process CSV file: {e}", level=messages.ERROR)
+
+        # Always redirect back to the SAMLProviderConfig listing page
+        return HttpResponseRedirect(reverse('admin:third_party_auth_samlproviderconfig_changelist'))
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """ Extend the change view to include CSV upload. """
+        extra_context = extra_context or {}
+        extra_context['show_csv_upload'] = True
+        return super().change_view(request, object_id, form_url, extra_context)
+
+    def csv_uuid_update_button(self, obj):
+        """ Add CSV upload button to the form. """
+        if obj:
+            form_url = reverse('admin:upload_csv', args=[obj.slug])
+            return format_html(
+                '<form method="post" enctype="multipart/form-data" action="{}">'
+                '<input type="file" name="csv_file" accept=".csv" style="margin-bottom: 10px;">'
+                '<button type="submit" class="button">Upload CSV</button>'
+                '</form>',
+                form_url
+            )
+        return ""
+
+    csv_uuid_update_button.short_description = 'UUID UPDATE CSV'
+    csv_uuid_update_button.allow_tags = True
+
+    def get_readonly_fields(self, request, obj=None):
+        """ Conditionally add csv_uuid_update_button to readonly fields. """
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj:
+            readonly_fields.append('csv_uuid_update_button')
+        return readonly_fields
 
 admin.site.register(SAMLProviderConfig, SAMLProviderConfigAdmin)
 

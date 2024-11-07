@@ -3,7 +3,6 @@
 Programmatic integration point for User API Accounts sub-application
 """
 
-
 import datetime
 import re
 
@@ -12,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
 from django.utils.translation import gettext as _
+from eventtracking import tracker
 from pytz import UTC
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
@@ -151,6 +151,12 @@ def update_account_settings(requesting_user, update, username=None):
 
     _validate_email_change(user, update, field_errors)
     _validate_secondary_email(user, update, field_errors)
+    if update.get('country', '') in settings.DISABLED_COUNTRIES:
+        field_errors['country'] = {
+            'developer_message': 'Country is disabled for registration',
+            'user_message': 'This country cannot be selected for user registration'
+        }
+
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
 
@@ -404,9 +410,27 @@ def get_name_validation_error(name):
     :return: Validation error message.
 
     """
+
+    def contains_html(value):
+        """
+        Validator method to check whether name contains html tags
+        """
+        regex = re.compile('(<|>)', re.UNICODE)
+        return bool(regex.search(value))
+
+    def contains_url(value):
+        """
+        Validator method to check whether full name contains url
+        """
+        regex = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))*', value)
+        return bool(regex)
+
     if name:
-        regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', name)
-        return _('Enter a valid name') if bool(regex) else ''
+        # Validation for the name length
+        if len(name) > 255:
+            return _("Full name can't be longer than 255 symbols")
+
+        return _('Enter a valid name') if (contains_html(name) or contains_url(name)) else ''
     else:
         return accounts.REQUIRED_FIELD_NAME_MSG
 
@@ -508,6 +532,23 @@ def get_email_existence_validation_error(email):
 
     """
     return _validate(_validate_email_doesnt_exist, errors.AccountEmailAlreadyExists, email)
+
+
+def get_profile_images(user_profile, user, request=None):
+    """
+    Returns metadata about a user's profile image.
+
+    The output is a dict that looks like:
+
+    {
+        "has_image": False,
+        "image_url_full": "http://testserver/static/default_500.png",
+        "image_url_large": "http://testserver/static/default_120.png",
+        "image_url_medium": "http://testserver/static/default_50.png",
+        "image_url_small": "http://testserver/static/default_30.png",
+    }
+    """
+    return AccountLegacyProfileSerializer.get_profile_image(user_profile, user, request)
 
 
 def _get_user_and_profile(username):
@@ -644,11 +685,14 @@ def _validate_password(password, username=None, email=None, reset_password_page=
         (settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY and reset_password_page) or
         (settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY and not reset_password_page)
     ):
-        pwned_response = check_pwned_password(password)
-        if pwned_response.get('vulnerability', 'no') == 'yes':
+        pwned_properties = check_pwned_password(password)
+        if pwned_properties.get('vulnerability', 'no') == 'yes':
+            if reset_password_page is False:
+                pwned_properties['user_request_page'] = 'registration'
+                tracker.emit('edx.bi.user.pwned.password.status', pwned_properties)
             if (
                 reset_password_page or
-                pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+                pwned_properties.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
             ):
                 raise errors.AccountPasswordInvalid(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
 

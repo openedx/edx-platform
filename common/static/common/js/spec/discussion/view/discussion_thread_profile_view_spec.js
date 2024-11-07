@@ -53,6 +53,7 @@
                 expectedText = 'Test body';
                 // I really have no idea what it is supposed to mean - probably just iteration, but better be safe
                 for (
+                    // eslint-disable-next-line no-multi-assign
                     i = _i = 0, _ref = numberOfImages - 1;
                     _ref >= 0 ? _i <= _ref : _i >= _ref;
                     i = _ref >= 0 ? ++_i : --_i
@@ -131,6 +132,7 @@
                         'body with ' + numImages + ' images and ' + (truncatedText ? 'truncated' : 'untruncated')
                         + ' text',
                         // eslint-disable no-loop-func
+                        // eslint-disable-next-line no-loop-func
                         function() {
                             return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);
                         }

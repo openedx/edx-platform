@@ -287,6 +287,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 oldParentLocator = element.data('parent'),
                 oldParentEle, saving, refreshParent;
 
+            // eslint-disable-next-line no-shadow
             refreshParent = function(element) {
                 var refresh = element.data('refresh');
                 // If drop was into a collapsed parent, the parent will have been

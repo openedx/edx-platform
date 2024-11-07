@@ -3,7 +3,7 @@ define([
 ], function($, CourseDetailsModel, MainView) {
     'use strict';
 
-    return function(detailsUrl, showMinGradeWarning, showCertificateAvailableDate, upgradeDeadline, useV2CertDisplaySettings) {
+    return function(detailsUrl, showMinGradeWarning, showCertificateAvailableDate, upgradeDeadline) {
         var model;
         // highlighting labels when fields are focused in
         $('form :input')
@@ -23,16 +23,15 @@ define([
         model = new CourseDetailsModel();
         model.urlRoot = detailsUrl;
         model.showCertificateAvailableDate = showCertificateAvailableDate;
-        model.useV2CertDisplaySettings = useV2CertDisplaySettings;
         model.set('upgrade_deadline', upgradeDeadline);
         model.fetch({
+            // eslint-disable-next-line no-shadow
             success: function(model) {
                 var editor = new MainView({
                     el: $('.settings-details'),
                     model: model,
                     showMinGradeWarning: showMinGradeWarning
                 });
-                editor.useV2CertDisplaySettings = useV2CertDisplaySettings;
                 editor.render();
             },
             reset: true,

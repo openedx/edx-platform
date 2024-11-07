@@ -56,6 +56,18 @@ class StubMakoService:
         """
         return self._render_template(*args, **kwargs)
 
+    def render_lms_template(self, *args, **kwargs):
+        """
+        Invokes the configured render_template method.
+        """
+        return self._render_template(*args, **kwargs)
+
+    def render_cms_template(self, *args, **kwargs):
+        """
+        Invokes the configured render_template method.
+        """
+        return self._render_template(*args, **kwargs)
+
 
 class StubUserService(UserService):
     """

@@ -49,6 +49,7 @@ from django.utils.translation import gettext_noop
 from django_countries.fields import CountryField
 from edx_django_utils import monitoring
 from edx_django_utils.cache import RequestCache
+from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from pytz import UTC, timezone
@@ -68,6 +69,9 @@ AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
 
 IS_MARKETABLE = 'is_marketable'
+
+USER_LOGGED_IN_EVENT_NAME = 'edx.user.login'
+USER_LOGGED_OUT_EVENT_NAME = 'edx.user.logout'
 
 
 class AnonymousUserId(models.Model):
@@ -548,7 +552,10 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
-    phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d*$',
+        message="Phone number must start with '+' (optional) followed by digits (0-9) only.",
+    )
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
 
     @property
@@ -1230,6 +1237,13 @@ def create_comments_service_user(user):  # lint-amnesty, pylint: disable=missing
 @receiver(user_logged_in)
 def log_successful_login(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logins have occurred successfully."""
+    tracker.emit(
+        USER_LOGGED_IN_EVENT_NAME,
+        {
+            'user_id': getattr(user, 'id', None) if user else None,
+            'event_type': "login",
+        }
+    )
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.info(f"Login success - user.id: {user.id}")
     else:
@@ -1240,6 +1254,13 @@ def log_successful_login(sender, request, user, **kwargs):  # lint-amnesty, pyli
 def log_successful_logout(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
     if hasattr(request, 'user'):
+        tracker.emit(
+            USER_LOGGED_OUT_EVENT_NAME,
+            {
+                'user_id': getattr(user, 'id', None) if user else None,
+                'event_type': "logout",
+            }
+        )
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.info(f'Logout - user.id: {request.user.id}')  # pylint: disable=logging-format-interpolation
         else:
@@ -1664,6 +1685,8 @@ class AllowedAuthUser(TimeStampedModel):
 class AccountRecoveryConfiguration(ConfigurationModel):
     """
     configuration model for recover account management command
+
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -1803,6 +1826,8 @@ class UserCelebration(TimeStampedModel):
 class UserPasswordToggleHistory(TimeStampedModel):
     """
     Keeps track of user password disable/enable history
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, related_name='password_toggle_history', on_delete=models.CASCADE)
     comment = models.CharField(max_length=255, help_text=_("Add a reason"), blank=True, null=True)

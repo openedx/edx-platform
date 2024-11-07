@@ -26,7 +26,6 @@ from openedx.core.lib.tests import attr
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.utils import (
     CONTENTSTORE_SETUPS,
-    MODULESTORE_SETUPS,
     SPLIT_MODULESTORE_SETUP,
     TEST_DATA_DIR,
     MongoContentstoreBuilder,
@@ -61,8 +60,8 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
 
     @patch('xmodule.video_block.video_block.edxval_api', None)
     @ddt.data(*itertools.product(
-        MODULESTORE_SETUPS,
-        MODULESTORE_SETUPS,
+        (SPLIT_MODULESTORE_SETUP,),
+        (SPLIT_MODULESTORE_SETUP,),
         CONTENTSTORE_SETUPS,
         CONTENTSTORE_SETUPS,
         COURSE_DATA_NAMES,

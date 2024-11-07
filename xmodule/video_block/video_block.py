@@ -30,9 +30,9 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE, TRANSCRIPT_FEEDBACK
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
@@ -48,11 +48,11 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
-    HTMLSnippet, ResourceTemplates, shim_xmodule_js,
+    ResourceTemplates, shim_xmodule_js,
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
@@ -121,7 +121,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin, HTMLSnippet,
+        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
@@ -159,7 +159,7 @@ class VideoBlock(
 
     uses_xmodule_styles_setup = True
 
-    def get_transcripts_for_student(self, transcripts):
+    def get_transcripts_for_student(self, transcripts, dest_lang=None):
         """Return transcript information necessary for rendering the XModule student view.
         This is more or less a direct extraction from `get_html`.
 
@@ -180,7 +180,7 @@ class VideoBlock(
             elif sub or other_lang:
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
-        transcript_language = self.get_default_transcript_language(transcripts)
+        transcript_language = self.get_default_transcript_language(transcripts, dest_lang)
         native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
         languages = {
             lang: native_languages.get(lang, display)
@@ -237,12 +237,13 @@ class VideoBlock(
 
         return False
 
-    def student_view(self, _context):
+    def student_view(self, context):
         """
         Return the student view.
         """
-        fragment = Fragment(self.get_html())
-        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        fragment = Fragment(self.get_html(context=context))
+        add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
@@ -257,9 +258,10 @@ class VideoBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'VideoBlockStudio')
+        add_css_to_fragment(fragment, 'VideoBlockEditor.css')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockEditor')
         shim_xmodule_js(fragment, 'TabsEditingDescriptor')
         return fragment
 
@@ -274,11 +276,15 @@ class VideoBlock(
             return self.student_view(context)
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
-        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
+        """
+        Return html for a given view of this block.
+        """
         context = context or {}
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
@@ -365,7 +371,10 @@ class VideoBlock(
                 download_video_link = next((url for url in self.html5_sources if not url.endswith('.m3u8')), None)
 
         transcripts = self.get_transcripts_info()
-        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
+        track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(
+            transcripts=transcripts,
+            dest_lang=context.get("dest_lang")
+        )
 
         cdn_eval = False
         cdn_exp_group = None
@@ -442,6 +451,7 @@ class VideoBlock(
             'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
                 self, 'transcript', 'available_translations'
             ).rstrip('/?'),
+            'aiTranslationsUrl': settings.AI_TRANSLATIONS_API_URL,
             'transcriptLanguage': transcript_language,
             'transcriptLanguages': sorted_languages,
             'transcriptTranslationUrl': self.runtime.handler_url(
@@ -472,7 +482,9 @@ class VideoBlock(
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
             'block_id': str(self.location),
-            'course_id': str(self.location.course_key),
+            'course_id': str(self.context_key),
+            'video_id': str(self.edx_video_id),
+            'user_id': self.get_user_id(),
             'is_embed': is_embed,
             'license': getattr(self, "license", None),
             'metadata': json.dumps(OrderedDict(metadata)),
@@ -480,8 +492,8 @@ class VideoBlock(
             'track': track_url,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
+            'transcript_feedback_enabled': self.is_transcript_feedback_enabled(),
         }
-
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
             template_context['public_sharing_enabled'] = True
@@ -492,14 +504,16 @@ class VideoBlock(
                 organization=organization
             )
 
-        return self.runtime.service(self, 'mako').render_template('video.html', template_context)
+        return self.runtime.service(self, 'mako').render_lms_template('video.html', template_context)
 
     def get_course_video_sharing_override(self):
         """
         Return course video sharing options override or None
         """
+        if not self.context_key.is_course:
+            return False  # Only courses support this feature at all (not libraries)
         try:
-            course = get_course_by_id(self.course_id)
+            course = get_course_by_id(self.context_key)
             return getattr(course, 'video_sharing_options', None)
 
         # In case the course / modulestore does something weird
@@ -511,9 +525,14 @@ class VideoBlock(
         """
         Is public sharing enabled for this video?
         """
-
-        # Video share feature must be enabled for sharing settings to take effect
-        feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
+        if not self.context_key.is_course:
+            return False  # Only courses support this feature at all (not libraries)
+        try:
+            # Video share feature must be enabled for sharing settings to take effect
+            feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.context_key)
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.context_key}")
+            return False
         if not feature_enabled:
             return False
 
@@ -532,6 +551,23 @@ class VideoBlock(
         # Equivalent to COURSE_VIDEO_SHARING_PER_VIDEO or None / unset
         else:
             return self.public_access
+
+    def is_transcript_feedback_enabled(self):
+        """
+        Is transcript feedback enabled for this video?
+        """
+        if not self.context_key.is_course:
+            return False  # Only courses support this feature at all (not libraries)
+        try:
+            # Video transcript feedback must be enabled in order to show the widget
+            feature_enabled = TRANSCRIPT_FEEDBACK.is_enabled(self.context_key)
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.context_key}")
+            return False
+        return feature_enabled
+
+    def get_user_id(self):
+        return self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
 
     def get_public_video_url(self):
         """
@@ -700,7 +736,7 @@ class VideoBlock(
         return video_block
 
     @classmethod
-    def parse_xml(cls, node, runtime, _keys, id_generator):
+    def parse_xml(cls, node, runtime, _keys):
         """
         Use `node` to construct a new block.
 
@@ -708,13 +744,13 @@ class VideoBlock(
         """
         url_name = node.get('url_name')
         block_type = 'video'
-        definition_id = id_generator.create_definition(block_type, url_name)
-        usage_id = id_generator.create_usage(definition_id)
+        definition_id = runtime.id_generator.create_definition(block_type, url_name)
+        usage_id = runtime.id_generator.create_usage(definition_id)
         if is_pointer_tag(node):
             filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
             node = cls.load_file(filepath, runtime.resources_fs, usage_id)
-            runtime.parse_asides(node, definition_id, usage_id, id_generator)
-        field_data = cls.parse_video_xml(node, id_generator)
+            runtime.parse_asides(node, definition_id, usage_id, runtime.id_generator)
+        field_data = cls.parse_video_xml(node, runtime.id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
         video = runtime.construct_xblock_from_class(
@@ -730,7 +766,7 @@ class VideoBlock(
         video.edx_video_id = video.import_video_info_into_val(
             node,
             runtime.resources_fs,
-            getattr(id_generator, 'target_course_id', None)
+            getattr(runtime.id_generator, 'target_course_id', None)
         )
 
         return video

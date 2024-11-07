@@ -318,6 +318,7 @@ mind, or whether to act, and in acting, to live."
                     i18n = function(value, word) {
                         var msg;
 
+                        // eslint-disable-next-line default-case
                         switch (word) {
                         case 'hour':
                             msg = ngettext('%(value)s hour', '%(value)s hours', value);

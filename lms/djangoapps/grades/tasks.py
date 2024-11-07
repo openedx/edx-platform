@@ -24,6 +24,8 @@ from common.djangoapps.util.date_utils import from_timestamp
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.model_data import get_score
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+from openedx.core.djangoapps.content.block_structure.exceptions import UsageKeyNotInBlockStructure
 from openedx.core.djangoapps.content.course_overviews.models import \
     CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -31,7 +33,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
-from .exceptions import DatabaseNotReadyError
+from .exceptions import ScoreNotFoundError
 from .grade_utils import are_grades_frozen
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
@@ -43,7 +45,8 @@ COURSE_GRADE_TIMEOUT_SECONDS = 1200
 KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
     DatabaseError,
     ValidationError,
-    DatabaseNotReadyError,
+    ScoreNotFoundError,
+    UsageKeyNotInBlockStructure,
 )
 RECALCULATE_GRADE_DELAY_SECONDS = 2  # to prevent excessive _has_db_updated failures. See TNL-6424.
 RETRY_DELAY_SECONDS = 40
@@ -236,7 +239,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         has_database_updated = _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs)
 
         if not has_database_updated:
-            raise DatabaseNotReadyError
+            raise ScoreNotFoundError
 
         _update_subsection_grades(
             course_key,
@@ -315,13 +318,25 @@ def _update_subsection_grades(
     student = User.objects.get(id=user_id)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course_structure = get_course_blocks(student, store.make_course_usage_key(course_key))
+        course_usage_key = store.make_course_usage_key(course_key)
+        course_structure = get_course_blocks(student, course_usage_key)
         subsections_to_update = course_structure.get_transformer_block_field(
             scored_block_usage_key,
             GradesTransformer,
             'subsections',
             set(),
         )
+
+        # Clear the course cache if access is restricted and course blocks are
+        # cached without the restricted blocks.
+        if not subsections_to_update:
+            clear_course_from_cache(course_usage_key.course_key)
+            raise UsageKeyNotInBlockStructure(
+                "Scored block usage_key '{0}' is not found in the block_structure with root '{1}'".format(
+                    str(scored_block_usage_key),
+                    str(course_usage_key)
+                )
+            )
 
         course = store.get_course(course_key, depth=0)
         subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)

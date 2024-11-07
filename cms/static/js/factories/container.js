@@ -8,6 +8,7 @@ import './base';
 import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
 
+// eslint-disable-next-line no-unused-expressions
 'use strict';
 export default function ContainerFactory(componentTemplates, XBlockInfoJson, action, options) {
     var main_options = {

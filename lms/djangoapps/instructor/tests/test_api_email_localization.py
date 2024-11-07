@@ -35,7 +35,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         # Esperanto.
         self.instructor = InstructorFactory(course_key=self.course.id)
         set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
-        self.client.login(username=self.instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
 
         self.student = UserFactory.create()
         set_user_preference(self.student, LANGUAGE_KEY, 'eo')

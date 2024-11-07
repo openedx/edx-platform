@@ -23,6 +23,7 @@
  * - The specified 'nextUrl' if safe, or
  * - The dashboard
  */
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 

@@ -63,16 +63,16 @@ class LTIBlockTest(TestCase):
                 </imsx_POXEnvelopeRequest>
             """)
         self.course_id = CourseKey.from_string('org/course/run')
-        self.system = get_test_system(self.course_id)
-        self.system.publish = Mock()
-        self.system._runtime_services['rebind_user'] = Mock()  # pylint: disable=protected-access
+        self.runtime = get_test_system(self.course_id)
+        self.runtime.publish = Mock()
+        self.runtime._services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
         self.xblock = LTIBlock(
-            self.system,
+            self.runtime,
             DictFieldData({}),
             ScopeIds(None, None, None, BlockUsageLocator(self.course_id, 'lti', 'name'))
         )
-        current_user = self.system.service(self.xblock, 'user').get_current_user()
+        current_user = self.runtime.service(self.xblock, 'user').get_current_user()
         self.user_id = current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
         self.lti_id = self.xblock.lti_id
 
@@ -178,7 +178,7 @@ class LTIBlockTest(TestCase):
         """
         If we have no real user, we should send back failure response.
         """
-        self.system._runtime_services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
+        self.runtime._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
         self.xblock.verify_oauth_body_sign = Mock()
         self.xblock.has_score = True
         request = Request(self.environ)

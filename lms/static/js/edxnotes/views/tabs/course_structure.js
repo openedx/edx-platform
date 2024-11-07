@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 
@@ -22,6 +23,7 @@
                                 sectionView;
                             if (sectionInfo) {
                                 sectionView = chapterView.addChild(sectionInfo);
+                                // eslint-disable-next-line no-shadow
                                 _.each(sectionInfo.children, function(location) {
                                     var notes = courseStructure.units[location];
                                     if (notes) {

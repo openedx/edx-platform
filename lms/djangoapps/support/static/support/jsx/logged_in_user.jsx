@@ -131,13 +131,14 @@ function LoggedInUser({
             <div className="row">
                 <div
                     className="col-sm-12 user-info"
+                    data-name={userInformation.fullName}
                     data-username={userInformation.username}
                     data-email={userInformation.email}
                 >
                     <p>
                         {StringUtils.interpolate(
-                            gettext('What can we help you with, {username}?'),
-                            { username: userInformation.username },
+                            gettext('What can we help you with, {fullName}?'),
+                            { fullName: userInformation.fullName },
                         )}
                     </p>
                 </div>
@@ -176,8 +177,10 @@ LoggedInUser.propTypes = {
     reDirectUser: PropTypes.func.isRequired,
     userInformation: PropTypes.shape({
         course_id: PropTypes.string,
+        fullName: PropTypes.string,
         username: PropTypes.string,
         email: PropTypes.string,
+        // eslint-disable-next-line react/forbid-prop-types
         enrollments: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     showWarning: PropTypes.bool.isRequired,

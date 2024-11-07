@@ -562,7 +562,8 @@
       }
     }
 
-    .btn-enroll{
+    .btn-enroll,
+    .btn-go-to-course{
       @extend %btn-shims;
       color: #FFFFFF;
       background: #D23228;

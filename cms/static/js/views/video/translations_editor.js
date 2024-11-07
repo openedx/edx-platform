@@ -56,6 +56,7 @@ define(
             getDropdown: (function() {
                 var dropdown,
                     disableOptions = function(element, values) {
+                        // eslint-disable-next-line no-shadow
                         var dropdown = $(element).clone();
 
                         _.each(values, function(value, key) {

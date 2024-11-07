@@ -161,7 +161,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         if self.current_user != username:
             self.logout()
             user_email = User.objects.get(username=username).email
-            self.login(user_email, "test")
+            self.login(user_email, self.TEST_PASSWORD)
             self.current_user = username
 
     def _create_user(self, username, email=None, is_staff=False, mode='honor', enrollment_active=True):

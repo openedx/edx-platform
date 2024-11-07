@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 
@@ -61,6 +62,7 @@
      * @param {Array} plugins A list of plugins for the annotator.
      * @param {Object} options An options for the annotator.
      * */
+        // eslint-disable-next-line no-shadow
         setupPlugins = function(annotator, plugins, options) {
             _.each(plugins, function(plugin) {
                 var settings = options[plugin.toLowerCase()];

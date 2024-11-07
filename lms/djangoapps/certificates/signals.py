@@ -4,14 +4,13 @@ Signal handler for enabling/disabling self-generated certificates based on the c
 
 import logging
 
+from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from openedx_events.event_bus import get_producer
 
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
-from lms.djangoapps.certificates.config import SEND_CERTIFICATE_CREATED_SIGNAL
 from lms.djangoapps.certificates.generation_handler import (
     CertificateGenerationNotAllowed,
     generate_allowlist_certificate_task,
@@ -24,15 +23,21 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.api import auto_certificate_generation_enabled
+from lms.djangoapps.certificates.api import (
+    auto_certificate_generation_enabled,
+    invalidate_certificate
+)
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
 from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED,
-    LEARNER_NOW_VERIFIED
+    LEARNER_SSO_VERIFIED,
+    PHOTO_VERIFICATION_APPROVED,
 )
-from openedx_events.learning.signals import CERTIFICATE_CREATED
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, IDV_ATTEMPT_APPROVED
+
+User = get_user_model()
 
 log = logging.getLogger(__name__)
 
@@ -114,10 +119,9 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
             log.info(f'Certificate marked not passing for {user.id} : {course_id} via failing grade')
 
 
-@receiver(LEARNER_NOW_VERIFIED, dispatch_uid="learner_track_changed")
-def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylint: disable=unused-argument
+def _handle_id_verification_approved(user):
     """
-    Listen for a signal indicating that the user's id verification status has changed.
+    Generate a certificate for the user if they are now verified
     """
     if not auto_certificate_generation_enabled():
         return
@@ -137,6 +141,25 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
                 str(user),
                 enrollment.course_id,
             )
+
+
+@receiver(LEARNER_SSO_VERIFIED, dispatch_uid="sso_learner_verified")
+@receiver(PHOTO_VERIFICATION_APPROVED, dispatch_uid="photo_verification_approved")
+def _listen_for_sso_verification_approved(sender, user, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a signal on SSOVerification indicating that the user has been verified.
+    """
+    _handle_id_verification_approved(user)
+
+
+@receiver(IDV_ATTEMPT_APPROVED, dispatch_uid="openedx_idv_attempt_approved")
+def _listen_for_id_verification_approved_event(sender, signal, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for an openedx event indicating that the user's id verification status has changed.
+    """
+    event_data = kwargs.get('idv_attempt')
+    user = User.objects.get(id=event_data.user.id)
+    _handle_id_verification_approved(user)
 
 
 @receiver(ENROLLMENT_TRACK_UPDATED)
@@ -161,16 +184,15 @@ def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs)
             return False
 
 
-@receiver(CERTIFICATE_CREATED)
-def listen_for_certificate_created_event(sender, signal, **kwargs):
+@receiver(EXAM_ATTEMPT_REJECTED)
+def handle_exam_attempt_rejected_event(sender, signal, **kwargs):
     """
-    Publish `CERTIFICATE_CREATED` events to the event bus.
+    Consume `EXAM_ATTEMPT_REJECTED` events from the event bus.
+    Pass the received data to invalidate_certificate in the services.py file in this folder.
     """
-    if SEND_CERTIFICATE_CREATED_SIGNAL.is_enabled():
-        get_producer().send(
-            signal=CERTIFICATE_CREATED,
-            topic='certificates',
-            event_key_field='certificate.course.course_key',
-            event_data={'certificate': kwargs['certificate']},
-            event_metadata=kwargs['metadata']
-        )
+    event_data = kwargs.get('exam_attempt')
+    user_data = event_data.student_user
+    course_key = event_data.course_key
+
+    # Note that the course_key is the same as the course_key_or_id, and is being passed in as the course_key param
+    invalidate_certificate(user_data.id, course_key, source='exam_event')

@@ -46,6 +46,15 @@ class Provider:
     OPEN_EDX = 'openedx'
 
 
+class PostingRestriction(models.TextChoices):
+    """
+    Discussions Restrictions choices
+    """
+    ENABLED = 'enabled'
+    DISABLED = 'disabled'
+    SCHEDULED = 'scheduled'
+
+
 DEFAULT_CONFIG_ENABLED = True
 
 
@@ -309,6 +318,8 @@ def get_supported_providers() -> List[str]:
 class ProviderFilter(StackedConfigurationModel):
     """
     Associate allow/deny-lists of discussions providers with courses/orgs
+
+    .. no_pii:
     """
 
     allow = ListCharField(
@@ -397,6 +408,8 @@ T = TypeVar('T', bound='DiscussionsConfiguration')
 class DiscussionsConfiguration(TimeStampedModel):
     """
     Associates a learning context with discussion provider and configuration
+
+    .. no_pii:
     """
 
     context_key = LearningContextKeyField(
@@ -412,6 +425,14 @@ class DiscussionsConfiguration(TimeStampedModel):
     enabled = models.BooleanField(
         default=True,
         help_text=_("If disabled, the discussions in the associated learning context/course will be disabled.")
+    )
+    posting_restrictions = models.CharField(
+        max_length=15,
+        default=PostingRestriction.DISABLED,
+        choices=PostingRestriction.choices,
+        help_text=_(
+            "The Posting availability in discussions whether it will be enabled, scheduled or indefinitely disabled."
+        )
     )
     lti_configuration = models.ForeignKey(
         LtiConfiguration,
@@ -537,6 +558,8 @@ class DiscussionsConfiguration(TimeStampedModel):
 class DiscussionTopicLink(models.Model):
     """
     A model linking discussion topics ids to the part of a course they are linked to.
+
+    ..no_pii:
     """
     context_key = LearningContextKeyField(
         db_index=True,

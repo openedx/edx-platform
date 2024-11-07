@@ -26,7 +26,7 @@ class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication)
     it can be mixed in with other `SessionAuthentication` subclasses.
     """
     def _process_enforce_csrf(self, request):
-        CsrfViewMiddleware().process_request(request)
+        CsrfViewMiddleware(get_response=lambda request: None).process_request(request)
         return super().enforce_csrf(request)
 
     def enforce_csrf(self, request):

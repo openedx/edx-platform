@@ -6,6 +6,7 @@ Certificates factories
 import datetime
 from uuid import uuid4
 
+from factory import Sequence
 from factory.django import DjangoModelFactory
 
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
@@ -15,7 +16,8 @@ from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
     CertificateStatuses,
-    GeneratedCertificate
+    CertificateTemplate,
+    GeneratedCertificate,
 )
 
 
@@ -23,15 +25,16 @@ class GeneratedCertificateFactory(DjangoModelFactory):
     """
     GeneratedCertificate factory
     """
+
     class Meta:
         model = GeneratedCertificate
 
     course_id = None
     status = CertificateStatuses.unavailable
     mode = GeneratedCertificate.MODES.honor
-    name = ''
+    name = ""
     verify_uuid = uuid4().hex
-    grade = ''
+    grade = ""
 
 
 class CertificateAllowlistFactory(DjangoModelFactory):
@@ -44,7 +47,7 @@ class CertificateAllowlistFactory(DjangoModelFactory):
 
     course_id = None
     allowlist = True
-    notes = 'Test Notes'
+    notes = "Test Notes"
 
 
 class CertificateInvalidationFactory(DjangoModelFactory):
@@ -55,7 +58,7 @@ class CertificateInvalidationFactory(DjangoModelFactory):
     class Meta:
         model = CertificateInvalidation
 
-    notes = 'Test Notes'
+    notes = "Test Notes"
     active = True
 
 
@@ -112,8 +115,21 @@ class CertificateDateOverrideFactory(DjangoModelFactory):
     """
     CertificateDateOverride factory
     """
+
     class Meta:
         model = CertificateDateOverride
 
     date = datetime.datetime(2021, 5, 11, 0, 0, tzinfo=datetime.timezone.utc)
     reason = "Learner really wanted this on their birthday"
+
+
+class CertificateTemplateFactory(DjangoModelFactory):
+    """CertificateTemplate factory"""
+
+    class Meta:
+        model = CertificateTemplate
+
+    name = Sequence("template{}".format)
+    description = Sequence("description for template{}".format)
+    template = ""
+    is_active = True

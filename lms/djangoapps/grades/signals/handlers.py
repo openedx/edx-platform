@@ -8,6 +8,7 @@ from logging import getLogger
 
 from django.dispatch import receiver
 from opaque_keys.edx.keys import LearningContextKey
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, EXAM_ATTEMPT_VERIFIED
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
@@ -25,7 +26,7 @@ from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERS
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 
 from .. import events
-from ..constants import ScoreDatabaseTableEnum
+from ..constants import GradeOverrideFeatureEnum, ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
 from .signals import (
@@ -122,6 +123,10 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
 def disconnect_submissions_signal_receiver(signal):
     """
     Context manager to be used for temporarily disconnecting edx-submission's set or reset signal.
+
+    Clear Student State on ORA problems currently results in a set->reset signal pair getting fired
+    from submissions which leads to tasks being enqueued, one of which can never succeed. This context manager
+    fixes the issue by disconnecting the "set" handler during the clear_state operation.
     """
     if signal == score_set:
         handler = submissions_score_set_handler
@@ -300,3 +305,45 @@ def listen_for_course_grade_passed_first_time(sender, user_id, course_id, **kwar
     """
     events.course_grade_passed_first_time(user_id, course_id)
     events.fire_segment_event_on_course_grade_passed_first_time(user_id, course_id)
+
+
+@receiver(EXAM_ATTEMPT_VERIFIED)
+def exam_attempt_verified_event_handler(sender, signal, **kwargs):  # pylint: disable=unused-argument
+    """
+    Consume `EXAM_ATTEMPT_VERIFIED` events from the event bus. This will trigger
+    an undo section override, if one exists.
+    """
+    from ..api import should_override_grade_on_rejected_exam, undo_override_subsection_grade
+
+    event_data = kwargs.get('exam_attempt')
+    user_data = event_data.student_user
+    course_key = event_data.course_key
+    usage_key = event_data.usage_key
+
+    if should_override_grade_on_rejected_exam(course_key):
+        undo_override_subsection_grade(user_data.id, course_key, usage_key, GradeOverrideFeatureEnum.proctoring)
+
+
+@receiver(EXAM_ATTEMPT_REJECTED)
+def exam_attempt_rejected_event_handler(sender, signal, **kwargs):  # pylint: disable=unused-argument
+    """
+    Consume `EXAM_ATTEMPT_REJECTED` events from the event bus. This will trigger a subsection override.
+    """
+    from ..api import override_subsection_grade
+
+    event_data = kwargs.get('exam_attempt')
+    override_grade_value = 0.0
+    user_data = event_data.student_user
+    course_key = event_data.course_key
+    usage_key = event_data.usage_key
+
+    override_subsection_grade(
+        user_data.id,
+        course_key,
+        usage_key,
+        earned_all=override_grade_value,
+        earned_graded=override_grade_value,
+        feature=GradeOverrideFeatureEnum.proctoring,
+        overrider=None,
+        comment=None,
+    )

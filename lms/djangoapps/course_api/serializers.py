@@ -5,6 +5,8 @@ Course API Serializers.  Representing course catalog data
 
 import urllib
 
+from common.djangoapps.student.models import CourseEnrollment
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from edx_django_utils import monitoring as monitoring_utils
 from rest_framework import serializers
@@ -164,10 +166,23 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         """
         Get the `certificate_available_date` in response
         if the `certificates.auto_certificate_generation` waffle switch is enabled
+
+        Get the 'is_enrolled' in response if 'username' is in query params,
+        user is staff, superuser, or user is authenticated and
+        the has the same 'username' as the 'username' in the query params.
         """
         response = super().to_representation(instance)
         if can_show_certificate_available_date_field(instance):
             response['certificate_available_date'] = instance.certificate_available_date
+
+        requested_username = self.context['request'].query_params.get('username', None)
+        if requested_username:
+            user = self.context['request'].user
+            if ((user.is_authenticated and user.username == requested_username)
+                    or user.is_staff or user.is_superuser):
+                User = get_user_model()
+                requested_user = User.objects.get(username=requested_username)
+                response['is_enrolled'] = CourseEnrollment.is_enrolled(requested_user, instance.id)
         return response
 
 

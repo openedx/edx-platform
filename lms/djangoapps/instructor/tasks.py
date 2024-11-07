@@ -5,14 +5,14 @@ import logging
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from django.core.exceptions import ObjectDoesNotExist
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from xblock.completable import XBlockCompletionMode
-from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.student.models import get_user_by_username_or_email
-from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+from lms.djangoapps.courseware.model_data import FieldDataCache
 from openedx.core.lib.request_utils import get_request_or_stub
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order

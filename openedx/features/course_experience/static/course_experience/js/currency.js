@@ -33,7 +33,9 @@ export class Currency { // eslint-disable-line import/prefer-default-export
             if (e instanceof SyntaxError) {
                 // If cookie isn't proper JSON, log but continue. This will show the purchase experience
                 // in a non-local currency but will not prevent the user from interacting with the page.
+                // eslint-disable-next-line no-console
                 console.error(e);
+                // eslint-disable-next-line no-console
                 console.error("Ignoring malformed 'edx-price-l10n' cookie.");
             } else {
                 throw e;

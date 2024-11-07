@@ -11,6 +11,7 @@ import ddt
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.test.client import RequestFactory
 
 from edx_django_utils.cache import TieredCache
@@ -428,6 +429,17 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         courseware_data = response.json()
         assert 'can_access_proctored_exams' in courseware_data
         assert courseware_data['can_access_proctored_exams'] == result
+
+    @ddt.data(
+        True,
+        False
+    )
+    def test_learning_assistant_enabled(self, setting_enabled):
+        with override_settings(LEARNING_ASSISTANT_AVAILABLE=setting_enabled):
+            response = self.client.get(self.url)
+
+        learning_assistant_enabled = response.json()['learning_assistant_enabled']
+        self.assertEqual(learning_assistant_enabled, setting_enabled)
 
 
 @ddt.ddt

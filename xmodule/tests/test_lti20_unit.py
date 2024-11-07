@@ -45,7 +45,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
 
         test_cases = (  # (before sanitize, after sanitize)
             ("plaintext", "plaintext"),
-            ("a <script>alert(3)</script>", "a &lt;script&gt;alert(3)&lt;/script&gt;"),  # encodes scripts
+            ("a <script>alert(3)</script>", "a "),  # drops scripts
             ("<b>bold 包</b>", "<b>bold 包</b>"),  # unicode, and <b> tags pass through
         )
         for case in test_cases:
@@ -370,7 +370,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         Test that we get a 404 when the supplied user does not exist
         """
         self.setup_system_xblock_mocks_for_lti20_request_test()
-        self.runtime._runtime_services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
+        self.runtime._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         assert response.status_code == 404

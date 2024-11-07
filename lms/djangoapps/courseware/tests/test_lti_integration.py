@@ -16,7 +16,6 @@ from lms.djangoapps.courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestLTI(BaseTestXmodule):
@@ -117,7 +116,7 @@ class TestLTI(BaseTestXmodule):
         self.addCleanup(patcher.stop)
 
     def test_lti_constructor(self):
-        generated_content = self.block.render(STUDENT_VIEW).content
+        generated_content = self.block.student_view(None).content
         expected_content = self.runtime.render_template('lti.html', self.expected_context)
         assert generated_content == expected_content
 

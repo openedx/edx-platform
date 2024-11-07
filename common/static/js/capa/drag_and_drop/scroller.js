@@ -143,6 +143,7 @@
             // draggables.
             state.updateArrowOpacity = updateArrowOpacity;
 
+            // eslint-disable-next-line no-useless-return
             return;
 
             function updateArrowOpacity() {

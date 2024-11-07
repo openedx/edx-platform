@@ -4,7 +4,6 @@ from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 
 import pytest
-import six
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
@@ -34,7 +33,7 @@ class UnsubscribeUserEmailTests(TestCase):
 
         csv.write(b"email\n")
         for line in lines:
-            csv.write(six.b(line))
+            csv.write(line.encode())
         csv.seek(0)
         return csv
 

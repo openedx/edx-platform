@@ -730,7 +730,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         response_element = etree.Element("stringresponse")
 
         # Set the answer attribute
-        response_element.set("answer", six.text_type(answer))
+        response_element.set("answer", str(answer))
 
         # Set the case sensitivity and regexp:
         type_value = ''

@@ -46,17 +46,26 @@ RUN useradd -m --shell /bin/false app
 RUN echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections
 RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | debconf-set-selections
 
+# Setting up ppa deadsnakes to get python 3.11
+RUN apt-get update && \
+  apt-get install -y software-properties-common && \
+  apt-add-repository -y ppa:deadsnakes/ppa
+
 # Install requirements that are absolutely necessary
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \
-        python3 \
-        python3-venv \
-        python3.8 \
-        python3.8-minimal \
-        libpython3.8 \
-        libpython3.8-stdlib \
+        python3-pip \
+        python3.11 \
+        # python3-dev: required for building mysqlclient python package
+        python3.11-dev \
+        python3.11-venv \
+        libpython3.11 \
+        libpython3.11-stdlib \
         libmysqlclient21 \
+        # libmysqlclient-dev: required for building mysqlclient python package
+        libmysqlclient-dev \
+        pkg-config \
         libssl1.1 \
         libxmlsec1-openssl \
         # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
@@ -85,13 +94,7 @@ FROM minimal-system as builder-production
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
-        pkg-config \
-        libmysqlclient-dev \
         libssl-dev \
-        libxml2-dev \
-        libxmlsec1-dev \
-        libxslt1-dev \
-        python3-dev \
         libffi-dev \
         libfreetype6-dev \
         libgeos-dev \
@@ -106,7 +109,7 @@ RUN apt-get update && \
 
 # Setup python virtual environment
 # It is already 'activated' because $VIRTUAL_ENV/bin was put on $PATH
-RUN python3.8 -m venv "${VIRTUAL_ENV}"
+RUN python3.11 -m venv "${VIRTUAL_ENV}"
 
 # Install python requirements
 # Requires copying over requirements files, but not entire repository
@@ -114,12 +117,19 @@ COPY requirements requirements
 RUN pip install -r requirements/pip.txt
 RUN pip install -r requirements/edx/base.txt
 
-# Install node and node modules
-RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
-RUN npm install -g npm@8.5.x
+# Install node and npm
+RUN nodeenv /edx/app/edxapp/nodeenv --node=18.19.0 --prebuilt
+RUN npm install -g npm@10.5.x
+
+# This script is used by an npm post-install hook.
+# We copy it into the image now so that it will be available when we run `npm install` in the next step.
+# The script itself will copy certain modules into some uber-legacy parts of edx-platform which still use RequireJS.
+COPY scripts/copy-node-modules.sh scripts/copy-node-modules.sh
+
+# Install node modules
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-RUN npm set progress=false && npm install
+RUN npm set progress=false && npm ci
 
 # The builder-development stage is a temporary stage that installs python modules required for development purposes
 # The built artifacts from this stage are then copied to the development stage.
@@ -141,15 +151,20 @@ COPY . .
 # Install Python requirements again in order to capture local projects
 RUN pip install -e .
 
-USER app
+# Setting edx-platform directory as safe for git commands
+RUN git config --global --add safe.directory /edx/app/edxapp/edx-platform
 
 # Production target
 FROM base as production
+
+USER app
+
 ENV EDX_PLATFORM_SETTINGS='docker-production'
-ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
-ENV SERVICE_PORT "${SERVICE_PORT}"
+ENV SERVICE_VARIANT="${SERVICE_VARIANT}"
+ENV SERVICE_PORT="${SERVICE_PORT}"
 ENV DJANGO_SETTINGS_MODULE="${SERVICE_VARIANT}.envs.$EDX_PLATFORM_SETTINGS"
 EXPOSE ${SERVICE_PORT}
+
 CMD gunicorn \
     -c /edx/app/edxapp/edx-platform/${SERVICE_VARIANT}/docker_${SERVICE_VARIANT}_gunicorn.py \
     --name ${SERVICE_VARIANT} \
@@ -161,9 +176,15 @@ CMD gunicorn \
 # Development target
 FROM base as development
 
-COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends \
+        # wget is used in Makefile for common_constraints.txt
+        wget \
+    && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/*
 
-USER root
+COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
 
 RUN ln -s "$(pwd)/lms/envs/devstack-experimental.yml" "$LMS_CFG"
 RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "$CMS_CFG"
@@ -174,6 +195,6 @@ RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "/edx/etc/studio.yml"
 RUN touch ../edxapp_env
 
 ENV EDX_PLATFORM_SETTINGS='devstack_docker'
-ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
+ENV SERVICE_VARIANT="${SERVICE_VARIANT}"
 EXPOSE ${SERVICE_PORT}
 CMD ./manage.py ${SERVICE_VARIANT} runserver 0.0.0.0:${SERVICE_PORT}

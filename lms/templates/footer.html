@@ -30,16 +30,13 @@
               <a href="/">
                 ## The default logo is a placeholder.
                 ## You can either replace this link entirely or update
-                ## the FOOTER_ORGANIZATION_IMAGE in Django settings.
-                ## If you customize FOOTER_ORGANIZATION_IMAGE, then the image
                 ## can be included in the footer on other sites
                 ## (e.g. a blog or marketing front-end) to provide a consistent
                 ## user experience.  See the branding app for details.
                 <img alt="${_('organization logo')}" src="${footer['logo_image']}">
               </a>
             </p>
-          </div>
-
+          </div>  
           ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
           <p class="copyright">${footer['copyright']}
                % if icp_license_info.get('icp_license'):
@@ -105,14 +102,11 @@
         % if context.get('include_language_selector', footer_language_selector_is_enabled()):
             <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
         % endif
-
         <div class="wrapper-logo">
           <p>
             <a href="/">
               ## The default logo is a placeholder.
               ## You can either replace this link entirely or update
-              ## the FOOTER_ORGANIZATION_IMAGE in Django settings.
-              ## If you customize FOOTER_ORGANIZATION_IMAGE, then the image
               ## can be included in the footer on other sites
               ## (e.g. a blog or marketing front-end) to provide a consistent
               ## user experience.  See the branding app for details.
@@ -120,7 +114,6 @@
             </a>
           </p>
         </div>
-
         ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
           <p class="copyright">${footer['copyright']}
               % if icp_license_info.get('icp_license'):

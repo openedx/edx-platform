@@ -1,5 +1,6 @@
 import '../helper.js';
 
+// eslint-disable-next-line no-shadow-restricted-names
 (function(undefined) {
     'use strict';
 

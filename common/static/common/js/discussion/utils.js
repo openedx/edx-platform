@@ -30,6 +30,7 @@
         DiscussionUtil.isStaff = function(userId) {
             var staff;
             if (_.isUndefined(userId)) {
+                // eslint-disable-next-line no-void
                 userId = this.user ? this.user.id : void 0;
             }
             if (_.isUndefined(this.roleIds)) {
@@ -42,6 +43,7 @@
         DiscussionUtil.isTA = function(userId) {
             var ta;
             if (_.isUndefined(userId)) {
+                // eslint-disable-next-line no-void
                 userId = this.user ? this.user.id : void 0;
             }
             ta = _.union(this.roleIds['Community TA']);
@@ -52,6 +54,7 @@
             var groupTa,
                 localUserId = userId;
             if (_.isUndefined(userId)) {
+                // eslint-disable-next-line no-void
                 localUserId = this.user ? this.user.id : void 0;
             }
             groupTa = _.union(this.roleIds['Group Moderator']);
@@ -394,6 +397,7 @@
             htmlString = $div.html();
             htmlString = htmlString.replace(/\\\$/g, ESCAPED_DOLLAR);
             /* eslint-disable no-loop-func */
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 if (RE_INLINEMATH.test(htmlString)) {
                     htmlString = htmlString.replace(RE_INLINEMATH, function($0, $1, $2, $3) {

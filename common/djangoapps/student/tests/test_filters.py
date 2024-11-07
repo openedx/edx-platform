@@ -316,7 +316,7 @@ class StudentDashboardFiltersTest(ModuleStoreTestCase):
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password="test")
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.dashboard_url = reverse("dashboard")
         self.first_course = CourseFactory.create(
             org="test1", course="course1", display_name="run1",

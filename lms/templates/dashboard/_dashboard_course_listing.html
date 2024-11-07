@@ -2,12 +2,12 @@
 
 <%!
 import datetime
-import six
 
 from django.conf import settings
-from django.utils.http import urlencode, urlquote_plus
+from django.utils.http import urlencode
+from urllib.parse import quote_plus
 from django.utils.translation import gettext as _
-from django.utils.translation import ungettext
+from django.utils.translation import ngettext
 from django.urls import reverse
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
@@ -174,7 +174,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                             % endif
                         </span>
                     % else:
-                        % if isinstance(course_date, six.string_types):
+                        % if isinstance(course_date, str):
                             <span class="info-date-block">${container_string.format(date=course_date)}</span>
                         % elif course_date is not None:
                             <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${course_date.strftime('%Y-%m-%dT%H:%M:%S%z')}" data-format=${format} data-string="${container_string}"></span>
@@ -233,8 +233,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                             <%
                               twitter_share_url = u"{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['twitter'])
                               default_share_text = _("I'm taking {course_name} online with {twitter_brand}. Check it out!").format(course_name=course_overview.display_name_with_default, twitter_brand=share_settings.get('TWITTER_BRAND', '@edxonline'))
-                              share_text = urlquote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text))
-                              twitter_url = u'https://twitter.com/intent/tweet?text=' + share_text + u'%20' + urlquote_plus(twitter_share_url)
+                              share_text = quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text))
+                              twitter_url = u'https://twitter.com/intent/tweet?text=' + share_text + u'%20' + quote_plus(twitter_share_url)
                               share_msg = _("Share {course_name} on Twitter").format(course_name=course_overview.display_name_with_default)
                             %>
                             <a
@@ -272,7 +272,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                         <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
                           % if can_unenroll:
                             <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
-                              <% course_refund_url = reverse('course_run_refund_status', args=[six.text_type(course_overview.id)]) %>
+                              <% course_refund_url = reverse('course_run_refund_status', args=[str(course_overview.id)]) %>
                                   <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
                                     data-course-id="${course_overview.id}"
                                     data-course-number="${course_overview.number}"
@@ -419,7 +419,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 
         % if course_requirements:
         ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
-        <% prc_target = reverse('about_course', args=[six.text_type(course_requirements['courses'][0]['key'])]) %>
+        <% prc_target = reverse('about_course', args=[str(course_requirements['courses'][0]['key'])]) %>
         <div class="prerequisites">
           <p class="tip">
             ${Text(_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.")).format(

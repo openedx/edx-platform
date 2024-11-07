@@ -1,0 +1,651 @@
+@import 'cms/theme/variables-v1';
+@import 'elements/course-unit-mfe-iframe';
+
+.wrapper {
+  .wrapper-xblock {
+    background-color: $transparent;
+    border-radius: 6px;
+    border: none;
+
+    &:hover {
+      border-color: none;
+    }
+
+    .xblock-header-primary {
+      padding: ($baseline * 1.2) ($baseline * 1.2) ($baseline / 1.67);
+      border-bottom: none;
+
+      .header-details .xblock-display-name {
+        font-size: 22px;
+        line-height: 28px;
+        font-weight: 700;
+        color: $black;
+      }
+    }
+
+    &.level-element {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
+      margin: 0 0 ($baseline * 1.4) 0;
+    }
+
+    &.level-element .xblock-header-primary {
+      background-color: $white;
+    }
+
+    &.level-element .xblock-render {
+      background: $white;
+      margin: 0;
+      padding: $baseline;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    .wrapper-xblock .header-actions .actions-list .action-item .action-button {
+      @extend %button-styles;
+
+      color: $black;
+
+      .fa-ellipsis-v {
+        font-size: $base-font-size;
+      }
+
+      &:hover {
+        background-color: $primary;
+        border-color: $transparent;
+      }
+
+      &:focus {
+        outline: 2px $transparent;
+        background-color: $transparent;
+        box-shadow: inset 0 0 0 2px $primary;
+        color: $primary;
+        border-color: $transparent;
+      }
+    }
+
+    .xblock-header-primary .header-actions .nav-dd .nav-sub {
+      border: 1px solid rgba(0, 0, 0, .15);
+      border-radius: 6px;
+      padding: ($baseline / 2) 0;
+      min-width: 288px;
+      right: 90px;
+
+      .nav-item {
+        border-bottom: none;
+        color: $dark;
+        font-size: $base-font-size;
+
+        a {
+          padding: ($baseline / 2) ($baseline / 1.25);
+        }
+
+        &:hover {
+          background-color: #f2f0ef;
+          color: $dark;
+        }
+
+        a:hover {
+          color: $dark;
+        }
+
+        a:focus {
+          outline: none;
+        }
+
+        &:active {
+          background-color: $primary;
+
+          a {
+            color: $white;
+          }
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  &.wrapper-modal-window .modal-window .modal-actions a {
+    color: $text-color;
+    background-color: $transparent;
+    border-color: $transparent;
+    box-shadow: none;
+    font-weight: 500;
+    border: 1px solid $transparent;
+    padding: ($baseline / 2) ($baseline / 1.25);
+    font-size: $base-font-size;
+    line-height: 20px;
+    border-radius: $btn-border-radius;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    background-image: none;
+    display: block;
+
+    &:hover {
+      background-color: $light-background-color;
+      border-color: $transparent;
+      color: $text-color;
+    }
+
+    &:focus {
+      background: $transparent;
+      outline: none;
+    }
+  }
+
+  .modal-window.modal-editor {
+    background-color: $white;
+    border-radius: 6px;
+
+    a {
+      color: #00688d;
+    }
+
+    select {
+      &:focus {
+        background-color: $white;
+        color: $text-color;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    input:not([type="radio"], [type="checkbox"], [type="submit"]) {
+      @extend %input-styles;
+
+      line-height: 20px;
+      height: 44px;
+
+      &:hover {
+        border: solid 1px #002121;
+      }
+
+      &:focus {
+        color: $text-color;
+        background-color: $white;
+        border-color: $primary;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    #student_training_settings_editor .openassessment_training_example .openassessment_training_example_body
+    .openassessment_training_example_essay_wrapper textarea {
+      @extend %input-styles;
+
+      box-shadow: none;
+    }
+
+    textarea {
+      @extend %input-styles;
+
+      box-shadow: none;
+
+      &#poll-question-editor,
+      &#poll-feedback-editor {
+        box-shadow: none;
+
+        &:focus {
+          color: $text-color;
+          background-color: $white;
+          border-color: $primary;
+          outline: 0;
+          box-shadow: 0 0 0 1px $primary;
+        }
+      }
+
+      &:hover {
+        border: solid 1px #002121;
+      }
+
+      &:focus {
+        color: $text-color;
+        background-color: $white;
+        border-color: $primary;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    .tip.setting-help {
+      color: $border-color;
+      font-size: 14px;
+      line-height: $base-font-size;
+    }
+
+    label,
+    .label.setting-label {
+      font-size: $base-font-size;
+      line-height: 28px;
+      color: $text-color;
+      font-weight: 400;
+    }
+
+    .title.modal-window-title {
+      color: $black;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 28px;
+    }
+
+    .xblock-actions {
+      background-color: $white;
+
+      .action-button {
+        background-color: $transparent;
+        border: 1px solid $transparent;
+        padding: ($baseline / 2.22) ($baseline / 1.25);
+        border-radius: $input-border-radius;
+        font-weight: 400;
+        color: #00688d;
+        font-size: $base-font-size;
+        line-height: 20px;
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      .openassessment_save_button,
+      .save-button,
+      .continue-button {
+        color: $white;
+        background-color: $primary;
+        border-color: $primary;
+        box-shadow: none;
+        font-weight: 500;
+        border: 1px solid $transparent;
+        padding: ($baseline / 2) ($baseline / 1.25);
+        font-size: $base-font-size;
+        line-height: 20px;
+        border-radius: $btn-border-radius;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        background-image: none;
+        height: auto;
+        display: block;
+
+        &:hover {
+          background: darken($primary, 5%);
+          border-color: $transparent;
+          color: $white;
+        }
+
+        &:focus {
+          background: $primary;
+          outline: none;
+        }
+      }
+
+      .openassessment_cancel_button,
+      .cancel-button {
+        color: $text-color;
+        background-color: $transparent;
+        border-color: $transparent;
+        box-shadow: none;
+        font-weight: 500;
+        border: 1px solid $transparent;
+        padding: ($baseline / 2) ($baseline / 1.25);
+        font-size: $base-font-size;
+        line-height: 20px;
+        border-radius: $btn-border-radius;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        background-image: none;
+        display: block;
+
+        &:hover {
+          background-color: $light-background-color;
+          border-color: $transparent;
+          color: $text-color;
+        }
+
+        &:focus {
+          background: $transparent;
+          outline: none;
+        }
+      }
+    }
+  }
+
+  .modal-lg.modal-window.confirm.openassessment_modal_window {
+    height: 635px;
+  }
+}
+
+.view-container .content-primary {
+  background-color: $transparent;
+  width: 100%;
+}
+
+.wrapper-content.wrapper {
+  padding: $baseline / 4;
+}
+
+.btn-default.action-edit.title-edit-button {
+  @extend %button-styles;
+
+  position: relative;
+  top: 7px;
+
+  .fa-pencil {
+    display: none;
+  }
+
+  &::before {
+    @extend %icon-position;
+
+    content: '';
+    position: absolute;
+    background-color: $black;
+    mask: url('#{$static-path}/images/pencil-icon.svg') center no-repeat;
+  }
+
+  &:hover {
+    background-color: $primary;
+    border-color: $transparent;
+
+    &::before {
+      background-color: $white;
+    }
+  }
+
+  &:focus {
+    outline: 2px $transparent;
+    background-color: $transparent;
+    box-shadow: inset 0 0 0 2px $primary;
+    border-color: $transparent;
+
+    &:hover {
+      color: $white;
+      border-color: $transparent;
+
+      &::before {
+        background-color: $primary;
+      }
+    }
+  }
+}
+
+.action-edit {
+  .action-button-text {
+    display: none;
+  }
+
+  .edit-button.action-button {
+    @extend %button-styles;
+
+    position: relative;
+
+    .fa-pencil {
+      display: none;
+    }
+
+    &::before {
+      @extend %icon-position;
+
+      content: '';
+      position: absolute;
+      background-color: $black;
+      mask: url('#{$static-path}/images/pencil-icon.svg') center no-repeat;
+    }
+
+    &:hover {
+      background-color: $primary;
+      border-color: $transparent;
+
+      &::before {
+        background-color: $white;
+      }
+    }
+
+    &:focus {
+      outline: 2px $transparent;
+      background-color: $transparent;
+      box-shadow: inset 0 0 0 2px $primary;
+      border-color: $transparent;
+
+      &:hover {
+        color: $white;
+        border-color: $transparent;
+
+        &::before {
+          background-color: $primary;
+        }
+      }
+    }
+  }
+}
+
+.nav-dd.ui-right .nav-sub {
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+[class*="view-"] .modal-lg.modal-editor .modal-header .editor-modes .action-item {
+  .editor-button,
+  .settings-button {
+    @extend %light-button;
+  }
+}
+
+[class*="view-"] .wrapper.wrapper-modal-window .modal-window .modal-actions .action-primary {
+  @extend %primary-button;
+}
+
+.wrapper-comp-settings {
+  .list-input.settings-list {
+    .metadata-list-enum .create-setting {
+      @extend %modal-actions-button;
+
+      background-color: $primary;
+      color: $white;
+      border: 1px solid $primary;
+      cursor: pointer;
+
+      &:hover {
+        background: darken($primary, 5%);
+        border-color: #2d494e;
+      }
+
+      &:focus {
+        background: $primary;
+        outline: none;
+      }
+    }
+  }
+
+  .list-input.settings-list {
+    .field.comp-setting-entry.is-set .setting-input {
+      color: $text-color;
+    }
+
+    select {
+      border: 1px solid $border-color;
+      border-radius: $input-border-radius;
+      color: $text-color;
+      height: 44px;
+
+      &:focus {
+        background-color: $white;
+        color: $text-color;
+        outline: 0;
+        box-shadow: 0 0 0 1px $primary;
+      }
+    }
+
+    .setting-label {
+      font-size: $base-font-size;
+      line-height: 28px;
+      color: $text-color;
+      font-weight: 400;
+    }
+
+    input[type="number"] {
+      width: 45%;
+    }
+
+    .action.setting-clear {
+      @extend %button-styles;
+
+      background-color: $transparent;
+      color: $primary;
+      border: none;
+
+      &:hover {
+        background-color: $primary;
+        color: $white;
+        border: none;
+      }
+
+      &:focus {
+        outline: 2px $transparent;
+        background-color: $transparent;
+        box-shadow: inset 0 0 0 2px $primary;
+        color: $primary;
+      }
+    }
+  }
+
+  .list-input.settings-list .metadata-list-enum .remove-setting .fa-times-circle {
+    color: $primary;
+  }
+}
+
+select {
+  border: 1px solid $border-color;
+  border-radius: $input-border-radius;
+  color: $text-color;
+  height: 44px;
+  padding: ($baseline / 2) ($baseline / 1.25);
+
+  &:focus {
+    background-color: $white;
+    color: $text-color;
+    outline: 0;
+    box-shadow: 0 0 0 1px $primary;
+  }
+}
+
+.xblock {
+  .xblock--drag-and-drop--editor .tab {
+    background-color: $white;
+    display: inline-block;
+  }
+
+  #openassessment-editor #oa_rubric_editor_wrapper {
+    .openassessment_criterion .openassessment_criterion_basic_editor .comp-setting-entry .wrapper-comp-settings label input,
+    .openassessment_criterion_option .openassessment_criterion_option_name_wrapper label,
+    .openassessment_criterion_option .openassessment_criterion_option_explanation_wrapper label,
+    .openassessment_criterion .openassessment_criterion_feedback_wrapper label,
+    #openassessment_rubric_feedback_wrapper label,
+    .openassessment_criterion_option .openassessment_criterion_option_point_wrapper label,
+    .openassessment_criterion_option .openassessment_criterion_option_name_wrapper label input,
+    .openassessment_criterion .openassessment_criterion_basic_editor .comp-setting-entry .wrapper-comp-settings .openassessment_criterion_prompt,
+    #openassessment_rubric_feedback_wrapper textarea,
+    .openassessment_criterion_option
+    .openassessment_criterion_option_explanation_wrapper label textarea,
+    input[type=number] {
+      font-size: $base-font-size;
+      background-color: $white;
+      background-image: none;
+    }
+  }
+
+  #openassessment-editor {
+    #openassessment_editor_header .editor_tabs .oa_editor_tab {
+      @extend %light-button;
+
+      padding: 0 10px;
+    }
+
+    #openassessment_editor_header,
+    .openassessment_tab_instructions {
+      background-color: $white;
+    }
+
+    #oa_schedule_editor_wrapper #dates_config_new_badge {
+      background-color: $primary;
+    }
+
+    .openassessment_description {
+      font-size: 14px;
+      line-height: $base-font-size;
+    }
+
+    #oa_rubric_editor_wrapper .openassessment_criterion
+    .openassessment_criterion_basic_editor .comp-setting-entry
+    .wrapper-comp-settings label {
+      font-size: $base-font-size;
+      line-height: 28px;
+      color: $text-color;
+      font-weight: 400;
+    }
+
+    #oa_rubric_editor_wrapper .openassessment_criterion_option
+    .openassessment_criterion_option_point_wrapper label input {
+      min-width: 70px;
+      font-size: 18px;
+      height: 44px;
+    }
+
+    .openassessment_assessment_module_settings_editor:hover {
+      border-color: $primary;
+
+      .drag-handle {
+        background-color: $primary;
+        border-color: $primary;
+      }
+    }
+
+    .setting-help,
+    .ti.wrapper-comp-settings .list-input.settings-list .setting-help {
+      color: $border-color;
+      font-size: 14px;
+      line-height: $base-font-size;
+    }
+  }
+
+  .xblock--drag-and-drop--editor .btn,
+  #openassessment-editor .openassessment_container_add_button,
+  #openassessment-editor #oa_rubric_editor_wrapper .openassessment_criterion .openassessment_criterion_add_option,
+  #student_training_settings_editor .openassessment_add_training_example {
+    @extend %primary-button;
+  }
+}
+
+.xblock-header-primary {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 83px;
+    left: 25px;
+    width: 95%;
+    height: 1px;
+    background-color: #eae6e5;
+  }
+}
+
+.ui-loading {
+  background-color: #f8f7f6;
+  box-shadow: none;
+
+  .spin,
+  .copy {
+    color: $primary;
+  }
+}
+
+.wrapper-comp-setting.metadata-list-enum .action.setting-clear.active {
+  margin-top: 0;
+}

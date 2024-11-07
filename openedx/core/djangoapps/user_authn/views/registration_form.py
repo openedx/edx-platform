@@ -4,6 +4,7 @@ Objects and utilities used to construct registration forms.
 
 import copy
 from importlib import import_module
+from eventtracking import tracker
 import re
 
 from django import forms
@@ -22,6 +23,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password, is_registration_api_v1 as is_api_v1
+from openedx.core.djangoapps.user_authn.views.utils import remove_disabled_country_from_list
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from common.djangoapps.student.models import (
@@ -93,7 +95,7 @@ def contains_url(value):
     """
     Validator method to check whether full name contains url
     """
-    regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', value)
+    regex = re.findall(r'://', value)
     return bool(regex)
 
 
@@ -241,12 +243,14 @@ class AccountCreationForm(forms.Form):
 
             if settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY:
                 # Checks the Pwned Databases for password vulnerability.
-                pwned_response = check_pwned_password(password)
+                pwned_properties = check_pwned_password(password)
 
                 if (
-                    pwned_response.get('vulnerability', 'no') == 'yes' and
-                    pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+                    pwned_properties.get('vulnerability', 'no') == 'yes' and
+                    pwned_properties.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
                 ):
+                    pwned_properties['user_request_page'] = 'registration'
+                    tracker.emit('edx.bi.user.pwned.password.status', pwned_properties)
                     raise ValidationError(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
         return password
 
@@ -293,6 +297,15 @@ class AccountCreationForm(forms.Form):
             for key, value in self.cleaned_data.items()
             if key in self.extended_profile_fields and value is not None
         }
+
+    def clean_country(self):
+        """
+        Check if the user's country is in the embargoed countries list.
+        """
+        country = self.cleaned_data.get("country")
+        if country in settings.DISABLED_COUNTRIES:
+            raise ValidationError(_("Registration from this country is not allowed due to restrictions."))
+        return self.cleaned_data.get("country")
 
 
 def get_registration_extension_form(*args, **kwargs):
@@ -683,7 +696,7 @@ class RegistrationFormFactory:
         """
         opt_in_label = _(
             'I agree that {platform_name} may send me marketing messages.').format(
-                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         )
 
         form_desc.add_field(
@@ -971,7 +984,7 @@ class RegistrationFormFactory:
             label=country_label,
             instructions=country_instructions,
             field_type="select",
-            options=list(countries),
+            options=list(remove_disabled_country_from_list(dict(countries)).items()),
             include_default_option=True,
             required=required,
             error_messages={

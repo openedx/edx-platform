@@ -1,7 +1,7 @@
 """
 REST API views for content staging
 """
-import logging
+from __future__ import annotations
 
 from django.db import transaction
 from django.http import HttpResponse
@@ -10,24 +10,22 @@ from django.utils.decorators import method_decorator
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocatorV2
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
+from openedx.core.djangoapps.content_libraries import api as lib_api
+from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
-from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx
-from xmodule import block_metadata_utils
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .data import CLIPBOARD_PURPOSE, StagedContentStatus
-from .models import StagedContent, UserClipboard
+from . import api
+from .data import StagedContentStatus
+from .models import StagedContent
 from .serializers import UserClipboardSerializer, PostToClipboardSerializer
-from .tasks import delete_expired_clipboards
-
-log = logging.getLogger(__name__)
 
 
 @view_auth_classes(is_authenticated=True)
@@ -70,18 +68,7 @@ class ClipboardEndpoint(APIView):
         """
         Get the detailed status of the user's clipboard. This does not return the OLX.
         """
-        try:
-            clipboard = UserClipboard.objects.get(user=request.user.id)
-        except UserClipboard.DoesNotExist:
-            # This user does not have any content on their clipboard.
-            return Response({
-                "content": None,
-                "source_usage_key": "",
-                "source_context_title": "",
-                "source_edit_url": "",
-            })
-        serializer = UserClipboardSerializer(clipboard, context={"request": request})
-        return Response(serializer.data)
+        return Response(api.get_user_clipboard_json(request.user.id, request))
 
     @apidocs.schema(
         body=PostToClipboardSerializer,
@@ -104,55 +91,35 @@ class ClipboardEndpoint(APIView):
         if usage_key.block_type in ('course', 'chapter', 'sequential'):
             raise ValidationError('Requested XBlock tree is too large')
         course_key = usage_key.context_key
-        if not isinstance(course_key, CourseLocator):
-            # In the future, we'll support libraries too but for now we don't.
-            raise ValidationError('Invalid usage key: not a modulestore course')
-        # Make sure the user has permission on that course
-        if not has_studio_read_access(request.user, course_key):
-            raise PermissionDenied("You must be a member of the course team in Studio to export OLX using this API.")
 
-        # Get the OLX of the content
+        # Load the block and copy it to the user's clipboard
         try:
-            block = modulestore().get_item(usage_key)
+            if isinstance(course_key, CourseLocator):
+                # Make sure the user has permission on that course
+                if not has_studio_read_access(request.user, course_key):
+                    raise PermissionDenied(
+                        "You must be a member of the course team in Studio to export OLX using this API."
+                    )
+                block = modulestore().get_item(usage_key)
+                version_num = None
+
+            elif isinstance(course_key, LibraryLocatorV2):
+                lib_api.require_permission_for_library_key(
+                    course_key,
+                    request.user,
+                    lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+                )
+                block = xblock_api.load_block(usage_key, user=None)
+                version_num = lib_api.get_library_block(usage_key).draft_version_num
+
+            else:
+                raise ValidationError("Invalid usage_key for the content.")
+
         except ItemNotFoundError as exc:
             raise NotFound("The requested usage key does not exist.") from exc
-        block_data = serialize_xblock_to_olx(block)
 
-        expired_ids = []
-        with transaction.atomic():
-            # Mark all of the user's existing StagedContent rows as EXPIRED
-            to_expire = StagedContent.objects.filter(
-                user=request.user,
-                purpose=CLIPBOARD_PURPOSE,
-            ).exclude(
-                status=StagedContentStatus.EXPIRED,
-            )
-            for sc in to_expire:
-                expired_ids.append(sc.id)
-                sc.status = StagedContentStatus.EXPIRED
-                sc.save()
-            # Insert a new StagedContent row for this
-            staged_content = StagedContent.objects.create(
-                user=request.user,
-                purpose=CLIPBOARD_PURPOSE,
-                status=StagedContentStatus.READY,
-                block_type=usage_key.block_type,
-                olx=block_data.olx_str,
-                display_name=block_metadata_utils.display_name_with_default(block),
-                suggested_url_name=usage_key.block_id,
-            )
-            (clipboard, _created) = UserClipboard.objects.update_or_create(user=request.user, defaults={
-                "content": staged_content,
-                "source_usage_key": usage_key,
-            })
-            # Return the current clipboard exactly as if GET was called:
-            serializer = UserClipboardSerializer(clipboard, context={"request": request})
-            # Log an event so we can analyze how this feature is used:
-            log.info(f"Copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
-        # Enqueue a (potentially slow) task to delete the old staged content
-        try:
-            delete_expired_clipboards.delay(expired_ids)
-        except Exception as err:  # pylint: disable=broad-except
-            log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
-        # Return the response:
+        clipboard = api.save_xblock_to_user_clipboard(block=block, version_num=version_num, user_id=request.user.id)
+
+        # Return the current clipboard exactly as if GET was called:
+        serializer = UserClipboardSerializer(clipboard, context={"request": request})
         return Response(serializer.data)

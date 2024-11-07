@@ -123,6 +123,7 @@ class EnrollmentSupportListView(GenericAPIView):
             self.include_verified_mode_info(enrollment, course_key)
             # Add order number associated with the enrollment if available
             self.include_order_number(enrollment)
+            self.include_source_system(enrollment)
             # Add manual enrollment history, if it exists
             enrollment['manual_enrollment'] = self.manual_enrollment_data(enrollment, course_key)
 
@@ -289,6 +290,25 @@ class EnrollmentSupportListView(GenericAPIView):
                 course_id
             )
         enrollment['order_number'] = order_attribute[-1] if order_attribute else ''
+
+    @staticmethod
+    def include_source_system(enrollment):
+        """
+        For a provided enrollment data dictionary, include source_system from CourseEnrollmentAttribute if available.
+
+        From all the attributes of a course enrollment:
+
+          * Filter source_system attribute namespaced under `order`
+        """
+        username = enrollment['user']
+        course_id = enrollment['course_id']
+        enrollment_attributes = get_enrollment_attributes(username, course_id)
+        source_system = ''
+        for attribute in enrollment_attributes:
+            if attribute['namespace'] == 'order' and attribute['name'] == 'source_system':
+                source_system = attribute.get('value', '')
+                break
+        enrollment['source_system'] = source_system
 
     @staticmethod
     def manual_enrollment_data(enrollment_data, course_key):

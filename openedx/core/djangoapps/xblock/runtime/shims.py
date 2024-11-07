@@ -11,7 +11,6 @@ from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.student.models import anonymous_id_for_user
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
@@ -103,7 +102,7 @@ class RuntimeShim:
 
         Only used for capa problems.
         """
-        # TODO: load the python code from Blockstore. Ensure it's not publicly accessible.
+        # TODO: load the python code from Learning Core. Ensure it's not publicly accessible.
         return None
 
     @property
@@ -142,7 +141,7 @@ class RuntimeShim:
         warnings.warn(
             "Use of runtime.render_template is deprecated. "
             "For template files included with your XBlock (which is preferable), use "
-            "xblockutils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
+            "xblock.utils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
             "template instead. For template files that are part of the LMS/Studio, use the 'mako' XBlock service.",
             DeprecationWarning, stacklevel=2,
         )
@@ -162,47 +161,13 @@ class RuntimeShim:
         # as part of the runtime.
         raise NotImplementedError("This newer runtime does not support process_xml()")
 
-    def replace_urls(self, html_str):
-        """
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'replace_urls is deprecated. Please use ReplaceURLService instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        return ReplaceURLService(
-            xblock=self._active_block,
-            lookup_asset_url=self._lookup_asset_url
-        ).replace_urls(html_str)
-
-    def replace_course_urls(self, html_str):
-        """
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'replace_course_urls is deprecated. Please use ReplaceURLService instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        return html_str
-
-    def replace_jump_to_id_urls(self, html_str):
-        """
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'replace_jump_to_id_urls is deprecated. Please use ReplaceURLService instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        return html_str
-
     @property
     def resources_fs(self):
         """
         A filesystem that XBlocks can use to read large binary assets.
         """
-        # TODO: implement this to serve any static assets that
-        # self._active_block has in its blockstore "folder". But this API should
-        # be deprecated and we should instead get compatible XBlocks to use a
+        # TODO: implement this to serve any static assets that self._active_block has.
+        # But this API should be deprecated and we should instead get compatible XBlocks to use a
         # runtime filesystem service. Some initial exploration of that (as well
         # as of the 'FileField' concept) has been done and is included in the
         # XBlock repo at xblock.reference.plugins.FSService and is available in

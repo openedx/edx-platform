@@ -4,6 +4,7 @@
     describe('VideoBumper', function() {
         var state, oldOTBD, waitForPlaying;
 
+        // eslint-disable-next-line no-shadow
         waitForPlaying = function(state, done) {
             jasmine.waitUntil(function() {
                 return state.el.hasClass('is-playing');

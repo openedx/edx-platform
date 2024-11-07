@@ -49,7 +49,6 @@ from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: d
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-PASSWORD = 'test'
 TOMORROW = now() + timedelta(days=1)
 ONE_WEEK_AGO = now() - timedelta(weeks=1)
 THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
@@ -81,7 +80,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         self.user = UserFactory()
         self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         self.cert_status = 'processing'
-        self.client.login(username=self.user.username, password=PASSWORD)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     def mock_cert(self, _user, _course_overview):
         """ Return a preset certificate status. """
@@ -212,7 +211,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         super().setUp()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=PASSWORD)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.path = reverse('dashboard')
 
     def set_course_sharing_urls(self, set_marketing, set_social_sharing):
@@ -236,12 +235,12 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
-    @patch('common.djangoapps.student.views.dashboard.should_redirect_to_learner_home_mfe')
-    def test_redirect_to_learner_home(self, mock_should_redirect_to_learner_home_mfe):
+    @patch('common.djangoapps.student.views.dashboard.learner_home_mfe_enabled')
+    def test_redirect_to_learner_home(self, mock_learner_home_mfe_enabled):
         """
         if learner home mfe is enabled, redirect to learner home mfe
         """
-        mock_should_redirect_to_learner_home_mfe.return_value = True
+        mock_learner_home_mfe_enabled.return_value = True
         response = self.client.get(self.path)
         self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
 
@@ -1018,7 +1017,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=PASSWORD)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.path = reverse('dashboard')
 
     def test_check_for_unacknowledged_notices(self):

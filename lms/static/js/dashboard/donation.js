@@ -22,6 +22,7 @@ var edx = edx || {};
          * @param {string} url - The URL where the form data will be submitted.
          * @param {Object} params - Form data, included as hidden inputs.
          */
+        // eslint-disable-next-line no-shadow
         var configureForm = function(form, method, url, params) {
             $('input', form).remove();
             form.attr('action', url);
@@ -80,6 +81,7 @@ var edx = edx || {};
             * @param {string} params.course - The ID of the course for the donation.
             * @returns {DonationView}
             */
+            // eslint-disable-next-line no-shadow
             initialize: function(params) {
                 this.$el = params.el;
                 this.course = params.course;

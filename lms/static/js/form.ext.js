@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function($, undefined) {
     var form_ext;
+    // eslint-disable-next-line no-multi-assign
     $.form_ext = form_ext = {
         ajax: function(options) {
             return $.ajax(options);
@@ -12,6 +14,7 @@
                 type: method || 'GET',
                 data: data,
                 dataType: 'text json',
+                // eslint-disable-next-line no-shadow
                 success: function(data, status, xhr) {
                     element.trigger('ajax:success', [data, status, xhr]);
                 },

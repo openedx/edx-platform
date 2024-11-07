@@ -17,12 +17,13 @@ from django.utils.translation import override as override_language
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.models import StudentModule
@@ -368,21 +369,26 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 
 class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course = CourseFactory(
+        cls.course = CourseFactory.create(
             name='fake',
             org='course',
             run='id',
         )
         cls.course_key = cls.course.location.course_key  # lint-amnesty, pylint: disable=no-member
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):  # lint-amnesty, pylint: disable=no-member
+            cls.chapter = BlockFactory.create(
+                category='chapter',
+                parent=cls.course,
+                display_name='chapter'
+            )
             cls.parent = BlockFactory(
                 category="library_content",
-                parent=cls.course,
+                parent=cls.chapter,
                 publish_item=True,
             )
             cls.child = BlockFactory(
@@ -392,7 +398,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             )
             cls.unrelated = BlockFactory(
                 category="html",
-                parent=cls.course,
+                parent=cls.chapter,
                 publish_item=True,
             )
             cls.team_enabled_ora = BlockFactory.create(
@@ -538,7 +544,10 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             'attempts': 1,
             'saved_files_descriptions': ['summary', 'proposal', 'diagrams'],
             'saved_files_sizes': [1364677, 958418],
-            'saved_files_names': ['case_study_abstract.txt', 'design_prop.pdf', 'diagram1.png']
+            'saved_files_names': ['case_study_abstract.txt', 'design_prop.pdf', 'diagram1.png'],
+            'score_history': [],
+            'correct_map_history': [],
+            'student_answers_history': [],
         }
         team_state = json.dumps(self.team_state_dict)
 
@@ -932,6 +941,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         )
         cls.course_about_url = cls.course_url + 'about'
         cls.registration_url = f'https://{site}/register'
+        cls.logo_url = get_logo_url_for_email()
 
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
@@ -942,6 +952,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         assert result['course_about_url'] == self.course_about_url
         assert result['registration_url'] == self.registration_url
         assert result['course_url'] == self.course_url
+        assert result['logo_url'] == self.logo_url
 
     def test_marketing_params(self):
         # For a site with a marketing front end, what do we expect to get for the URLs?
@@ -954,6 +965,19 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         assert result['course_about_url'] is None
         assert result['registration_url'] == self.registration_url
         assert result['course_url'] == self.course_url
+        assert result['logo_url'] == self.logo_url
+
+    @patch('lms.djangoapps.instructor.enrollment.get_logo_url_for_email', return_value='https://www.logo.png')
+    def test_logo_url_params(self, mock_get_logo_url_for_email):
+        # Verify that the logo_url is correctly set in the email params
+        result = get_email_params(self.course, False)
+
+        assert result['auto_enroll'] is False
+        assert result['course_about_url'] == self.course_about_url
+        assert result['registration_url'] == self.registration_url
+        assert result['course_url'] == self.course_url
+        mock_get_logo_url_for_email.assert_called_once()
+        assert result['logo_url'] == 'https://www.logo.png'
 
 
 @ddt.ddt

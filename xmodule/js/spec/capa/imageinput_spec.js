@@ -5,6 +5,7 @@
  * ~ Donald Knuth
  */
 
+// eslint-disable-next-line no-shadow-restricted-names
 (function($, ImageInput, undefined) {
     describe('ImageInput', function() {
         var state;

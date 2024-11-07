@@ -22,9 +22,10 @@ import datetime
 import os
 
 import yaml
-from corsheaders.defaults import default_headers as corsheaders_default_headers
+import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
+from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -83,6 +84,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
         'REST_FRAMEWORK',
+        'EVENT_BUS_PRODUCER_CONFIG',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -141,13 +143,14 @@ if STATIC_URL_BASE:
 REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PROFILE)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
-# values when the varibale is an empty string. Therefore, setting these variable as empty text in related
-# json files will make the system reads thier values from django translation files
+# values when the variable is an empty string. Therefore, setting these variable as empty text in related
+# json files will make the system reads their values from django translation files
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME') or PLATFORM_NAME
 PLATFORM_DESCRIPTION = ENV_TOKENS.get('PLATFORM_DESCRIPTION') or PLATFORM_DESCRIPTION
 
+DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 CC_MERCHANT_NAME = ENV_TOKENS.get('CC_MERCHANT_NAME', PLATFORM_NAME)
-EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
+EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', DATA_DIR / "emails" / "lms")
 EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', 'localhost')  # django default is localhost
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', 25)  # django default is 25
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', False)  # django default is False
@@ -317,7 +320,6 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
 
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
-DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
@@ -360,12 +362,16 @@ VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
 # Determines whether the CSRF token can be transported on
 # unencrypted channels. It is set to False here for backward compatibility,
-# but it is highly recommended that this is True for enviroments accessed
+# but it is highly recommended that this is True for environments accessed
 # by end users.
 CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
 # Determines which origins are trusted for unsafe requests eg. POST requests.
 CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
+# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
+# case of new django version these values will override.
+if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
+    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 ############# CORS headers for cross-domain requests #################
 
@@ -375,9 +381,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
 
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
-    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
-    )
 
     # If setting a cross-domain cookie, it's really important to choose
     # a name for the cookie that is DIFFERENT than the cookies used
@@ -453,6 +456,11 @@ AWS_SECRET_ACCESS_KEY = AUTH_TOKENS.get("AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCE
 if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
+# these variable already exists in cms with `private` value. django-storages starting `1.10.1`
+# does not set acl values till 1.9.1 default-acl is `public-read`. To maintain the behaviour
+# same with upcoming version setting it to `public-read`.
+AWS_DEFAULT_ACL = 'public-read'
+AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
@@ -463,9 +471,10 @@ AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.am
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
@@ -490,23 +499,22 @@ XQUEUE_INTERFACE = AUTH_TOKENS.get('XQUEUE_INTERFACE', XQUEUE_INTERFACE)
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
+
+# After conversion above, the modulestore will have a "stores" list with all defined stores, for all stores, add the
+# fs_root entry to derived collection so that if it's a callable it can be resolved.  We need to do this because the
+# `derived_collection_entry` takes an exact index value but the config file might have overridden the number of stores
+# and so we can't be sure that the 2 we define in common.py will be there when we try to derive settings.  This could
+# lead to exceptions being thrown when the `derive_settings` call later in this file tries to update settings.  We call
+# the derived_collection_entry function here to ensure that we update the fs_root for any callables that remain after
+# we've updated the MODULESTORE setting from our config file.
+for idx, store in enumerate(MODULESTORE['default']['OPTIONS']['stores']):
+    if 'OPTIONS' in store and 'fs_root' in store["OPTIONS"]:
+        derived_collection_entry('MODULESTORE', 'default', 'OPTIONS', 'stores', idx, 'OPTIONS', 'fs_root')
+
 MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
 
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', '')  # django default is ''
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', '')  # django default is ''
-
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
-# Configure an API auth token at (blockstore URL)/admin/authtoken/token/
-BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
-
-# Datadog for events!
-DATADOG = AUTH_TOKENS.get("DATADOG", {})
-DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
-
-# TODO: deprecated (compatibility with previous settings)
-if 'DATADOG_API' in AUTH_TOKENS:
-    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
 
 # Analytics API
 ANALYTICS_API_KEY = AUTH_TOKENS.get("ANALYTICS_API_KEY", ANALYTICS_API_KEY)
@@ -746,6 +754,11 @@ SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = ENV_TOKENS.get(
     SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING,
 )
 
+SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = ENV_TOKENS.get(
+    'SEARCH_COURSEWARE_CONTENT_LOG_PARAMS',
+    SEARCH_COURSEWARE_CONTENT_LOG_PARAMS,
+)
+
 # TODO: Once we have successfully upgraded to ES7, switch this back to ELASTIC_SEARCH_CONFIG.
 ELASTIC_SEARCH_CONFIG = ENV_TOKENS.get('ELASTIC_SEARCH_CONFIG_ES7', [{}])
 
@@ -909,6 +922,16 @@ ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
 
+CHAT_COMPLETION_API = ENV_TOKENS.get('CHAT_COMPLETION_API', '')
+CHAT_COMPLETION_API_KEY = ENV_TOKENS.get('CHAT_COMPLETION_API_KEY', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
+    'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
+    ''
+)
+LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT', '')
+LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT', '')
+
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
 # which are not provided by the Enterprise service. These settings override the
@@ -1040,12 +1063,19 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
-        'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_all_blocked_submissions_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_course_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflows_for_ora_block_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+    'openassessment.workflow.tasks.update_workflow_for_submission_task': {
+        'queue': ORA_WORKFLOW_UPDATE_ROUTING_KEY},
+
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
@@ -1069,6 +1099,9 @@ DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', 
 ################### Discussions micro frontend Feedback URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = ENV_TOKENS.get('DISCUSSIONS_MFE_FEEDBACK_URL', DISCUSSIONS_MFE_FEEDBACK_URL)
 
+############################ AI_TRANSLATIONS URL ##################################
+AI_TRANSLATIONS_API_URL = ENV_TOKENS.get('AI_TRANSLATIONS_API_URL', AI_TRANSLATIONS_API_URL)
+
 ############## DRF overrides ##############
 REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
 
@@ -1082,10 +1115,19 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
     "URL": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL', None),
 }
 
-############## Settings for survey report ##############
-SURVEY_REPORT_EXTRA_DATA = ENV_TOKENS.get('SURVEY_REPORT_EXTRA_DATA', {})
-SURVEY_REPORT_ENDPOINT = ENV_TOKENS.get('SURVEY_REPORT_ENDPOINT',
-                                        'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/')
-ANONYMOUS_SURVEY_REPORT = False
-
 AVAILABLE_DISCUSSION_TOURS = ENV_TOKENS.get('AVAILABLE_DISCUSSION_TOURS', [])
+
+############## NOTIFICATIONS EXPIRY ##############
+NOTIFICATIONS_EXPIRY = ENV_TOKENS.get('NOTIFICATIONS_EXPIRY', NOTIFICATIONS_EXPIRY)
+
+############## Event bus producer ##############
+EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
+                                                   ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))
+BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)
+
+# .. setting_name: DISABLED_COUNTRIES
+# .. setting_default: []
+# .. setting_description: List of country codes that should be disabled
+# .. for now it wil impact country listing in auth flow and user profile.
+# .. eg ['US', 'CA']
+DISABLED_COUNTRIES = ENV_TOKENS.get('DISABLED_COUNTRIES', [])

@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%!
   import json
-  from django.utils.translation import ugettext as _
+  from django.utils.translation import gettext as _
   from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 %>
 <%inherit file="../main.html" />
@@ -23,7 +23,8 @@
       ${course_discovery_meanings | n, dump_js_escaped_json},
       getParameterByName('search_query'),
       "${user_language | n, js_escaped_string}",
-      "${user_timezone | n, js_escaped_string}"
+      "${user_timezone | n, js_escaped_string}",
+      ${set_default_filter | n, dump_js_escaped_json}
     );
   </%static:require_module>
 </%block>

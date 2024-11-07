@@ -139,6 +139,7 @@ define([
             });
 
             it('should focus highlighted text after closing', function() {
+                // eslint-disable-next-line no-shadow
                 var note;
                 highlight.trigger(keyDownEvent(this.KEY.ENTER));
                 note = this.annotator.element.find('.annotator-edit');

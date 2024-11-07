@@ -3,8 +3,8 @@ Django module for Course Metadata class -- manages advanced settings and related
 """
 
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 import pytz
 from django.conf import settings
@@ -13,14 +13,17 @@ from django.utils.translation import gettext as _
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
+from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
-from openedx.core.lib.teams_config import TeamsetType
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TeamsConfig, TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 LOGGER = logging.getLogger(__name__)
 
@@ -78,6 +81,7 @@ class CourseMetadata:
         'highlights_enabled_for_messaging',
         'is_onboarding_exam',
         'discussions_settings',
+        'copied_from_block',
     ]
 
     @classmethod
@@ -126,11 +130,6 @@ class CourseMetadata:
             exclude_list.append('enable_ccx')
             exclude_list.append('ccx_connector')
 
-        # Do not show "Issue Open Badges" in Studio Advanced Settings
-        # if the feature is disabled.
-        if not settings.FEATURES.get('ENABLE_OPENBADGES'):
-            exclude_list.append('issue_badges')
-
         # If the XBlockStudioConfiguration table is not being used, there is no need to
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
@@ -151,7 +150,6 @@ class CourseMetadata:
             exclude_list.append('allow_anonymous')
             exclude_list.append('allow_anonymous_to_peers')
             exclude_list.append('discussion_topics')
-
         return exclude_list
 
     @classmethod
@@ -219,7 +217,10 @@ class CourseMetadata:
             try:
                 val = model['value']
                 if hasattr(block, key) and getattr(block, key) != val:
-                    key_values[key] = block.fields[key].from_json(val)
+                    if key == 'proctoring_provider':
+                        key_values[key] = block.fields[key].from_json(val, validate_providers=True)
+                    else:
+                        key_values[key] = block.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
                 raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(  # lint-amnesty, pylint: disable=raise-missing-from
                     name=model['display_name'], detailed_message=str(err)))
@@ -255,7 +256,10 @@ class CourseMetadata:
             try:
                 val = model['value']
                 if hasattr(block, key) and getattr(block, key) != val:
-                    key_values[key] = block.fields[key].from_json(val)
+                    if key == 'proctoring_provider':
+                        key_values[key] = block.fields[key].from_json(val, validate_providers=True)
+                    else:
+                        key_values[key] = block.fields[key].from_json(val)
             except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
                 errors.append({'key': key, 'message': str(err), 'model': model})
@@ -272,6 +276,10 @@ class CourseMetadata:
                 did_validate = False
                 errors.append({'key': key, 'message': err_message, 'model': model})
 
+        teams_config = key_values.get('teams_configuration')
+        if teams_config:
+            key_values['teams_configuration'] = cls.fill_teams_user_partitions_ids(block, teams_config)
+
         team_setting_errors = cls.validate_team_settings(filtered_dict)
         if team_setting_errors:
             errors = errors + team_setting_errors
@@ -287,6 +295,43 @@ class CourseMetadata:
             updated_data = cls.update_from_dict(key_values, block, user, save=False)
 
         return did_validate, errors, updated_data
+
+    @staticmethod
+    def get_user_partition_id(block, min_partition_id, max_partition_id):
+        """
+        Get a dynamic partition id that is not already in use.
+        """
+        used_partition_ids = {p.id for p in get_all_partitions_for_course(block)}
+        return generate_int_id(
+            min_partition_id,
+            max_partition_id,
+            used_partition_ids,
+        )
+
+    @classmethod
+    def fill_teams_user_partitions_ids(cls, block, teams_config):
+        """
+        Fill the `user_partition_id` in the team settings if it is not set.
+
+        This is used by the Dynamic Team Partition Generator to create the dynamic user partitions
+        based on the team-sets defined in the course.
+        """
+        if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(block.id):
+            return teams_config
+
+        for team_set in teams_config.teamsets:
+            if not team_set.user_partition_id:
+                team_set.user_partition_id = cls.get_user_partition_id(
+                    block,
+                    MINIMUM_UNUSED_PARTITION_ID,
+                    MYSQL_MAX_INT,
+                )
+        return TeamsConfig(
+            {
+                **teams_config.cleaned_data,
+                "team_sets": [team_set.cleaned_data for team_set in teams_config.teamsets],
+            }
+        )
 
     @classmethod
     def update_from_dict(cls, key_values, block, user, save=True):
@@ -363,8 +408,15 @@ class CourseMetadata:
         """
         error_list = []
         valid_teamset_types = [TeamsetType.open.value, TeamsetType.public_managed.value,
-                               TeamsetType.private_managed.value]
-        valid_keys = {'id', 'name', 'description', 'max_team_size', 'type'}
+                               TeamsetType.private_managed.value, TeamsetType.open_managed.value]
+        valid_keys = {
+            'id',
+            'name',
+            'description',
+            'max_team_size',
+            'type',
+            'user_partition_id',
+        }
         teamset_type = topic_settings.get('type', {})
         if teamset_type:
             if teamset_type not in valid_teamset_types:
@@ -438,17 +490,30 @@ class CourseMetadata:
             enable_proctoring = block.enable_proctored_exams
 
         if enable_proctoring:
+
+            if proctoring_provider_model:
+                proctoring_provider = proctoring_provider_model.get('value')
+            else:
+                proctoring_provider = block.proctoring_provider
+
+            # If the proctoring provider stored in the course block no longer
+            # matches the available providers for this instance, show an error
+            if proctoring_provider not in available_providers:
+                message = (
+                    f'The proctoring provider configured for this course, \'{proctoring_provider}\', is not valid.'
+                )
+                errors.append({
+                    'key': 'proctoring_provider',
+                    'message': message,
+                    'model': proctoring_provider_model
+                })
+
             # Require a valid escalation email if Proctortrack is chosen as the proctoring provider
             escalation_email_model = settings_dict.get('proctoring_escalation_email')
             if escalation_email_model:
                 escalation_email = escalation_email_model.get('value')
             else:
                 escalation_email = block.proctoring_escalation_email
-
-            if proctoring_provider_model:
-                proctoring_provider = proctoring_provider_model.get('value')
-            else:
-                proctoring_provider = block.proctoring_provider
 
             missing_escalation_email_msg = 'Provider \'{provider}\' requires an exam escalation contact.'
             if proctoring_provider_model and proctoring_provider == 'proctortrack':

@@ -37,7 +37,8 @@
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie'
+                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie',
+                'toggleGoogleDisclaimer'
             );
 
             this.state = state;
@@ -481,6 +482,7 @@
                 // get start and caption. If startTime and endTime
                 // are specified, filter by that range.
                 var times = this.getStartEndTimes();
+                // eslint-disable-next-line prefer-spread
                 var results = this.sjson.filter.apply(this.sjson, times);
                 var start = results.start;
                 var captions = results.captions;
@@ -489,6 +491,31 @@
                     start: start,
                     captions: captions
                 };
+            },
+
+            /**
+            * @desc Shows/Hides Google disclaimer based on captions being AI generated and
+            * if ClosedCaptions are being shown.
+            *
+            * @param {array} captions List of captions for the video.
+            *
+            * @returns {boolean}
+            */
+            toggleGoogleDisclaimer: function(captions) {
+                var self = this,
+                    state = this.state,
+                    aIGeneratedSpan = '<span id="captions-ai-generated"></span>',
+                    captionsAIGenerated = captions.some(caption => caption.includes(aIGeneratedSpan));
+
+                if (!self.hideCaptionsOnLoad && !state.captionsHidden) {
+                    if (captionsAIGenerated) {
+                        state.el.find('.google-disclaimer').show();
+                        self.shouldShowGoogleDisclaimer = true;
+                    } else {
+                        state.el.find('.google-disclaimer').hide();
+                        self.shouldShowGoogleDisclaimer = false;
+                    }
+                }
             },
 
             /**
@@ -545,6 +572,8 @@
                         results = self.getBoundedCaptions();
                         start = results.start;
                         captions = results.captions;
+
+                        self.toggleGoogleDisclaimer(captions);
 
                         if (self.loaded) {
                             if (self.rendered) {
@@ -1056,6 +1085,7 @@
                     // if start and end times are defined, limit search.
                     // else, use the entire list of video captions
                     params = [time].concat(times);
+                    // eslint-disable-next-line prefer-spread
                     newIndex = this.sjson.search.apply(this.sjson, params);
 
                     if (
@@ -1066,12 +1096,13 @@
                         if (typeof this.currentIndex !== 'undefined') {
                             this.subtitlesEl
                                 .find('li.current')
+                                .attr('aria-current', 'false')
                                 .removeClass('current');
-                        }
-
+                        }                 
                         this.subtitlesEl
                             .find("span[data-index='" + newIndex + "']")
                             .parent()
+                            .attr('aria-current', 'true')
                             .addClass('current');
 
                         this.currentIndex = newIndex;
@@ -1282,6 +1313,7 @@
                 var captions = this.captionDisplayEl['0'];
 
                 if (typeof Draggabilly === 'function') {
+                    // eslint-disable-next-line no-new
                     new Draggabilly(captions, {containment: true});
                 } else {
                     console.log('Closed captioning available but not draggable');
@@ -1296,6 +1328,7 @@
             */
             hideCaptions: function(hideCaptions, triggerEvent) {
                 var transcriptControlEl = this.transcriptControlEl,
+                    self = this,
                     state = this.state,
                     text;
 
@@ -1306,6 +1339,8 @@
                     if (triggerEvent) {
                         this.state.el.trigger('transcript:hide');
                     }
+
+                    state.el.find('.google-disclaimer').hide();
 
                     transcriptControlEl
                         .removeClass('is-active')
@@ -1319,6 +1354,10 @@
                     if (triggerEvent) {
                         this.state.el.trigger('transcript:show');
                     }
+
+                    if (self.shouldShowGoogleDisclaimer) {
+                        state.el.find('.google-disclaimer').show();
+                      }
 
                     transcriptControlEl
                         .addClass('is-active')

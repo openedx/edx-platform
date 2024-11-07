@@ -88,6 +88,7 @@
                                     gettext('The certificate for this learner has been re-validated and the system is re-running the grade for this learner.') // eslint-disable-line max-len
                                 );
                             },
+                            // eslint-disable-next-line no-shadow
                             error: function(model, response) {
                                 try {
                                     var response_data = JSON.parse(response.responseText);

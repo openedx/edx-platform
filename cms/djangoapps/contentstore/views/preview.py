@@ -24,10 +24,10 @@ from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import SandboxService
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, XModuleMixin
 from cms.djangoapps.xblock_config.models import StudioConfig
-from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id, ENABLE_COPY_PASTE_FEATURE
+from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
@@ -45,7 +45,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside
 )
 
-from ..utils import get_visibility_partition_info
+from ..utils import StudioPermissionsService, get_visibility_partition_info
 from .access import get_user_role
 from .session_kv_store import SessionKeyValueStore
 
@@ -149,20 +149,17 @@ def preview_layout_asides(block, context, frag, view_name, aside_frag_fns, wrap_
     return result
 
 
-def _prepare_runtime_for_preview(request, block, field_data):
+def _prepare_runtime_for_preview(request, block):
     """
     Sets properties in the runtime of the specified block that is
     required for rendering block previews.
 
     request: The active django request
     block: An XBlock
-    field_data: Wrapped field data for previews
     """
 
     course_id = block.location.course_key
     display_name_only = (block.category == 'static_tab')
-
-    replace_url_service = ReplaceURLService(course_id=course_id)
 
     wrappers = [
         # This wrapper wraps the block in the template specified above
@@ -176,7 +173,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
 
         # This wrapper replaces urls in the output that start with /static
         # with the correct course-specific url for the static content
-        partial(replace_urls_wrapper, replace_url_service=replace_url_service, static_replace_only=True),
+        partial(replace_urls_wrapper, replace_url_service=ReplaceURLService, static_replace_only=True),
         _studio_wrap_xblock,
     ]
 
@@ -201,7 +198,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
         deprecated_anonymous_user_id = anonymous_id_for_user(request.user, None)
 
     services = {
-        "field-data": field_data,
+        "studio_user_permissions": StudioPermissionsService(request.user),
         "i18n": XBlockI18nService,
         'mako': mako_service,
         "settings": SettingsService(),
@@ -215,7 +212,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
         "teams_configuration": TeamsConfigurationService(),
         "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
         "cache": CacheService(cache),
-        'replace_urls': replace_url_service
+        'replace_urls': ReplaceURLService
     }
 
     block.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
@@ -224,7 +221,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
     # Set up functions to modify the fragment produced by student_view
     block.runtime.wrappers = wrappers
     block.runtime.wrappers_asides = wrappers_asides
-    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    block.runtime._services.update(services)  # pylint: disable=protected-access
 
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
@@ -268,9 +265,7 @@ def _load_preview_block(request: Request, block: XModuleMixin):
     else:
         wrapper = partial(LmsFieldData, student_data=student_data)
 
-    # wrap the _field_data upfront to pass to _prepare_runtime_for_preview
-    wrapped_field_data = wrapper(block._field_data)  # pylint: disable=protected-access
-    _prepare_runtime_for_preview(request, block, wrapped_field_data)
+    _prepare_runtime_for_preview(request, block)
 
     block.bind_for_student(
         request.user.id,
@@ -305,8 +300,13 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)  # lint-amnesty, pylint: disable=line-too-long
         course = modulestore().get_course(xblock.location.course_key)
         can_edit = context.get('can_edit', True)
-        # Copy-paste is a new feature; while we are beta-testing it, only beta users with the Waffle flag enabled see it
-        enable_copy_paste = can_edit and ENABLE_COPY_PASTE_FEATURE.is_enabled()
+        can_add = context.get('can_add', True)
+        # Is this a course or a library?
+        is_course = xblock.context_key.is_course
+        tags_count_map = context.get('tags_count_map')
+        tags_count = 0
+        if tags_count_map:
+            tags_count = tags_count_map.get(str(xblock.location), 0)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
@@ -315,15 +315,23 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
             'can_edit': can_edit,
-            'enable_copy_paste': enable_copy_paste,
-            'can_edit_visibility': context.get('can_edit_visibility', xblock.scope_ids.usage_id.context_key.is_course),
+            'can_edit_visibility': context.get('can_edit_visibility', is_course),
+            'course_authoring_url': settings.COURSE_AUTHORING_MICROFRONTEND_URL,
+            'is_loading': context.get('is_loading', False),
+            'is_selected': context.get('is_selected', False),
+            'selectable': context.get('selectable', False),
             'selected_groups_label': selected_groups_label,
-            'can_add': context.get('can_add', True),
-            'can_move': context.get('can_move', xblock.scope_ids.usage_id.context_key.is_course),
-            'language': getattr(course, 'language', None)
+            'can_add': can_add,
+            # Generally speaking, "if you can add, you can delete". One exception is itembank (Problem Bank)
+            # which has its own separate "add" workflow but uses the normal delete workflow for its child blocks.
+            'can_delete': can_add or (root_xblock and root_xblock.scope_ids.block_type == "itembank" and can_edit),
+            'can_move': context.get('can_move', is_course),
+            'language': getattr(course, 'language', None),
+            'is_course': is_course,
+            'tags_count': tags_count,
         }
 
-        add_webpack_to_fragment(frag, "js/factories/xblock_validation")
+        add_webpack_js_to_fragment(frag, "js/factories/xblock_validation")
 
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)

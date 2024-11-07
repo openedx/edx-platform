@@ -14,6 +14,7 @@ describe('ModuleEdit', function() {
                     + '<li class="component" id="stub-id" data-locator="stub-id">\n'
                     + '  <div class="component-editor">\n'
                     + '    <div class="module-editor">\n'
+                    // eslint-disable-next-line no-template-curly-in-string
                     + '      ${editor}\n'
                     + '    </div>\n'
                     + '    <a href="#" class="save-button">Save</a>\n'
@@ -73,6 +74,7 @@ describe('ModuleEdit', function() {
                 window.MockXBlock = function() {
                     return {};
                 };
+                // eslint-disable-next-line no-void
                 window.loadedXBlockResources = void 0;
                 this.moduleEdit.render();
                 return $.ajax.calls.mostRecent().args[0].success({

@@ -4,6 +4,8 @@ Course API Views
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -17,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
@@ -89,6 +92,7 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
+        self.overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
 
@@ -130,6 +134,10 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
+
+    @property
+    def language(self):
+        return self.course.language
 
     @property
     def notes(self):
@@ -359,7 +367,15 @@ class CoursewareMeta:
             enrollment_active = self.enrollment['is_active']
             return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
+    @property
+    def learning_assistant_enabled(self):
+        """
+        Returns a boolean representing whether the requesting user should have access to the Xpert Learning Assistant.
+        """
+        return getattr(settings, 'LEARNING_ASSISTANT_AVAILABLE', False)
 
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareInformation(RetrieveAPIView):
     """
     **Use Cases**
@@ -407,6 +423,7 @@ class CoursewareInformation(RetrieveAPIView):
             * entrance_exam_passed: (bool) Indicates if the entrance exam has been passed
         * id: A unique identifier of the course; a serialized representation
             of the opaque key identifying the course.
+        * language: The language code for the course
         * media: An object that contains named media items.  Included here:
             * course_image: An image to show for the course.  Represented
               as an object with the following fields:
@@ -448,6 +465,7 @@ class CoursewareInformation(RetrieveAPIView):
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
+        * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
 
     **Parameters:**
 
@@ -577,30 +595,40 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError as exc:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.") from exc
+
+        staff_access = has_access(request.user, 'staff', usage_key.course_key)
+        is_preview = request.GET.get('preview', '0') == '1'
         _, request.user = setup_masquerade(
             request,
             usage_key.course_key,
-            staff_access=has_access(request.user, 'staff', usage_key.course_key),
+            staff_access=staff_access,
             reset_masquerade_data=True,
         )
 
-        sequence, _ = get_block_by_usage_id(
-            self.request,
-            str(usage_key.course_key),
-            str(usage_key),
-            disable_staff_debug_info=True,
-            will_recheck_access=True)
+        branch_type = (
+            ModuleStoreEnum.Branch.draft_preferred
+        ) if is_preview and staff_access else (
+            ModuleStoreEnum.Branch.published_only
+        )
 
-        if not hasattr(sequence, 'get_metadata'):
-            # Looks like we were asked for metadata on something that is not a sequence (or section).
-            return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        with modulestore().branch_setting(branch_type, usage_key.course_key):
+            sequence, _ = get_block_by_usage_id(
+                self.request,
+                str(usage_key.course_key),
+                str(usage_key),
+                disable_staff_debug_info=True,
+                will_recheck_access=True)
 
-        view = STUDENT_VIEW
-        if request.user.is_anonymous:
-            view = PUBLIC_VIEW
+            if not hasattr(sequence, 'get_metadata'):
+                # Looks like we were asked for metadata on something that is not a sequence (or section).
+                return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
-        return Response(sequence.get_metadata(view=view, context=context))
+            view = STUDENT_VIEW
+            if request.user.is_anonymous:
+                view = PUBLIC_VIEW
+
+            context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
+            return Response(sequence.get_metadata(view=view, context=context))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):

@@ -1,0 +1,51 @@
+<table cellpadding="0" cellspacing="0" style="color:black; font-weight:400; font-size:12px;line-height:20px" width="100%">
+    <tbody>
+        <tr>
+            <td>
+                <table width="100%">
+                    <tbody>
+                        <tr>
+                            <td width="25%" align="left" style="padding: 0">
+                                <img src="{{ logo_url }}" style="width: auto;" height="24" alt="Logo"/></a>
+                            </td>
+                            <td width="75%" align="right" style="padding: 0">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            {% for social_name, social_data in social_media.items %}
+                                                <td style="padding: 0">
+                                                    <a href="{{social_data.url}}">
+                                                        <img src="{{social_data.icon}}" style="max-height: 24px; max-width: 24px; margin-left: 0.6rem" alt="{{social_name}}" />
+                                                    </a>
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p style="margin: 1.5rem 0 0 0;">
+                    You are receiving this email because you have subscribed to email digest
+                </p>
+                <p style="margin: 0.625rem 0">
+                    <a href="{{notification_settings_url}}" rel="noopener noreferrer" target="_blank" style="color: black">
+                        Notification Settings
+                    </a>
+                    <a href="{{unsubscribe_url}}" rel="noopener noreferrer" target="_blank" style="color: black; margin-left: 1rem">
+                        Unsubscribe from email digest for learning activity
+                    </a>
+                </p>
+                <p>
+                    &copy; {% now "Y" %} {{ platform_name }}. All Rights Reserved <br/>
+                    {{ mailing_address }}
+                </p>
+            </td>
+        </tr>
+    </tbody>
+</table>

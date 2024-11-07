@@ -17,6 +17,7 @@ const initialState = {
     timeout: null,
 };
 
+// eslint-disable-next-line default-param-last
 export const reportStatus = (state = initialState, action) => {
     switch (action.type) {
     case REPORT_GENERATION_REQUEST:

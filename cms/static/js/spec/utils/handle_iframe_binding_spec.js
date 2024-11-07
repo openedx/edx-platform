@@ -48,6 +48,7 @@ define(
             });
 
             it('does nothing on tinymce iframe', function() {
+                // eslint-disable-next-line no-script-url
                 verify_no_modification('javascript:');
             });
         });

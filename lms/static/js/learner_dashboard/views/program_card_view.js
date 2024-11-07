@@ -18,6 +18,7 @@ class ProgramCardView extends Backbone.View {
                 };
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -29,24 +30,17 @@ class ProgramCardView extends Backbone.View {
                 uuid: this.model.get('uuid'),
             });
         }
-        this.isSubscribed = (
-            context.isUserB2CSubscriptionsEnabled &&
-            context.subscriptionCollection?.some({
-                resource_id: this.model.get('uuid'),
-                subscription_state: 'active',
-            })
-        ) ?? false;
         this.render();
     }
 
     render() {
         const orgList = this.model.get('authoring_organizations').map(org => gettext(org.key));
+        // eslint-disable-next-line no-undef
         const data = $.extend(
             this.model.toJSON(),
             this.getProgramProgress(),
             {
                 orgList: orgList.join(' '),
-                isSubscribed: this.isSubscribed,
             },
         );
 

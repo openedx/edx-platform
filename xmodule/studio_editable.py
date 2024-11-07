@@ -2,6 +2,7 @@
 Mixin to support editing in Studio.
 """
 from xblock.core import XBlock, XBlockMixin
+
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
@@ -12,6 +13,7 @@ class StudioEditableBlock(XBlockMixin):
 
     This class is only intended to be used with an XBlock!
     """
+
     has_author_view = True
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):
@@ -33,10 +35,9 @@ class StudioEditableBlock(XBlockMixin):
                 'content': rendered_child.content
             })
 
-        # 'lms.' namespace_prefix is required for rendering in studio
         mako_service = self.runtime.service(self, 'mako')
-        mako_service.namespace_prefix = 'lms.'
-        fragment.add_content(mako_service.render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+        # For historic reasons, this template is in the LMS folder, and some code like xblock-utils expects that.
+        fragment.add_content(mako_service.render_lms_template("studio_render_children_view.html", {  # pylint: disable=no-member
             'items': contents,
             'xblock_context': context,
             'can_add': can_add,

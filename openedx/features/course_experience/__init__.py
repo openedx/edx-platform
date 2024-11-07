@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx_filters.exceptions import OpenEdxFilterException
+from openedx_filters.learning.filters import CourseHomeUrlCreationStarted
 
 
 # Namespace for course experience waffle flags.
@@ -31,6 +33,16 @@ COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.pre_start_ac
 # .. toggle_target_removal_date: None
 # .. toggle_warning: This temporary feature toggle does not have a target removal date.
 ENABLE_COURSE_GOALS = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_course_goals', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
+
+# .. toggle_name: course_experience.enable_ses_for_goalreminder
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Used to determine whether or not to use AWS SES to send goal reminder emails for the course.
+# .. toggle_use_cases: opt_in, temporary
+# .. toggle_creation_date: 2024-10-06
+# .. toggle_target_removal_date: None
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
+ENABLE_SES_FOR_GOALREMINDER = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_ses_for_goalreminder', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 # Waffle flag to enable anonymous access to a course
 SEO_WAFFLE_FLAG_NAMESPACE = 'seo'
@@ -105,4 +117,14 @@ def course_home_url(course_key):
         course_key (CourseKey): The course key for which the home url is being requested.
     """
     from .url_helpers import get_learning_mfe_home_url
-    return get_learning_mfe_home_url(course_key, url_fragment='home')
+    home_url = get_learning_mfe_home_url(course_key, url_fragment='home')
+    try:
+        # .. filter_implemented_name: CourseHomeUrlCreationStarted
+        # .. filter_type: org.openedx.learning.course.homepage.url.creation.started.v1
+        course_key, home_url = CourseHomeUrlCreationStarted.run_filter(
+            course_key=course_key, course_home_url=home_url
+        )
+    except OpenEdxFilterException as exc:
+        pass
+
+    return home_url

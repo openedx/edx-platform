@@ -60,7 +60,7 @@ class StaticBookTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(**kwargs)
         user = UserFactory.create()
         CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
 
     def make_url(self, url_name, **kwargs):
         """

@@ -16,6 +16,7 @@ class CertificateStatusView extends Backbone.View {
     render() {
         let data = this.model.toJSON();
 
+        // eslint-disable-next-line no-undef
         data = $.extend(data, { certificateSvg: this.iconTpl() });
         HtmlUtils.setHtml(this.$el, this.statusTpl(data));
     }

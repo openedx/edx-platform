@@ -1,14 +1,16 @@
 """
-Tests for static asset files in Blockstore-based Content Libraries
+Tests for static asset files in Learning-Core-based Content Libraries
 """
+from uuid import UUID
 
+from opaque_keys.edx.keys import UsageKey
 
-import requests
-
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.tests.base import (
-    ContentLibrariesRestApiBlockstoreServiceTest,
     ContentLibrariesRestApiTest,
 )
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 # Binary data representing an SVG image file
 SVG_DATA = """<svg xmlns="http://www.w3.org/2000/svg" height="30" width="100">
@@ -26,74 +28,11 @@ I'm Anant Agarwal, I'm the president of edX,
 """
 
 
-class ContentLibrariesStaticAssetsTestMixin:
+@skip_unless_cms
+class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
     """
-    Tests for static asset files in Blockstore-based Content Libraries
-
-    WARNING: every test should have a unique library slug, because even though
-    the django/mysql database gets reset for each test case, the lookup between
-    library slug and bundle UUID does not because it's assumed to be immutable
-    and cached forever.
+    Tests for static asset files in Learning-Core-based Content Libraries
     """
-
-    def test_asset_crud(self):
-        """
-        Test create, read, update, and write of a static asset file.
-
-        Also tests that the static asset file (an image in this case) can be
-        used in an HTML block.
-        """
-        library = self._create_library(slug="asset-lib1", title="Static Assets Test Library")
-        block = self._add_block_to_library(library["id"], "html", "html1")
-        block_id = block["id"]
-        file_name = "image.svg"
-
-        # A new block has no assets:
-        assert self._get_library_block_assets(block_id) == []
-        self._get_library_block_asset(block_id, file_name, expect_response=404)
-
-        # Upload an asset file
-        self._set_library_block_asset(block_id, file_name, SVG_DATA)
-
-        # Get metadata about the uploaded asset file
-        metadata = self._get_library_block_asset(block_id, file_name)
-        assert metadata['path'] == file_name
-        assert metadata['size'] == len(SVG_DATA)
-        asset_list = self._get_library_block_assets(block_id)
-        # We don't just assert that 'asset_list == [metadata]' because that may
-        # break in the future if the "get asset" view returns more detail than
-        # the "list assets" view.
-        assert len(asset_list) == 1
-        assert asset_list[0]['path'] == metadata['path']
-        assert asset_list[0]['size'] == metadata['size']
-        assert asset_list[0]['url'] == metadata['url']
-
-        # Download the file and check that it matches what was uploaded.
-        # We need to download using requests since this is served by Blockstore,
-        # which the django test client can't interact with.
-        content_get_result = requests.get(metadata["url"])
-        assert content_get_result.content == SVG_DATA
-
-        # Set some OLX referencing this asset:
-        self._set_library_block_olx(block_id, """
-            <html display_name="HTML with Image"><![CDATA[
-                <img src="/static/image.svg" alt="An image that says 'SVG is lit' using a fire emoji" />
-            ]]></html>
-        """)
-        # Publish the OLX and the new image file, since published data gets
-        # served differently by Blockstore and we should test that too.
-        self._commit_library_changes(library["id"])
-        metadata = self._get_library_block_asset(block_id, file_name)
-        assert metadata['path'] == file_name
-        assert metadata['size'] == len(SVG_DATA)
-        # Download the file from the new URL:
-        content_get_result = requests.get(metadata["url"])
-        assert content_get_result.content == SVG_DATA
-
-        # Check that the URL in the student_view gets rewritten:
-        fragment = self._render_block_view(block_id, "student_view")
-        assert '/static/image.svg' not in fragment['content']
-        assert metadata['url'] in fragment['content']
 
     def test_asset_filenames(self):
         """
@@ -126,7 +65,7 @@ class ContentLibrariesStaticAssetsTestMixin:
 
     def test_video_transcripts(self):
         """
-        Test that video blocks can read transcript files out of blockstore.
+        Test that video blocks can read transcript files out of learning core.
         """
         library = self._create_library(slug="transcript-test-lib", title="Transcripts Test Library")
         block = self._add_block_to_library(library["id"], "video", "video1")
@@ -140,7 +79,7 @@ class ContentLibrariesStaticAssetsTestMixin:
             />
         """)
         # Upload the transcript file
-        self._set_library_block_asset(block_id, "3_yD_cEKoCk-en.srt", TRANSCRIPT_DATA)
+        self._set_library_block_asset(block_id, "static/3_yD_cEKoCk-en.srt", TRANSCRIPT_DATA)
 
         transcript_handler_url = self._get_block_handler_url(block_id, "transcript")
 
@@ -165,25 +104,110 @@ class ContentLibrariesStaticAssetsTestMixin:
         check_sjson()
         check_download()
         # Publish the OLX and the transcript file, since published data gets
-        # served differently by Blockstore and we should test that too.
+        # served differently by Learning Core and we should test that too.
         self._commit_library_changes(library["id"])
         check_sjson()
         check_download()
 
 
-class ContentLibrariesStaticAssetsBlockstoreServiceTest(
-    ContentLibrariesStaticAssetsTestMixin,
-    ContentLibrariesRestApiBlockstoreServiceTest,
-):
+@skip_unless_cms
+class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
     """
-    Tests for static asset files in Blockstore-based Content Libraries, using the standalone Blockstore service.
+    Tests for the view that actually delivers the Library asset in Studio.
     """
 
+    def setUp(self):
+        super().setUp()
 
-class ContentLibrariesStaticAssetsTest(
-    ContentLibrariesStaticAssetsTestMixin,
-    ContentLibrariesRestApiTest,
-):
-    """
-    Tests for static asset files in Blockstore-based Content Libraries, using the installed Blockstore app.
-    """
+        library = self._create_library(slug="asset-lib2", title="Static Assets Test Library")
+        block = self._add_block_to_library(library["id"], "html", "html1")
+        self._set_library_block_asset(block["id"], "static/test.svg", SVG_DATA)
+        usage_key = UsageKey.from_string(block["id"])
+        self.usage_key = usage_key
+        self.component = get_component_from_usage_key(usage_key)
+        self.draft_component_version = self.component.versioning.draft
+
+    def test_good_responses(self):
+        get_response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert get_response.status_code == 200
+        content = b''.join(chunk for chunk in get_response.streaming_content)
+        assert content == SVG_DATA
+
+        good_head_response = self.client.head(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert good_head_response.headers == get_response.headers
+
+    def test_missing(self):
+        """Test asset requests that should 404."""
+        # Non-existent version...
+        wrong_version_uuid = UUID('11111111-1111-1111-1111-111111111111')
+        response = self.client.get(
+            f"/library_assets/component_versions/{wrong_version_uuid}/static/test.svg"
+        )
+        assert response.status_code == 404
+
+        # Non-existent file...
+        response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/missing.svg"
+        )
+        assert response.status_code == 404
+
+        # File-like ComponenVersionContent entry that isn't an actually
+        # downloadable file...
+        response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/block.xml"
+        )
+        assert response.status_code == 404
+
+    def test_anonymous_user(self):
+        """Anonymous users shouldn't get access to library assets."""
+        self.client.logout()
+        response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert response.status_code == 401
+
+    def test_unauthorized_user(self):
+        """User who is not a Content Library staff should not have access."""
+        self.client.logout()
+        UserFactory.create(
+            username="student",
+            email="student@example.com",
+            password="student-pass",
+            is_staff=False,
+            is_superuser=False,
+        )
+        self.client.login(username="student", password="student-pass")
+        get_response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert get_response.status_code == 403
+
+    def test_draft_version(self):
+        """Get draft version of asset"""
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}/static/test.svg"
+        )
+        assert get_response.status_code == 200
+        content = b''.join(chunk for chunk in get_response.streaming_content)
+        assert content == SVG_DATA
+
+        good_head_response = self.client.head(
+            f"/library_assets/blocks/{self.usage_key}/static/test.svg"
+        )
+        assert good_head_response.headers == get_response.headers
+
+    def test_draft_version_404(self):
+        """Get draft version of asset"""
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}@/static/test.svg"
+        )
+        assert get_response.status_code == 404
+
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}/static/test2.svg"
+        )
+        assert get_response.status_code == 404

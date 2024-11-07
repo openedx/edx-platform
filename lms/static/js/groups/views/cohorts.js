@@ -272,6 +272,7 @@
                         submitButtonText: gettext('Upload File and Assign Students'),
                         extensions: '.csv',
                         url: this.context.uploadCohortsCsvUrl,
+                        // eslint-disable-next-line no-shadow
                         successNotification: function(file, event, data) {
                             var message = interpolate_text(gettext(
                                 "Your file '{file}' has been uploaded. Allow a few minutes for processing."

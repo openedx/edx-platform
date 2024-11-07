@@ -30,6 +30,7 @@ const problemResponsesRefreshStatus = timeout => ({
     timeout,
 });
 
+// eslint-disable-next-line max-len
 const getTaskStatus = (taskStatusEndpoint, reportDownloadEndpoint, taskId) => dispatch => fetchTaskStatus(taskStatusEndpoint, taskId)
     .then((response) => {
         if (response.ok) {

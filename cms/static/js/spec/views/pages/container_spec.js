@@ -97,6 +97,7 @@ function parameterized_suite(label, globalPageOptions) {
             AjaxHelpers.respondWithJson(requests, options || {});
         };
 
+        // eslint-disable-next-line no-shadow
         handleContainerPageRefresh = function(requests) {
             var request = AjaxHelpers.currentRequest(requests);
             expect(str.startsWith(request.url,
@@ -551,10 +552,12 @@ function parameterized_suite(label, globalPageOptions) {
             describe('Previews', function() {
                 var getButtonIcon, getButtonText;
 
+                // eslint-disable-next-line no-shadow
                 getButtonIcon = function(containerPage) {
                     return containerPage.$('.action-toggle-preview .fa');
                 };
 
+                // eslint-disable-next-line no-shadow
                 getButtonText = function(containerPage) {
                     return containerPage.$('.action-toggle-preview .preview-text').text().trim();
                 };

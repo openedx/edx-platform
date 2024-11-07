@@ -6,7 +6,6 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  import six
   from six.moves.urllib.parse import quote
   import json
   from cms.djangoapps.contentstore import utils
@@ -38,6 +37,7 @@
             ),
             "${grading_url | n, js_escaped_string}",
             ${course_assignment_lists | n, dump_js_escaped_json},
+            ${default_grade_designations | n, dump_js_escaped_json},
         );
     });
 </%block>
@@ -158,7 +158,7 @@
       <div class="bit">
       % if context_course:
         <%
-          url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='')
+          url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='')
           detailed_settings_url = utils.reverse_course_url('settings_handler', context_course.id)
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
           advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)

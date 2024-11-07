@@ -10,7 +10,7 @@
   >
   <div class="<%- type %> <%- intent %> <% if(obj.actions) { %>has-actions<% } %>">
     <% if(obj.icon) { %>
-      <% var iconClass = {"warning": "warning", "confirmation": "check", "error": "warning", "announcement": "bullhorn", "step-required": "exclamation-circle", "help": "question", "mini": "cog"} %>
+      <% var iconClass = {"warning": "warning", "confirmation": "check", "error": "warning", "announcement": "bullhorn", "step-required": "exclamation-circle", "help": "question", "mini": "cog", "info": "info-circle"} %>
       <span class="feedback-symbol fa fa-<%- iconClass[intent] %>" aria-hidden="true"></span>
     <% } %>
 
@@ -30,7 +30,7 @@
         <% if(actions.secondary) {
              _.each(actions.secondary, function(secondary) { %>
         <li class="nav-item">
-          <button class="action-secondary <%- secondary.class %>"><%- secondary.text %></button>
+          <a class="action-secondary <%- secondary.class %>" tabindex="0"><%- secondary.text %></a>
         </li>
         <%   });
            } %>

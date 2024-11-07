@@ -162,7 +162,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         # we reverse it here
         html = blocks['cond_block'].render(STUDENT_VIEW).content
         mako_service = blocks['cond_block'].runtime.service(blocks['cond_block'], 'mako')
-        expected = mako_service.render_template('conditional_ajax.html', {
+        expected = mako_service.render_lms_template('conditional_ajax.html', {
             'ajax_url': blocks['cond_block'].ajax_url,
             'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
             'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
@@ -243,7 +243,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         block = self.get_block_for_location(location)
         html = block.render(STUDENT_VIEW).content
         mako_service = block.runtime.service(block, 'mako')
-        html_expect = mako_service.render_template(
+        html_expect = mako_service.render_lms_template(
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name

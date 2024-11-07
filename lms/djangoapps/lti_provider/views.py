@@ -6,8 +6,10 @@ LTI Provider view functions
 import logging
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -88,7 +90,17 @@ def lti_launch(request, course_id, usage_id):
 
     # Create an edX account if the user identifed by the LTI launch doesn't have
     # one already, and log the edX account into the platform.
-    authenticate_lti_user(request, params['user_id'], lti_consumer)
+    try:
+        authenticate_lti_user(request, params['user_id'], lti_consumer)
+    except PermissionDenied:
+        request.session.flush()
+        context = {
+            "login_link": request.build_absolute_uri(settings.LOGIN_URL),
+            "allow_iframing": True,
+            "disable_header": True,
+            "disable_footer": True,
+        }
+        return render_to_response("lti_provider/user-auth-error.html", context)
 
     # Store any parameters required by the outcome service in order to report
     # scores back later. We know that the consumer exists, since the record was
@@ -145,7 +157,7 @@ def render_courseware(request, usage_key):
     """
     # return an HttpResponse object that contains the template and necessary context to render the courseware.
     from lms.djangoapps.courseware.views.views import render_xblock
-    return render_xblock(request, str(usage_key), check_if_enrolled=False)
+    return render_xblock(request, str(usage_key), check_if_enrolled=False, disable_staff_debug_info=True)
 
 
 def parse_course_and_usage_keys(course_id, usage_id):
