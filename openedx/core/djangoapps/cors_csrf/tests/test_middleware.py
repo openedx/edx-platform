@@ -277,6 +277,6 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
                 domain=self.COOKIE_DOMAIN
             )
             assert expected in cookie_header
-            assert 'Max-Age=31449600; Path=/; secure' in cookie_header.lower()
+            assert 'Max-Age=31449600; Path=/; secure' in cookie_header
         else:
             assert self.COOKIE_NAME not in response.cookies
