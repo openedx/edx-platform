@@ -2,7 +2,7 @@
 import { Button } from '@edx/paragon';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import { Provider } from 'react-redux';
-import { shallow } from 'enzyme';
+// import { shallow } from 'enzyme';
 import React from 'react';
 import renderer from 'react-test-renderer';
 import store from '../../data/store';
@@ -74,21 +74,50 @@ describe('ProblemBrowser Main component', () => {
         expect(fetchCourseBlocksMock.mock.calls.length).toBe(1);
     });
 
+    // test('display dropdown on toggling dropdown', () => {
+    //     const component = shallow(
+    //         <Main
+    //             courseId={courseId}
+    //             createProblemResponsesReportTask={jest.fn()}
+    //             excludeBlockTypes={excludedBlockTypes}
+    //             fetchCourseBlocks={jest.fn()}
+    //             problemResponsesEndpoint={problemResponsesEndpoint}
+    //             onSelectBlock={jest.fn()}
+    //             selectedBlock="some-selected-block"
+    //             taskStatusEndpoint={taskStatusEndpoint}
+    //         />,
+    //     );
+    //     expect(component.find(BlockBrowserContainer).length).toBeFalsy();
+    //     component.find(Button).find({ label: 'Select a section or problem' }).simulate('click');
+    //     expect(component.find(BlockBrowserContainer).length).toBeTruthy();
+    // });
+
     test('display dropdown on toggling dropdown', () => {
-        const component = shallow(
-            <Main
-                courseId={courseId}
-                createProblemResponsesReportTask={jest.fn()}
-                excludeBlockTypes={excludedBlockTypes}
-                fetchCourseBlocks={jest.fn()}
-                problemResponsesEndpoint={problemResponsesEndpoint}
-                onSelectBlock={jest.fn()}
-                selectedBlock="some-selected-block"
-                taskStatusEndpoint={taskStatusEndpoint}
-            />,
-        );
-        expect(component.find(BlockBrowserContainer).length).toBeFalsy();
-        component.find(Button).find({ label: 'Select a section or problem' }).simulate('click');
-        expect(component.find(BlockBrowserContainer).length).toBeTruthy();
+        let component;
+        act(() => {
+            component = create(
+                <Main
+                    courseId={courseId}
+                    createProblemResponsesReportTask={jest.fn()}
+                    excludeBlockTypes={excludedBlockTypes}
+                    fetchCourseBlocks={jest.fn()}
+                    problemResponsesEndpoint={problemResponsesEndpoint}
+                    onSelectBlock={jest.fn()}
+                    selectedBlock="some-selected-block"
+                    taskStatusEndpoint={taskStatusEndpoint}
+                />
+            );
+        });
+    
+        const root = component.root;
+    
+        expect(() => root.findByType(BlockBrowserContainer)).toThrow();
+    
+        const button = root.findByProps({ label: 'Select a section or problem' });
+        act(() => {
+            button.props.onClick();
+        });
+    
+        expect(() => root.findByType(BlockBrowserContainer)).not.toThrow();
     });
 });
