@@ -12,7 +12,7 @@ from django.http import HttpRequest
 from django.http.request import QueryDict
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six.moves.urllib.parse import urlencode, urlparse, urlunparse
+from six.moves.urllib.parse import urlencode, urlparse
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -190,7 +190,7 @@ def make_learning_mfe_courseware_url(
             mfe_link += f'/{unit_key}'
 
     if get_params:
-        mfe_link += get_params.urlencode()
+        mfe_link += f'?{get_params.urlencode()}'
 
     return mfe_link
 
