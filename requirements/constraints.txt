@@ -19,10 +19,6 @@
 # Ticket: https://github.com/openedx/edx-platform/issues/35334
 algoliasearch<4.0.0
 
-# Date: 2024-03-14
-# Temporary to Support the python 3.11 Upgrade
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35281
-backports.zoneinfo;python_version<"3.9"  # Newer versions have zoneinfo available in the standard library
 
 # Date: 2020-02-26
 # As it is not clarified what exact breaking changes will be introduced as per
