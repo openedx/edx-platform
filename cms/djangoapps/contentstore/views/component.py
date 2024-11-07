@@ -60,6 +60,8 @@ COMPONENT_TYPES = [
     'drag-and-drop-v2',
 ]
 
+BETA_COMPONENT_TYPES = ['library_v2', 'itembank']
+
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
@@ -419,7 +421,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
             "type": category,
             "templates": templates_for_category,
             "display_name": component_display_names[category],
-            "support_legend": create_support_legend_dict()
+            "support_legend": create_support_legend_dict(),
+            "beta": category in BETA_COMPONENT_TYPES,
         })
 
     # Libraries do not support advanced components at this time.
