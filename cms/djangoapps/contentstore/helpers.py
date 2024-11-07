@@ -465,7 +465,7 @@ def _import_xml_node_to_parent(
         # Allow an XBlock to do anything fancy it may need to when pasted from the clipboard.
         # These blocks may handle their own children or parenting if needed. Let them return booleans to
         # let us know if we need to handle these or not.
-        children_handed = new_xblock.studio_post_paste(store, node)
+        children_handled = new_xblock.studio_post_paste(store, node)
 
     if not children_handled:
         for child_node in child_nodes:
