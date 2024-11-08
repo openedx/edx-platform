@@ -42,10 +42,37 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Add
         },
 
         showComponentTemplates: function(event) {
-            var type;
+            var type, parentLocator, model;
             event.preventDefault();
             event.stopPropagation();
+
             type = $(event.currentTarget).data('type');
+            parentLocator = $(event.currentTarget).closest('.xblock[data-usage-id]').data('usage-id');
+            model = this.collection.models.find(function(item) { return item.type === type; }) || {};
+
+            try {
+                if (this.options.isIframeEmbed) {
+                    window.parent.postMessage(
+                        {
+                            type: 'showComponentTemplates',
+                            payload: {
+                                type: type,
+                                parentLocator: parentLocator,
+                                model: {
+                                    type: model.type,
+                                    display_name: model.display_name,
+                                    templates: model.templates,
+                                    support_legend: model.support_legend,
+                                },
+                            }
+                        }, document.referrer
+                    );
+                }
+                return true;
+            } catch (e) {
+                console.error(e);
+            }
+
             this.$('.new-component').slideUp(250);
             this.$('.new-component-' + type).slideDown(250);
             this.$('.new-component-' + type + ' div').focus();
