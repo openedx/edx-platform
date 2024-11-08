@@ -148,8 +148,6 @@ urlpatterns = oauth2_urlpatterns + [
             name='export_status_handler'),
     re_path(fr'^link_check/{COURSELIKE_KEY_PATTERN}$', contentstore_views.link_check_handler,
             name='link_check_handler'),
-    re_path(fr'^link_check_output/{COURSELIKE_KEY_PATTERN}$', contentstore_views.link_check_output_handler,
-            name='link_check_output_handler'),
     re_path(fr'^link_check_status/{COURSELIKE_KEY_PATTERN}$', contentstore_views.link_check_status_handler,
             name='link_check_status_handler'),
     re_path(fr'^xblock/outline/{settings.USAGE_KEY_PATTERN}$', contentstore_views.xblock_outline_handler,

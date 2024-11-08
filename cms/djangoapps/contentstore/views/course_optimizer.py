@@ -36,14 +36,17 @@ from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.monitoring import monitor_import_failure
 from common.djangoapps.util.views import ensure_valid_course_key
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..storage import course_import_export_storage
 from ..tasks import CourseLinkCheckTask, check_broken_links
-from ..utils import reverse_course_url
+from ..utils import reverse_course_url, reverse_usage_url
 
 __all__ = [
-    'link_check_handler', 'link_check_output_handler', 'link_check_status_handler',
+    'link_check_handler',
+    'link_check_status_handler',
 ]
 
 log = logging.getLogger(__name__)
@@ -96,7 +99,7 @@ def link_check_handler(request, course_key_string):
     requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
     if request.method == 'POST':
-        check_broken_links.delay(request.user.id, course_key_string)
+        check_broken_links.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
         return JsonResponse({'ExportStatus': 1})
     else:
         # Only HTML request format is supported (no JSON).
@@ -114,11 +117,16 @@ def link_check_status_handler(request, course_key_string):
 
         -X : Link check unsuccessful due to some error with X as stage [0-3]
         0 : No status info found (export done or task not yet created)
-        1 : Checking links
-        2 : Saving???
+        1 : Scanning
+        2 : Verifying
         3 : Link check successful
 
     If the link check was successful, a result is also returned.
+    sections
+        subsections
+            units
+                blocks
+                    links: [ <broken links>, … ],
     """
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
@@ -126,8 +134,9 @@ def link_check_status_handler(request, course_key_string):
 
     # The task status record is authoritative once it's been created
     task_status = _latest_task_status(request, course_key_string, link_check_status_handler)
-    output_url = None
+    json_content = None
     error = None
+    broken_links_dto = None
     if task_status is None:
         # The task hasn't been initialized yet; did we store info in the session already?
         try:
@@ -136,22 +145,12 @@ def link_check_status_handler(request, course_key_string):
         except KeyError:
             status = 0
     elif task_status.state == UserTaskStatus.SUCCEEDED:
-        # TODO WRITE THE OUTPUT HERE
         status = 3
-        artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
-        if isinstance(artifact.file.storage, FileSystemStorage):
-            output_url = reverse_course_url('export_output_handler', course_key)
-        elif isinstance(artifact.file.storage, S3Boto3Storage):
-            filename = os.path.basename(artifact.file.name)
-            disposition = f'attachment; filename="{filename}"'
-            output_url = artifact.file.storage.url(artifact.file.name, parameters={
-                'ResponseContentDisposition': disposition,
-                'ResponseContentType': 'application/json'
-            })
-        else:
-            output_url = artifact.file.storage.url(artifact.file.name)
-        output_json = f'raytest'
-        # TODO WRITE THE OUTPUT HERE
+        artifact = UserTaskArtifact.objects.get(status=task_status, name='BrokenLinks')
+        with artifact.file as file:
+            content = file.read()
+            json_content = json.loads(content)
+            broken_links_dto = _create_dto(json_content, request.user)
     elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
         status = max(-(task_status.completed_steps + 1), -2)
         errors = UserTaskArtifact.objects.filter(status=task_status, name='Error')
@@ -165,51 +164,21 @@ def link_check_status_handler(request, course_key_string):
     else:
         status = min(task_status.completed_steps + 1, 2)
 
-    response = {"LinkCheckStatus": status}
-    if output_json:
-        response['LinkCheckOutput'] = output_json
-    elif error:
+    response = {
+        "LinkCheckStatus": status,
+    }
+    if broken_links_dto:
+        response["LinkCheckOutput"] = broken_links_dto
+    if json_content:
+        response['json'] = json_content
+    if error:
         response['LinkCheckError'] = error
     return JsonResponse(response)
 
 
-@transaction.non_atomic_requests
-@require_GET
-@ensure_csrf_cookie
-@login_required
-@ensure_valid_course_key
-def link_check_output_handler(request, course_key_string):
-    """
-    Returns the response body produced by a link scan.  Only used in
-    environments such as devstack where the output is stored in a local
-    filesystem instead of an external service like S3.
-    """
-    course_key = CourseKey.from_string(course_key_string)
-    if not has_course_author_access(request.user, course_key):
-        raise PermissionDenied()
-
-    task_status = _latest_task_status(request, course_key_string, link_check_output_handler)
-    if task_status and task_status.state == UserTaskStatus.SUCCEEDED:
-        artifact = None
-        try:
-            artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
-            tarball = course_import_export_storage.open(artifact.file.name)
-            data = {
-              'something': 123,
-            }
-            return JsonResponse(data)
-        except UserTaskArtifact.DoesNotExist:
-            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
-        finally:
-            if artifact:
-                artifact.file.close()
-    else:
-        raise Http404
-
-
 def _latest_task_status(request, course_key_string, view_func=None):
     """
-    Get the most recent link check status update for the specified course/library
+    Get the most recent link check status update for the specified course
     key.
     """
     args = {'course_key_string': course_key_string}
@@ -218,3 +187,35 @@ def _latest_task_status(request, course_key_string, view_func=None):
     for status_filter in STATUS_FILTERS:
         task_status = status_filter().filter_queryset(request, task_status, view_func)
     return task_status.order_by('-created').first()
+
+
+def _create_dto(json_content, request_user):
+    """
+    Create a DTO for frontend given a list of broken links.
+    """
+    result = {}
+    for item in json_content:
+        usage_key = usage_key_with_run(item[0])
+        block = get_xblock(usage_key, request_user)
+        link = item[1]
+        _add_broken_link(result, block, link)
+
+    return result
+
+
+def _add_broken_link(result, block, link):
+    hierarchy = []
+    current = block
+    while current:
+        hierarchy.append(current)
+        current = current.get_parent()
+    
+    current_dict = result
+    for xblock in reversed(hierarchy):
+        current_dict = current_dict.setdefault(
+            str(xblock.location.block_id), 
+            { 'display_name': xblock.display_name }
+        )
+    
+    current_dict['url'] = f'/course/{block.course_id}/editor/{block.category}/{block.location}'
+    current_dict.setdefault('broken_links', []).append(link)

@@ -7,6 +7,8 @@ import json
 import os
 import shutil
 import tarfile
+import re
+import requests
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
@@ -1079,9 +1081,8 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
         Get the number of in-progress steps in the export process, as shown in the UI.
 
         For reference, these are:
-
-        1. Checking links
-        2. Saving???
+        1. Scanning
+        2. Verifying
         """
         return 2
 
@@ -1097,11 +1098,146 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
             str: The generated name
         """
         key = arguments_dict['course_key_string']
-        return f'Link check of {key}'
+        return f'Broken link check of {key}'
 
 
-def check_broken_links(self, user_id, course_key_string):
+@shared_task(base=CourseLinkCheckTask, bind=True)
+def check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results.
     """
-    return f'link_check {user_id} {course_key_string}'
+    courselike_key = CourseKey.from_string(course_key_string)
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        with translation_language(language):
+            self.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
+        return
+    if not has_course_author_access(user, courselike_key):
+        with translation_language(language):
+            self.status.fail(UserErrors.PERMISSION_DENIED)
+        return
+    
+    courselike_block = modulestore().get_course(courselike_key)
+
+    try:
+        self.status.set_state('Scanning')
+        links_file = _create_broken_link_json(courselike_block, courselike_key, {}, self.status)
+        artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
+        artifact.file.save(name=os.path.basename(links_file.name), content=File(links_file))
+        artifact.save()
+    # catch all exceptions so we can record useful error messages
+    except Exception as exception:  # pylint: disable=broad-except
+        LOGGER.exception('Error checking links for course %s', courselike_key, exc_info=True)
+        if self.status.state != UserTaskStatus.FAILED:
+            self.status.fail({'raw_error_msg': str(exception)})
+        return
+
+
+def _create_broken_link_json(course_block, course_key, context, status=None):
+    """
+    Generates a json file for broken links, or returns None if there was an error.
+    Updates the context with any error information if applicable.
+
+    File format:
+    [
+        [<blockId>, <broken link>],
+        ...,
+    ]
+    """
+    name = course_block.url_name
+    links_file = NamedTemporaryFile(prefix=name + '.', suffix='.json')
+    root_dir = path(mkdtemp())
+
+    try:
+        export_course_to_xml(modulestore(), contentstore(), course_block.id, root_dir, name)
+
+        if status:
+            status.set_state('Verifying')
+            status.increment_completed_steps()
+        LOGGER.debug('json file being generated at %s', links_file.name)
+
+        verticals = modulestore().get_items(
+            course_key,
+            qualifiers={'category': 'vertical'},
+        )
+        blocks = []
+        for vertical in verticals:
+            blocks.extend(vertical.get_children())
+        data = []
+        for block in blocks:
+            # TODO cleanup unused stuff below
+            location = block.location
+            block_id = block.location.block_id
+            usage_key = block.usage_key
+            display_name = block.display_name
+            category = getattr(block, 'category', '')
+            block_data = getattr(block, 'data', '')
+            # data.append([str(display_name), block_data])
+            urls = _get_urls(block_data)
+            for url in urls:
+                if not _verify_url(url):
+                    # data.append([str(location), str(display_name), str(category), url])
+                    data.append([str(usage_key), url])
+
+        with open(links_file.name, 'w') as file:
+            json.dump(data, file, indent=4)
+
+    except SerializationError as exc:
+        LOGGER.exception('There was an error exporting %s', course_key, exc_info=True)
+        parent = None
+        try:
+            failed_item = modulestore().get_item(exc.location)
+            parent_loc = modulestore().get_parent_location(failed_item.location)
+
+            if parent_loc is not None:
+                parent = modulestore().get_item(parent_loc)
+        except:  # pylint: disable=bare-except
+            # if we have a nested exception, then we'll show the more generic error message
+            pass
+
+        context.update({
+            'in_err': True,
+            'raw_err_msg': str(exc),
+            'edit_unit_url': reverse_usage_url("container_handler", parent.location) if parent else "",
+        })
+        if status:
+            status.fail(json.dumps({'raw_error_msg': context['raw_err_msg'],
+                                    'edit_unit_url': context['edit_unit_url']}))
+        raise
+    except Exception as exc:
+        LOGGER.exception('There was an error exporting %s', course_key, exc_info=True)
+        context.update({
+            'in_err': True,
+            'edit_unit_url': None,
+            'raw_err_msg': str(exc)})
+        if status:
+            status.fail(json.dumps({'raw_error_msg': context['raw_err_msg']}))
+        raise
+    finally:
+        if os.path.exists(root_dir / name):
+            shutil.rmtree(root_dir / name)
+
+    return links_file
+
+
+def _get_urls(content):
+    """
+    Return all urls after hrefs in content
+    """
+    # TODO process non-https
+    # TODO handle /static
+    urls = re.findall(r'(?:href|src)=["\']([^"\']*)["\']', content)
+    return urls
+
+
+def _verify_url(url):
+    """
+    Verify if url returns 200 OK
+    """
+    try:
+        response = requests.get(url, timeout=5)
+        return response.status_code == 200
+    except requests.exceptions.RequestException as e:
+        return False
