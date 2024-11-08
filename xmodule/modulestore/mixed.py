@@ -343,7 +343,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     @strip_key
     def get_library_summaries(self, **kwargs):
         """
-        Returns a list of LibrarySummary objects.
+        Returns a list of LegacyLibrarySummary objects.
         Information contains `location`, `display_name`, `locator` of the libraries in this modulestore.
         """
         library_summaries = {}

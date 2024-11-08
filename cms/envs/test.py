@@ -333,3 +333,13 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
     "SECRET": "***",
     "URL": "***",
 }
+
+############## openedx-learning (Learning Core) config ##############
+OPENEDX_LEARNING = {
+    'MEDIA': {
+        'BACKEND': 'django.core.files.storage.InMemoryStorage',
+        'OPTIONS': {
+            'location': MEDIA_ROOT + "_private"
+        }
+    }
+}

@@ -31,22 +31,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'first_name', 'last_name']
 
 
-class AccessSerializer(serializers.Serializer):
+class UniqueStudentIdentifierSerializer(serializers.Serializer):
     """
-    Serializer for managing user access changes.
-    This serializer validates and processes the data required to modify
-    user access within a system.
+    Serializer for identifying unique_student.
     """
     unique_student_identifier = serializers.CharField(
         max_length=255,
         help_text="Email or username of user to change access"
-    )
-    rolename = serializers.CharField(
-        help_text="Role name to assign to the user"
-    )
-    action = serializers.ChoiceField(
-        choices=['allow', 'revoke'],
-        help_text="Action to perform on the user's access"
     )
 
     def validate_unique_student_identifier(self, value):
@@ -59,6 +50,21 @@ class AccessSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class AccessSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for managing user access changes.
+    This serializer validates and processes the data required to modify
+    user access within a system.
+    """
+    rolename = serializers.CharField(
+        help_text="Role name to assign to the user"
+    )
+    action = serializers.ChoiceField(
+        choices=['allow', 'revoke'],
+        help_text="Action to perform on the user's access"
+    )
 
 
 class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -222,3 +228,25 @@ class BlockDueDateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         if disable_due_datetime:
             self.fields['due_datetime'].required = False
+
+
+class CertificateSerializer(serializers.Serializer):
+    """
+    Serializer for resetting a students attempts counter or starts a task to reset all students
+    attempts counters.
+    """
+    user = serializers.CharField(
+        help_text="Email or username of student.", required=True
+    )
+    notes = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    def validate_user(self, value):
+        """
+        Validate that the user corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
