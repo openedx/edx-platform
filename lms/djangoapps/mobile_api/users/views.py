@@ -3,11 +3,14 @@ Views for user API
 """
 
 
+import datetime
 import logging
 from functools import cached_property
-from typing import Optional
+from typing import Dict, List, Optional, Set
 
+import pytz
 from completion.exceptions import UnavailableCompletionData
+from completion.models import BlockCompletion
 from completion.utilities import get_key_to_last_completed_block
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in
@@ -17,6 +20,7 @@ from django.utils import dateparse
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import CourseLocator
 from rest_framework import generics, views
 from rest_framework.decorators import api_view
 from rest_framework.permissions import SAFE_METHODS
@@ -528,6 +532,133 @@ def my_user_info(request, api_version):
     # updating it from the oauth2 related code is too complex
     user_logged_in.send(sender=User, user=request.user, request=request)
     return redirect("user-detail", api_version=api_version, username=request.user.username)
+
+
+@mobile_view(is_user=True)
+class UserEnrollmentsStatus(views.APIView):
+    """
+    **Use Case**
+
+        Get information about user's enrolments status.
+
+        Returns active enrolment status if user was enrolled for the course
+        less than 30 days ago or has progressed in the course in the last 30 days.
+        Otherwise, the registration is considered inactive.
+
+        USER_ENROLLMENTS_LIMIT - adds users enrollments query limit to
+        safe API from possible DDOS attacks.
+
+    **Example Request**
+
+        GET /api/mobile/{api_version}/users/<user_name>/enrollments_status/
+
+    **Response Values**
+
+        If the request for information about the user's enrolments is successful, the
+        request returns an HTTP 200 "OK" response.
+
+        The HTTP 200 response has the following values.
+
+        * course_id (str): The course id associated with the user's enrollment.
+        * course_name (str): The course name associated with the user's enrollment.
+        * recently_active (bool): User's course enrolment status.
+
+
+        The HTTP 200 response contains a list of dictionaries that contain info
+        about each user's enrolment status.
+
+    **Example Response**
+
+        ```json
+        [
+            {
+                "course_id": "course-v1:a+a+a",
+                "course_name": "a",
+                "recently_active": true
+            },
+            {
+                "course_id": "course-v1:b+b+b",
+                "course_name": "b",
+                "recently_active": true
+            },
+            {
+                "course_id": "course-v1:c+c+c",
+                "course_name": "c",
+                "recently_active": false
+            },
+            ...
+        ]
+        ```
+    """
+
+    USER_ENROLLMENTS_LIMIT = 500
+
+    def get(self, request, *args, **kwargs) -> Response:
+        """
+        Gets user's enrollments status.
+        """
+        active_status_date = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=30)
+        username = kwargs.get('username')
+        course_ids_where_user_has_completions = self._get_course_ids_where_user_has_completions(
+            username,
+            active_status_date,
+        )
+        enrollments_status = self._build_enrollments_status_dict(
+            username,
+            active_status_date,
+            course_ids_where_user_has_completions
+        )
+        return Response(enrollments_status)
+
+    def _build_enrollments_status_dict(
+        self,
+        username: str,
+        active_status_date: datetime,
+        course_ids: Set[CourseLocator],
+    ) -> List[Dict[str, bool]]:
+        """
+        Builds list with dictionaries with user's enrolments statuses.
+        """
+        user = get_object_or_404(User, username=username)
+        user_enrollments = (
+            CourseEnrollment
+            .enrollments_for_user(user)
+            .select_related('course')
+            [:self.USER_ENROLLMENTS_LIMIT]
+        )
+        mobile_available = [
+            enrollment for enrollment in user_enrollments
+            if is_mobile_available_for_user(user, enrollment.course_overview)
+        ]
+        enrollments_status = []
+        for user_enrollment in mobile_available:
+            course_id = user_enrollment.course_overview.id
+            enrollments_status.append(
+                {
+                    'course_id': str(course_id),
+                    'course_name': user_enrollment.course_overview.display_name,
+                    'recently_active': bool(
+                        course_id in course_ids
+                        or user_enrollment.created > active_status_date
+                    )
+                }
+            )
+        return enrollments_status
+
+    @staticmethod
+    def _get_course_ids_where_user_has_completions(
+        username: str,
+        active_status_date: datetime,
+    ) -> Set[CourseLocator]:
+        """
+        Gets course keys where user has completions.
+        """
+        context_keys = BlockCompletion.objects.filter(
+            user__username=username,
+            created__gte=active_status_date
+        ).values_list('context_key', flat=True).distinct()
+
+        return set(context_keys)
 
 
 class UserCourseEnrollmentsV4Pagination(DefaultPagination):
