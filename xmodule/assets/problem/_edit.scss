@@ -5,20 +5,20 @@
       margin-top: -4px;
       padding: 3px 9px;
       font-size: 12px;
-      color: $link-color;
+      color: var(--link-color);
 
       &.current {
-        border: 1px solid $lightGrey !important;
+        border: 1px solid var(--lightGrey) !important;
         border-radius: 3px !important;
-        background: $lightGrey !important;
-        color: $darkGrey !important;
+        background: var(--lightGrey) !important;
+        color: var(--darkGrey) !important;
         pointer-events: none;
         cursor: none;
 
         &:hover,
         &:focus {
           box-shadow: 0 0 0 0 !important;
-          background-color: $white;
+          background-color: var(--white);
         }
       }
     }
@@ -31,9 +31,9 @@
   top: 41px;
   @include left(70%);
   width: 0;
-  border-left: 1px solid $gray-l2;
+  border-left: 1px solid var(--gray-l2);
 
-  background-color: $lightGrey;
+  background-color: var(--lightGrey);
   overflow: hidden;
 
   &.shown {
@@ -76,7 +76,7 @@
       margin-right: 30px;
 
       .icon {
-        height: ($baseline * 1.5);
+        height: calc(var(--baseline) * 1.5);
       }
     }
   }
@@ -105,5 +105,5 @@
   width: 26px;
   height: 21px;
   vertical-align: middle;
-  color: $body-color;
+  color: var(--body-color);
 }
