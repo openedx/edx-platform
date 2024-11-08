@@ -1627,6 +1627,10 @@ GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 GOOGLE_ANALYTICS_TRACKING_ID = None
 GOOGLE_ANALYTICS_4_ID = None
 
+######################## MATAMO ANALYTICS ####################
+MATAMO_SITE_ID = None
+MATAMO_INSTANCE_URL = None
+
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
 

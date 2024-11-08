@@ -177,6 +177,28 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
   </script>
 % endif
 
+
+<% matamo_site_id = static.get_value("MATAMO_SITE_ID", settings.MATAMO_SITE_ID) %>
+<% matamo_instance_url = static.get_value("MATAMO_INSTANCE_URL", settings.MATAMO_INSTANCE_URL) %>
+% if matamo_site_id and matamo_instance_url:
+    <script type="text/javascript">
+        var _paq = (window._paq = window._paq || []);
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function () {
+        var u = '${matamo_instance_url | n, js_escaped_string}';
+        _paq.push(['setTrackerUrl', u + 'matomo.php']);
+        _paq.push(['setSiteId','${matamo_site_id | n, js_escaped_string}']);
+        var d = document,
+            g = d.createElement('script'),
+            s = d.getElementsByTagName('script')[0];
+        g.async = true;
+        g.src = u + 'matomo.js';
+        s.parentNode.insertBefore(g, s);
+        })();
+    </script>
+% endif
+
 <% branch_key = static.get_value("BRANCH_IO_KEY", settings.BRANCH_IO_KEY) %>
 % if branch_key and not is_from_mobile_app:
     <script type="text/javascript">
