@@ -1042,7 +1042,6 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
                 component_version.pk,
                 content.id,
                 key=filename,
-                learner_downloadable=True,
             )
 
     # Emit library block created event
@@ -1112,7 +1111,6 @@ def _create_component_for_block(content_lib, usage_key, user_id=None):
             component_version.pk,
             content.id,
             key="block.xml",
-            learner_downloadable=False
         )
 
         return component_version
