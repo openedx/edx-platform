@@ -219,10 +219,13 @@ pycodestyle: ## check python files for quality issues
 
 ## Re-enable --lint flag when this issue https://github.com/openedx/edx-platform/issues/35775 is resolved
 pii_check: ## check django models for pii annotations
+	DJANGO_SETTINGS_MODULE=cms.envs.test \
 	code_annotations django_find_annotations \
 		--config_file .pii_annotations.yml \
 		--app_name cms \
 		--coverage
+	
+	DJANGO_SETTINGS_MODULE=lms.envs.test \
 	code_annotations django_find_annotations \
 		--config_file .pii_annotations.yml \
 		--app_name lms \
