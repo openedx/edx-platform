@@ -8,3 +8,4 @@ pep517==0.13.0
 pip-tools==6.9.0
 pyparsing==3.0.9
 tomli==2.0.1
+figures==2.0.0
