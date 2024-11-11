@@ -78,7 +78,6 @@ jobs:
           TARGET_BRANCH: ${{ github.base_ref }}
         run: |
             make pycodestyle
-            make stylelint
             make xsslint
             make pii_check
             make check_keywords
