@@ -49,14 +49,14 @@ log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = [
-    'discussion',
-    'library',
-    'library_v2',  # Not an XBlock
-    'itembank',
     'html',
-    'openassessment',
-    'problem',
     'video',
+    'problem',
+    'itembank',
+    'library_v2',  # Not an XBlock
+    'library',
+    'discussion',
+    'openassessment',
     'drag-and-drop-v2',
 ]
 
@@ -472,7 +472,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
             course_advanced_keys
         )
     if advanced_component_templates['templates']:
-        component_templates.insert(0, advanced_component_templates)
+        component_templates.append(advanced_component_templates)
 
     return component_templates
 
