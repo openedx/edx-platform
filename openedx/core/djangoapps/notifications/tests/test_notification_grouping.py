@@ -114,13 +114,33 @@ class TestNewPostGrouper(unittest.TestCase):
         new_notification = MagicMock(spec=Notification)
         old_notification = MagicMock(spec=Notification)
         old_notification.content_context = {
-            'author_name': 'User1'
+            'author_name': 'User1',
+            'username': 'User1'
         }
 
         updated_context = NewPostGrouper().group(new_notification, old_notification)
 
         self.assertTrue(updated_context['grouped'])
         self.assertEqual(updated_context['replier_name'], new_notification.content_context['replier_name'])
+
+    def test_new_post_with_same_user(self):
+        """
+        Test that the function does not group notifications with same authors if notification is not
+        already grouped
+        """
+        new_notification = MagicMock(spec=Notification)
+        old_notification = MagicMock(spec=Notification)
+        old_notification.content_context = {
+            'username': 'User1',
+            'grouped': False
+        }
+        new_notification.content_context = {
+            'username': 'User1',
+        }
+
+        updated_context = NewPostGrouper().group(new_notification, old_notification)
+
+        self.assertFalse(updated_context.get('grouped', False))
 
 
 class TestGroupUserNotifications(unittest.TestCase):
