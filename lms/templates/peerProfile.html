@@ -118,6 +118,15 @@
     }
 
     @media (max-width: 991.98px) {
+      .card-container{
+        padding: 0 2rem !important;
+      }
+      .connected-lines{
+        opacity: 0.5;
+      }
+      .modal-content {
+        width: 100%;
+      }
       .profile-img-modal {
         width: 115px;
         height: 115px;
@@ -125,6 +134,7 @@
       .modal-content-container {
         padding: 45px;
         margin-bottom: 0px;
+        align-items: center;
       }
       .peer-about {
         word-break: break-all;
@@ -155,7 +165,7 @@
 </head>
 
 <body class="position-relative" style="height: 100vh;">
-  <img class="position-fixed" style="top: 0; right: 0px;"
+  <img class="position-fixed connected-lines" style="top: 0; right: 0px;"
     src="https://static.talentsprint.com/lms_maple/images/topRight.svg" alt="">
 
   <nav class="top-0 z-3">
@@ -164,14 +174,14 @@
   </nav>
   <header class="mb-5" style="margin-top: 40px">
     <div class="text-center">
-      <h1>Know Your Peers</h1>
+      <h1 class="font-weight-bold">Know Your Peers</h1>
       <h5>Build Connections Beyond Boundaries</h5>
     </div>
   </header>
 
   <section>
     <div class="student-profile py-4">
-      <div class="" style="padding: 0 6rem">
+      <div class="card-container" style="padding: 0 6rem">
         <div class="row gap" id="row">
           {% for profile in profiles %}
            {% if not profile.is_superuser or not profile.is_staff %}
@@ -211,8 +221,8 @@
       </div>
     </div>
   </section>
-  <img class="position-fixed" style="bottom: 0px; left: 0;z-index: 0;"
-    src="https://static.talentsprint.com/lms_maple/imagesimages/bottomLeft.svg" alt="">
+  <img class="position-fixed connected-lines" style="bottom: 0px; left: 0;z-index: 0;"
+    src="https://static.talentsprint.com/lms_maple/images/bottomLeft.svg" alt="">
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
