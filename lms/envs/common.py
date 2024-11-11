@@ -5532,3 +5532,32 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_default: empty dictionary
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
+######figures######
+{
+  "FEATURES": {
+    "ENABLE_ANALYTICS": true
+  },
+  "FIGURES_ANALYTICS_ENABLED": true,
+  "DATABASES": {
+    "default": {
+      "ENGINE": "django.db.backends.postgresql_psycopg2",
+      "NAME": "figures_db",
+      "USER": "figures_user",
+      "PASSWORD": "figures_password",
+      "HOST": "localhost",
+      "PORT": "5432"
+    }
+  },
+  "FIGURES": {
+    "ENABLED": true,
+    "DATABASE": {
+      "NAME": "figures_db",
+      "USER": "figures_user",
+      "PASSWORD": "figures_password",
+      "HOST": "localhost",
+      "PORT": "5432"
+    },
+    "API_URL": "http://localhost:8000/api/analytics"  // Using localhost for the internal API (adjust as needed)
+  }
+}
+
