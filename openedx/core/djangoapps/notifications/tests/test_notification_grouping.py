@@ -12,7 +12,7 @@ from openedx.core.djangoapps.notifications.grouping_notifications import (
     NotificationRegistry,
     NewCommentGrouper,
     group_user_notifications,
-    get_user_existing_notifications
+    get_user_existing_notifications, NewPostGrouper
 )
 from openedx.core.djangoapps.notifications.models import Notification
 
@@ -100,6 +100,47 @@ class TestNewCommentGrouper(unittest.TestCase):
         content_context = NewCommentGrouper().group(self.new_notification, self.old_notification)
         self.assertIn('email_content', content_context)
         self.assertEqual(content_context['email_content'], 'new content')
+
+
+class TestNewPostGrouper(unittest.TestCase):
+    """
+    Tests for the NewPostGrouper class
+    """
+
+    def test_group(self):
+        """
+        Test that the function groups new post notifications based on the author name
+        """
+        new_notification = MagicMock(spec=Notification)
+        old_notification = MagicMock(spec=Notification)
+        old_notification.content_context = {
+            'author_name': 'User1',
+            'username': 'User1'
+        }
+
+        updated_context = NewPostGrouper().group(new_notification, old_notification)
+
+        self.assertTrue(updated_context['grouped'])
+        self.assertEqual(updated_context['replier_name'], new_notification.content_context['replier_name'])
+
+    def test_new_post_with_same_user(self):
+        """
+        Test that the function does not group notifications with same authors if notification is not
+        already grouped
+        """
+        new_notification = MagicMock(spec=Notification)
+        old_notification = MagicMock(spec=Notification)
+        old_notification.content_context = {
+            'username': 'User1',
+            'grouped': False
+        }
+        new_notification.content_context = {
+            'username': 'User1',
+        }
+
+        updated_context = NewPostGrouper().group(new_notification, old_notification)
+
+        self.assertFalse(updated_context.get('grouped', False))
 
 
 class TestGroupUserNotifications(unittest.TestCase):
