@@ -1,0 +1,11 @@
+from figures import FiguresAnalytics
+
+ANALYTICS_BACKENDS = [
+    {
+        'BACKEND': 'figures.FiguresAnalytics',
+        'API_URL': 'http://your-figures-api-url',
+        'DATABASE': 'figures_db',
+        'USER': 'figures_user',
+        'PASSWORD': 'figures_password',
+    }
+]
