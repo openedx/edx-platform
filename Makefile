@@ -208,25 +208,37 @@ ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip ins
 eslint:	## check javascript for quality issues
 	python scripts/quality_test.py eslint
 
-stylelint: ## check css/scss for quality issues
-	python scripts/quality_test.py stylelint
-
-xsslint: ## check xss for quality issues
-	python scripts/quality_test.py xsslint
+xsslint: ## check xss for quality issuest
+	python scripts/xsslint/xss_linter.py \
+	--rule-totals \
+	--config=scripts.xsslint_config \
+	--thresholds=scripts/xsslint_thresholds.json
 
 pycodestyle: ## check python files for quality issues 
 	pycodestyle .
 
+## Re-enable --lint flag when this issue https://github.com/openedx/edx-platform/issues/35775 is resolved
 pii_check: ## check django models for pii annotations
-	python scripts/quality_test.py pii_check
+	code_annotations django_find_annotations \
+		--config_file .pii_annotations.yml \
+		--app_name cms \
+		--coverage
+	code_annotations django_find_annotations \
+		--config_file .pii_annotations.yml \
+		--app_name lms \
+		--coverage		
 
 check_keywords: ## check django models for reserve keywords
-	python scripts/quality_test.py check_keywords
+	DJANGO_SETTINGS_MODULE=cms.envs.test \
+	python manage.py cms check_reserved_keywords \
+	--override_file db_keyword_overrides.yml
+
+	DJANGO_SETTINGS_MODULE=lms.envs.test \
+	python manage.py lms check_reserved_keywords \
+	--override_file db_keyword_overrides.yml
 
 test-js: ## run javascript tests
-	python scripts/js_test.py --option jstest
-
-coverage-js: ## run javascript coverage test
-	python scripts/js_test.py --option coverage
-
-quality: pycodestyle eslint stylelint xsslint pii_check check_keywords
+	node --max_old_space_size=4096 node_modules/.bin/karma start common/static/karma_common.conf.js \
+		--single-run=false \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates
