@@ -241,7 +241,7 @@ check_keywords: ## check django models for reserve keywords
 	--override_file db_keyword_overrides.yml
 
 test-js: ## run javascript tests
-	node --max_old_space_size=4096 node_modules/.bin/karma start common/static/karma_common.conf.js \
+	node --max_old_space_size=4096 node_modules/.bin/karma start cms/static/karma_cms.conf.js \
 		--single-run=false \
 		--capture-timeout=60000 \
 		--browsers=FirefoxNoUpdates
