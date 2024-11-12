@@ -2,7 +2,7 @@
 
 chem                                # A helper library for chemistry calculations
 cryptography                        # Implementations of assorted cryptography algorithms
-lxml[html_clean]                    # XML parser
+lxml                                # XML parser
 matplotlib                          # 2D plotting library
 networkx                            # Utilities for creating, manipulating, and studying network graphs
 nltk                                # Natural language processing; used by the chem package
