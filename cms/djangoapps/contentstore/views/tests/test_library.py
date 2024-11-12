@@ -403,6 +403,8 @@ class UnitTestLibraries(CourseTestCase):
         self.assertNotIn('advanced', templates)
         self.assertNotIn('openassessment', templates)
         self.assertNotIn('library', templates)
+        self.assertNotIn('library_v2', templates)
+        self.assertNotIn('itembank', templates)
 
     def test_advanced_problem_types(self):
         """
