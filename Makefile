@@ -242,6 +242,6 @@ check_keywords: ## check django models for reserve keywords
 
 test-js: ## run javascript tests
 	node --max_old_space_size=4096 node_modules/.bin/karma start common/static/karma_common.conf.js \
-		--single-run=false \
+		--single-run=true \
 		--capture-timeout=60000 \
 		--browsers=FirefoxNoUpdates
