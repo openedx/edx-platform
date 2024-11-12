@@ -80,8 +80,9 @@ class Command(BaseCommand):
         readable_option = options['warning']
         index_all_courses_option = all_option or setup_option
 
-        if ((not course_ids and not (index_all_courses_option or active_option or inclusion_date_option)) or
-                (course_ids and (index_all_courses_option or active_option or inclusion_date_option))):
+        course_option_flag_option = index_all_courses_option or active_option or inclusion_date_option
+
+        if (not course_ids and not course_option_flag_option) or (course_ids and course_option_flag_option):
             raise CommandError((
                 "reindex_course requires one or more <course_id>s"
                 " OR the --all, --active, --setup, or --from_inclusion_date flags."
