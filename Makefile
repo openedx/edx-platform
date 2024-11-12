@@ -245,3 +245,38 @@ test-js: ## run javascript tests
 		--single-run=true \
 		--capture-timeout=60000 \
 		--browsers=FirefoxNoUpdates
+
+	node --max_old_space_size=4096 node_modules/.bin/karma start cms/static/karma_cms_squire.conf.js \
+		--single-run=true \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates
+
+	node --max_old_space_size=4096 node_modules/.bin/karma start cms/static/karma_cms_webpack.conf.js \
+		--single-run=true \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates
+
+	node --max_old_space_size=4096 node_modules/.bin/karma start lms/static/karma_lms.conf.js \
+		--single-run=true \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates
+
+	node --max_old_space_size=4096 node_modules/.bin/karma start xmodule/js/karma_xmodule.conf.js \
+		--single-run=true \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates
+
+	node --max_old_space_size=4096 node_modules/.bin/karma start xmodule/js/karma_xmodule_webpack.conf.js \
+		--single-run=true \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates
+
+	node --max_old_space_size=4096 node_modules/.bin/karma start common/static/karma_common.conf.js \
+		--single-run=true \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates	
+
+	node --max_old_space_size=4096 node_modules/.bin/karma start common/static/karma_common_requirejs.conf.js \
+		--single-run=true \
+		--capture-timeout=60000 \
+		--browsers=FirefoxNoUpdates	
