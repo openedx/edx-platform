@@ -1,4 +1,4 @@
 # This file is a temporary compatibility wrapper around quince.txt.
 # It will be removed before Sumac.
 
--r releases/quince.txt
+-r releases/sumac.txt
