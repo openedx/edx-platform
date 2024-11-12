@@ -58,12 +58,17 @@
                         selfPacedCourses.push(course);
                     } else {
                         var course_start = new Date(course.attributes.start);
-                        var course_end = new Date(course.attributes.end);
-                        if (course_start <= currentDate && course_end >= currentDate) {
+                        var course_end;
+                        if (course.attributes.end === undefined) {
+                            course_end = undefined;
+                        } else {
+                            course_end = new Date(course.attributes.end);
+                        }
+                        if ((course_start <= currentDate) && ((course_end >= currentDate) || (course_end === undefined))) {
                             currentCourses.push(course);
-                        } else if (course_start > currentDate && course_end > currentDate) {
+                        } else if ((course_start > currentDate) && ((course_end >= currentDate) || (course_end === undefined))) {
                             upcomingCourses.push(course);
-                        } else if (course_start < currentDate && course_end < currentDate) {
+                        } else if ((course_start < currentDate) && ((course_end >= currentDate) || (course_end === undefined))) {
                             pastCourses.push(course);
                         }
                     }
