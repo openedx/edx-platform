@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <!-- <link rel="stylesheet" href="https://cdn.exec.talentsprint.com/edx_styles/gradebook.css" /> -->
+		<link rel="stylesheet" href="https://static.talentsprint.com/edx_styles/iimc_gradebook.css">
+        <style></style>
+    </head>
+    <body>
+        <h2 class="title">Gradebook</h2>
+		<div id="details_bar">
+	   <div>
+                    <span> Student ID : {{studentid}} </span>
+	            
+	   </div>
+	   <div>
+		<span> Student Name : {{studentname}} </span>
+<!--	    <span>Total Score : {{overall_percentage}}%</span>
+	    <span>Total Submissions : {{total_submissions_in_percentage}}%</span> -->
+	</div>
+        </div>
+
+		<br />
+		<div id="parent_table_div">
+			<table class="fold-table parent_table">
+				<thead class="main_thead">
+					<tr  id="heading_thead_1">
+						<th class = "course_heading">Course</th>
+						<th class = "grade_heading">Grade</th>
+						<!-- <th colspan="7"  class = "total_grade_heading">% Score</th>
+						<th class = "total_submissions_prcnt_heading">% Submissions</th> -->
+					</tr>
+				</thead>
+				<tbody>
+					{% for record in grades %}
+						{% if record.rawgrade %}
+					
+						
+						{% for assignment in record.individual_scores %} 
+							{% if not assignment.gradeishidden %} 
+								{% if assignment.itemtype != "course" and assignment.graderaw %}
+								<tr class="view">
+									<td>{{record.course_name}}</td>
+									<td>{{assignment.gradeformatted}}</td>
+								</tr>
+								{%endif%}
+							{%endif%}
+						{%endfor%}
+						<!-- <td colspan="7">{{record.percentage}}</td>
+						<td>{{record.coursewise_submissions_in_percentage}}%</td> -->
+					
+					{%endif%}
+					{%endfor%}
+				</tbody>
+			</table>
+		</div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script>
+            // $(function () {
+            //     $(".fold-table tr.view").on("click", function () {
+            //         if (!$(this).hasClass("open")) {
+            //             $(this).siblings("tr").removeClass("open");
+            //             $(this).toggleClass("open").next(".fold").toggleClass("open");
+            //         } else {
+            //             $(this).removeClass("open");
+            //             $(this).next(".fold").removeClass("open");
+            //         }
+            //     });
+            // });
+        </script>
+    </body>
+</html>
