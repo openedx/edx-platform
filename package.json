@@ -39,7 +39,7 @@
     "datatables": "1.10.18",
     "datatables.net-fixedcolumns": "3.2.6",
     "edx-proctoring-proctortrack": "git+https://git@github.com/anupdhabarde/edx-proctoring-proctortrack.git#f0fa9edbd16aa5af5a41ac309d2609e529ea8732",
-    "edx-ui-toolkit": "1.8.5",
+    "edx-ui-toolkit": "1.8.6",
     "exports-loader": "0.6.4",
     "file-loader": "^6.2.0",
     "font-awesome": "4.7.0",
