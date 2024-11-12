@@ -1,0 +1,41 @@
+name: Documentation linter
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  run_tests:
+    name: Quality Others
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        python-version:
+          - "3.11"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system requirements
+        run: sudo apt update && sudo apt install -y libxmlsec1-dev
+
+      - name: Install pip
+        run: python -m pip install -r requirements/pip.txt
+
+      - name: Install Required Python Dependencies
+        run: |
+          pip install -r requirements/edx/doc.txt
+
+      - name: Run lint check
+        run: |
+          make docs-lint

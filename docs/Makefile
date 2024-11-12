@@ -4,6 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
+SPHINXLINT    = sphinx-lint
 SOURCEDIR     = .
 BUILDDIR      = _build
 
@@ -11,7 +12,7 @@ BUILDDIR      = _build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help clean Makefile
+.PHONY: help clean lint Makefile
 
 clean:
 	rm -rf _build cms common lms openedx
@@ -20,6 +21,9 @@ clean:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+lint:
+	$(SPHINXLINT) "$(SOURCEDIR)"
 
 update_redirects:
 	# This updates redirects.txt, creating redirects for any files that have moved (relative to master).
