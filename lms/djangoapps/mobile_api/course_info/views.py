@@ -28,6 +28,7 @@ from lms.djangoapps.mobile_api.course_info.serializers import (
     MobileCourseEnrollmentSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
@@ -341,6 +342,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                     kwargs={'api_version': api_version, 'course_id': course_id},
                     request=request,
                 ),
+                'deprecate_youtube': DEPRECATE_YOUTUBE.is_enabled(course_key)
             }
 
             course_info_context = {}

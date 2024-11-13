@@ -21,6 +21,8 @@ register(UserSocialAuth, app=__package__)
 class CourseResetCourseOptIn(TimeStampedModel):
     """
     Model that represents a course which has opted in to the course reset feature.
+
+    .. no_pii:
     """
     course_id = CourseKeyField(max_length=255, unique=True)
     active = BooleanField()
@@ -40,6 +42,8 @@ class CourseResetCourseOptIn(TimeStampedModel):
 class CourseResetAudit(TimeStampedModel):
     """
     Model which records the course reset action's status and metadata
+
+    .. no_pii:
     """
     class CourseResetStatus(TextChoices):
         IN_PROGRESS = "in_progress"

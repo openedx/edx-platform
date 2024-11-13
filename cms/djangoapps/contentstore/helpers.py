@@ -24,7 +24,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.upstream_sync import UpstreamLink, BadUpstream, BadDownstream, fetch_customizable_fields
+from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fetch_customizable_fields
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
@@ -323,6 +323,56 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
     return new_xblock, notices
 
 
+def _fetch_and_set_upstream_link(
+    copied_from_block: str,
+    copied_from_version_num: int,
+    temp_xblock: XBlock,
+    user: User
+):
+    """
+    Fetch and set upstream link for the given xblock. This function handles following cases:
+    * the xblock is copied from a v2 library; the library block is set as upstream.
+    * the xblock is copied from a course; no upstream is set, only copied_from_block is set.
+    * the xblock is copied from a course where the source block was imported from a library; the original libary block
+      is set as upstream.
+    """
+    # Try to link the pasted block (downstream) to the copied block (upstream).
+    temp_xblock.upstream = copied_from_block
+    try:
+        UpstreamLink.get_for_block(temp_xblock)
+    except UpstreamLinkException:
+        # Usually this will fail. For example, if the copied block is a modulestore course block, it can't be an
+        # upstream. That's fine! Instead, we store a reference to where this block was copied from, in the
+        # 'copied_from_block' field (from AuthoringMixin).
+
+        # In case if the source block was imported from a library, we need to check its upstream
+        # and set the same upstream link for the new block.
+        source_descriptor = modulestore().get_item(UsageKey.from_string(copied_from_block))
+        if source_descriptor.upstream:
+            _fetch_and_set_upstream_link(
+                source_descriptor.upstream,
+                source_descriptor.upstream_version,
+                temp_xblock,
+                user,
+            )
+        else:
+            # else we store a reference to where this block was copied from, in the 'copied_from_block'
+            # field (from AuthoringMixin).
+            temp_xblock.upstream = None
+            temp_xblock.copied_from_block = copied_from_block
+    else:
+        # But if it doesn't fail, then populate the `upstream_version` field based on what was copied. Note that
+        # this could be the latest published version, or it could be an an even newer draft version.
+        temp_xblock.upstream_version = copied_from_version_num
+        # Also, fetch upstream values (`upstream_display_name`, etc.).
+        # Recall that the copied block could be a draft. So, rather than fetching from the published upstream (which
+        # could be older), fetch from the copied block itself. That way, if an author customizes a field, but then
+        # later wants to restore it, it will restore to the value that the field had when the block was pasted. Of
+        # course, if the author later syncs updates from a *future* published upstream version, then that will fetch
+        # new values from the published upstream content.
+        fetch_customizable_fields(upstream=temp_xblock, downstream=temp_xblock, user=user)
+
+
 def _import_xml_node_to_parent(
     node,
     parent_xblock: XBlock,
@@ -404,28 +454,7 @@ def _import_xml_node_to_parent(
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
     temp_xblock.parent = parent_key
     if copied_from_block:
-        # Try to link the pasted block (downstream) to the copied block (upstream).
-        temp_xblock.upstream = copied_from_block
-        try:
-            UpstreamLink.get_for_block(temp_xblock)
-        except (BadDownstream, BadUpstream):
-            # Usually this will fail. For example, if the copied block is a modulestore course block, it can't be an
-            # upstream. That's fine! Instead, we store a reference to where this block was copied from, in the
-            # 'copied_from_block' field (from AuthoringMixin).
-            temp_xblock.upstream = None
-            temp_xblock.copied_from_block = copied_from_block
-        else:
-            # But if it doesn't fail, then populate the `upstream_version` field based on what was copied. Note that
-            # this could be the latest published version, or it could be an an even newer draft version.
-            temp_xblock.upstream_version = copied_from_version_num
-            # Also, fetch upstream values (`upstream_display_name`, etc.).
-            # Recall that the copied block could be a draft. So, rather than fetching from the published upstream (which
-            # could be older), fetch from the copied block itself. That way, if an author customizes a field, but then
-            # later wants to restore it, it will restore to the value that the field had when the block was pasted. Of
-            # course, if the author later syncs updates from a *future* published upstream version, then that will fetch
-            # new values from the published upstream content.
-            fetch_customizable_fields(upstream=temp_xblock, downstream=temp_xblock, user=user)
-
+        _fetch_and_set_upstream_link(copied_from_block, copied_from_version_num, temp_xblock, user)
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
     new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
     parent_xblock.children.append(new_xblock.location)
@@ -436,7 +465,7 @@ def _import_xml_node_to_parent(
         # Allow an XBlock to do anything fancy it may need to when pasted from the clipboard.
         # These blocks may handle their own children or parenting if needed. Let them return booleans to
         # let us know if we need to handle these or not.
-        children_handed = new_xblock.studio_post_paste(store, node)
+        children_handled = new_xblock.studio_post_paste(store, node)
 
     if not children_handled:
         for child_node in child_nodes:

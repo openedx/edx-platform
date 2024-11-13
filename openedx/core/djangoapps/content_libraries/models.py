@@ -89,6 +89,8 @@ class ContentLibrary(models.Model):
     re-imported on another Open edX instance should be kept in Learning Core. This
     model in Studio should only be used to track settings specific to this Open
     edX instance, like who has permission to edit this content library.
+
+    .. no_pii:
     """
     objects: ContentLibraryManager[ContentLibrary] = ContentLibraryManager()
 
@@ -183,6 +185,8 @@ class ContentLibrary(models.Model):
 class ContentLibraryPermission(models.Model):
     """
     Row recording permissions for a content library
+
+    .. no_pii:
     """
     library = models.ForeignKey(ContentLibrary, on_delete=models.CASCADE, related_name="permission_grants")
     # One of the following must be set (but not both):
@@ -226,6 +230,8 @@ class ContentLibraryPermission(models.Model):
 class ContentLibraryBlockImportTask(models.Model):
     """
     Model of a task to import blocks from an external source (e.g. modulestore).
+
+    .. no_pii:
     """
 
     library = models.ForeignKey(
@@ -331,6 +337,8 @@ class LtiProfile(models.Model):
     Unless Anonymous, this should be a unique representation of the LTI subject
     (as per the client token ``sub`` identify claim) that initiated an LTI
     launch through Content Libraries.
+
+    .. no_pii:
     """
 
     objects = LtiProfileManager()
@@ -453,6 +461,8 @@ class LtiGradedResource(models.Model):
     launch.  This model links the profile that launched the resource with the
     resource itself, allowing identifcation of the link through its usage key
     string and user id.
+
+    .. no_pii:
     """
 
     objects = LtiGradedResourceManager()

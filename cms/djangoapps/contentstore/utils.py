@@ -9,7 +9,7 @@ import re
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlencode, urlunparse, urlparse
 from uuid import uuid4
 
 from bs4 import BeautifulSoup
@@ -193,31 +193,30 @@ def get_lms_link_for_item(location, preview=False):
     """
     assert isinstance(location, UsageKey)
 
-    # checks LMS_BASE value in site configuration for the given course_org_filter(org)
-    # if not found returns settings.LMS_BASE
+    # checks LMS_ROOT_URL value in site configuration for the given course_org_filter(org)
+    # if not found returns settings.LMS_ROOT_URL
     lms_base = SiteConfiguration.get_value_for_org(
         location.org,
-        "LMS_BASE",
-        settings.LMS_BASE
+        "LMS_ROOT_URL",
+        settings.LMS_ROOT_URL
     )
+    query_string = ''
 
     if lms_base is None:
         return None
 
     if preview:
-        # checks PREVIEW_LMS_BASE value in site configuration for the given course_org_filter(org)
-        # if not found returns settings.FEATURES.get('PREVIEW_LMS_BASE')
-        lms_base = SiteConfiguration.get_value_for_org(
-            location.org,
-            "PREVIEW_LMS_BASE",
-            settings.FEATURES.get('PREVIEW_LMS_BASE')
-        )
+        params = {'preview': '1'}
+        query_string = urlencode(params)
 
-    return "//{lms_base}/courses/{course_key}/jump_to/{location}".format(
-        lms_base=lms_base,
+    url_parts = list(urlparse(lms_base))
+    url_parts[2] = '/courses/{course_key}/jump_to/{location}'.format(
         course_key=str(location.course_key),
         location=str(location),
     )
+    url_parts[4] = query_string
+
+    return urlunparse(url_parts)
 
 
 def get_lms_link_for_certificate_web_view(course_key, mode):

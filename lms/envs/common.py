@@ -2844,6 +2844,15 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
+# Until we've tested protocol 2, stay with protocol 1. It should be
+# fine to just switch to protocol 2, since we're well past celery
+# version 3.1.25 (the first version to support it) but we'll want to
+# test this in a stage environment first.
+#
+# - Docs: https://docs.celeryq.dev/en/stable/history/whatsnew-4.0.html#new-task-message-protocol
+# - Ticket: https://github.com/edx/edx-arch-experiments/issues/800
+CELERY_TASK_PROTOCOL = 1
+
 CELERY_IMPORTS = [
     # Since xblock-poll is not a Django app, and XBlocks don't get auto-imported
     # by celery workers, its tasks will not get auto-discovered:
@@ -3820,6 +3829,16 @@ ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
 
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
+
+# .. setting_name: ORA_PEER_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a peer submission expires
+ORA_PEER_LEASE_EXPIRATION_HOURS = 8
+
+# .. setting_name: ORA_STAFF_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a staff submission expires
+ORA_STAFF_LEASE_EXPIRATION_HOURS = 8
 
 # Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'

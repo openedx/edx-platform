@@ -89,6 +89,7 @@ class DiscussionNotificationSender:
                 "post_title": getattr(self.thread, 'title', ''),
                 "course_name": self.course.display_name,
                 "sender_id": self.creator.id,
+                "group_by_id": str(self.course.id),
                 **extra_context,
             },
             notification_type=notification_type,

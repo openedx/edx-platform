@@ -79,6 +79,8 @@ class CourseGoalReminderStatus(TimeStampedModel):
     Tracks whether we've sent a reminder about a particular goal this week.
 
     See the management command goal_reminder_email for more detail about how this is used.
+
+    .. no_pii:
     """
     class Meta:
         verbose_name_plural = "Course goal reminder statuses"

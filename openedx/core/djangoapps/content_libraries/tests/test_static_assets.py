@@ -168,12 +168,12 @@ class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
         response = self.client.get(
             f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
         )
-        assert response.status_code == 403
+        assert response.status_code == 401
 
     def test_unauthorized_user(self):
         """User who is not a Content Library staff should not have access."""
         self.client.logout()
-        student = UserFactory.create(
+        UserFactory.create(
             username="student",
             email="student@example.com",
             password="student-pass",

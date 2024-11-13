@@ -103,7 +103,7 @@ importlib_metadata                  # Used to access entry_points in i18n_api pl
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 importlib_metadata                  # Used to access entry_points in i18n_api plugin
-lxml                                # XML parser
+lxml[html_clean]                    # XML parser
 lti-consumer-xblock>=7.3.0
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis

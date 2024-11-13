@@ -15,7 +15,7 @@ defaults:
 jobs:
   check-requirements:
     name: Compile requirements
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       # Only run remaining steps if there are changes to requirements/**
