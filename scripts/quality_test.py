@@ -2,17 +2,9 @@
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
-import argparse
-import glob
-import json
-import os
 import re
-import sys
 import subprocess
 import shlex
-import shutil
-from pathlib import Path
-from time import sleep
 
 
 def run_eslint():
@@ -54,18 +46,10 @@ def run_eslint():
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit:
         print('eslint')
-        print("FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
-            count=num_violations, violations_limit=violations_limit))
+        print(f"FAILURE: Too many eslint violations ({num_violations}).\nThe limit is {violations_limit}.")
     else:
-        print("successfully run eslint with violations")
-        print(num_violations)
+        print(f"successfully run eslint with violations '{num_violations}'")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=['eslint'])
-
-    argument = parser.parse_args()
-
-    if argument.command == 'eslint':
-        run_eslint()
+    run_eslint()
