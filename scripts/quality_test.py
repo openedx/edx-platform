@@ -2,8 +2,8 @@
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
-import argparse
 import re
+import sys
 import subprocess
 import shlex
 
@@ -43,6 +43,7 @@ def run_eslint():
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit:
         print(f"FAILURE: Too many eslint violations ({num_violations}).\nThe limit is {violations_limit}.")
+        sys.exit()
     else:
         print(f"successfully run eslint with '{num_violations}' violations")
 
