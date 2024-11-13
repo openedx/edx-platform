@@ -13,7 +13,7 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    violations_limit = 4950
+    violations_limit = 1213
     
     command = [
         "node",
