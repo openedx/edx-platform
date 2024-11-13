@@ -206,7 +206,7 @@ ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip ins
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
 
 eslint:	## check javascript for quality issues
-	python scripts/quality_test.py eslint
+	python scripts/eslint.py
 
 xsslint: ## check xss for quality issuest
 	python scripts/xsslint/xss_linter.py \
