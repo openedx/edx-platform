@@ -122,7 +122,7 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    import pdb; pdb.set_trace()
+
     REPO_ROOT = repo_root()
     REPORT_DIR = REPO_ROOT / 'reports'
     eslint_report_dir = REPORT_DIR / "eslint"
