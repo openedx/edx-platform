@@ -34,7 +34,6 @@ def run_eslint():
     
     last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
     regex = r'^\d+'
-    import pdb; pdb.set_trace()
     try:
         num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
     # An AttributeError will occur if the regex finds no matches.
