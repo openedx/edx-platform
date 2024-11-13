@@ -444,6 +444,7 @@ django-statici18n==2.5.0
     #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-poll
+    #   xblocks-contrib
 django-storages==1.14.3
     # via
     #   -c requirements/edx/../constraints.txt
@@ -584,6 +585,7 @@ edx-i18n-tools==1.5.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   ora2
+    #   xblocks-contrib
 edx-lint==5.4.1
     # via -r requirements/edx/testing.in
 edx-milestones==0.6.0
@@ -1023,6 +1025,7 @@ openedx-django-pyfs==3.7.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   xblock
+    #   xblocks-contrib
 openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
@@ -1671,6 +1674,7 @@ xblock[django]==5.1.0
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
     #   xblock-utils
+    #   xblocks-contrib
 xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/base.txt
 xblock-google-drive==0.7.0
@@ -1682,6 +1686,8 @@ xblock-utils==4.0.0
     #   -r requirements/edx/base.txt
     #   edx-sga
     #   xblock-poll
+xblocks-contrib==0.1.0
+    # via -r requirements/edx/base.txt
 xmlsec==1.3.14
     # via
     #   -r requirements/edx/base.txt
