@@ -6,7 +6,7 @@
   <span class="large-template-icon large-<%- type %>-icon"></span>
   <span class="sr"> <%- gettext("Add Component:") %></span>
   <span class="name"><%- display_name %></span>
-  <% if (type === 'library_v2' || type === 'itembank') { %>
+  <% if (beta) { %>
   <span class="beta"><%- gettext("Beta") %></span>
   <% } %>
 </button>

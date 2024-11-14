@@ -3184,13 +3184,13 @@ class TestComponentTemplates(CourseTestCase):
         templates = get_component_templates(self.course)
         button_names = [template["display_name"] for template in templates]
         self.assertIn("Advanced", button_names)
-        self.assertEqual(len(templates[0]["templates"]), len(expected_xblocks))
+        self.assertEqual(len(templates[-1]["templates"]), len(expected_xblocks))
         template_display_names = [
-            template["display_name"] for template in templates[0]["templates"]
+            template["display_name"] for template in templates[-1]["templates"]
         ]
         self.assertEqual(template_display_names, expected_xblocks)
         template_support_levels = [
-            template["support_level"] for template in templates[0]["templates"]
+            template["support_level"] for template in templates[-1]["templates"]
         ]
         self.assertEqual(template_support_levels, expected_support_levels)
 
