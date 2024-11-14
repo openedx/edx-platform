@@ -316,6 +316,30 @@ class RegistrationViewValidationErrorTest(
             }
         )
 
+    def test_register_fullname_max_lenghth_validation_error(self):
+        """
+        Full name error detection test if the length exceeds 255 characters.
+        """
+        expected_error_message = f"Your legal name is too long. It must not exceed {NAME_MAX_LENGTH} characters"
+
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "x" * 256,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": expected_error_message}],
+                "error_code": "validation-error"
+            }
+        )
+
     def test_register_fullname_html_validation_error(self):
         """
         Test for catching invalid full name errors
