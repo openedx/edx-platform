@@ -17,6 +17,8 @@ from cms.djangoapps.contentstore.transcript_storage_handlers import (
     delete_video_transcript,
     handle_transcript_credentials,
     handle_transcript_download,
+    validate_bulk_transcript_delete_data,
+    handle_transcript_bulk_delete,
 )
 from common.djangoapps.student.auth import has_studio_write_access
 from common.djangoapps.util.json_request import JsonResponse, expect_json
@@ -28,6 +30,7 @@ __all__ = [
     'transcript_upload_handler',
     'transcript_delete_handler',
     'transcript_upload_api',
+    'transcript_bulk_delete_handler',
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -144,3 +147,37 @@ def transcript_delete_handler(request, course_key_string, edx_video_id, language
     delete_video_transcript(video_id=edx_video_id, language_code=language_code)
 
     return JsonResponse(status=200)
+
+
+@login_required
+@require_POST
+@expect_json
+def transcript_bulk_delete_handler(request):
+    """
+    View to delete a set of transcript files.
+
+    Arguments:
+        request: A WSGI request object
+
+    The request body should be a JSON object.
+    The JSON object should be a dictionary:
+      * Each key in the dictionary should be a video_id (a string representing the ID of the video).
+      * Each value in the dictionary should be a list of language_codes (a string representing the
+        language code of the transcript to be deleted).
+
+    Example:
+    {
+        "video_id_1": ["language_code_1", "language_code_2"],
+        "video_id_2": ["language_code_3", "language_code_4"]
+    }
+
+    Returns
+        - A 400 if any of the validation fails
+        - A 200 if all transcripts delete jobs are triggered successfully
+    """
+    error = validate_bulk_transcript_delete_data(data=request.json)
+    if error:
+        response = JsonResponse({'error': error}, status=400)
+    else:
+        response = handle_transcript_bulk_delete(data=request.json)
+    return response

@@ -263,3 +263,64 @@ def delete_video_transcript_or_404(request):
     delete_video_transcript(video_id=video_id, language_code=language_code)
 
     return JsonResponse(status=200)
+
+
+def validate_bulk_transcript_delete_data(data):
+    """
+    Validates video transcript file.
+    Arguments:
+        data: A request's data part.
+    Returns:
+        None or String
+        If there is error returns error message otherwise None.
+    """
+    missing_transcripts = []
+    for video_id, language_codes in data.items():
+        if not isinstance(language_codes, list):
+            return f'Value for video "{video_id}" needs to be a list of language codes.'
+        for language_code in language_codes:
+            if language_code not in get_available_transcript_languages(video_id=video_id):
+                missing_transcripts.append(f'Language "{language_code}" is not available for video "{video_id}".')
+
+    if missing_transcripts:
+        return '\n'.join(missing_transcripts)
+
+    return None
+
+
+def handle_transcript_bulk_delete(data):
+    """
+    Handle bulk delete of video transcripts.
+    Arguments:
+        data: A request's data part.
+    Returns:
+        JsonResponse
+    """
+    bulk_delete_errors = []
+    deleted = 0
+
+    for video_id, language_codes in data.items():
+        for language_code in language_codes:
+            if not get_video_transcript(video_id=video_id, language_code=language_code):
+                bulk_delete_errors.append(f'Transcript not found for video "{video_id}" and language "{language_code}"')
+                continue
+            try:
+                delete_video_transcript(video_id=video_id, language_code=language_code)
+                deleted += 1
+            except Exception as e:
+                LOGGER.error(
+                    (f'Error occurred while deleting transcript for video "{video_id}"'
+                     f'and language "{language_code}": {e}')
+                )
+                bulk_delete_errors.append(
+                    f'Error occurred while deleting transcript for video "{video_id}" and language "{language_code}"'
+                )
+
+    if bulk_delete_errors:
+        bulk_delete_errors_msg = '\n'.join(bulk_delete_errors)
+        response_message = (f'{deleted} transcripts were successfully deleted. '
+                            f'Following errors happened through deletion:\n{bulk_delete_errors_msg}')
+    else:
+        response_message = f'{deleted} transcripts were successfully deleted.'
+
+    return JsonResponse({'msg': response_message}, status=200)

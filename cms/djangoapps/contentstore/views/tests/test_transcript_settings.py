@@ -744,3 +744,158 @@ class TranscriptUploadApiTest(CourseTestCase):
             json.loads(response.content.decode('utf-8'))['error'],
             'There is a problem with this transcript file. Try to upload a different file.'
         )
+
+
+@ddt.ddt
+class TranscriptBulkDeleteTest(CourseTestCase):
+    """
+    Tests for transcript bulk deletion handler.
+    """
+    @property
+    def view_url(self):
+        """
+        Returns url for this view
+        """
+        return reverse('transcript_bulk_delete_handler')
+
+    def test_302_with_anonymous_user(self):
+        """
+        Verify that redirection happens in case of unauthorized request.
+        """
+        self.client.logout()
+        response = self.client.post(self.view_url, content_type='application/json')
+        self.assertEqual(response.status_code, 302)
+
+    def test_405_with_not_allowed_request_method(self):
+        """
+        Verify that 405 is returned in case of not-allowed request methods.
+        Allowed request methods include POST.
+        """
+        response = self.client.get(self.view_url, content_type='application/json')
+        self.assertEqual(response.status_code, 405)
+
+    @ddt.data(
+        (
+            {
+                'edx_video_id_1': ['es', 'ko', 'ru']
+            },
+            ('Language "ko" is not available for video "edx_video_id_1".\n'
+             'Language "ru" is not available for video "edx_video_id_1".')
+        ),
+        (
+            {
+                'edx_video_id_1': ['ko'],
+                'edx_video_id_2': ['ru'],
+            },
+            ('Language "ko" is not available for video "edx_video_id_1".\n'
+             'Language "ru" is not available for video "edx_video_id_2".')
+        ),
+        (
+            {
+                'edx_video_id_3': 'ru'
+            },
+            'Value for video "edx_video_id_3" needs to be a list of language codes.'
+        ),
+    )
+    @ddt.unpack
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
+        Mock(return_value=['en', 'es']),
+    )
+    def test_transcript_bulk_delete_handler_wrong_payload(self, request_payload, expected_error_message):
+        """
+        Tests the transcript upload handler when the required attributes are missing.
+        """
+        response = self.client.post(self.view_url, data=json.dumps(request_payload), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
+
+    @ddt.data(
+        (
+            {
+                'edx_video_id': ['es', 'ko', 'ru'],
+            },
+            '3 transcripts were successfully deleted.'
+        ),
+    )
+    @ddt.unpack
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
+        Mock(return_value=['en', 'es', 'ko', 'ru']),
+    )
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_video_transcript',
+        Mock(return_value={'edx_video_id': 'xx'}),
+    )
+    def test_transcript_bulk_delete_handler_success(self, request_payload, expected_message):
+        """
+        Tests the transcript upload handler when payload is accurate and deletion works.
+        """
+        response = self.client.post(self.view_url, data=json.dumps(request_payload), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['msg'], expected_message)
+
+    @ddt.data(
+        (
+            {
+                'edx_video_id': ['es', 'ko', 'ru'],
+            },
+            ('0 transcripts were successfully deleted. Following errors happened through deletion:\n'
+             'Transcript not found for video "edx_video_id" and language "es"\n'
+             'Transcript not found for video "edx_video_id" and language "ko"\n'
+             'Transcript not found for video "edx_video_id" and language "ru"')
+        ),
+    )
+    @ddt.unpack
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
+        Mock(return_value=['en', 'es', 'ko', 'ru']),
+    )
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_video_transcript',
+        Mock(return_value=None),
+    )
+    def test_transcript_bulk_delete_handler_transctripts_not_found(self, request_payload, expected_message):
+        """
+        Tests the transcript upload handler when payload is accurate but some transcripts are not found.
+        """
+        response = self.client.post(self.view_url, data=json.dumps(request_payload), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['msg'], expected_message)
+
+    @ddt.data(
+        (
+            {
+                'edx_video_id': ['es', 'ko', 'ru'],
+            },
+            ('0 transcripts were successfully deleted. Following errors happened through deletion:\n'
+             'Error occurred while deleting transcript for video "edx_video_id" and language "es"\n'
+             'Error occurred while deleting transcript for video "edx_video_id" and language "ko"\n'
+             'Error occurred while deleting transcript for video "edx_video_id" and language "ru"')
+        ),
+    )
+    @ddt.unpack
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
+        Mock(return_value=['en', 'es', 'ko', 'ru']),
+    )
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_video_transcript',
+        Mock(return_value={'edx_video_id': 'xx'}),
+    )
+    @patch(
+        'cms.djangoapps.contentstore.transcript_storage_handlers.delete_video_transcript',
+        side_effect=Exception('Error while deleting transcript')
+    )
+    def test_transcript_bulk_delete_handler_error_on_delete(
+        self,
+        request_payload,
+        expected_message,
+        mock_delete_video_transcript
+    ):
+        """
+        Tests the transcript bulk delete handler when payload is accurate but some errors happen when deleting.
+        """
+        response = self.client.post(self.view_url, data=json.dumps(request_payload), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['msg'], expected_message)

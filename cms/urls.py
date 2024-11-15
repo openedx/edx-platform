@@ -185,6 +185,8 @@ urlpatterns = oauth2_urlpatterns + [
         settings.COURSE_KEY_PATTERN
     ), contentstore_views.transcript_delete_handler, name='transcript_delete_handler'),
     path('transcript_upload_api/', contentstore_views.transcript_upload_api, name='transcript_upload_api'),
+    path('transcript_bulk_delete/', contentstore_views.transcript_bulk_delete_handler,
+         name='transcript_bulk_delete_handler'),
     re_path(fr'^video_encodings_download/{settings.COURSE_KEY_PATTERN}$',
             contentstore_views.video_encodings_download, name='video_encodings_download'),
     re_path(fr'^group_configurations/{settings.COURSE_KEY_PATTERN}$',
