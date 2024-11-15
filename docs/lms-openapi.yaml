@@ -9291,21 +9291,6 @@ paths:
       in: path
       required: true
       type: string
-  /user/v1/skill_level/{job_id}/:
-    get:
-      operationId: user_v1_skill_level_read
-      description: GET /api/user/v1/skill_level/{job_id}/
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - user
-    parameters:
-    - name: job_id
-      in: path
-      required: true
-      type: string
   /user/v1/user_prefs/:
     get:
       operationId: user_v1_user_prefs_list
