@@ -113,7 +113,8 @@
     height: 21px;
 }
 
-.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:hover, .xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:focus,
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:hover,
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:focus,
 .xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button:hover,
 .xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button:focus,
 .xmodule_edit.xmodule_HtmlBlock .editor .editor-bar button:hover,
