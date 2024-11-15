@@ -10,7 +10,7 @@
         'js/edxnotes/plugins/search_override',
         'js/edxnotes/plugins/llm_summarize',
     ], function($, _, Annotator, NotesLogger, NotesCollector) {
-        var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags', 'LlmSummarize'],
+        var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
             getOptions, setupPlugins, getAnnotator;
 
     /**
