@@ -106,9 +106,12 @@ def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     we could use PublishableEntity's primary key / UUID instead.
     """
     # The slugified key _may_ not be unique so we append a hashed string to make it unique:
-    key_bin = str(usage_key).encode()
-    suffix = blake2b(key_bin, digest_size=4).hexdigest()  # When we use Python 3.9+, should add usedforsecurity=False
-    return slugify(str(usage_key)) + "-" + suffix
+    key_str = str(usage_key)
+    key_bin = key_str.encode()
+
+    suffix = blake2b(key_bin, digest_size=4, usedforsecurity=False).hexdigest()
+
+    return f"{slugify(key_str)}-{suffix}"
 
 
 def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
