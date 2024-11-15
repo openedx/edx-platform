@@ -15,7 +15,6 @@
 # Note: Changes to this file will automatically be used by other repos, referencing
 #  this file from Github directly. It does not require packaging in edx-lint.
 
-
 # using LTS django version
 Django<5.0
 
@@ -25,13 +24,6 @@ Django<5.0
 elasticsearch<7.14.0
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
-
-# Cause: https://github.com/openedx/event-tracking/pull/290
-# event-tracking 2.4.1 upgrades to pymongo 4.4.0 which is not supported on edx-platform.
-# We will pin event-tracking to do not break existing installations
-# This can be unpinned once https://github.com/openedx/edx-platform/issues/34586
-# has been resolved and edx-platform is running with pymongo>=4.4.0
-
 
 # Cause: https://github.com/openedx/edx-lint/issues/458
 # This can be unpinned once https://github.com/openedx/edx-lint/issues/459 has been resolved.
