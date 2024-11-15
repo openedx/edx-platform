@@ -352,18 +352,6 @@ def main(
                     repo / "lms" / "static" / "sass",
                 ],
             )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for default LMS",
-                repo / "xmodule" / "assets",
-                repo / "lms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
-                    repo / "cms" / "static" / "sass",
-                ],
-            )
         if not skip_cms:
             compile_sass_dir(
                 "Compiling default CMS Sass",
@@ -373,18 +361,6 @@ def main(
                     *common_includes,
                     repo / "lms" / "static" / "sass" / "partials",
                     repo / "cms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass",
-                ],
-            )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for default CMS",
-                repo / "xmodule" / "assets",
-                repo / "cms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
                     repo / "cms" / "static" / "sass",
                 ],
             )
@@ -429,20 +405,6 @@ def main(
                 ],
                 tolerate_missing=True,
             )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for themed LMS",
-                repo / "xmodule" / "assets",
-                theme / "lms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    theme / "lms" / "static" / "sass" / "partials",
-                    theme / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
-                    repo / "cms" / "static" / "sass",
-                ],
-            )
         if not skip_cms:
             compile_sass_dir(
                 "Compiling default CMS Sass with themed partials",
@@ -469,20 +431,6 @@ def main(
                     repo / "cms" / "static" / "sass",
                 ],
                 tolerate_missing=True,
-            )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for themed CMS",
-                repo / "xmodule" / "assets",
-                theme / "cms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    theme / "lms" / "static" / "sass" / "partials",
-                    theme / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
-                    repo / "cms" / "static" / "sass",
-                ],
             )
         click.secho(f"Done compiling Sass for theme at {theme}!", fg="cyan", bold=True)
         click.echo()
