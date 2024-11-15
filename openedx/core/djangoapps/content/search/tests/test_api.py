@@ -10,12 +10,15 @@ from unittest.mock import MagicMock, Mock, call, patch
 from opaque_keys.edx.keys import UsageKey
 
 import ddt
+import pytest
 from django.test import override_settings
 from freezegun import freeze_time
+from meilisearch.errors import MeilisearchApiError
 from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.search.models import IncrementalIndexCompleted
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content.course_overviews.api import CourseOverview
@@ -238,6 +241,73 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             any_order=True,
         )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reindex_meilisearch_incremental(self, mock_meilisearch):
+
+        # Add tags field to doc, since reindex calls includes tags
+        doc_sequential = copy.deepcopy(self.doc_sequential)
+        doc_sequential["tags"] = {}
+        doc_vertical = copy.deepcopy(self.doc_vertical)
+        doc_vertical["tags"] = {}
+        doc_problem1 = copy.deepcopy(self.doc_problem1)
+        doc_problem1["tags"] = {}
+        doc_problem1["collections"] = {'display_name': [], 'key': []}
+        doc_problem2 = copy.deepcopy(self.doc_problem2)
+        doc_problem2["tags"] = {}
+        doc_problem2["collections"] = {'display_name': [], 'key': []}
+        doc_collection = copy.deepcopy(self.collection_dict)
+        doc_collection["tags"] = {}
+
+        api.rebuild_index(incremental=True)
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
+        mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
+            [
+                call([doc_sequential, doc_vertical]),
+                call([doc_problem1, doc_problem2]),
+                call([doc_collection]),
+            ],
+            any_order=True,
+        )
+
+        # Now we simulate interruption by patching _wait_for_meili_task to raise an exception
+        def simulated_interruption():
+            yield
+            yield
+            raise Exception("Simulated interruption")
+        with patch("openedx.core.djangoapps.content.search.api._wait_for_meili_task", side_effect=simulated_interruption()):
+            with pytest.raises(Exception, match="Simulated interruption"):
+                api.rebuild_index(incremental=True)
+        assert IncrementalIndexCompleted.objects.all().count() == 1
+        api.rebuild_index(incremental=True)
+        assert IncrementalIndexCompleted.objects.all().count() == 0
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 7
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reset_meilisearch_index(self, mock_meilisearch):
+        api.reset_index()
+        mock_meilisearch.return_value.swap_indexes.assert_called_once()
+        mock_meilisearch.return_value.create_index.assert_called_once()
+        mock_meilisearch.return_value.delete_index.call_count = 2
+        api.reset_index()
+        mock_meilisearch.return_value.delete_index.call_count = 4
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_init_meilisearch_index(self, mock_meilisearch):
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_not_called()
+        mock_meilisearch.return_value.create_index.assert_not_called()
+        mock_meilisearch.return_value.delete_index.assert_not_called()
+
+        mock_meilisearch.return_value.get_index.side_effect = [
+            MeilisearchApiError("Testing reindex", Mock(code="index_not_found", text=None)),
+            MeilisearchApiError("Testing reindex", Mock(code="index_not_found", text=None)),
+            Mock(),
+        ]
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_called_once()
+        mock_meilisearch.return_value.create_index.assert_called_once()
+        mock_meilisearch.return_value.delete_index.call_count = 2
 
     @override_settings(MEILISEARCH_ENABLED=True)
     @patch(
