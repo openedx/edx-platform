@@ -1,11 +1,10 @@
 /* global jest,test,describe,expect */
-import { Button } from '@edx/paragon';
-import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
-import { Provider } from 'react-redux';
 import React from 'react';
+import { Provider } from 'react-redux';
+import { act, create } from 'react-test-renderer';
 import renderer from 'react-test-renderer';
+import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import store from '../../data/store';
-
 import Main from './Main';
 
 describe('ProblemBrowser Main component', () => {
@@ -27,7 +26,7 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock={null}
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
         const tree = component.toJSON();
         expect(tree).toMatchSnapshot();
@@ -46,7 +45,7 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
         const tree = component.toJSON();
         expect(tree).toMatchSnapshot();
@@ -66,10 +65,15 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
-        const instance = component.root.children[0].instance;
-        instance.handleToggleDropdown();
+        const root = component.root;
+
+        const button = root.findByProps({ label: 'Select a section or problem' });
+        act(() => {
+            button.props.onClick();
+        });
+
         expect(fetchCourseBlocksMock.mock.calls.length).toBe(1);
     });
 
@@ -77,16 +81,18 @@ describe('ProblemBrowser Main component', () => {
         let component;
         act(() => {
             component = create(
-                <Main
-                    courseId={courseId}
-                    createProblemResponsesReportTask={jest.fn()}
-                    excludeBlockTypes={excludedBlockTypes}
-                    fetchCourseBlocks={jest.fn()}
-                    problemResponsesEndpoint={problemResponsesEndpoint}
-                    onSelectBlock={jest.fn()}
-                    selectedBlock="some-selected-block"
-                    taskStatusEndpoint={taskStatusEndpoint}
-                />
+                <Provider store={store}>
+                    <Main
+                        courseId={courseId}
+                        createProblemResponsesReportTask={jest.fn()}
+                        excludeBlockTypes={excludedBlockTypes}
+                        fetchCourseBlocks={jest.fn()}
+                        problemResponsesEndpoint={problemResponsesEndpoint}
+                        onSelectBlock={jest.fn()}
+                        selectedBlock="some-selected-block"
+                        taskStatusEndpoint={taskStatusEndpoint}
+                    />
+                </Provider>
             );
         });
 
