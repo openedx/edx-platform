@@ -1,13 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_display.xmodule_AboutBlock,
-.xmodule_display.xmodule_CourseInfoBlock,
-.xmodule_display.xmodule_HtmlBlock,
-.xmodule_display.xmodule_StaticTabBlock {
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-}
-
 .xmodule_display.xmodule_AboutBlock *,
 .xmodule_display.xmodule_CourseInfoBlock *,
 .xmodule_display.xmodule_HtmlBlock *,

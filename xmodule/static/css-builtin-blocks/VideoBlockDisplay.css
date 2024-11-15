@@ -1,15 +1,6 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
 .xmodule_display.xmodule_VideoBlock {
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-}
-
-.xmodule_display.xmodule_VideoBlock {
     margin-bottom: calc((var(--baseline) * 1.5));
 }
 
