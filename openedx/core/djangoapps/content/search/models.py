@@ -71,6 +71,9 @@ class IncrementalIndexCompleted(models.Model):
     """
     Stores the contex keys of aleady indexed courses and libraries for incremental indexing.
     """
+
     context_key = LearningContextKeyField(
-        max_length=255, unique=True, null=False,
+        max_length=255,
+        unique=True,
+        null=False,
     )

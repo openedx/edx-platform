@@ -230,68 +230,76 @@ def _configure_index(index_name):
     # Mark usage_key as unique (it's not the primary key for the index, but nevertheless must be unique):
     client.index(index_name).update_distinct_attribute(Fields.usage_key)
     # Mark which attributes can be used for filtering/faceted search:
-    client.index(index_name).update_filterable_attributes([
-        # Get specific block/collection using combination of block_id and context_key
-        Fields.block_id,
-        Fields.block_type,
-        Fields.context_key,
-        Fields.usage_key,
-        Fields.org,
-        Fields.tags,
-        Fields.tags + "." + Fields.tags_taxonomy,
-        Fields.tags + "." + Fields.tags_level0,
-        Fields.tags + "." + Fields.tags_level1,
-        Fields.tags + "." + Fields.tags_level2,
-        Fields.tags + "." + Fields.tags_level3,
-        Fields.collections,
-        Fields.collections + "." + Fields.collections_display_name,
-        Fields.collections + "." + Fields.collections_key,
-        Fields.type,
-        Fields.access_id,
-        Fields.last_published,
-        Fields.content + "." + Fields.problem_types,
-    ])
+    client.index(index_name).update_filterable_attributes(
+        [
+            # Get specific block/collection using combination of block_id and context_key
+            Fields.block_id,
+            Fields.block_type,
+            Fields.context_key,
+            Fields.usage_key,
+            Fields.org,
+            Fields.tags,
+            Fields.tags + "." + Fields.tags_taxonomy,
+            Fields.tags + "." + Fields.tags_level0,
+            Fields.tags + "." + Fields.tags_level1,
+            Fields.tags + "." + Fields.tags_level2,
+            Fields.tags + "." + Fields.tags_level3,
+            Fields.collections,
+            Fields.collections + "." + Fields.collections_display_name,
+            Fields.collections + "." + Fields.collections_key,
+            Fields.type,
+            Fields.access_id,
+            Fields.last_published,
+            Fields.content + "." + Fields.problem_types,
+        ]
+    )
     # Mark which attributes are used for keyword search, in order of importance:
-    client.index(index_name).update_searchable_attributes([
-        # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
-        Fields.display_name,
-        Fields.block_id,
-        Fields.content,
-        Fields.description,
-        Fields.tags,
-        Fields.collections,
-        # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
-        # are searchable only if at least one document in the index has a value. If we didn't list them here and,
-        # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
-        # these sub-fields: "Attribute `tags.level3` is not searchable."
-        Fields.tags + "." + Fields.tags_taxonomy,
-        Fields.tags + "." + Fields.tags_level0,
-        Fields.tags + "." + Fields.tags_level1,
-        Fields.tags + "." + Fields.tags_level2,
-        Fields.tags + "." + Fields.tags_level3,
-        Fields.collections + "." + Fields.collections_display_name,
-        Fields.collections + "." + Fields.collections_key,
-        Fields.published + "." + Fields.display_name,
-        Fields.published + "." + Fields.published_description,
-    ])
+    client.index(index_name).update_searchable_attributes(
+        [
+            # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
+            Fields.display_name,
+            Fields.block_id,
+            Fields.content,
+            Fields.description,
+            Fields.tags,
+            Fields.collections,
+            # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
+            # are searchable only if at least one document in the index has a value. If we didn't list them here and,
+            # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
+            # these sub-fields: "Attribute `tags.level3` is not searchable."
+            Fields.tags + "." + Fields.tags_taxonomy,
+            Fields.tags + "." + Fields.tags_level0,
+            Fields.tags + "." + Fields.tags_level1,
+            Fields.tags + "." + Fields.tags_level2,
+            Fields.tags + "." + Fields.tags_level3,
+            Fields.collections + "." + Fields.collections_display_name,
+            Fields.collections + "." + Fields.collections_key,
+            Fields.published + "." + Fields.display_name,
+            Fields.published + "." + Fields.published_description,
+        ]
+    )
     # Mark which attributes can be used for sorting search results:
-    client.index(index_name).update_sortable_attributes([
-        Fields.display_name,
-        Fields.created,
-        Fields.modified,
-        Fields.last_published,
-    ])
+    client.index(index_name).update_sortable_attributes(
+        [
+            Fields.display_name,
+            Fields.created,
+            Fields.modified,
+            Fields.last_published,
+        ]
+    )
 
     # Update the search ranking rules to let the (optional) "sort" parameter take precedence over keyword relevance.
     # cf https://www.meilisearch.com/docs/learn/core_concepts/relevancy
-    client.index(index_name).update_ranking_rules([
-        "sort",
-        "words",
-        "typo",
-        "proximity",
-        "attribute",
-        "exactness",
-    ])
+    client.index(index_name).update_ranking_rules(
+        [
+            "sort",
+            "words",
+            "typo",
+            "proximity",
+            "attribute",
+            "exactness",
+        ]
+    )
 
 
 def _recurse_children(block, fn, status_cb: Callable[[str], None] | None = None) -> None:
@@ -357,6 +365,9 @@ def is_meilisearch_enabled() -> bool:
 
 
 def reset_index(status_cb: Callable[[str], None] | None = None) -> None:
+    """
+    Reset the Meilisearch index, deleting all documents and reconfiguring it
+    """
     if status_cb is None:
         status_cb = log.info
 
@@ -368,19 +379,25 @@ def reset_index(status_cb: Callable[[str], None] | None = None) -> None:
 
 
 def init_index(status_cb: Callable[[str], None] | None = None, warn_cb: Callable[[str], None] | None = None) -> None:
+    """
+    Initialize the Meilisearch index, creating it and configuring it if it doesn't exist
+    """
     if status_cb is None:
         status_cb = log.info
     if warn_cb is None:
         warn_cb = log.warning
 
     if _index_exists(STUDIO_INDEX_NAME):
-        warn_cb("A rebuild of the index is required. Please run ./manage.py cms reindex_studio --experimental [--incremental]")
+        warn_cb(
+            "A rebuild of the index is required. Please run ./manage.py cms reindex_studio"
+            " --experimental [--incremental]"
+        )
         return
 
     reset_index(status_cb)
 
 
-def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=False) -> None:
+def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=False) -> None:  # lint-amnesty, pylint: disable=too-many-statements
     """
     Rebuild the Meilisearch index from scratch
     """
@@ -394,10 +411,10 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
     status_cb("Counting libraries...")
     keys_indexed = []
     if incremental:
-        keys_indexed = list(IncrementalIndexCompleted.objects.values_list('context_key', flat=True))
+        keys_indexed = list(IncrementalIndexCompleted.objects.values_list("context_key", flat=True))
     lib_keys = [
         lib.library_key
-        for lib in lib_api.ContentLibrary.objects.select_related('org').only('org', 'slug').order_by('-id')
+        for lib in lib_api.ContentLibrary.objects.select_related("org").only("org", "slug").order_by("-id")
         if lib.library_key not in keys_indexed
     ]
     num_libraries = len(lib_keys)

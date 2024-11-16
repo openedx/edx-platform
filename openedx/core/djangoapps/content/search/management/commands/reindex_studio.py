@@ -18,10 +18,10 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('--experimental', action='store_true')
-        parser.add_argument('--reset', action='store_true')
-        parser.add_argument('--init', action='store_true')
-        parser.add_argument('--incremental', action='store_true')
+        parser.add_argument("--experimental", action="store_true")
+        parser.add_argument("--reset", action="store_true")
+        parser.add_argument("--init", action="store_true")
+        parser.add_argument("--incremental", action="store_true")
         parser.set_defaults(experimental=False, reset=False, init=False, incremental=False)
 
     def handle(self, *args, **options):

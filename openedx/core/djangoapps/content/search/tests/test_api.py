@@ -18,7 +18,6 @@ from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content.search.models import IncrementalIndexCompleted
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content.course_overviews.api import CourseOverview
@@ -29,7 +28,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 try:
     # This import errors in the lms because content.search is not an installed app there.
     from .. import api
-    from ..models import SearchAccess
+    from ..models import SearchAccess, IncrementalIndexCompleted
 except RuntimeError:
     SearchAccess = {}
 
@@ -252,10 +251,10 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_vertical["tags"] = {}
         doc_problem1 = copy.deepcopy(self.doc_problem1)
         doc_problem1["tags"] = {}
-        doc_problem1["collections"] = {'display_name': [], 'key': []}
+        doc_problem1["collections"] = {"display_name": [], "key": []}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
-        doc_problem2["collections"] = {'display_name': [], 'key': []}
+        doc_problem2["collections"] = {"display_name": [], "key": []}
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
 
@@ -270,18 +269,22 @@ class TestSearchApi(ModuleStoreTestCase):
             any_order=True,
         )
 
-        # Now we simulate interruption by patching _wait_for_meili_task to raise an exception
-        def simulated_interruption():
-            yield
-            yield
-            raise Exception("Simulated interruption")
-        with patch("openedx.core.djangoapps.content.search.api._wait_for_meili_task", side_effect=simulated_interruption()):
-            with pytest.raises(Exception, match="Simulated interruption"):
-                api.rebuild_index(incremental=True)
+        # Now we simulate interruption by passing this function to the status_cb argument
+        def simulated_interruption(message):
+            # this exception prevents courses from being indexed
+            if "Indexing courses" in message:
+                raise Exception("Simulated interruption")
+
+        with pytest.raises(Exception, match="Simulated interruption"):
+            api.rebuild_index(simulated_interruption, incremental=True)
+
+        # two more calls due to collections
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 5
         assert IncrementalIndexCompleted.objects.all().count() == 1
         api.rebuild_index(incremental=True)
         assert IncrementalIndexCompleted.objects.all().count() == 0
-        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 7
+        # one missing course indexed
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 6
 
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_reset_meilisearch_index(self, mock_meilisearch):
@@ -300,9 +303,11 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.delete_index.assert_not_called()
 
         mock_meilisearch.return_value.get_index.side_effect = [
-            MeilisearchApiError("Testing reindex", Mock(code="index_not_found", text=None)),
-            MeilisearchApiError("Testing reindex", Mock(code="index_not_found", text=None)),
-            Mock(),
+            MeilisearchApiError("Testing reindex", Mock(text='{"code":"index_not_found"}')),
+            MeilisearchApiError("Testing reindex", Mock(text='{"code":"index_not_found"}')),
+            Mock(created_at=1),
+            Mock(created_at=1),
+            Mock(created_at=1),
         ]
         api.init_index()
         mock_meilisearch.return_value.swap_indexes.assert_called_once()
