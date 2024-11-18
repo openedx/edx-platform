@@ -83,9 +83,12 @@ asn1crypto==1.5.1
     #   snowflake-connector-python
 astroid==2.13.5
     # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pylint
     #   pylint-celery
+    #   sphinx-autoapi
 attrs==24.2.0
     # via
     #   -r requirements/edx/doc.txt
@@ -741,7 +744,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.32.1
+edx-enterprise==4.32.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1103,6 +1106,7 @@ jinja2==3.1.4
     #   code-annotations
     #   diff-cover
     #   sphinx
+    #   sphinx-autoapi
 jmespath==1.0.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1166,6 +1170,7 @@ lazy==1.6
     #   xblock
 lazy-object-proxy==1.10.0
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   astroid
 libsass==0.10.0
@@ -1799,6 +1804,7 @@ pyyaml==6.0.2
     #   edx-django-release-util
     #   edx-i18n-tools
     #   jsondiff
+    #   sphinx-autoapi
     #   sphinxcontrib-openapi
     #   xblock
 random2==1.0.2
@@ -1999,6 +2005,7 @@ sphinx==8.1.3
     # via
     #   -r requirements/edx/doc.txt
     #   pydata-sphinx-theme
+    #   sphinx-autoapi
     #   sphinx-book-theme
     #   sphinx-design
     #   sphinx-mdinclude
@@ -2006,6 +2013,8 @@ sphinx==8.1.3
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
     #   sphinxext-rediraffe
+sphinx-autoapi==3.3.3
+    # via -r requirements/edx/doc.txt
 sphinx-book-theme==1.1.3
     # via -r requirements/edx/doc.txt
 sphinx-design==0.6.1
