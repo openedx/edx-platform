@@ -70,7 +70,7 @@
     "sass": "^1.54.8",
     "sass-loader": "^14.1.1",
     "scriptjs": "2.5.9",
-    "style-loader": "0.23.1",
+    "style-loader": "4.0.0",
     "svg-inline-loader": "0.8.2",
     "uglify-js": "2.7.0",
     "underscore": "1.13.1",
