@@ -142,7 +142,6 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
 @task
 @needs(
-    'pavelib.prereqs.install_node_prereqs',
     'pavelib.utils.test.utils.ensure_clean_package_lock',
 )
 @cmdopts([
@@ -154,6 +153,7 @@ def run_eslint(options):
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
+    sh("npm clean-install")
 
     eslint_report_dir = (Env.REPORT_DIR / "eslint")
     eslint_report = eslint_report_dir / "eslint.report"
@@ -222,7 +222,6 @@ def _get_stylelint_violations():
 
 
 @task
-@needs('pavelib.prereqs.install_node_prereqs')
 @cmdopts([
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
@@ -232,6 +231,8 @@ def run_stylelint(options):
     Runs stylelint on Sass files.
     If limit option is passed, fails build if more violations than the limit are found.
     """
+    sh("npm clean-install")
+
     violations_limit = 0
     num_violations = _get_stylelint_violations()
 
@@ -252,7 +253,6 @@ def run_stylelint(options):
 
 
 @task
-@needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("thresholds=", "t", "json containing limit for number of acceptable violations per rule"),
 ])
@@ -261,6 +261,7 @@ def run_xsslint(options):
     """
     Runs xsslint/xss_linter.py on the codebase
     """
+    sh("pip install -r requirements/edx/development.txt -e .")
 
     thresholds_option = getattr(options, 'thresholds', '{}')
     try:
@@ -509,7 +510,6 @@ def _extract_missing_pii_annotations(filename):
 
 
 @task
-@needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("report-dir=", "r", "Directory in which to put PII reports"),
 ])
@@ -518,6 +518,8 @@ def run_pii_check(options):
     """
     Guarantee that all Django models are PII-annotated.
     """
+    sh("pip install -r requirements/edx/development.txt -e .")
+
     pii_report_name = 'pii'
     default_report_dir = (Env.REPORT_DIR / pii_report_name)
     report_dir = getattr(options, 'report_dir', default_report_dir)
@@ -566,12 +568,13 @@ def run_pii_check(options):
 
 
 @task
-@needs('pavelib.prereqs.install_python_prereqs')
 @timed
 def check_keywords():
     """
     Check Django model fields for names that conflict with a list of reserved keywords
     """
+    sh("pip install -r requirements/edx/development.txt -e .")
+
     report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
     sh(f"mkdir -p {report_path}")
 

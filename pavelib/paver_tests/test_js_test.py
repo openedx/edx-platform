@@ -31,6 +31,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
     )
 
     EXPECTED_COMMANDS = [
+        "npm clean-install",
         "make report_dir",
         'git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads',
         "find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \\;",

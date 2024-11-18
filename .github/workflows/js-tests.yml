@@ -61,7 +61,7 @@ jobs:
 
       - name: Install Required Python Dependencies
         run: |
-          make base-requirements
+          make test-requirements
 
       - uses: c-hive/gha-npm-cache@v1
       - name: Run JS Tests

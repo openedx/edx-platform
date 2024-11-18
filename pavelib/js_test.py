@@ -23,7 +23,6 @@ __test__ = False  # do not collect
 
 @task
 @needs(
-    'pavelib.prereqs.install_node_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
@@ -39,6 +38,7 @@ def test_js(options):
     """
     Run the JavaScript tests
     """
+    sh("npm clean-install")
     mode = getattr(options, 'mode', 'run')
     port = None
     skip_clean = getattr(options, 'skip_clean', False)
@@ -100,7 +100,6 @@ def test_js_dev(options):
 
 
 @task
-@needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
 ], share_with=['coverage'])
@@ -109,6 +108,8 @@ def diff_coverage(options):
     """
     Build the diff coverage reports
     """
+    sh("pip install -r requirements/edx/coverage.txt")
+
     compare_branch = options.get('compare_branch', 'origin/master')
 
     # Find all coverage XML files (both Python and JavaScript)
