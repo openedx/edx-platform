@@ -3,7 +3,7 @@
 import lms.djangoapps.courseware.fields
 
 from django.conf import settings
-from django.db import migrations
+from django.db import migrations, models
 from django.db.migrations import AlterField
 
 class CsmBigInt(AlterField):
@@ -51,6 +51,6 @@ class Migration(migrations.Migration):
         CsmBigInt(
             model_name='studentmodule',
             name='id',
-            field=lms.djangoapps.courseware.fields.UnsignedBigIntAutoField(primary_key=True, serialize=False),
+            field=models.BigAutoField(primary_key=True),
         )
     ]

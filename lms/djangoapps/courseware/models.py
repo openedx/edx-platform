@@ -28,7 +28,6 @@ from django.utils.translation import gettext_lazy as _
 from edx_django_utils.cache.utils import RequestCache
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
-from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 
 from openedx.core.djangolib.markup import HTML
 
@@ -86,7 +85,7 @@ class StudentModule(models.Model):
     """
     objects = ChunkingManager()
 
-    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+    id = models.BigAutoField(primary_key=True)  # pylint: disable=invalid-name
 
     ## The XBlock/XModule type (e.g. "problem")
     module_type = models.CharField(max_length=32, db_index=True)
