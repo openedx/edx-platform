@@ -57,6 +57,7 @@ asn1crypto==1.5.1
     #   snowflake-connector-python
 astroid==2.13.5
     # via
+    #   -c requirements/edx/../constraints.txt
     #   pylint
     #   pylint-celery
 attrs==24.2.0
@@ -571,7 +572,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.32.1
+edx-enterprise==4.32.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

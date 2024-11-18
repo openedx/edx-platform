@@ -1,11 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_display.xmodule_LTIBlock {
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-}
 
 .xmodule_display.xmodule_LTIBlock h2.problem-header {
     display: inline-block;
@@ -13,7 +7,7 @@
 
 .xmodule_display.xmodule_LTIBlock div.problem-progress {
     display: inline-block;
-    padding-left: calc((var(--baseline)/4));
+    padding-left: calc((var(--baseline) / 4));
     color: #666;
     font-weight: 100;
     font-size: 1em;
@@ -57,6 +51,6 @@
 }
 
 .xmodule_display.xmodule_LTIBlock div.lti div.problem-feedback {
-    margin-top: calc((var(--baseline)/4));
-    margin-bottom: calc((var(--baseline)/4));
+    margin-top: calc((var(--baseline) / 4));
+    margin-bottom: calc((var(--baseline) / 4));
 }
