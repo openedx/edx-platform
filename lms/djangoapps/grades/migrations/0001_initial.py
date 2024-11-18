@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('id', models.BigAutoField(primary_key=True)),
+                ('id', models.BigAutoField(primary_key=True, serialize=False)),
                 ('user_id', models.IntegerField()),
                 ('course_id', CourseKeyField(max_length=255)),
                 ('usage_key', UsageKeyField(max_length=255)),
