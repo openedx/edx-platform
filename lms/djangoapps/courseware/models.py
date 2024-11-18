@@ -85,7 +85,7 @@ class StudentModule(models.Model):
     """
     objects = ChunkingManager()
 
-    id = models.BigAutoField(primary_key=True)  # pylint: disable=invalid-name
+    id = models.BigAutoField(verbose_name='ID', primary_key=True)  # pylint: disable=invalid-name
 
     ## The XBlock/XModule type (e.g. "problem")
     module_type = models.CharField(max_length=32, db_index=True)

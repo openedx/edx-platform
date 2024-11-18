@@ -51,6 +51,6 @@ class Migration(migrations.Migration):
         CsmBigInt(
             model_name='studentmodule',
             name='id',
-            field=models.BigAutoField(primary_key=True),
+            field=models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID'),
         )
     ]
