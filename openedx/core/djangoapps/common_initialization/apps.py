@@ -2,7 +2,6 @@
 Common initialization app for the LMS and CMS
 """
 
-
 from django.apps import AppConfig
 from django.db import connection
 
@@ -31,14 +30,15 @@ class CommonInitializationConfig(AppConfig):  # lint-amnesty, pylint: disable=mi
 
     @staticmethod
     def _add_required_adapters():
+        """
+        Register CourseLocator in psycopg2 extensions
+        :return:
+        """
         if 'postgresql' in connection.vendor.lower():
             from opaque_keys.edx.locator import CourseLocator
-            from psycopg2.extensions import register_adapter, QuotedString
-
-
+            from psycopg2.extensions import QuotedString, register_adapter
             def adapt_course_locator(course_locator):
-                return QuotedString(course_locator._to_string())
-
+                return QuotedString(course_locator._to_string())  # lint-amnesty, pylint: disable=protected-access
 
             # Register the adapter
             register_adapter(CourseLocator, adapt_course_locator)
