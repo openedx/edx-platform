@@ -34,7 +34,7 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
         get_latest_by = "created"
         index_together = ['student_module']
 
-    id = models.BigAutoField(primary_key=True)  # pylint: disable=invalid-name
+    id = models.BigAutoField(primary_key=True, serialize=False)  # pylint: disable=invalid-name
 
     student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.DO_NOTHING)
 
