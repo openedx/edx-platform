@@ -40,7 +40,7 @@ class Command(BaseCommand):
         if options["reset"]:
             api.reset_index(self.stdout.write)
         elif options["init"]:
-            api.init_index(self.stdout.write)
+            api.init_index(self.stdout.write, self.stderr.write)
         elif options["incremental"]:
             api.rebuild_index(self.stdout.write, incremental=True)
         else:
