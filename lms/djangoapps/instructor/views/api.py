@@ -2456,6 +2456,9 @@ def _list_instructor_tasks(request, course_id, serialize_data=None):
         else:
             # Specifying for single problem's history
             tasks = task_api.get_instructor_task_history(course_id, module_state_key)
+    elif request.GET.get('include_canvas') is not None:
+        from ol_openedx_canvas_integration.task_helpers import get_filtered_instructor_tasks  # pylint: disable=import-error
+        tasks = get_filtered_instructor_tasks(course_id, request.user)
     else:
         # If no problem or student, just get currently running tasks
         tasks = task_api.get_running_instructor_tasks(course_id)

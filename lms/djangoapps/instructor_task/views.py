@@ -138,7 +138,9 @@ def get_task_completion_info(instructor_task):  # lint-amnesty, pylint: disable=
 
     student = None
     problem_url = None
+    entrance_exam_url = None
     email_id = None
+    task_input = None
     try:
         task_input = json.loads(instructor_task.task_input)
     except ValueError:
@@ -192,6 +194,10 @@ def get_task_completion_info(instructor_task):  # lint-amnesty, pylint: disable=
         else:  # num_succeeded < num_attempted
             # Translators: {action} is a past-tense verb that is localized separately. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint: disable=line-too-long
             msg_format = _("Problem {action} for {succeeded} of {attempted} students")
+    elif task_input and task_input.get('course_key'):
+        from ol_openedx_canvas_integration.utils import get_task_output_formatted_message  # pylint: disable=import-error
+        msg_format = get_task_output_formatted_message(task_output)
+        succeeded = True
     elif email_id is not None:
         # this reports on actions on bulk emails
         if num_attempted == 0:
