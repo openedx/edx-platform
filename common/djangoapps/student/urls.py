@@ -4,7 +4,7 @@ URLs for student app
 
 
 from django.conf import settings
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from django.views.decorators.csrf import csrf_exempt
 
 from . import views
