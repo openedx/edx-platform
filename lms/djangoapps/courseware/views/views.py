@@ -33,6 +33,8 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
+from xblock.core import XBlock
+
 from lms.djangoapps.static_template_view.views import render_500
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
@@ -1562,6 +1564,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     set_custom_attributes_for_course_key(course_key)
     set_custom_attribute('usage_key', usage_key_string)
     set_custom_attribute('block_type', usage_key.block_type)
+    block_class = XBlock.load_class(usage_key.block_type)
+    if hasattr(block_class, 'is_extracted'):
+        is_extracted = block_class.is_extracted
+        set_custom_attribute('block_extracted', is_extracted)
 
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
