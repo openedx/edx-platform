@@ -72,7 +72,7 @@
     "scriptjs": "2.5.9",
     "style-loader": "4.0.0",
     "svg-inline-loader": "0.8.2",
-    "uglify-js": "2.7.0",
+    "uglify-js": "2.8.29",
     "underscore": "1.13.1",
     "underscore.string": "3.3.6",
     "webpack": "^5.90.3",
