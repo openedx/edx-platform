@@ -442,15 +442,43 @@ function($, _, Backbone, gettext, BasePage,
 
         /** Show the modal for previewing changes before syncing a library-sourced XBlock. */
         showXBlockLibraryChangesPreview: function(event, options) {
+            const xblockElement = this.findXBlockElement(event.target);
+            const self = this;
+            const xblockInfo = XBlockUtils.findXBlockInfo(xblockElement, this.model);
+            const courseAuthoringMfeUrl = this.model.attributes.course_authoring_url;
+            const headerElement = xblockElement.find('.xblock-header-primary');
+            const upstreamBlockId = headerElement.data('upstream-ref');
+            const upstreamBlockVersionSynced = headerElement.data('version-synced');
+
+            try {
+                if (this.options.isIframeEmbed) {
+                    window.parent.postMessage(
+                        {
+                            type: 'showXBlockLibraryChangesPreview',
+                            payload: {
+                                downstreamBlockId: xblockInfo.get('id'),
+                                displayName: xblockInfo.get('display_name'),
+                                isVertical: xblockInfo.isVertical(),
+                                upstreamBlockId,
+                                upstreamBlockVersionSynced,
+                            }
+                        }, document.referrer
+                    );
+                    return true;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
             event.preventDefault();
-
-            var xblockElement = this.findXBlockElement(event.target),
-                self = this,
-                modal = new PreviewLibraryChangesModal(options);
-
-            modal.showPreviewFor(xblockElement, this.model, function() {
-                self.refreshXBlock(xblockElement, false);
-            });
+            var modal = new PreviewLibraryChangesModal(options);
+            modal.showPreviewFor(
+                xblockInfo,
+                courseAuthoringMfeUrl,
+                upstreamBlockId,
+                upstreamBlockVersionSynced,
+                function() { self.refreshXBlock(xblockElement, false); }
+            );
         },
 
         /** Show the multi-select library content picker, for adding to a Problem Bank (itembank) Component */
