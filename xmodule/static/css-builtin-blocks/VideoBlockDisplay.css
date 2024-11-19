@@ -1,19 +1,11 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
 .xmodule_display.xmodule_VideoBlock {
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-}
-
-.xmodule_display.xmodule_VideoBlock {
     margin-bottom: calc((var(--baseline) * 1.5));
 }
 
-.xmodule_display.xmodule_VideoBlock .is-hidden, .xmodule_display.xmodule_VideoBlock .video.closed .subtitles {
+.xmodule_display.xmodule_VideoBlock .is-hidden,
+.xmodule_display.xmodule_VideoBlock .video.closed .subtitles {
     display: none;
 }
 
@@ -32,7 +24,9 @@
     clear: both;
 }
 
-.xmodule_display.xmodule_VideoBlock .video:focus, .xmodule_display.xmodule_VideoBlock .video:active, .xmodule_display.xmodule_VideoBlock .video:hover {
+.xmodule_display.xmodule_VideoBlock .video:focus,
+.xmodule_display.xmodule_VideoBlock .video:active,
+.xmodule_display.xmodule_VideoBlock .video:hover {
     border: 0;
 }
 
@@ -116,7 +110,8 @@
     margin: 0;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option a.btn, .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option a.btn-link {
+.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option a.btn,
+.xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option a.btn-link {
     font-size: 16px !important;
     font-weight: unset;
 }
@@ -266,12 +261,14 @@
     opacity: 0.5;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible:hover, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible.is-dragging {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible:hover,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible.is-dragging {
     background: black;
     cursor: move;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible:hover::before, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible.is-dragging::before {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible:hover::before,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible.is-dragging::before {
     opacity: 1;
 }
 
@@ -280,11 +277,11 @@
     min-height: 158px;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-player > div {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-player>div {
     height: 100%;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-player > div.hidden {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-player>div.hidden {
     display: none;
 }
 
@@ -327,7 +324,8 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls:hover ul,
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls:hover div, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls:focus ul,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls:hover div,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls:focus ul,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls:focus div {
     opacity: 1;
 }
@@ -345,11 +343,14 @@
     color: #cfd8dc;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .control:hover, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .control:focus {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .control:hover,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .control:focus {
     background: #171a1b;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .control:active, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .is-active.control, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .active.control {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .control:active,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .is-active.control,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .active.control {
     color: #0ea6ec;
 }
 
@@ -411,7 +412,8 @@
     box-shadow: none;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .slider .ui-slider-handle:focus, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .slider .ui-slider-handle:hover {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .slider .ui-slider-handle:focus,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .slider .ui-slider-handle:hover {
     background-color: #db8baf;
     border-color: #db8baf;
 }
@@ -465,7 +467,7 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .speed-button:focus,
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume > .control:focus,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume>.control:focus,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .add-fullscreen:focus,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .auto-advance:focus,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .quality-control:focus,
@@ -513,7 +515,8 @@
     white-space: nowrap;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li .speed-option:hover, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li .speed-option:focus,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li .speed-option:hover,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li .speed-option:focus,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li .control-lang:hover,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li .control-lang:focus {
     background-color: #4f595d;
@@ -585,7 +588,7 @@
     opacity: 1;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume:not(:first-child) > a {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume:not(:first-child)>a {
     border-left: none;
 }
 
@@ -622,7 +625,8 @@
     box-shadow: none;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container .volume-slider .ui-slider-handle:hover, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container .volume-slider .ui-slider-handle:focus {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container .volume-slider .ui-slider-handle:hover,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container .volume-slider .ui-slider-handle:focus {
     background: #db8baf;
     border-color: #db8baf;
 }
@@ -643,7 +647,8 @@
     color: #0ea6ec;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .quality-control.is-hidden, .xmodule_display.xmodule_VideoBlock .video.closed .video-wrapper .video-controls .secondary-controls .quality-control.subtitles {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .quality-control.is-hidden,
+.xmodule_display.xmodule_VideoBlock .video.closed .video-wrapper .video-controls .secondary-controls .quality-control.subtitles {
     display: none !important;
 }
 
@@ -651,7 +656,7 @@
     color: #0ea6ec;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .lang > .hide-subtitles {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .lang>.hide-subtitles {
     transition: none;
 }
 
@@ -715,7 +720,8 @@
     outline-offset: -1px;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li:hover, .xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li:focus {
+.xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li:hover,
+.xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li:focus {
     text-decoration: underline;
 }
 
@@ -890,11 +896,16 @@
     width: calc((var(--baseline) * 4));
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-pre-roll .btn-play.btn-pre-roll:hover, .xmodule_display.xmodule_VideoBlock .video .video-pre-roll .btn-play.btn-pre-roll:focus {
+.xmodule_display.xmodule_VideoBlock .video .video-pre-roll .btn-play.btn-pre-roll:hover,
+.xmodule_display.xmodule_VideoBlock .video .video-pre-roll .btn-play.btn-pre-roll:focus {
     background: var(--blue);
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .slider .ui-slider-handle, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container .volume-slider .ui-slider-handle, .xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li, .xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .slider .ui-slider-handle,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container .volume-slider .ui-slider-handle,
+.xmodule_display.xmodule_VideoBlock .video .subtitles .subtitles-menu li,
+.xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li {
     cursor: pointer;
 }
 
@@ -902,15 +913,19 @@
     z-index: 0;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu, .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container {
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu,
+.xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container {
     z-index: 10;
 }
 
-.xmodule_display.xmodule_VideoBlock .video .video-pre-roll, .xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list {
+.xmodule_display.xmodule_VideoBlock .video .video-pre-roll,
+.xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list {
     z-index: 1000;
 }
 
-.xmodule_display.xmodule_VideoBlock .video.video-fullscreen, .xmodule_display.xmodule_VideoBlock .video.video-fullscreen .tc-wrapper .video-controls, .xmodule_display.xmodule_VideoBlock .overlay {
+.xmodule_display.xmodule_VideoBlock .video.video-fullscreen,
+.xmodule_display.xmodule_VideoBlock .video.video-fullscreen .tc-wrapper .video-controls,
+.xmodule_display.xmodule_VideoBlock .overlay {
     z-index: 10000;
 }
 
@@ -919,7 +934,7 @@
     z-index: 100000;
 }
 
-.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container > a::after {
+.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container>a::after {
     font-family: FontAwesome;
     -webkit-font-smoothing: antialiased;
     display: inline-block;
@@ -962,7 +977,8 @@
     line-height: 23px;
 }
 
-.xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li a:hover, .xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li a:focus {
+.xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li a:hover,
+.xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li a:focus {
     color: var(--gray-d1);
 }
 
@@ -982,16 +998,16 @@
     border-left: 1px solid #eee;
 }
 
-.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container.open > a {
+.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container.open>a {
     background-color: var(--action-primary-active-bg);
     color: var(--very-light-text);
 }
 
-.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container.open > a::after {
+.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container.open>a::after {
     color: var(--very-light-text);
 }
 
-.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container > a {
+.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container>a {
     transition: all var(--tmg-f2) ease-in-out 0s;
     font-size: 12px;
     display: block;
@@ -1006,7 +1022,7 @@
     text-overflow: ellipsis;
 }
 
-.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container > a::after {
+.xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container>a::after {
     content: "\f0d7";
     position: absolute;
     right: calc((var(--baseline) * 0.5));
@@ -1061,10 +1077,10 @@
     outline: none;
 }
 
-.xmodule_display.xmodule_VideoBlock .contextmenu .menu-item > span,
-.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item > span,
-.xmodule_display.xmodule_VideoBlock .submenu .menu-item > span,
-.xmodule_display.xmodule_VideoBlock .submenu .submenu-item > span {
+.xmodule_display.xmodule_VideoBlock .contextmenu .menu-item>span,
+.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item>span,
+.xmodule_display.xmodule_VideoBlock .submenu .menu-item>span,
+.xmodule_display.xmodule_VideoBlock .submenu .submenu-item>span {
     color: #333;
 }
 
@@ -1083,10 +1099,10 @@
     color: var(--white);
 }
 
-.xmodule_display.xmodule_VideoBlock .contextmenu .menu-item:focus > span,
-.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item:focus > span,
-.xmodule_display.xmodule_VideoBlock .submenu .menu-item:focus > span,
-.xmodule_display.xmodule_VideoBlock .submenu .submenu-item:focus > span {
+.xmodule_display.xmodule_VideoBlock .contextmenu .menu-item:focus>span,
+.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item:focus>span,
+.xmodule_display.xmodule_VideoBlock .submenu .menu-item:focus>span,
+.xmodule_display.xmodule_VideoBlock .submenu .submenu-item:focus>span {
     color: var(--white);
 }
 
@@ -1116,13 +1132,13 @@
     color: var(--white);
 }
 
-.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item.is-opened > span,
-.xmodule_display.xmodule_VideoBlock .submenu .submenu-item.is-opened > span {
+.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item.is-opened>span,
+.xmodule_display.xmodule_VideoBlock .submenu .submenu-item.is-opened>span {
     color: var(--white);
 }
 
-.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item.is-opened > .submenu,
-.xmodule_display.xmodule_VideoBlock .submenu .submenu-item.is-opened > .submenu {
+.xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item.is-opened>.submenu,
+.xmodule_display.xmodule_VideoBlock .submenu .submenu-item.is-opened>.submenu {
     display: block;
 }
 

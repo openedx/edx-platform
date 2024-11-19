@@ -78,7 +78,7 @@ django-storages<1.14.4
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.32.2
+edx-enterprise==4.32.3
 
 # Date: 2024-05-09
 # This has to be constrained as well because newer versions of edx-i18n-tools need the
@@ -156,6 +156,7 @@ pycodestyle<2.9.0
 # Date: 2021-07-12
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/33560
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
+astroid<2.14.0
 
 # Date: 2021-08-25
 # At the time of writing this comment, we do not know whether py2neo>=2022
