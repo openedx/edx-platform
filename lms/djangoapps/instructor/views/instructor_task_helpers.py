@@ -10,7 +10,7 @@ import logging
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
-from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.date_utils import get_default_time_display, get_time_display
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.instructor_task.views import get_task_completion_info
 
@@ -60,7 +60,7 @@ def extract_email_features(email_task):
 
     email = CourseEmail.objects.get(id=task_input_information['email_id'])
     email_feature_dict = {
-        'created': get_default_time_display(email.created),
+        'created': get_time_display(email.created, coerce_tz="Asia/Kolkata"),
         'sent_to': [target.long_display() for target in email.targets.all()],
         'requester': str(email_task.requester),
     }
@@ -115,7 +115,7 @@ def extract_task_features(task):
     features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
     task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
     # Some information (created, duration, status, task message) require additional formatting
-    task_feature_dict['created'] = task.created.isoformat()
+    task_feature_dict['created'] = get_time_display(task.created, coerce_tz="Asia/Kolkata")
 
     # Get duration info, if known
     duration_sec = 'unknown'

@@ -57,7 +57,7 @@ SEND_TO_COHORT = 'cohort'
 SEND_TO_TRACK = 'track'
 EMAIL_TARGET_CHOICES = list(zip(
     [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK],
-    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', 'Specific course mode']
+    ['Myself', 'Staff/Administrators', 'All Learners', 'Specific cohort', 'Specific course mode']
 ))
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 

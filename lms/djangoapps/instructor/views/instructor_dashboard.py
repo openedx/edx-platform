@@ -728,10 +728,13 @@ def _section_send_email(course, access):
             'list_email_content', kwargs={'course_id': str(course_key)}
         ),
     }
-    if settings.FEATURES.get("ENABLE_NEW_BULK_EMAIL_EXPERIENCE", False) is not False:
+    helper_settings = configuration_helpers.get_value('FEATURES', settings.FEATURES)
+    if helper_settings.get("ENABLE_NEW_BULK_EMAIL_EXPERIENCE", False) is not False:
+        mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+        communications_mfe_url = settings.COMMUNICATIONS_MICROFRONTEND_URL if "COMMUNICATIONS_MICROFRONTEND_URL" not in mfe_config else mfe_config["COMMUNICATIONS_MICROFRONTEND_URL"]
         section_data[
             "communications_mfe_url"
-        ] = f"{settings.COMMUNICATIONS_MICROFRONTEND_URL}/courses/{str(course_key)}/bulk_email"
+        ] = f"{communications_mfe_url}/courses/{str(course_key)}/bulk_email"
     return section_data
 
 
