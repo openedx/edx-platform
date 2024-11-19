@@ -55,8 +55,16 @@ from cms.djangoapps.contentstore.utils import (
     translation_language,
     delete_course
 )
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
+    handle_xblock,
+    create_xblock_info,
+    get_block_info,
+    get_xblock,
+    delete_orphans,
+)
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.course_action_state.models import CourseRerunState
+from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.monitoring import monitor_import_failure
@@ -1104,7 +1112,7 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
 @shared_task(base=CourseLinkCheckTask, bind=True)
 def check_broken_links(self, user_id, course_key_string, language):
     """
-    Checks for broken links in a course. Store the results.
+    Checks for broken links in a course. Store the results in a file.
     """
     courselike_key = CourseKey.from_string(course_key_string)
 
@@ -1139,6 +1147,8 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
     """
     Generates a json file for broken links, or returns None if there was an error.
     Updates the context with any error information if applicable.
+    Note that because the celery queue does not have credentials, some broken links will
+    need to be checked client side.
 
     File format:
     [
@@ -1168,17 +1178,21 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
         data = []
         for block in blocks:
             # TODO cleanup unused stuff below
-            location = block.location
-            block_id = block.location.block_id
+            # location = block.location
+            # block_id = block.location.block_id
             usage_key = block.usage_key
-            display_name = block.display_name
-            category = getattr(block, 'category', '')
-            block_data = getattr(block, 'data', '')
-            # data.append([str(display_name), block_data])
+            # display_name = block.display_name
+            # category = getattr(block, 'category', '')
+            # data = getattr(block, 'data', '') # do we want this? it has /static -> /asset
+            block_info = get_block_info(block)
+            block_data = block_info['data']
             urls = _get_urls(block_data)
+
             for url in urls:
-                if not _verify_url(url):
-                    # data.append([str(location), str(display_name), str(category), url])
+                if url == '#':
+                    break
+                processed_url = _process_url(url)
+                if not _verify_url(processed_url):
                     data.append([str(usage_key), url])
 
         with open(links_file.name, 'w') as file:
@@ -1224,17 +1238,33 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
 
 def _get_urls(content):
     """
-    Return all urls after hrefs in content
+    Return all urls after hrefs and src in content
     """
-    # TODO process non-https
-    # TODO handle /static
-    urls = re.findall(r'(?:href|src)=["\']([^"\']*)["\']', content)
+    urls = re.findall(r'\s+(?:href|src)=["\']([^"\']*)["\']', content)
     return urls
+
+
+def _process_url(url):
+    """
+    Returns processed url
+    Some example urls that refer to places in studio:
+        - /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
+        - /static/getting-started_x250.png
+        - /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
+    """
+    if not url.startswith('http://') and not url.startswith('https://'):
+        if url.startswith('/static/'):
+            processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)
+            return 'http://' + settings.CMS_BASE + processed_url[1:-1]
+        elif url.startswith('/'):
+            return 'http://' + settings.CMS_BASE + url
+        else:
+            return 'http://' + settings.CMS_BASE + '/container/' + url
 
 
 def _verify_url(url):
     """
-    Verify if url returns 200 OK
+    Returns true if url request returns 200
     """
     try:
         response = requests.get(url, timeout=5)

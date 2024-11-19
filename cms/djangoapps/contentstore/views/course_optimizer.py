@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import re
+import requests
 import shutil
 from wsgiref.util import FileWrapper
 
@@ -32,6 +33,7 @@ from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.monitoring import monitor_import_failure
@@ -100,7 +102,7 @@ def link_check_handler(request, course_key_string):
 
     if request.method == 'POST':
         check_broken_links.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
-        return JsonResponse({'ExportStatus': 1})
+        return JsonResponse({'LinkCheckStatus': 1})
     else:
         # Only HTML request format is supported (no JSON).
         return HttpResponse(status=406)
@@ -116,17 +118,12 @@ def link_check_status_handler(request, course_key_string):
     Returns an integer corresponding to the status of a link check. These are:
 
         -X : Link check unsuccessful due to some error with X as stage [0-3]
-        0 : No status info found (export done or task not yet created)
+        0 : No status info found (task not yet created)
         1 : Scanning
         2 : Verifying
-        3 : Link check successful
+        3 : Success
 
-    If the link check was successful, a result is also returned.
-    sections
-        subsections
-            units
-                blocks
-                    links: [ <broken links>, … ],
+    If the link check was successful, an output result is also returned.
     """
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
@@ -135,6 +132,8 @@ def link_check_status_handler(request, course_key_string):
     # The task status record is authoritative once it's been created
     task_status = _latest_task_status(request, course_key_string, link_check_status_handler)
     json_content = None
+    test = None
+    response = None
     error = None
     broken_links_dto = None
     if task_status is None:
@@ -169,8 +168,8 @@ def link_check_status_handler(request, course_key_string):
     }
     if broken_links_dto:
         response["LinkCheckOutput"] = broken_links_dto
-    if json_content:
-        response['json'] = json_content
+    # if json_content:
+    #     response['debug'] = json_content
     if error:
         response['LinkCheckError'] = error
     return JsonResponse(response)
@@ -191,19 +190,45 @@ def _latest_task_status(request, course_key_string, view_func=None):
 
 def _create_dto(json_content, request_user):
     """
-    Create a DTO for frontend given a list of broken links.
+    Returns a DTO for frontend given a list of broken links.
+
+    json_content contains a list of the following:
+        [block_id, link]
+
+    Returned DTO structure:
+    {
+        section: {
+            display_name,
+            subsection: {
+                display_name,
+                unit: {
+                    display_name,
+                    block: {
+                        display_name,
+                        url,
+                        broken_links: [],
+                    }
+                }
+            }
+        }
+    }
     """
     result = {}
     for item in json_content:
-        usage_key = usage_key_with_run(item[0])
+        block_id, link = item
+        usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
-        link = item[1]
         _add_broken_link(result, block, link)
 
     return result
 
 
 def _add_broken_link(result, block, link):
+    """
+    Adds broken link found in the specified block along with other block data.
+    Note that because the celery queue does not have credentials, some broken links will
+    need to be checked client side.
+    """
     hierarchy = []
     current = block
     while current:
