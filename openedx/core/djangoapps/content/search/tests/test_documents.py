@@ -443,5 +443,37 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             'tags': {
                 'taxonomy': ['Difficulty'],
                 'level0': ['Difficulty > Normal']
+            },
+            "published": {
+                "num_children": 0
+            }
+        }
+
+    def test_collection_with_published_library(self):
+        library_api.publish_changes(self.library.key)
+
+        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
+        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+
+        assert doc == {
+            "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
+            "block_id": self.collection.key,
+            "usage_key": self.collection_usage_key,
+            "type": "collection",
+            "org": "edX",
+            "display_name": "Toy Collection",
+            "description": "my toy collection description",
+            "num_children": 1,
+            "context_key": "lib:edX:2012_Fall",
+            "access_id": self.library_access_id,
+            "breadcrumbs": [{"display_name": "some content_library"}],
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            'tags': {
+                'taxonomy': ['Difficulty'],
+                'level0': ['Difficulty > Normal']
+            },
+            "published": {
+                "num_children": 1
             }
         }
