@@ -122,6 +122,7 @@ beautifulsoup4==4.12.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   openedx-forum
     #   pydata-sphinx-theme
     #   pynliner
 billiard==4.2.1
@@ -406,6 +407,7 @@ django==4.2.16
     #   openedx-django-wiki
     #   openedx-events
     #   openedx-filters
+    #   openedx-forum
     #   openedx-learning
     #   ora2
     #   social-auth-app-django
@@ -618,6 +620,7 @@ djangorestframework==3.14.0
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
+    #   openedx-forum
     #   openedx-learning
     #   ora2
     #   super-csv
@@ -813,6 +816,7 @@ edx-search==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   openedx-forum
 edx-sga==0.25.0
     # via
     #   -r requirements/edx/doc.txt
@@ -859,6 +863,7 @@ elasticsearch==7.9.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-search
+    #   openedx-forum
 enmerkar==0.7.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1297,6 +1302,7 @@ mysqlclient==2.2.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   openedx-forum
 newrelic==10.2.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1347,6 +1353,7 @@ openedx-atlas==0.6.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   openedx-forum
 openedx-calc==3.1.2
     # via
     #   -r requirements/edx/doc.txt
@@ -1381,6 +1388,10 @@ openedx-filters==1.11.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   ora2
+openedx-forum==0.1.2
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 openedx-learning==0.18.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1649,6 +1660,7 @@ pymongo==4.4.0
     #   edx-opaque-keys
     #   event-tracking
     #   mongoengine
+    #   openedx-forum
     #   openedx-mongodbproxy
 pynacl==1.5.0
     # via
@@ -1845,6 +1857,7 @@ requests==2.32.3
     #   mailsnake
     #   meilisearch
     #   openai
+    #   openedx-forum
     #   optimizely-sdk
     #   pact-python
     #   pyjwkest
