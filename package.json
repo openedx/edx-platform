@@ -55,7 +55,7 @@
     "node-gyp": "10.2.0",
     "picturefill": "3.0.3",
     "popper.js": "1.16.1",
-    "prop-types": "15.6.0",
+    "prop-types": "15.8.1",
     "raw-loader": "0.5.1",
     "react": "16.14.0",
     "react-dom": "16.14.0",
