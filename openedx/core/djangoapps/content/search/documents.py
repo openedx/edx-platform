@@ -80,6 +80,7 @@ class Fields:
     published = "published"
     published_display_name = "display_name"
     published_description = "description"
+    published_num_children = "num_children"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
@@ -485,6 +486,15 @@ def searchable_doc_for_collection(
     if collection:
         assert collection.key == collection_key
 
+        draft_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_draft=True,
+        ).count()
+        published_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_published=True,
+        ).count()
+
         doc.update({
             Fields.context_key: str(library_key),
             Fields.org: str(library_key.org),
@@ -495,7 +505,10 @@ def searchable_doc_for_collection(
             Fields.description: collection.description,
             Fields.created: collection.created.timestamp(),
             Fields.modified: collection.modified.timestamp(),
-            Fields.num_children: collection.entities.count(),
+            Fields.num_children: draft_num_children,
+            Fields.published: {
+                Fields.published_num_children: published_num_children,
+            },
             Fields.access_id: _meili_access_id_from_context_key(library_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })

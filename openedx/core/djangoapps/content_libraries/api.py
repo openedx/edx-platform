@@ -82,6 +82,7 @@ from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
     LibraryCollectionData,
+    ContentObjectChangedData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -91,6 +92,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
@@ -698,7 +700,11 @@ def _get_library_component_tags_count(library_key) -> dict:
     return get_object_tag_counts(library_key_pattern, count_implicit=True)
 
 
-def get_library_components(library_key, text_search=None, block_types=None) -> QuerySet[Component]:
+def get_library_components(
+    library_key,
+    text_search=None,
+    block_types=None,
+) -> QuerySet[Component]:
     """
     Get the library components and filter.
 
@@ -714,6 +720,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
         type_names=block_types,
         draft_title=text_search,
     )
+
     return components
 
 
@@ -1116,14 +1123,30 @@ def delete_library_block(usage_key, remove_from_parent=True):
     Delete the specified block from this library (soft delete).
     """
     component = get_component_from_usage_key(usage_key)
+    library_key = usage_key.context_key
+    affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
+
     authoring_api.soft_delete_draft(component.pk)
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
-            library_key=usage_key.context_key,
+            library_key=library_key,
             usage_key=usage_key
         )
     )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # To delete the component on collections
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                background=True,
+            )
+        )
 
 
 def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticFile]:
@@ -1358,6 +1381,39 @@ def revert_changes(library_key):
             update_blocks=True
         )
     )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # This is to update component counts in all library collections,
+    # because there may be components that have been discarded in the revert.
+    for collection in authoring_api.get_collections(learning_package.id):
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                background=True,
+            )
+        )
+
+    # Reindex components that are in collections
+    #
+    # Use case: When a component that was within a collection has been deleted
+    # and the changes are reverted, the component should appear in the
+    # collection again.
+    components_in_collections = authoring_api.get_components(
+        learning_package.id, draft=True, namespace='xblock.v1',
+    ).filter(publishable_entity__collections__isnull=False)
+
+    for component in components_in_collections:
+        usage_key = library_component_usage_key(library_key, component)
+
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            content_object=ContentObjectChangedData(
+                object_id=str(usage_key),
+                changes=["collections"],
+            ),
+        )
 
 
 def create_library_collection(
