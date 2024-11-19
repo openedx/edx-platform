@@ -1257,5 +1257,8 @@ zipp==3.17.0
     #   importlib-metadata
     #   importlib-resources
 
+swig==4.2.1.post0
+djangosaml2idp==0.5.0
+
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

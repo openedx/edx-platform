@@ -9,6 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 
+import djangosaml2idp
+
+
 urlpatterns = [
 
     re_path(r'^extras/join_zoom_meeting$', views.join_zoom_meeting, name = "join_zoom_meeting"),
@@ -59,5 +62,6 @@ urlpatterns = [
     ),
 ]
 
+urlpatterns += [re_path(r'^idp/', include('djangosaml2idp.urls')),]
 
 urlpatterns += [re_path(r'^assessment_tracker', views.user_tracker_link, name='user_tracker_link')]
