@@ -46,6 +46,11 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         super().setUp()
         self.url = reverse("cms.djangoapps.contentstore:v1:course_waffle_flags")
         self.create_waffle_flags(self.course_waffle_flags)
+        WaffleFlagCourseOverrideModel.objects.create(
+            waffle_flag=f"contentstore.enable_course_optimizer",
+            course_id=self.course.id,
+            enabled=True,
+        )
 
     def create_waffle_flags(self, flags, enabled=True):
         """
@@ -72,7 +77,9 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         Returns:
             dict: A dictionary with each flag set to the value of `enabled`.
         """
-        return {flag: enabled for flag in self.course_waffle_flags}
+        res = {flag: enabled for flag in self.course_waffle_flags}
+        res["enable_course_optimizer"] = enabled
+        return res
 
     def test_get_course_waffle_flags_with_course_id(self):
         """
